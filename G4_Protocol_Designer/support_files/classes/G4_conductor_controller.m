@@ -695,16 +695,20 @@ classdef G4_conductor_controller < handle
             %Need to know how many frames each pattern in each trial has
             %in case the frame index on any of them needs to be randomized.
             if ~isempty(pretrial{1})
-                parameters.num_pretrial_frames = length(self.doc.Patterns.(pretrial{2}).pattern.Pats(1,1,:));
+                prepat_field = self.doc.get_pattern_field_name(pretrial{2});
+                parameters.num_pretrial_frames = length(self.doc.Patterns.(prepat_field).pattern.Pats(1,1,:));
             end
             if ~isempty(intertrial{1})
-                parameters.num_intertrial_frames = length(self.doc.Patterns.(intertrial{2}).pattern.Pats(1,1,:));
+                interpat_field = self.doc.get_pattern_field_name(intertrial{2});
+                parameters.num_intertrial_frames = length(self.doc.Patterns.(interpat_field).pattern.Pats(1,1,:));
             end
             if ~isempty(posttrial{1})
-                parameters.num_posttrial_frames = length(self.doc.Patterns.(posttrial{2}).pattern.Pats(1,1,:));
+                postpat_field = self.doc.get_pattern_field_name(posttrial{2});
+                parameters.num_posttrial_frames = length(self.doc.Patterns.(postpat_field).pattern.Pats(1,1,:));
             end
             for i = 1:length(block_trials(:,1))
-                parameters.num_block_frames(i) = length(self.doc.Patterns.(block_trials{i,2}).pattern.Pats(1,1,:));
+                blockpat_field = self.doc.get_pattern_field_name(block_trials{i,2});
+                parameters.num_block_frames(i) = length(self.doc.Patterns.(blockpat_field).pattern.Pats(1,1,:));
             end
             
             %Create experiment order .mat file and add the trial order to

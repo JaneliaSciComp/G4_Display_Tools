@@ -8,6 +8,9 @@ classdef G4_document < handle
         Patterns_
         Pos_funcs_
         Ao_funcs_
+        imported_pattern_names_
+        imported_posfunc_names_
+        imported_aofunc_names_
         binary_files_
         save_filename_
         currentExp_
@@ -43,6 +46,9 @@ classdef G4_document < handle
         Patterns
         Pos_funcs
         Ao_funcs
+        imported_pattern_names
+        imported_posfunc_names
+        imported_aofunc_names
         binary_files
         save_filename
         currentExp
@@ -80,6 +86,9 @@ classdef G4_document < handle
             self.Patterns = struct;
             self.Pos_funcs = struct;
             self.Ao_funcs = struct;
+            self.imported_pattern_names = {};
+            self.imported_posfunc_names = {};
+            self.imported_aofunc_names = {};
             self.binary_files.pats = struct;
             self.binary_files.funcs = struct;
             self.binary_files.ao = struct;
@@ -213,8 +222,9 @@ classdef G4_document < handle
                 end
                 
                 if index(2) == 2 && ~strcmp(string(new_value),'')
-                    patfield = new_value;
-                    if ~isfield(self.Patterns, patfield)
+                    patfile = new_value;
+                    patfield = self.get_pattern_field_name(patfile);
+                    if strcmp(patfield, '')
                         waitfor(errordlg("That filename does not match any imported files."));
                         return;
                     end
@@ -223,8 +233,9 @@ classdef G4_document < handle
                     numrows = self.num_rows;
                 
                     if ~strcmp(string(self.block_trials{index(1),3}),'')
-
-                        posfield = self.block_trials{index(1),3};
+                        
+                        posfile = self.block_trials{index(1),3};
+                        posfield = self.get_posfunc_field_name(posfile);
                         funcDim = max(self.Pos_funcs.(posfield).pfnparam.func);
 
                     else
@@ -236,12 +247,15 @@ classdef G4_document < handle
 
                 elseif index(2) == 3 && ~strcmp(string(new_value),'') && ~strcmp(string(self.block_trials{index(1),2}),'')
 
-                    posfield = new_value;
-                    if ~isfield(self.Pos_funcs, posfield)
+                    posfile = new_value;
+                    posfield = self.get_posfunc_field_name(posfile);
+                    if strcmp(posfield,'')
                         waitfor(errordlg("That filename does not match any imported files."));
                         return;
                     end
-                    patfield = self.block_trials{index(1),2};
+                    
+                    patfile = self.block_trials{index(1),2};
+                    patfield = self.get_pattern_field_name(patfile);
                     patDim = length(self.Patterns.(patfield).pattern.Pats(1,1,:));
                     funcDim = max(self.Pos_funcs.(posfield).pfnparam.func);
                     patRows = 0;
@@ -254,7 +268,9 @@ classdef G4_document < handle
                 end
                 
                 if index(2) > 3 && index(2) < 8 && ~strcmp(string(new_value),'')
-                    if ~isfield(self.Ao_funcs, new_value)
+                    aofile = new_value;
+                    aofield = self.get_aofunc_field_name(aofile);
+                    if strcmp(aofield,'')
                         waitfor(errordlg("That filename does not match any imported files."));
                         return;
                     end
@@ -274,7 +290,8 @@ classdef G4_document < handle
 
                     associated_pattern = self.block_trials{index(1),2};
                     if ~isempty(associated_pattern)
-                        num_pat_frames = length(self.Patterns.(associated_pattern).pattern.Pats(1,1,:));
+                        patfield = self.get_pattern_field_name(associated_pattern);
+                        num_pat_frames = length(self.Patterns.(patfield).pattern.Pats(1,1,:));
                         if chars == 0
                             if str2num(new_value) > num_pat_frames
                                 waitfor(errordlg("Please make sure your frame index is within the bounds of your pattern."));
@@ -336,9 +353,7 @@ classdef G4_document < handle
             end
             end
         end
-        
-%%%%%%%%%%%%%%%%%%%Consider making the dimension checking a single separate
-%%%%%%%%%%%%%%%%%%%function
+
 
 %Same as above for pretrial, intertrial, and posttrial
 
@@ -357,8 +372,9 @@ classdef G4_document < handle
             
             
             if index == 2 && strcmp(string(new_value),'') == 0
-                patfield = new_value;
-                if ~isfield(self.Patterns, patfield)
+                patfile = new_value;
+                patfield = self.get_pattern_field_name(patfile);
+                if strcmp(patfield,'')
                     waitfor(errordlg("That filename does not match any imported files."));
                     return;
                 end
@@ -367,7 +383,8 @@ classdef G4_document < handle
                 numrows = self.num_rows;
                 if strcmp(string(self.pretrial{3}),'') == 0
                     
-                    posfield = self.pretrial{3};
+                    posfile = self.pretrial{3};
+                    posfield = self.get_posfunc_field_name(posfile);
                     funcDim = max(self.Pos_funcs.(posfield).pfnparam.func);
                     
                 else
@@ -378,13 +395,14 @@ classdef G4_document < handle
                 end
                     
             elseif index == 3 && strcmp(string(new_value),'') == 0 && strcmp(string(self.pretrial{2}),'') == 0
-
-                posfield = new_value;
-                if ~isfield(self.Pos_funcs, posfield)
+                posfile = new_value;
+                posfield = self.get_posfunc_field_name(posfile);
+                if strcmp(posfield,'')
                     waitfor(errordlg("That filename does not match any imported files."));
                     return;
                 end
-                patfield = self.pretrial{2};
+                patfile = self.pretrial{2};
+                patfield = self.get_pattern_field_name(patfile);
                 patDim = length(self.Patterns.(patfield).pattern.Pats(1,1,:));
                 funcDim = max(self.Pos_funcs.(posfield).pfnparam.func);
                 patRows = 0;
@@ -397,7 +415,9 @@ classdef G4_document < handle
             end
             
             if index > 3 && index < 8 && ~strcmp(string(new_value),'')
-                if ~isfield(self.Ao_funcs, new_value)
+                aofile = new_value;
+                aofield = self.get_aofunc_field_name(aofile);
+                if strcmp(aofield,'')
                     waitfor(errordlg("That filename does not match any imported files."));
                     return;
                 end
@@ -419,7 +439,8 @@ classdef G4_document < handle
                end
                 associated_pattern = self.pretrial{2};
                 if ~isempty(associated_pattern)
-                    num_pat_frames = length(self.Patterns.(associated_pattern).pattern.Pats(1,1,:));
+                    patfield = self.get_pattern_field_name(associated_pattern);
+                    num_pat_frames = length(self.Patterns.(patfield).pattern.Pats(1,1,:));
                     if chars == 0
                         if str2num(new_value) > num_pat_frames
                             waitfor(errordlg("Please make sure your frame index is within the bounds of your pattern."));
@@ -495,8 +516,9 @@ classdef G4_document < handle
             end
             
            if index == 2 && strcmp(string(new_value),'') == 0
-                patfield = new_value;
-                if ~isfield(self.Patterns, patfield)
+                patfile = new_value;
+                patfield = self.get_pattern_field_name(patfile);
+                if strcmp(patfield,'')
                     waitfor(errordlg("That filename does not match any imported files."));
                     return;
                 end
@@ -505,7 +527,8 @@ classdef G4_document < handle
                 numrows = self.num_rows;
                 if strcmp(string(self.intertrial{3}),'') == 0
                     
-                    posfield = self.intertrial{3};
+                    posfile = self.intertrial{3};
+                    posfield = self.get_posfunc_field_name(posfile);
                     funcDim = max(self.Pos_funcs.(posfield).pfnparam.func);
                     
                 else
@@ -516,13 +539,15 @@ classdef G4_document < handle
                 end
                     
             elseif index == 3 && strcmp(string(new_value),'') == 0 && strcmp(string(self.intertrial{2}),'') == 0
-
-                posfield = new_value;
-                if ~isfield(self.Pos_funcs, posfield)
+                posfile = new_value;
+                posfield = self.get_posfunc_field_name(posfile);
+                if strcmp(posfield,'')
                     waitfor(errordlg("That filename does not match any imported files."));
                     return;
                 end
-                patfield = self.intertrial{2};
+                
+                patfile = self.intertrial{2};
+                patfield = self.get_pattern_field_name(patfile);
                 patDim = length(self.Patterns.(patfield).pattern.Pats(1,1,:));
                 funcDim = max(self.Pos_funcs.(posfield).pfnparam.func);
                 patRows = 0;
@@ -535,7 +560,9 @@ classdef G4_document < handle
            end
             
            if index > 3 && index < 8 && ~strcmp(string(new_value),'')
-                if ~isfield(self.Ao_funcs, new_value)
+                aofile = new_value;
+                aofield = self.get_aofunc_field_name(aofile);
+                if strcmp(aofield,'')
                     waitfor(errordlg("That filename does not match any imported files."));
                     return;
                 end
@@ -554,7 +581,8 @@ classdef G4_document < handle
                end
                 associated_pattern = self.intertrial{2};
                 if ~isempty(associated_pattern)
-                    num_pat_frames = length(self.Patterns.(associated_pattern).pattern.Pats(1,1,:));
+                    patfield = self.get_pattern_field_name(associated_pattern);
+                    num_pat_frames = length(self.Patterns.(patfield).pattern.Pats(1,1,:));
                     if chars == 0
                         if str2num(new_value) > num_pat_frames
                             waitfor(errordlg("Please make sure your frame index is within the bounds of your pattern."));
@@ -630,8 +658,9 @@ classdef G4_document < handle
             %If the user edited the pattern or position function, make sure
             %the file dimensions match
             if index == 2 && strcmp(string(new_value),'') == 0
-                patfield = new_value;
-                if ~isfield(self.Patterns, patfield)
+                patfile = new_value;
+                patfield = self.get_pattern_field_name(patfile);
+                if strcmp(patfield,'')
                     waitfor(errordlg("That filename does not match any imported files."));
                     return;
                 end
@@ -640,7 +669,8 @@ classdef G4_document < handle
                 numrows = self.num_rows;
                 if strcmp(string(self.posttrial{3}),'') == 0
                     
-                    posfield = self.posttrial{3};
+                    posfile = self.posttrial{3};
+                    posfield = self.get_posfunc_field_name(posfile);
                     funcDim = max(self.Pos_funcs.(posfield).pfnparam.func);
                     
                 else
@@ -651,13 +681,15 @@ classdef G4_document < handle
                 end
                     
             elseif index == 3 && strcmp(string(new_value),'') == 0 && strcmp(string(self.posttrial{2}),'') == 0
-
-                posfield = new_value;
+                posfile = new_value;
+                posfield = self.get_posfunc_field_name(posfile);
                 if ~isfield(self.Pos_funcs, posfield)
                     waitfor(errordlg("That filename does not match any imported files."));
                     return;
                 end
-                patfield = self.posttrial{2};
+                
+                patfile = self.posttrial{2};
+                patfield = self.get_pattern_field_name(patfile);
                 patDim = length(self.Patterns.(patfield).pattern.Pats(1,1,:));
                 funcDim = max(self.Pos_funcs.(posfield).pfnparam.func);
                 patRows = 0;
@@ -670,7 +702,9 @@ classdef G4_document < handle
             end
             
             if index > 3 && index < 8 && ~strcmp(string(new_value),'')
-                if ~isfield(self.Ao_funcs, new_value)
+                aofile = new_value;
+                aofield = self.get_aofunc_field_name(aofile);
+                if strcmp(aofield,'')
                     waitfor(errordlg("That filename does not match any imported files."));
                     return;
                 end
@@ -689,7 +723,8 @@ classdef G4_document < handle
                end
                 associated_pattern = self.posttrial{2};
                 if ~isempty(associated_pattern)
-                    num_pat_frames = length(self.Patterns.(associated_pattern).pattern.Pats(1,1,:));
+                    patfield = self.get_pattern_field_name(associated_pattern);
+                    num_pat_frames = length(self.Patterns.(patfield).pattern.Pats(1,1,:));
                     if chars == 0
                         if str2num(new_value) > num_pat_frames
                             waitfor(errordlg("Please make sure your frame index is within the bounds of your pattern."));
@@ -903,8 +938,8 @@ classdef G4_document < handle
             
             
             for i = 1:length(pat_list)
-
-                id = num2str(self.Patterns.(pat_list{i}).pattern.param.ID);
+                field = self.get_pattern_field_name(pat_list{i});
+                id = num2str(self.Patterns.(field).pattern.param.ID);
                 add_zeros = 4 - numel(id);
                 for j = 1:add_zeros
                     id = strcat("0",id);
@@ -917,8 +952,9 @@ classdef G4_document < handle
             
             if ~strcmp(func_list{1},'')
                 for i = 1:length(func_list)
+                    field = self.get_posfunc_field_name(func_list{i});
 
-                    id = num2str(self.Pos_funcs.(func_list{i}).pfnparam.ID);
+                    id = num2str(self.Pos_funcs.(field).pfnparam.ID);
                     add_zeros = 4 - numel(id);
                     for j = 1:add_zeros
                         id = strcat("0",id);
@@ -930,7 +966,8 @@ classdef G4_document < handle
             end
             if ~strcmp(ao_list{1},'')
                 for i = 1:length(ao_list)
-                    id = num2str(self.Ao_funcs.(ao_list{i}).afnparam.ID);
+                    field = self.get_aofunc_field_name(ao_list{i});
+                    id = num2str(self.Ao_funcs.(field).afnparam.ID);
                     add_zeros = 4 - numel(id);
                     for j = 1:add_zeros
                         id = strcat("0",id);
@@ -942,6 +979,77 @@ classdef G4_document < handle
             end
         
         end
+        
+        
+%GIVEN THE PATTERN'S FIELD NAME, GET THE FILE NAME------------------------
+
+        function [field_name] = get_pattern_field_name(self, filename)
+            if isempty(fieldnames(self.Patterns))
+                field_name = '';
+            else
+                imported_pattern_fields = fieldnames(self.Patterns);
+                for i = 1:length(imported_pattern_fields)
+                    is_match(i) = strcmp(self.Patterns.(imported_pattern_fields{i}).filename, filename);
+                end
+
+                idx = find(is_match,1);
+                if ~isempty(idx)
+                    field_name = imported_pattern_fields{idx};
+                else
+                    field_name = '';
+                end
+            end
+
+        end
+        
+        function [field_name] = get_posfunc_field_name(self, filename)
+            if isempty(fieldnames(self.Pos_funcs))
+                field_name = '';
+            else
+                imported_func_fields = fieldnames(self.Pos_funcs);
+                for i = 1:length(imported_func_fields)
+                    is_match(i) = strcmp(self.Pos_funcs.(imported_func_fields{i}).filename, filename);
+                end
+                idx = find(is_match,1);
+                if ~isempty(idx)
+                    field_name = imported_func_fields{idx};
+                else
+                    field_name = '';
+                end
+                
+            end
+
+        end
+        
+        function [field_name] = get_aofunc_field_name(self, filename)
+            if isempty(fieldnames(self.Ao_funcs))
+                field_name = '';
+            else
+                imported_ao_fields = fieldnames(self.Ao_funcs);
+                for i = 1:length(imported_ao_fields)
+                    is_match(i) = strcmp(self.Ao_funcs.(imported_ao_fields{i}).filename, filename);
+                end
+                idx = find(is_match,1);
+                if ~isempty(idx)
+                    field_name = imported_ao_fields{idx};
+                else
+                    field_name = '';
+                end
+                
+            end
+
+        end
+
+
+
+%GIVEN THE PATTERN'S FILE NAME, GET THE FIELD NAME
+
+        function [filename] =  get_pattern_filename(self, field_name)
+            
+            filename = self.Patterns.(field_name).filename;
+
+        end
+
         
 %UPDATE THE CONFIG FILE----------------------------------------------------
 
@@ -1009,8 +1117,10 @@ classdef G4_document < handle
 
                     num_funcs = length(func_list);
                     for m = 1:num_funcs
-                        field = func_list{m};
-                        filename = strcat(field, '.mat');
+                        file = func_list{m};
+                        field = self.get_posfunc_field_name(file);
+
+                        filename = strcat(file, '.mat');
                         filepath = fullfile(funcpath, filename);
                         pfnparam = self.Pos_funcs.(field).pfnparam;
                         save(filepath, 'pfnparam');
@@ -1036,14 +1146,15 @@ classdef G4_document < handle
                    
                    num_ao = length(ao_list);
                    for n = 1:num_ao
-                    
-                        field = ao_list{n};
-                        filename = strcat(field, '.mat');
+                        file = ao_list{n};
+                        field = self.get_aofunc_field_name(file);
+                        filename = strcat(file, '.mat');
                         filepath = fullfile(aopath, filename);
                         afnparam = self.Ao_funcs.(field).afnparam;
                         save(filepath, 'afnparam');
                    end
                    num_afn = length(ao_bin_list);
+                   
                    for i = 1:num_afn
                        
                        afnName = ao_bin_list{i};
@@ -1059,10 +1170,12 @@ classdef G4_document < handle
 
                
                num_pats = length(pat_list);
+               pattNames = cell(num_pats);
                for k = 1:num_pats
                     
-                    field = pat_list{k};
-                    filename = strcat(field,'.mat');
+                    file = pat_list{k};
+                    field = self.get_pattern_field_name(file);
+                    filename = strcat(file,'.mat');
                     pattNames{k} = filename;
                     filepath = fullfile(patpath, filename);
                     pattern = self.Patterns.(field).pattern;
@@ -1071,6 +1184,7 @@ classdef G4_document < handle
                end
                
                num_bins = length(pat_bin_list);
+               patternList = cell(num_bins);
                for j = 1:num_bins
                    
                     patname = pat_bin_list{j}; 
@@ -1113,12 +1227,13 @@ classdef G4_document < handle
                
                %newcurrentExp.pattern
                 for j = 1:num_pats
-                    field = pat_list{j};
+                    file = pat_list{j};
+                    field = self.get_pattern_field_name(file);
                     newcurrentExp.pattern.x_num(j) = self.Patterns.(field).pattern.x_num;
                     newcurrentExp.pattern.y_num(j) = self.Patterns.(field).pattern.y_num;
                     newcurrentExp.pattern.gs_val(j) = self.Patterns.(field).pattern.gs_val;
                     newcurrentExp.pattern.arena_pitch(j) = self.Patterns.(field).pattern.param.arena_pitch;
-                    pat_list{j} = strcat(field, '.mat');
+                    pat_list{j} = strcat(file, '.mat');
                     
                 end
                 newcurrentExp.pattern.pattNames = pattNames;
@@ -1128,9 +1243,10 @@ classdef G4_document < handle
                 %newcurrentExp.function
                 if ~strcmp(func_list{1},'')
                     for k = 1:num_funcs
-                        field = func_list{k};
+                        file = func_list{k};
+                        field = self.get_posfunc_field_name(file);
                         newcurrentExp.function.functionSize{k} = self.Pos_funcs.(field).pfnparam.size;
-                        func_list{k} = strcat(field, '.mat');
+                        func_list{k} = strcat(file, '.mat');
                         newcurrentExp.function.functionName{k} = func_list{k};
                         func_bin_list{k} = strcat(func_bin_list{k},'.pfn');
                     end
@@ -1141,9 +1257,10 @@ classdef G4_document < handle
                 
                 if ~strcmp(ao_list{1},'')
                     for p = 1:num_ao
-                        field = ao_list{p};
+                        file = ao_list{p};
+                        field = self.get_aofunc_field_name(file);
                         newcurrentExp.aoFunction.aoFunctionSize{p} = self.Ao_funcs.(field).afnparam.size;  
-                        ao_list{p} = strcat(field, '.mat');
+                        ao_list{p} = strcat(file, '.mat');
                         ao_bin_list{p} = strcat(ao_bin_list{p},'.afn');
                     end
                     newcurrentExp.aoFunction.aoFunctionName = ao_list;
@@ -1263,7 +1380,7 @@ classdef G4_document < handle
 
             file_full = fullfile(path, file);
             [filepath, name, ext] = fileparts(file_full);
-            
+
             if strcmp(ext, '.mat') == 0
                 
                 waitfor(errordlg("Please make sure you are importing a .mat file"));
@@ -1284,11 +1401,18 @@ classdef G4_document < handle
                     waitfor(errordlg("Please make sure the patterns you import match the number of rows you have selected."));
                     return;
                 end
-                if isfield(self.Patterns, name) == 1
+                pat_already_present = sum(count(self.imported_pattern_names,name)); %if 0, it's not present, if 1 it is.
+                if pat_already_present > 1
+                    waitfor(errordlg("This pattern name is present multiple times in the imported patterns."));
+                    return;
+                elseif pat_already_present == 1
                     waitfor(errordlg("A pattern of that name has already been imported."));
                     return;
                 else
-                    self.Patterns.(name) = fileData;
+                    self.imported_pattern_names{end+1} = name;
+                    fieldname = "Pattern" + length(self.imported_pattern_names);
+                    fileData.filename = name;
+                    self.Patterns.(fieldname) = fileData;
                     success_message = "One Pattern file imported successfully.";
                     
                     %If they are importing an individual file, we must try
@@ -1311,12 +1435,22 @@ classdef G4_document < handle
                 
             elseif strcmp(type{1},'pfnparam') == 1
                 
-                if isfield(self.Pos_funcs, name) == 1
-                    waitfor(errordlg("A Position Function of that name has already been imported."));
+                pos_already_present = sum(count(self.imported_posfunc_names,name)); %if 0, it's not present, if 1 it is.
+                if pos_already_present > 1
+                    waitfor(errordlg("This position function is present multiple times in the imported functions."));
+                    return;
+                elseif pos_already_present == 1
+                    waitfor(errordlg("A position function of that name has already been imported."));
                     return;
                 else
-                    self.Pos_funcs.(name) = fileData;
-                    success_message = "One Position function imported successfully.";
+                    self.imported_posfunc_names{end+1} = name;
+                    fieldname = "Function" + length(self.imported_posfunc_names);
+                    fileData.filename = name;
+                    self.Pos_funcs.(fieldname) = fileData;
+                    success_message = "One Position Function imported successfully.";
+                    
+                    %create binary file name
+               
                     bin_ext = '.pfn';
                     id = num2str(fileData.pfnparam.ID);
                     num_zeroes_to_add = 4 - numel(id);
@@ -1333,12 +1467,22 @@ classdef G4_document < handle
                 
             elseif strcmp(type{1},'afnparam') == 1
                 
-                if isfield(self.Ao_funcs, name) == 1
-                    waitfor(errordlg("An Analog Output Function of that name has already been imported."));
+                ao_already_present = sum(count(self.imported_aofunc_names,name)); %if 0, it's not present, if 1 it is.
+                if ao_already_present > 1
+                    waitfor(errordlg("This ao function is present multiple times in the imported functions."));
+                    return;
+                elseif ao_already_present == 1
+                    waitfor(errordlg("An AO function of that name has already been imported."));
                     return;
                 else
-                    self.Ao_funcs.(name) = fileData;
+                    self.imported_aofunc_names{end+1} = name;
+                    fieldname = "AOFunction" + length(self.imported_aofunc_names);
+                    fileData.filename = name;
+                    self.Ao_funcs.(fieldname) = fileData;
                     success_message = "One AO Function imorted successfully.";
+                    
+                    %create binary file name
+                    
                     bin_ext = '.afn';
                     id = num2str(fileData.afnparam.ID);
                     num_zeroes_to_add = 4 - numel(id);
@@ -1427,7 +1571,7 @@ classdef G4_document < handle
         end
 
         
-        function [file_names, folder_names] = get_file_folder_names(self,path)
+        function [file_names, folder_names] = get_file_folder_names(self, path)
             
             all = dir(path);
             isub = [all(:).isdir];
@@ -1503,7 +1647,6 @@ classdef G4_document < handle
 
                     elseif strcmp(ext, '.mat') == 1
                         type = fieldnames(load(full_file_path));
-                        
 
                         if strcmp(type{1},'pattern') == 1
                             patData = load(full_file_path);
@@ -1512,24 +1655,40 @@ classdef G4_document < handle
                                 waitfor(errordlg("Please make sure the patterns you import match the number of rows you have selected."));
                                 return;
                             end
-                            if isfield(self.Patterns, name) == 1
+                            
+                            pat_already_present = sum(count(self.imported_pattern_names,name)); %if 0, it's not present, if 1 it is.
+                                
+                            if pat_already_present >= 1
                                 skipped_patterns = skipped_patterns + 1;
                             else
-                                self.Patterns.(name) = load(full_file_path);
+                                self.imported_pattern_names{end+1} = name;
+                                patfield = "Pattern" + length(self.imported_pattern_names);
+                                patData.filename = name;
+                                self.Patterns.(patfield) = patData;
                                 imported_patterns = imported_patterns + 1;
                             end
                         elseif strcmp(type{1},'pfnparam') == 1
-                            if isfield(self.Pos_funcs, name) == 1
+                            posData = load(full_file_path);
+                            pos_already_present = sum(count(self.imported_posfunc_names, name));
+                            if pos_already_present >= 1
                                 skipped_functions = skipped_functions + 1;
                             else
-                                self.Pos_funcs.(name) = load(full_file_path);
+                                self.imported_posfunc_names{end+1} = name;
+                                posfield = "Function" + length(self.imported_posfunc_names);
+                                posData.filename = name;
+                                self.Pos_funcs.(posfield) = posData;
                                 imported_functions = imported_functions + 1;
                             end
                         elseif strcmp(type{1},'afnparam') == 1
-                            if isfield(self.Ao_funcs, name) == 1
+                            aoData = load(full_file_path);
+                            ao_already_present = sum(count(self.imported_aofunc_names, name));
+                            if ao_already_present >= 1
                                 skipped_aos = skipped_aos + 1;
                             else
-                                self.Ao_funcs.(name) = load(full_file_path);
+                                self.imported_aofunc_names{end+1} = name;
+                                aofield = "AOFunction" + length(self.imported_aofunc_names);
+                                aoData.filename = name;
+                                self.Ao_funcs.(aofield) = aoData;
                                 imported_aos = imported_aos + 1;
                             end
 
@@ -1543,7 +1702,7 @@ classdef G4_document < handle
                             
                         else
                             disp("Unrecognized field")
-                        disp(strcat(name,ext))
+                            disp(strcat(name,ext))
                             unrecognized_files = unrecognized_files + 1;
                         end
                         
@@ -1836,6 +1995,17 @@ classdef G4_document < handle
             self.binary_files_ = value;
         end
         
+        function set.imported_pattern_names(self,value)
+            self.imported_pattern_names_ = value;
+        end
+        
+        function set.imported_posfunc_names(self, value)
+            self.imported_posfunc_names_ = value;
+        end
+        
+        function set.imported_aofunc_names(self, value)
+            self.imported_aofunc_names_ = value;
+        end
         %Getters
         
         
@@ -1937,6 +2107,18 @@ classdef G4_document < handle
         
         function output = get.binary_files(self)
             output = self.binary_files_;
+        end
+        
+        function output = get.imported_pattern_names(self)
+            output = self.imported_pattern_names_;
+        end
+        
+        function output = get.imported_posfunc_names(self)
+            output = self.imported_posfunc_names_;
+        end
+        
+        function output = get.imported_aofunc_names(self)
+            output = self.imported_aofunc_names_;
         end
         
 

@@ -1026,17 +1026,53 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
         pat_index = 1; %Keeps track of the indices of patterns that are actually displayed (not cut due to screen size discrepancy)
         pat_indices = []; %A record of all pattern indices that match the screen size.
         
-        doc = self.doc;
-        pat_names = fieldnames(doc.Patterns_);
-        if ~isempty(fieldnames(doc.Pos_funcs))
+        d = self.doc;
+        
+        pat_fields = fieldnames(d.Patterns);
+        %Create an array of ID values from each pattern field
+        for i = 1:length(pat_fields)
+            pattern_ids{i} = d.Patterns.(pat_fields{i}).pattern.param.ID;
+        end
+        
+        %Create an array of actual pattern names in order by ID, so if you
+        %imported pattern0008, then pattern0001, then pattern0003, it will
+        %still autofill 0001, 0003, 0008.
+        pat_names = cell(length(pat_fields),1);
+        for k = 1:length(pat_fields)
+            [val, idx] = min(cell2mat(pattern_ids));
+            pat_names{k} = d.Patterns.(pat_fields{idx}).filename;
+            pattern_ids{idx} = 100000;
+        
+        end
+        
+        if ~isempty(fieldnames(d.Pos_funcs))
             
-            pos_names = fieldnames(doc.Pos_funcs);
+            pos_fields = fieldnames(d.Pos_funcs);
+            pos_names = cell(length(pos_fields),1);
+            for i = 1:length(pos_fields)
+                pos_ids{i} = d.Pos_funcs.(pos_fields{i}).pfnparam.ID;
+            end
+            for j = 1:length(pos_fields)
+                [val, idx] = min(cell2mat(pos_ids));
+                pos_names{j} = d.Pos_funcs.(pos_fields{idx}).filename;
+                pos_ids{idx} = 100000;
+            end
+        
         else
             pos_names = [];
         end
-        if ~isempty(fieldnames(doc.Ao_funcs))
+        if ~isempty(fieldnames(d.Ao_funcs))
             
-            ao_names = fieldnames(doc.Ao_funcs);
+            ao_fields = fieldnames(d.Ao_funcs);
+            ao_names = cell(length(ao_fields),1);
+            for i = 1:length(ao_fields)
+                ao_ids{i} = d.Ao_funcs.(ao_fields{i}).afnparam.ID;
+            end
+            for j = 1:length(ao_fields)
+                [val, idx] = min(cell2mat(ao_ids));
+                ao_names{j} = d.Ao_funcs.(ao_fields{idx}).filename;
+                ao_ids{idx} = 100000;
+            end
         else
             ao_names = [];
         end
@@ -1046,16 +1082,17 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
         num_ao = length(ao_names);
 
         pat1 = pat_names{pat_index};
+        pat1_field = d.get_pattern_field_name(pat1);
         
-        if length(doc.Patterns.(pat1).pattern.Pats(:,1,1))/16 ~= self.doc.num_rows
-            while length(doc.Patterns.(pat1).pattern.Pats(:,1,1)) ~= self.doc.num_rows && pat_index < length(pat_names)
+        if length(d.Patterns.(pat1_field).pattern.Pats(:,1,1))/16 ~= self.doc.num_rows
+            while length(d.Patterns.(pat1_field).pattern.Pats(:,1,1)) ~= self.doc.num_rows && pat_index < length(pat_names)
                 pat_index = pat_index + 1;
                 pat1 = pat_names{pat_index};
             end
             
         end
         
-        if pat_index == length(pat_names) && length(doc.Patterns.(pat1).pattern.Pats(:,1,1))/16 ~= self.doc.num_rows
+        if pat_index == length(pat_names) && length(d.Patterns.(pat1_field).pattern.Pats(:,1,1))/16 ~= self.doc.num_rows
             waitfor(errordlg("None of the patterns imported match the screen size selected. Please import a different folder or select a new screen size"));
             return;
         end
@@ -1074,8 +1111,9 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
         
         if num_pos ~= 0
             pos1 = pos_names{pos_index}; %Set initial position and ao functions to correspond to initial pattern.
-            if length(doc.Patterns.(pat1).pattern.Pats(1,1,:)) < ...
-                max(doc.Pos_funcs.(pos1).pfnparam.func)
+            pos1_field = d.get_posfunc_field_name(pos1);
+            if length(d.Patterns.(pat1_field).pattern.Pats(1,1,:)) < ...
+                max(d.Pos_funcs.(pos1_field).pfnparam.func)
             pos1 = '';
             end
         else
@@ -1084,6 +1122,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
         end
         if num_ao ~= 0
             ao1 = ao_names{ao_index};
+            ao1_field = d.get_aofunc_field_name(ao1);
         else
             ao1 = '';
         end    
@@ -1093,21 +1132,21 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
         
 
         
-        self.doc.set_pretrial_property(2, pat1);
-        self.doc.set_pretrial_property(3, pos1);
-        self.doc.set_pretrial_property(4, ao1);
+        d.set_pretrial_property(2, pat1);
+        d.set_pretrial_property(3, pos1);
+        d.set_pretrial_property(4, ao1);
         
-        self.doc.set_intertrial_property(2, pat1);
-        self.doc.set_intertrial_property(3, pos1);
-        self.doc.set_intertrial_property(4, ao1);
+        d.set_intertrial_property(2, pat1);
+        d.set_intertrial_property(3, pos1);
+        d.set_intertrial_property(4, ao1);
         
-        self.doc.set_posttrial_property(2, pat1);
-        self.doc.set_posttrial_property(3, pos1);
-        self.doc.set_posttrial_property(4, ao1);
+        d.set_posttrial_property(2, pat1);
+        d.set_posttrial_property(3, pos1);
+        d.set_posttrial_property(4, ao1);
         
-        self.doc.set_block_trial_property([1,2], pat1);
-        self.doc.set_block_trial_property([1,3], pos1);
-        self.doc.set_block_trial_property([1,4], ao1);
+        d.set_block_trial_property([1,2], pat1);
+        d.set_block_trial_property([1,3], pos1);
+        d.set_block_trial_property([1,4], ao1);
         
        
         
@@ -1121,11 +1160,13 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
             for i = pat_index:num_pats
                 
                 pat = pat_names{pat_index};
+                pat_field = d.get_pattern_field_name(pat);
                 if num_pos ~= 0
                     if pos_index > num_pos %Make sure indices are in range 
                         pos_index = 1;
                     end
                     pos = pos_names{pos_index};
+                    pos_field = d.get_posfunc_field_name(pos);
                 else
                     
                     pos = '';
@@ -1137,21 +1178,22 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                         ao_index = 1;
                     end
                     ao = ao_names{ao_index};
+                    ao_field = d.get_aofunc_field_name(ao);
                 else
                     ao = '';
                 end
                 
                 
-                if length(doc.Patterns.(pat).pattern.Pats(:,1,1))/16 ~= self.doc.num_rows
+                if length(d.Patterns.(pat_field).pattern.Pats(:,1,1))/16 ~= d.num_rows
                     pat_index = pat_index + 1;
                     pos_index = pos_index + 1;
                     ao_index = ao_index + 1;
                     
                     continue;
                 end
-                
+                %Only executes if previous if statement did not. Sets new row's pattern
                 newrow = self.doc.block_trials(end, 1:end);
-                newrow{2} = pat_names{pat_index}; %Only executes if previous if statement did not. Sets new row's pattern
+                newrow{2} = pat; 
 
                 newrow{3} = pos; 
 
@@ -1163,13 +1205,13 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                 ao_index = ao_index + 1;
                 
                 if ~strcmp(newrow{3},'')
-                    if length(doc.Patterns.(newrow{2}).pattern.Pats(1,1,:)) < ...
-                           max(doc.Pos_funcs.(newrow{3}).pfnparam.func)
+                    if length(d.Patterns.(pat_field).pattern.Pats(1,1,:)) < ...
+                           max(d.Pos_funcs.(pos_field).pfnparam.func)
                         newrow{3} = '';
                     end
                 end
 
-                self.doc.set_block_trial_property([j,1],newrow);
+                d.set_block_trial_property([j,1],newrow);
                 self.block_files.pattern(end + 1) = string(newrow{2});
                 self.block_files.position(end + 1) = string(newrow{3});
  
@@ -1569,17 +1611,19 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
 %IN SCREEN PREVIEW OF SELECTED CELL----------------------------------------
 
         function preview_selection(self, src, event, positions)
-            %disp(event.Indices);
+            
+    %When a new cell is selected, first delete the current preview axes if
+    %there
             delete(self.hAxes);
             delete(self.second_axes);
-            if isempty(event.Indices) == 0
+            
+      %Next assuming a valid cell was selected, get the index of the selection
+      %and determine which table it took place in.
+            if ~isempty(event.Indices)
                 
                 x_event_index = event.Indices(1);
                 y_event_index = event.Indices(2);
-                
                 self.model.current_selected_cell.index = event.Indices;
-                 %A new file has been selected so preview starts over at frame 1
-                
                 if y_event_index > 1 && y_event_index< 8
 
                     file = string(src.Data(x_event_index, y_event_index));
@@ -1589,338 +1633,74 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                     file = '';
                     
                 end
-                
-               
-                
-                 if src.Position == positions.pre
+                if src.Position == positions.pre
                     self.model.current_selected_cell.table = "pre";
-                    mode = self.doc.pretrial{1};
-                    
-                    if ~isempty(src.Data(x_event_index,y_event_index)) && ~isempty(self.doc.pretrial{2})
-                        if mode == 2
-                            frame_rate = self.doc.pretrial{9};
-                        else
-                            pat = self.doc.pretrial{2};
-                            if self.doc.Patterns.(pat).pattern.gs_val == 1
-                                frame_rate = 1000;
-                            else 
-                                frame_rate = 500;
-                            end
-                        end
-                    end
-                    dur = self.doc.pretrial{12}*1000;
                 elseif src.Position == positions.inter
-                    
                     self.model.current_selected_cell.table = "inter";
-                    mode = self.doc.intertrial{1};
-                    if ~isempty(src.Data(x_event_index,y_event_index)) && ~isempty(self.doc.intertrial{2})
-                        if mode == 2
-                            frame_rate = self.doc.intertrial{9};
-                        else
-                            pat = self.doc.intertrial{2};
-                            if self.doc.Patterns.(pat).pattern.gs_val == 1
-                                frame_rate = 1000;
-                            else 
-                                frame_rate = 500;
-                            end
-                        end
-                    end
-                    dur = self.doc.intertrial{12}*1000;
                 elseif src.Position == positions.block
                     self.model.current_selected_cell.table = "block";
-                    mode = self.doc.block_trials{x_event_index, 1};
-                    if ~isempty(src.Data(x_event_index,y_event_index)) && ~isempty(self.doc.block_trials{x_event_index,2})
-                        if mode == 2
-                            frame_rate = self.doc.block_trials{x_event_index, 9};
-                        else
-                            pat = self.doc.block_trials{x_event_index, 2};
-                            if self.doc.Patterns.(pat).pattern.gs_val == 1
-                                frame_rate = 1000;
-                            else 
-                                frame_rate = 500;
-                            end
-                        end
-                    end
-                    dur = self.doc.block_trials{x_event_index,12}*1000;
-                 elseif src.Position == positions.post
+                elseif src.Position == positions.post
                     self.model.current_selected_cell.table = "post";
-                    mode = self.doc.posttrial{1};
-                    if ~isempty(src.Data(x_event_index,y_event_index)) && ~isempty(self.doc.posttrial{2})
-                        if mode == 2
-                            frame_rate = self.doc.posttrial{9};
-                        else
-                            pat = self.doc.posttrial{2};
-                            if self.doc.Patterns.(pat).pattern.gs_val == 1
-                                frame_rate = 1000;
-                            else 
-                                frame_rate = 500;
-                            end
-                        end
+                end
+
+  %If cells 2 -7 were chosen, get the string that's already there if there
+  %is one.
+                
+                
+
+    %At this point if the cell is empty, call provide_file_list function
+    %which will provide a list of imported files to choose from.
+                
+                if strcmp(file,'') && event.Indices(2) > 1 && event.Indices(2) < 8
+
+                     [success, chosen_file, chosen_field] = provide_file_list(self, event);
+                     if success == 0
+                         return;
+                     end
+                     
+                     
+                      %Now that they've chosen a file, update the model
+                    if strcmp(self.model.current_selected_cell.table, "pre") == 1
+
+                        self.doc.set_pretrial_property(event.Indices(2), chosen_file);
+                        self.update_gui();
+
+                    elseif strcmp(self.model.current_selected_cell.table, "inter") == 1
+
+                        self.doc.set_intertrial_property(event.Indices(2), chosen_file);
+                        self.update_gui();
+
+                    elseif strcmp(self.model.current_selected_cell.table, "block") == 1
+                        self.doc.set_block_trial_property(event.Indices, chosen_file);
+                        self.update_gui();
+
+                    elseif strcmp(self.model.current_selected_cell.table, "post") == 1
+
+                        self.doc.set_posttrial_property(event.Indices(2), chosen_file);
+                        self.update_gui();
+
+                    else
+                        waitfor(errordlg("Make sure you haven't changed your selection."));
                     end
-                    dur = self.doc.posttrial{12}*1000;
+                    
                 else
-                    waitfor(errordlg("Something has gone wrong, table positions have been corrupted."));
-                 end
-
-                
-                
-                %At this point if the cell is empty, open a list dialog
-                %with all possible filenames for the index. After they
-                %select one, file becomes that string. 
-                
-                if strcmp(file,'') == 1
-                
-%                     if strcmp(self.doc.top_folder_path, '') == 1
-%                         waitfor(errordlg("Nothing has been imported."));
-%                     end
-                    if event.Indices(2) == 2
-                        
-                        pats = self.doc.Patterns;
-                        if isempty(fieldnames(pats))
-                            waitfor(errordlg("You haven't imported any patterns yet."));
-                            return;
-                        end
-                        fields = fieldnames(pats);
-                        [index, chose] = listdlg('ListString',fields,'SelectionMode','single');
-
-                        if chose == 1
-                            
-                            chosen_pat = fields{index};
-                            if length(self.doc.Patterns.(chosen_pat).pattern.Pats(:,1,1))/16 ~= self.doc.num_rows
-                                waitfor(errordlg("This pattern will not run on the currently selected screen size. Please try again."));
-                                return;
-                            end
-                            file = fields{index};
-
-                            if strcmp(self.model.current_selected_cell.table, "pre") == 1
-
-                                self.doc.set_pretrial_property(event.Indices(2), file);
-                                self.update_gui();
-
-                            elseif strcmp(self.model.current_selected_cell.table, "inter") == 1
-
-                                self.doc.set_intertrial_property(event.Indices(2), file);
-                                self.update_gui();
-
-                            elseif strcmp(self.model.current_selected_cell.table, "block") == 1
-                                self.doc.set_block_trial_property(event.Indices, file);
-                                self.update_gui();
-
-                            elseif strcmp(self.model.current_selected_cell.table, "post") == 1
-
-                                self.doc.set_posttrial_property(event.Indices(2), file);
-                                self.update_gui();
-
-                            else
-                                waitfor(errordlg("Make sure you haven't changed your selection."));
-                            end
-                            file = string(file);
-                        end
-                        
-                    elseif event.Indices(2) == 3
-                        
-                        edit = self.check_editable(mode, 3);
-
-                        if edit == 1
-                            pos = self.doc.Pos_funcs;
-                            if isempty(fieldnames(pos))
-                                waitfor(errordlg("You have not imported any position functions yet."));
-                                return;
-                            end
-                            
-                            fields = fieldnames(pos);
-                            [index, chose] = listdlg('ListString',fields,'SelectionMode','single');
-                            if chose == 1
-                                file = cell2mat(fields(index));
-
-                                if strcmp(self.model.current_selected_cell.table, "pre") == 1
-
-                                    self.doc.set_pretrial_property(event.Indices(2), file);
-                                    self.update_gui();
-
-                                elseif strcmp(self.model.current_selected_cell.table, "inter") == 1
-
-                                    self.doc.set_intertrial_property(event.Indices(2), file);
-                                    self.update_gui();
-
-                                elseif strcmp(self.model.current_selected_cell.table, "block") == 1
-
-                                    self.doc.set_block_trial_property(event.Indices, file);
-                                    self.update_gui();
-
-                                elseif strcmp(self.model.current_selected_cell.table, "post") == 1
-
-                                    self.doc.set_posttrial_property(event.Indices(2), file);
-                                    self.update_gui();
-
-                                else
-                                    waitfor(errordlg("Make sure you haven't changed your selection."));
-                                end
-                                file = string(file);
-                            end
-                        end
-                    elseif event.Indices(2) > 3 && event.Indices(2) < 8
-
-                        ao = self.doc.Ao_funcs;
-                        if isempty(fieldnames(ao))
-                            waitfor(errordlg("You haven't imported any AO functions yet."));
-                            return;
-                        end
-                        fields = fieldnames(ao);
-                        [index, chose] = listdlg('ListString',fields,'SelectionMode','single');
-                        if chose == 1
-                            file = fields{index};
-
-                            if strcmp(self.model.current_selected_cell.table, "pre") == 1
-
-                                self.doc.set_pretrial_property(event.Indices(2), file);
-                                self.update_gui();
-
-                            elseif strcmp(self.model.current_selected_cell.table, "inter") == 1
-
-                                self.doc.set_intertrial_property(event.Indices(2), file);
-                                self.update_gui();
-
-                            elseif strcmp(self.model.current_selected_cell.table, "block") == 1
-
-                                self.doc.set_block_trial_property(event.Indices, file);
-                                self.update_gui();
-
-                            elseif strcmp(self.model.current_selected_cell.table, "post") == 1
-
-                                self.doc.set_posttrial_property(event.Indices(2), file);
-                                self.update_gui();
-
-                            else
-                                waitfor(errordlg("Make sure you haven't changed your selection."));
-                            end
-                            file = string(file);
-                        end
-                        %Pull list dialog for AO functions
-                    end
                     
                     
+
                 end
-                
+            
+                %Get all parameters that might be needed for preview from
+                %the trial the selected cell belongs to.
+                [mode, frame_rate, dur, patfield, posfield, aofields] = get_table_parameters(self, src, event);
+           
+                %Now actually display the preview of whatever file is
+                %selected
 
-                %%%%%%%%%%%I REUSE THIS CODE A LOT - CONSIDER MAKING IT ITS OWN FUNCTION   
+                if ~strcmp(file,'')
 
-                if strcmp(file,'') == 0
-                    if event.Indices(2) == 2
-%                         if isempty(self.doc) == 1
-%                             waitfor(errordlg("You haven't imported anything yet"));
-%                         end
+                    display_inscreen_preview(self, event, mode, frame_rate, dur, patfield, posfield, aofields); 
 
-                        self.model.auto_preview_index = self.check_pattern_dimensions();
-
-
-                        self.model.current_preview_file = self.doc.Patterns.(file).pattern.Pats;
-                        
-%                         if length(self.model.auto_preview_index) == 1
-
-                            x = [0 length(self.model.current_preview_file(1,:,1))];
-                            y = [0 length(self.model.current_preview_file(:,1,1))];
-                            adjusted_file = zeros(y(2),x(2),length(self.model.current_preview_file(1,1,:)));
-                            max_num = max(max(self.model.current_preview_file,[],2));
-                            for i = 1:length(self.model.current_preview_file(1,1,:))
-
-                                adjusted_matrix = self.model.current_preview_file(:,:,i) ./ max_num(i);
-                                adjusted_file(:,:,i) = adjusted_matrix(:,:,1);
-                            end
-
-                            self.hAxes = axes(self.f, 'units', 'pixels', 'OuterPosition', [245, 135, 1190 ,397], 'XTick', [], 'YTick', [] ,'XLim', x, 'YLim', y);
-                            im = imshow(adjusted_file(:,:,self.model.auto_preview_index), 'Colormap',gray);
-
-                            set(im, 'parent', self.hAxes);
-                            
-                            %BELOW ATTEMPT TO WORK WITH 4D PATTERNS - NOT
-                            %WORKING YET.
-%                         else
-%                             x = [0 length(self.model.current_preview_file(1,:,1,1))];
-%                             y = [0 length(self.model.current_preview_file(:,1,1,1))];
-%                             adjusted_file = zeros(y(2),x(2), length(self.model.current_preview_file(1,1,:,1)), length(self.model.current_preview_file(1,1,1,:)));
-%                             max_num = max(self.model.current_preview_file,[],[1 2 4]);
-%                             
-%                             for j = 1:length(self.model.current_preview_file(1,1,:,1))
-%                                 adjusted_matrix = self.model.current_preview_file(:,:,j,:) ./ max_num(j);
-%                                 adjusted_file(:,:,j,:) = adjusted_matrix(:,:,j,:);
-%                             end
-%                             data_to_plot = adjusted_file(:,:, self.model.auto_preview_index, 1)
-%                             
-%                             self.hAxes = axes(self.f, 'units', 'pixels', 'OuterPosition', [245, 135, 1190 ,397], 'XTick', [], 'YTick', [] ,'XLim', x, 'YLim', y);
-%                             im = imshow(data_to_plot(:,:), 'Colormap', gray);
-%                             set(im, 'parent', self.hAxes);
-%                         end
-
-
-
-
-
-
-
-
-                    elseif event.Indices(2) == 3
-
-
-                        self.model.current_preview_file = self.doc.Pos_funcs.(file).pfnparam.func;
-                        self.hAxes = axes(self.f,'units', 'pixels', 'OuterPosition', [245, 135, 1190 ,397]);
-                        self.second_axes = axes(self.f, 'units', 'pixels', 'OuterPosition', self.hAxes.OuterPosition, 'XAxisLocation', 'top', 'YAxisLocation', 'right');
-                        p = plot(self.model.current_preview_file, 'parent', self.hAxes);
-                        
-                        time_in_ms = length(self.model.current_preview_file(1,:));
-                        xax = [0 time_in_ms];
-                        yax = [min(self.model.current_preview_file) max(self.model.current_preview_file)];
-                        timeLabel = 'Time (ms)';
-                        patLabel = 'Pattern';
-                        frameLabel = 'Frame Number';
-                        set(self.hAxes, 'XLim', xax, 'YLim', yax, 'TickLength',[0,0]);
-                        self.hAxes.XLabel.String = timeLabel;
-                        self.hAxes.YLabel.String = patLabel;
-                        
-                        num_frames = frame_rate*(1/1000)*time_in_ms;
-                        xax2 = [0 num_frames];
-                        yax2 = yax;
-                        set(self.second_axes, 'Position', self.hAxes.Position, 'XLim', xax2, 'YLim', yax2, 'TickLength', [0,0], 'Color', 'none');
-                        self.second_axes.XLabel.String = frameLabel;
-                        
-%                         
-%                         
-                        
-                        %set(p, 'parent', self.hAxes);
-                        if dur <= length(self.model.current_preview_file(1,:))
-                            dur_line = line('XData', [dur, dur], 'YData', [yax(1), yax(2)], 'Color', [1 0 0], 'LineWidth', 2);
-                        end
-
-                    elseif event.Indices(2) > 3 && event.Indices(2) < 7
-
-                        self.model.current_preview_file = self.doc.Ao_funcs_.(file).afnparam.func;
-                        self.hAxes = axes(self.f,'units', 'pixels', 'OuterPosition', [245, 135, 1190 ,397]);
-                        self.second_axes = axes(self.f, 'units', 'pixels', 'OuterPosition', self.hAxes.OuterPosition, 'XAxisLocation', 'top', 'YAxisLocation', 'right');
-                        
-                        p = plot(self.model.current_preview_file, 'parent', self.hAxes);
-                        time_in_ms = length(self.model.current_preview_file(1,:));
-
-                        xax = [0 length(self.model.current_preview_file(1,:))];
-                        yax = [min(self.model.current_preview_file) max(self.model.current_preview_file)];
-                        
-                        timeLabel = 'Time (ms)';
-                        patLabel = 'Pattern';
-                        frameLabel = 'Frame Number';
-                        set(self.hAxes, 'XLim', xax, 'YLim', yax, 'TickLength',[0,0]);
-                        self.hAxes.XLabel.String = timeLabel;
-                        self.hAxes.YLabel.String = patLabel;
-                        
-                        num_frames = frame_rate*(1/1000)*time_in_ms;
-                        xax2 = [0 num_frames];
-                        yax2 = yax;
-                        set(self.second_axes, 'Position', self.hAxes.Position, 'XLim', xax2, 'YLim', yax2, 'TickLength', [0,0], 'Color', 'none');
-                        self.second_axes.XLabel.String = frameLabel;
-
-                    end
-                
                 end
-
-                
 
             end
 
@@ -2285,9 +2065,9 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
             if strcmp(self.model.current_selected_cell.table, "pre")
                 
                 filename = string(self.pretrial_table.Data(self.model.current_selected_cell.index(2)));
-                mode = cell2mat(self.doc.pretrial(1));
+                mode = self.doc.pretrial{1};
                 if mode == 2
-                    fr_rate = cell2mat(self.doc.pretrial(9));
+                    fr_rate = self.doc.pretrial{9};
                 else
                     fr_rate = 30;
                 end
@@ -2295,9 +2075,9 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
             elseif strcmp(self.model.current_selected_cell.table, "inter")
                 
                 filename = string(self.intertrial_table.Data(self.model.current_selected_cell.index(2)));
-                mode = cell2mat(self.doc.intertrial(1));
+                mode = self.doc.intertrial{1};
                 if mode == 2
-                    fr_rate = cell2mat(self.doc.intertrial(9));
+                    fr_rate = self.doc.intertrial{9};
                 else
                     fr_rate = 30;
                 end
@@ -2305,9 +2085,9 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
             elseif strcmp(self.model.current_selected_cell.table, "block")
                 
                 filename = string(self.block_table.Data(self.model.current_selected_cell.index(1),self.model.current_selected_cell.index(2)));
-                mode = cell2mat(self.doc.block_trials(self.model.current_selected_cell.index(1), 1));
+                mode = self.doc.block_trials{self.model.current_selected_cell.index(1), 1};
                 if mode == 2
-                    fr_rate = cell2mat(self.doc.block_trials(self.model.current_selected_cell.index(1), 9));
+                    fr_rate = self.doc.block_trials{self.model.current_selected_cell.index(1), 9};
                 else
                     fr_rate = 30;
                 end
@@ -2316,9 +2096,9 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                 
             elseif strcmp(self.model.current_selected_cell.table, "post")
                 filename = string(self.posttrial_table.Data(self.model.current_selected_cell.index(2)));
-                mode = cell2mat(self.doc.posttrial(1));
+                mode = self.doc.posttrial{1};
                 if mode == 2
-                    fr_rate = cell2mat(self.doc.posttrial(9));
+                    fr_rate = self.doc.posttrial{9};
                 else
                     fr_rate = 30;
                 end
@@ -2495,10 +2275,11 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
             %block_trials = self.doc.block_trials();
             trial_mode = trial{1};
             trial_duration = trial{12};
+            pat_field = self.doc.get_pattern_field_name(trial{2});
             if isempty(trial{8})
                 trial_frame_index = 1;
             elseif strcmp(trial{8},'r')
-                num_frames = length(self.doc.Patterns.(trial{2}).pattern.Pats(1,1,:));
+                num_frames = length(self.doc.Patterns.(pat_field).pattern.Pats(1,1,:));
                 trial_frame_index = randperm(num_frames,1);
             else
                 trial_frame_index = str2num(trial{8});
@@ -2686,6 +2467,387 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
             self.run_con = G4_conductor_controller(self.doc);
             
         end
+        
+%PREVIEW SELECTED CELL ON IN-SCREEN PREVIEW--------------------------------        
+        function display_inscreen_preview(self, event, mode, frame_rate, dur, patfield, funcfield, aofields)  
+    
+            if event.Indices(2) == 2
+
+                self.model.auto_preview_index = self.check_pattern_dimensions();
+                self.model.current_preview_file = self.doc.Patterns.(patfield).pattern.Pats;
+
+                x = [0 length(self.model.current_preview_file(1,:,1))];
+                y = [0 length(self.model.current_preview_file(:,1,1))];
+                adjusted_file = zeros(y(2),x(2),length(self.model.current_preview_file(1,1,:)));
+                max_num = max(max(self.model.current_preview_file,[],2));
+                for i = 1:length(self.model.current_preview_file(1,1,:))
+
+                    adjusted_matrix = self.model.current_preview_file(:,:,i) ./ max_num(i);
+                    adjusted_file(:,:,i) = adjusted_matrix(:,:,1);
+                end
+
+                self.hAxes = axes(self.f, 'units', 'pixels', 'OuterPosition', [245, 135, 1190 ,397], 'XTick', [], 'YTick', [] ,'XLim', x, 'YLim', y);
+                im = imshow(adjusted_file(:,:,self.model.auto_preview_index), 'Colormap',gray);
+
+                set(im, 'parent', self.hAxes);
+
+                %BELOW ATTEMPT TO WORK WITH 4D PATTERNS - NOT
+                                    %WORKING YET.
+        %                         else
+        %                             x = [0 length(self.model.current_preview_file(1,:,1,1))];
+        %                             y = [0 length(self.model.current_preview_file(:,1,1,1))];
+        %                             adjusted_file = zeros(y(2),x(2), length(self.model.current_preview_file(1,1,:,1)), length(self.model.current_preview_file(1,1,1,:)));
+        %                             max_num = max(self.model.current_preview_file,[],[1 2 4]);
+        %                             
+        %                             for j = 1:length(self.model.current_preview_file(1,1,:,1))
+        %                                 adjusted_matrix = self.model.current_preview_file(:,:,j,:) ./ max_num(j);
+        %                                 adjusted_file(:,:,j,:) = adjusted_matrix(:,:,j,:);
+        %                             end
+        %                             data_to_plot = adjusted_file(:,:, self.model.auto_preview_index, 1)
+        %                             
+        %                             self.hAxes = axes(self.f, 'units', 'pixels', 'OuterPosition', [245, 135, 1190 ,397], 'XTick', [], 'YTick', [] ,'XLim', x, 'YLim', y);
+        %                             im = imshow(data_to_plot(:,:), 'Colormap', gray);
+        %                             set(im, 'parent', self.hAxes);
+        %                         end
+
+
+            elseif event.Indices(2) == 3
+
+
+                self.model.current_preview_file = self.doc.Pos_funcs.(funcfield).pfnparam.func;
+                self.hAxes = axes(self.f,'units', 'pixels', 'OuterPosition', [245, 135, 1190 ,397]);
+                self.second_axes = axes(self.f, 'units', 'pixels', 'OuterPosition', self.hAxes.OuterPosition, 'XAxisLocation', 'top', 'YAxisLocation', 'right');
+                plot(self.model.current_preview_file, 'parent', self.hAxes);
+
+                time_in_ms = length(self.model.current_preview_file(1,:));
+                xax = [0 time_in_ms];
+                yax = [min(self.model.current_preview_file) max(self.model.current_preview_file)];
+                timeLabel = 'Time (ms)';
+                patLabel = 'Pattern';
+                frameLabel = 'Frame Number';
+                set(self.hAxes, 'XLim', xax, 'YLim', yax, 'TickLength',[0,0]);
+                self.hAxes.XLabel.String = timeLabel;
+                self.hAxes.YLabel.String = patLabel;
+
+                num_frames = frame_rate*(1/1000)*time_in_ms;
+                xax2 = [0 num_frames];
+                yax2 = yax;
+                set(self.second_axes, 'Position', self.hAxes.Position, 'XLim', xax2, 'YLim', yax2, 'TickLength', [0,0], 'Color', 'none');
+                self.second_axes.XLabel.String = frameLabel;
+
+                if dur <= length(self.model.current_preview_file(1,:))
+                    line('XData', [dur, dur], 'YData', [yax(1), yax(2)], 'Color', [1 0 0], 'LineWidth', 2);
+                end
+
+            elseif event.Indices(2) > 3 && event.Indices(2) < 7
+                
+                if event.Indices(2) == 4
+                    aofield = aofields{1};
+                elseif event.Indices(2) == 5
+                    aofield = aofields{2};
+                elseif event.Indices(2) == 6
+                    aofield = aofields{3};
+                else
+                    aofield = aofields{4};
+                end
+
+                self.model.current_preview_file = self.doc.Ao_funcs_.(aofield).afnparam.func;
+                self.hAxes = axes(self.f,'units', 'pixels', 'OuterPosition', [245, 135, 1190 ,397]);
+                self.second_axes = axes(self.f, 'units', 'pixels', 'OuterPosition', self.hAxes.OuterPosition, 'XAxisLocation', 'top', 'YAxisLocation', 'right');
+
+                plot(self.model.current_preview_file, 'parent', self.hAxes);
+                time_in_ms = length(self.model.current_preview_file(1,:));
+
+                xax = [0 length(self.model.current_preview_file(1,:))];
+                yax = [min(self.model.current_preview_file) max(self.model.current_preview_file)];
+
+                timeLabel = 'Time (ms)';
+                patLabel = 'Pattern';
+                frameLabel = 'Frame Number';
+                set(self.hAxes, 'XLim', xax, 'YLim', yax, 'TickLength',[0,0]);
+                self.hAxes.XLabel.String = timeLabel;
+                self.hAxes.YLabel.String = patLabel;
+
+                num_frames = frame_rate*(1/1000)*time_in_ms;
+                xax2 = [0 num_frames];
+                yax2 = yax;
+                set(self.second_axes, 'Position', self.hAxes.Position, 'XLim', xax2, 'YLim', yax2, 'TickLength', [0,0], 'Color', 'none');
+                self.second_axes.XLabel.String = frameLabel;
+
+            end
+
+
+
+        end
+        
+%PROVIDES LIST OF IMPORTED FILES TO CHOOSE FROM WHEN EMPTY CELL IS SELECTED        
+        function [success, chosen_file, chosen_field] = provide_file_list(self, event)
+
+            if event.Indices(2) == 2
+
+                pats = self.doc.Patterns;
+                fields = fieldnames(pats);
+                if isempty(fields)
+                    waitfor(errordlg("You haven't imported any patterns yet."));
+                    success = 0;
+                    chosen_file = '';
+                    chosen_field = '';
+                    return;
+                end
+
+                for i = 1:length(fields)
+                    filenames{i} = self.doc.Patterns.(fields{i}).filename;
+                end
+
+                [index, chose] = listdlg('ListString',filenames,'SelectionMode','single');
+
+                if chose == 1
+
+                    chosen_file = filenames{index};
+                    chosen_field = self.doc.get_pattern_field_name(chosen_file);
+
+                    if length(self.doc.Patterns.(chosen_field).pattern.Pats(:,1,1))/16 ~= self.doc.num_rows
+                        waitfor(errordlg("This pattern will not run on the currently selected screen size. Please try again."));
+                        success = 0;
+                        chosen_file = '';
+                        chosen_field = '';
+                        return;
+                    end
+
+                    success = 1;
+
+                else
+
+                    success = 0;
+                    chosen_file = '';
+                    chosen_field = '';
+                    return;
+
+                end
+
+            elseif event.Indices(2) == 3
+                if strcmp(self.model.current_selected_cell.table, "pre")
+                    mode = self.doc.pretrial{1};
+                elseif strcmp(self.model.current_selected_cell.table, "inter")
+                    mode = self.doc.intertrial{1};
+                elseif strcmp(self.model.current_selected_cell.table, "post")
+                    mode = self.doc.posttrial{1};
+                else
+                    mode = self.doc.block_trials{event.Indices(1),1};
+                end
+                
+
+                edit = self.check_editable(mode, 3);
+                if edit == 0
+                    waitfor(errordlg("You cannot edit the position function in this mode."));
+                    success = 0;
+                    chosen_file = '';
+                    chosen_field = '';
+                    return;
+                end
+                funcs = self.doc.Pos_funcs;
+                fields = fieldnames(funcs);
+                if isempty(fields)
+                    waitfor(errordlg("You haven't imported any functions yet."));
+                    success = 0;
+                    chosen_file = '';
+                    chosen_field = '';
+                    return;
+                end
+
+                for i = 1:length(fields)
+                    filenames{i} = self.doc.Pos_funcs.(fields{i}).filename;
+                end
+
+                [index, chose] = listdlg('ListString',filenames,'SelectionMode','single');
+
+                if chose == 1
+
+                    chosen_file = filenames{index};
+                    chosen_field = self.doc.get_posfunc_field_name(chosen_file);
+
+                else
+
+                    success = 0;
+                    chosen_file = '';
+                    chosen_field = '';
+                    return;
+
+                end
+                success = 1;
+
+           elseif event.Indices(2) > 3 && event.Indices(2) < 8
+
+                ao = self.doc.Ao_funcs;
+                fields = fieldnames(ao);
+                if isempty(fields)
+                    waitfor(errordlg("You haven't imported any AO functions yet."));
+                    success = 0;
+                    chosen_file = '';
+                    chosen_field = '';
+                    return;
+                end
+
+                for i = 1:length(fields)
+                    filenames{i} = self.doc.Ao_funcs.(fields{i}).filename;
+                end
+
+                [index, chose] = listdlg('ListString',filenames,'SelectionMode','single');
+
+                if chose == 1
+
+                    chosen_file = filenames{index};
+                    chosen_field = self.doc.get_aofunc_field_name(chosen_file);
+
+                else
+
+                    success = 0;
+                    chosen_file = '';
+                    chosen_field = '';
+                    return;
+
+                end
+                success = 1;
+
+            else
+
+                return;
+
+            end
+
+        end
+ 
+%PULLS PARAMETERS FROM TRIAL CONTAINING A SELECTED CELL FOR PREVIEWING-----        
+        function [mode, frame_rate, dur, patfield, funcfield, aofields] = get_table_parameters(self, src, event)
+    
+            if strcmp(self.model.current_selected_cell.table, "pre")
+
+                mode = self.doc.pretrial{1};
+
+                patfile = self.doc.pretrial{2};
+                patfield = self.doc.get_pattern_field_name(patfile);
+                if mode == 2
+                    frame_rate = self.doc.pretrial{9};
+                else
+                    if ~strcmp(patfield,'')
+                        if self.doc.Patterns.(patfield).pattern.gs_val == 1
+                            frame_rate = 1000;
+                        else 
+                            frame_rate = 500;
+                        end
+                    else
+                        frame_rate = 30;
+                    end
+                end
+                funcfile = self.doc.pretrial{3};
+                funcfield = self.doc.get_posfunc_field_name(funcfile);
+                for i = 1:4
+                    aofiles{i} = self.doc.pretrial{i+3};
+                end
+                aofields = {};
+                
+                for i = 1:length(aofiles)
+                    aofields{i} = self.doc.get_aofunc_field_name(aofiles{i});
+                end
+                
+                dur = self.doc.pretrial{12}*1000;
+
+            elseif strcmp(self.model.current_selected_cell.table,"inter")
+
+                mode = self.doc.intertrial{1};
+                patfile = self.doc.intertrial{2};
+                patfield = self.doc.get_pattern_field_name(patfile);
+
+                if mode == 2
+                    frame_rate = self.doc.intertrial{9};
+                else
+                    if ~strcmp(patfield, '')
+
+                        if self.doc.Patterns.(patfield).pattern.gs_val == 1
+                            frame_rate = 1000;
+                        else 
+                            frame_rate = 500;
+                        end
+                    else
+                        frame_rate = 30;
+                    end
+                end
+                funcfile = self.doc.intertrial{3};
+                funcfield = self.doc.get_posfunc_field_name(funcfile);
+                for i = 1:4
+                    aofiles{i} = self.doc.intertrial{i+3};
+                end
+                aofields = {};
+                for i = 1:length(aofiles)
+                    aofields{i} = self.doc.get_aofunc_field_name(aofiles{i});
+                end
+
+                dur = self.doc.intertrial{12}*1000;
+
+            elseif strcmp(self.model.current_selected_cell.table,"block")
+
+                mode = self.doc.block_trials{event.Indices(1), 1};
+                patfile = self.doc.block_trials{event.Indices(1), 2};
+                patfield = self.doc.get_pattern_field_name(patfile);
+                if mode == 2
+                    frame_rate = self.doc.block_trials{event.Indices(1), 9};
+                else
+                    if ~strcmp(patfield,'')
+                    
+                        if self.doc.Patterns.(patfield).pattern.gs_val == 1
+                            frame_rate = 1000;
+                        else 
+                            frame_rate = 500;
+                        end
+                    else
+                        frame_rate = 30;
+                    end
+                end
+                funcfile = self.doc.block_trials{event.Indices(1),3};
+                funcfield = self.doc.get_posfunc_field_name(funcfile);
+                for i = 1:4
+                    aofiles{i} = self.doc.block_trials{event.Indices(1),i+3};
+                end
+                aofields = {};
+                for i = 1:length(aofiles)
+                    aofields{i} = self.doc.get_aofunc_field_name(aofiles{i});
+                end
+
+                dur = self.doc.block_trials{event.Indices(1),12}*1000;
+
+            elseif strcmp(self.model.current_selected_cell.table,"post")
+
+                mode = self.doc.posttrial{1};
+                patfile = self.doc.posttrial{2};
+                patfield = self.doc.get_pattern_field_name(patfile);
+
+                if mode == 2
+                    frame_rate = self.doc.posttrial{9};
+                else
+                    if ~strcmp(patfield,'')
+                        if self.doc.Patterns.(patfield).pattern.gs_val == 1
+                            frame_rate = 1000;
+                        else 
+                            frame_rate = 500;
+                        end
+                    else
+                        frame_rate = 30;
+                    end
+                end
+                funcfile = self.doc.posttrial{3};
+                funcfield = self.doc.get_posfunc_field_name(funcfile);
+                for i = 1:4
+                    aofiles{i} = self.doc.posttrial{i+3};
+                end
+                aofields = {};
+                for i = 1:length(aofiles)
+                    aofields{i} = self.doc.get_aofunc_field_name(aofiles{i});
+                end
+
+                dur = self.doc.posttrial{12}*1000;
+            end
+
+        end
 
 
 
@@ -2701,38 +2863,38 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
 
 %Return true or false, on true the update function continues, on false the 
 %gui is updated with the old data and an error message is displayed. 
-        function [allow] = check_editable(self, mode, y) 
+        function [allow] = check_editable(self, mode_val, y) 
 
 
             allow = 1;
-            if ~isnumeric(mode)
-                mode = str2num(mode);
+            if ~isnumeric(mode_val)
+                mode_val = str2num(mode_val);
             end
 
             %check that the field is editable based on the mode
-            if isempty(mode)
+            if isempty(mode_val)
                 return;
-            elseif mode == 1 && (7 < y) && (12 > y)
+            elseif mode_val == 1 && (7 < y) && (12 > y)
 
                 allow = 0;
 
-            elseif mode == 2 && (y ==3 || ((y > 9) && (y < 12)))
+            elseif mode_val == 2 && (y ==3 || ((y > 9) && (y < 12)))
 
                 allow = 0;
 
-            elseif mode == 3 && (y == 3 || ((y > 8) && (y < 12)))
+            elseif mode_val == 3 && (y == 3 || ((y > 8) && (y < 12)))
 
                 allow = 0;
 
-            elseif mode == 4 && (y == 3 || y == 9 )
+            elseif mode_val == 4 && (y == 3 || y == 9 )
 
                 allow = 0;
 
-            elseif (mode == 5 || mode == 6) && (y == 9)
+            elseif (mode_val == 5 || mode_val == 6) && (y == 9)
 
                 allow = 0;
 
-            elseif mode == 7 && ( y == 3 || ((y > 7) && (y < 12)))
+            elseif mode_val == 7 && ( y == 3 || ((y > 7) && (y < 12)))
 
                 allow = 0;
 
@@ -2782,8 +2944,8 @@ function [start_index] = check_pattern_dimensions(self)
    else
        pat = 0;
    end
-   
-   num_dim = ndims(self.doc.Patterns.(pat).pattern.Pats);
+   pat_field = self.doc.get_pattern_field_name(pat);
+   num_dim = ndims(self.doc.Patterns.(pat_field).pattern.Pats);
    if num_dim == 3
        start_index = 1;
    elseif num_dim == 4
@@ -2809,14 +2971,24 @@ function clear_fields(self, mode)
     offset = [];
     
     if mode == 1
-
-        index_of_pat = find(strcmp(pat_fields(:), [self.doc.block_trials{self.model.current_selected_cell.index(1), 2}]));
+        
+        if strcmp(self.model.current_selected_cell.table,"pre")
+            pat_field = self.doc.get_pattern_field_name(self.doc.pretrial{2});
+        elseif strcmp(self.model.current_selected_cell.table,"inter")
+            pat_field = self.doc.get_pattern_field_name(self.doc.intertrial{2});
+        elseif strcmp(self.model.current_selected_cell.table,"post")
+            pat_field = self.doc.get_pattern_field_name(self.doc.posttrial{2});
+        else
+            pat_field = self.doc.get_pattern_field_name(self.doc.block_trials{self.model.current_selected_cell.index(1),2});
+        end
+        index_of_pat = find(strcmp(pat_fields(:), pat_field));
         %%%%%%DOESN'T WORK IF THERE ARE MORE PATTERNS IMPORTED THAN
         %%%%%%POSITION FUNCTIONS
         if index_of_pat > length(pos_fields)
             index_of_pat = rem(length(pos_fields), index_of_pat);
         end
-        pos = pos_fields{index_of_pat};
+        pos_field = pos_fields{index_of_pat};
+        pos = self.doc.Pos_funcs.(pos_field).filename;
         self.set_mode_dep_props(pos, indx, rate, gain, offset);
         
     elseif mode == 2
@@ -2839,8 +3011,21 @@ function clear_fields(self, mode)
         %gain, offset, clear others
         
     elseif mode == 5
-        index_of_pat = find(strcmp(pat_fields(:), [self.doc.block_trials{self.model.current_selected_cell.index(1), 2}]));
-        pos = cell2mat(pos_fields(index_of_pat));
+        if strcmp(self.model.current_selected_cell.table,"pre")
+            pat_field = self.doc.get_pattern_field_name(self.doc.pretrial{2});
+        elseif strcmp(self.model.current_selected_cell.table,"inter")
+            pat_field = self.doc.get_pattern_field_name(self.doc.intertrial{2});
+        elseif strcmp(self.model.current_selected_cell.table,"post")
+            pat_field = self.doc.get_pattern_field_name(self.doc.posttrial{2});
+        else
+            pat_field = self.doc.get_pattern_field_name(self.doc.block_trials{self.model.current_selected_cell.index(1),2});
+        end
+        index_of_pat = find(strcmp(pat_fields(:), pat_field));
+        if index_of_pat > length(pos_fields)
+            index_of_pat = rem(length(pos_fields), index_of_pat);
+        end
+        pos_field = pos_fields{index_of_pat};
+        pos = self.doc.Pos_funcs.(pos_field).filename;
         gain = 1;
         offset = 0;
         self.set_mode_dep_props(pos, indx, rate, gain, offset);
@@ -2848,8 +3033,21 @@ function clear_fields(self, mode)
         
     elseif mode == 6
         
-        index_of_pat = find(strcmp(pat_fields(:), [self.doc.block_trials{self.model.current_selected_cell.index(1), 2}]));
-        pos = cell2mat(pos_fields(index_of_pat));
+        if strcmp(self.model.current_selected_cell.table,"pre")
+            pat_field = self.doc.get_pattern_field_name(self.doc.pretrial{2});
+        elseif strcmp(self.model.current_selected_cell.table,"inter")
+            pat_field = self.doc.get_pattern_field_name(self.doc.intertrial{2});
+        elseif strcmp(self.model.current_selected_cell.table,"post")
+            pat_field = self.doc.get_pattern_field_name(self.doc.posttrial{2});
+        else
+            pat_field = self.doc.get_pattern_field_name(self.doc.block_trials{self.model.current_selected_cell.index(1),2});
+        end
+        index_of_pat = find(strcmp(pat_fields(:), pat_field));
+        if index_of_pat > length(pos_fields)
+            index_of_pat = rem(length(pos_fields), index_of_pat);
+        end
+        pos_field = pos_fields{index_of_pat};
+        pos = self.doc.Pos_funcs.(pos_field).filename;
         gain = 1;
         offset = 0;
         self.set_mode_dep_props(pos, indx, rate, gain, offset);

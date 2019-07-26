@@ -58,13 +58,14 @@ classdef G4_preview_model
             self.mode = data{1};
             self.pattern_data = self.normalize_matrix();
             pat = self.data{2};
+            patfield = self.doc.get_pattern_field_name(pat);
             
             if self.mode == 2
                 self.rt_frRate = self.data{9};
             else
-                if self.doc.Patterns_.(pat).pattern.gs_val == 1
+                if self.doc.Patterns.(patfield).pattern.gs_val == 1
                     self.rt_frRate = 1000;
-                elseif self.doc.Patterns_.(pat).pattern.gs_val == 4
+                elseif self.doc.Patterns.(patfield).pattern.gs_val == 4
                     self.rt_frRate = 500;
                 else
                     waitfor(errordlg("Please make sure your pattern has a valid gs_val"));
@@ -73,27 +74,32 @@ classdef G4_preview_model
             
             if strcmp(self.data{3},'') == 0
                 pos = self.data{3};
-                self.pos_data = self.doc.Pos_funcs_.(pos).pfnparam.func;
+                posfield = self.doc.get_posfunc_field_name(pos);
+                self.pos_data = self.doc.Pos_funcs.(posfield).pfnparam.func;
             end
             
             if strcmp(self.data{4},'') == 0
                 ao1 = self.data{4};
-                self.ao1_data = self.doc.Ao_funcs_.(ao1).afnparam.func;
+                ao1field = self.doc.get_aofunc_field_name(ao1);
+                self.ao1_data = self.doc.Ao_funcs.(ao1field).afnparam.func;
             end
             
             if strcmp(self.data{5},'') == 0
                 ao2 = self.data{5};
-                self.ao2_data = self.doc.Ao_funcs_.(ao2).afnparam.func;
+                ao2field = self.doc.get_aofunc_field_name(ao2);
+                self.ao2_data = self.doc.Ao_funcs.(ao2field).afnparam.func;
             end
             
             if strcmp(self.data{6},'') == 0
                 ao3 = self.data{6};
-                self.ao3_data = self.doc.Ao_funcs_.(ao3).afnparam.func;
+                ao3field = self.doc.get_aofunc_field_name(ao3);
+                self.ao3_data = self.doc.Ao_funcs.(ao3field).afnparam.func;
             end
             
             if strcmp(self.data{7},'') == 0
                 ao4 = self.data{7};
-                self.ao4_data = self.doc.Ao_funcs_.(ao4).afnparam.func;
+                ao4field = self.doc.get_aofunc_field_name(ao4);
+                self.ao4_data = self.doc.Ao_funcs.(ao4field).afnparam.func;
             end
             
             self.dur = self.data{12};
@@ -103,7 +109,8 @@ classdef G4_preview_model
         function [adjusted_data] = normalize_matrix(self)
             
             pat = self.data{2};
-            original_data = self.doc.Patterns_.(pat).pattern.Pats;
+            patfield = self.doc.get_pattern_field_name(pat);
+            original_data = self.doc.Patterns.(patfield).pattern.Pats;
             x = length(original_data(1,:,1));
             y = length(original_data(:,1,1));
             z = length(original_data(1,1,:));
