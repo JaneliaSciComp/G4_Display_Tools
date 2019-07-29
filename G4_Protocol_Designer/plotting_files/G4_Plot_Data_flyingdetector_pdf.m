@@ -71,23 +71,23 @@ if nargin<5
     default_H = [1 1 2 2 2 2 3 3 3 4 4 4 4 4 4 4 5 5 5 5 5 5 5 5 5 6 6 6 6 6]; %height of figure by number of subplots
     
     %find all open-loop conditions, organize into block
-    conds_vec = find(Data.conditionModes~=4); 
+    OL_conds_vec = find(Data.conditionModes~=4); %changed conds_vec to OL_conds_vec
     num_conds = length(OL_conds_vec);
     W = default_W(min([num_conds length(default_W)])); %get number of subplot columns (up to default limit)
     H = default_H(min([num_conds length(default_W)])); %get number of subplot rows
     D = ceil(num_conds/length(default_W)); %number of figures
     OL_conds = nan([W H D]);
-    OL_conds(1:num_conds) = conds_vec;
+    OL_conds(1:num_conds) = OL_conds_vec;
     OL_conds = permute(OL_conds,[2 1 3]);
     
     %find all closed-loop conditions, organize into block
-    conds_vec = find(Data.conditionModes=4); 
+    CL_conds_vec = find(Data.conditionModes==4); %changed single equal sign to double and conds_vec to CL_conds_vec
     num_conds = length(CL_conds_vec);
     W = default_W(min([num_conds length(default_W)])); %get number of subplot columns (up to default limit)
     H = default_H(min([num_conds length(default_W)])); %get number of subplot rows
     D = ceil(num_conds/length(default_W)); %number of figures
     CL_conds = nan([W H D]);
-    CL_conds(1:num_conds) = conds_vec;
+    CL_conds(1:num_conds) = CL_conds_vec;
     CL_conds = permute(CL_conds,[2 1 3]);
     
     TC_conds = []; %by default, don't plot any tuning curves
@@ -149,20 +149,20 @@ end
 %% Histograms for closed-loop trials
 if ~isempty(CL_conds)
     num_figs = size(CL_conds,3);
-    for d = CL_inds
+    for d = 1:length(CL_inds) %changed d = CL_inds to 1:length(CL_inds) (CL_inds was [4 5 6] so first element was out of bounds)
         for fig = 1:num_figs
-            num_plot_rows = (1-overlap/2)*max(nansum(CL_conds(:,:,fig)>0));
+            num_plot_rows = (1-overlap/2)*max(nansum(CL_conds(:,:,fig)>0)); 
             num_plot_cols = max(nansum(CL_conds(:,:,fig)>0,2));
             figure('Position',[100 100 540 540*(num_plot_rows/num_plot_cols)])
             for row = 1:num_plot_rows
                 for col = 1:num_plot_cols
-                    cond = CL_conds(row*(1+overlap)-1,col,fig);
+                    cond = CL_conds(row*(1+overlap),col,fig); %took away -1 from 1+overlap to avoid index of 0
                     if cond>0 
                         better_subplot(num_plot_rows, num_plot_cols, col+num_plot_cols*(row-1))
                         [~, ~, num_reps, num_positions] = size(Data.histograms);
-                        x = circshift(1:num_positions,[1 num_positions/2]);
+                        x = circshift(1:num_positions,[1 floor(num_positions/2)]); %Added floor here because was getting fraction for index
                         x(x>x(end)) = x(x>x(end))-num_positions;
-                        tmpdata = circshift(squeeze(Data.histograms(d,cond,:,:)),[1 num_positions/2]);
+                        tmpdata = circshift(squeeze(Data.histograms(d,cond,:,:)),[1 ceil(num_positions/2)]); %add ceil here for same reason
                         plot(repmat(x',[1 num_reps]),tmpdata','Color',rep_Color,'LineWidth',rep_LineWidth);
                         hold on
                         plot(x,nanmean(tmpdata),'Color',mean_Color,'LineWidth',mean_LineWidth)
@@ -172,7 +172,7 @@ if ~isempty(CL_conds)
                         
                     end
                     if overlap==1
-                        cond = CL_conds(row*(1+overlap),col,fig);
+                        cond = CL_conds(row*(1+overlap)-1,col,fig); 
                         if cond>0
                             tmpdata = circshift(squeeze(Data.histograms(d,cond,:,:)),[1 num_positions/2]);
                             plot(repmat(x',[1 num_reps]),tmpdata','Color',rep_Color2,'LineWidth',rep_LineWidth);
@@ -200,7 +200,11 @@ if ~isempty(OL_conds)
             figure('Position',[100 100 540 540*(num_plot_rows/num_plot_cols)])
             for row = 1:num_plot_rows
                 for col = 1:num_plot_cols
-                    cond = OL_conds(row*(1+overlap)-1,col,fig);
+                    if row > 1 %%Added this if statement because first index would either be 0 or get out of bounds
+                        cond = OL_conds(row*(1+overlap)-1,col,fig);
+                    else
+                        cond_OL_conds(row*(1+overlap),col,fig);
+                    end
                     if cond>0
                         better_subplot(num_plot_rows, num_plot_cols, col+num_plot_cols*(row-1))
                         plot(repmat(Data.timestamps',[1 num_reps]),squeeze(Data.timeseries(d,cond,:,:))','Color',rep_Color,'LineWidth',rep_LineWidth);
@@ -233,7 +237,7 @@ if ~isempty(TC_conds)
             num_plot_rows = (1-overlap/2)*max(nansum(TC_conds(:,:,fig)>0));
             figure('Position',[100 100 540/num_plot_rows 540])
             for row = 1:num_plot_rows
-                conds = TC_conds(row*(1+overlap)-1,:,fig);
+                conds = TC_conds(row*(1+overlap),:,fig); %Took out -1 to avoid index of 0
                 conds(isnan(conds)&&conds==0) = [];
                 better_subplot(num_plot_rows, 1, row)
                 plot(squeeze(Data.summaries(d,conds,:)),'Color',rep_Color,'LineWidth',rep_LineWidth);

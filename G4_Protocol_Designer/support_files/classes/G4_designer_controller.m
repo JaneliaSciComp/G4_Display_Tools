@@ -1569,7 +1569,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
         if src.Value == false  
         %disp(length(self.doc.block_trials(:,1)));
             for i = 1:length(self.doc.block_trials(:,1))
-                if cell2mat(self.doc.block_trials(i, l)) == 1
+                if self.doc.block_trials{i, l} == 1
                     self.doc.set_block_trial_property([i, l], false);
                 end
             end
