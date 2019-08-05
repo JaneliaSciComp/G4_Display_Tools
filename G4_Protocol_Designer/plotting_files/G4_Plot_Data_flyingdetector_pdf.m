@@ -49,7 +49,8 @@ mean_Color2 = [1 0 0];
 rep_LineWidth = 0.05;
 mean_LineWidth = 1;
 subtitle_FontSize = 8;
-ylimits = [-6 6; -1 6; -1 6; -1 6; 1 192; -6 6; 2 10]; %[min max] y limits for each datatype
+timeseries_ylimits = [-6 6; -1 6; -1 6; -1 6; 1 192; -6 6; 2 10]; %[min max] y limits for each datatype
+histogram_ylimits = [0 100; -6 6; 2 10];
 
 %%%% load data and prepare for plotting
 %load G4_Processed_Data
@@ -63,7 +64,7 @@ try
 catch
     error('cannot find G4_Processed_Data file in specified folder')
 end
-load(fullfile(exp_folder,Data_name));
+load(fullfile(exp_folder,Data_name),'Data');
 
 %create default matrices for plotting all conditions
 if nargin<5 
@@ -104,7 +105,7 @@ end
 num_CL_datatypes = length(CL_datatypes);
 CL_inds = nan(1,num_CL_datatypes);
 for d = 1:num_CL_datatypes
-    CL_inds(d) = find(strcmpi(Data.channelNames.timeseries,CL_datatypes{d}));
+    CL_inds(d) = find(strcmpi(Data.channelNames.histograms,CL_datatypes{d})); %%% now correctly looks for CL_inds from histogram names
 end
 num_TC_datatypes = length(TC_datatypes);
 TC_inds = nan(1,num_TC_datatypes);
@@ -149,35 +150,33 @@ end
 %% Histograms for closed-loop trials
 if ~isempty(CL_conds)
     num_figs = size(CL_conds,3);
-    for d = 1:length(CL_inds) %changed d = CL_inds to 1:length(CL_inds) (CL_inds was [4 5 6] so first element was out of bounds)
+    for d = CL_inds
         for fig = 1:num_figs
             num_plot_rows = (1-overlap/2)*max(nansum(CL_conds(:,:,fig)>0)); 
             num_plot_cols = max(nansum(CL_conds(:,:,fig)>0,2));
             figure('Position',[100 100 540 540*(num_plot_rows/num_plot_cols)])
             for row = 1:num_plot_rows
                 for col = 1:num_plot_cols
-                    cond = CL_conds(row*(1+overlap),col,fig); %took away -1 from 1+overlap to avoid index of 0
+                    cond = CL_conds(1+(row-1)*(1+overlap),col,fig); %should be correct now
                     if cond>0 
                         better_subplot(num_plot_rows, num_plot_cols, col+num_plot_cols*(row-1))
                         [~, ~, num_reps, num_positions] = size(Data.histograms);
-                        x = circshift(1:num_positions,[1 floor(num_positions/2)]); %Added floor here because was getting fraction for index
+                        x = circshift(1:num_positions,[1 floor(num_positions/2)]);
                         x(x>x(end)) = x(x>x(end))-num_positions;
-                        tmpdata = circshift(squeeze(Data.histograms(d,cond,:,:)),[1 ceil(num_positions/2)]); %add ceil here for same reason
+                        tmpdata = circshift(squeeze(Data.histograms(d,cond,:,:)),[1 floor(num_positions/2)]); %changed to floor to match x
                         plot(repmat(x',[1 num_reps]),tmpdata','Color',rep_Color,'LineWidth',rep_LineWidth);
                         hold on
                         plot(x,nanmean(tmpdata),'Color',mean_Color,'LineWidth',mean_LineWidth)
-                        ylim(ylimits(d,:));
+                        ylim(histogram_ylimits(d,:));
                         title(['Condition #' num2str(cond)],'FontSize',subtitle_FontSize)
-                        
                         
                     end
                     if overlap==1
-                        cond = CL_conds(row*(1+overlap)-1,col,fig); 
+                        cond = CL_conds(row*2,col,fig); 
                         if cond>0
                             tmpdata = circshift(squeeze(Data.histograms(d,cond,:,:)),[1 num_positions/2]);
                             plot(repmat(x',[1 num_reps]),tmpdata','Color',rep_Color2,'LineWidth',rep_LineWidth);
                             plot(x,nanmean(tmpdata),'Color',mean_Color2,'LineWidth',mean_LineWidth)
-                            
                             
                         end
                     end
@@ -200,21 +199,17 @@ if ~isempty(OL_conds)
             figure('Position',[100 100 540 540*(num_plot_rows/num_plot_cols)])
             for row = 1:num_plot_rows
                 for col = 1:num_plot_cols
-                    if row > 1 %%Added this if statement because first index would either be 0 or get out of bounds
-                        cond = OL_conds(row*(1+overlap)-1,col,fig);
-                    else
-                        cond_OL_conds(row*(1+overlap),col,fig);
-                    end
+                    cond = OL_conds(1+(row-1)*(1+overlap),col,fig);
                     if cond>0
                         better_subplot(num_plot_rows, num_plot_cols, col+num_plot_cols*(row-1))
                         plot(repmat(Data.timestamps',[1 num_reps]),squeeze(Data.timeseries(d,cond,:,:))','Color',rep_Color,'LineWidth',rep_LineWidth);
                         hold on
                         plot(Data.timestamps,squeeze(nanmean(Data.timeseries(d,cond,:,:),3)),'Color',mean_Color,'LineWidth',mean_LineWidth);
-                        ylim(ylimits(d,:));
+                        ylim(timeseries_ylimits(d,:));
                         title(['Condition #' num2str(cond)],'FontSize',subtitle_FontSize)
                     end
                     if overlap==1
-                        cond = CL_conds(row*(1+overlap),col,fig);
+                        cond = CL_conds(row*2,col,fig);
                         if cond>0
                             plot(repmat(Data.timestamps',[1 num_reps]),squeeze(Data.timeseries(d,cond,:,:))','Color',rep_Color2,'LineWidth',rep_LineWidth);
                             plot(Data.timestamps,squeeze(nanmean(Data.timeseries(d,cond,:,:),3)),'Color',mean_Color2,'LineWidth',mean_LineWidth);
@@ -237,16 +232,16 @@ if ~isempty(TC_conds)
             num_plot_rows = (1-overlap/2)*max(nansum(TC_conds(:,:,fig)>0));
             figure('Position',[100 100 540/num_plot_rows 540])
             for row = 1:num_plot_rows
-                conds = TC_conds(row*(1+overlap),:,fig); %Took out -1 to avoid index of 0
+                conds = TC_conds(1+(row-1)*(1+overlap),:,fig);
                 conds(isnan(conds)&&conds==0) = [];
                 better_subplot(num_plot_rows, 1, row)
                 plot(squeeze(Data.summaries(d,conds,:)),'Color',rep_Color,'LineWidth',rep_LineWidth);
                 hold on
                 plot(nanmean(Data.summaries(d,conds,:),3),'Color',mean_Color,'LineWidth',mean_LineWidth);
-                ylim(ylimits(d,:));
+                ylim(timeseries_ylimits(d,:));
                 title(['Condition #' num2str(cond)],'FontSize',subtitle_FontSize)
                 if overlap==1
-                    conds = TC_conds(row*(1+overlap),:,fig);
+                    conds = TC_conds(row*2,:,fig);
                     conds(isnan(conds)&&conds==0) = [];
                     plot(squeeze(Data.summaries(d,conds,:)),'Color',rep_Color2,'LineWidth',rep_LineWidth);
                     plot(nanmean(Data.summaries(d,conds,:),3),'Color',mean_Color2,'LineWidth',mean_LineWidth);

@@ -24,7 +24,8 @@ mean_Color2 = [1 0 0];
 rep_LineWidth = 0.05;
 mean_LineWidth = 1;
 subtitle_FontSize = 8;
-ylimits = [-6 6; -1 6; -1 6; -1 6; 1 192; -6 6; 2 10]; %[min max] y limits for each datatype
+timeseries_ylimits = [-6 6; -1 6; -1 6; -1 6; 1 192; -6 6; 2 10]; %[min max] y limits for each datatype
+histogram_ylimits = [0 100; -6 6; 2 10];
 
 %% load data and prepare for plotting
 %load G4_Processed_Data
@@ -38,7 +39,7 @@ try
 catch
     error('cannot find G4_Processed_Data file in specified folder')
 end
-load(fullfile(exp_folder,Data_name));
+load(fullfile(exp_folder,Data_name),'Data');
 
 %create default matrices for plotting all conditions
 if nargin<5 
@@ -56,7 +57,7 @@ if nargin<5
     OL_conds = permute(OL_conds,[2 1 3]);
     
     %find all closed-loop conditions, organize into block
-    conds_vec = find(Data.conditionModes=4); 
+    conds_vec = find(Data.conditionModes==4); 
     num_conds = length(CL_conds_vec);
     W = default_W(min([num_conds length(default_W)])); %get number of subplot columns (up to default limit)
     H = default_H(min([num_conds length(default_W)])); %get number of subplot rows
@@ -79,7 +80,7 @@ end
 num_CL_datatypes = length(CL_datatypes);
 CL_inds = nan(1,num_CL_datatypes);
 for d = 1:num_CL_datatypes
-    CL_inds(d) = find(strcmpi(Data.channelNames.timeseries,CL_datatypes{d}));
+    CL_inds(d) = find(strcmpi(Data.channelNames.histograms,CL_datatypes{d}));
 end
 num_TC_datatypes = length(TC_datatypes);
 TC_inds = nan(1,num_TC_datatypes);
@@ -126,21 +127,21 @@ if ~isempty(CL_conds)
             figure('Position',[100 100 540 540*(num_plot_rows/num_plot_cols)])
             for row = 1:num_plot_rows
                 for col = 1:num_plot_cols
-                    cond = CL_conds(row*(1+overlap)-1,col,fig);
+                    cond = CL_conds(1+(row-1)*(1+overlap),col,fig);
                     if cond>0 
                         better_subplot(num_plot_rows, num_plot_cols, col+num_plot_cols*(row-1))
                         [~, ~, num_reps, num_positions] = size(Data.histograms);
-                        x = circshift(1:num_positions,[1 num_positions/2]);
+                        x = circshift(1:num_positions,[1 floor(num_positions/2)]);
                         x(x>x(end)) = x(x>x(end))-num_positions;
-                        tmpdata = circshift(squeeze(Data.histograms(d,cond,:,:)),[1 num_positions/2]);
+                        tmpdata = circshift(squeeze(Data.histograms(d,cond,:,:)),[1 floor(num_positions/2)]);
                         plot(repmat(x',[1 num_reps]),tmpdata','Color',rep_Color,'LineWidth',rep_LineWidth);
                         hold on
                         plot(x,nanmean(tmpdata),'Color',mean_Color,'LineWidth',mean_LineWidth)
-                        ylim(ylimits(d,:));
+                        ylim(histogram_ylimits(d,:));
                         title(['Condition #' num2str(cond)],'FontSize',subtitle_FontSize)
                     end
                     if overlap==1
-                        cond = CL_conds(row*(1+overlap),col,fig);
+                        cond = CL_conds(row*2,col,fig);
                         if cond>0
                             tmpdata = circshift(squeeze(Data.histograms(d,cond,:,:)),[1 num_positions/2]);
                             plot(repmat(x',[1 num_reps]),tmpdata','Color',rep_Color2,'LineWidth',rep_LineWidth);
@@ -165,17 +166,17 @@ if ~isempty(OL_conds)
             figure('Position',[100 100 540 540*(num_plot_rows/num_plot_cols)])
             for row = 1:num_plot_rows
                 for col = 1:num_plot_cols
-                    cond = OL_conds(row*(1+overlap)-1,col,fig);
+                    cond = OL_conds(1+(row-1)*(1+overlap),col,fig);
                     if cond>0
                         better_subplot(num_plot_rows, num_plot_cols, col+num_plot_cols*(row-1))
                         plot(repmat(Data.timestamps',[1 num_reps]),squeeze(Data.timeseries(d,cond,:,:))','Color',rep_Color,'LineWidth',rep_LineWidth);
                         hold on
                         plot(Data.timestamps,squeeze(nanmean(Data.timeseries(d,cond,:,:),3)),'Color',mean_Color,'LineWidth',mean_LineWidth);
-                        ylim(ylimits(d,:));
+                        ylim(timeseries_ylimits(d,:));
                         title(['Condition #' num2str(cond)],'FontSize',subtitle_FontSize)
                     end
                     if overlap==1
-                        cond = CL_conds(row*(1+overlap),col,fig);
+                        cond = OL_conds(row*2,col,fig);
                         if cond>0
                             plot(repmat(Data.timestamps',[1 num_reps]),squeeze(Data.timeseries(d,cond,:,:))','Color',rep_Color2,'LineWidth',rep_LineWidth);
                             plot(Data.timestamps,squeeze(nanmean(Data.timeseries(d,cond,:,:),3)),'Color',mean_Color2,'LineWidth',mean_LineWidth);
@@ -196,16 +197,16 @@ if ~isempty(TC_conds)
             num_plot_rows = (1-overlap/2)*max(nansum(TC_conds(:,:,fig)>0));
             figure('Position',[100 100 540/num_plot_rows 540])
             for row = 1:num_plot_rows
-                conds = TC_conds(row*(1+overlap)-1,:,fig);
+                conds = TC_conds(1+(row-1)*(1+overlap),:,fig);
                 conds(isnan(conds)&&conds==0) = [];
                 better_subplot(num_plot_rows, 1, row)
                 plot(squeeze(Data.summaries(d,conds,:)),'Color',rep_Color,'LineWidth',rep_LineWidth);
                 hold on
                 plot(nanmean(Data.summaries(d,conds,:),3),'Color',mean_Color,'LineWidth',mean_LineWidth);
-                ylim(ylimits(d,:));
+                ylim(timeseries_ylimits(d,:));
                 title(['Condition #' num2str(cond)],'FontSize',subtitle_FontSize)
                 if overlap==1
-                    conds = TC_conds(row*(1+overlap),:,fig);
+                    conds = TC_conds(row*2,:,fig);
                     conds(isnan(conds)&&conds==0) = [];
                     plot(squeeze(Data.summaries(d,conds,:)),'Color',rep_Color2,'LineWidth',rep_LineWidth);
                     plot(nanmean(Data.summaries(d,conds,:),3),'Color',mean_Color2,'LineWidth',mean_LineWidth);
