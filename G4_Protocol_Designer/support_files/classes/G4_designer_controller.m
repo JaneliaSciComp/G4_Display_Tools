@@ -2310,6 +2310,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
             end
             
             connectHost;
+            pause(15);
             Panel_com('change_root_directory', experiment_folder)
             pause(.5);
             start = questdlg('Start Dry Run?','Confirm Start','Start','Cancel','Start');
@@ -2326,26 +2327,29 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                     %ao_index = self.doc.get_ao_index(trial{4});
                     
                     Panel_com('set_control_mode', trial_mode);
-                    
-
+                    pause(.1);
                     Panel_com('set_pattern_id', pattern_index); 
+                    pause(.1);
                     
                    % Panel_com('set_gain_bias', [LmR_gain LmR_offset])
                    if func_index ~= 0
                         Panel_com('set_pattern_func_id', func_index);
+                        pause(.1);
                        
                    end
                     %Panel_com('set_ao_function_id',[0, ao_index]);
                     if ~isempty(trial{10})
                         Panel_com('set_gain_bias',[LmR_gain LmR_offset]);
+                        pause(.1);
                        
                     end
                     if trial_mode == 2
                         Panel_com('set_frame_rate', trial_fr_rate);
+                        pause(.1);
                         
                     end
-
                     Panel_com('set_position_x', trial_frame_index);
+                    pause(.1);
                     
                     if trial_duration ~= 0
   
@@ -2355,7 +2359,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                         
                     else
                         
-                        Panel_com('start_display', 20);
+                        Panel_com('start_display', 2000);
                         w = waitforbuttonpress; %If pretrial duration is set to zero, this
                         %causes it to loop until a button is press or
                         %mouse clicked

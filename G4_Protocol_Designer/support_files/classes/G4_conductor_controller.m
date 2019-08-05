@@ -107,6 +107,10 @@ classdef G4_conductor_controller < handle
                 
                 self.doc = varargin{1};
                 
+            else
+                
+                self.doc = G4_document();
+                
             end
             
             self.layout();
@@ -133,7 +137,7 @@ classdef G4_conductor_controller < handle
 
            
            menu = uimenu(self.fig, 'Text', 'File');
-           menu_open = uimenu(menu, 'Text', 'Open', 'Callback', @self.open_g4p_file);
+           menu_open = uimenu(menu, 'Text', 'Open', 'Callback', {@self.open_g4p_file,[]});
          %  menu_clear = uimenu(menu, 'Text', 'Clear', 'Callback', @self.clear_data);
            
             start_button = uicontrol(self.fig,'Style','pushbutton', 'String', 'Run', ...
@@ -404,10 +408,17 @@ classdef G4_conductor_controller < handle
         end
         
      
-        function open_g4p_file(self, src, event)
+        function open_g4p_file(self, src, event, filepath)
+            
+            if isempty(filepath)
            
-            [filename, top_folder_path] = uigetfile('*.g4p');
-            filepath = fullfile(top_folder_path, filename);
+                [filename, top_folder_path] = uigetfile('*.g4p');
+                filepath = fullfile(top_folder_path, filename);
+                
+            else
+                
+                [top_folder_path, filename] = fileparts(filepath);
+            end
        
             if isequal (top_folder_path,0)
             
@@ -892,7 +903,37 @@ classdef G4_conductor_controller < handle
         
         
         function run_test(self, src, event)
-        
+            
+            %Get filepath to the test protocol
+            if self.model.experiment_type == 1
+                %Get the flight filepath from settings
+                line_to_match = '%Flight test protocol file:';
+            elseif self.model.experiment_type == 2
+                %Get path to camera test file
+                line_to_match = '%Camera walk test protocol file:';
+               
+            else
+                %Get path to chip test file
+                line_to_match = '%Chip walk test protocol file:';
+            end
+            
+            settings_data = strtrim(regexp( fileread('G4_Protocol_Designer_settings.m'),'\n','split'));
+            path_line = find(contains(settings_data, line_to_match));
+            path_index = strfind(settings_data{path_line},'file: ');
+            path = settings_data{path_line}(path_index+6:end);
+            
+            test_con = G4_conductor_controller();
+            test_con.open_g4p_file(src, event, path);
+            test_con.model.do_plotting = 0;
+            test_con.model.do_processing = 0;
+            test_con.model.fly_name = 'test';
+            test_con.model.fly_genotype = 'n/a';
+            set(test_con.processing_textbox, 'enable', 'off');
+            set(test_con.browse_button_processing, 'enable', 'off');
+            set(test_con.plotting_textbox, 'enable', 'off');
+            set(test_con.browse_button_plotting, 'enable', 'off');
+            test_con.update_run_gui();
+            
 %             [testFilename, testFilepath] = uigetfile('*.g4p');
 %             filepath = fullfile(testFilepath, testFilename);
 %             

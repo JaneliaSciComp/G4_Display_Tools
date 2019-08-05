@@ -230,8 +230,15 @@ function G4_default_run_protocol(runcon, p)
                  
                 %Set the panel values appropriately----------------
                  Panel_com('set_control_mode',pre_mode);
+                 if pre_mode == 3 %For some reason, mode 3 specifically screws up the run, making subsequent trials glitch. 
+                     pause(.1); %A pause is unnecessary with other modes but seems necessary with mode 3. Will investigate further.
+                 end
                  
                  Panel_com('set_pattern_id', pre_pat);
+                 if pre_mode == 3
+                     pause(.1);
+                 end
+                    
                  
                  
                  %randomize frame index if indicated
@@ -241,6 +248,9 @@ function G4_default_run_protocol(runcon, p)
                  end
                  
                  Panel_com('set_position_x',pre_frame_ind);
+                 if pre_mode == 3
+                     pause(.1);
+                 end
                  
 
                  if pre_pos ~= 0
