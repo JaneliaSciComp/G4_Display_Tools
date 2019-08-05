@@ -293,7 +293,7 @@ function G4_default_run_protocol(runcon, p)
                     Panel_com('start_display', (pre_dur*10));
                     pause(pre_dur + .01);
                  else
-                     Panel_com('start_display', 20);
+                     Panel_com('start_display', 2000);
                      w = waitforbuttonpress; %If pretrial duration is set to zero, this
                      %causes it to loop until you press a button.
                  end
