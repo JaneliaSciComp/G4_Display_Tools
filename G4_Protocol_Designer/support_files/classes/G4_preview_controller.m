@@ -178,7 +178,7 @@ classdef G4_preview_controller < handle
                %if not, set to zero.
            if self.model.mode == 1
                if strcmp(self.model.data(3),'') == 1
-                   waitfor(errordlg("To preview in mode one please enter a position function"));
+                   self.create_error_box("To preview in mode one please enter a position function");
                    return;
                else
                    
@@ -344,6 +344,25 @@ classdef G4_preview_controller < handle
         end
         
 
+        function create_error_box(varargin)
+            if isempty(varargin)
+                return;
+            else
+                msg = varargin{1};
+                if length(varargin) >= 2
+                    title = varargin{2};
+                else
+                    title = "";
+                end
+
+                e = errordlg(msg, title);
+                set(e, 'Resize', 'on');
+                waitfor(e);
+
+                disp("Display this after I've closed the box");
+            end
+
+        end
         
         function preview_Mode1(self)
             
@@ -364,7 +383,7 @@ classdef G4_preview_controller < handle
             end
             
             if self.pos_line == 0
-                waitfor(errordlg("Please make sure you've entered a position function and try again."));
+                self.create_error_box("Please make sure you've entered a position function and try again.");
             else
                 
                 time = self.model.dur*1000;
@@ -669,7 +688,7 @@ classdef G4_preview_controller < handle
             
 
             if self.pos_line == 0
-                waitfor(errordlg("Please make sure you have entered a position function and try again."));
+                self.create_error_box("Please make sure you have entered a position function and try again.");
             else
 
                 index = self.model.preview_index;
@@ -742,12 +761,12 @@ classdef G4_preview_controller < handle
            
 
             if self.pos_line == 0
-                waitfor(errordlg("Please make sure you have entered a position function and try again."));
+                self.create_error_box("Please make sure you have entered a position function and try again.");
             else
                 
                 
                 if length(self.model.dummy_data) ~= length(self.model.pos_data)
-                    waitfor(errordlg("Please make sure your position function is the same length as your duration"));
+                    self.create_error_box("Please make sure your position function is the same length as your duration");
                 else
                 
                     for i = self.model.preview_index:length(self.model.pos_data)

@@ -46,7 +46,7 @@
  %p.active_ao_channels lists the channels that are active - [0 2 3] for
  %example means channels 1, 3, and 4 are active.
 
-function G4_default_run_protocol(runcon, p)
+function [success] = G4_default_run_protocol(runcon, p)
 
 %% Get access to the figure and progress bar in the run gui.
 
@@ -54,6 +54,7 @@ function G4_default_run_protocol(runcon, p)
     progress_bar = runcon.progress_bar;
     progress_axes = runcon.progress_axes;
     axes_label = runcon.axes_label;
+    expected_time = runcon.expected_time;
 
  %% Set up parameters 
  %pretrial params-----------------------------------------------------
@@ -161,6 +162,7 @@ function G4_default_run_protocol(runcon, p)
      
          case 'Cancel'
              disconnectHost;
+             success = 0;
              return;
          case 'Start' 
 %The rest of the code to run the experiment goes under this case
@@ -207,7 +209,9 @@ function G4_default_run_protocol(runcon, p)
             
             %Update the progress bar's label to reflect the expected
             %duration.
+           
             axes_label.String = "Estimated experiment duration: " + num2str(total_time/60) + " minutes.";
+            expected_time.String = num2str(round(total_time/60, 2)) + " minutes.";
             
             %Will increment this every time a trial is completed to track how far along 
             %in the experiment we are
@@ -544,6 +548,7 @@ function G4_default_run_protocol(runcon, p)
             disconnectHost;
             
             pause(1);
+            success = 1;
 
      end
 

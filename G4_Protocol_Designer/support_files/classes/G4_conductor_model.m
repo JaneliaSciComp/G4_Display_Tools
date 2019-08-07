@@ -45,17 +45,17 @@ classdef G4_conductor_model
             %TO DO: MAKE THIS ITS OWN FUNCTION AND REPLACE ALL INSTANCES OF
             %IT
             settings_data = strtrim(regexp( fileread('G4_Protocol_Designer_settings.m'),'\n','split'));
-            protocol_path_line = find(contains(settings_data, '%Default run protocol file:'));
+            protocol_path_line = find(contains(settings_data, 'Default run protocol file:'));
             protocol_path_index = strfind(settings_data{protocol_path_line},'file: ');
             protocol_path = settings_data{protocol_path_line}(protocol_path_index+6:end);
             self.run_protocol_file = protocol_path;
             
-            processing_path_line = find(contains(settings_data, '%Default processing file:'));
+            processing_path_line = find(contains(settings_data, 'Default processing file:'));
             processing_path_index = strfind(settings_data{processing_path_line},'file: ');
             processing_path = settings_data{processing_path_line}(processing_path_index+6:end);
             self.processing_file = processing_path;
              
-            plotting_path_line = find(contains(settings_data, '%Default plotting file:'));
+            plotting_path_line = find(contains(settings_data, 'Default plotting file:'));
             plotting_path_index = strfind(settings_data{plotting_path_line},'file: ');
             plotting_path = settings_data{plotting_path_line}(plotting_path_index+6:end);
             

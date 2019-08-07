@@ -491,12 +491,12 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
 
     %             elseif within_bounds == 0
     %                 
-    %                 waitfor(errordlg("The value you provided is out of bounds."));
+    %                 self.create_error_box("The value you provided is out of bounds."));
     %                 self.layout_gui();
 
             else
 
-                waitfor(errordlg("You cannot edit that field in this mode."));
+                self.create_error_box("You cannot edit that field in this mode.");
                 %self.layout_gui();
 
 
@@ -536,7 +536,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                 %self.doc.block_trials
             else
                 
-                waitfor(errordlg("You cannot edit that field in this mode."));
+                self.create_error_box("You cannot edit that field in this mode.");
 
             end
             
@@ -576,7 +576,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                 end
             else
                 
-                waitfor(errordlg("You cannot edit that field in this mode."));
+                self.create_error_box("You cannot edit that field in this mode.");
                 %self.layout_gui();
             end
             
@@ -613,7 +613,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
 
             else
                 
-                waitfor(errordlg("You cannot edit that field in this mode."));
+                self.create_error_box("You cannot edit that field in this mode.");
                 %self.layout_gui();
             end
             if y == 1
@@ -697,7 +697,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
             
             new = str2num(src.String);
             if rem(new,1000) ~= 0 && new ~= 0
-                waitfor(errordlg("The value you've entered is not a multiple of 1000. Please double check your entry."));
+                self.create_error_box("The value you've entered is not a multiple of 1000. Please double check your entry.");
             end
             self.doc.chan1_rate = new;
             if new == 0
@@ -716,7 +716,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
             
             new = str2num(src.String);
             if rem(new,1000) ~= 0
-                waitfor(errordlg("The value you've entered is not a multiple of 1000. Please double check your entry."));
+                self.create_error_box("The value you've entered is not a multiple of 1000. Please double check your entry.");
             end
             self.doc.set_config_data(new,2);
             self.doc.chan2_rate = new;
@@ -735,7 +735,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
             
             new = str2num(src.String);
             if rem(new,1000) ~= 0
-                waitfor(errordlg("The value you've entered is not a multiple of 1000. Please double check your entry."));
+                self.create_error_box("The value you've entered is not a multiple of 1000. Please double check your entry.");
             end
             self.doc.chan3_rate = new;
             if new == 0
@@ -754,7 +754,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
             
             new = str2num(src.String);
             if rem(new,1000) ~= 0
-                waitfor(errordlg("The value you've entered is not a multiple of 1000. Please double check your entry."));
+                self.create_error_box("The value you've entered is not a multiple of 1000. Please double check your entry.");
             end
             self.doc.chan4_rate = new;
             if new == 0
@@ -827,6 +827,26 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
 %             fclose(fid);
 %             
 %         end
+
+
+        function create_error_box(self, varargin)
+            if isempty(varargin)
+                return;
+            else
+                msg = varargin{1};
+                if length(varargin) >= 2
+                    title = varargin{2};
+                else
+                    title = "";
+                end
+
+                e = errordlg(msg, title);
+                set(e, 'Resize', 'on');
+                waitfor(e);
+
+            end
+
+        end
         
 %CLEAR OUT ALL DATA TO START DESIGNING NEW EXPERIMENT----------------------
 
@@ -882,7 +902,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                 
                 
             else 
-                waitfor(errordlg("you can only have one row checked for this functionality"));
+                self.create_error_box("you can only have one row checked for this functionality");
                       
                   
                 
@@ -916,7 +936,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
             %disp(checked_list);
             
             if checked_count == 0
-                waitfor(errordlg("You didn't select a trial to delete."));
+                self.create_error_box("You didn't select a trial to delete.");
             else
                 
                 for i = 1:checked_count
@@ -950,14 +970,14 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
             checked_count = length(checked);
             
             if checked_count == 0
-                waitfor(errordlg("Please select a trial to shift upward."));
+                self.create_error_box("Please select a trial to shift upward.");
             elseif checked_count > 1
-                waitfor(errordlg("Please select only one trial to shift upward."));
+                self.create_error_box("Please select only one trial to shift upward.");
             else 
             
                 selected = self.doc.block_trials(checked, :);
                 if checked == 1
-                    waitfor(errordlg("I can't shift up any more."));
+                    self.create_error_box("I can't shift up any more.");
                     return;
                 else
                     above_selected = self.doc.block_trials(checked - 1, :);
@@ -990,15 +1010,15 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
             checked_count = length(checked);
             
             if checked_count == 0
-                waitfor(errordlg("Please select a trial to shift downward"));
+                self.create_error_box("Please select a trial to shift downward");
             elseif checked_count > 1
-                waitfor(errordlg("Please select only one trial to shift downward"));
+                self.create_error_box("Please select only one trial to shift downward");
             else 
                 
                 selected = self.doc.block_trials(checked, :);
                 
                 if checked == length(self.doc.block_trials(:,1))
-                    waitfor(errordlg("I can't shift down any further."));
+                    self.create_error_box("I can't shift down any further.");
                     return;
                 else
                     below_selected = self.doc.block_trials(checked + 1, :);
@@ -1093,7 +1113,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
         end
         
         if pat_index == length(pat_names) && length(d.Patterns.(pat1_field).pattern.Pats(:,1,1))/16 ~= self.doc.num_rows
-            waitfor(errordlg("None of the patterns imported match the screen size selected. Please import a different folder or select a new screen size"));
+            self.create_error_box("None of the patterns imported match the screen size selected. Please import a different folder or select a new screen size");
             return;
         end
         
@@ -1680,7 +1700,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                         self.update_gui();
 
                     else
-                        waitfor(errordlg("Make sure you haven't changed your selection."));
+                        self.create_error_box("Make sure you haven't changed your selection.");
                     end
                     
                 else
@@ -1732,7 +1752,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
             if event.Indices(2) == 2
                 pats = self.doc.Patterns;
                 if isempty(fieldnames(pats))
-                    waitfor(errordlg("You haven't imported any patterns yet."));
+                    self.create_error_box("You haven't imported any patterns yet.");
                     return;
                 end
                 fields = fieldnames(pats);
@@ -1742,7 +1762,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
 
                     chosen_pat = fields{index};
                     if length(self.doc.Patterns.(chosen_pat).pattern.Pats(:,1,1))/16 ~= self.doc.num_rows
-                        waitfor(errordlg("This pattern will not run on the currently selected screen size. Please try again."));
+                        self.create_error_box("This pattern will not run on the currently selected screen size. Please try again.");
                         return;
                     end
                     file = fields{index};
@@ -1767,7 +1787,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                         self.update_gui();
 
                     else
-                        waitfor(errordlg("Make sure you haven't changed your selection."));
+                        self.create_error_box("Make sure you haven't changed your selection.");
                     end
                     file = string(file);
                 end
@@ -1779,7 +1799,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                 if edit == 1
                     pos = self.doc.Pos_funcs;
                     if isempty(fieldnames(pos))
-                        waitfor(errordlg("You have not imported any position functions yet."));
+                        self.create_error_box("You have not imported any position functions yet.");
                         return;
                     end
 
@@ -1809,7 +1829,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                             self.update_gui();
 
                         else
-                            waitfor(errordlg("Make sure you haven't changed your selection."));
+                            self.create_error_box("Make sure you haven't changed your selection.");
                         end
                         file = string(file);
                     end
@@ -1818,7 +1838,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
 
                 ao = self.doc.Ao_funcs;
                 if isempty(fieldnames(ao))
-                    waitfor(errordlg("You haven't imported any AO functions yet."));
+                    self.create_error_box("You haven't imported any AO functions yet.");
                     return;
                 end
                 fields = fieldnames(ao);
@@ -1847,7 +1867,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                         self.update_gui();
 
                     else
-                        waitfor(errordlg("Make sure you haven't changed your selection."));
+                        self.create_error_box("Make sure you haven't changed your selection.");
                     end
                     file = string(file);
                 end
@@ -1863,7 +1883,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
  
                 if event.Indices(2) == 2
         %                         if isempty(self.doc) == 1
-        %                             waitfor(errordlg("You haven't imported anything yet"));
+        %                             self.create_error_box("You haven't imported anything yet"));
         %                         end
 
                     self.model.auto_preview_index = self.check_pattern_dimensions();
@@ -1975,7 +1995,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                 filename = string(self.posttrial_table.Data(self.model.current_selected_cell.index(2)));
 
             else
-                waitfor(errordlg("Please make sure you have selected a cell and try again"));
+                self.create_error_box("Please make sure you have selected a cell and try again");
                 return;
             end
 
@@ -2024,7 +2044,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                 filename = string(self.posttrial_table.Data(self.model.current_selected_cell.index(2)));
 
             else
-                waitfor(errordlg("Please make sure you have selected a cell and try again"));
+                self.create_error_box("Please make sure you have selected a cell and try again");
                 return;
             end
 
@@ -2103,7 +2123,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                     fr_rate = 30;
                 end
             else
-                waitfor(errordlg("Please make sure you have selected a cell and try again"));
+                self.create_error_box("Please make sure you have selected a cell and try again");
                 return;
             end
 
@@ -2189,7 +2209,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
         function preview_stop(self,src,event)
             
             if strcmp(self.model.current_selected_cell.table, "")
-                waitfor(errordlg("Please make sure you've selected a cell."));
+                self.create_error_box("Please make sure you've selected a cell.");
                 return;
             end
 
@@ -2252,7 +2272,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                elseif mode == 7
                    self.preview_con.preview_Mode4();
                else
-                   waitfor(errordlg("Please make sure you have entered a valid mode and try again."));
+                   self.create_error_box("Please make sure you have entered a valid mode and try again.");
                end
 
 %At this point, all axes should have been created and all existing
@@ -2298,7 +2318,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
             end
             %pre_start = 0;
             if strcmp(self.doc.top_export_path,'') == 1
-                waitfor(errordlg("You must save the experiment before you can test it on the screens."));
+                self.create_error_box("You must save the experiment before you can test it on the screens.");
                 return;
             end
             experiment_folder = self.doc.top_export_path;
@@ -2385,7 +2405,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
              [pos, ao1, ao2, ao3, ao4] = self.create_preview_objects(data, pos_pos, ao1_pos, ao2_pos, ao3_pos, ao4_pos, f); %CREATE THIS FUNCTION TO RETURN AXES
 
             if pos == 0
-                waitfor(errordlg("Please make sure you have entered a position function and try again."));
+                self.create_error_box("Please make sure you have entered a position function and try again.");
             else
 
 
@@ -2436,7 +2456,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
         function [loaded_file] = check_file_exists(self, filename)
 
             if isfile(filename) == 0
-                waitfor(errordlg("This file doesn't exist"));
+                self.create_error_box("This file doesn't exist");
                 loaded_file = 0;
             else
                 loaded_file = load(filename);
@@ -2592,7 +2612,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                 pats = self.doc.Patterns;
                 fields = fieldnames(pats);
                 if isempty(fields)
-                    waitfor(errordlg("You haven't imported any patterns yet."));
+                    self.create_error_box("You haven't imported any patterns yet.");
                     success = 0;
                     chosen_file = '';
                     chosen_field = '';
@@ -2611,7 +2631,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                     chosen_field = self.doc.get_pattern_field_name(chosen_file);
 
                     if length(self.doc.Patterns.(chosen_field).pattern.Pats(:,1,1))/16 ~= self.doc.num_rows
-                        waitfor(errordlg("This pattern will not run on the currently selected screen size. Please try again."));
+                        self.create_error_box("This pattern will not run on the currently selected screen size. Please try again.");
                         success = 0;
                         chosen_file = '';
                         chosen_field = '';
@@ -2643,7 +2663,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
 
                 edit = self.check_editable(mode, 3);
                 if edit == 0
-                    waitfor(errordlg("You cannot edit the position function in this mode."));
+                    self.create_error_box("You cannot edit the position function in this mode.");
                     success = 0;
                     chosen_file = '';
                     chosen_field = '';
@@ -2652,7 +2672,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                 funcs = self.doc.Pos_funcs;
                 fields = fieldnames(funcs);
                 if isempty(fields)
-                    waitfor(errordlg("You haven't imported any functions yet."));
+                    self.create_error_box("You haven't imported any functions yet.");
                     success = 0;
                     chosen_file = '';
                     chosen_field = '';
@@ -2685,7 +2705,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                 ao = self.doc.Ao_funcs;
                 fields = fieldnames(ao);
                 if isempty(fields)
-                    waitfor(errordlg("You haven't imported any AO functions yet."));
+                    self.create_error_box("You haven't imported any AO functions yet.");
                     success = 0;
                     chosen_file = '';
                     chosen_field = '';
@@ -3237,10 +3257,10 @@ end
 
       %throw error if more or less than one is selected
             if all_checked == 0 
-                waitfor(errordlg("You must selected a trial to preview"));
+                self.create_error_box("You must selected a trial to preview");
                 data = [];
             elseif all_checked > 1
-                waitfor(errordlg("You can only select one trial at a time to preview"));
+                self.create_error_box("You can only select one trial at a time to preview");
                 data = [];
             else
       %set data to correct table
@@ -3253,7 +3273,7 @@ end
                 elseif strcmp(checked_trial, 'post')
                     data = self.doc.posttrial;
                 else
-                    waitfor(errordlg("Something went wrong. Please make sure you have exactly one trial selected and try again."));
+                    self.create_error_box("Something went wrong. Please make sure you have exactly one trial selected and try again.");
                 end
             end
         end

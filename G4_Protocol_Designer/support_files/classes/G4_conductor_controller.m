@@ -25,6 +25,7 @@ classdef G4_conductor_controller < handle
         browse_button_plotting_
         browse_button_processing_
         browse_button_run_
+        expected_time_
         %total_trials_;
         
         %These are pieces of text in the updates panel that are updated
@@ -70,6 +71,7 @@ classdef G4_conductor_controller < handle
         browse_button_plotting
         browse_button_processing
         browse_button_run
+        expected_time
        % total_trials;
        
         %These are pieces of text in the updates panel that are updated
@@ -151,58 +153,62 @@ classdef G4_conductor_controller < handle
             
             %Labels for status update showing current trial parameters
             current_trial = uicontrol(status_pan, 'Style', 'text', 'String', 'Current Trial:', 'FontSize', 10.5, ...
-                'HorizontalAlignment', 'center', 'units', 'pixels', 'Position', [10, 35, 100, 15]);
+                'HorizontalAlignment', 'center', 'units', 'pixels', 'Position', [10, 45, 100, 15]);
             mode_label = uicontrol(status_pan, 'Style', 'text', 'String', 'Mode', 'FontSize', 10.5, ...
-                'HorizontalAlignment', 'center', 'units', 'pixels', 'Position', [115, 60, 55, 15]);
+                'HorizontalAlignment', 'center', 'units', 'pixels', 'Position', [115, 70, 55, 15]);
             pat_label = uicontrol(status_pan, 'Style', 'text', 'String', 'Pattern', 'FontSize', 10.5, ...
-                'HorizontalAlignment', 'center', 'units', 'pixels', 'Position', [180, 60, 55, 15]);
+                'HorizontalAlignment', 'center', 'units', 'pixels', 'Position', [180, 70, 55, 15]);
             pos_label = uicontrol(status_pan, 'Style', 'text', 'String', 'Position', 'FontSize', 10.5, ...
-                'HorizontalAlignment', 'center', 'units', 'pixels', 'Position', [245, 60, 60, 15]);
+                'HorizontalAlignment', 'center', 'units', 'pixels', 'Position', [245, 70, 60, 15]);
             ao1_label = uicontrol(status_pan, 'Style', 'text', 'String', 'AO1', 'FontSize', 10.5, ...
-                'HorizontalAlignment', 'center', 'units', 'pixels', 'Position', [320, 60, 55, 15]);
+                'HorizontalAlignment', 'center', 'units', 'pixels', 'Position', [320, 70, 55, 15]);
             ao2_label = uicontrol(status_pan, 'Style', 'text', 'String', 'AO2', 'FontSize', 10.5, ...
-                'HorizontalAlignment', 'center', 'units', 'pixels', 'Position', [385, 60, 55, 15]);
+                'HorizontalAlignment', 'center', 'units', 'pixels', 'Position', [385, 70, 55, 15]);
             ao3_label = uicontrol(status_pan, 'Style', 'text', 'String', 'AO3', 'FontSize', 10.5, ...
-                'HorizontalAlignment', 'center', 'units', 'pixels', 'Position', [450, 60, 55, 15]);
+                'HorizontalAlignment', 'center', 'units', 'pixels', 'Position', [450, 70, 55, 15]);
             ao4_label = uicontrol(status_pan, 'Style', 'text', 'String', 'AO4', 'FontSize', 10.5, ...
-                'HorizontalAlignment', 'center', 'units', 'pixels', 'Position', [515, 60, 55, 15]);
+                'HorizontalAlignment', 'center', 'units', 'pixels', 'Position', [515, 70, 55, 15]);
             frameInd_label = uicontrol(status_pan, 'Style', 'text', 'String', 'Fr. Index', 'FontSize', 10.5, ...
-                'HorizontalAlignment', 'center', 'units', 'pixels', 'Position', [580, 60, 60, 15]);
+                'HorizontalAlignment', 'center', 'units', 'pixels', 'Position', [580, 70, 60, 15]);
             frRate_label = uicontrol(status_pan, 'Style', 'text', 'String', 'Fr. Rate', 'FontSize', 10.5, ...
-                'HorizontalAlignment', 'center', 'units', 'pixels', 'Position', [655, 60, 55, 15]);
+                'HorizontalAlignment', 'center', 'units', 'pixels', 'Position', [655, 70, 55, 15]);
             gain_label = uicontrol(status_pan, 'Style', 'text', 'String', 'Gain', 'FontSize', 10.5, ...
-                'HorizontalAlignment', 'center', 'units', 'pixels', 'Position', [720, 60, 55, 15]);
+                'HorizontalAlignment', 'center', 'units', 'pixels', 'Position', [720, 70, 55, 15]);
             off_label = uicontrol(status_pan, 'Style', 'text', 'String', 'Offset', 'FontSize', 10.5, ...
-                'HorizontalAlignment', 'center', 'units', 'pixels', 'Position', [785, 60, 55, 15]);
+                'HorizontalAlignment', 'center', 'units', 'pixels', 'Position', [785, 70, 55, 15]);
             dur_label = uicontrol(status_pan, 'Style', 'text', 'String', 'Duration', 'FontSize', 10.5, ...
-                'HorizontalAlignment', 'center', 'units', 'pixels', 'Position', [850, 60, 60, 15]);
+                'HorizontalAlignment', 'center', 'units', 'pixels', 'Position', [850, 70, 60, 15]);
+            exp_time_label = uicontrol(status_pan, 'Style', 'text', 'String', 'Expected Experiment Length:', 'FontSize', ...
+                10.5, 'HorizontalAlignment', 'center', 'units', 'pixels', 'Position', [10, 15, 200, 20]);
             
             %Parameter values in status panel which change with every trial
             
             self.current_mode =  uicontrol(status_pan, 'Style', 'text', 'String', '', 'FontSize', 10.5, ...
-                'HorizontalAlignment', 'center', 'units', 'pixels', 'Position', [115, 35, 55, 15]);
+                'HorizontalAlignment', 'center', 'units', 'pixels', 'Position', [115, 45, 55, 15]);
             self.current_pat = uicontrol(status_pan, 'Style', 'text', 'String', '', 'FontSize', 10.5, ...
-                'HorizontalAlignment', 'center', 'units', 'pixels', 'Position', [180, 35, 55, 15]);
+                'HorizontalAlignment', 'center', 'units', 'pixels', 'Position', [180, 45, 55, 15]);
             self.current_pos = uicontrol(status_pan, 'Style', 'text', 'String', '', 'FontSize', 10.5, ...
-                'HorizontalAlignment', 'center', 'units', 'pixels', 'Position', [245, 35, 60, 15]);
+                'HorizontalAlignment', 'center', 'units', 'pixels', 'Position', [245, 45, 60, 15]);
             self.current_ao1 = uicontrol(status_pan, 'Style', 'text', 'String', '', 'FontSize', 10.5, ...
-                'HorizontalAlignment', 'center', 'units', 'pixels', 'Position', [320, 35, 55, 15]);
+                'HorizontalAlignment', 'center', 'units', 'pixels', 'Position', [320, 45, 55, 15]);
             self.current_ao2 = uicontrol(status_pan, 'Style', 'text', 'String', '', 'FontSize', 10.5, ...
-                'HorizontalAlignment', 'center', 'units', 'pixels', 'Position', [385, 35, 55, 15]);
+                'HorizontalAlignment', 'center', 'units', 'pixels', 'Position', [385, 45, 55, 15]);
             self.current_ao3 = uicontrol(status_pan, 'Style', 'text', 'String', '', 'FontSize', 10.5, ...
-                'HorizontalAlignment', 'center', 'units', 'pixels', 'Position', [450, 35, 55, 15]);
+                'HorizontalAlignment', 'center', 'units', 'pixels', 'Position', [450, 45, 55, 15]);
             self.current_ao4 = uicontrol(status_pan, 'Style', 'text', 'String', '', 'FontSize', 10.5, ...
-                'HorizontalAlignment', 'center', 'units', 'pixels', 'Position', [515, 35, 55, 15]);
+                'HorizontalAlignment', 'center', 'units', 'pixels', 'Position', [515, 45, 55, 15]);
              self.current_frInd = uicontrol(status_pan, 'Style', 'text', 'String', '', 'FontSize', 10.5, ...
-                'HorizontalAlignment', 'center', 'units', 'pixels', 'Position', [580, 35, 60, 15]);
+                'HorizontalAlignment', 'center', 'units', 'pixels', 'Position', [580, 45, 60, 15]);
             self.current_frRate = uicontrol(status_pan, 'Style', 'text', 'String', '', 'FontSize', 10.5, ...
-                'HorizontalAlignment', 'center', 'units', 'pixels', 'Position', [655, 35, 55, 15]);
+                'HorizontalAlignment', 'center', 'units', 'pixels', 'Position', [655, 45, 55, 15]);
             self.current_gain = uicontrol(status_pan, 'Style', 'text', 'String', '', 'FontSize', 10.5, ...
-                'HorizontalAlignment', 'center', 'units', 'pixels', 'Position', [720, 35, 55, 15]);
+                'HorizontalAlignment', 'center', 'units', 'pixels', 'Position', [720, 45, 55, 15]);
             self.current_offset = uicontrol(status_pan, 'Style', 'text', 'String', '', 'FontSize', 10.5, ...
-                'HorizontalAlignment', 'center', 'units', 'pixels', 'Position', [785, 35, 55, 15]);
+                'HorizontalAlignment', 'center', 'units', 'pixels', 'Position', [785, 45, 55, 15]);
             self.current_duration = uicontrol(status_pan, 'Style', 'text', 'String', '', 'FontSize', 10.5, ...
-                'HorizontalAlignment', 'center', 'units', 'pixels', 'Position', [850, 35, 60, 15]);
+                'HorizontalAlignment', 'center', 'units', 'pixels', 'Position', [850, 45, 60, 15]);
+            self.expected_time = uicontrol(status_pan, 'Style', 'text', 'String', '', 'FontSize', ...
+                10.5, 'HorizontalAlignment', 'left', 'units', 'pixels', 'Position', [230, 15, 120, 20]);
             
             
             self.progress_axes = axes(self.fig, 'units','pixels', 'Position', [15, fig_size(4)*.2+30, fig_size(3) - 30 ,50]);
@@ -329,7 +335,7 @@ classdef G4_conductor_controller < handle
             errormsg = "The experiment has already been saved under this name. " ...
                 + "If you would like to change the experiment name, close this window " ...
                 + "and save it under the new name in the designer view.";
-            waitfor(errordlg(errormsg));
+            self.create_error_box(errormsg);
             self.exp_name_box.String = self.doc.experiment_name;
             self.update_run_gui();
         end
@@ -390,6 +396,26 @@ classdef G4_conductor_controller < handle
             
             drawnow;
             
+        end
+        
+        function create_error_box(self, varargin)
+  
+            if isempty(varargin)
+                return;
+            else
+                msg = varargin{1};
+                if length(varargin) >= 2
+                    title = varargin{2};
+                else
+                    title = "";
+                end
+
+                e = errordlg(msg, title);
+                set(e, 'Resize', 'on');
+                waitfor(e);
+       
+            end
+   
         end
         
         function test_progress_bar(self, src, event)
@@ -495,7 +521,7 @@ classdef G4_conductor_controller < handle
             
             %returns if you forgot to save the experiment.
             if strcmp(self.doc.save_filename,'') == 1
-                waitfor(errordlg("You didn't save this experiment. Please go back and save then run the experiment again."));
+                self.create_error_box("You didn't save this experiment. Please go back and save then run the experiment again.", "Please save.");
                 return
             end
             
@@ -512,11 +538,11 @@ classdef G4_conductor_controller < handle
             %already has results in this experiment folder.
             
             if length(dir([experiment_folder '\Log Files\']))>2
-                waitfor(errordlg('unsorted files present in "Log Files" folder, remove before restarting experiment\n'));
+                self.create_error_box('unsorted files present in "Log Files" folder, remove before restarting experiment\n');
                 return;
             end
             if exist([experiment_folder '\Results\' self.model.fly_name],'dir')
-                waitfor(errordlg('Results folder already exists with that fly name\n'));
+                self.create_error_box('Results folder already exists with that fly name\n');
                 return;
             end
             %-------------------------------------------------------------
@@ -742,7 +768,7 @@ classdef G4_conductor_controller < handle
             
             %Make sure the run file entered exists
             if ~isfile(self.model.run_protocol_file)
-                waitfor(errordlg("Please make sure you've entered a valid .m file to run the experiment."));
+                self.create_error_box("Please make sure you've entered a valid .m file to run the experiment.");
                 return;
             end
             
@@ -750,7 +776,7 @@ classdef G4_conductor_controller < handle
             [run_path, run_name, ext] = fileparts(self.model.run_protocol_file);
             
             %Create the full command
-            run_command = run_name + "(self, parameters)";
+            run_command = "success = " + run_name + "(self, parameters)";
             
             %run script
             eval(run_command);
@@ -770,7 +796,9 @@ classdef G4_conductor_controller < handle
 %             disconnectHost;
 %             pause(10);
             
-
+            if success == 0
+                return;
+            end
             %Move the log files to the results file under the fly name
             movefile([experiment_folder '\Log Files\*'],fullfile(experiment_folder,'Results',self.model.fly_name));
 
@@ -814,7 +842,7 @@ classdef G4_conductor_controller < handle
             
             %Run post processing and plotting scripts if selected
             if self.model.do_processing == 1 && (strcmp(self.model.processing_file,'') || ~isfile(self.model.processing_file))
-                waitfor(errordlg("Processing script was not run because the processing file could not be found. Please run manually."));
+                self.create_error_box("Processing script was not run because the processing file could not be found. Please run manually.");
      
             elseif self.model.do_processing == 1 && isfile(self.model.processing_file)
                 [proc_path, proc_name, proc_ext] = fileparts(self.model.processing_file);
@@ -825,7 +853,7 @@ classdef G4_conductor_controller < handle
             end
             
             if self.model.do_plotting == 1 && (strcmp(self.model.plotting_file,'') || ~isfile(self.model.plotting_file))
-                waitfor(errordlg("Plotting script was not run because the plotting file could not be found. Please run manually."));
+                self.create_error_box("Plotting script was not run because the plotting file could not be found. Please run manually.");
             elseif self.model.do_plotting == 1 && isfile(self.model.plotting_file)
                 [plot_path, plot_name, plot_ext] = fileparts(self.model.plotting_file);
                 plotting_command = plot_name + "(metadata.fly_results_folder, metadata.trial_options)";
@@ -907,14 +935,14 @@ classdef G4_conductor_controller < handle
             %Get filepath to the test protocol
             if self.model.experiment_type == 1
                 %Get the flight filepath from settings
-                line_to_match = '%Flight test protocol file:';
+                line_to_match = 'Flight test protocol file:';
             elseif self.model.experiment_type == 2
                 %Get path to camera test file
-                line_to_match = '%Camera walk test protocol file:';
+                line_to_match = 'Camera walk test protocol file:';
                
             else
                 %Get path to chip test file
-                line_to_match = '%Chip walk test protocol file:';
+                line_to_match = 'Chip walk test protocol file:';
             end
             
             settings_data = strtrim(regexp( fileread('G4_Protocol_Designer_settings.m'),'\n','split'));
@@ -1108,6 +1136,10 @@ classdef G4_conductor_controller < handle
             self.browse_button_run_ = value;
         end
         
+        function set.expected_time(self, value)
+            self.expected_time_ = value;
+        end
+        
 
 
 
@@ -1246,7 +1278,11 @@ classdef G4_conductor_controller < handle
         end
         
         function value = get.browse_button_run(self)
-            value = self.browse_button_run;
+            value = self.browse_button_run_;
+        end
+        
+        function value = get.expected_time(self)
+            value = self.expected_time_;
         end
             
 
