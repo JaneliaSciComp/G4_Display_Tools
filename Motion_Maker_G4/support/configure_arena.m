@@ -54,7 +54,24 @@ function configure_arena_OpeningFcn(hObject, eventdata, handles, varargin)
 
 handles.gui1tag = findobj('Tag','Motion_Maker_G4_gui');
 
-load('C:\matlabroot\G4\arena\arena_parameters.mat')
+try
+    load('C:\matlabroot\G4\arena\arena_parameters.mat','aparam')
+catch
+    disp('Could not locate C:\matlabroot\G4\arena\arena_parameters.mat, setting default parameters instead')
+    aparam.Psize = 16;
+    aparam.Prows = 3;
+    aparam.Pcols = 12;
+    aparam.Pcircle = 18;
+    aparam.rot180 = 1;
+    aparam.rotations(1) = 0;
+    aparam.rotations(2) = 0;
+    aparam.rotations(3) = 0;
+    aparam.translations(1) = 0;
+    aparam.translations(2) = 0; 
+    aparam.translations(3) = 0;
+    aparam.model = 'polygonal cylinder';
+end
+
 set(handles.edit1, 'String',num2str(aparam.Psize));
 set(handles.edit2, 'String',num2str(aparam.Prows));
 set(handles.edit3, 'String',num2str(aparam.Pcols));
