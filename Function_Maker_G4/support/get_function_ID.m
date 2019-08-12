@@ -6,9 +6,9 @@ function ID = get_function_ID(function_type,save_dir)
 %save_dir: e.g. 'C:/matlabroot/G4/Functions/'
 
 if strcmpi(function_type,'afn')
-    ID_inds = 3:6; %first 2 are 'ao'
+    ID_inds = 3:6; %first 2 are 'ao', next 4 is ID
 elseif strcmpi(function_type,'pfn')
-    ID_inds = 4:7; %first 3 are 'fun'
+    ID_inds = 4:7; %first 3 are 'fun', next 4 is ID
 else
     error('function type must be either afn or pfn')
 end

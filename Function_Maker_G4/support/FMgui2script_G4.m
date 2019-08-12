@@ -52,6 +52,7 @@ lowstr = [param.type 'param.low = [ '];
 durstr = [param.type 'param.dur = [ '];
 freqstr = [param.type 'param.freq = [ '];
 valstr = [param.type 'param.val = [ '];
+sizespeedstr = [param.type 'param.size_speed_ratio = [ '];
 flipstr = [param.type 'param.flip = [ '];
 for i=1:length(param.section)
     secstr = [secstr '''' param.section{i} ''' '];
@@ -60,9 +61,10 @@ for i=1:length(param.section)
     durstr = [durstr num2str(param.dur(i)) ' '];
     freqstr = [freqstr num2str(param.freq(i)) ' '];
     valstr = [valstr num2str(param.val(i)) ' '];
+    sizespeedstr = [sizespeedstr num2str(param.size_speed_ratio(i)) ' '];
     flipstr = [flipstr num2str(param.flip(i)) ' '];
 end
-
+    
 %print parameter arrays with comments
 fprintf(FID,'%s\n',[secstr '}; %static, sawtooth, traingle, sine, cosine, or square']);
 fprintf(FID,'%s\n',[durstr ']; %section duration (in s)']);
@@ -70,6 +72,7 @@ fprintf(FID,'%s\n',[valstr ']; %function value for static sections']);
 fprintf(FID,'%s\n',[highstr ']; %high end of function range {for non-static sections}']);
 fprintf(FID,'%s\n',[lowstr ']; %low end of function range {for non-static sections}']);
 fprintf(FID,'%s\n',[freqstr ']; %frequency of section {for non-static sections}']);
+fprintf(FID,'%s\n',[sizespeedstr ']; %size/speed ratio {for looms}']);
 fprintf(FID,'%s\n',[flipstr ']; %flip the range of values of function {for non-static sections}']);
 fprintf(FID,'%s\n','');
 fprintf(FID,'%s\n','');
@@ -83,14 +86,8 @@ fprintf(FID,'%s\n','');
 %print script to save function
 fprintf(FID,'%s\n','%% save function');
 fprintf(FID,'%s\n',['save_dir = ''C:\matlabroot\G4\' foldername ''';']);
-fprintf(FID,'%s\n','cd(save_dir);');
-fprintf(FID,'%s\n','funcfiles = ls(''Function*.mat'');');
-fprintf(FID,'%s\n','if isempty(funcfiles)');
-fprintf(FID,'%s\n',['    ' param.type 'param.ID = 1;']);
-fprintf(FID,'%s\n','else');
-fprintf(FID,'%s\n',['    ' param.type 'param.ID = size(funcfiles,1)+1;']);
-fprintf(FID,'%s\n','end');
-fprintf(FID,'%s\n',['filename = [''Function_'' num2str(' param.type 'param.ID, ''%04d'') ''_G4.mat''];']);
+fprintf(FID,'%s\n',[param.type 'param.ID = get_function_ID(''' param.type ''',save_dir);']);
+fprintf(FID,'%s\n','filename = ''TestFunction'';');
 fprintf(FID,'%s\n',['save_function_G4(func, ' param.type 'param, save_dir, filename);']);
 fprintf(FID,'%s\n','');
 
