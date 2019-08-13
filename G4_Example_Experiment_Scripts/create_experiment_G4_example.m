@@ -44,6 +44,7 @@ pfnparam.val = [ 1 nan 1 ]; %function value for static sections
 pfnparam.high = [ nan 33 nan ]; %high end of function range {for non-static sections}
 pfnparam.low = [ nan 2 nan ]; %low end of function range {for non-static sections}
 pfnparam.freq = [ nan 8 nan ]; %frequency of section {for non-static sections}
+pfnparam.size_speed_ratio = [ nan nan nan]; %size/speed ratio {for loom sections}
 pfnparam.flip = [ 0 0 0 ]; %flip the range of values of function {for non-static sections}
 
 
@@ -58,6 +59,7 @@ afnparam.val = [ 5 0 ]; %function value for static sections
 afnparam.high = [ nan nan ]; %high end of function range {for non-static sections}
 afnparam.low = [ nan nan ]; %low end of function range {for non-static sections}
 afnparam.freq = [ nan nan ]; %frequency of section {for non-static sections}
+afnparam.size_speed_ratio = [ nan nan ]; %size/speed ratio {for loom sections}
 afnparam.flip = [ 0 0 ]; %flip the range of values of function {for non-static sections}
 
 param.ID = 0;
