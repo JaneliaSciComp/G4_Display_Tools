@@ -1652,7 +1652,7 @@ classdef G4_document < handle
                             patData = load(full_file_path);
                             patRows = length(patData.pattern.Pats(:,1,1))/16;
                             if patRows ~= self.num_rows
-                                waitfor(errordlg("Please make sure the patterns you import match the number of rows you have selected."));
+                                waitfor(errordlg("Please make sure the patterns you import match the size screen you have selected (3 row or 4 row)."));
                                 return;
                             end
                             
