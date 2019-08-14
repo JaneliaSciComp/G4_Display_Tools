@@ -8,7 +8,13 @@ patfiles = ls('*.pat');
 if isempty(patfiles)
     ID = 1;
 else
-    takenIDs = sort(str2num(patfiles(:,1:4)))';
+    takenIDs = [];
+    for i = 1:size(patfiles,1)
+        num_inds = regexp(patfiles(i,:),'\d');
+        assert(length(num_inds)==4,['file ' patfiles(i,:) ' appears to have incorrect ID (should be 4 digits)']);
+        takenIDs = [takenIDs str2double(patfiles(i,num_inds))];
+    end
+    takenIDs = sort(takenIDs);
     ID = find((1:size(patfiles,1))-takenIDs<0,1);
     if isempty(ID)
         ID = max(takenIDs)+1;
