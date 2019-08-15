@@ -67,6 +67,7 @@ s2data.long_lat_mask = [-pi pi -pi/2 pi/2 0];
 if exist('C:\matlabroot\G4\Arena\arena_parameters.mat','file')
     load('C:\matlabroot\G4\Arena\arena_parameters.mat');
     s3data.arena_pitch = rad2deg(aparam.rotations(2));
+    set(handles.edit2, 'String', num2str(round(1000*rad2deg(p_rad))/1000));
     s3data.updated = 1;
 else
     s3data.arena_pitch = 0;
