@@ -72,7 +72,7 @@ classdef G4_preview_model
                 end
             end
             
-            if strcmp(self.data{3},'') == 0
+            if ~strcmp(self.data{3},'') && ~self.doc.check_if_cell_disabled(self.data{3})
                 pos = self.data{3};
                 posfield = self.doc.get_posfunc_field_name(pos);
                 self.pos_data = self.doc.Pos_funcs.(posfield).pfnparam.func;

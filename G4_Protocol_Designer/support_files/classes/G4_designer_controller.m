@@ -44,6 +44,9 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
         exp_name_box_
         pageUp_button_
         pageDown_button_
+        uneditable_cell_color_
+        uneditable_cell_text_
+        
 
         %is_ao_visible_
     end
@@ -101,6 +104,8 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
         exp_name_box
         pageUp_button
         pageDown_button
+        uneditable_cell_color
+        uneditable_cell_text
 
         
 %         isRandomized_box
@@ -124,6 +129,8 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
             self.doc = G4_document();
             
             screensize = get(0, 'screensize');
+            self.uneditable_cell_color = '#bdbdbd';
+            self.uneditable_cell_text = '---------';
 
             self.f = figure('Name', 'Fly Experiment Designer', 'NumberTitle', 'off','units', 'pixels', 'MenuBar', 'none', ...
                 'ToolBar', 'none', 'Resize', 'off', 'outerposition', [screensize(3)*.1, screensize(4)*.05, 1600, 1000]);
@@ -212,6 +219,10 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
             self.posttrial_table = uitable(self.f, 'data', self.doc.posttrial, 'columnname', column_names_, ...
             'units', 'pixels', 'Position', positions.post, 'ColumnEditable', columns_editable_, 'ColumnFormat', column_format_, ...
             'CellEditCallback', @self.update_model_posttrial, 'CellSelectionCallback', {@self.preview_selection, positions});
+            
+%         %Create anonymous function which adds color to particular cells in
+%         %the above tables based on mode. 
+%             self.colorgen = @(color, text) ['<html><table border=0 width=400 bgcolor=',color,'><TR><TD>',text,'</TD></TR></table>'];
 
             add_trial_button = uicontrol(self.f, 'Style', 'pushbutton','String','Add Trial','units', ...
             'pixels','Position', [positions.block(1) + positions.block(3), ...
@@ -1156,17 +1167,35 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
         d.set_pretrial_property(3, pos1);
         d.set_pretrial_property(4, ao1);
         
+        %disable appropriate cells for mode 1
+        d.set_pretrial_property(9, self.colorgen());
+        d.set_pretrial_property(10, self.colorgen());
+        d.set_pretrial_property(11, self.colorgen());
+        
         d.set_intertrial_property(2, pat1);
         d.set_intertrial_property(3, pos1);
         d.set_intertrial_property(4, ao1);
+        
+        %disable appropriate cells for mode 1
+        d.set_intertrial_property(9, self.colorgen());
+        d.set_intertrial_property(10, self.colorgen());
+        d.set_intertrial_property(11, self.colorgen());
         
         d.set_posttrial_property(2, pat1);
         d.set_posttrial_property(3, pos1);
         d.set_posttrial_property(4, ao1);
         
+        d.set_posttrial_property(9, self.colorgen());
+        d.set_posttrial_property(10, self.colorgen());
+        d.set_posttrial_property(11, self.colorgen());
+        
         d.set_block_trial_property([1,2], pat1);
         d.set_block_trial_property([1,3], pos1);
         d.set_block_trial_property([1,4], ao1);
+        
+        d.set_block_trial_property([1,9], self.colorgen());
+        d.set_block_trial_property([1,10], self.colorgen());
+        d.set_block_trial_property([1,11], self.colorgen());
         
        
         
@@ -1340,11 +1369,12 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
         prog = waitbar(0,'Please wait...');
         
         waitbar(.33,prog,'Saving...');
-        
+        self.doc.replace_greyed_cell_values();
         self.doc.saveas(full_path, prog);
         if ~isempty(self.run_con)
             self.run_con.update_run_gui();
         end
+        self.insert_greyed_cells();
         self.update_gui();
         
         
@@ -1449,6 +1479,12 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                 end
 
             end
+            self.doc.pretrial
+            self.doc.intertrial
+            self.doc.posttrial
+            self.doc.block_trials
+            
+            self.insert_greyed_cells();
 
 
 
@@ -2000,7 +2036,8 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
             end
 
             if strcmp(filename,'') == 0
-                data = self.doc.Patterns_.(filename).pattern.Pats;
+                fieldname = self.doc.get_pattern_field_name(filename);
+                data = self.doc.Patterns_.(fieldname).pattern.Pats;
                 self.model.auto_preview_index = self.model.auto_preview_index + 1;
                 if self.model.auto_preview_index > length(data(1,1,:))
                     self.model.auto_preview_index = 1;
@@ -2054,7 +2091,8 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                 if self.model.auto_preview_index < 1
                     self.model.auto_preview_index = length(self.model.current_preview_file(1,1,:));
                 end
-                data = self.doc.Patterns_.(filename).pattern.Pats;
+                fieldname = self.doc.get_pattern_field_name(filename);
+                data = self.doc.Patterns_.(fieldname).pattern.Pats;
                 preview_data = data(:,:,self.model.auto_preview_index);
                 
                 xax = [0 length(preview_data(1,:))];
@@ -2982,68 +3020,106 @@ function [start_index] = check_pattern_dimensions(self)
 
 end
 
+%CLEAR GREY SPACE AND INSERT PATTERN INTO PATTERN CELL---------------------
+
+function [pat_field] = get_or_insert_pattern(self)
+
+    pat_fields = fieldnames(self.doc.Patterns);
+    
+    if strcmp(self.model.current_selected_cell.table,"pre")
+        if ~isempty(self.doc.pretrial{2}) && ~self.doc.check_if_cell_disabled(self.doc.pretrial{2})
+            pat_field = self.doc.get_pattern_field_name(self.doc.pretrial{2});
+        elseif ~isempty(self.doc.imported_pattern_names)
+            pat_field = pat_fields{1};
+            self.doc.set_pretrial_property(2,self.doc.Patterns.(pat_field).filename);
+        else
+            pat_field = '';
+        end
+
+    elseif strcmp(self.model.current_selected_cell.table,"inter")
+        if ~isempty(self.doc.intertrial{2}) && ~self.doc.check_if_cell_disabled(self.doc.intertrial{2})
+            pat_field = self.doc.get_pattern_field_name(self.doc.intertrial{2});
+        elseif ~isempty(self.doc.imported_pattern_names)
+            pat_field = pat_fields{1};
+            self.doc.set_intertrial_property(2,self.doc.Patterns.(pat_field).filename);
+        else
+            pat_field = '';
+        end
+    elseif strcmp(self.model.current_selected_cell.table,"post")
+        if ~isempty(self.doc.posttrial{2}) && ~self.doc.check_if_cell_disabled(self.doc.posttrial{2})
+            pat_field = self.doc.get_pattern_field_name(self.doc.posttrial{2});
+        elseif ~isempty(self.doc.imported_pattern_names)
+            pat_field = pat_fields{1};
+            self.doc.set_posttrial_property(2,self.doc.Patterns.(pat_field).filename);
+        else
+            pat_field = '';
+        end
+    else
+        if ~isempty(self.doc.block_trials{self.model.current_selected_cell.index(1),2}) && ...
+                ~self.doc.check_if_cell_disabled(self.doc.block_trials{self.model.current_selected_cell.index(1),2})
+            pat_field = self.doc.get_pattern_field_name(self.doc.block_trials{self.model.current_selected_cell.index(1),2});            
+        elseif ~isempty(self.doc.imported_pattern_names)
+            pat_field = pat_fields{1};
+            self.doc.set_block_trial_property([self.current_selected_cell.index(1),2],self.doc.Patterns.(pat_field).filename);
+        else
+            pat_field = '';
+        end
+
+    end
+
+end
 %CLEAR APPROPRIATE FIELDS WHEN THE MODE IS CHANGED-------------------------
 
 function clear_fields(self, mode)
 
     pos_fields = fieldnames(self.doc.Pos_funcs);
     pat_fields = fieldnames(self.doc.Patterns);
-    pos = '';
+    pos = self.colorgen();
     indx = [];
-    rate = [];
-    gain = [];
-    offset = [];
+    rate = self.colorgen();
+    gain = self.colorgen();
+    offset = self.colorgen();
     
     if mode == 1
         
-        if strcmp(self.model.current_selected_cell.table,"pre")
-            pat_field = self.doc.get_pattern_field_name(self.doc.pretrial{2});
-        elseif strcmp(self.model.current_selected_cell.table,"inter")
-            pat_field = self.doc.get_pattern_field_name(self.doc.intertrial{2});
-        elseif strcmp(self.model.current_selected_cell.table,"post")
-            pat_field = self.doc.get_pattern_field_name(self.doc.posttrial{2});
-        else
-            pat_field = self.doc.get_pattern_field_name(self.doc.block_trials{self.model.current_selected_cell.index(1),2});
-        end
+        pat_field = self.get_or_insert_pattern();
         index_of_pat = find(strcmp(pat_fields(:), pat_field));
-        %%%%%%DOESN'T WORK IF THERE ARE MORE PATTERNS IMPORTED THAN
-        %%%%%%POSITION FUNCTIONS
+
         if index_of_pat > length(pos_fields)
             index_of_pat = rem(length(pos_fields), index_of_pat);
         end
-        pos_field = pos_fields{index_of_pat};
-        pos = self.doc.Pos_funcs.(pos_field).filename;
+        if ~isempty(index_of_pat)
+            pos_field = pos_fields{index_of_pat};
+            pos = self.doc.Pos_funcs.(pos_field).filename;
+
+        end
         self.set_mode_dep_props(pos, indx, rate, gain, offset);
         
     elseif mode == 2
         
+        pat_field = self.get_or_insert_pattern();
         rate = 60;
         self.set_mode_dep_props(pos, indx, rate, gain, offset);
         %frame rate, clear others
         
         
     elseif mode == 3
+        
+        pat_field = self.get_or_insert_pattern();
 
         indx = 1;
         self.set_mode_dep_props(pos, indx, rate, gain, offset);
         %frame index, clear others
         
     elseif mode == 4
+        pat_field = self.get_or_insert_pattern();
         gain = 1;
         offset = 0;
         self.set_mode_dep_props(pos, indx, rate, gain, offset);
         %gain, offset, clear others
         
     elseif mode == 5
-        if strcmp(self.model.current_selected_cell.table,"pre")
-            pat_field = self.doc.get_pattern_field_name(self.doc.pretrial{2});
-        elseif strcmp(self.model.current_selected_cell.table,"inter")
-            pat_field = self.doc.get_pattern_field_name(self.doc.intertrial{2});
-        elseif strcmp(self.model.current_selected_cell.table,"post")
-            pat_field = self.doc.get_pattern_field_name(self.doc.posttrial{2});
-        else
-            pat_field = self.doc.get_pattern_field_name(self.doc.block_trials{self.model.current_selected_cell.index(1),2});
-        end
+        pat_field = self.get_or_insert_pattern();
         index_of_pat = find(strcmp(pat_fields(:), pat_field));
         if index_of_pat > length(pos_fields)
             index_of_pat = rem(length(pos_fields), index_of_pat);
@@ -3057,15 +3133,7 @@ function clear_fields(self, mode)
         
     elseif mode == 6
         
-        if strcmp(self.model.current_selected_cell.table,"pre")
-            pat_field = self.doc.get_pattern_field_name(self.doc.pretrial{2});
-        elseif strcmp(self.model.current_selected_cell.table,"inter")
-            pat_field = self.doc.get_pattern_field_name(self.doc.intertrial{2});
-        elseif strcmp(self.model.current_selected_cell.table,"post")
-            pat_field = self.doc.get_pattern_field_name(self.doc.posttrial{2});
-        else
-            pat_field = self.doc.get_pattern_field_name(self.doc.block_trials{self.model.current_selected_cell.index(1),2});
-        end
+        pat_field = self.get_or_insert_pattern();
         index_of_pat = find(strcmp(pat_fields(:), pat_field));
         if index_of_pat > length(pos_fields)
             index_of_pat = rem(length(pos_fields), index_of_pat);
@@ -3078,47 +3146,48 @@ function clear_fields(self, mode)
         %pos, gain, offset, clear others
         
     elseif mode == 7
-        
+        pat_field = self.get_or_insert_pattern();
         self.set_mode_dep_props(pos, indx, rate, gain, offset);
         %clear all
         
     elseif isempty(mode)
-        pos = '';
-        indx ='';
-        rate = '';
-        gain = '';
-        offset = '';
+        
+        pos = self.colorgen();
+        indx = self.colorgen();
+        rate = self.colorgen();
+        gain = self.colorgen();
+        offset = self.colorgen();
         self.set_mode_dep_props(pos, indx, rate, gain, offset);
         if strcmp(self.model.current_selected_cell.table,"pre") == 1
-            self.doc.set_pretrial_property(2, '');
+            self.doc.set_pretrial_property(2, self.colorgen());
             for i = 4:7
-                self.doc.set_pretrial_property(i,'');
+                self.doc.set_pretrial_property(i,self.colorgen());
             end
-            self.doc.set_pretrial_property(12,'');
+            self.doc.set_pretrial_property(12,self.colorgen());
             
         elseif strcmp(self.model.current_selected_cell.table,"inter") == 1
-            self.doc.set_intertrial_property(2, '');
+            self.doc.set_intertrial_property(2, self.colorgen());
             for i = 4:7
-                self.doc.set_intertrial_property(i,'');
+                self.doc.set_intertrial_property(i,self.colorgen());
             end
-            self.doc.set_intertrial_property(12,'');
+            self.doc.set_intertrial_property(12,self.colorgen());
             
             
         elseif strcmp(self.model.current_selected_cell.table,"post") == 1
-            self.doc.set_posttrial_property(2, '');
+            self.doc.set_posttrial_property(2, self.colorgen());
             for i = 4:7
-                self.doc.set_posttrial_property(i,'');
+                self.doc.set_posttrial_property(i,self.colorgen());
             end
-            self.doc.set_posttrial_property(12,'');
+            self.doc.set_posttrial_property(12,self.colorgen());
             
             
         else
             x = self.model.current_selected_cell.index(1);
-            self.doc.set_block_trial_property([x,2], '');
+            self.doc.set_block_trial_property([x,2], self.colorgen());
             for i = 4:7
-                self.doc.set_block_trial_property([x,i],'');
+                self.doc.set_block_trial_property([x,i],self.colorgen());
             end
-            self.doc.set_block_trial_property([x,12],'');
+            self.doc.set_block_trial_property([x,12],self.colorgen());
         end
         
     end
@@ -3134,6 +3203,14 @@ function set_mode_dep_props(self, pos, indx, rate, gain, offset)
         self.doc.set_pretrial_property(10, gain);
         self.doc.set_pretrial_property(11, offset);
         self.set_pretrial_files_(3, pos);
+        
+        if ~isempty(self.doc.pretrial{1})
+            self.doc.set_pretrial_property(4,'');
+            self.doc.set_pretrial_property(5,'');
+            self.doc.set_pretrial_property(6,'');
+            self.doc.set_pretrial_property(7,'');
+            self.doc.set_pretrial_property(12,self.doc.trial_data.trial_array{12});
+        end
             
     elseif strcmp(self.model.current_selected_cell.table,"inter") == 1
         self.doc.set_intertrial_property(3, pos);
@@ -3142,6 +3219,14 @@ function set_mode_dep_props(self, pos, indx, rate, gain, offset)
         self.doc.set_intertrial_property(10, gain);
         self.doc.set_intertrial_property(11, offset);
         self.set_intertrial_files_(3,pos);
+        
+        if ~isempty(self.doc.intertrial{1})
+            self.doc.set_intertrial_property(4,'');
+            self.doc.set_intertrial_property(5,'');
+            self.doc.set_intertrial_property(6,'');
+            self.doc.set_intertrial_property(7,'');
+            self.doc.set_intertrial_property(12,self.doc.trial_data.trial_array{12});
+        end
 
     elseif strcmp(self.model.current_selected_cell.table,"post") == 1
         self.doc.set_posttrial_property(3, pos);
@@ -3150,6 +3235,15 @@ function set_mode_dep_props(self, pos, indx, rate, gain, offset)
         self.doc.set_posttrial_property(10, gain);
         self.doc.set_posttrial_property(11, offset);
         self.set_posttrial_files_(3,pos);
+        
+        if ~isempty(self.doc.posttrial{1})
+            self.doc.set_posttrial_property(4,'');
+            self.doc.set_posttrial_property(5,'');
+            self.doc.set_posttrial_property(6,'');
+            self.doc.set_posttrial_property(7,'');
+            self.doc.set_posttrial_property(12,self.doc.trial_data.trial_array{12});
+        end
+
 
     else
         x = self.model.current_selected_cell.index(1);
@@ -3159,10 +3253,114 @@ function set_mode_dep_props(self, pos, indx, rate, gain, offset)
         self.doc.set_block_trial_property([x,10], gain);
         self.doc.set_block_trial_property([x,11], offset);
         self.set_blocktrial_files_(self.model.current_selected_cell.index(1),3,pos);
+        
+        if ~isempty(self.doc.block_trials{x,1})
+            self.doc.set_block_trial_property([x,4],'');
+            self.doc.set_block_trial_property([x,5],'');
+            self.doc.set_block_trial_property([x,6],'');
+            self.doc.set_block_trial_property([x,7],'');
+            self.doc.set_block_trial_property([x,12],self.doc.trial_data.trial_array{12});
+        end
+
 
     end
     
     self.update_gui();
+
+
+end
+
+function [c] = colorgen(self)
+    color = self.uneditable_cell_color;
+    text = self.uneditable_cell_text;
+    c = ['<html><table border=0 width=400 bgcolor=',color,'><TR><TD>',text,'</TD></TR></table>'];
+end
+
+ %After saving or running an experiment, convert uneditable cells back to being greyed out       
+function insert_greyed_cells(self)
+
+    pretrial_mode = self.doc.pretrial{1};
+    intertrial_mode = self.doc.intertrial{1};
+    posttrial_mode = self.doc.posttrial{1};
+    pre_indices_to_color = [];
+    inter_indices_to_color = [];
+    post_indices_to_color = [];
+    indices_to_color = [];
+
+    if pretrial_mode == 1
+        pre_indices_to_color = [9, 10, 11];
+    elseif pretrial_mode == 2
+        pre_indices_to_color = [3, 10, 11];
+    elseif pretrial_mode == 3
+        pre_indices_to_color = [3, 9, 10, 11];
+    elseif pretrial_mode == 4
+        pre_indices_to_color = [3, 9];
+    elseif pretrial_mode == 5 || pretrial_mode == 6
+        pre_indices_to_color = 9;
+    elseif pretrial_mode == 7
+        pre_indices_to_color = [3, 9, 10, 11];
+    end
+    
+    if intertrial_mode == 1
+        inter_indices_to_color = [9, 10, 11];
+    elseif intertrial_mode == 2
+        inter_indices_to_color = [3, 10, 11];
+    elseif intertrial_mode == 3
+        inter_indices_to_color = [3, 9, 10, 11];
+    elseif intertrial_mode == 4
+        inter_indices_to_color = [3, 9];
+    elseif intertrial_mode == 5 || intertrial_mode == 6
+        inter_indices_to_color = 9;
+    elseif intertrial_mode == 7
+        inter_indices_to_color = [3, 9, 10, 11];
+    end
+    
+    if posttrial_mode == 1
+        post_indices_to_color = [9, 10, 11];
+    elseif posttrial_mode == 2
+        post_indices_to_color = [3, 10, 11];
+    elseif posttrial_mode == 3
+        post_indices_to_color = [3, 9, 10, 11];
+    elseif posttrial_mode == 4
+        post_indices_to_color = [3, 9];
+    elseif posttrial_mode == 5 || posttrial_mode == 6
+        post_indices_to_color = 9;
+    elseif posttrial_mode == 7
+        post_indices_to_color = [3, 9, 10, 11];
+    end
+  
+    
+    for i = 1:length(pre_indices_to_color)
+        self.doc.set_pretrial_property(pre_indices_to_color(i),self.colorgen());
+       
+    end
+    for i = 1:length(inter_indices_to_color)
+        self.doc.set_intertrial_property(inter_indices_to_color(i),self.colorgen());
+    end
+    for i = 1:length(post_indices_to_color)
+        self.doc.set_posttrial_property(post_indices_to_color(i),self.colorgen());
+    end
+    
+    for i = 1:length(self.doc.block_trials(:,1))
+        mode = self.doc.block_trials{i,1};
+        if mode == 1
+            indices_to_color = [9, 10, 11];
+        elseif mode == 2
+            indices_to_color = [3, 10, 11];
+        elseif mode == 3
+            indices_to_color = [3, 9, 10, 11];
+        elseif mode == 4
+            indices_to_color = [3, 9];
+        elseif mode == 5 || mode == 6
+            indices_to_color = 9;
+        elseif mode == 7
+            indices_to_color = [3, 9, 10, 11];
+        end
+        for j = 1:length(indices_to_color)
+            self.doc.set_block_trial_property([i,indices_to_color(j)],self.colorgen());
+        end
+    end
+            
 
 
 end
@@ -3422,6 +3620,14 @@ end
          function set.pageDown_button(self, value)
              self.pageDown_button_ = value;
          end
+         
+         function set.uneditable_cell_color(self, value)
+             self.uneditable_cell_color_ = value;
+         end
+         
+         function set.uneditable_cell_text(self, value)
+             self.uneditable_cell_text_ = value;
+         end
 
 
 
@@ -3572,6 +3778,16 @@ end
          function output = get.pageDown_button(self)
              output = self.pageDown_button_;
          end
+         
+         function output = get.uneditable_cell_color(self)
+             output = self.uneditable_cell_color_;
+         end
+         
+         function output = get.uneditable_cell_text(self)
+             output = self.uneditable_cell_text_;
+         end
+         
+         
 
          
 %SETTERS OF GUI OBJECT VALUES

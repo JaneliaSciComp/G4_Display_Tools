@@ -67,31 +67,44 @@ end
 load(fullfile(exp_folder,Data_name),'Data');
 
 %create default matrices for plotting all conditions
-if nargin<5 
+if nargin<6 
     default_W = [2 2 2 2 3 3 3 3 3 3 3 3 4 4 4 4 4 4 4 4 5 5 5 5 5 5 5 5 5 5]; %width of figure by number of subplots
     default_H = [1 1 2 2 2 2 3 3 3 4 4 4 4 4 4 4 5 5 5 5 5 5 5 5 5 6 6 6 6 6]; %height of figure by number of subplots
     
     %find all open-loop conditions, organize into block
     OL_conds_vec = find(Data.conditionModes~=4); %changed conds_vec to OL_conds_vec
     num_conds = length(OL_conds_vec);
-    W = default_W(min([num_conds length(default_W)])); %get number of subplot columns (up to default limit)
-    H = default_H(min([num_conds length(default_W)])); %get number of subplot rows
-    D = ceil(num_conds/length(default_W)); %number of figures
-    OL_conds = nan([W H D]);
-    OL_conds(1:num_conds) = OL_conds_vec;
-    OL_conds = permute(OL_conds,[2 1 3]);
+    if num_conds > 0
+        W = default_W(min([num_conds length(default_W)])); %get number of subplot columns (up to default limit)
+        H = default_H(min([num_conds length(default_W)])); %get number of subplot rows
+        D = ceil(num_conds/length(default_W)); %number of figures
+        OL_conds = nan([W H D]);
+        OL_conds(1:num_conds) = OL_conds_vec;
+        OL_conds = permute(OL_conds,[2 1 3]);
+    else
+        OL_conds = [];
+    end
+      
     
     %find all closed-loop conditions, organize into block
     CL_conds_vec = find(Data.conditionModes==4); %changed single equal sign to double and conds_vec to CL_conds_vec
     num_conds = length(CL_conds_vec);
-    W = default_W(min([num_conds length(default_W)])); %get number of subplot columns (up to default limit)
-    H = default_H(min([num_conds length(default_W)])); %get number of subplot rows
-    D = ceil(num_conds/length(default_W)); %number of figures
-    CL_conds = nan([W H D]);
-    CL_conds(1:num_conds) = CL_conds_vec;
-    CL_conds = permute(CL_conds,[2 1 3]);
+    if num_conds > 0
+        W = default_W(min([num_conds length(default_W)])); %get number of subplot columns (up to default limit)
+        H = default_H(min([num_conds length(default_W)])); %get number of subplot rows
+        D = ceil(num_conds/length(default_W)); %number of figures
+        CL_conds = nan([W H D]);
+        CL_conds(1:num_conds) = CL_conds_vec;
+        CL_conds = permute(CL_conds,[2 1 3]);
+    else %Added this if statement because lines 88-90 went out of bounds when there were no closed loop conditions - LT
+        CL_conds = [];
+    end
+    
     
     TC_conds = []; %by default, don't plot any tuning curves
+    
+end
+if nargin < 7
     overlap = 0; %by default, don't overlap multiple conditions on same plot
 end
 overlap = logical(overlap);
@@ -188,14 +201,15 @@ if ~isempty(CL_conds)
 end
 
 %% Timeseries data for open-loop trials
+
 if ~isempty(OL_conds)
     num_figs = size(OL_conds,3);
     num_reps = size(Data.timeseries,3);
     %loop for different data types
     for d = OL_inds
         for fig = 1:num_figs
-            num_plot_rows = (1-overlap/2)*max(nansum(OL_conds(:,:,fig)>0));
-            num_plot_cols = max(nansum(OL_conds(:,:,fig)>0,2));
+            num_plot_rows = (1-overlap/2)*max(nansum(OL_conds(:,1,fig)>0));
+            num_plot_cols = max(nansum(OL_conds(1,:,fig)>0,2)); %Added 1's to the dimensions here because it was giving twice the number rows necessary and causing line 211 to go out of bounds - LT
             figure('Position',[100 100 540 540*(num_plot_rows/num_plot_cols)])
             for row = 1:num_plot_rows
                 for col = 1:num_plot_cols
