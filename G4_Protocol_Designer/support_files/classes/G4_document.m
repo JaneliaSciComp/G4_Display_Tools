@@ -209,6 +209,11 @@ classdef G4_document < handle
 %                 block_data = self.block_trials;
             
             else
+                
+                if self.check_if_cell_disabled(new_value)
+                    self.set_uneditable_block_trial_property(index, new_value);
+                    return;
+                end
 
 %If the user edited the pattern or position function, make sure the file dimensions match
                 if index(2) == 1 && ~strcmp(num2str(new_value),'')
@@ -225,14 +230,14 @@ classdef G4_document < handle
                     patfile = new_value;
                     patfield = self.get_pattern_field_name(patfile);
                     if strcmp(patfield, '')
-                        waitfor(errordlg("That filename does not match any imported files."));
+                        waitfor(errordlg("That block trial pat filename does not match any imported files."));
                         return;
                     end
                     patDim = length(self.Patterns.(patfield).pattern.Pats(1,1,:));
                     patRows = length(self.Patterns.(patfield).pattern.Pats(:,1,1))/16;
                     numrows = self.num_rows;
                 
-                    if ~strcmp(string(self.block_trials{index(1),3}),'')
+                    if ~strcmp(string(self.block_trials{index(1),3}),'') && ~self.check_if_cell_disabled(self.block_trials{index(1),3})
                         
                         posfile = self.block_trials{index(1),3};
                         posfield = self.get_posfunc_field_name(posfile);
@@ -249,8 +254,8 @@ classdef G4_document < handle
 
                     posfile = new_value;
                     posfield = self.get_posfunc_field_name(posfile);
-                    if strcmp(posfield,'')
-                        waitfor(errordlg("That filename does not match any imported files."));
+                    if strcmp(posfield,'') && ~strcmp(new_value,'')
+                        waitfor(errordlg("That block trial pos filename does not match any imported files."));
                         return;
                     end
                     
@@ -271,7 +276,7 @@ classdef G4_document < handle
                     aofile = new_value;
                     aofield = self.get_aofunc_field_name(aofile);
                     if strcmp(aofield,'')
-                        waitfor(errordlg("That filename does not match any imported files."));
+                        waitfor(errordlg("That block trial AO filename does not match any imported files."));
                         return;
                     end
                 end
@@ -353,6 +358,11 @@ classdef G4_document < handle
             end
             end
         end
+        
+        function set_uneditable_block_trial_property(self, index, new_value)
+            
+            self.block_trials{index(1), index(2)} = new_value;
+        end
 
 
 %Same as above for pretrial, intertrial, and posttrial
@@ -360,6 +370,11 @@ classdef G4_document < handle
         function set_pretrial_property(self, index, new_value)
             %If the user edited the pattern or position function, make sure
             %the file dimensions match
+            
+            if self.check_if_cell_disabled(new_value)
+                self.set_uneditable_pretrial_property(index, new_value)
+                return;
+            end
             if index == 1 && ~isempty(new_value)
                 if ~isnumeric(new_value)
                     new_value = str2num(new_value);
@@ -371,17 +386,17 @@ classdef G4_document < handle
             end
             
             
-            if index == 2 && strcmp(string(new_value),'') == 0
+            if index == 2 && ~strcmp(string(new_value),'')
                 patfile = new_value;
                 patfield = self.get_pattern_field_name(patfile);
                 if strcmp(patfield,'')
-                    waitfor(errordlg("That filename does not match any imported files."));
+                    waitfor(errordlg("That pretrial pattern filename does not match any imported files."));
                     return;
                 end
                 patDim = length(self.Patterns.(patfield).pattern.Pats(1,1,:));
                 patRows = length(self.Patterns.(patfield).pattern.Pats(:,1,1))/16;
                 numrows = self.num_rows;
-                if strcmp(string(self.pretrial{3}),'') == 0
+                if ~strcmp(string(self.pretrial{3}),'') && ~self.check_if_cell_disabled(self.pretrial{3})
                     
                     posfile = self.pretrial{3};
                     posfield = self.get_posfunc_field_name(posfile);
@@ -397,8 +412,8 @@ classdef G4_document < handle
             elseif index == 3 && strcmp(string(new_value),'') == 0 && strcmp(string(self.pretrial{2}),'') == 0
                 posfile = new_value;
                 posfield = self.get_posfunc_field_name(posfile);
-                if strcmp(posfield,'')
-                    waitfor(errordlg("That filename does not match any imported files."));
+                if strcmp(posfield,'') && ~strcmp(new_value,'')
+                    waitfor(errordlg("That pretrial position filename does not match any imported files."));
                     return;
                 end
                 patfile = self.pretrial{2};
@@ -418,7 +433,7 @@ classdef G4_document < handle
                 aofile = new_value;
                 aofield = self.get_aofunc_field_name(aofile);
                 if strcmp(aofield,'')
-                    waitfor(errordlg("That filename does not match any imported files."));
+                    waitfor(errordlg("That pretrial AO filename does not match any imported files."));
                     return;
                 end
             end
@@ -501,10 +516,21 @@ classdef G4_document < handle
             
         end
         
+        function set_uneditable_pretrial_property(self, index, new_value)
+        
+            self.pretrial{index} = new_value;
+        
+        end
+        
         function set_intertrial_property(self, index, new_value)
 %             %If the user edited the pattern or position function, make sure
             %the file dimensions match
-            
+            if self.check_if_cell_disabled(new_value)
+                
+                self.set_uneditable_intertrial_property(index, new_value);
+                return;
+            end
+                
             if index == 1 && ~isempty(new_value)
                 if ~isnumeric(new_value)
                     new_value = str2num(new_value);
@@ -519,13 +545,13 @@ classdef G4_document < handle
                 patfile = new_value;
                 patfield = self.get_pattern_field_name(patfile);
                 if strcmp(patfield,'')
-                    waitfor(errordlg("That filename does not match any imported files."));
+                    waitfor(errordlg("That intertrial pattern filename does not match any imported files."));
                     return;
                 end
                 patDim = length(self.Patterns.(patfield).pattern.Pats(1,1,:));
                 patRows = length(self.Patterns.(patfield).pattern.Pats(:,1,1))/16;
                 numrows = self.num_rows;
-                if strcmp(string(self.intertrial{3}),'') == 0
+                if ~strcmp(string(self.intertrial{3}),'') && ~self.check_if_cell_disabled(self.intertrial{3})
                     
                     posfile = self.intertrial{3};
                     posfield = self.get_posfunc_field_name(posfile);
@@ -539,10 +565,11 @@ classdef G4_document < handle
                 end
                     
             elseif index == 3 && strcmp(string(new_value),'') == 0 && strcmp(string(self.intertrial{2}),'') == 0
+                
                 posfile = new_value;
                 posfield = self.get_posfunc_field_name(posfile);
-                if strcmp(posfield,'')
-                    waitfor(errordlg("That filename does not match any imported files."));
+                if strcmp(posfield,'') && ~strcmp(new_value,'')
+                    waitfor(errordlg("That intertrial pos filename does not match any imported files."));
                     return;
                 end
                 
@@ -562,8 +589,8 @@ classdef G4_document < handle
            if index > 3 && index < 8 && ~strcmp(string(new_value),'')
                 aofile = new_value;
                 aofield = self.get_aofunc_field_name(aofile);
-                if strcmp(aofield,'')
-                    waitfor(errordlg("That filename does not match any imported files."));
+                if ~isfield(self.Ao_funcs, aofield) && ~strcmp(aofield,'')
+                    waitfor(errordlg("That intertrial AO filename does not match any imported files."));
                     return;
                 end
            end
@@ -643,8 +670,19 @@ classdef G4_document < handle
 %             end
         end
         
+        function set_uneditable_intertrial_property(self, index, new_value)
+            
+            self.intertrial{index} = new_value;
+        end
+        
         function set_posttrial_property(self, index, new_value)
             
+            if self.check_if_cell_disabled(new_value)
+                
+                self.set_uneditable_posttrial_property(index, new_value);
+                return;
+            end
+                
             if index == 1 && ~isempty(new_value)
                 if ~isnumeric(new_value)
                     new_value = str2num(new_value);
@@ -661,13 +699,13 @@ classdef G4_document < handle
                 patfile = new_value;
                 patfield = self.get_pattern_field_name(patfile);
                 if strcmp(patfield,'')
-                    waitfor(errordlg("That filename does not match any imported files."));
+                    waitfor(errordlg("That posttrial Pattern filename does not match any imported files."));
                     return;
                 end
                 patDim = length(self.Patterns.(patfield).pattern.Pats(1,1,:));
                 patRows = length(self.Patterns.(patfield).pattern.Pats(:,1,1))/16;
                 numrows = self.num_rows;
-                if strcmp(string(self.posttrial{3}),'') == 0
+                if ~strcmp(string(self.posttrial{3}),'') && ~self.check_if_cell_disabled(self.posttrial{3})
                     
                     posfile = self.posttrial{3};
                     posfield = self.get_posfunc_field_name(posfile);
@@ -680,11 +718,11 @@ classdef G4_document < handle
                     
                 end
                     
-            elseif index == 3 && strcmp(string(new_value),'') == 0 && strcmp(string(self.posttrial{2}),'') == 0
+            elseif index == 3 && ~strcmp(string(new_value),'') && ~strcmp(string(self.posttrial{2}),'')
                 posfile = new_value;
                 posfield = self.get_posfunc_field_name(posfile);
-                if ~isfield(self.Pos_funcs, posfield)
-                    waitfor(errordlg("That filename does not match any imported files."));
+                if ~isfield(self.Pos_funcs, posfield) && ~strcmp(posfield,'')
+                    waitfor(errordlg("That posttrial pos filename does not match any imported files."));
                     return;
                 end
                 
@@ -705,7 +743,7 @@ classdef G4_document < handle
                 aofile = new_value;
                 aofield = self.get_aofunc_field_name(aofile);
                 if strcmp(aofield,'')
-                    waitfor(errordlg("That filename does not match any imported files."));
+                    waitfor(errordlg("That posttrial AO filename does not match any imported files."));
                     return;
                 end
             end
@@ -783,6 +821,11 @@ classdef G4_document < handle
 
         end
         
+        function set_uneditable_posttrial_property(self, index, new_value)
+            
+            self.posttrial{index} = new_value;
+        end
+        
 %SET THE CONFIGURATION FILE DATA-------------------------------------------
 
         function set_config_data(self, new_value, channel)
@@ -843,11 +886,12 @@ classdef G4_document < handle
            for i = 1:length(self.block_trials(:,1))
 
                 pat_list{i} = self.block_trials{i,2};
-                if strcmp(self.block_trials{i,3},'') == 0
+                
+                if ~strcmp(self.block_trials{i,3},'')
                     func_list{func_count} = self.block_trials{i,3};
                     func_count = func_count + 1;
                 end
-                if strcmp(self.block_trials{i,4},'') == 0
+                if ~strcmp(self.block_trials{i,4},'')
                     ao_list{ao_count} = self.block_trials{i,4};
                     ao_count = ao_count + 1;
                 end
@@ -864,36 +908,45 @@ classdef G4_document < handle
                     ao_count = ao_count + 1;
                 end
            end
+           
 
            pat_list{end + 1} = self.pretrial{2};
            pat_list{end + 1} = self.posttrial{2};
            pat_list{end + 1} = self.intertrial{2};
 
-           if strcmp(self.pretrial{3},'') == 0
-               func_list{end+1} = self.pretrial{3};
+           if ~strcmp(self.pretrial{3},'')
+               func_list{func_count} = self.pretrial{3};
+               func_count = func_count + 1;
            end
-           if strcmp(self.posttrial{3},'') == 0
-               func_list{end+1} = self.posttrial{3};
+           if ~strcmp(self.posttrial{3},'')
+               func_list{func_count} = self.posttrial{3};
+               func_count = func_count + 1;
            end
-           if strcmp(self.intertrial{3},'') == 0
-               func_list{end+1} = self.intertrial{3};
+           if ~strcmp(self.intertrial{3},'')
+               func_list{func_count} = self.intertrial{3};
+               func_count = func_count + 1;
            end
 
            for i = 4:7
-               if strcmp(self.pretrial{i},'') == 0
-                   ao_list{end+1} = self.pretrial{i};
+               if ~strcmp(self.pretrial{i},'')
+                   ao_list{ao_count} = self.pretrial{i};
+                   ao_count = ao_count + 1;
                end
            end
+           
            for i = 4:7
                if strcmp(self.posttrial{i},'') == 0
                    ao_list{end+1} = self.posttrial{i};
                end
            end
+         
            for i = 4:7
                if strcmp(self.intertrial{i},'') == 0
-                   ao_list{end+1} = self.intertrial{i};
+                   ao_list{ao_count} = self.intertrial{i};
+                   ao_count = ao_count + 1;
                end
            end
+        
 
            if ~strcmp(func_list{1},'')
 
@@ -908,6 +961,7 @@ classdef G4_document < handle
            else
                func_list = {''};
            end
+           
            if ~strcmp(ao_list,'')
                ao_list = unique(ao_list);
                empty_aocells = cellfun(@isempty, ao_list);
@@ -1113,6 +1167,7 @@ classdef G4_document < handle
                 
                [pat_list, func_list, ao_list] = self.get_file_list();
                [pat_bin_list, func_bin_list, ao_bin_list] = self.get_bin_list(pat_list, func_list, ao_list);
+               
                if ~strcmp(func_list{1},'')
 
                     num_funcs = length(func_list);
@@ -1332,6 +1387,7 @@ classdef G4_document < handle
                 temp_path = '';
 
             end
+            
             waitbar(.5, prog, 'Exporting...');
             export_successful = self.export();% 0 - export was unable to complete 1- export completed successfully 2-user canceled and export not attempted
             if export_successful == 0
@@ -1831,10 +1887,55 @@ classdef G4_document < handle
 % 
 
         end
+        
+        function replace_greyed_cell_values(self)
+        
+            for i = 1:length(self.pretrial)
+                if strncmp(self.pretrial{i},'<html>',6)
+                    if i == 3
+                        self.pretrial{i} = '';
+                    else
+                        self.pretrial{i} = [];
+                    end
+                end
+            end
+            for i = 1:length(self.intertrial)
+                if strncmp(self.intertrial{i},'<html>',6)
+                    if i == 3
+                        self.intertrial{i} = '';
+                    else
+                        self.intertrial{i} = [];
+                    end
+                end
+            end
+            for i = 1:length(self.posttrial)
+                if strncmp(self.posttrial{i},'<html>',6)
+                    if i == 3
+                        self.posttrial{i} = '';
+                    else
+                        self.posttrial{i} = [];
+                    end
+                end
+            end
+            for i = 1:length(self.block_trials(:,1))
+                for j = 1:length(self.block_trials(1,:))
+                    if strncmp(self.block_trials{i,j},'<html>',6)
+                        if j == 3
+                            self.block_trials{i,j} = '';
+                        else
+                            self.block_trials{i,j} = [];
+                        end
+                    end
+                end
+            end
+        
+        end
+
     
 %CREATE STRUCTURE TO SAVE TO .G4P FILE WHEN SAVING------------------------        
         function [vars] = create_parameters_structure(self)
-        
+            
+            
             vars.block_trials = self.block_trials();
             vars.pretrial = self.pretrial();
             vars.intertrial = self.intertrial();
@@ -1851,6 +1952,16 @@ classdef G4_document < handle
             vars.chan4_rate = self.chan4_rate();
             vars.num_rows = self.num_rows();
             vars.experiment_name = self.experiment_name;
+        
+        end
+        
+        function [is_disabled] = check_if_cell_disabled(self, cell_value)
+        
+            if strncmp(cell_value, '<html>', 6)
+                is_disabled = 1;
+            else
+                is_disabled = 0;
+            end
         
         end
         

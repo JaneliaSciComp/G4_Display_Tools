@@ -68,22 +68,30 @@ if nargin<5
     %find all open-loop conditions, organize into block
     OL_conds_vec = find(Data.conditionModes~=4); 
     num_conds = length(OL_conds_vec);
-    W = default_W(min([num_conds length(default_W)])); %get number of subplot columns (up to default limit)
-    H = default_H(min([num_conds length(default_W)])); %get number of subplot rows
-    D = ceil(num_conds/length(default_W)); %number of figures
-    OL_conds = nan([W H D]);
-    OL_conds(1:num_conds) = OL_conds_vec;
-    OL_conds = permute(OL_conds,[2 1 3]);
+    if num_conds > 0
+        W = default_W(min([num_conds length(default_W)])); %get number of subplot columns (up to default limit)
+        H = default_H(min([num_conds length(default_W)])); %get number of subplot rows
+        D = ceil(num_conds/length(default_W)); %number of figures
+        OL_conds = nan([W H D]);
+        OL_conds(1:num_conds) = OL_conds_vec;
+        OL_conds = permute(OL_conds,[2 1 3]);
+    else 
+        OL_conds = [];
+    end
     
     %find all closed-loop conditions, organize into block
     CL_conds_vec = find(Data.conditionModes==4); 
     num_conds = length(CL_conds_vec);
-    W = default_W(min([num_conds length(default_W)])); %get number of subplot columns (up to default limit)
-    H = default_H(min([num_conds length(default_W)])); %get number of subplot rows
-    D = ceil(num_conds/length(default_W)); %number of figures
-    CL_conds = nan([W H D]);
-    CL_conds(1:num_conds) = CL_conds_vec;
-    CL_conds = permute(CL_conds,[2 1 3]);
+    if num_conds > 0
+        W = default_W(min([num_conds length(default_W)])); %get number of subplot columns (up to default limit)
+        H = default_H(min([num_conds length(default_W)])); %get number of subplot rows
+        D = ceil(num_conds/length(default_W)); %number of figures
+        CL_conds = nan([W H D]);
+        CL_conds(1:num_conds) = CL_conds_vec;
+        CL_conds = permute(CL_conds,[2 1 3]);
+    else
+        CL_conds = [];
+    end
     
     TC_conds = []; %by default, don't plot any tuning curves
     overlap = 0; %by default, don't overlap multiple conditions on same plot
@@ -185,13 +193,15 @@ if ~isempty(OL_conds)
     %loop for different data types
     for d = OL_inds
         for fig = 1:num_figs
-            num_plot_rows = (1-overlap/2)*max(nansum(OL_conds(:,:,fig)>0));
-            num_plot_cols = max(nansum(OL_conds(:,:,fig)>0,2));
+            num_plot_rows = (1-overlap/2)*max(nansum(OL_conds(:,1,fig)>0));
+            num_plot_cols = max(nansum(OL_conds(1,:,fig)>0,2));
             figure('Position',[100 100 540 540*(num_plot_rows/num_plot_cols)])
             for row = 1:num_plot_rows
                 for col = 1:num_plot_cols
                     cond = OL_conds(1+(row-1)*(1+overlap),col,fig);
+                    
                     if ~isnan(cond)
+                        
                         better_subplot(num_plot_rows, num_plot_cols, col+num_plot_cols*(row-1))
                         plot(repmat(Data.timestamps',[1 num_reps]),squeeze(Data.timeseries(d,cond,:,:))','Color',rep_Color,'LineWidth',rep_LineWidth);
                         hold on

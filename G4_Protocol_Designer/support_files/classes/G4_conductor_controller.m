@@ -512,6 +512,8 @@ classdef G4_conductor_controller < handle
 
             
         end
+        
+        
 
         function run(self, src, event)
             
@@ -546,7 +548,11 @@ classdef G4_conductor_controller < handle
                 return;
             end
             %-------------------------------------------------------------
+            %Go through and replace all the greyed out parameters with
+            %appropriate values to be sent to panel_com
             
+            self.doc.replace_greyed_cell_values();
+
             %For ease of use throughout the function
             pretrial = self.doc.pretrial;
             intertrial = self.doc.intertrial;
