@@ -136,7 +136,7 @@ for d = 1:num_TC_datatypes
     plot(xl,[avg avg],'--','Color',rep_Color','LineWidth',mean_LineWidth)
     title([datastr ' Histogram'],'FontSize',subtitle_FontSize);
     
-    snapnow;
+    
 end
 if trial_options(2)==1
     subplot(2,num_TC_datatypes,num_TC_datatypes)
@@ -145,9 +145,9 @@ if trial_options(2)==1
     plot(nanmean(Data.interhistogram),'Color',mean_Color,'LineWidth',mean_LineWidth)
     title('Intertrial Pattern Frame Histogram','FontSize',subtitle_FontSize)
     
-    snapnow;
+    
 end
-
+snapnow;
 %% Histograms for closed-loop trials
 if ~isempty(CL_conds)
     num_figs = size(CL_conds,3);

@@ -6,7 +6,7 @@
 %options.outputDir = path to the fly's results folder;
 %options.showCode = false;
 
-function G4_Plot_Data_flyingdetector(exp_folder, trial_options, metadata_for_publishing, CL_conds, OL_conds, TC_conds, overlap)
+function G4_Plot_Data_flyingdetector_pdf(exp_folder, trial_options, metadata_for_publishing, CL_conds, OL_conds, TC_conds, overlap)
 % Inputs:
 % exp_folder: path containing G4_Processed_Data.mat file
 % trial_options: 1x3 logical array [pre-trial, intertrial, post-trial]
@@ -148,8 +148,9 @@ for d = 1:num_TC_datatypes
     plot(xl,[avg avg],'--','Color',rep_Color','LineWidth',mean_LineWidth)
     title([datastr ' Histogram'],'FontSize',subtitle_FontSize);
     
-    snapnow;
+    
 end
+
 if trial_options(2)==1
     subplot(2,num_TC_datatypes,num_TC_datatypes)
     plot(Data.interhistogram','Color',rep_Color,'LineWidth',rep_LineWidth)
@@ -157,8 +158,9 @@ if trial_options(2)==1
     plot(nanmean(Data.interhistogram),'Color',mean_Color,'LineWidth',mean_LineWidth)
     title('Intertrial Pattern Frame Histogram','FontSize',subtitle_FontSize)
     
-    snapnow;
+    
 end
+snapnow;
 
 %% Histograms for closed-loop trials
 if ~isempty(CL_conds)
@@ -209,7 +211,7 @@ if ~isempty(OL_conds)
     for d = OL_inds
         for fig = 1:num_figs
             num_plot_rows = (1-overlap/2)*max(nansum(OL_conds(:,1,fig)>0));
-            num_plot_cols = max(nansum(OL_conds(1,:,fig)>0,2)); %Added 1's to the dimensions here because it was giving twice the number rows necessary and causing line 211 to go out of bounds - LT
+            num_plot_cols = max(nansum(OL_conds(1,:,fig)>0,2)); %Added 1/s to the dimensions here because it was giving twice the number rows necessary and causing line 211 to go out of bounds - LT
             figure('Position',[100 100 540 540*(num_plot_rows/num_plot_cols)])
             for row = 1:num_plot_rows
                 for col = 1:num_plot_cols

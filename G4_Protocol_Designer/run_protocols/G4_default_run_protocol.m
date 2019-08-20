@@ -144,6 +144,7 @@ function [success] = G4_default_run_protocol(runcon, p)
      pause(10);
      Panel_com('change_root_directory', p.experiment_folder);
      
+     
  
  %% set active ao channels
      if ~isempty(p.active_ao_channels)
@@ -312,6 +313,16 @@ function [success] = G4_default_run_protocol(runcon, p)
                      %causes it to loop until you press a button.
                  end
              end
+             
+             if runcon.check_if_aborted()
+                Panel_com('stop_display');
+                Panel_com('stop_log');
+                pause(1);
+                disconnectHost;
+                success = 0;
+                return;
+             
+             end
 
 %% Loop to run the block/inter trials --------------------------------------
 
@@ -397,6 +408,16 @@ function [success] = G4_default_run_protocol(runcon, p)
                     %Run block trial--------------------------------------
                     Panel_com('start_display', (dur*10)); %duration expected in 100ms units
                     pause(dur + .01)
+                    runcon.check_if_aborted()
+                    if runcon.check_if_aborted() == 1
+                        Panel_com('stop_display');
+                        Panel_com('stop_log');
+                        pause(1);
+                        disconnectHost;
+                        success = 0;
+                        return;
+                  
+                     end
 
                     %Tells loop to skip the intertrial if this is the last iteration of the last rep
                     if r == reps && c == num_cond
@@ -471,6 +492,15 @@ function [success] = G4_default_run_protocol(runcon, p)
                          pause(0.01);
                          Panel_com('start_display', (inter_dur*10));
                          pause(inter_dur + .01);
+                         if runcon.check_if_aborted() == 1
+                            Panel_com('stop_display');
+                            Panel_com('stop_log');
+                            pause(1);
+                            disconnectHost;
+                            success = 0;
+                            return;
+                         
+                         end
                     end 
                  end
              end
@@ -533,6 +563,16 @@ function [success] = G4_default_run_protocol(runcon, p)
 
                  pause(post_dur + 1);
                  
+                 if runcon.check_if_aborted() == 1
+                    Panel_com('stop_display');
+                    Panel_com('stop_log');
+                    pause(1);
+                    disconnectHost;
+                    success = 0;
+                    return;
+                 
+                 end
+                 
                  
             end
 
@@ -544,7 +584,7 @@ function [success] = G4_default_run_protocol(runcon, p)
             
             pause(1);
             
-            disp("Disconnecting!");
+
             disconnectHost;
             
             pause(1);

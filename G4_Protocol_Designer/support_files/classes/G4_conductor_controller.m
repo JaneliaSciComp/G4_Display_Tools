@@ -43,6 +43,8 @@ classdef G4_conductor_controller < handle
         current_gain_
         current_offset_
         current_duration_
+        
+        is_aborted_
 
         
     end
@@ -90,6 +92,8 @@ classdef G4_conductor_controller < handle
         current_offset
         current_duration
         
+        is_aborted
+        
         
     end
     
@@ -114,7 +118,7 @@ classdef G4_conductor_controller < handle
                 self.doc = G4_document();
                 
             end
-            
+            self.is_aborted = 0;
             self.layout();
 %             self.total_trials_ = self.model.get_repetitions()*length(self.model.block_trials_{:,1});
 %             if strcmp(self.model.pretrial{2},'') == 0
@@ -131,7 +135,7 @@ classdef G4_conductor_controller < handle
             
         
         end
-        
+
         function layout(self)
            pix = get(0, 'screensize');
            fig_size = [.25*pix(3), .25*pix(4), .5*pix(3), .5*pix(4)];
@@ -144,6 +148,8 @@ classdef G4_conductor_controller < handle
            
             start_button = uicontrol(self.fig,'Style','pushbutton', 'String', 'Run', ...
                 'units', 'pixels', 'Position', [15, fig_size(4)- 305, 115, 85],'Callback', @self.run);
+            abort_button = uicontrol(self.fig,'Style','pushbutton', 'String', 'Abort Experiment',...
+                'units', 'pixels', 'Position', [140, fig_size(4) - 305, 115, 85], 'Callback', @self.abort_experiment);
             settings_pan = uipanel(self.fig, 'Title', 'Settings', 'FontSize', 13, 'units', 'pixels', ...
                 'Position', [15, fig_size(4) - 215, 370, 200]);
             metadata_pan = uipanel(self.fig, 'Title', 'Metadata', 'units', 'pixels', ...
@@ -513,9 +519,23 @@ classdef G4_conductor_controller < handle
             
         end
         
+        function [aborted] = check_if_aborted(self)
+            
+            aborted = self.is_aborted;
+        end
+        
+        function abort_experiment(self, src, event)
+        
+            self.is_aborted = 1;
+
+        
+        end
         
 
         function run(self, src, event)
+            
+            self.is_aborted = false; %change aborted back to zero in case the experiment was aborted earlier. 
+            
             
             %Before creating the data and sending you to the run script,
             %check to make sure there are no issues that will disrupt the
@@ -782,11 +802,24 @@ classdef G4_conductor_controller < handle
             [run_path, run_name, ext] = fileparts(self.model.run_protocol_file);
             
             %Create the full command
-            run_command = "success = " + run_name + "(self, parameters)";
+            run_command = "success = " + run_name + "(self, parameters);";
             
             %run script
             eval(run_command);
             pause(3);
+            
+            if self.check_if_aborted()
+                [logs_removed, msg] = rmdir([experiment_folder '\Log Files\'], 's');
+                if logs_removed == 0
+                    self.create_error_box("Matlab was unable to delete the log files. Please delete manually.");
+                    disp(msg);
+                else
+                    self.create_error_box("Experiment aborted successfully.");
+                end
+                self.is_aborted = 0;
+                    
+                return;
+            end
             
             
             %For some reason, if I gave the stop display and log commands
@@ -1146,6 +1179,10 @@ classdef G4_conductor_controller < handle
             self.expected_time_ = value;
         end
         
+        function set.is_aborted(self, value)
+            self.is_aborted_ = value;
+        end
+        
 
 
 
@@ -1289,6 +1326,10 @@ classdef G4_conductor_controller < handle
         
         function value = get.expected_time(self)
             value = self.expected_time_;
+        end
+        
+        function value = get.is_aborted(self)
+            value = self.is_aborted_;
         end
             
 

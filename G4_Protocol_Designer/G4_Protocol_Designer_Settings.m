@@ -1,7 +1,7 @@
 %G4 Protocol Designer Settings
 %--------------------------------------------------------------------------
 
-Configuration File Path: C:\Program Files (x86)\HHMI G4\Support Files\HHMI Panels Configuration.ini
+Configuration File Path: C:\Users\taylorl\Desktop\HHMI Panels Configuration.ini
 
 Default run protocol file: insert path to protocol file
 Default processing file: insert path to processing file
