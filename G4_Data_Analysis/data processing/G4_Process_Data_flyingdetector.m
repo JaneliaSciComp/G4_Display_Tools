@@ -122,18 +122,23 @@ if common_cond_dur == 1
         fprintf(' - cond %d, rep %d',[bad_conds bad_reps]')
         fprintf('\n')
     end
+else
+    bad_conds = [];
+    bad_reps = [];
 end
 
 %check intertrial durations for experiment errors
-median_dur = median(intertrial_durs,2); %find median duration for each intertrial
-dur_error = abs(intertrial_durs_dur-median_dur)./median_dur; %find intertrial duration error away from median
-bad_intertrials = find(dur_error>0.01); %find bad intertrials (any trial where duration is off by >1%)
-if ~isempty(bad_intertrials) %display bad intertrials
-    out = regexp(exp_folder,'\','start');
-    exp_name = exp_folder(out(end)+1:end);
-    fprintf([exp_name ' excluded intertrials' ])
-    fprintf(' - trial %d',[bad_intertrials]')
-    fprintf('\n')
+if trial_options(2)
+    median_dur = median(intertrial_durs,2); %find median duration for each intertrial
+    dur_error = abs(intertrial_durs_dur-median_dur)./median_dur; %find intertrial duration error away from median
+    bad_intertrials = find(dur_error>0.01); %find bad intertrials (any trial where duration is off by >1%)
+    if ~isempty(bad_intertrials) %display bad intertrials
+        out = regexp(exp_folder,'\','start');
+        exp_name = exp_folder(out(end)+1:end);
+        fprintf([exp_name ' excluded intertrials' ])
+        fprintf(' - trial %d',[bad_intertrials]')
+        fprintf('\n')
+    end
 end
     
 %get indices for all datatypes
@@ -173,7 +178,7 @@ for trial=1:num_trials
             if isempty(stop_ind)
                 stop_ind = length(Log.ADC.Time(chan,:));
             end
-            unaligned_time = (Log.ADC.Time(chan,start_ind:stop_ind) - trial_start_times(trial))/time_conv;
+            unaligned_time = double(Log.ADC.Time(chan,start_ind:stop_ind) - trial_start_times(trial))/time_conv;
             ts_data(chan,cond,rep,:) = align_timeseries(ts_time, unaligned_time, Log.ADC.Volts(chan,start_ind:stop_ind), 'leave nan', 'mean');
         end
 
@@ -187,7 +192,7 @@ for trial=1:num_trials
         ts_data(Frame_ind,cond,rep,:) = align_timeseries(ts_time, unaligned_time, Log.Frames.Position(1,start_ind:stop_ind)+1, 'propagate', 'median');
 
         %create dataset for intertrial histogram (if applicable)
-        if trial_options(2)==1 && trial<num_trials
+        if trial_options(2)==1 && trial<num_trials && ~(any(trial==bad_intertrials))
             %get frame position data, upsampled to match ADC timestamps
             start_ind = find(Log.Frames.Time(1,:)>=intertrial_start_times(trial),1);
             stop_ind = find(Log.Frames.Time(1,:)<=intertrial_stop_times(trial),1,'last');
