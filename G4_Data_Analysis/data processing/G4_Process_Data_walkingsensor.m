@@ -88,7 +88,7 @@ if trial_options(2) %if intertrials were run
     intertrial_start_times = trial_stop_times(1:end-1);
     intertrial_stop_times = trial_start_times(2:end);
     intertrial_modes = modeID_order(trial_start_ind+1:2:trial_end_ind-1);
-    intertrial_durs = (intertrial_stop_times - intertrial_start_times)/time_conv;
+    intertrial_durs = double(intertrial_stop_times - intertrial_start_times)/time_conv;
     assert(all(intertrial_modes-intertrial_modes(1)==0),...
         'unexpected order of trials and intertrials - check that pre-trial, post-trial, and intertrial options are correct')
 else
@@ -104,7 +104,7 @@ cond_modes = nan(num_conds, num_reps);
 for trial=1:num_trials
     cond = exp_order(trial);
     rep = floor((trial-1)/num_conds)+1;
-    cond_dur(cond,rep) = (trial_stop_times(trial) - trial_start_times(trial))/time_conv;
+    cond_dur(cond,rep) = double(trial_stop_times(trial) - trial_start_times(trial))/time_conv;
     cond_modes(cond,rep) = trial_modes(trial);
 end
 
@@ -197,7 +197,7 @@ for trial=1:num_trials
             %get frame position data, upsampled to match ADC timestamps
             start_ind = find(Log.Frames.Time(1,:)>=intertrial_start_times(trial),1);
             stop_ind = find(Log.Frames.Time(1,:)<=intertrial_stop_times(trial),1,'last');
-            unaligned_time = (Log.Frames.Time(1,start_ind:stop_ind)-intertrial_start_times(trial))/time_conv;
+            unaligned_time = double(Log.Frames.Time(1,start_ind:stop_ind)-intertrial_start_times(trial))/time_conv;
             inter_ts_data(trial,:) = align_timeseries(inter_ts_time, unaligned_time, Log.Frames.Position(1,start_ind:stop_ind)+1, 'propagate', 'median');
         end
     end
