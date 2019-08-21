@@ -1,5 +1,5 @@
-function G4_Process_Data_walkingsensor(exp_folder, trial_options, manual_first_start)
-%FUNCTION G4_Process_Data_walkingsensor(exp_folder, trial_options, manual_first_start)
+function G4_Process_Data_flyingdetector(exp_folder, trial_options, manual_first_start)
+%FUNCTION G4_Process_Data_flyingdetector(exp_folder, trial_options, manual_first_start)
 % 
 % Inputs:
 % exp_folder: path containing G4_TDMS_Logs file
@@ -9,15 +9,16 @@ function G4_Process_Data_walkingsensor(exp_folder, trial_options, manual_first_s
 
 %% user-defined parameters
 %specify timeseries data channels
-channel_order = {'Vx0_chan', 'Vx1_chan', 'Vy0_chan', 'Vy1_chan', 'Frame Position', 'Turning', 'Forward', 'Sideslip'};
+channel_order = {'LmR_chan', 'L_chan', 'R_chan', 'F_chan', 'Frame Position', 'LmR', 'LpR'};
 
 %specify time ranges for parsing and data analysis
-data_rate = 100; % rate (in Hz) which all data will be aligned to
+data_rate = 1000; % rate (in Hz) which all data will be aligned to
 pre_dur = 1; %seconds before start of trial to include
 post_dur = 1; %seconds after end of trial to include
 da_start = 0.05; %seconds after start of trial to start data analysis
 da_stop = 0.15; %seconds before end of trial to end data analysis
 time_conv = 1000000; %converts seconds to microseconds (TDMS timestamps are in micros)
+common_cond_dur = 0; %sets whether all condition durations are the same (1) or not (0), for error-checking
 
 
 %% configure data processing
@@ -110,26 +111,39 @@ end
 %check condition durations and control modes for experiment errors
 assert(all(all((cond_modes-repmat(cond_modes(:,1),[1 num_reps]))==0)),...
     'unexpected order of trial modes - check that pre-trial, post-trial, and intertrial options are correct')
-median_dur = repmat(median(cond_dur,2),[1 num_reps]); %find median duration for each condition
-dur_error = abs(cond_dur-median_dur)./median_dur; %find condition duration error away from median
-[bad_conds, bad_reps] = find(dur_error>0.01); %find bad trials (any trial where duration is off by >1%)
-if ~isempty(bad_conds) %display bad trials
-    out = regexp(exp_folder,'\','start');
-    exp_name = exp_folder(out(end)+1:end);
-    fprintf([exp_name ' excluded trials: ' ])
-    fprintf('cond %d, rep %d; ',[bad_conds bad_reps]')
-    fprintf('\n')
+if common_cond_dur == 1
+    median_dur = repmat(median(cond_dur,2),[1 num_reps]); %find median duration for each condition
+    dur_error = abs(cond_dur-median_dur)./median_dur; %find condition duration error away from median
+    [bad_conds, bad_reps] = find(dur_error>0.01); %find bad trials (any trial where duration is off by >1%)
+    if ~isempty(bad_conds) %display bad trials
+        out = regexp(exp_folder,'\','start');
+        exp_name = exp_folder(out(end)+1:end);
+        fprintf([exp_name ' excluded trials' ])
+        fprintf(' - cond %d, rep %d',[bad_conds bad_reps]')
+        fprintf('\n')
+    end
 end
 
+%check intertrial durations for experiment errors
+median_dur = median(intertrial_durs,2); %find median duration for each intertrial
+dur_error = abs(intertrial_durs_dur-median_dur)./median_dur; %find intertrial duration error away from median
+bad_intertrials = find(dur_error>0.01); %find bad intertrials (any trial where duration is off by >1%)
+if ~isempty(bad_intertrials) %display bad intertrials
+    out = regexp(exp_folder,'\','start');
+    exp_name = exp_folder(out(end)+1:end);
+    fprintf([exp_name ' excluded intertrials' ])
+    fprintf(' - trial %d',[bad_intertrials]')
+    fprintf('\n')
+end
+    
 %get indices for all datatypes
 Frame_ind = strcmpi(channel_order,'Frame Position');
-Turning_ind = find(strcmpi(channel_order,'Turning'));
-Forward_ind = find(strcmpi(channel_order,'Forward'));
-Sideslip_ind = find(strcmpi(channel_order,'Sideslip'));
-Vx0_idx = strcmpi(channel_order,'Vx0_chan');
-Vx1_idx = strcmpi(channel_order,'Vx1_chan');
-Vy0_idx = strcmpi(channel_order,'Vy0_chan');
-Vy1_idx = strcmpi(channel_order,'Vy1_chan');
+LmR_ind = find(strcmpi(channel_order,'LmR'));
+LpR_ind = find(strcmpi(channel_order,'LpR'));
+% LmR_chan_idx = strcmpi(channel_order,'LmR_chan');
+L_chan_idx = strcmpi(channel_order,'L_chan');
+R_chan_idx = strcmpi(channel_order,'R_chan');
+% F_chan_idx = strcmpi(channel_order,'F_chan');
 num_ts_datatypes = length(channel_order);
 num_ADC_chans = length(Log.ADC.Channels);
 
@@ -155,7 +169,7 @@ for trial=1:num_trials
         %get analog input data for this trial, aligned to data rate
         for chan = 1:num_ADC_chans
             start_ind = find(Log.ADC.Time(chan,:)>=(trial_start_times(trial)-pre_dur*time_conv),1);
-            stop_ind = find(Log.ADC.Time(chan,:)>(trial_stop_times(trial)+post_dur*time_conv),1)-1;
+            stop_ind = find(Log.ADC.Time(chan,:)<=(trial_stop_times(trial)+post_dur*time_conv),1,'last');
             if isempty(stop_ind)
                 stop_ind = length(Log.ADC.Time(chan,:));
             end
@@ -165,18 +179,18 @@ for trial=1:num_trials
 
         %get frame position data for this trial, aligned to data rate
         start_ind = find(Log.Frames.Time(1,:)>=(trial_start_times(trial)-pre_dur*time_conv),1);
-        stop_ind = find(Log.Frames.Time(1,:)>(trial_stop_times(trial)+post_dur*time_conv),1)-1;
+        stop_ind = find(Log.Frames.Time(1,:)<=(trial_stop_times(trial)+post_dur*time_conv),1,'last');
         if isempty(stop_ind)
             stop_ind = length(Log.Frames.Time(1,:));
         end
         unaligned_time = (Log.Frames.Time(1,start_ind:stop_ind)-trial_start_times(trial))/time_conv;
         ts_data(Frame_ind,cond,rep,:) = align_timeseries(ts_time, unaligned_time, Log.Frames.Position(1,start_ind:stop_ind)+1, 'propagate', 'median');
-               
+
         %create dataset for intertrial histogram (if applicable)
         if trial_options(2)==1 && trial<num_trials
             %get frame position data, upsampled to match ADC timestamps
             start_ind = find(Log.Frames.Time(1,:)>=intertrial_start_times(trial),1);
-            stop_ind = find(Log.Frames.Time(1,:)>intertrial_stop_times(trial),1)-1;
+            stop_ind = find(Log.Frames.Time(1,:)<=intertrial_stop_times(trial),1,'last');
             unaligned_time = (Log.Frames.Time(1,start_ind:stop_ind)-intertrial_start_times(trial))/time_conv;
             inter_ts_data(trial,:) = align_timeseries(inter_ts_time, unaligned_time, Log.Frames.Position(1,start_ind:stop_ind)+1, 'propagate', 'median');
         end
@@ -185,17 +199,16 @@ end
 
 
 %% process data into meaningful datasets
-%calculate turning, forward, and sideslip
-ts_data(Turning_ind,:,:,:) = -(ts_data(Vx0_idx,:,:,:) + ts_data(Vx1_idx,:,:,:) - 5); % + = right turn, - = left turn
-ts_data(Forward_ind,:,:,:) = ts_data(Vy0_idx,:,:,:) + ts_data(Vy1_idx,:,:,:) - 5; % + = forward, - = backward
-ts_data(Sideslip_ind,:,:,:) = ts_data(Vy0_idx,:,:,:) - ts_data(Vy1_idx,:,:,:); % + = slip right, - = slip left
+%calculate LmR (Left - Right) and LpR (Left + Right)
+ts_data(LmR_ind,:,:,:) = ts_data(L_chan_idx,:,:,:) - ts_data(R_chan_idx,:,:,:); % + = right turns, - = left turns
+ts_data(LpR_ind,:,:,:) = ts_data(L_chan_idx,:,:,:) + ts_data(R_chan_idx,:,:,:); % + = increased amplitude, - = decreased
 
 %duplicate ts_data and exclude all datapoints outside data analysis window (da_start:da_stop)
 da_data = ts_data;
 da_start_ind = find(ts_time>=da_start,1);
 da_data(:,:,:,1:da_start_ind) = nan; %omit data before trial start
 for cond = 1:num_conds
-    da_stop_ind = find(ts_time>(cond_dur(cond,1)-da_stop),1)-1;
+    da_stop_ind = find(ts_time<=(cond_dur(cond,1)-da_stop),1,'last');
     assert(~isempty(da_stop_ind),'data analysis window extends past trial end')
     da_data(:,cond,:,da_stop_ind:end) = nan; %omit data after trial end
 end
@@ -204,22 +217,22 @@ end
 tc_data = nanmean(da_data,4);
 
 %calculate histograms of/by pattern position
-hist_datatypes = {'Frame Position', 'Turning', 'Forward', 'Sideslip'};
+hist_datatypes = {'Frame Position', 'LmR', 'LpR'};
 num_hist_datatypes = length(hist_datatypes); 
 max_pos = max(max(max(da_data(Frame_ind,:,:,:),[],4),[],3),[],2);
 hist_data = nan([num_hist_datatypes num_conds num_reps max_pos]);
-p = permute(1:max_pos,[1 3 4 2]); %create array of all possible pattern position values
+p = permute(1:max_pos,[1 3 4 2]); %create array of all possible pattern position values along 4th dimension
         
 %get histogram of pattern position
 tmpdata = permute(da_data(Frame_ind,:,:,:),[2 3 4 1]);
 p_idx = tmpdata==p;
-hist_data(1,:,:,:) = nansum(p_idx,3);  
+hist_data(1,:,:,:) = nansum(p_idx,3); 
 
 %get mean turning, forward, and sideslip for each pattern position
-tmpdata = repmat(da_data([Turning_ind, Forward_ind, Sideslip_ind],:,:,:),[1 1 1 1 max_pos]);
-p_idx = repmat(permute(p_idx,[5 1 2 3 4]),[3 1 1 1 1]);
+tmpdata = repmat(da_data([LmR_ind, LpR_ind],:,:,:),[1 1 1 1 max_pos]);
+p_idx = repmat(permute(p_idx,[5 1 2 3 4]),[2 1 1 1 1]);
 tmpdata(~p_idx) = nan;
-hist_data(2:4,:,:,:) = nanmean(tmpdata,4); %Turning, Forward, and Sideslip by pattern position
+hist_data(2:3,:,:,:) = nanmean(tmpdata,4); %LmR and LpR by pattern position
 
 %get histogram of intertrial pattern position
 if trial_options(2) %if intertrials were run
@@ -230,7 +243,7 @@ if trial_options(2) %if intertrials were run
 else
     inter_hist_data = [];
 end
-    
+
 
 %% save data
 Data.channelNames.timeseries = channel_order; %cell array of channel names for timeseries data
