@@ -193,7 +193,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
 
             self.pretrial_table = uitable(self.f, 'data', self.doc.pretrial, 'columnname', column_names_, ...
             'units', 'pixels', 'Position', positions.pre, 'ColumnEditable', columns_editable_, 'ColumnFormat', column_format_, ...
-           'CellEditCallback', @self.update_model_pretrial, 'CellSelectionCallback', {@self.preview_selection, positions}, 'ButtonDownFcn', @self.right_click_cell);
+           'CellEditCallback', @self.update_model_pretrial, 'CellSelectionCallback', {@self.preview_selection, positions});
 
             intertrial_label_ = uicontrol(self.f, 'Style', 'text', 'String', 'Inter-Trial', ...
                'units', 'pixels', 'FontSize', font_size_, ...
@@ -1762,25 +1762,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
 
         end
         
-        function right_click_cell(self, src, event)
-
-            
-            delete(self.hAxes);
-            delete(self.second_axes);
-            
-            src
-            event
-            pos = get(gca, 'CurrentPoint')
-            
-            if src.Position(2) == 870
-                table = "pre";
-            end
-            if pos(1,1) > .2 && pos(1,1) < .26
-                table_index = 2;
-            end
-            %disp(table + " " + table_index);
-          
-        end
+      
         
         
         function page_up_4d(self, src, event)
