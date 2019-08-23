@@ -49,7 +49,7 @@ mean_Color2 = [1 0 0];
 rep_LineWidth = 0.05;
 mean_LineWidth = 1;
 subtitle_FontSize = 8;
-timeseries_ylimits = [-6 6; -1 6; -1 6; -1 6; 1 192; -6 6; 2 10]; %[min max] y limits for each datatype
+timeseries_ylimits = [-6 6; -1 6; -1 6; -1 6; 1 192; -6 6; 2 20]; %[min max] y limits for each datatype
 histogram_ylimits = [0 100; -6 6; 2 10];
 
 %%%% load data and prepare for plotting
