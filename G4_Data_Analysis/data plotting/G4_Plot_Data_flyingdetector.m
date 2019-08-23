@@ -27,6 +27,7 @@ subtitle_FontSize = 8;
 timeseries_ylimits = [-6 6; -1 6; -1 6; -1 6; 1 192; -6 6; 2 10]; %[min max] y limits for each datatype
 histogram_ylimits = [0 100; -6 6; 2 10];
 
+
 %% load data and prepare for plotting
 %load G4_Processed_Data
 if nargin==0
