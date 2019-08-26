@@ -1,0 +1,295 @@
+function G4_Plot_Data_Combined(exp_folder, trial_options, CL_conds, OL_conds, TC_conds, overlap)
+%FUNCTION G4_Plot_Data_Combined(exp_folder, trial_options, CL_conds, OL_conds, TC_conds, overlap)
+% 
+% Inputs:
+% exp_folder: cell array of paths containing G4_Processed_Data.mat files
+% trial_options: 1x3 logical array [pre-trial, intertrial, post-trial]
+% CL_conds: matrix of closed-loop (CL) conditions to plot as histograms
+% OL_conds: matrix of open-loop (OL) conditions to plot as timeseries
+% TC_conds: matrix of open-loop conditions to plot as tuning curves (TC)
+% overlap: logical (0 default); plots every 2 rows of conditions on a single row of axes in different colors
+
+
+%% user-defined parameters
+%datatype options for flying data: 'LmR_chan', 'L_chan', 'R_chan', 'F_chan', 'Frame Position', 'LmR', 'LpR'
+%datatype options for walking data: 'Vx0_chan', 'Vx1_chan', 'Vy0_chan', 'Vy1_chan', 'Frame Position', 'Turning', 'Forward', 'Sideslip'
+CL_datatypes = {'Frame Position'}; %datatypes to plot as histograms
+OL_datatypes = {'LmR'}; %datatypes to plot as timeseries
+TC_datatypes = {'LmR'}; %datatypes to plot as tuning curves
+
+%specify plot properties
+rep_Colors = [0.5 0.5 0.5; 1 0.5 0.5; 0.5 0.5 1];
+mean_Colors = [0 0 0;1 0 0; 0 0 1];
+rep_LineWidth = 0.05;
+mean_LineWidth = 1;
+subtitle_FontSize = 8;
+timeseries_ylimits = [-1.1 1.1; -1 6; -1 6; -1 6; 1 192; -1.1 1.1; 2 20]; %[min max] y limits for each datatype
+timeseries_xlimits = [0 4];
+histogram_ylimits = [0 100; -6 6; 2 10];
+
+
+%% load first data file and prepare for plotting
+%load G4_Processed_Data
+files = dir(exp_folder{1,1});
+try
+    Data_name = files(contains({files.name},{'G4_Processed_Data'})).name;
+catch
+    error('cannot find TDMSlogs file in specified folder')
+end
+load(fullfile(exp_folder{1,1},Data_name),'Data');
+[num_groups, num_exps] = size(exp_folder);
+CombData.timestamps = Data.timestamps;
+CombData.channelNames = Data.channelNames;
+CombData.conditionModes = Data.conditionModes;
+CombData.histograms = nan([num_groups, num_exps, size(Data.histograms)]);
+CombData.interhistogram = nan([num_groups, num_exps, size(Data.interhistogram)]);
+CombData.timeseries = nan([num_groups, num_exps, size(Data.timeseries)]);
+CombData.summaries = nan([num_groups, num_exps, size(Data.summaries)]);
+            
+%create default matrices for plotting all conditions
+if nargin<5 
+    default_W = [2 2 2 2 3 3 3 3 3 3 3 3 4 4 4 4 4 4 4 4 5 5 5 5 5 5 5 5 5 5]; %width of figure by number of subplots
+    default_H = [1 1 2 2 2 2 3 3 3 4 4 4 4 4 4 4 5 5 5 5 5 5 5 5 5 6 6 6 6 6]; %height of figure by number of subplots
+    
+    %find all open-loop conditions, organize into block
+    conds_vec = find(Data.conditionModes~=4); 
+    num_conds = length(OL_conds_vec);
+    W = default_W(min([num_conds length(default_W)])); %get number of subplot columns (up to default limit)
+    H = default_H(min([num_conds length(default_W)])); %get number of subplot rows
+    D = ceil(num_conds/length(default_W)); %number of figures
+    OL_conds = nan([W H D]);
+    OL_conds(1:num_conds) = conds_vec;
+    OL_conds = permute(OL_conds,[2 1 3]);
+    
+    %find all closed-loop conditions, organize into block
+    conds_vec = find(Data.conditionModes==4); 
+    num_conds = length(CL_conds_vec);
+    W = default_W(min([num_conds length(default_W)])); %get number of subplot columns (up to default limit)
+    H = default_H(min([num_conds length(default_W)])); %get number of subplot rows
+    D = ceil(num_conds/length(default_W)); %number of figures
+    CL_conds = nan([W H D]);
+    CL_conds(1:num_conds) = conds_vec;
+    CL_conds = permute(CL_conds,[2 1 3]);
+    
+    TC_conds = []; %by default, don't plot any tuning curves
+    overlap = 0; %by default, don't overlap multiple conditions on same plot
+end
+overlap = logical(overlap);
+
+%get datatype indices
+for i = 1:length(OL_datatypes)
+    ind = find(strcmpi(Data.channelNames.timeseries,OL_datatypes{i}));
+    assert(~isempty(ind),['could not find ' OL_datatypes{i} 'datatype'])
+    OL_inds(i) = ind;
+end
+for i = 1:length(CL_datatypes)
+    ind = find(strcmpi(Data.channelNames.histograms,CL_datatypes{i}));
+    assert(~isempty(ind),['could not find ' OL_datatypes{i} 'datatype'])
+    CL_inds(i) = ind;
+end
+for i = 1:length(TC_datatypes)
+    ind = find(strcmpi(Data.channelNames.timeseries,TC_datatypes{i}));
+    assert(~isempty(ind),['could not find ' OL_datatypes{i} 'datatype'])
+    TC_inds(i) = ind;
+end
+
+
+%% load all data files
+for g = 1:num_groups
+    for e = 1:num_exps
+        if ~isempty(exp_folder{g,e})
+            %load Data file
+            files = dir(exp_folder{g,e});
+            try
+                Data_name = files(contains({files.name},{'G4_Processed_Data'})).name;
+            catch
+                error(['cannot find G4_Processed_Data file in ' exp_folder{g,e}])
+            end
+            load(fullfile(exp_folder{g,e},Data_name),'Data');
+
+            %check Data file for consistency with previously loaded Data files
+            num_datapoints = size(Data.timeseries,4);
+            if num_datapoints>size(CombData.timeseries,6)
+                CombData.timeseries(:,:,:,:,:,size(CombData.timeseries,6)+1:num_datapoints) = nan;
+                CombData.timestamps = Data.timestamps;
+            end
+            num_positions = size(Data.histograms,4);
+            if num_positions>size(CombData.histograms,6)
+                CombData.timeseries(:,:,:,:,:,size(CombData.histograms,6)+1:num_positions) = nan;
+            end
+            assert(all(size(Data.timeseries(:,:,:,1))==size(squeeze(CombData.timeseries(1,1,:,:,:,1)))),...
+                ['Data in ' exp_folder{g,e} 'appears to be the incorrect size']);
+
+            %load Data file into larger struct
+            try
+                CombData.histograms(g,e,:,:,:,1:num_positions) = Data.histograms; %[group, exp, type, cond, rep, position]
+                CombData.interhistogram(g,e,:,:) = Data.interhistogram; %[group, exp, rep, position]
+                CombData.timeseries(g,e,:,:,:,1:num_datapoints) = Data.timeseries; %[group, exp, type, cond, rep, data]
+                CombData.summaries(g,e,:,:,:) = Data.summaries; %[group, exp, type, cond, rep]
+            catch
+                error(['could not load exp ' exp_folder{g,e}])
+            end
+        end
+    end
+end
+
+
+%% plot data
+%calculate overall measurements and plot basic histograms
+figure()
+for g = 1:num_groups
+    for d = 1:num_TC_datatypes
+        data_vec = reshape(CombData.timeseries(g,:,TC_inds(d),:,:,:),[1 numel(CombData.timeseries(g,:,d,:,:,:))]);
+        datastr = TC_datatypes{d};
+        datastr(strfind(datastr,'_')) = '-'; %convert underscores to dashes to prevent subscripts
+    
+        subplot(2+num_TC_datatypes,num_groups,g)
+        text(0.1, 1.25-0.3*d, ['Mean ' TC_datatypes{d} ' = ' num2str(nanmean(data_vec))]);
+        axis off
+        hold on
+        title(['Group ' num2str(g)],'FontSize',subtitle_FontSize);
+        
+        subplot(2+num_TC_datatypes,num_groups,d*num_groups+g)
+        avg = length(data_vec)/100;
+        hist(data_vec,100)
+        hold on
+        xl = xlim;
+        plot(xl,[avg avg],'--','Color',rep_Colors(g,:)','LineWidth',mean_LineWidth)
+        title([datastr ' Histogram'],'FontSize',subtitle_FontSize);
+    end
+    
+    if trial_options(2)==1
+        subplot(2+num_TC_datatypes,num_groups,(1+num_TC_datatypes)*num_groups+g)
+        plot(squeeze(nanmean(CombData.interhistogram(g,:,:,:),3))','Color',rep_Colors(g,:),'LineWidth',rep_LineWidth)
+        hold on
+        plot(squeeze(nanmean(nanmean(CombData.interhistogram(g,:,:,:),3),2)),'Color',mean_Colors(g,:),'LineWidth',mean_LineWidth)
+        title('Intertrial Pattern Frame Histogram','FontSize',subtitle_FontSize)
+    end
+end
+
+
+%plot histograms for closed-loop trials
+if ~isempty(CL_conds)
+    num_figs = size(CL_conds,3);
+    for d = CL_inds
+        for fig = 1:num_figs
+            num_plot_rows = (1-overlap/2)*max(nansum(CL_conds(:,:,fig)>0));
+            num_plot_cols = max(nansum(CL_conds(:,:,fig)>0,2));
+            figure('Position',[100 100 540 540*(num_plot_rows/num_plot_cols)])
+            for row = 1:num_plot_rows
+                for col = 1:num_plot_cols
+                    cond = CL_conds(1+(row-1)*(1+overlap),col,fig);
+                    if cond>0
+                        better_subplot(num_plot_rows, num_plot_cols, col+num_plot_cols*(row-1))
+                        hold on
+                        [~, num_exps, ~, ~, ~, num_positions] = size(CombData.histograms);
+                        x = circshift(1:num_positions,[1 floor(num_positions/2)]);
+                        x(x>x(end)) = x(x>x(end))-num_positions;
+                        for g = 1:num_groups
+                            tmpdata = circshift(squeeze(nanmean(CombData.histograms(g,:,d,cond,:,:),5)),[1 num_positions/2]);
+                            if num_groups==1 && overlap==0 %plot individual trials only if plotting one data group (otherwise it's too messy)
+                                plot(repmat(x',[1 num_exps]),tmpdata','Color',rep_Colors(g,:),'LineWidth',rep_LineWidth);
+                            end
+                            plot(x,nanmean(tmpdata),'Color',mean_Colors(g,:),'LineWidth',mean_LineWidth)
+                        end
+                        ylim(histogram_ylimits(d,:));
+                        titlestr = ['\fontsize{' num2str(subtitle_FontSize) '} Condition #{\color[rgb]{' num2str(mean_Colors(g,:)) '}' num2str(cond)']; 
+                        if overlap==1
+                            cond = CL_conds(row*2,col,fig);
+                            if cond>0
+                                titlestr = [titlestr ' \color[rgb]{' num2str(rep_Colors(g,:)) '}(' num2str(cond) ')'];
+                                for g = 1:num_groups
+                                    tmpdata = circshift(squeeze(nanmean(CombData.histograms(g,:,d,cond,:,:),5)),[1 num_positions/2]);
+                                    plot(x,nanmean(tmpdata),'Color',rep_Colors(g,:),'LineWidth',mean_LineWidth)
+                                end
+                            end
+                        end
+                        title([titlestr '}'])
+                    end
+                end
+            end
+        end
+    end
+end
+
+%plot timeseries data for open-loop trials
+if ~isempty(OL_conds)
+    num_figs = size(OL_conds,3);
+    num_exps = size(CombData.timeseries,2);
+    %loop for different data types
+    for d = OL_inds
+        for fig = 1:num_figs
+            num_plot_rows = (1-overlap/2)*max(nansum(OL_conds(:,:,fig)>0));
+            num_plot_cols = max(nansum(OL_conds(:,:,fig)>0,2));
+            figure('Position',[100 100 540 540*(num_plot_rows/num_plot_cols)])
+            for row = 1:num_plot_rows
+                for col = 1:num_plot_cols
+                    cond = OL_conds(1+(row-1)*(1+overlap),col,fig);
+                    if cond>0
+                        better_subplot(num_plot_rows, num_plot_cols, col+num_plot_cols*(row-1))
+                        hold on
+                        for g = 1:num_groups
+                            tmpdata = squeeze(nanmean(CombData.timeseries(g,:,d,cond,:,:),5));
+                            if num_groups==1 && overlap==0 
+                                plot(repmat(CombData.timestamps',[1 num_exps]),tmpdata','Color',rep_Colors(g,:),'LineWidth',rep_LineWidth);
+                            end
+                            plot(CombData.timestamps,nanmean(tmpdata),'Color',mean_Colors(g,:),'LineWidth',mean_LineWidth);
+                        end
+                        titlestr = ['\fontsize{' num2str(subtitle_FontSize) '} Condition #{\color[rgb]{' num2str(mean_Colors(g,:)) '}' num2str(cond)']; 
+                        ylim(timeseries_ylimits(d,:));
+                        xlim(timeseries_xlimits)
+                        if overlap==1
+                            cond = OL_conds(row*2,col,fig);
+                            if cond>0
+                                titlestr = [titlestr ' \color[rgb]{' num2str(rep_Colors(g,:)) '}(' num2str(cond) ')'];
+                                for g = 1:num_groups
+                                    tmpdata = squeeze(nanmean(CombData.timeseries(g,:,d,cond,:,:),5));
+                                    plot(CombData.timestamps,nanmean(tmpdata),'Color',rep_Colors(g,:),'LineWidth',mean_LineWidth);
+                                end
+                            end
+                        end
+                        title([titlestr '}'])
+                    end
+                end
+            end
+        end
+    end
+end
+
+%plot tuning-curves for specified open-loop trials
+if ~isempty(TC_conds)
+    num_figs = size(TC_conds,3);
+    %loop for different data types
+    for d = TC_inds
+        for fig = 1:num_figs
+            num_plot_rows = (1-overlap/2)*max(nansum(TC_conds(:,:,fig)>0));
+            figure('Position',[100 100 540/num_plot_rows 540])
+            for row = 1:num_plot_rows
+                conds = TC_conds(1+(row-1)*(1+overlap),:,fig);
+                conds(isnan(conds)|conds==0) = [];
+                better_subplot(num_plot_rows, 1, row)
+                hold on
+                for g = 1:num_groups
+                    tmpdata = squeeze(nanmean(CombData.summaries(g,:,d,conds,:),5));
+                    if num_groups==1 && overlap==0 
+                        plot(tmpdata','Color',rep_Colors(g,:),'LineWidth',rep_LineWidth);
+                    end
+                    plot(nanmean(tmpdata),'Color',mean_Colors(g,:),'LineWidth',mean_LineWidth);
+                end
+                ylim(timeseries_ylimits(d,:));
+                titlestr = ['\fontsize{' num2str(subtitle_FontSize) '} Condition #{\color[rgb]{' num2str(mean_Colors(g,:)) '}' num2str(cond)']; 
+                if overlap==1
+                    conds = TC_conds(row*2,:,fig);
+                    conds(isnan(conds)|conds==0) = [];
+                    titlestr = [titlestr ' \color[rgb]{' num2str(rep_Colors(g,:)) '}(' num2str(cond) ')'];
+                    for g = 1:num_groups
+                        tmpdata = squeeze(nanmean(CombData.summaries(g,:,d,conds,:),5));
+                        plot(nanmean(tmpdata),'Color',rep_Colors(g,:),'LineWidth',mean_LineWidth);
+                    end
+                end
+                title([titlestr '}'])
+            end
+        end
+    end
+end
+
