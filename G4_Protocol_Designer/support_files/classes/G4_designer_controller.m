@@ -46,6 +46,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
         pageDown_button_
         uneditable_cell_color_
         uneditable_cell_text_
+        listbox_imported_files_
         
 
         %is_ao_visible_
@@ -106,6 +107,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
         pageDown_button
         uneditable_cell_color
         uneditable_cell_text
+        listbox_imported_files
 
         
 %         isRandomized_box
@@ -173,7 +175,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
             columns_editable_ = true;
             column_format_ = {'numeric', 'char', 'char', 'char', 'char','char', ...
                 'char', 'char', 'numeric', 'numeric', 'numeric', 'numeric', 'logical'};
-            font_size_ = 10;
+            font_size = 10;
             positions.pre = [350, 870, 1035, 50];
             %pos_pre_ = [350, 870, 1035, 50];
             positions.inter = [350, 815, 1035, 50];
@@ -182,13 +184,13 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
             %pos_block_ = [350, 585, 1035, 200];
             positions.post = [350, 525, 1035, 50];
             %pos_post_ = [350, 525, 1035, 50];
-            pos_panel_ = [350, 190, 1035, 325];
+            pos_panel = [350, 190, 1035, 325];
             pos_menu_ = [15, 875, 105, 40];
 
 
 
             pretrial_label_ = uicontrol(self.f, 'Style', 'text', 'String', 'Pre-Trial', ...
-               'Units', 'Pixels', 'FontSize', font_size_, ...
+               'Units', 'Pixels', 'FontSize', font_size, ...
            'Position', [positions.pre(1) - 85, positions.pre(2) + 15, 78, 20]);
 
             self.pretrial_table = uitable(self.f, 'data', self.doc.pretrial, 'columnname', column_names_, ...
@@ -196,7 +198,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
            'CellEditCallback', @self.update_model_pretrial, 'CellSelectionCallback', {@self.preview_selection, positions});
 
             intertrial_label_ = uicontrol(self.f, 'Style', 'text', 'String', 'Inter-Trial', ...
-               'units', 'pixels', 'FontSize', font_size_, ...
+               'units', 'pixels', 'FontSize', font_size, ...
            'Position', [positions.inter(1) - 85, positions.inter(2) + 15, 78, 20]);
 
             self.intertrial_table = uitable(self.f, 'data', self.doc.intertrial, 'columnname', column_names_, ...
@@ -204,7 +206,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
             'CellEditCallback', @self.update_model_intertrial, 'CellSelectionCallback', {@self.preview_selection, positions});
 
             blocktrial_label_ = uicontrol(self.f, 'Style', 'text', 'String', 'Block Trials', ...
-               'units', 'pixels', 'FontSize', font_size_, ...
+               'units', 'pixels', 'FontSize', font_size, ...
            'Position', [positions.block(1) - 85, positions.block(2) + .5*positions.block(4), 78, 20]);
 
             self.block_table = uitable(self.f, 'data', self.doc.block_trials, 'columnname', column_names_, ...
@@ -213,7 +215,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
 
 
             posttrial_label_ = uicontrol(self.f, 'Style', 'text', 'String', 'Post-Trial', ...
-               'units', 'pixels', 'FontSize', font_size_, ...
+               'units', 'pixels', 'FontSize', font_size, ...
            'Position', [positions.post(1) - 85, positions.post(2) + 15, 78, 20]);
 
             self.posttrial_table = uitable(self.f, 'data', self.doc.posttrial, 'columnname', column_names_, ...
@@ -233,7 +235,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
             75, 20], 'Callback', @self.delete_trial);
 
             self.isSelect_all_box = uicontrol(self.f, 'Style', 'checkbox', 'String', 'Select All', 'Value', self.model.isSelect_all, 'units', ...
-                'pixels','FontSize', font_size_, 'Position', [positions.block(1) + positions.block(3) - 45, ... 
+                'pixels','FontSize', font_size, 'Position', [positions.block(1) + positions.block(3) - 45, ... 
                 positions.block(2) + positions.block(4) + 2, 78, 22], 'Callback', @self.select_all);
 
             invert_selection = uicontrol(self.f, 'Style', 'pushbutton', 'String', 'Invert Selection', ...
@@ -253,12 +255,25 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                 85, positions.pre(4)], 'Callback', @self.clear_all);
             
             autofill_button = uicontrol(self.f, 'Style', 'pushbutton', 'String', 'Auto-Fill', ...
-                'FontSize', 14, 'units', 'pixels', 'Position', [pos_panel_(1), pos_panel_(2) - 50, 100, 50], ...
+                'FontSize', 14, 'units', 'pixels', 'Position', [pos_panel(1), pos_panel(2) - 50, 100, 50], ...
                 'Callback', @self.autofill);
 
 
-            self.preview_panel = uipanel(self.f, 'Title', 'Preview', 'FontSize', font_size_, 'units', 'pixels', ...
-                'Position', pos_panel_);
+            self.preview_panel = uipanel(self.f, 'Title', 'Preview', 'FontSize', font_size, 'units', 'pixels', ...
+                'Position', pos_panel);
+            
+            listbox_files_label = uicontrol(self.f, 'Style', 'text', 'String', 'Imported files for selected cell:',...
+                'units', 'pixels', 'Position', [pos_panel(1) + pos_panel(3) + 10, pos_panel(2) + pos_panel(4), ...
+                180, 20], 'FontSize', font_size);
+            
+            self.listbox_imported_files = uicontrol(self.f, 'Style', 'listbox', 'String', {'Imported files here'},  ...
+                'Position', [listbox_files_label.Position(1) + ((listbox_files_label.Position(3) - 150)/2), listbox_files_label.Position(2) - 255, ...
+                150, 250],'Callback', @self.preview_selection);
+            
+            select_imported_file_button = uicontrol(self.f, 'Style', 'pushbutton', 'String', 'Select', 'Position', ...
+                [self.listbox_imported_files.Position(1) + .5*self.listbox_imported_files.Position(3), ...
+                self.listbox_imported_files.Position(2) - 20, 75, 15], 'Callback', @self.select_new_file);
+            
 
             %code to make the above panel transparent, so the preview image
             %can be seen.
@@ -269,36 +284,36 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
             jPanel.repaint
 
             preview_button = uicontrol(self.f, 'Style', 'pushbutton', 'String', 'Preview', 'Fontsize', ...
-                font_size_, 'units', 'pixels', 'Position', [pos_panel_(1) + pos_panel_(3) + 2, ...
-                pos_panel_(2), 75, 40], 'Callback', @self.full_preview);
+                font_size, 'units', 'pixels', 'Position', [pos_panel(1) + pos_panel(3) + 2, ...
+                pos_panel(2), 75, 40], 'Callback', @self.full_preview);
 
             play_button = uicontrol(self.f, 'Style', 'pushbutton', 'String', 'Play', 'FontSize', ...
-                font_size_, 'units', 'pixels', 'Position', [pos_panel_(1) + .5*pos_panel_(3) - 120, ...
-                pos_panel_(2) - 35, 75, 20], 'Callback', @self.preview_play);
+                font_size, 'units', 'pixels', 'Position', [pos_panel(1) + .5*pos_panel(3) - 120, ...
+                pos_panel(2) - 35, 75, 20], 'Callback', @self.preview_play);
 
             pause_button = uicontrol(self.f, 'Style', 'pushbutton', 'String', 'Pause', 'FontSize', ...
-                font_size_, 'units', 'pixels', 'Position', [pos_panel_(1) + .5*pos_panel_(3) - 35, ...
-                pos_panel_(2) - 35, 75, 20], 'Callback', @self.preview_pause);
+                font_size, 'units', 'pixels', 'Position', [pos_panel(1) + .5*pos_panel(3) - 35, ...
+                pos_panel(2) - 35, 75, 20], 'Callback', @self.preview_pause);
 
             stop_button = uicontrol(self.f, 'Style', 'pushbutton', 'String', 'Stop', 'FontSize', ...
-                font_size_, 'units', 'pixels', 'Position', [pos_panel_(1) + .5*pos_panel_(3) + 50, ...
-                pos_panel_(2) - 35, 75, 20], 'Callback', @self.preview_stop);
+                font_size, 'units', 'pixels', 'Position', [pos_panel(1) + .5*pos_panel(3) + 50, ...
+                pos_panel(2) - 35, 75, 20], 'Callback', @self.preview_stop);
 
             frameBack_button = uicontrol(self.f, 'Style', 'pushbutton', 'String', 'Back Frame', 'FontSize', ...
-                font_size_, 'units', 'pixels', 'Position', [pos_panel_(1) + .5*pos_panel_(3) - 205, ...
-                pos_panel_(2) - 35, 75, 20], 'Callback', @self.frame_back);
+                font_size, 'units', 'pixels', 'Position', [pos_panel(1) + .5*pos_panel(3) - 205, ...
+                pos_panel(2) - 35, 75, 20], 'Callback', @self.frame_back);
 
             frameForward_button = uicontrol(self.f, 'Style', 'pushbutton', 'String', 'Forward Frame', ...
-                'FontSize', font_size_, 'units', 'pixels', 'Position', [pos_panel_(1) + .5*pos_panel_(3) ...
-                + 135, pos_panel_(2) - 35, 90, 20], 'Callback', @self.frame_forward);
+                'FontSize', font_size, 'units', 'pixels', 'Position', [pos_panel(1) + .5*pos_panel(3) ...
+                + 135, pos_panel(2) - 35, 90, 20], 'Callback', @self.frame_forward);
             
             self.pageUp_button = uicontrol(self.f, 'Style', 'pushbutton', 'String', 'Page Up', ...
-                'FontSize', font_size_, 'units', 'pixels', 'Position', [pos_panel_(1) + .5*pos_panel_(3) + 235, ...
-                pos_panel_(2) - 35, 90, 20], 'Enable', 'off', 'Callback', @self.page_up_4d);
+                'FontSize', font_size, 'units', 'pixels', 'Position', [pos_panel(1) + .5*pos_panel(3) + 235, ...
+                pos_panel(2) - 35, 90, 20], 'Enable', 'off', 'Callback', @self.page_up_4d);
             
             self.pageDown_button = uicontrol(self.f, 'Style', 'pushbutton', 'String', 'Page Down', ...
-                'FontSize', font_size_, 'units', 'pixels', 'Position', [pos_panel_(1) + .5*pos_panel_(3) - 305, ...
-                pos_panel_(2) - 35, 90, 20], 'Enable', 'off', 'Callback', @self.page_down_4d);
+                'FontSize', font_size, 'units', 'pixels', 'Position', [pos_panel(1) + .5*pos_panel(3) - 305, ...
+                pos_panel(2) - 35, 90, 20], 'Enable', 'off', 'Callback', @self.page_down_4d);
 
            % self.hAxes = axes(self.f, 'units', 'pixels', 'OuterPosition', [245, 135, 1190 ,397], 'TickLength', [0,0],'XLim', [0 200], 'YLim', [0 65]);
             
@@ -311,11 +326,11 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
             
             self.exp_name_box = uicontrol(self.f, 'Style', 'edit', ...
                 'FontSize', 14, 'units', 'pixels', 'Position', ...
-                [pos_panel_(1)+ (pos_panel_(3)/2) - 200, pos_panel_(2) - 100, 400, 30], 'Callback', @self.update_experiment_name);
+                [pos_panel(1)+ (pos_panel(3)/2) - 200, pos_panel(2) - 100, 400, 30], 'Callback', @self.update_experiment_name);
             
             exp_name_label = uicontrol(self.f, 'Style', 'text', 'String', 'Experiment Name: ', ...
-                'FontSize', 16, 'units', 'pixels', 'Position', [pos_panel_(1) + (pos_panel_(3)/2) - 375, ...
-                pos_panel_(2) - 100, 150, 30]);
+                'FontSize', 16, 'units', 'pixels', 'Position', [pos_panel(1) + (pos_panel(3)/2) - 375, ...
+                pos_panel(2) - 100, 150, 30]);
 
 
        %Drop down menu and associated labels and buttons
@@ -333,10 +348,10 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
             self.bg = uibuttongroup(self.f, 'units', 'pixels', 'Position', [15, positions.block(2) + positions.block(4) - 10, 130, 55], 'SelectionChangedFcn', @self.update_randomize);
        
        
-            self.isRandomized_radio = uicontrol(self.bg, 'Style', 'radiobutton', 'String', 'Randomize Trials', 'FontSize', font_size_, ...
+            self.isRandomized_radio = uicontrol(self.bg, 'Style', 'radiobutton', 'String', 'Randomize Trials', 'FontSize', font_size, ...
                 'units', 'pixels', 'Position', [1, 29, 130, 20]);
             
-            self.isSequential_radio = uicontrol(self.bg, 'Style', 'radiobutton', 'String', 'Sequential Trials', 'FontSize', font_size_, ...
+            self.isSequential_radio = uicontrol(self.bg, 'Style', 'radiobutton', 'String', 'Sequential Trials', 'FontSize', font_size, ...
                 'units', 'pixels', 'Position', [1,7, 130, 20]);
 
        %Repetitions
@@ -344,66 +359,66 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
             self.repetitions_box = uicontrol(self.f, 'Style', 'edit', 'units', 'pixels', 'Position', ...
                 [90, positions.block(2) + positions.block(4) - 45, 40, 20], 'Callback', @self.update_repetitions);
 
-            repetitions_label = uicontrol(self.f, 'Style', 'text', 'String', 'Repetitions:', 'FontSize', font_size_, ...
+            repetitions_label = uicontrol(self.f, 'Style', 'text', 'String', 'Repetitions:', 'FontSize', font_size, ...
                 'units', 'pixels', 'Position', [15, positions.block(2) + positions.block(4) - 45, 70, 20]);
 
        %Dry Run
-            dry_run = uicontrol(self.f, 'Style', 'pushbutton', 'String', 'Dry Run', 'FontSize', font_size_, 'units', 'pixels', 'Position', ...
-                [pos_panel_(1) + pos_panel_(3) + 2, pos_panel_(2) - 40, 75, 40],'Callback',@self.dry_run);
+            dry_run = uicontrol(self.f, 'Style', 'pushbutton', 'String', 'Dry Run', 'FontSize', font_size, 'units', 'pixels', 'Position', ...
+                [pos_panel(1) + pos_panel(3) + 2, pos_panel(2) - 40, 75, 40],'Callback',@self.dry_run);
 
        %Actual run button
 
-            run_button =  uicontrol(self.f, 'Style', 'pushbutton', 'String', 'Run Trials', 'FontSize', font_size_, 'units', 'pixels', 'Position', ...
+            run_button =  uicontrol(self.f, 'Style', 'pushbutton', 'String', 'Run Trials', 'FontSize', font_size, 'units', 'pixels', 'Position', ...
                  [15, positions.block(2) + positions.block(4) - 110, 90, 50], 'Callback', @self.open_run_gui);
 
        %Channels to acquire
 
-            chan_pan = uipanel(self.f, 'Title', 'Analog Input Channels', 'FontSize', font_size_, 'units', 'pixels', ...
+            chan_pan = uipanel(self.f, 'Title', 'Analog Input Channels', 'FontSize', font_size, 'units', 'pixels', ...
                 'Position', [15, positions.block(2) + positions.block(4) - 240, 250, 120]);
 
-            %self.chan1 = uicontrol(self.f, 'Style', 'checkbox', 'String', 'Channel 1', 'Value', self.doc.is_chan1, 'FontSize', font_size_, ...
+            %self.chan1 = uicontrol(self.f, 'Style', 'checkbox', 'String', 'Channel 1', 'Value', self.doc.is_chan1, 'FontSize', font_size, ...
              %   'units', 'pixels', 'Position', [20, positions.block(2) + positions.block(4) - 160, 80, 20], 'Callback', @self.update_chan1);
 
             self.chan1_rate_box = uicontrol(chan_pan, 'Style', 'edit', 'String', num2str(self.doc.chan1_rate), 'units', 'pixels', 'Position', ...
                 [170, 74, 40, 20],'Callback', @self.update_chan1_rate);
 
-            chan1_rate_label = uicontrol(chan_pan, 'Style', 'text', 'String', 'Channel 1 Sample Rate', 'FontSize', font_size_, ...
+            chan1_rate_label = uicontrol(chan_pan, 'Style', 'text', 'String', 'Channel 1 Sample Rate', 'FontSize', font_size, ...
                 'units', 'pixels', 'HorizontalAlignment', 'left', 'Position', [15, 74, 150, 20]);
 
-            %self.chan2 = uicontrol(self.f, 'Style', 'checkbox', 'String', 'Channel 2', 'Value', self.doc.is_chan2, 'FontSize', font_size_, ...
+            %self.chan2 = uicontrol(self.f, 'Style', 'checkbox', 'String', 'Channel 2', 'Value', self.doc.is_chan2, 'FontSize', font_size, ...
             %    'units', 'pixels', 'Position', [20, positions.block(2) + positions.block(4) - 180, 80, 20], 'Callback', @self.update_chan2);
 
             self.chan2_rate_box = uicontrol(chan_pan, 'Style', 'edit', 'String', num2str(self.doc.chan2_rate), 'units', 'pixels', 'Position', ...
                 [170, 51, 40, 20], 'Callback', @self.update_chan2_rate);
 
-            chan2_rate_label = uicontrol(chan_pan, 'Style', 'text', 'String', 'Channel 2 Sample Rate', 'FontSize', font_size_, ...
+            chan2_rate_label = uicontrol(chan_pan, 'Style', 'text', 'String', 'Channel 2 Sample Rate', 'FontSize', font_size, ...
                 'units', 'pixels', 'HorizontalAlignment', 'left', 'Position', [15, 51, 150, 20]);
 
-            %self.chan3 = uicontrol(self.f, 'Style', 'checkbox', 'String', 'Channel 3', 'Value', self.doc.is_chan3, 'FontSize', font_size_, ...
+            %self.chan3 = uicontrol(self.f, 'Style', 'checkbox', 'String', 'Channel 3', 'Value', self.doc.is_chan3, 'FontSize', font_size, ...
              %   'units', 'pixels', 'Position', [20, positions.block(2) + positions.block(4) - 200, 80, 20], 'Callback', @self.update_chan3);
 
             self.chan3_rate_box = uicontrol(chan_pan, 'Style', 'edit', 'String', num2str(self.doc.chan3_rate), 'units', 'pixels', 'Position', ...
                 [170, 28, 40, 20], 'Callback', @self.update_chan3_rate);
 
-            chan3_rate_label = uicontrol(chan_pan, 'Style', 'text', 'String', 'Channel 3 Sample Rate', 'FontSize', font_size_, ...
+            chan3_rate_label = uicontrol(chan_pan, 'Style', 'text', 'String', 'Channel 3 Sample Rate', 'FontSize', font_size, ...
                 'HorizontalAlignment', 'left', 'units', 'pixels', 'Position', [15, 28, 150, 20]);
 
-            %self.chan4 = uicontrol(self.f, 'Style', 'checkbox', 'String', 'Channel 4', 'Value', self.doc.is_chan4, 'FontSize', font_size_, ...
+            %self.chan4 = uicontrol(self.f, 'Style', 'checkbox', 'String', 'Channel 4', 'Value', self.doc.is_chan4, 'FontSize', font_size, ...
              %   'units', 'pixels', 'Position', [20, positions.block(2) + positions.block(4) - 220, 80, 20], 'Callback', @self.update_chan4);
 
             self.chan4_rate_box = uicontrol(chan_pan, 'Style', 'edit', 'String', num2str(self.doc.chan4_rate), 'units', 'pixels', 'Position', ...
                 [170, 5, 40, 20], 'Callback', @self.update_chan4_rate);
 
-            chan4_rate_label = uicontrol(chan_pan, 'Style', 'text', 'String', 'Channel 4 Sample Rate', 'FontSize', font_size_, ...
+            chan4_rate_label = uicontrol(chan_pan, 'Style', 'text', 'String', 'Channel 4 Sample Rate', 'FontSize', font_size, ...
                 'HorizontalAlignment', 'left', 'units', 'pixels', 'Position', [15, 5, 150, 20]);
 
             self.bg2 = uibuttongroup(self.f, 'units', 'pixels', 'Position', [15, positions.block(2) + positions.block(4) - 270, 250, 25], 'SelectionChangedFcn', @self.update_rowNum);
        
        
-            self.num_rows_3 = uicontrol(self.bg2, 'Style', 'radiobutton', 'String', '3 Row Screen', 'FontSize', font_size_, ...
+            self.num_rows_3 = uicontrol(self.bg2, 'Style', 'radiobutton', 'String', '3 Row Screen', 'FontSize', font_size, ...
                 'units', 'pixels', 'Position', [1, 3, 120, 19]);
             
-            self.num_rows_4 = uicontrol(self.bg2, 'Style', 'radiobutton', 'String', '4 Row Screen', 'FontSize', font_size_, ...
+            self.num_rows_4 = uicontrol(self.bg2, 'Style', 'radiobutton', 'String', '4 Row Screen', 'FontSize', font_size, ...
                 'units', 'pixels', 'Position', [121,3, 120, 19]);
             
             key_pan = uipanel(self.f, 'Title', 'Mode Key:', 'BackgroundColor', [.75, .75, .75], 'BorderType', 'none', ...
@@ -838,6 +853,27 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
 %             fclose(fid);
 %             
 %         end
+
+
+        function select_new_file(self, src, event)
+        
+            new_file = self.listbox_imported_files.String{self.listbox_imported_files.Value};
+            
+            
+            if strcmp(self.model.current_selected_cell.table, "pre")
+                self.doc.set_pretrial_property(self.model.current_selected_cell.index(2), new_file);
+            elseif strcmp(self.model.current_selected_cell.table, "inter")
+                self.doc.set_intertrial_property(self.model.current_selected_cell.index(2), new_file);            
+            elseif strcmp(self.model.current_selected_cell.table, "post")
+                self.doc.set_posttrial_property(self.model.current_selected_cell.index(2), new_file);
+            else
+                self.doc.set_block_trial_property(self.model.current_selected_cell.index, new_file);
+            end
+            
+            self.update_gui();
+            
+        
+        end
 
 
         function create_error_box(self, varargin)
@@ -1663,104 +1699,99 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
             self.update_gui();
 
         end
+        
+        function [file] = check_table_selected(self, src, event, positions)
+        
+            x_event_index = event.Indices(1);
+            y_event_index = event.Indices(2);
+            self.model.current_selected_cell.index = event.Indices;
+            if y_event_index > 1 && y_event_index< 8
+
+                file = string(src.Data(x_event_index, y_event_index));
+
+            else
+
+                file = '';
+
+            end
+            if src.Position == positions.pre
+                self.model.current_selected_cell.table = "pre";
+            elseif src.Position == positions.inter
+                self.model.current_selected_cell.table = "inter";
+            elseif src.Position == positions.block
+                self.model.current_selected_cell.table = "block";
+            elseif src.Position == positions.post
+                self.model.current_selected_cell.table = "post";
+            end
+        
+        end
+        
+
 
 %IN SCREEN PREVIEW OF SELECTED CELL----------------------------------------
 
-        function preview_selection(self, src, event, positions)
+        function preview_selection(self, varargin)
             
     %When a new cell is selected, first delete the current preview axes if
     %there
             delete(self.hAxes);
             delete(self.second_axes);
             
-      %Next assuming a valid cell was selected, get the index of the selection
-      %and determine which table it took place in.
-            if ~isempty(event.Indices)
-                
-                x_event_index = event.Indices(1);
-                y_event_index = event.Indices(2);
-                self.model.current_selected_cell.index = event.Indices;
-                if y_event_index > 1 && y_event_index< 8
-
-                    file = string(src.Data(x_event_index, y_event_index));
-                 
-                else
-                    
-                    file = '';
-                    
-                end
-                if src.Position == positions.pre
-                    self.model.current_selected_cell.table = "pre";
-                elseif src.Position == positions.inter
-                    self.model.current_selected_cell.table = "inter";
-                elseif src.Position == positions.block
-                    self.model.current_selected_cell.table = "block";
-                elseif src.Position == positions.post
-                    self.model.current_selected_cell.table = "post";
-                end
-
-  %If cells 2 -7 were chosen, get the string that's already there if there
-  %is one.
-                
-                
-
-    %At this point if the cell is empty, call provide_file_list function
-    %which will provide a list of imported files to choose from.
-                
-                if strcmp(file,'') && event.Indices(2) > 1 && event.Indices(2) < 8
-
-                     [success, chosen_file, chosen_field] = provide_file_list(self, event);
-                     if success == 0
-                         return;
-                     end
-                     
-                     
-                      %Now that they've chosen a file, update the model
-                    if strcmp(self.model.current_selected_cell.table, "pre") == 1
-
-                        self.doc.set_pretrial_property(event.Indices(2), chosen_file);
-                        self.update_gui();
-
-                    elseif strcmp(self.model.current_selected_cell.table, "inter") == 1
-
-                        self.doc.set_intertrial_property(event.Indices(2), chosen_file);
-                        self.update_gui();
-
-                    elseif strcmp(self.model.current_selected_cell.table, "block") == 1
-                        self.doc.set_block_trial_property(event.Indices, chosen_file);
-                        self.update_gui();
-
-                    elseif strcmp(self.model.current_selected_cell.table, "post") == 1
-
-                        self.doc.set_posttrial_property(event.Indices(2), chosen_file);
-                        self.update_gui();
-
-                    else
-                        self.create_error_box("Make sure you haven't changed your selection.");
-                    end
-                    
-                else
-                    
-                    
-
-                end
+            src = varargin{1};
+            event = varargin{2};
+            if length(varargin) >= 3
+                positions = varargin{3};
+            end
             
-                %Get all parameters that might be needed for preview from
-                %the trial the selected cell belongs to.
-                [mode, frame_rate, dur, patfield, posfield, aofields] = get_table_parameters(self, src, event);
-           
-                %Now actually display the preview of whatever file is
-                %selected
-
-                if ~strcmp(file,'')
-
-                    display_inscreen_preview(self, event, mode, frame_rate, dur, patfield, posfield, aofields); 
-
+      %Determine whether we are previewing a file from a table or from the
+      %listbox
+      
+            if src.Position == self.listbox_imported_files.Position
+                is_table = 0;
+            else
+                if ~isempty(event.Indices)
+                    is_table = 1;
+                else
+                    is_table = NaN;
                 end
+            end
+      
+            
+            if is_table == 1
+                
+                %get index of selected cell, table it resides in, and
+                %string of the file in the cell if its index is 2-7
+                 file = self.check_table_selected(src, event, positions);
+   
+                %Fill embedded list with imported files appropriate for the
+                %selected cell
+                 self.provide_file_list(event);
+                 
+            else
+                
+                file = self.listbox_imported_files.String{self.listbox_imported_files.Value};
+             
 
             end
 
+            %Get all parameters that might be needed for preview from
+            %the trial the selected cell belongs to.
+            
+            if ~strcmp(file,'')
+                [frame_rate, dur, patfield, posfield, aofield, file_type] = get_preview_parameters(self, is_table);
+
+            %Now actually display the preview of whatever file is
+            %selected
+
+
+                self.display_inscreen_preview(frame_rate, dur, patfield, posfield, aofield, file_type); 
+            end
+
+            
+
         end
+
+       
         
       
         
@@ -1776,30 +1807,13 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
 
         function frame_forward(self, src, event)
 
-            if strcmp(self.model.current_selected_cell.table, "pre")
-                filename = string(self.pretrial_table.Data(self.model.current_selected_cell.index(2)));
-            elseif strcmp(self.model.current_selected_cell.table, "inter")
-                filename = string(self.intertrial_table.Data(self.model.current_selected_cell.index(2)));
-
-            elseif strcmp(self.model.current_selected_cell.table, "block")
-                filename = string(self.block_table.Data(self.model.current_selected_cell.index(1),self.model.current_selected_cell.index(2)));
-
-            elseif strcmp(self.model.current_selected_cell.table, "post")
-                filename = string(self.posttrial_table.Data(self.model.current_selected_cell.index(2)));
-
-            else
-                self.create_error_box("Please make sure you have selected a cell and try again");
-                return;
-            end
-
-            if strcmp(filename,'') == 0
-                fieldname = self.doc.get_pattern_field_name(filename);
-                data = self.doc.Patterns_.(fieldname).pattern.Pats;
+            if ~strcmp(self.model.current_preview_file,'') && length(self.model.current_preview_file(1,1,:)) > 1
+                
                 self.model.auto_preview_index = self.model.auto_preview_index + 1;
-                if self.model.auto_preview_index > length(data(1,1,:))
+                if self.model.auto_preview_index > length(self.model.current_preview_file(1,1,:))
                     self.model.auto_preview_index = 1;
                 end
-                preview_data = data(:,:,self.model.auto_preview_index);
+                preview_data = self.model.current_preview_file(:,:,self.model.auto_preview_index);
                 
                 xax = [0 length(preview_data(1,:))];
                 yax = [0 length(preview_data(:,1))];
@@ -1826,30 +1840,14 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
         
         function frame_back(self, src, event)
 
-            if strcmp(self.model.current_selected_cell.table, "pre")
-                filename = string(self.pretrial_table.Data(self.model.current_selected_cell.index(2)));
-            elseif strcmp(self.model.current_selected_cell.table, "inter")
-                filename = string(self.intertrial_table.Data(self.model.current_selected_cell.index(2)));
-
-            elseif strcmp(self.model.current_selected_cell.table, "block")
-                filename = string(self.block_table.Data(self.model.current_selected_cell.index(1),self.model.current_selected_cell.index(2)));
-
-            elseif strcmp(self.model.current_selected_cell.table, "post")
-                filename = string(self.posttrial_table.Data(self.model.current_selected_cell.index(2)));
-
-            else
-                self.create_error_box("Please make sure you have selected a cell and try again");
-                return;
-            end
-
-            if strcmp(filename,'') == 0
+            if ~strcmp(self.model.current_preview_file,'') && length(self.model.current_preview_file(1,1,:)) > 1
                 self.model.auto_preview_index = self.model.auto_preview_index - 1;
 
                 if self.model.auto_preview_index < 1
                     self.model.auto_preview_index = length(self.model.current_preview_file(1,1,:));
                 end
-                fieldname = self.doc.get_pattern_field_name(filename);
-                data = self.doc.Patterns_.(fieldname).pattern.Pats;
+                
+                data = self.model.current_preview_file;
                 preview_data = data(:,:,self.model.auto_preview_index);
                 
                 xax = [0 length(preview_data(1,:))];
@@ -1857,13 +1855,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                  
                 max_num = max(preview_data,[],[1 2]);    
                 adjusted_matrix = preview_data ./ max_num;
-                
-          
 
-                % black = [1 1 1];
-                 %white = [0 0 0];
-
-                %for i = 1:30
                 im = imshow(adjusted_matrix(:,:), 'Colormap', gray);
                 set(im, 'parent', self.hAxes);
                 set(self.hAxes, 'XLim', xax, 'YLim', yax);
@@ -1879,7 +1871,6 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
 
             if strcmp(self.model.current_selected_cell.table, "pre")
                 
-                filename = string(self.pretrial_table.Data(self.model.current_selected_cell.index(2)));
                 mode = self.doc.pretrial{1};
                 if mode == 2
                     fr_rate = self.doc.pretrial{9};
@@ -1888,8 +1879,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                 end
                 
             elseif strcmp(self.model.current_selected_cell.table, "inter")
-                
-                filename = string(self.intertrial_table.Data(self.model.current_selected_cell.index(2)));
+               
                 mode = self.doc.intertrial{1};
                 if mode == 2
                     fr_rate = self.doc.intertrial{9};
@@ -1898,19 +1888,16 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                 end
                 
             elseif strcmp(self.model.current_selected_cell.table, "block")
-                
-                filename = string(self.block_table.Data(self.model.current_selected_cell.index(1),self.model.current_selected_cell.index(2)));
+               
                 mode = self.doc.block_trials{self.model.current_selected_cell.index(1), 1};
                 if mode == 2
                     fr_rate = self.doc.block_trials{self.model.current_selected_cell.index(1), 9};
                 else
                     fr_rate = 30;
                 end
-                
-                
-                
+
             elseif strcmp(self.model.current_selected_cell.table, "post")
-                filename = string(self.posttrial_table.Data(self.model.current_selected_cell.index(2)));
+                
                 mode = self.doc.posttrial{1};
                 if mode == 2
                     fr_rate = self.doc.posttrial{9};
@@ -1921,39 +1908,10 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                 self.create_error_box("Please make sure you have selected a cell and try again");
                 return;
             end
-
             
             
-            
-%             
-%             
-%             x = [0 length(self.model.current_preview_file(1,:,1))];
-%                         y = [0 length(self.model.current_preview_file(:,1,1))];
-%                         adjusted_file = zeros(y(2),x(2),length(self.model.current_preview_file(1,1,:)));
-%                         for i = 1:length(self.model.current_preview_file(1,1,:))
-%                             max_num = max(self.model.current_preview_file(:,:,i));    
-%                             adjusted_matrix = self.model.current_preview_file(:,:,i) ./ max_num;
-%                             adjusted_file(:,:,i) = adjusted_matrix(:,:,1);
-%                         end
-% 
-% 
-%                         %disp("it worked!");
-%                          black = [1 1 1];
-%                          white = [0 0 0];
-%                         %hAxes = gca; 
-%                         
-% 
-%                         %for i = 1:30
-%                         im = imshow(adjusted_file(:,:,self.model.auto_preview_index), 'Colormap',gray);
-%                         set(im, 'parent', self.hAxes)
-%                         colormap( self.hAxes, gray )
-%                         set(self.hAxes, 'XLim', x, 'YLim', y);
-%                        % pause(1/fr_rate);
-            
-            
-            
-            
-            if strcmp(filename,'') == 0
+        
+            if ~strcmp(self.model.current_preview_file,'') && length(self.model.current_preview_file(1,1,:)) > 1
                 len = length(self.model.current_preview_file(1,1,:));
                 xax = [0 length(self.model.current_preview_file(1,:,1))];
                 yax = [0 length(self.model.current_preview_file(:,1,1))];
@@ -1962,8 +1920,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                 for i = 1:len
                     adjusted_matrix = self.model.current_preview_file(:,:,i) ./ max_num(i);
                     adjusted_file(:,:,i) = adjusted_matrix(:,:,1);
-               
-                    
+
                     
                 end
                 im = imshow(adjusted_file(:,:,self.model.auto_preview_index), 'Colormap', gray);
@@ -2017,20 +1974,11 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
      
             max_num = max(self.model.current_preview_file,[],[1 2]);    
             adjusted_matrix = self.model.current_preview_file(:,:,self.model.auto_preview_index) ./ max_num(self.model.auto_preview_index);
-                
-          
 
-                % black = [1 1 1];
-                 %white = [0 0 0];
-
-                %for i = 1:30
             im = imshow(adjusted_matrix(:,:), 'Colormap', gray);
             set(im, 'parent', self.hAxes);
             set(self.hAxes, 'XLim', x, 'YLim', y);
                         
-
-
-
         end
 
 
@@ -2288,11 +2236,11 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
         end
         
 %PREVIEW SELECTED CELL ON IN-SCREEN PREVIEW--------------------------------        
-        function display_inscreen_preview(self, event, mode, frame_rate, dur, patfield, funcfield, aofields)  
+        function display_inscreen_preview(self, frame_rate, dur, patfield, funcfield, aofield, file_type)  
     
-            if event.Indices(2) == 2
+            if strcmp(file_type, 'pat')
 
-                self.model.auto_preview_index = self.check_pattern_dimensions();
+                self.model.auto_preview_index = self.check_pattern_dimensions(patfield);
                 self.model.current_preview_file = self.doc.Patterns.(patfield).pattern.Pats;
 
                 x = [0 length(self.model.current_preview_file(1,:,1))];
@@ -2310,30 +2258,13 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
 
                 set(im, 'parent', self.hAxes);
 
-                %BELOW ATTEMPT TO WORK WITH 4D PATTERNS - NOT
-                                    %WORKING YET.
-        %                         else
-        %                             x = [0 length(self.model.current_preview_file(1,:,1,1))];
-        %                             y = [0 length(self.model.current_preview_file(:,1,1,1))];
-        %                             adjusted_file = zeros(y(2),x(2), length(self.model.current_preview_file(1,1,:,1)), length(self.model.current_preview_file(1,1,1,:)));
-        %                             max_num = max(self.model.current_preview_file,[],[1 2 4]);
-        %                             
-        %                             for j = 1:length(self.model.current_preview_file(1,1,:,1))
-        %                                 adjusted_matrix = self.model.current_preview_file(:,:,j,:) ./ max_num(j);
-        %                                 adjusted_file(:,:,j,:) = adjusted_matrix(:,:,j,:);
-        %                             end
-        %                             data_to_plot = adjusted_file(:,:, self.model.auto_preview_index, 1)
-        %                             
-        %                             self.hAxes = axes(self.f, 'units', 'pixels', 'OuterPosition', [245, 135, 1190 ,397], 'XTick', [], 'YTick', [] ,'XLim', x, 'YLim', y);
-        %                             im = imshow(data_to_plot(:,:), 'Colormap', gray);
-        %                             set(im, 'parent', self.hAxes);
-        %                         end
 
 
-            elseif event.Indices(2) == 3
+            elseif strcmp(file_type, 'pos')
 
 
                 self.model.current_preview_file = self.doc.Pos_funcs.(funcfield).pfnparam.func;
+                
                 self.hAxes = axes(self.f,'units', 'pixels', 'OuterPosition', [245, 135, 1190 ,397]);
                 self.second_axes = axes(self.f, 'units', 'pixels', 'OuterPosition', self.hAxes.OuterPosition, 'XAxisLocation', 'top', 'YAxisLocation', 'right');
                 plot(self.model.current_preview_file, 'parent', self.hAxes);
@@ -2358,19 +2289,9 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                     line('XData', [dur, dur], 'YData', [yax(1), yax(2)], 'Color', [1 0 0], 'LineWidth', 2);
                 end
 
-            elseif event.Indices(2) > 3 && event.Indices(2) < 7
-                
-                if event.Indices(2) == 4
-                    aofield = aofields{1};
-                elseif event.Indices(2) == 5
-                    aofield = aofields{2};
-                elseif event.Indices(2) == 6
-                    aofield = aofields{3};
-                else
-                    aofield = aofields{4};
-                end
+            elseif strcmp(file_type, 'ao')
 
-                self.model.current_preview_file = self.doc.Ao_funcs_.(aofield).afnparam.func;
+                self.model.current_preview_file = self.doc.Ao_funcs.(aofield).afnparam.func;
                 self.hAxes = axes(self.f,'units', 'pixels', 'OuterPosition', [245, 135, 1190 ,397]);
                 self.second_axes = axes(self.f, 'units', 'pixels', 'OuterPosition', self.hAxes.OuterPosition, 'XAxisLocation', 'top', 'YAxisLocation', 'right');
 
@@ -2400,53 +2321,29 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
         end
         
 %PROVIDES LIST OF IMPORTED FILES TO CHOOSE FROM WHEN EMPTY CELL IS SELECTED        
-        function [success, chosen_file, chosen_field] = provide_file_list(self, event)
+        function provide_file_list(self, event)
 
             if event.Indices(2) == 2
 
                 pats = self.doc.Patterns;
                 fields = fieldnames(pats);
                 if isempty(fields)
-                    self.create_error_box("You haven't imported any patterns yet.");
-                    success = 0;
-                    chosen_file = '';
-                    chosen_field = '';
+                    self.listbox_imported_files.String = {''};
+                    
                     return;
                 end
 
                 for i = 1:length(fields)
                     filenames{i} = self.doc.Patterns.(fields{i}).filename;
                 end
+                self.listbox_imported_files.String = filenames;
 
-                [index, chose] = listdlg('ListString',filenames,'SelectionMode','single');
-
-                if chose == 1
-
-                    chosen_file = filenames{index};
-                    chosen_field = self.doc.get_pattern_field_name(chosen_file);
-
-                    if length(self.doc.Patterns.(chosen_field).pattern.Pats(:,1,1))/16 ~= self.doc.num_rows
-                        self.create_error_box("This pattern will not run on the currently selected screen size. Please try again.");
-                        success = 0;
-                        chosen_file = '';
-                        chosen_field = '';
-                        return;
-                    end
-
-                    success = 1;
-
-                else
-
-                    success = 0;
-                    chosen_file = '';
-                    chosen_field = '';
-                    return;
-
-                end
 
             elseif event.Indices(2) == 3
+                
                 if strcmp(self.model.current_selected_cell.table, "pre")
                     mode = self.doc.pretrial{1};
+                    
                 elseif strcmp(self.model.current_selected_cell.table, "inter")
                     mode = self.doc.intertrial{1};
                 elseif strcmp(self.model.current_selected_cell.table, "post")
@@ -2457,94 +2354,121 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                 
 
                 edit = self.check_editable(mode, 3);
+                
                 if edit == 0
                     self.create_error_box("You cannot edit the position function in this mode.");
-                    success = 0;
-                    chosen_file = '';
-                    chosen_field = '';
+  
                     return;
                 end
+                
                 funcs = self.doc.Pos_funcs;
                 fields = fieldnames(funcs);
+                
                 if isempty(fields)
-                    self.create_error_box("You haven't imported any functions yet.");
-                    success = 0;
-                    chosen_file = '';
-                    chosen_field = '';
+                    self.listbox_imported_files.String = {''};
                     return;
                 end
 
                 for i = 1:length(fields)
                     filenames{i} = self.doc.Pos_funcs.(fields{i}).filename;
                 end
-
-                [index, chose] = listdlg('ListString',filenames,'SelectionMode','single');
-
-                if chose == 1
-
-                    chosen_file = filenames{index};
-                    chosen_field = self.doc.get_posfunc_field_name(chosen_file);
-
-                else
-
-                    success = 0;
-                    chosen_file = '';
-                    chosen_field = '';
-                    return;
-
-                end
-                success = 1;
+                
+                self.listbox_imported_files.String = filenames;
+               
 
            elseif event.Indices(2) > 3 && event.Indices(2) < 8
 
                 ao = self.doc.Ao_funcs;
                 fields = fieldnames(ao);
                 if isempty(fields)
-                    self.create_error_box("You haven't imported any AO functions yet.");
-                    success = 0;
-                    chosen_file = '';
-                    chosen_field = '';
+                    self.listbox_imported_files.String = {''};
                     return;
                 end
 
                 for i = 1:length(fields)
                     filenames{i} = self.doc.Ao_funcs.(fields{i}).filename;
                 end
-
-                [index, chose] = listdlg('ListString',filenames,'SelectionMode','single');
-
-                if chose == 1
-
-                    chosen_file = filenames{index};
-                    chosen_field = self.doc.get_aofunc_field_name(chosen_file);
-
-                else
-
-                    success = 0;
-                    chosen_file = '';
-                    chosen_field = '';
-                    return;
-
-                end
-                success = 1;
+                
+                self.listbox_imported_files.String = filenames;
+                
 
             else
 
                 return;
 
             end
+            
+            if strcmp(self.model.current_selected_cell.table,"pre")
+                selected_file = self.doc.pretrial{event.Indices(2)};
+                ind = find(strcmp(filenames, selected_file));
+                
+            elseif strcmp(self.model.current_selected_cell.table,"inter")
+                selected_file = self.doc.intertrial{event.Indices(2)};
+                ind = find(strcmp(filenames, selected_file));
+              
+            elseif strcmp(self.model.current_selected_cell.table, "block")
+                selected_file = self.doc.block_trials{event.Indices(1), event.Indices(2)};
+                ind = find(strcmp(filenames, selected_file));
+            else
+                selected_file = self.doc.posttrial{event.Indices(2)};
+                ind = find(strcmp(filenames, selected_file));
+              
+            end
+            
+            if ~isempty(ind)
+                self.listbox_imported_files.Value = ind;
+            else
+                self.listbox_imported_files.Value = 1;
+            end
+
 
         end
  
 %PULLS PARAMETERS FROM TRIAL CONTAINING A SELECTED CELL FOR PREVIEWING-----        
-        function [mode, frame_rate, dur, patfield, funcfield, aofields] = get_table_parameters(self, src, event)
-    
-            if strcmp(self.model.current_selected_cell.table, "pre")
+        function [frame_rate, dur, patfield, funcfield, aofield, file_type] = get_preview_parameters(self, is_table)
+            
+            index = self.model.current_selected_cell.index;
+            table = self.model.current_selected_cell.table;
+            file_type = '';
+            patfile = '';
+            funcfile = '';
+            aofile = '';
+            
+            if strcmp(table, "pre")
 
                 mode = self.doc.pretrial{1};
-
-                patfile = self.doc.pretrial{2};
+                
+                if index(2) == 2 
+                    file_type = 'pat';
+                    if is_table == 0
+                        patfile = self.listbox_imported_files.String{self.listbox_imported_files.Value};
+                    else
+                        patfile = self.doc.pretrial{2};
+                    end
+                end
+                
+                if index(2) == 3 
+                    file_type = 'pos';
+                    
+                    if is_table == 0
+                        funcfile = self.listbox_imported_files.String{self.listbox_imported_files.Value};
+                    else
+                        funcfile = self.doc.pretrial{3};
+                    end
+                end
+                if index(2) > 3 && index(2) < 8 
+                    file_type = 'ao';
+                    if is_table == 0
+                        aofile = self.listbox_imported_files.String{self.listbox_imported_files.Value};
+                    else
+                        aofile = self.doc.pretrial{index(2)};
+                    end
+                end
+                
                 patfield = self.doc.get_pattern_field_name(patfile);
+                funcfield = self.doc.get_posfunc_field_name(funcfile);
+                aofield = self.doc.get_aofunc_field_name(aofile);
+                
                 if mode == 2
                     frame_rate = self.doc.pretrial{9};
                 else
@@ -2558,30 +2482,51 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                         frame_rate = 30;
                     end
                 end
-                funcfile = self.doc.pretrial{3};
-                funcfield = self.doc.get_posfunc_field_name(funcfile);
-                for i = 1:4
-                    aofiles{i} = self.doc.pretrial{i+3};
-                end
-                aofields = {};
                 
-                for i = 1:length(aofiles)
-                    aofields{i} = self.doc.get_aofunc_field_name(aofiles{i});
-                end
+                
+               
                 
                 dur = self.doc.pretrial{12}*1000;
 
-            elseif strcmp(self.model.current_selected_cell.table,"inter")
+            elseif strcmp(table,"inter")
 
                 mode = self.doc.intertrial{1};
-                patfile = self.doc.intertrial{2};
+                
+                if index(2) == 2 
+                    file_type = 'pat';
+                    if is_table == 0
+                        patfile = self.listbox_imported_files.String{self.listbox_imported_files.Value};
+                    else
+                        patfile = self.doc.intertrial{2};
+                    end
+                end
+                
+                if index(2) == 3 
+                    file_type = 'pos';
+                    
+                    if is_table == 0
+                        funcfile = self.listbox_imported_files.String{self.listbox_imported_files.Value};
+                    else
+                        funcfile = self.doc.intertrial{3};
+                    end
+                end
+                if index(2) > 3 && index(2) < 8 
+                    file_type = 'ao';
+                    if is_table == 0
+                        aofile = self.listbox_imported_files.String{self.listbox_imported_files.Value};
+                    else
+                        aofile = self.doc.intertrial{index(2)};
+                    end
+                end
+                
                 patfield = self.doc.get_pattern_field_name(patfile);
-
+                funcfield = self.doc.get_posfunc_field_name(funcfile);
+                aofield = self.doc.get_aofunc_field_name(aofile);
+                
                 if mode == 2
                     frame_rate = self.doc.intertrial{9};
                 else
-                    if ~strcmp(patfield, '')
-
+                    if ~strcmp(patfield,'')
                         if self.doc.Patterns.(patfield).pattern.gs_val == 1
                             frame_rate = 1000;
                         else 
@@ -2591,25 +2536,47 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                         frame_rate = 30;
                     end
                 end
-                funcfile = self.doc.intertrial{3};
-                funcfield = self.doc.get_posfunc_field_name(funcfile);
-                for i = 1:4
-                    aofiles{i} = self.doc.intertrial{i+3};
-                end
-                aofields = {};
-                for i = 1:length(aofiles)
-                    aofields{i} = self.doc.get_aofunc_field_name(aofiles{i});
-                end
 
                 dur = self.doc.intertrial{12}*1000;
 
-            elseif strcmp(self.model.current_selected_cell.table,"block")
+            elseif strcmp(table,"block")
 
-                mode = self.doc.block_trials{event.Indices(1), 1};
-                patfile = self.doc.block_trials{event.Indices(1), 2};
+                mode = self.doc.block_trials{index(1), 1};
+                
+                if index(2) == 2 
+                    file_type = 'pat';
+                    if is_table == 0
+                        patfile = self.listbox_imported_files.String{self.listbox_imported_files.Value};
+                    else
+                        patfile = self.doc.block_trials{index(1), 2};
+                    end
+                end
+                
+                if index(2) == 3 
+                    file_type = 'pos';
+                    
+                    if is_table == 0
+                        funcfile = self.listbox_imported_files.String{self.listbox_imported_files.Value};
+                    else
+                        funcfile = self.doc.block_trials{index(1), 3};
+                    end
+                end
+                
+                if index(2) > 3 && index(2) < 8 
+                    file_type = 'ao';
+                    if is_table == 0
+                        aofile = self.listbox_imported_files.String{self.listbox_imported_files.Value};
+                    else
+                        aofile = self.doc.block_trials{index(1), index(2)};
+                    end
+                end
+                
                 patfield = self.doc.get_pattern_field_name(patfile);
+                funcfield = self.doc.get_posfunc_field_name(funcfile);
+                aofield = self.doc.get_aofunc_field_name(aofile);
+                
                 if mode == 2
-                    frame_rate = self.doc.block_trials{event.Indices(1), 9};
+                    frame_rate = self.doc.block_trials{index(1), 9};
                 else
                     if ~strcmp(patfield,'')
                     
@@ -2622,24 +2589,44 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                         frame_rate = 30;
                     end
                 end
-                funcfile = self.doc.block_trials{event.Indices(1),3};
-                funcfield = self.doc.get_posfunc_field_name(funcfile);
-                for i = 1:4
-                    aofiles{i} = self.doc.block_trials{event.Indices(1),i+3};
-                end
-                aofields = {};
-                for i = 1:length(aofiles)
-                    aofields{i} = self.doc.get_aofunc_field_name(aofiles{i});
-                end
 
-                dur = self.doc.block_trials{event.Indices(1),12}*1000;
+                dur = self.doc.block_trials{index(1),12}*1000;
 
-            elseif strcmp(self.model.current_selected_cell.table,"post")
+            elseif strcmp(table,"post")
 
                 mode = self.doc.posttrial{1};
-                patfile = self.doc.posttrial{2};
+                
+                if index(2) == 2 
+                    file_type = 'pat';
+                    if is_table == 0
+                        patfile = self.listbox_imported_files.String{self.listbox_imported_files.Value};
+                    else
+                        patfile = self.doc.posttrial{2};
+                    end
+                end
+                
+                if index(2) == 3 
+                    file_type = 'pos';
+                    
+                    if is_table == 0
+                        funcfile = self.listbox_imported_files.String{self.listbox_imported_files.Value};
+                    else
+                        funcfile = self.doc.posttrial{3};
+                    end
+                end
+                if index(2) > 3 && index(2) < 8 
+                    file_type = 'ao';
+                    if is_table == 0
+                        aofile = self.listbox_imported_files.String{self.listbox_imported_files.Value};
+                    else
+                        aofile = self.doc.posttrial{index(2)};
+                    end
+                end
+                
                 patfield = self.doc.get_pattern_field_name(patfile);
-
+                funcfield = self.doc.get_posfunc_field_name(funcfile);
+                aofield = self.doc.get_aofunc_field_name(aofile);
+                
                 if mode == 2
                     frame_rate = self.doc.posttrial{9};
                 else
@@ -2653,18 +2640,13 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                         frame_rate = 30;
                     end
                 end
-                funcfile = self.doc.posttrial{3};
-                funcfield = self.doc.get_posfunc_field_name(funcfile);
-                for i = 1:4
-                    aofiles{i} = self.doc.posttrial{i+3};
-                end
-                aofields = {};
-                for i = 1:length(aofiles)
-                    aofields{i} = self.doc.get_aofunc_field_name(aofiles{i});
-                end
 
                 dur = self.doc.posttrial{12}*1000;
             end
+            
+            
+            
+            
 
         end
 
@@ -2750,30 +2732,19 @@ end
 
 %CHECK PATTERN BEING PREVIEWED FOR THREE OR FOUR DIMENSIONS----------------
 
-function [start_index] = check_pattern_dimensions(self)
-
-   if strcmp(self.model.current_selected_cell.table, "pre")
-       pat = self.doc.pretrial{2};
-   elseif strcmp(self.model.current_selected_cell.table, "inter")
-       pat = self.doc.intertrial{2};
-   elseif strcmp(self.model.current_selected_cell.table, "post")
-       pat = self.doc.posttrial{2};
-   elseif strcmp(self.model.current_selected_cell.table, "block")
-       pat = self.doc.block_trials_{self.model.current_selected_cell.index(1),2};
-   else
-       pat = 0;
-   end
-   pat_field = self.doc.get_pattern_field_name(pat);
-   num_dim = ndims(self.doc.Patterns.(pat_field).pattern.Pats);
-   if num_dim == 3
-       start_index = 1;
-   elseif num_dim == 4
-       start_index = [1,1];
-       set(self.pageUp_button, 'Enable', 'on');
-       set(self.pageDown_button, 'Enable', 'on');
-   else
-       start_index = 0;
-   end
+function [start_index] = check_pattern_dimensions(self, pat_field)
+    if ~strcmp(pat_field,'')
+       num_dim = ndims(self.doc.Patterns.(pat_field).pattern.Pats);
+       if num_dim == 3
+           start_index = 1;
+       elseif num_dim == 4
+           start_index = [1,1];
+           set(self.pageUp_button, 'Enable', 'on');
+           set(self.pageDown_button, 'Enable', 'on');
+       else
+           start_index = 0;
+       end
+    end
 
 end
 
@@ -2817,7 +2788,7 @@ function [pat_field] = get_or_insert_pattern(self)
             pat_field = self.doc.get_pattern_field_name(self.doc.block_trials{self.model.current_selected_cell.index(1),2});            
         elseif ~isempty(self.doc.imported_pattern_names)
             pat_field = pat_fields{1};
-            self.doc.set_block_trial_property([self.current_selected_cell.index(1),2],self.doc.Patterns.(pat_field).filename);
+            self.doc.set_block_trial_property([self.model.current_selected_cell.index(1),2],self.doc.Patterns.(pat_field).filename);
         else
             pat_field = '';
         end
@@ -3385,6 +3356,10 @@ end
          function set.uneditable_cell_text(self, value)
              self.uneditable_cell_text_ = value;
          end
+         
+         function set.listbox_imported_files(self, value)
+             self.listbox_imported_files_ = value;
+         end
 
 
 
@@ -3542,6 +3517,10 @@ end
          
          function output = get.uneditable_cell_text(self)
              output = self.uneditable_cell_text_;
+         end
+         
+         function output = get.listbox_imported_files(self)
+             output = self.listbox_imported_files_;
          end
          
          

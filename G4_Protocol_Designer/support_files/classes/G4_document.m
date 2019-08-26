@@ -936,7 +936,8 @@ classdef G4_document < handle
            
            for i = 4:7
                if strcmp(self.posttrial{i},'') == 0
-                   ao_list{end+1} = self.posttrial{i};
+                   ao_list{ao_count} = self.posttrial{i};
+                   ao_count = ao_count + 1;
                end
            end
          
