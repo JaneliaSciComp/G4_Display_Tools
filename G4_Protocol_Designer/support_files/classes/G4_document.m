@@ -37,6 +37,11 @@ classdef G4_document < handle
         %Data to save to configuration file
         configData_
         
+        %Shared data on recently opened .g4p files
+        recent_g4p_files_
+        recent_files_filepath_
+        
+        
     end
     
     
@@ -71,6 +76,11 @@ classdef G4_document < handle
         chan4_rate
         
         configData
+        
+         %Shared data on recently opened .g4p files
+        recent_g4p_files
+        recent_files_filepath
+        
         
     end
     
@@ -195,6 +205,14 @@ classdef G4_document < handle
             self.is_chan3 = 0;
             
             self.is_chan4 = 0;
+            
+            %Get the recently opened .g4p files
+            %Get info from log of recently opened .g4p files
+            recent_files_filename = 'recently_opened_g4p_files.m';
+            filepath = fileparts(which(recent_files_filename));
+            self.recent_files_filepath = fullfile(filepath, recent_files_filename);
+            self.recent_g4p_files = strtrim(regexp( fileread(self.recent_files_filepath),'\n','split'));
+            self.recent_g4p_files = self.recent_g4p_files(~cellfun('isempty',self.recent_g4p_files));
         
         end
         
@@ -826,6 +844,39 @@ classdef G4_document < handle
             self.posttrial{index} = new_value;
         end
         
+        function set_recent_files(self, filepath)
+        
+            on_list = find(strcmp(self.recent_g4p_files,filepath)); 
+
+            if on_list == 1
+                %do nothing, the top most recent filew as chosen and everything stays in the same spot
+                return;
+            elseif on_list > 1 
+                for i = on_list:-1:2
+                    self.recent_g4p_files{i} = self.recent_g4p_files{i-1};
+                end
+            elseif isempty(on_list)
+                for i = length(self.recent_g4p_files)+1:-1:2
+                    self.recent_g4p_files{i} = self.recent_g4p_files{i-1};
+                end
+            end
+            self.recent_g4p_files{1} = filepath;
+            if length(self.recent_g4p_files) > 4
+                for i = 5:length(self.recent_g4p_files)
+                    self.recent_g4p_files(i) = [];
+                end
+            end
+        
+        end
+        
+        function update_recent_files_file(self)
+    
+            fid = fopen(self.recent_files_filepath,'wt');
+            fprintf(fid, '%s\n', self.recent_g4p_files{:});
+            fclose(fid);
+    
+        end
+        
 %SET THE CONFIGURATION FILE DATA-------------------------------------------
 
         function set_config_data(self, new_value, channel)
@@ -936,8 +987,7 @@ classdef G4_document < handle
            
            for i = 4:7
                if strcmp(self.posttrial{i},'') == 0
-                   ao_list{ao_count} = self.posttrial{i};
-                   ao_count = ao_count + 1;
+                   ao_list{end+1} = self.posttrial{i};
                end
            end
          
@@ -2118,6 +2168,14 @@ classdef G4_document < handle
         function set.imported_aofunc_names(self, value)
             self.imported_aofunc_names_ = value;
         end
+        
+        function set.recent_g4p_files(self, value)
+             self.recent_g4p_files_ = value;
+         end
+         
+         function set.recent_files_filepath(self, value)
+             self.recent_files_filepath_ = value;
+         end
         %Getters
         
         
@@ -2231,6 +2289,14 @@ classdef G4_document < handle
         
         function output = get.imported_aofunc_names(self)
             output = self.imported_aofunc_names_;
+        end
+        
+        function output = get.recent_g4p_files(self)
+            output = self.recent_g4p_files_;
+        end
+         
+        function output = get.recent_files_filepath(self)
+            output = self.recent_files_filepath_;
         end
         
 

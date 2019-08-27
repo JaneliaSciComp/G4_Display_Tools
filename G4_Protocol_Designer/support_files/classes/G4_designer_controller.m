@@ -47,6 +47,10 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
         uneditable_cell_color_
         uneditable_cell_text_
         listbox_imported_files_
+        recent_g4p_files_
+        recent_files_filepath_
+        recent_file_menu_items_
+        menu_open_
         
 
         %is_ao_visible_
@@ -108,6 +112,10 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
         uneditable_cell_color
         uneditable_cell_text
         listbox_imported_files
+        recent_g4p_files
+        recent_files_filepath
+        recent_file_menu_items
+        menu_open
 
         
 %         isRandomized_box
@@ -130,13 +138,26 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
             self.model = G4_designer_model();
             self.doc = G4_document();
             
+            %Get info from log of recently opened .g4p files - now done in
+            %DOC
+%             recent_files_filename = 'recently_opened_g4p_files.m';
+%             filepath = fileparts(which(recent_files_filename));
+%             self.recent_files_filepath = fullfile(filepath, recent_files_filename);
+%             self.recent_g4p_files = strtrim(regexp( fileread(self.recent_files_filepath),'\n','split'));
+%             self.recent_g4p_files = self.recent_g4p_files(~cellfun('isempty',self.recent_g4p_files));
+%             
+            %get screensize to calculate gui dimensions
             screensize = get(0, 'screensize');
+            
+            %set color and text for uneditable cells
             self.uneditable_cell_color = '#bdbdbd';
             self.uneditable_cell_text = '---------';
-
+            
+            %create figure
             self.f = figure('Name', 'Fly Experiment Designer', 'NumberTitle', 'off','units', 'pixels', 'MenuBar', 'none', ...
                 'ToolBar', 'none', 'Resize', 'off', 'outerposition', [screensize(3)*.1, screensize(4)*.05, 1600, 1000]);
-           %ALL REST OF PROPERTIES ARE DEFINED IN LAYOUT         
+           
+            %ALL REST OF PROPERTIES ARE DEFINED IN LAYOUT         
           self.pre_files = struct('pattern', self.doc.pretrial(2),...
                'position',self.doc.pretrial(3),'ao1',self.doc.pretrial(4),...
                'ao2',self.doc.pretrial(5),'ao3',self.doc.pretrial(6),...
@@ -263,11 +284,11 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                 'Position', pos_panel);
             
             listbox_files_label = uicontrol(self.f, 'Style', 'text', 'String', 'Imported files for selected cell:',...
-                'units', 'pixels', 'Position', [pos_panel(1) + pos_panel(3) + 10, pos_panel(2) + pos_panel(4), ...
-                180, 20], 'FontSize', font_size);
+                'units', 'pixels', 'Position', [pos_panel(1) + pos_panel(3) + 30, pos_panel(2) + pos_panel(4), ...
+                150, 20], 'FontSize', font_size);
             
             self.listbox_imported_files = uicontrol(self.f, 'Style', 'listbox', 'String', {'Imported files here'},  ...
-                'Position', [listbox_files_label.Position(1) + ((listbox_files_label.Position(3) - 150)/2), listbox_files_label.Position(2) - 255, ...
+                'Position', [listbox_files_label.Position(1), listbox_files_label.Position(2) - 255, ...
                 150, 250],'Callback', @self.preview_selection);
             
             select_imported_file_button = uicontrol(self.f, 'Style', 'pushbutton', 'String', 'Select', 'Position', ...
@@ -334,10 +355,24 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
 
 
        %Drop down menu and associated labels and buttons
+       
 
             menu = uimenu(self.f, 'Text', 'File');
             menu_import = uimenu(menu, 'Text', 'Import', 'Callback', @self.import);
-            menu_open = uimenu(menu, 'Text', 'Open', 'Callback', @self.open_file);
+            self.menu_open = uimenu(menu, 'Text', 'Open');
+            menu_recent_files = uimenu(self.menu_open, 'Text', '.g4p file', 'Callback', {@self.open_file, ''});
+            
+                
+            for i = 1:length(self.doc.recent_g4p_files)
+                [path, filename] = fileparts(self.doc.recent_g4p_files{i});
+                self.recent_file_menu_items{i} = uimenu(self.menu_open, 'Text', filename, 'Callback', {@self.open_file, self.doc.recent_g4p_files{i}});
+            end
+            
+            if length(self.doc.recent_g4p_files) < 1
+                self.recent_file_menu_items = {};
+            end
+      
+
             menu_saveas = uimenu(menu, 'Text', 'Save as', 'Callback', @self.saveas);
             %menu_save = uimenu(menu, 'Text', 'Save', 'Callback', @self.save);
             menu_copy = uimenu(menu, 'Text', 'Copy to...', 'Callback', @self.copy_to);
@@ -475,6 +510,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
             self.set_chan4_rate_box_val();
             self.set_bg2_selection();
             self.set_exp_name();
+            self.set_recent_file_menu_items();
             
 
 
@@ -1431,7 +1467,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
 
 %Open
 
-    function open_file(self, src, event)
+    function open_file(self, src, event, filepath)
         %document open function opens the file, saves the data, and sends
         %data back to controller. 
 
@@ -1439,25 +1475,21 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
         
         %check if there is a doc_ - if not, import the parent folder of the
         %.g4p file.
-        
-        [filename, top_folder_path] = uigetfile('*.g4p');
-        filepath = fullfile(top_folder_path, filename);
+        if strcmp(filepath,'')
+            [filename, top_folder_path] = uigetfile('*.g4p');
+            filepath = fullfile(top_folder_path, filename);
+        else
+            [top_folder_path, filename] = fileparts(filepath);
+        end
        
         if isequal (top_folder_path,0)
-            
-            %do nothing
+            return;
         else
-        
-%             if isempty(fieldnames(self.doc.currentExp))
+
             self.doc.top_export_path = top_folder_path;
             self.doc.import_folder(top_folder_path);
             [exp_path, exp_name, ext] = fileparts(filepath);
-                   % [exp_path, exp_name] = fileparts(self.doc.top_folder_path_);
-                    
-                    %self.update_doc();
-%                     self.update_gui();
-                    
-%              end
+
             if isempty(fieldnames(self.doc.Patterns))
                 %no patterns were successfully imported, so don't autofill
                 return;
@@ -1520,12 +1552,11 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
             self.doc.posttrial
             self.doc.block_trials
             
-            self.insert_greyed_cells();
-
-
-
-            
+            self.insert_greyed_cells();     
+            self.doc.set_recent_files(filepath);
+            self.doc.update_recent_files_file();
             self.update_gui();
+            
             if ~isempty(self.run_con)
                 self.run_con.update_run_gui();
             end
@@ -1533,6 +1564,10 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
             set(self.num_rows_4, 'Enable', 'off');
         end
     end
+    
+  
+    
+    
     
  
         
@@ -2264,7 +2299,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
 
 
                 self.model.current_preview_file = self.doc.Pos_funcs.(funcfield).pfnparam.func;
-                
+                self.model.current_preview_file
                 self.hAxes = axes(self.f,'units', 'pixels', 'OuterPosition', [245, 135, 1190 ,397]);
                 self.second_axes = axes(self.f, 'units', 'pixels', 'OuterPosition', self.hAxes.OuterPosition, 'XAxisLocation', 'top', 'YAxisLocation', 'right');
                 plot(self.model.current_preview_file, 'parent', self.hAxes);
@@ -3360,6 +3395,17 @@ end
          function set.listbox_imported_files(self, value)
              self.listbox_imported_files_ = value;
          end
+         
+         
+         
+         function set.recent_file_menu_items(self, value)
+             self.recent_file_menu_items_ = value;
+         end
+         
+         function set.menu_open(self, value)
+             self.menu_open_ = value;
+         end
+
 
 
 
@@ -3524,6 +3570,14 @@ end
          end
          
          
+             
+         function output = get.recent_file_menu_items(self)
+             output = self.recent_file_menu_items_;
+         end
+         
+         function output = get.menu_open(self)
+             output = self.menu_open_;
+         end
 
          
 %SETTERS OF GUI OBJECT VALUES
@@ -3650,6 +3704,20 @@ end
          
          function set_exp_name(self)
              set(self.exp_name_box,'String', self.doc.experiment_name);
+         end
+         
+         function set_recent_file_menu_items(self)
+             for i = 1:length(self.doc.recent_g4p_files)
+                 [path,filename] = fileparts(self.doc.recent_g4p_files{i});
+                 if i > length(self.recent_file_menu_items)
+                     self.recent_file_menu_items{end + 1} = uimenu(self.menu_open, 'Text', filename, 'MenuSelectedFcn', {@self.open_file, self.doc.recent_g4p_files{i}});
+                 else
+                
+                    set(self.recent_file_menu_items{i},'Text',filename);
+                    set(self.recent_file_menu_items{i}, 'MenuSelectedFcn', {@self.open_file, self.doc.recent_g4p_files{i}});
+                 end
+
+             end
          end
          
 

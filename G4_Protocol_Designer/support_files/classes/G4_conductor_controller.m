@@ -45,6 +45,10 @@ classdef G4_conductor_controller < handle
         current_duration_
         
         is_aborted_
+        
+
+        recent_file_menu_items_
+        menu_open_
 
         
     end
@@ -93,6 +97,9 @@ classdef G4_conductor_controller < handle
         current_duration
         
         is_aborted
+
+        recent_file_menu_items
+        menu_open
         
         
     end
@@ -143,7 +150,14 @@ classdef G4_conductor_controller < handle
 
            
            menu = uimenu(self.fig, 'Text', 'File');
-           menu_open = uimenu(menu, 'Text', 'Open', 'Callback', {@self.open_g4p_file,[]});
+           self.menu_open = uimenu(menu, 'Text', 'Open');
+           menu_recent_files = uimenu(self.menu_open, 'Text', '.g4p file', 'Callback', {@self.open_g4p_file, ''});
+            
+                
+            for i = 1:length(self.doc.recent_g4p_files)
+                [path, filename] = fileparts(self.doc.recent_g4p_files{i});
+                self.recent_file_menu_items{i} = uimenu(self.menu_open, 'Text', filename, 'Callback', {@self.open_g4p_file, self.doc.recent_g4p_files{i}});
+            end
          %  menu_clear = uimenu(menu, 'Text', 'Clear', 'Callback', @self.clear_data);
            
             start_button = uicontrol(self.fig,'Style','pushbutton', 'String', 'Run', ...
@@ -319,6 +333,7 @@ classdef G4_conductor_controller < handle
             self.processing_textbox.String = self.model.processing_file;
             self.exp_type_menu.Value = self.model.experiment_type;
             self.run_textbox.String = self.model.run_protocol_file;
+            self.set_recent_file_menu_items();
             
         end
         
@@ -442,7 +457,7 @@ classdef G4_conductor_controller < handle
      
         function open_g4p_file(self, src, event, filepath)
             
-            if isempty(filepath)
+            if strcmp(filepath,'')
            
                 [filename, top_folder_path] = uigetfile('*.g4p');
                 filepath = fullfile(top_folder_path, filename);
@@ -455,6 +470,7 @@ classdef G4_conductor_controller < handle
             if isequal (top_folder_path,0)
             
             %They hit cancel, do nothing
+            return;
             else
                 
                 self.doc.import_folder(top_folder_path);
@@ -511,6 +527,8 @@ classdef G4_conductor_controller < handle
 
                 end
                 
+                self.doc.set_recent_files(filepath);
+                self.doc.update_recent_files_file();
                 self.update_run_gui();
                 
                 
@@ -1032,6 +1050,23 @@ classdef G4_conductor_controller < handle
             self.update_run_gui();
         end
         
+  
+        
+        function set_recent_file_menu_items(self)
+             for i = 1:length(self.doc.recent_g4p_files)
+                 [path,filename] = fileparts(self.doc.recent_g4p_files{i});
+                 if i > length(self.recent_file_menu_items)
+                     self.recent_file_menu_items{end + 1} = uimenu(self.menu_open, 'Text', filename, 'MenuSelectedFcn', {@self.open_g4p_file, self.doc.recent_g4p_files{i}});
+                 else
+                
+                    set(self.recent_file_menu_items{i},'Text',filename);
+                    set(self.recent_file_menu_items{i}, 'MenuSelectedFcn', {@self.open_g4p_file, self.doc.recent_g4p_files{i}});
+                 end
+
+             end
+         end
+        
+        
         
 
         
@@ -1183,6 +1218,13 @@ classdef G4_conductor_controller < handle
             self.is_aborted_ = value;
         end
         
+        function set.recent_file_menu_items(self, value)
+             self.recent_file_menu_items_ = value;
+        end
+         
+        function set.menu_open(self, value)
+             self.menu_open_ = value;
+         end
 
 
 
@@ -1331,6 +1373,14 @@ classdef G4_conductor_controller < handle
         function value = get.is_aborted(self)
             value = self.is_aborted_;
         end
+        
+        function value = get.recent_file_menu_items(self)
+             value = self.recent_file_menu_items_;
+        end
+         
+        function output = get.menu_open(self)
+             output = self.menu_open_;
+         end
             
 
    
