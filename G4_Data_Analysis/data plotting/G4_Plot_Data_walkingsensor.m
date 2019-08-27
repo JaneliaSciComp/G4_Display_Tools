@@ -27,6 +27,7 @@ subtitle_FontSize = 8;
 timeseries_ylimits = [1 4; 1 4; 1 4; 1 4; 1 192; -0.3 0.3; -0.1 0.3; -0.1 0.3]; %[min max] y limits for each datatype
 histogram_ylimits = [0 100; -0.3 0.3; -0.1 0.3; -0.1 0.3];
 
+
 %% load data and prepare for plotting
 %load G4_Processed_Data
 if nargin==0
@@ -198,7 +199,7 @@ if ~isempty(TC_conds)
             figure('Position',[100 100 540/num_plot_rows 540])
             for row = 1:num_plot_rows
                 conds = TC_conds(1+(row-1)*(1+overlap),:,fig);
-                conds(isnan(conds)) = [];
+                conds(isnan(conds)|conds==0) = [];
                 better_subplot(num_plot_rows, 1, row)
                 plot(squeeze(Data.summaries(d,conds,:)),'Color',rep_Color,'LineWidth',rep_LineWidth);
                 hold on
@@ -207,7 +208,7 @@ if ~isempty(TC_conds)
                 title(['Condition #' num2str(cond)],'FontSize',subtitle_FontSize)
                 if overlap==1
                     conds = TC_conds(row*2,:,fig);
-                    conds(isnan(conds)&&conds==0) = [];
+                    conds(isnan(conds)|conds==0) = [];
                     plot(squeeze(Data.summaries(d,conds,:)),'Color',rep_Color2,'LineWidth',rep_LineWidth);
                     plot(nanmean(Data.summaries(d,conds,:),3),'Color',mean_Color2,'LineWidth',mean_LineWidth);
                 end
