@@ -1014,7 +1014,6 @@ classdef G4_document < handle
            end
            
            if ~strcmp(ao_list,'')
-               ao_list
                ao_list = unique(ao_list);
                empty_aocells = cellfun(@isempty, ao_list);
                 for i = 1:length(empty_aocells)
@@ -1439,7 +1438,7 @@ classdef G4_document < handle
                 temp_path = '';
 
             end
-            self.replace_greyed_cell_values();
+            
             waitbar(.5, prog, 'Exporting...');
             export_successful = self.export();% 0 - export was unable to complete 1- export completed successfully 2-user canceled and export not attempted
             if export_successful == 0
@@ -1944,7 +1943,7 @@ classdef G4_document < handle
         
             for i = 1:length(self.pretrial)
                 if strncmp(self.pretrial{i},'<html>',6)
-                    if i >= 3 || i <= 7
+                    if i == 3
                         self.pretrial{i} = '';
                     else
                         self.pretrial{i} = [];
@@ -1953,7 +1952,7 @@ classdef G4_document < handle
             end
             for i = 1:length(self.intertrial)
                 if strncmp(self.intertrial{i},'<html>',6)
-                    if i >= 3 || i <= 7
+                    if i == 3
                         self.intertrial{i} = '';
                     else
                         self.intertrial{i} = [];
@@ -1962,7 +1961,7 @@ classdef G4_document < handle
             end
             for i = 1:length(self.posttrial)
                 if strncmp(self.posttrial{i},'<html>',6)
-                    if i >= 3 || i <= 7
+                    if i == 3
                         self.posttrial{i} = '';
                     else
                         self.posttrial{i} = [];
@@ -1972,7 +1971,7 @@ classdef G4_document < handle
             for i = 1:length(self.block_trials(:,1))
                 for j = 1:length(self.block_trials(1,:))
                     if strncmp(self.block_trials{i,j},'<html>',6)
-                        if j >= 3 || j <= 7
+                        if j == 3
                             self.block_trials{i,j} = '';
                         else
                             self.block_trials{i,j} = [];

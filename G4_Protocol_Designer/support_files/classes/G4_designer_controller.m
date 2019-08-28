@@ -350,8 +350,8 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                 [pos_panel(1)+ (pos_panel(3)/2) - 200, pos_panel(2) - 100, 400, 30], 'Callback', @self.update_experiment_name);
             
             exp_name_label = uicontrol(self.f, 'Style', 'text', 'String', 'Experiment Name: ', ...
-                'FontSize', 16, 'units', 'pixels', 'Position', [pos_panel(1) + (pos_panel(3)/2) - 375, ...
-                pos_panel(2) - 100, 150, 30]);
+                'FontSize', 16, 'units', 'pixels', 'Position', [pos_panel(1) + (pos_panel(3)/2) - 395, ...
+                pos_panel(2) - 100, 180, 30]);
 
 
        %Drop down menu and associated labels and buttons
@@ -3049,47 +3049,59 @@ function insert_greyed_cells(self)
     inter_indices_to_color = [];
     post_indices_to_color = [];
     indices_to_color = [];
-
-    if pretrial_mode == 1
-        pre_indices_to_color = [9, 10, 11];
-    elseif pretrial_mode == 2
-        pre_indices_to_color = [3, 10, 11];
-    elseif pretrial_mode == 3
-        pre_indices_to_color = [3, 9, 10, 11];
-    elseif pretrial_mode == 4
-        pre_indices_to_color = [3, 9];
-    elseif pretrial_mode == 5 || pretrial_mode == 6
-        pre_indices_to_color = 9;
-    elseif pretrial_mode == 7
-        pre_indices_to_color = [3, 9, 10, 11];
+    
+    if ~isempty(pretrial_mode)
+        if pretrial_mode == 1
+            pre_indices_to_color = [9, 10, 11];
+        elseif pretrial_mode == 2
+            pre_indices_to_color = [3, 10, 11];
+        elseif pretrial_mode == 3
+            pre_indices_to_color = [3, 9, 10, 11];
+        elseif pretrial_mode == 4
+            pre_indices_to_color = [3, 9];
+        elseif pretrial_mode == 5 || pretrial_mode == 6
+            pre_indices_to_color = 9;
+        elseif pretrial_mode == 7
+            pre_indices_to_color = [3, 9, 10, 11];
+        end
+    else
+        pre_indices_to_color = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
     end
     
-    if intertrial_mode == 1
-        inter_indices_to_color = [9, 10, 11];
-    elseif intertrial_mode == 2
-        inter_indices_to_color = [3, 10, 11];
-    elseif intertrial_mode == 3
-        inter_indices_to_color = [3, 9, 10, 11];
-    elseif intertrial_mode == 4
-        inter_indices_to_color = [3, 9];
-    elseif intertrial_mode == 5 || intertrial_mode == 6
-        inter_indices_to_color = 9;
-    elseif intertrial_mode == 7
-        inter_indices_to_color = [3, 9, 10, 11];
+    if ~isempty(intertrial_mode)
+        if intertrial_mode == 1
+            inter_indices_to_color = [9, 10, 11];
+        elseif intertrial_mode == 2
+            inter_indices_to_color = [3, 10, 11];
+        elseif intertrial_mode == 3
+            inter_indices_to_color = [3, 9, 10, 11];
+        elseif intertrial_mode == 4
+            inter_indices_to_color = [3, 9];
+        elseif intertrial_mode == 5 || intertrial_mode == 6
+            inter_indices_to_color = 9;
+        elseif intertrial_mode == 7
+            inter_indices_to_color = [3, 9, 10, 11];
+        end
+    else
+        inter_indices_to_color = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
     end
     
-    if posttrial_mode == 1
-        post_indices_to_color = [9, 10, 11];
-    elseif posttrial_mode == 2
-        post_indices_to_color = [3, 10, 11];
-    elseif posttrial_mode == 3
-        post_indices_to_color = [3, 9, 10, 11];
-    elseif posttrial_mode == 4
-        post_indices_to_color = [3, 9];
-    elseif posttrial_mode == 5 || posttrial_mode == 6
-        post_indices_to_color = 9;
-    elseif posttrial_mode == 7
-        post_indices_to_color = [3, 9, 10, 11];
+    if ~isempty(posttrial_mode)
+        if posttrial_mode == 1
+            post_indices_to_color = [9, 10, 11];
+        elseif posttrial_mode == 2
+            post_indices_to_color = [3, 10, 11];
+        elseif posttrial_mode == 3
+            post_indices_to_color = [3, 9, 10, 11];
+        elseif posttrial_mode == 4
+            post_indices_to_color = [3, 9];
+        elseif posttrial_mode == 5 || posttrial_mode == 6
+            post_indices_to_color = 9;
+        elseif posttrial_mode == 7
+            post_indices_to_color = [3, 9, 10, 11];
+        end
+    else
+        post_indices_to_color = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
     end
   
     
