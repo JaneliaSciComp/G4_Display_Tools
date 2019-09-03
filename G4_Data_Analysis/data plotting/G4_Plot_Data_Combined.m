@@ -27,6 +27,14 @@ timeseries_ylimits = [-1.1 1.1; -1 6; -1 6; -1 6; 1 192; -1.1 1.1; 2 20]; %[min 
 timeseries_xlimits = [0 4];
 histogram_ylimits = [0 100; -6 6; 2 10];
 
+%set data normalization options
+normalize_option = 0; %0 = don't normalize, 1 = normalize every fly, 2 = normalize every group
+normalize_to_baseline = {'LpR'}; %datatypes to normalize by setting the baseline value to 1
+baseline_startstop = [0 1]; %start and stop times to use for baseline normalization
+normalize_to_max = {'LmR'}; %datatypes to normalize by setting the maximum (or minimum) values to +1 (or -1)
+max_startstop = [1 3]; %start and stop times to use for max normalization
+max_prctile = 98; %percentile to use as a more robust estimate of the maximum value
+
 
 %% load first data file and prepare for plotting
 %load G4_Processed_Data
@@ -132,6 +140,48 @@ for g = 1:num_groups
                 error(['could not load exp ' exp_folder{g,e}])
             end
         end
+    end
+end
+[~, ~, num_datatypes, num_conds, num_reps, num_datapoints] = size(CombData.timeseries);
+
+
+%% normalize data
+if normalize_option>0
+    base_start(1) = find(CombData.timestamps>=baseline_startstop(1),1);
+    base_stop(2) = find(CombData.timestamps<=baseline_startstop(2),1,'last');
+    max_start(1) = find(CombData.timestamps>=max_startstop(1),1);
+    max_stop(2) = find(CombData.timestamps<=max_startstop(2),1,'last');
+    if normalize_option==1
+        datalen = numel(CombData.timeseries(1,1,1,:,:,base_start:base_stop));
+        tmpdata = reshape(CombData.timeseries(:,:,:,:,:,base_start:base_stop),[num_groups num_exps num_datatypes datalen]);
+        baselines = repmat(nanmean(tmpdata,4),[1 1 1 num_conds num_reps num_datapoints]);
+        datalen = numel(CombData.timeseries(1,1,1,:,:,max_start:max_stop));
+        tmpdata = reshape(CombData.timeseries(:,:,:,:,:,max_start:max_stop),[num_groups num_exps num_datatypes datalen]);
+        maxs = repmat(prctile(tmpdata,max_prctile,4),[1 1 1 num_conds num_reps num_datapoints]);
+    elseif normalize_option==2
+        tmptimeseries = permute(CombData.timeseries,[1 3 2 4 5 6]); %[group type exp cond rep datapoint]
+        datalen = numel(tmptimeseries(1,1,:,:,:,base_start:base_stop));
+        tmpdata = reshape(tmptimeseries(:,:,:,:,:,base_start:base_stop),[num_groups num_datatypes datalen]);
+        baselines = repmat(nanmean(tmpdata,4),[1 1 num_exps num_conds num_reps num_datapoints]);
+        baselines = permute(baselines,[1 3 2 4 5 6]); %[group exp type cond rep datapoint]
+        datalen = numel(tmptimeseries(1,1,:,:,:,max_start:max_stop));
+        tmpdata = reshape(tmptimeseries(:,:,:,:,:,max_start:max_stop),[num_groups num_datatypes datalen]);
+        maxs = repmat(prctile(tmpdata,max_prctile,4),[1 1 num_exps num_conds num_reps num_datapoints]);
+        maxs = permute(maxs,[1 3 2 4 5 6]); %[group exp type cond rep datapoint]
+    end
+    for datatype = normalize_to_baseline
+        d = find(strcmpi(Data.channelNames.timeseries,datatype));
+        CombData.timeseries(:,:,d,:,:,:) = CombData.timeseries(:,:,d,:,:,:)./baselines(:,:,d,:,:,:);
+        CombData.summaries(:,:,d,:,:) = CombData.summaries(:,:,d,:,:)./baselines(:,:,d,:,:,1);
+        d = find(strcmpi(Data.channelNames.histograms,datatype));
+        CombData.histograms(:,:,d,:,:,:) = CombData.histograms(:,:,d,:,:,:)./repmat(baselines(:,:,d,:,:,1),[1 1 1 1 1 num_positions]);
+    end
+    for datatype = normalize_to_max
+        d = find(strcmpi(Data.channelNames.timeseries,datatype));
+        CombData.timeseries(:,:,d,:,:,:) = CombData.timeseries(:,:,d,:,:,:)./maxs(:,:,d,:,:,:);
+        CombData.summaries(:,:,d,:,:) = CombData.summaries(:,:,d,:,:)./maxs(:,:,d,:,:,1);
+        d = find(strcmpi(Data.channelNames.histograms,datatype));
+        CombData.histograms(:,:,d,:,:,:) = CombData.histograms(:,:,d,:,:,:)./repmat(maxs(:,:,d,:,:,1),[1 1 1 1 1 num_positions]);
     end
 end
 
