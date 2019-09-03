@@ -72,6 +72,8 @@ if nargin<5
     CL_conds = permute(CL_conds,[2 1 3]);
     
     TC_conds = []; %by default, don't plot any tuning curves
+end
+if nargin<6
     overlap = 0; %by default, don't overlap multiple conditions on same plot
 end
 overlap = logical(overlap);
