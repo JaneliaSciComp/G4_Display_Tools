@@ -1,4 +1,4 @@
-function save_pattern_G4(Pats, param, save_dir, filename)
+function save_pattern_G4(Pats, param, save_dir, filename, Pats2)
 % FUNCTION save_pattern_G4(Pats, param, save_loc, filename)
 % 
 % Saves the Pats variable to both .mat and .pat files, the former of which
@@ -10,6 +10,22 @@ function save_pattern_G4(Pats, param, save_dir, filename)
 % param: full parameters of the input pattern to be stored in .mat file
 % save_loc: directory to store the pattern files
 % filename: desired name of the .mat pattern file
+% Pats2: (optional, only used for checkerboard layouts) array of brightness 
+%        values for each pixel in the arena for 2nd half of checkerboard -
+%        if left blank, Pats will be duplicated for both halves of 
+%        checkerboard
+
+%rearrgange pattern if using checkerboard layout
+if isfield(param,'checker_layout')
+    if param.checker_layout==1
+        if nargin<5
+            Pats2 = Pats;
+        end
+        Pats = checkerboard_pattern(Pats, Pats2);
+    end
+else
+    param.checker_layout = 0;
+end
 
 pattern.Pats = Pats;
 pattern.x_num = length(Pats(1,1,:,1));

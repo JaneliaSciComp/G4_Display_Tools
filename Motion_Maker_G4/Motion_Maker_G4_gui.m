@@ -61,6 +61,7 @@ sdata.back_frame = 0;
 sdata.flip_right = 0;
 sdata.snap_dots = 0;
 sdata.dot_re_random = 1;
+sdata.color = [0 1 0; 0.6 0 0.9];
 s2data.enable = [0 0];
 s2data.sa_mask = [0 0 pi 0];
 s2data.long_lat_mask = [-pi pi -pi/2 pi/2 0];
@@ -147,6 +148,7 @@ handles.param.dot_level = get(handles.popupmenu10, 'Value')-1;
 handles.param.pole_coord = deg2rad(str2double({get(handles.edit7, 'String'), ...
     get(handles.edit8, 'String')}));
 handles.param.motion_angle = deg2rad(str2double(get(handles.edit9, 'String')));
+handles.param.checker_layout = get(handles.checkbox4, 'Value');
 
 %get arena configurations
 s3data = getappdata(handles.tag,'s3data');
@@ -168,6 +170,7 @@ handles.param.back_frame = sdata.back_frame;
 handles.param.flip_right = sdata.flip_right;
 handles.param.snap_dots = sdata.snap_dots;
 handles.param.dot_re_random = sdata.dot_re_random;
+handles.color = sdata.color;
 
 %get mask options
 if strncmpi(handles.param.pattern_fov,'f',1)
@@ -192,19 +195,15 @@ end
 [handles.Pats, handles.param.true_step_size, handles.param.rot180] = Motion_Maker_G4(handles.param);
 handles.num_frames = size(handles.Pats,3);
 handles.param.stretch = ones(handles.num_frames,1);
+if handles.param.checker_layout==1
+    handles.Pats = checkerboard_pattern(handles.Pats);
+end
 
 %update step size if needed to be changed
 if abs(handles.param.step_size-handles.param.true_step_size)>0.00001
     set(handles.edit2,'String',num2str(rad2deg(handles.param.true_step_size)));
     set(handles.edit2,'BackgroundColor','yellow');
 end
-
-%generate arena projection
-handles.cur_frame = 1+handles.param.back_frame;
-set(handles.edit16,'String',num2str(handles.cur_frame));
-set(handles.text24,'String',num2str(handles.num_frames));
-handles.plot_type = get(handles.popupmenu6, 'Value');
-arena_projection(handles.Pats, handles.param.gs_val, handles.plot_type, handles.cur_frame);
 
 %set pattern name
 if handles.loaded_pattern
@@ -214,10 +213,16 @@ else
     if ~exist(handles.save_dir,'dir')
         mkdir(handles.save_dir)
     end
-    
     handles.param.ID = get_pattern_ID(handles.save_dir);
 end
 set(handles.text41,'String',[num2str(handles.param.ID,'%04d') '_']);
+
+%generate arena projection
+handles.cur_frame = 1+handles.param.back_frame;
+set(handles.edit16,'String',num2str(handles.cur_frame));
+set(handles.text24,'String',num2str(handles.num_frames));
+handles.plot_type = get(handles.popupmenu6, 'Value');
+arena_projection(handles.Pats, handles.param.gs_val, handles.color, handles.plot_type, handles.cur_frame, handles.param.checker_layout);
 
 %update pattern
 set(handles.pushbutton1,'String','Update Pattern')
@@ -738,7 +743,7 @@ if handles.cur_frame>handles.num_frames;
     handles.cur_frame = 1;
 end
 set(handles.edit16,'String',num2str(handles.cur_frame));
-arena_projection(handles.Pats, handles.param.gs_val, handles.plot_type, handles.cur_frame);
+arena_projection(handles.Pats, handles.param.gs_val, handles.color, handles.plot_type, handles.cur_frame, handles.param.checker_layout);
 guidata(hObject, handles);
 
 
@@ -753,7 +758,7 @@ if handles.cur_frame<1;
     handles.cur_frame = handles.num_frames;
 end
 set(handles.edit16,'String',num2str(handles.cur_frame));
-arena_projection(handles.Pats, handles.param.gs_val, handles.plot_type, handles.cur_frame);
+arena_projection(handles.Pats, handles.param.gs_val, handles.color, handles.plot_type, handles.cur_frame, handles.param.checker_layout);
 guidata(hObject, handles);
 
 
@@ -775,7 +780,7 @@ set(handles.text37,'visible',strings{1})
 set(handles.text38,'visible',strings{2})
 set(handles.text39,'visible',strings{1})
 set(handles.text40,'visible',strings{2})
-arena_projection(handles.Pats, handles.param.gs_val, handles.plot_type, handles.cur_frame);
+arena_projection(handles.Pats, handles.param.gs_val, handles.color, handles.plot_type, handles.cur_frame, handles.param.checker_layout);
 guidata(hObject, handles);
 
 
@@ -849,7 +854,11 @@ handles.save_dir = get(handles.text26,'String');
 handles.patName = get(handles.edit15,'String');
 
 %save .mat and .pat files
-save_pattern_G4(handles.Pats, handles.param, handles.save_dir, handles.patName)
+if handles.param.checker_layout==0
+    save_pattern_G4(handles.Pats, handles.param, handles.save_dir, handles.patName)
+else
+    save_pattern_checkerboard_G4(handles.param, handles.save_dir, handles.patName, handles.Pats)
+end
 
 
 % --- Executes during object creation, after setting all properties.
@@ -927,7 +936,7 @@ else
     handles.cur_frame = round(frame);
 end
 set(hObject,'String',num2str(handles.cur_frame));
-arena_projection(handles.Pats, handles.param.gs_val, handles.plot_type, handles.cur_frame);
+arena_projection(handles.Pats, handles.param.gs_val, handles.color, handles.plot_type, handles.cur_frame, handles.param.checker_layout);
 guidata(hObject, handles);
 
 
@@ -1173,6 +1182,11 @@ try
     setappdata(handles.tag,'sdata',sdata);
     setappdata(handles.tag,'s2data',s2data);
     handles.loaded_pattern = 1;
+    if isfield(param,'checkerboad_layout')
+        set(handles.checkbox4, 'Value', param.checkerboard_layout);
+    else
+        set(handles.checkbox4, 'Value', 0);
+    end
     
     guidata(hObject, handles);
     
@@ -1203,7 +1217,7 @@ catch
     
     guidata(hObject, handles);
     
-    arena_projection(handles.Pats, handles.param.gs_val, handles.plot_type, handles.cur_frame);
+    arena_projection(handles.Pats, handles.param.gs_val, handles.color, handles.plot_type, handles.cur_frame, handles.param.checker_layout);
 end
     
 
