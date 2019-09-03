@@ -143,6 +143,7 @@ for g = 1:num_groups
     end
 end
 [~, ~, num_datatypes, num_conds, num_reps, num_datapoints] = size(CombData.timeseries);
+num_positions = size(CombData.histograms,6);
 
 
 %% normalize data
@@ -162,11 +163,11 @@ if normalize_option>0
         tmptimeseries = permute(CombData.timeseries,[1 3 2 4 5 6]); %[group type exp cond rep datapoint]
         datalen = numel(tmptimeseries(1,1,:,:,:,base_start:base_stop));
         tmpdata = reshape(tmptimeseries(:,:,:,:,:,base_start:base_stop),[num_groups num_datatypes datalen]);
-        baselines = repmat(nanmean(tmpdata,4),[1 1 num_exps num_conds num_reps num_datapoints]);
+        baselines = repmat(nanmean(tmpdata,3),[1 1 num_exps num_conds num_reps num_datapoints]);
         baselines = permute(baselines,[1 3 2 4 5 6]); %[group exp type cond rep datapoint]
         datalen = numel(tmptimeseries(1,1,:,:,:,max_start:max_stop));
         tmpdata = reshape(tmptimeseries(:,:,:,:,:,max_start:max_stop),[num_groups num_datatypes datalen]);
-        maxs = repmat(prctile(tmpdata,max_prctile,4),[1 1 num_exps num_conds num_reps num_datapoints]);
+        maxs = repmat(prctile(tmpdata,max_prctile,3),[1 1 num_exps num_conds num_reps num_datapoints]);
         maxs = permute(maxs,[1 3 2 4 5 6]); %[group exp type cond rep datapoint]
     end
     for datatype = normalize_to_baseline
@@ -189,6 +190,7 @@ end
 %% plot data
 %calculate overall measurements and plot basic histograms
 figure()
+num_TC_datatypes = length(TC_datatypes);
 for g = 1:num_groups
     for d = 1:num_TC_datatypes
         data_vec = reshape(CombData.timeseries(g,:,TC_inds(d),:,:,:),[1 numel(CombData.timeseries(g,:,d,:,:,:))]);
