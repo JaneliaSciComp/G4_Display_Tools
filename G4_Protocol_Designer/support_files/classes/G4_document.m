@@ -1989,9 +1989,17 @@ classdef G4_document < handle
             
             
             vars.block_trials = self.block_trials();
+            %clear all checked boxes in the saved file without affecting
+            %the currently opened version
+            for i = 1:length(vars.block_trials(:,1))
+                vars.block_trials{i,13} = false;
+            end
             vars.pretrial = self.pretrial();
+            vars.pretrial{13} = false;
             vars.intertrial = self.intertrial();
+            vars.intertrial{13} = false; 
             vars.posttrial = self.posttrial();
+            vars.posttrial{13} = false;
             vars.is_randomized = self.is_randomized();
             vars.repetitions = self.repetitions();
             vars.is_chan1 = self.is_chan1();

@@ -96,7 +96,6 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
         bg2
         num_rows_3
         num_rows_4
-        isSelect_all
         isRandomized_radio
         isSequential_radio
         bg
@@ -607,6 +606,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                 self.clear_fields(str2num(new));
             
             end
+            self.deselect_all();
             
 
             self.update_gui();
@@ -946,9 +946,6 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                     clear self.model;
                     delete(self.doc);
                     self.doc = G4_document();
-                    self.doc.experiment_name
-                    
-
                     self.update_gui();
                     
                     
@@ -1712,6 +1709,21 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
         self.model.isSelect_all = src.Value;
         self.update_gui();
         
+      end
+      
+%CHECKS IF SELECT ALL NEEDS TO BE DESELECTED-------------------------------      
+      function deselect_all(self)
+          checks = [];
+          for i = 1:length(self.doc.block_trials(:,1))
+              checks(i) = self.doc.block_trials{i, 13};
+          end
+          
+          if ~isempty(find(checks == 0))
+              self.model.isSelect_all = false;
+          end
+          self.update_gui();
+          
+          
       end
       
 %INVERT SELECTION CALLBACK-------------------------------------------------

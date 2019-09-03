@@ -385,8 +385,11 @@ classdef G4_preview_controller < handle
             if self.pos_line == 0
                 self.create_error_box("Please make sure you've entered a position function and try again.");
             else
-                
-                time = self.model.dur*1000;
+                if self.model.dur ~= 0
+                    time = self.model.dur*1000;
+                else
+                    time = 5000;
+                end
 %                aofr_rate = 1000;
                 ratio = aofr_rate/fr_rate;
                 count = 1;
@@ -678,7 +681,11 @@ classdef G4_preview_controller < handle
         function preview_Mode4(self)
             
             self.model.is_paused = false;
-            time = self.model.dur*1000;
+            if self.model.dur ~= 0
+                time = self.model.dur*1000;
+            else
+                time = 5000;
+            end
 
             if self.model.is_realtime == 1
                 fr_rate = self.model.rt_frRate;
@@ -912,7 +919,11 @@ classdef G4_preview_controller < handle
 % 
 %                 %self.model.dummy_data(t) = ybound*sin(2*pi*(t/1000)+(pi/2)) + ybound;
 %                end
-                time = self.model.dur*1000;
+                if self.model.dur ~= 0
+                    time = self.model.dur*1000;
+                else
+                    time = 5000;
+                end
                 sample_rate = 1;
                 frequency = .001;
                 step_size = 1/sample_rate;
