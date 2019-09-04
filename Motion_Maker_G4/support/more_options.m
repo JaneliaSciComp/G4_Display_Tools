@@ -60,7 +60,7 @@ handles.gui1tag = findobj('Tag','Motion_Maker_G4_gui');
 sdata = getappdata(handles.gui1tag,'sdata');
 
 set(handles.popupmenu2, 'Value', ceil(sdata.aa_samples/8));
-set(handles.edit1, 'String', num2str(sdata.phase_shift));
+set(handles.edit1, 'String', num2str(rad2deg(sdata.phase_shift)));
 set(handles.checkbox1, 'Value', sdata.back_frame);
 set(handles.checkbox2, 'Value', sdata.flip_right);
 set(handles.checkbox3, 'Value', sdata.aa_poles); 
@@ -180,7 +180,7 @@ function pushbutton1_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 popup_strings = get(handles.popupmenu2, 'String');
 sdata.aa_samples = str2double(popup_strings{get(handles.popupmenu2, 'Value')});
-sdata.phase_shift = round(str2double(get(handles.edit1, 'String')));
+sdata.phase_shift = deg2rad(str2double(get(handles.edit1, 'String')));
 sdata.back_frame = get(handles.checkbox1, 'Value');
 sdata.flip_right = get(handles.checkbox2, 'Value');
 sdata.aa_poles = get(handles.checkbox3, 'Value'); 

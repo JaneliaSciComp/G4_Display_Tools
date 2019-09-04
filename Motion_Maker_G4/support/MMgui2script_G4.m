@@ -54,7 +54,8 @@ fprintf(FID,'%s\n',['param.aa_samples = ' num2str(param.aa_samples) '; %# of sam
 fprintf(FID,'%s\n',['param.aa_poles = ' num2str(param.aa_poles) '; %1=anti-aliases the poles of rotation/translation grating/edge stimuli by matching them to the duty cycle']);
 fprintf(FID,'%s\n',['param.back_frame = ' num2str(param.back_frame) '; %1=adds a frame (frame 1) uniformly at background (mask) level']);
 fprintf(FID,'%s\n',['param.flip_right = ' num2str(param.flip_right) '; %1=left-right flips the right half of the pattern']);
-fprintf(FID,'%s\n',['param.phase_shift = ' num2str(param.phase_shift) '; %shifts the starting frame of pattern']);
+fprintf(FID,'%s\n',['param.phase_shift = ' num2str(param.phase_shift) '; %shifts the starting frame of pattern (in radians)']);
+fprintf(FID,'%s\n',['param.checker_layout = ' num2str(param.checker_layout) '; %0 = standard LED panel layout; 1 = checkerboard (e.g. 2-color) panel layout']);
 fprintf(FID,'%s\n','');
 fprintf(FID,'%s\n','');
 fprintf(FID,'%s\n','%% generate pattern');

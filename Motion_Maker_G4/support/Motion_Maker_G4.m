@@ -105,11 +105,6 @@ if rot180
     Pats = rot90(Pats,2);
 end
 
-%shift order of pattern frames (if desired)
-if param.phase_shift~=0
-    Pats = circshift(Pats,-param.phase_shift,3);
-end
-
 %add background frame as frame 1 (if desired)
 if param.back_frame
     num_frames = num_frames+1;

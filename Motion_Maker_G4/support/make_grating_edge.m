@@ -20,7 +20,8 @@ function [Pats, num_frames, true_step_size] = make_grating_edge(param, arena_x, 
 % param.sa_mask: [mask-center-longitude, mask-center-lattitude]
 % param.aa_samples: # of samples taken to calculate a single pixel's brightness
 % param.aa_poles: anti-aliases the poles of rotation/translation grating/edge stimuli by matching them to the duty cycle
-% 
+% param.phase_shift: amount to shift the starting phase of the grating/edge pattern
+%
 % outputs:
 % Pats: array of brightness values for each pixel in the arena
 % num_frames: # of frames in the Pats variable (3rd dimension in Pats)
@@ -66,7 +67,7 @@ if strncmpi(param.pattern_type,'e',1) %for edges
     Pats = zeros(param.rows, param.cols, num_frames);
     duty_cycle = 0:100/(num_frames-1):100; %duty cycle from 0 to 100 to create advancing edge
     for i=1:num_frames %draw pattern
-        Pats(:,:,i) = squeeze((mean(square(coord*2*pi/param.spat_freq,duty_cycle(i)),3)+1)/2);
+        Pats(:,:,i) = squeeze((mean(square((coord+param.phase_shift)*2*pi/param.spat_freq,duty_cycle(i)),3)+1)/2);
     end
     
     %repeat duty cycle for every frame/pixel (used for anti-aliasing at end of script)
@@ -85,9 +86,9 @@ else %for gratings
     coord = coord - frame_adj;
 
     if strncmpi(param.pattern_type,'sq',2) %draw square wave gratings
-        Pats = squeeze((mean(square(coord*2*pi/param.spat_freq,duty_cycle),3)+1)/2); 
+        Pats = squeeze((mean(square((coord+param.phase_shift)*2*pi/param.spat_freq,duty_cycle),3)+1)/2); 
     else %draw sine wave gratings
-        Pats = squeeze((mean(sin(coord*2*pi/param.spat_freq),3)+1)/2);
+        Pats = squeeze((mean(sin((coord+param.phase_shift)*2*pi/param.spat_freq),3)+1)/2);
     end
 end
 
