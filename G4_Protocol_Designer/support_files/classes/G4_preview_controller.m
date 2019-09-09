@@ -7,11 +7,11 @@ classdef G4_preview_controller < handle
         im_;
         pat_axes_;
         pos_line_;
-        ao1_line_;
-        ao2_line_;
-        ao3_line_;
-        ao4_line_;
+        
+        ao_lines_;
+      
         dummy_line_;
+        frames_;
          
     end
     
@@ -22,11 +22,10 @@ classdef G4_preview_controller < handle
         im;
         pat_axes;
         pos_line;
-        ao1_line;
-        ao2_line;
-        ao3_line;
-        ao4_line;
+       
+        ao_lines;
         dummy_line;
+        frames
 
     end
     
@@ -38,6 +37,7 @@ classdef G4_preview_controller < handle
             self.model = G4_preview_model(data, doc);
             
             self.fig = figure( 'Name', 'Trial Preview', 'NumberTitle', 'off','units', 'pixels'); 
+            self.frames = struct('cdata', [], 'colormap', []);
 
 
             self.layout();
@@ -64,95 +64,14 @@ classdef G4_preview_controller < handle
             
             if self.model.mode ~= 6 %There only needs to be a spot for one position function
 
-                %figure
-                fig_height = pix(4)*.65;
-                fig_width = pix(3)*.9;
-                fig_x = (pix(3) - fig_width)/2;
-                fig_y = (pix(4)-fig_height)/2;
-                fig_pos = [fig_x, fig_y, fig_width, fig_height];
+                
+                [fig_pos, pat_pos, pos_pos, ao1_pos, ao2_pos, ao3_pos, ao4_pos] ...
+                = self.set_object_positions(pix, yTOx_pat_ratio);
+                
 
-
-                %charts h/w
-                chart_height = fig_height/2 - 200;
-                pat_chart_width = chart_height*yTOx_pat_ratio;
-                pos_chart_width = pat_chart_width;
-                aoChart_height = chart_height/2 - 20;
-                aoChart_width = pat_chart_width/2;
-    %             ao2Chart_width = pat_chart_width/2;
-    %             ao3Chart_width = pat_chart_width/2;
-    %             ao4Chart_width = pat_chart_width/2;
-
-
-
-                %title height plus buffer
-                title_height = 100;
-                aoTitle_height = title_height*.75;
-                buffer = 50;
-
-                %x/y positions of charts in figure
-                patpos_x = 100;
-                pos_y = 200;
-                pat_y = pos_y + chart_height + title_height + buffer;
-                ao_x = patpos_x + pat_chart_width + 150;
-                ao1_y = pat_y + aoChart_height;
-                ao2_y = ao1_y - aoTitle_height - aoChart_height;
-                ao3_y = ao2_y - aoTitle_height - aoChart_height;
-                ao4_y = ao3_y - aoTitle_height - aoChart_height;
-
-                pat_pos = [patpos_x, pat_y, pat_chart_width, chart_height];
-                pos_pos = [patpos_x, pos_y, pos_chart_width, chart_height];
-                ao1_pos = [ao_x, ao1_y, aoChart_width, aoChart_height];
-                ao2_pos = [ao_x, ao2_y, aoChart_width, aoChart_height];
-                ao3_pos = [ao_x, ao3_y, aoChart_width, aoChart_height];
-                ao4_pos = [ao_x, ao4_y, aoChart_width, aoChart_height];
-
-                %graph dimensions based on screen size
             else %There needs to be space for two position functions
-                
-                %figure
-                fig_height = pix(4)*.85;
-                fig_width = pix(3)*.97;
-                fig_x = (pix(3) - fig_width)/2;
-                fig_y = (pix(4)-fig_height)/2;
-                fig_pos = [fig_x, fig_y, fig_width, fig_height];
-
-
-                %charts h/w
-                chart_height = fig_height/3 - 200;
-                pat_chart_width = chart_height*yTOx_pat_ratio;
-                aoChart_height = chart_height/2 - 20;
-                aoChart_width = pat_chart_width/2;
-    %             ao2Chart_width = pat_chart_width/2;
-    %             ao3Chart_width = pat_chart_width/2;
-    %             ao4Chart_width = pat_chart_width/2;
-
-
-
-                %title height plus buffer
-                title_height = 100;
-                aoTitle_height = title_height*.75;
-                buffer = 50;
-
-                %x/y positions of charts in figure
-                patpos_x = 100;
-                dummy_y = 150;
-                pos_y = dummy_y + chart_height + title_height + buffer;
-                pat_y = pos_y + chart_height + title_height + buffer;
-                ao_x = patpos_x + pat_chart_width + 150;
-                ao1_y = pat_y + aoChart_height;
-                ao2_y = ao1_y - aoTitle_height - aoChart_height;
-                ao3_y = ao2_y - aoTitle_height - aoChart_height;
-                ao4_y = ao3_y - aoTitle_height - aoChart_height;
-
-                pat_pos = [patpos_x, pat_y, pat_chart_width, chart_height];
-                pos_pos = [patpos_x, pos_y, pat_chart_width, chart_height];
-                dum_pos = [patpos_x, dummy_y, pat_chart_width, chart_height];
-                ao1_pos = [ao_x, ao1_y, aoChart_width, aoChart_height];
-                ao2_pos = [ao_x, ao2_y, aoChart_width, aoChart_height];
-                ao3_pos = [ao_x, ao3_y, aoChart_width, aoChart_height];
-                ao4_pos = [ao_x, ao4_y, aoChart_width, aoChart_height];
-
-                
+                [fig_pos, pat_pos, pos_pos, dum_pos, ao1_pos, ao2_pos, ao3_pos, ao4_pos] ...
+                = self.set_object_positions_mode6(pix, yTOx_pat_ratio);
                 
             end
 
@@ -166,30 +85,26 @@ classdef G4_preview_controller < handle
                 'XLim', pat_xlim, 'YLim', pat_ylim);
             
             first_frame = self.get_first_frame();
-           
-
-            %fr_rate = cell2mat(data(9));
+            
+%%%%%%%%%%%%%Make plotting a frame a different function 
             self.im = imshow(self.model.pattern_data(:,:,first_frame), 'Colormap', gray);
             set(self.im, 'parent', self.pat_axes);
             title(self.pat_axes, 'Pattern Preview');
 
 
-               %check for position and ao functions. if preset, set data,
-               %if not, set to zero.
+           %Check for a position function and graph it according to mode
            if self.model.mode == 1
-               if strcmp(self.model.data(3),'') == 1
+               if strcmp(self.model.data(3),'')
                    self.create_error_box("To preview in mode one please enter a position function");
                    return;
                else
                    
-                   posSize = size(self.model.pos_data(:,:));
-    %                pos_position = [patpos_x, pos_y, pos_chart_width, chart_height];
                    pos_title = 'Position Function Preview';
                    pos_xlabel = 'Time';
                    pos_ylabel = 'Frame Index';
                    self.pos_line = self.plot_function(self.fig, self.model.pos_data, pos_pos, pos_title, ...
                            pos_xlabel, pos_ylabel);
-                   pos_dur_line = self.place_red_dur_line(self.model.pos_data);
+                   self.place_red_dur_line(self.model.pos_data);
                end
            end
                
@@ -205,7 +120,7 @@ classdef G4_preview_controller < handle
                pos_ylabel = 'Frame Index';
                self.dummy_line = self.plot_function(self.fig, self.model.dummy_data, pos_pos, pos_title, ...
                     pos_xlabel, pos_ylabel);
-                dummy_dur_line = self.place_red_dur_line(self.model.dummy_data);
+                self.place_red_dur_line(self.model.dummy_data);
                
            end
            
@@ -223,76 +138,26 @@ classdef G4_preview_controller < handle
                     dummy_title, pos_xlabel, pos_ylabel);
                 self.pos_line = self.plot_function(self.fig, self.model.pos_data, pos_pos, ...
                     pos_title, pos_xlabel, pos_ylabel);
-                dummy6_dur_line = self.place_red_dur_line(self.model.pos_data);
-                pos6_dur_line = self.place_red_dur_line(self.model.dummy_data);
+                self.place_red_dur_line(self.model.pos_data);
+                self.place_red_dur_line(self.model.dummy_data);
            
            
            end
-
-           if strcmp(self.model.data(4),'') == 0
-
-               ao1Size = size(self.model.ao1_data(:,:));
-%                ao_position = [ao_x, ao1_y, ao1Chart_width, aoChart_height];
-               ao1_title = 'Analog Output 1';
-               self.ao1_line = self.plot_function(self.fig, self.model.ao1_data, ao1_pos, ao1_title, ...
-                        ao_xlabel, ao_ylabel);
-               ao1_duration_line = self.place_red_dur_line(self.model.ao1_data);
-
-           else
-
-               self.ao1_line = 0;
-               ao1Size = [1,3];
-
-           end
-
-           if strcmp(self.model.data(5),'') == 0
-
-               ao2Size = size(self.model.ao2_data(:,:));
-               %ao_position = [ao_x, ao2_y, ao2Chart_width, aoChart_height];
-               ao2_title = 'Analog Output 2';
-               self.ao2_line = self.plot_function(self.fig, self.model.ao2_data, ao2_pos, ao2_title, ...
-               ao_xlabel, ao_ylabel);
-               ao2_dur_line = self.place_red_dur_line(self.model.ao2_data);
-
-           else
-
-               ao2Size = [1,3];
-               self.ao2_line = 0;
-
-           end
-
-           if strcmp(self.model.data(6),'') == 0
-
-               ao3Size = size(self.model.ao3_data(:,:));
-               %ao_position = [ao_x, ao3_y, ao3Chart_width, aoChart_height];
-               ao3_title = 'Analog Output 3';
-               self.ao3_line = self.plot_function(self.fig, self.model.ao3_data, ao3_pos, ao3_title, ...
-               ao_xlabel, ao_ylabel);
-               ao3_dur_line = self.place_red_dur_line(self.model.ao3_data);
-
-           else
-
-               ao3Size = [1,3];
-               self.ao3_line = 0;
-
-           end
-
-           if strcmp(self.model.data(7),'') == 0
-
-               ao4Size = size(self.model.ao4_data(:,:));
-              % ao_position = [ao_x, ao4_y, ao4Chart_width, aoChart_height];
-               ao4_title = 'Analog Output 4';
-               self.ao4_line = self.plot_function(self.fig, self.model.ao4_data, ao4_pos, ao4_title, ...
-               ao_xlabel, ao_ylabel);
-               ao4_dur_line = self.place_red_dur_line(self.model.ao4_data);
-
-           else
-
-               ao4Size = [1,3];
-               self.ao4_line = 0;
-
-           end
            
+           %Cycle through ao functions and graph any that are present. 
+           ao_positions = {ao1_pos, ao2_pos, ao3_pos, ao4_pos};
+           
+           
+           for i = 1:4
+               aoTitle = "Analog Output " + (i);
+               if ~strcmp(self.model.data(i+3),'')
+                   self.ao_lines{i} = self.plot_function(self.fig, self.model.ao_data{i}, ...
+                       ao_positions{i}, aoTitle, ao_xlabel, ao_ylabel);
+                   self.place_red_dur_line(self.model.ao_data{i});
+               else
+                   self.ao_lines{i} = 0;
+               end
+           end
 
            
            playButton = uicontrol(self.fig, 'Style', 'pushbutton', 'String', 'Play', 'FontSize', ...
@@ -304,6 +169,10 @@ classdef G4_preview_controller < handle
            realtime = uicontrol(self.fig, 'Style', 'checkbox', 'String', 'Real-time speed', 'Value', ...
                self.model.is_realtime, 'FontSize', 14, 'Position', [ ((pat_pos(1) + pat_pos(3))/2 +215), 75, 200, 25],...
                'Callback', @self.set_realtime); 
+           generate_video = uicontrol(self.fig, 'Style', 'pushbutton', 'String', 'Generate Video', 'FontSize', ...
+               14, 'units', 'pixels', 'Position', [ ao_positions{1}(1) + .5*ao_positions{1}(3) - 75, realtime.Position(2), 150, realtime.Position(4)], ...
+               'Callback', @self.generate_video);
+          
 
            
         
@@ -325,24 +194,110 @@ classdef G4_preview_controller < handle
                 self.dummy_line.XData = xdata;
                 %set dummy_line position
             end
-            if self.ao1_line ~= 0
-                self.ao1_line.XData = xdata;
-                %set ao1_line position
-            end
-            if self.ao2_line ~= 0
-                self.ao2_line.XData = xdata;%set ao2_line position
-            end
-            if self.ao3_line ~= 0
-                self.ao3_line.XData = xdata;
-                %set ao3_line position
-            end
-            if self.ao4_line ~= 0
-                self.ao4_line.XData = xdata;
-                %set ao4_line position
+            
+            %cycle through ao functions and update their data
+            for i = 1:4
+                if self.ao_lines{i} ~= 0
+                    self.ao_lines{i}.XData = xdata;
+                end
             end
             
         end
         
+        function [fig_pos, pat_pos, pos_pos, ao1_pos, ao2_pos, ao3_pos, ao4_pos] ...
+                = set_object_positions(self, pix, yTOx_pat_ratio)
+        
+            fig_height = pix(4)*.65;
+            fig_width = pix(3)*.9;
+            fig_x = (pix(3) - fig_width)/2;
+            fig_y = (pix(4)-fig_height)/2;
+            fig_pos = [fig_x, fig_y, fig_width, fig_height];
+
+
+            %charts h/w
+            chart_height = fig_height/2 - pix(4)*.18;
+            pat_chart_width = chart_height*yTOx_pat_ratio;
+            pos_chart_width = pat_chart_width;
+            aoChart_height = chart_height/2 - pix(4)*.02;
+            aoChart_width = pat_chart_width/2;
+%             ao2Chart_width = pat_chart_width/2;
+%             ao3Chart_width = pat_chart_width/2;
+%             ao4Chart_width = pat_chart_width/2;
+
+
+
+            %title height plus buffer
+            title_height = pix(4)*.1;
+            aoTitle_height = title_height*.75;
+            buffer = pix(4)*.05;
+
+            %x/y positions of charts in figure
+            patpos_x = pix(3)*.05;
+            pos_y = pix(4)*.18;
+            pat_y = pos_y + chart_height + title_height + buffer;
+            ao_x = patpos_x + pat_chart_width + pix(3)*.15;
+            ao1_y = pat_y + aoChart_height;
+            ao2_y = ao1_y - aoTitle_height - aoChart_height;
+            ao3_y = ao2_y - aoTitle_height - aoChart_height;
+            ao4_y = ao3_y - aoTitle_height - aoChart_height;
+
+            pat_pos = [patpos_x, pat_y, pat_chart_width, chart_height];
+            pos_pos = [patpos_x, pos_y, pos_chart_width, chart_height];
+            ao1_pos = [ao_x, ao1_y, aoChart_width, aoChart_height];
+            ao2_pos = [ao_x, ao2_y, aoChart_width, aoChart_height];
+            ao3_pos = [ao_x, ao3_y, aoChart_width, aoChart_height];
+            ao4_pos = [ao_x, ao4_y, aoChart_width, aoChart_height];
+
+        
+        end
+        
+        function [fig_pos, pat_pos, pos_pos, dum_pos, ao1_pos, ao2_pos, ao3_pos, ao4_pos] ...
+                = set_object_positions_mode6(self, pix, yTOx_pat_ratio)
+        
+        %figure
+            fig_height = pix(4)*.85;
+            fig_width = pix(3)*.97;
+            fig_x = (pix(3) - fig_width)/2;
+            fig_y = (pix(4)-fig_height)/2;
+            fig_pos = [fig_x, fig_y, fig_width, fig_height];
+
+
+            %charts h/w
+            chart_height = fig_height/3 - 200;
+            pat_chart_width = chart_height*yTOx_pat_ratio;
+            aoChart_height = chart_height/2 - 20;
+            aoChart_width = pat_chart_width/2;
+%             ao2Chart_width = pat_chart_width/2;
+%             ao3Chart_width = pat_chart_width/2;
+%             ao4Chart_width = pat_chart_width/2;
+
+
+
+            %title height plus buffer
+            title_height = 100;
+            aoTitle_height = title_height*.75;
+            buffer = 50;
+
+            %x/y positions of charts in figure
+            patpos_x = 100;
+            dummy_y = 150;
+            pos_y = dummy_y + chart_height + title_height + buffer;
+            pat_y = pos_y + chart_height + title_height + buffer;
+            ao_x = patpos_x + pat_chart_width + 150;
+            ao1_y = pat_y + aoChart_height;
+            ao2_y = ao1_y - aoTitle_height - aoChart_height;
+            ao3_y = ao2_y - aoTitle_height - aoChart_height;
+            ao4_y = ao3_y - aoTitle_height - aoChart_height;
+
+            pat_pos = [patpos_x, pat_y, pat_chart_width, chart_height];
+            pos_pos = [patpos_x, pos_y, pat_chart_width, chart_height];
+            dum_pos = [patpos_x, dummy_y, pat_chart_width, chart_height];
+            ao1_pos = [ao_x, ao1_y, aoChart_width, aoChart_height];
+            ao2_pos = [ao_x, ao2_y, aoChart_width, aoChart_height];
+            ao3_pos = [ao_x, ao3_y, aoChart_width, aoChart_height];
+            ao4_pos = [ao_x, ao4_y, aoChart_width, aoChart_height];
+        
+        end
 
         function create_error_box(varargin)
             if isempty(varargin)
@@ -359,151 +314,146 @@ classdef G4_preview_controller < handle
                 set(e, 'Resize', 'on');
                 waitfor(e);
 
-                disp("Display this after I've closed the box");
             end
 
         end
         
         function preview_Mode1(self)
-            
 
-        self.model.is_paused = false;
-            
+            self.model.is_paused = false;
+            time = self.model.dur*1000;
             if self.model.is_realtime == 1
+                
                 fr_rate = self.model.rt_frRate;
                 aofr_rate = 1000;
-                fr_increment = 1;
-                ao_increment = 1;
+                fr_increment = floor(fr_rate/self.model.slow_frRate);
+                ao_increment = floor(aofr_rate/self.model.slow_frRate);
+                
                 
             else
                 fr_rate = self.model.slow_frRate;
-                aofr_rate = (1000/self.model.rt_frRate)*fr_rate;
+                aofr_rate = 1000*(self.model.slow_frRate/self.model.rt_frRate);
                 fr_increment = 1;
                 ao_increment = 1;
+                
             end
+            
+            num_frames = ceil((self.model.rt_frRate*self.model.dur)/fr_increment);
+            
+            
+            
+            
             
             if self.pos_line == 0
                 self.create_error_box("Please make sure you've entered a position function and try again.");
             else
-                if self.model.dur ~= 0
-                    time = self.model.dur*1000;
-                else
-                    time = 5000;
-                end
-%                aofr_rate = 1000;
+                
+                
                 ratio = aofr_rate/fr_rate;
                 count = 1;
-                j = self.model.preview_index;
-                numIt = 1;
-                if self.ao1_line ~= 0
-                    lineDist1 = length(self.model.ao1_data);
-                end
-                if self.ao2_line ~= 0
-                    lineDist2 = length(self.model.ao2_data);
-                end
-                if self.ao3_line ~= 0
-                    lineDist3 = length(self.model.ao3_data);
-    
-                end
-                if self.ao4_line ~= 0
-                    lineDist4 = length(self.model.ao4_data);
-                end
+                aoLineDist = [0 0 0 0];
+                fr_increment = fr_increment*ratio;
+                if self.model.is_realtime == 0
 
-                for i = self.model.preview_index:time
+                    ao_increment = ao_increment*ratio;
+                end
+                
+                
+                
+                for i = 1:4
+                    if self.ao_lines{i} ~= 0
+                        aoLineDist(i) = length(self.model.ao_data{i});
+                    end
+                end
+                
+                for i = floor(self.model.preview_index/fr_increment):num_frames
                     inside = tic;
-                    if self.model.is_paused == false
+
+                    if self.model.is_paused == true
+                        return;
+                    end
+                    
+                    
                     %move ao lines
                     
-                        if self.ao1_line ~= 0
-
-                            if self.ao1_line.XData(1) >= lineDist1 %if line reaches end of graph and duration hasn't been reached, it starts at beginning again.
-                                self.ao1_line.XData = [1,1];
+                    for k = 1:4
+                        if self.ao_lines{k} ~= 0
+                            if self.ao_lines{k}.XData(1) >= aoLineDist(k)
+                                self.ao_lines{k}.XData = [1,1];
                             else
-                                self.ao1_line.XData = [self.ao1_line.XData(1) + ao_increment, self.ao1_line.XData(2) + ao_increment];
+                                self.ao_lines{k}.XData = [self.ao_lines{k}.XData(1) + ao_increment, self.ao_lines{k}.XData(2) + ao_increment];
                             end
-                        end
-                        if self.ao2_line ~= 0
-
-                            if self.ao2_line.XData(1) >= lineDist2
-                                self.ao2_line.XData = [1,1];
-                            else
-                                self.ao2_line.XData = [self.ao2_line.XData(1) + ao_increment, self.ao2_line.XData(2) + ao_increment];
-                            end
-                        end
-                        if self.ao3_line ~= 0
-
-                            if self.ao3_line.XData(1) >= lineDist3
-                                self.ao3_line.XData = [1,1];
-                            else
-                                self.ao3_line.XData = [self.ao3_line.XData(1) + ao_increment, self.ao3_line.XData(2) + ao_increment];
-                            end
-                        end
-                        if self.ao4_line ~= 0
-
-                            if self.ao4_line.XData(1) >= lineDist4
-                                self.ao4_line.XData = [1,1];
-                            else
-                                self.ao4_line.XData = [self.ao4_line.XData(1) + ao_increment, self.ao4_line.XData(2) + ao_increment];
-                            end
-                        end
-                        
-                        
-                        j = j + fr_increment;
-                            if j > length(self.model.pos_data)
-                                j = 1;
-                            end
-
-                        if count >= ratio
-
-                            frame = self.model.pos_data(j);
                             
-
-                            set(self.im,'cdata',self.model.pattern_data(:,:,frame));
-                            if self.pos_line ~= 0
-                                if self.pos_line.XData(1) >= length(self.model.pos_data)
-                                    self.pos_line.XData = [1,1];
-                                else
-                                    self.pos_line.XData = [j,j];%[self.pos_line.XData(1) + fr_increment, self.pos_line.XData(2) + fr_increment];
-                                end
-                            end
-
-                            self.model.preview_index = self.model.preview_index + 1;
-                            %move pos line if it exists
-                            %put up next frame
-                            count = 1;
-
-                        else
-
-                            count = count + 1;
-
+                        if i == num_frames
+                            self.ao_lines{k}.XData = [aoLineDist(k), aoLineDist(k)];
                         end
 
-                        drawnow limitrate %nocallbacks
-                        timeElapsed = toc(inside);
-
-                        if self.model.is_realtime == 1
-                            time_to_pause = ao_increment - (timeElapsed*1000);%if realtime, ao line moves once every millsecond no matter what.
-                            if time_to_pause < 0
-                                time_to_pause = 0;
-                            end
-                            java.lang.Thread.sleep(time_to_pause);
-                            numIt = numIt + 1;
-                        else
-
-                            time_to_pause = (((1/fr_rate)/ratio)*1000) - (timeElapsed*1000);%if slow, ao line still moves same number of times but at ratio of whatever the pattern frame rate is.
-                            if time_to_pause < 0
-                                time_to_pause = 0;
-                            end 
-                            java.lang.Thread.sleep(time_to_pause);
-
                         end
-                    
-                    
-                    else
-                        
-                        return;
                         
                     end
+                    
+                    
+                    
+
+
+                    if i == num_frames
+                        if time > length(self.model.pos_data)
+                            self.model.preview_index = rem(time,length(self.model.pos_data));
+                        else
+                            self.model.preview_index = time;
+                        end
+                     
+
+                    end
+
+                    if self.model.preview_index > length(self.model.pos_data)
+                        self.model.preview_index = 1;
+                    end
+
+
+                    
+
+                    frame = self.model.pos_data(self.model.preview_index);
+                    set(self.im,'cdata',self.model.pattern_data(:,:,frame));
+
+                    if self.pos_line ~= 0
+                        if self.pos_line.XData(1) >= length(self.model.pos_data)
+                            self.pos_line.XData = [1,1];
+                        else
+                            self.pos_line.XData = [self.model.preview_index,self.model.preview_index];
+                        end
+                    end
+
+                    self.model.preview_index = self.model.preview_index + fr_increment;
+
+                    %move pos line if it exists
+                    %put up next frame
+                        
+
+                    drawnow limitrate %nocallbacks
+
+
+%                         self.frames(i) = getframe(gcf);
+                    timeElapsed = toc(inside);
+
+                    if self.model.is_realtime == 1
+                        time_to_pause = 1/self.model.slow_frRate - timeElapsed;%if realtime, ao line moves once every millsecond no matter what.
+                        if time_to_pause < 0
+                            time_to_pause = 0;
+                        end
+                        pause(time_to_pause);
+
+                    else
+
+                        time_to_pause = ((1/fr_rate)/ratio) - timeElapsed;%if slow, ao line still moves same number of times but at ratio of whatever the pattern frame rate is.
+                        if time_to_pause < 0
+                            time_to_pause = 0;
+                        end 
+                        pause(time_to_pause);
+
+                    end
+                    
+
                 
                 end
             
@@ -513,153 +463,105 @@ classdef G4_preview_controller < handle
 
         
         function preview_Mode2(self)
-            self.model.is_paused = false;
-            numIt = 1;
-            
-            
+           self.model.is_paused = false;
+            time = self.model.dur*1000;
             if self.model.is_realtime == 1
+                
                 fr_rate = self.model.rt_frRate;
                 aofr_rate = 1000;
-                fr_increment = 1;
-                ao_increment = aofr_rate/fr_rate;
+                fr_increment = floor(fr_rate/self.model.slow_frRate);
+                ao_increment = floor(aofr_rate/self.model.slow_frRate);
+                
                 
             else
                 fr_rate = self.model.slow_frRate;
-                aofr_rate = (1000/self.model.rt_frRate)*fr_rate;
+                aofr_rate = 1000*(self.model.slow_frRate/self.model.rt_frRate);
                 fr_increment = 1;
-                ao_increment = aofr_rate/fr_rate;
+                ao_increment = 1;
+                
             end
             
-            num_frames = self.model.rt_frRate * self.model.dur;
-            ratio = aofr_rate/fr_rate;
+            num_frames = ceil((self.model.rt_frRate*self.model.dur)/fr_increment);
             
-            if self.ao1_line ~= 0
-                lineDist1 = length(self.model.ao1_data);
-            end
-            if self.ao2_line ~= 0
-                lineDist2 = length(self.model.ao2_data);
-            end
-            if self.ao3_line ~= 0
-                lineDist3 = length(self.model.ao3_data);
+            
+            ratio = floor(aofr_rate/fr_rate);
+            count = 1;
+            aoLineDist = [0 0 0 0];
+            fr_increment = fr_increment*ratio;
+            if self.model.is_realtime == 0
 
-            end
-            if self.ao4_line ~= 0
-                lineDist4 = length(self.model.ao4_data);
+                ao_increment = ao_increment*ratio;
             end
 
-            for i = self.model.preview_index:num_frames
+
+
+            for i = 1:4
+                if self.ao_lines{i} ~= 0
+                    aoLineDist(i) = length(self.model.ao_data{i});
+                end
+            end
+
+            for i = floor(self.model.preview_index/fr_increment):num_frames
                 inside = tic;
-                if self.model.is_paused == false
-                    if self.model.is_realtime == true
-                        fr_rate = self.model.rt_frRate;
-                    elseif self.model.is_realtime == false
-                        fr_rate = self.model.slow_frRate;
-                    end
+
+                if self.model.is_paused == true
+                    return;
+                end
+
+
                 %move ao lines
 
-                    if self.ao1_line ~= 0
-
-                        if self.ao1_line.XData(1) >= lineDist1 %if line reaches end of graph and duration hasn't been reached, it starts at beginning again.
-                            self.ao1_line.XData = [1,1];
-                        elseif numIt ~= num_frames
-                            self.ao1_line.XData = [self.ao1_line.XData(1) + ao_increment, self.ao1_line.XData(2) + ao_increment];
+                for k = 1:4
+                    if self.ao_lines{k} ~= 0
+                        if self.ao_lines{k}.XData(1) >= aoLineDist(k)
+                            self.ao_lines{k}.XData = [1,1];
                         else
-                            if self.model.dur*1000/lineDist1 > 1
-                                final_xval = fix(self.model.dur*1000/lineDist1)*lineDist1 + rem(self.model.dur*1000,lineDist1);
-                                self.ao1_line.XData = [final_xval, final_xval];
-                            else
-                                self.ao1_line.XData = [self.model.dur*1000, self.model.dur*1000];
-                            end
+                            self.ao_lines{k}.XData = [self.ao_lines{k}.XData(1) + ao_increment, self.ao_lines{k}.XData(2) + ao_increment];
                         end
-                    end
-                    if self.ao2_line ~= 0
 
-                        if self.ao2_line.XData(1) >= lineDist2
-                            self.ao2_line.XData = [1,1];
-                        elseif numIt ~= num_frames
-                            self.ao2_line.XData = [self.ao2_line.XData(1) + ao_increment, self.ao2_line.XData(2) + ao_increment];
-                        else
-                            if self.model.dur*1000/lineDist2 > 1
-                                final_xval = fix(self.model.dur*1000/lineDist2)*lineDist2 + rem(self.model.dur*1000,lineDist2);
-                                self.ao2_line.XData = [final_xval, final_xval];
-                            else
-                                self.ao2_line.XData = [self.model.dur*1000, self.model.dur*1000];
-                            end
+                        if i == num_frames
+                            self.ao_lines{k}.XData = [aoLineDist(k), aoLineDist(k)];
                         end
+
                     end
-                    if self.ao3_line ~= 0
 
-                        if self.ao3_line.XData(1) >= lineDist3
-                            self.ao3_line.XData = [1,1];
-                        elseif numIt ~= num_frames
-                            self.ao3_line.XData = [self.ao3_line.XData(1) + ao_increment, self.ao3_line.XData(2) + ao_increment];
-                        else
-                            if self.model.dur*1000/lineDist3 > 1
-                                final_xval = fix(self.model.dur*1000/lineDist3)*lineDist3 + rem(self.model.dur*1000,lineDist3);
-                                self.ao3_line.XData = [final_xval, final_xval];
-                            else
-                                self.ao3_line.XData = [self.model.dur*1000, self.model.dur*1000];
-                            end
-                        end
-                    end
-                    if self.ao4_line ~= 0
+                end
+                
+               
+                frame = rem(self.model.preview_index,length(self.model.pattern_data(1,1,:)));
+                
+                if frame == 0
+                    frame = 1;
+                end
+                
+                set(self.im,'cdata',self.model.pattern_data(:,:,frame));
 
-                        if self.ao4_line.XData(1) >= lineDist4
-                            self.ao4_line.XData = [1,1];
-                        elseif numIt ~= num_frames
-                            self.ao4_line.XData = [self.ao4_line.XData(1) + ao_increment, self.ao4_line.XData(2) + ao_increment];
-                        else
-                            if self.model.dur*1000/lineDist4 > 1
-                                final_xval = fix(self.model.dur*1000/lineDist4)*lineDist4 + rem(self.model.dur*1000,lineDist4);
-                                self.ao4_line.XData = [final_xval, final_xval];
-                            else
-                                self.ao4_line.XData = [self.model.dur*1000, self.model.dur*1000];
-                            end
-                        end
-                    end
+                 self.model.preview_index = self.model.preview_index + fr_increment;
+%                 if self.model.preview_index > length(self.model.pattern_data(1,1,:))
+%                     self.model.preview_index = 1;
+%                 end
                     
-                    frame = rem(self.model.preview_index,length(self.model.pattern_data(1,1,:)));
-                    if frame == 0
-                        frame = 1;
-                    end
-                    set(self.im,'cdata',self.model.pattern_data(:,:,frame));
+                
 
-                   
-                    
-                    
-                    
-                    numIt = numIt + 1;
-                    self.model.preview_index
+                drawnow limitrate %nocallbacks
+                timeElapsed = toc(inside);
 
+                %self.frames(i) = getframe(gcf);
 
-
-                    drawnow limitrate %nocallbacks
-                    timeElapsed = toc(inside);
-
-
-%                     if self.model.is_realtime == 1
-                    time_to_pause = (1/fr_rate - timeElapsed)*1000;%pause minus time taken running code sets the frame rate
+                if self.model.is_realtime == 1
+                    time_to_pause = 1/self.model.slow_frRate - timeElapsed;
                     if time_to_pause < 0
                         time_to_pause = 0;
                     end
-                    java.lang.Thread.sleep(time_to_pause);
-
-                    self.model.preview_index = self.model.preview_index + 1;
-
-%                     else
-% 
-%                         time_to_pause = (((1/fr_rate)/ratio)*1000) - (timeElapsed*1000);%if slow, ao line still moves same number of times but at ratio of whatever the pattern frame rate is.
-%                         if time_to_pause < 0
-%                             time_to_pause = 0;
-%                         end 
-%                         java.lang.Thread.sleep(time_to_pause);
-
-%                     end
-
+                    pause(time_to_pause);
 
                 else
 
-                    return;
+                    time_to_pause = 1/self.model.slow_frRate - timeElapsed;
+                    if time_to_pause < 0
+                        time_to_pause = 0;
+                    end 
+                    pause(time_to_pause);
 
                 end
                 
@@ -681,73 +583,142 @@ classdef G4_preview_controller < handle
         function preview_Mode4(self)
             
             self.model.is_paused = false;
-            if self.model.dur ~= 0
-                time = self.model.dur*1000;
-            else
-                time = 5000;
-            end
-
+            time = self.model.dur*1000;
             if self.model.is_realtime == 1
+                
                 fr_rate = self.model.rt_frRate;
-            else 
+                aofr_rate = 1000;
+                fr_increment = floor(fr_rate/self.model.slow_frRate);
+                ao_increment = floor(aofr_rate/self.model.slow_frRate);
+                
+                
+            else
                 fr_rate = self.model.slow_frRate;
+                aofr_rate = 1000*(self.model.slow_frRate/self.model.rt_frRate);
+                fr_increment = 1;
+                ao_increment = 1;
+                
             end
             
+            num_frames = ceil((self.model.rt_frRate*self.model.dur)/fr_increment);
+            
+%             if self.dummy_line == 0
+%                 self.create_error_box("Please make sure you've entered a position function and try again.");
+%             else
+%                 
+                
+                ratio = aofr_rate/fr_rate;
+                count = 1;
+                aoLineDist = [0 0 0 0];
+                fr_increment = fr_increment*ratio;
+                if self.model.is_realtime == 0
 
-            if self.pos_line == 0
-                self.create_error_box("Please make sure you have entered a position function and try again.");
-            else
+                    ao_increment = ao_increment*ratio;
+                end
+                
+                
+                
+                for i = 1:4
+                    if self.ao_lines{i} ~= 0
+                        aoLineDist(i) = length(self.model.ao_data{i});
+                    end
+                end
+                
+                for i = floor(self.model.preview_index/fr_increment):num_frames
+                    inside = tic;
 
-                index = self.model.preview_index;
-                for j = self.model.preview_index:time
-                    tic
+                    if self.model.is_paused == true
+                        return;
+                    end
                     
-                    if self.model.is_paused == false
-                        if index > length(self.model.dummy_data)
-                            index = 1;
-                        end
-                        frame = self.model.dummy_data(index);
-
-                        set(self.im,'cdata',self.model.pattern_data(:,:,frame));
-                        if self.dummy_line ~= 0
-                            self.dummy_line.XData = [self.dummy_line.XData(1) + 1, self.dummy_line.XData(2) + 1];
-                        end
-
-                        if self.ao1_line ~= 0
-                            self.ao1_line.XData = [self.ao1_line.XData(1) + 1, self.ao1_line.XData(2) + 1];
-                        end
-                        if self.ao2_line ~= 0
-                            self.ao2_line.XData = [self.ao2_line.XData(1) + 1, self.ao2_line.XData(2) + 1];
-                        end
-                        if self.ao3_line ~= 0
-                            self.ao3_line.XData = [self.ao3_line.XData(1) + 1, self.ao3_line.XData(2) + 1];
-                        end
-                        if self.ao4_line ~= 0
-                            self.ao4_line.XData = [self.ao4_line.XData(1) + 1, self.ao4_line.XData(2) + 1];
+                    
+                    %move ao lines
+                    
+                    for k = 1:4
+                        if self.ao_lines{k} ~= 0
+                            if self.ao_lines{k}.XData(1) >= aoLineDist(k)
+                                self.ao_lines{k}.XData = [1,1];
+                            else
+                                self.ao_lines{k}.XData = [self.ao_lines{k}.XData(1) + ao_increment, self.ao_lines{k}.XData(2) + ao_increment];
+                            end
+                            
+                        if i == num_frames
+                            self.ao_lines{k}.XData = [aoLineDist(k), aoLineDist(k)];
                         end
 
-                        drawnow limitrate %nocallbacks
-                        time_taken = toc;
+                        end
                         
-                        time_to_pause = ((1/fr_rate)*1000) - (time_taken*1000);
+                    end
+                    
+                    
+                    
+
+
+                    if i == num_frames
+                        if time > length(self.model.dummy_data)
+                            self.model.preview_index = rem(time,length(self.model.dummy_data));
+                        else
+                            self.model.preview_index = time;
+                        end
+                     
+
+                    end
+
+                    if self.model.preview_index > length(self.model.dummy_data)
+                        self.model.preview_index = 1;
+                    end
+
+
+                    
+
+                    frame = self.model.dummy_data(self.model.preview_index);
+                    set(self.im,'cdata',self.model.pattern_data(:,:,frame));
+
+                    if self.dummy_line ~= 0
+                        if self.dummy_line.XData(1) >= length(self.model.dummy_data)
+                            self.dummy_line.XData = [1,1];
+                        else
+                            self.dummy_line.XData = [self.model.preview_index,self.model.preview_index];
+                        end
+                    end
+
+                    self.model.preview_index = self.model.preview_index + fr_increment;
+
+                    %move pos line if it exists
+                    %put up next frame
+                        
+
+                    drawnow limitrate %nocallbacks
+
+
+%                         self.frames(i) = getframe(gcf);
+                    timeElapsed = toc(inside);
+
+                    if self.model.is_realtime == 1
+                        time_to_pause = 1/self.model.slow_frRate - timeElapsed;%if realtime, ao line moves once every millsecond no matter what.
                         if time_to_pause < 0
                             time_to_pause = 0;
                         end
+                        pause(time_to_pause);
 
-                        java.lang.Thread.sleep(time_to_pause);                        
-                        self.model.preview_index = self.model.preview_index + 1;
-                        index = index + 1;
-                        
-                        
+                    else
+
+                        time_to_pause = ((1/fr_rate)/ratio) - timeElapsed;%if slow, ao line still moves same number of times but at ratio of whatever the pattern frame rate is.
+                        if time_to_pause < 0
+                            time_to_pause = 0;
+                        end 
+                        pause(time_to_pause);
+
                     end
-                       
+                    
 
-
+                
                 end
+            
             end
             
             
-        end
+        
         
         function preview_Mode5(self)
         end
@@ -791,21 +762,15 @@ classdef G4_preview_controller < handle
                             if self.dummy_line ~= 0
                                 self.dummy_line.XData = [self.dummy_line.XData(1) + 1, self.dummy_line.XData(2) + 1];
                             end
-                            if self.ao1_line ~= 0
-                                self.ao1_line.XData = [self.ao1_line.XData(1) + 1, self.ao1_line.XData(2) + 1];
-                            end
-                            if self.ao2_line ~= 0
-                                self.ao2_line.XData = [self.ao2_line.XData(1) + 1, self.ao2_line.XData(2) + 1];
-                            end
-                            if self.ao3_line ~= 0
-                                self.ao3_line.XData = [self.ao3_line.XData(1) + 1, self.ao3_line.XData(2) + 1];
-                            end
-                            if self.ao4_line ~= 0
-                                self.ao4_line.XData = [self.ao4_line.XData(1) + 1, self.ao4_line.XData(2) + 1];
+                            for k = 1:4
+                                if self.ao_lines{k} ~= 0
+                                    self.ao_lines{k}.XData = [self.ao_lines{k}.XData(1) + 1, self.ao_lines{k}.XData(2) + 1];
+                                end
                             end
 
                             drawnow limitrate %nocallbacks
                              time_taken = toc;
+                             self.frames(i) = getframe(gcf);
                         
                             time_to_pause = ((1/fr_rate)*1000) - (time_taken*1000);
                             if time_to_pause < 0
@@ -832,7 +797,7 @@ classdef G4_preview_controller < handle
         end
         
         function [func_line] = plot_function(self, fig, func, position, graph_title, x_label, y_label)
-
+            
             xlim = [0 length(func(1,:))];
             ylim = [min(func) max(func)];
             func_axes = axes(fig, 'units','pixels','Position', position, ...
@@ -919,11 +884,7 @@ classdef G4_preview_controller < handle
 % 
 %                 %self.model.dummy_data(t) = ybound*sin(2*pi*(t/1000)+(pi/2)) + ybound;
 %                end
-                if self.model.dur ~= 0
-                    time = self.model.dur*1000;
-                else
-                    time = 5000;
-                end
+                time = self.model.dur*1000;
                 sample_rate = 1;
                 frequency = .001;
                 step_size = 1/sample_rate;
@@ -1009,6 +970,9 @@ classdef G4_preview_controller < handle
             end
         end
         
+        function generate_video(self, src, event)
+        end
+        
         
         %GETTERS
 
@@ -1031,20 +995,15 @@ classdef G4_preview_controller < handle
         function value = get.pos_line(self)
             value = self.pos_line_;
         end
-        function value = get.ao1_line(self)
-            value = self.ao1_line_;
-        end
-        function value = get.ao2_line(self)
-            value = self.ao2_line_;
-        end
-        function value = get.ao3_line(self)
-            value = self.ao3_line_;
-        end
-        function value = get.ao4_line(self)
-            value = self.ao4_line_;
-        end
+
         function value = get.dummy_line(self)
             value = self.dummy_line_;
+        end
+        function value = get.frames(self)
+            value = self.frames_;
+        end
+        function value = get.ao_lines(self)
+            value = self.ao_lines_;
         end
         
         %SETTERS
@@ -1067,20 +1026,15 @@ classdef G4_preview_controller < handle
         function set.pos_line(self, value)
             self.pos_line_ = value;
         end
-        function set.ao1_line(self, value)
-            self.ao1_line_ = value;
-        end
-        function set.ao2_line(self, value)
-            self.ao2_line_ = value;
-        end
-        function set.ao3_line(self, value)
-            self.ao3_line_ = value;
-        end
-        function set.ao4_line(self, value)
-            self.ao4_line_ = value;
-        end
+
         function set.dummy_line(self, value)
             self.dummy_line_ = value;
+        end
+        function set.frames(self, value)
+            self.frames_ = value;
+        end
+        function set.ao_lines(self, value)
+            self.ao_lines_ = value;
         end
         
         
