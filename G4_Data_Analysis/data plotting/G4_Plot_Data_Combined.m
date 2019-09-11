@@ -22,6 +22,7 @@ rep_Colors = [0.5 0.5 0.5; 1 0.5 0.5; 0.5 0.5 1];
 mean_Colors = [0 0 0;1 0 0; 0 0 1];
 rep_LineWidth = 0.05;
 mean_LineWidth = 1;
+patch_alpha = 0.3;
 subtitle_FontSize = 8;
 timeseries_ylimits = [-1.1 1.1; -1 6; -1 6; -1 6; 1 192; -1.1 1.1; 2 20]; %[min max] y limits for each datatype
 timeseries_xlimits = [0 4];
@@ -61,7 +62,7 @@ if nargin<5
     
     %find all open-loop conditions, organize into block
     conds_vec = find(Data.conditionModes~=4); 
-    num_conds = length(OL_conds_vec);
+    num_conds = length(conds_vec);
     W = default_W(min([num_conds length(default_W)])); %get number of subplot columns (up to default limit)
     H = default_H(min([num_conds length(default_W)])); %get number of subplot rows
     D = ceil(num_conds/length(default_W)); %number of figures
@@ -71,7 +72,7 @@ if nargin<5
     
     %find all closed-loop conditions, organize into block
     conds_vec = find(Data.conditionModes==4); 
-    num_conds = length(CL_conds_vec);
+    num_conds = length(conds_vec);
     W = default_W(min([num_conds length(default_W)])); %get number of subplot columns (up to default limit)
     H = default_H(min([num_conds length(default_W)])); %get number of subplot rows
     D = ceil(num_conds/length(default_W)); %number of figures
@@ -89,17 +90,17 @@ overlap = logical(overlap);
 %get datatype indices
 for i = 1:length(OL_datatypes)
     ind = find(strcmpi(Data.channelNames.timeseries,OL_datatypes{i}));
-    assert(~isempty(ind),['could not find ' OL_datatypes{i} 'datatype'])
+    assert(~isempty(ind),['could not find ' OL_datatypes{i} ' datatype'])
     OL_inds(i) = ind;
 end
 for i = 1:length(CL_datatypes)
     ind = find(strcmpi(Data.channelNames.histograms,CL_datatypes{i}));
-    assert(~isempty(ind),['could not find ' OL_datatypes{i} 'datatype'])
+    assert(~isempty(ind),['could not find ' OL_datatypes{i} ' datatype'])
     CL_inds(i) = ind;
 end
 for i = 1:length(TC_datatypes)
     ind = find(strcmpi(Data.channelNames.timeseries,TC_datatypes{i}));
-    assert(~isempty(ind),['could not find ' OL_datatypes{i} 'datatype'])
+    assert(~isempty(ind),['could not find ' OL_datatypes{i} ' datatype'])
     TC_inds(i) = ind;
 end
 
@@ -148,10 +149,10 @@ num_positions = size(CombData.histograms,6);
 
 %% normalize data
 if normalize_option>0
-    base_start(1) = find(CombData.timestamps>=baseline_startstop(1),1);
-    base_stop(2) = find(CombData.timestamps<=baseline_startstop(2),1,'last');
-    max_start(1) = find(CombData.timestamps>=max_startstop(1),1);
-    max_stop(2) = find(CombData.timestamps<=max_startstop(2),1,'last');
+    base_start = find(CombData.timestamps>=baseline_startstop(1),1);
+    base_stop = find(CombData.timestamps<=baseline_startstop(2),1,'last');
+    max_start = find(CombData.timestamps>=max_startstop(1),1);
+    max_stop = find(CombData.timestamps<=max_startstop(2),1,'last');
     if normalize_option==1
         datalen = numel(CombData.timeseries(1,1,1,:,:,base_start:base_stop));
         tmpdata = reshape(CombData.timeseries(:,:,:,:,:,base_start:base_stop),[num_groups num_exps num_datatypes datalen]);
@@ -247,7 +248,7 @@ if ~isempty(CL_conds)
                             plot(x,nanmean(tmpdata),'Color',mean_Colors(g,:),'LineWidth',mean_LineWidth)
                         end
                         ylim(histogram_ylimits(d,:));
-                        titlestr = ['\fontsize{' num2str(subtitle_FontSize) '} Condition #{\color[rgb]{' num2str(mean_Colors(g,:)) '}' num2str(cond)']; 
+                        titlestr = ['\fontsize{' num2str(subtitle_FontSize) '} Condition #{\color[rgb]{' num2str(mean_Colors(g,:)) '}' num2str(cond)]; 
                         if overlap==1
                             cond = CL_conds(row*2,col,fig);
                             if cond>0
@@ -284,12 +285,17 @@ if ~isempty(OL_conds)
                         hold on
                         for g = 1:num_groups
                             tmpdata = squeeze(nanmean(CombData.timeseries(g,:,d,cond,:,:),5));
-                            if num_groups==1 && overlap==0 
-                                plot(repmat(CombData.timestamps',[1 num_exps]),tmpdata','Color',rep_Colors(g,:),'LineWidth',rep_LineWidth);
-                            end
-                            plot(CombData.timestamps,nanmean(tmpdata),'Color',mean_Colors(g,:),'LineWidth',mean_LineWidth);
+                            meandata = nanmean(tmpdata);
+                            nanidx = isnan(meandata);
+                            stddata = nanstd(tmpdata);
+                            semdata = stddata./sqrt(sum(max(~isnan(tmpdata),[],2)));
+                            timestamps = CombData.timestamps(~nanidx);
+                            meandata(nanidx) = []; 
+                            semdata(nanidx) = []; 
+                            plot(CombData.timestamps,meandata,'Color',mean_Colors(g,:),'LineWidth',mean_LineWidth);
+                            patch([timestamps fliplr(timestamps)],[meandata+semdata fliplr(meandata-semdata)],'FaceColor',mean_Colors(g,:),'EdgeColor','none','FaceAlpha',patch_alpha)
                         end
-                        titlestr = ['\fontsize{' num2str(subtitle_FontSize) '} Condition #{\color[rgb]{' num2str(mean_Colors(g,:)) '}' num2str(cond)']; 
+                        titlestr = ['\fontsize{' num2str(subtitle_FontSize) '} Condition #{\color[rgb]{' num2str(mean_Colors(g,:)) '}' num2str(cond)]; 
                         ylim(timeseries_ylimits(d,:));
                         xlim(timeseries_xlimits)
                         if overlap==1
@@ -298,7 +304,15 @@ if ~isempty(OL_conds)
                                 titlestr = [titlestr ' \color[rgb]{' num2str(rep_Colors(g,:)) '}(' num2str(cond) ')'];
                                 for g = 1:num_groups
                                     tmpdata = squeeze(nanmean(CombData.timeseries(g,:,d,cond,:,:),5));
-                                    plot(CombData.timestamps,nanmean(tmpdata),'Color',rep_Colors(g,:),'LineWidth',mean_LineWidth);
+                                    meandata = nanmean(tmpdata);
+                                    nanidx = isnan(meandata);
+                                    stddata = nanstd(tmpdata);
+                                    semdata = stddata./sqrt(sum(max(~isnan(tmpdata),[],2)));
+                                    timestamps = CombData.timestamps(~nanidx);
+                                    meandata(nanidx) = []; 
+                                    semdata(nanidx) = []; 
+                                    plot(CombData.timestamps,meandata,'Color',mean_Colors(g,:),'LineWidth',mean_LineWidth);
+                                    patch([timestamps fliplr(timestamps)],[meandata+semdata fliplr(meandata-semdata)],'FaceColor',mean_Colors(g,:),'EdgeColor','none','FaceAlpha',patch_alpha)
                                 end
                             end
                         end
@@ -331,7 +345,7 @@ if ~isempty(TC_conds)
                     plot(nanmean(tmpdata),'Color',mean_Colors(g,:),'LineWidth',mean_LineWidth);
                 end
                 ylim(timeseries_ylimits(d,:));
-                titlestr = ['\fontsize{' num2str(subtitle_FontSize) '} Condition #{\color[rgb]{' num2str(mean_Colors(g,:)) '}' num2str(cond)']; 
+                titlestr = ['\fontsize{' num2str(subtitle_FontSize) '} Condition #{\color[rgb]{' num2str(mean_Colors(g,:)) '}' num2str(cond)]; 
                 if overlap==1
                     conds = TC_conds(row*2,:,fig);
                     conds(isnan(conds)|conds==0) = [];
