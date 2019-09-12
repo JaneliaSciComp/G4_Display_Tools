@@ -1,5 +1,5 @@
-function G4_Plot_Data_Combined(exp_folder, trial_options, CL_conds, OL_conds, TC_conds, overlap)
-%FUNCTION G4_Plot_Data_Combined(exp_folder, trial_options, CL_conds, OL_conds, TC_conds, overlap)
+function G4_Plot_Data_Combined(exp_folder, trial_options, CL_conds, OL_conds, TC_conds, overlap, frame_superimpose)
+%FUNCTION G4_Plot_Data_Combined(exp_folder, trial_options, CL_conds, OL_conds, TC_conds, overlap, frame_superimpose)
 % 
 % Inputs:
 % exp_folder: cell array of paths containing G4_Processed_Data.mat files
@@ -8,6 +8,7 @@ function G4_Plot_Data_Combined(exp_folder, trial_options, CL_conds, OL_conds, TC
 % OL_conds: matrix of open-loop (OL) conditions to plot as timeseries
 % TC_conds: matrix of open-loop conditions to plot as tuning curves (TC)
 % overlap: logical (0 default); plots every 2 rows of conditions on a single row of axes in different colors
+% frame_superimpose: logical (0 default) plots the frame position underneath each timeseries plot
 
 
 %% user-defined parameters
@@ -20,9 +21,11 @@ TC_datatypes = {'LmR'}; %datatypes to plot as tuning curves
 %specify plot properties
 rep_Colors = [0.5 0.5 0.5; 1 0.5 0.5; 0.5 0.5 1];
 mean_Colors = [0 0 0;1 0 0; 0 0 1];
+frame_color = [0.7 0.7 0.7]; %color of the frame position timeseries (if frame_superimpose=1)
+frame_scale = 0.5; %sets the y-size of the superimposed frame timeseries, relative to the y-size of the timeseries data
 rep_LineWidth = 0.05;
 mean_LineWidth = 1;
-patch_alpha = 0.3;
+patch_alpha = 0.3; %sets the level of transparency for patch region around timeseries data
 subtitle_FontSize = 8;
 timeseries_ylimits = [-1.1 1.1; -1 6; -1 6; -1 6; 1 192; -1.1 1.1; 2 20]; %[min max] y limits for each datatype
 timeseries_xlimits = [0 4];
@@ -88,6 +91,7 @@ end
 overlap = logical(overlap);
 
 %get datatype indices
+Frame_ind = find(strcmpi(Data.channelNames.timeseries,'Frame Position'));
 for i = 1:length(OL_datatypes)
     ind = find(strcmpi(Data.channelNames.timeseries,OL_datatypes{i}));
     assert(~isempty(ind),['could not find ' OL_datatypes{i} ' datatype'])
@@ -298,6 +302,13 @@ if ~isempty(OL_conds)
                         titlestr = ['\fontsize{' num2str(subtitle_FontSize) '} Condition #{\color[rgb]{' num2str(mean_Colors(g,:)) '}' num2str(cond)]; 
                         ylim(timeseries_ylimits(d,:));
                         xlim(timeseries_xlimits)
+                        if frame_superimpose==1
+                            framepos = squeeze(nanmedian(nanmedian(nanmedian(CombData.timeseries(:,:,Frame_ind,cond,:,:),5),2),1))';
+                            framepos = (frame_scale*framepos/max(framepos))+timeseries_ylimits(d,1)-frame_scale*yrange;
+                            yrange = diff(timeseries_ylimits(d,:));
+                            ylim([timeseries_ylimits(d,1)-frame_scale*yrange timeseries_ylimits(d,2)])
+                            plot(CombData.timestamps,framepos,'Color',frame_color,'LineWidth',mean_LineWidth);
+                        end
                         if overlap==1
                             cond = OL_conds(row*2,col,fig);
                             if cond>0
