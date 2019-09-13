@@ -12,6 +12,8 @@ classdef G4_preview_controller < handle
       
         dummy_line_;
         frames_;
+        
+        making_video_;
          
     end
     
@@ -26,6 +28,8 @@ classdef G4_preview_controller < handle
         ao_lines;
         dummy_line;
         frames
+        
+        making_video;
 
     end
     
@@ -38,6 +42,7 @@ classdef G4_preview_controller < handle
             
             self.fig = figure( 'Name', 'Trial Preview', 'NumberTitle', 'off','units', 'pixels'); 
             self.frames = struct('cdata', [], 'colormap', []);
+            self.making_video = 0;
 
 
             self.layout();
@@ -47,14 +52,16 @@ classdef G4_preview_controller < handle
         end
         
         
-        function layout(self)
+        function layout(self, varargin)
 
-
+            if ~isempty(varargin) && self.making_video == 1
+                currentFig = varargin{1};
+            else
+                currentFig = self.fig;
+            end
             pix = get(0, 'screensize'); 
-            patternSize = size(self.model.pattern_data(:,:,1));
-            pat_xlim = [0 length(self.model.pattern_data(1,:,1))];
-            pat_ylim = [0 length(self.model.pattern_data(:,1,1))];
-
+            
+            [patternSize, pat_xlim, pat_ylim] = self.get_pattern_axis_sizes();
             %ratios of y direction to x direction in pattern/function
             %files so images don't get squished forced into axes that
             %don't fit the data correctly.
@@ -79,9 +86,9 @@ classdef G4_preview_controller < handle
             ao_xlabel = 'Time';
             ao_ylabel = 'Volts';
             
-            set(self.fig, 'Position', fig_pos); %create overall figure for preview
+            set(currentFig, 'Position', fig_pos); %create overall figure for preview
             %Files are all loaded, now create figure and axes
-            self.pat_axes = axes(self.fig, 'units', 'pixels', 'Position', pat_pos, ...
+            self.pat_axes = axes(currentFig, 'units', 'pixels', 'Position', pat_pos, ...
                 'XLim', pat_xlim, 'YLim', pat_ylim);
             
             first_frame = self.get_first_frame();
@@ -102,7 +109,7 @@ classdef G4_preview_controller < handle
                    pos_title = 'Position Function Preview';
                    pos_xlabel = 'Time';
                    pos_ylabel = 'Frame Index';
-                   self.pos_line = self.plot_function(self.fig, self.model.pos_data, pos_pos, pos_title, ...
+                   self.pos_line = self.plot_function(currentFig, self.model.pos_data, pos_pos, pos_title, ...
                            pos_xlabel, pos_ylabel);
                    self.place_red_dur_line(self.model.pos_data);
                end
@@ -118,7 +125,7 @@ classdef G4_preview_controller < handle
                end
                pos_xlabel = 'Time';
                pos_ylabel = 'Frame Index';
-               self.dummy_line = self.plot_function(self.fig, self.model.dummy_data, pos_pos, pos_title, ...
+               self.dummy_line = self.plot_function(currentFig, self.model.dummy_data, pos_pos, pos_title, ...
                     pos_xlabel, pos_ylabel);
                 self.place_red_dur_line(self.model.dummy_data);
                
@@ -134,9 +141,9 @@ classdef G4_preview_controller < handle
                 self.create_dummy_function();
                 dummy_title = "closed loop displayed as 1 Hz sine wave";
                 
-                self.dummy_line = self.plot_function(self.fig, self.model.dummy_data, dum_pos, ...
+                self.dummy_line = self.plot_function(currentFig, self.model.dummy_data, dum_pos, ...
                     dummy_title, pos_xlabel, pos_ylabel);
-                self.pos_line = self.plot_function(self.fig, self.model.pos_data, pos_pos, ...
+                self.pos_line = self.plot_function(currentFig, self.model.pos_data, pos_pos, ...
                     pos_title, pos_xlabel, pos_ylabel);
                 self.place_red_dur_line(self.model.pos_data);
                 self.place_red_dur_line(self.model.dummy_data);
@@ -151,7 +158,7 @@ classdef G4_preview_controller < handle
            for i = 1:4
                aoTitle = "Analog Output " + (i);
                if ~strcmp(self.model.data(i+3),'')
-                   self.ao_lines{i} = self.plot_function(self.fig, self.model.ao_data{i}, ...
+                   self.ao_lines{i} = self.plot_function(currentFig, self.model.ao_data{i}, ...
                        ao_positions{i}, aoTitle, ao_xlabel, ao_ylabel);
                    self.place_red_dur_line(self.model.ao_data{i});
                else
@@ -160,16 +167,16 @@ classdef G4_preview_controller < handle
            end
 
            
-           playButton = uicontrol(self.fig, 'Style', 'pushbutton', 'String', 'Play', 'FontSize', ...
+           playButton = uicontrol(currentFig, 'Style', 'pushbutton', 'String', 'Play', 'FontSize', ...
                 14, 'units', 'pixels', 'Position', [(pat_pos(1) + pat_pos(3))/2 + 25, 75, 50, 25], 'Callback', @self.play);
-           stopButton = uicontrol(self.fig, 'Style', 'pushbutton', 'String', 'Stop', 'FontSize', ...
+           stopButton = uicontrol(currentFig, 'Style', 'pushbutton', 'String', 'Stop', 'FontSize', ...
                 14, 'units', 'pixels', 'Position', [(pat_pos(1) + pat_pos(3))/2 - 50, 75, 50, 25], 'Callback', @self.stop);
-           pauseButton = uicontrol(self.fig, 'Style', 'pushbutton', 'String', 'Pause', 'FontSize', ...
+           pauseButton = uicontrol(currentFig, 'Style', 'pushbutton', 'String', 'Pause', 'FontSize', ...
                 14, 'units', 'pixels', 'Position', [ (pat_pos(1) + pat_pos(3))/2 + 100, 75, 90, 25], 'Callback', @self.pause);
-           realtime = uicontrol(self.fig, 'Style', 'checkbox', 'String', 'Real-time speed', 'Value', ...
+           realtime = uicontrol(currentFig, 'Style', 'checkbox', 'String', 'Real-time speed', 'Value', ...
                self.model.is_realtime, 'FontSize', 14, 'Position', [ ((pat_pos(1) + pat_pos(3))/2 +215), 75, 200, 25],...
                'Callback', @self.set_realtime); 
-           generate_video = uicontrol(self.fig, 'Style', 'pushbutton', 'String', 'Generate Video', 'FontSize', ...
+           generate_video = uicontrol(currentFig, 'Style', 'pushbutton', 'String', 'Generate Video', 'FontSize', ...
                14, 'units', 'pixels', 'Position', [ ao_positions{1}(1) + .5*ao_positions{1}(3) - 75, realtime.Position(2), 150, realtime.Position(4)], ...
                'Callback', @self.generate_video);
           
@@ -318,8 +325,14 @@ classdef G4_preview_controller < handle
 
         end
         
-        function preview_Mode1(self)
-
+        function preview_Mode1(self, varargin)
+            
+            if ~isempty(varargin) && self.making_video == 1
+                currentFig = varargin{1};
+            else
+                currentFig = self.fig;
+            end
+            
             self.model.is_paused = false;
             time = self.model.dur*1000;
             if self.model.is_realtime == 1
@@ -337,22 +350,22 @@ classdef G4_preview_controller < handle
                 ao_increment = 1;
                 
             end
-            
+            frame_count = 1; 
+             
             num_frames = ceil((self.model.rt_frRate*self.model.dur)/fr_increment);
-            
-            
-            
-            
-            
+            self.frames = cell(1, num_frames);
+
             if self.pos_line == 0
+                
                 self.create_error_box("Please make sure you've entered a position function and try again.");
+                
             else
-                
-                
+
                 ratio = aofr_rate/fr_rate;
                 count = 1;
                 aoLineDist = [0 0 0 0];
                 fr_increment = fr_increment*ratio;
+                
                 if self.model.is_realtime == 0
 
                     ao_increment = ao_increment*ratio;
@@ -391,10 +404,6 @@ classdef G4_preview_controller < handle
                         end
                         
                     end
-                    
-                    
-                    
-
 
                     if i == num_frames
                         if time > length(self.model.pos_data)
@@ -410,9 +419,6 @@ classdef G4_preview_controller < handle
                         self.model.preview_index = 1;
                     end
 
-
-                    
-
                     frame = self.model.pos_data(self.model.preview_index);
                     set(self.im,'cdata',self.model.pattern_data(:,:,frame));
 
@@ -426,14 +432,15 @@ classdef G4_preview_controller < handle
 
                     self.model.preview_index = self.model.preview_index + fr_increment;
 
-                    %move pos line if it exists
-                    %put up next frame
+                    drawnow limitrate %nocallbacks
+                    
+                    if self.making_video == 1
+                        
+                        self.frames{frame_count} = getframe(currentFig);
+                        frame_count = frame_count + 1;
+                    end
                         
 
-                    drawnow limitrate %nocallbacks
-
-
-%                         self.frames(i) = getframe(gcf);
                     timeElapsed = toc(inside);
 
                     if self.model.is_realtime == 1
@@ -463,7 +470,8 @@ classdef G4_preview_controller < handle
 
         
         function preview_Mode2(self)
-           self.model.is_paused = false;
+            
+            self.model.is_paused = false;
             time = self.model.dur*1000;
             if self.model.is_realtime == 1
                 
@@ -509,8 +517,6 @@ classdef G4_preview_controller < handle
                 end
 
 
-                %move ao lines
-
                 for k = 1:4
                     if self.ao_lines{k} ~= 0
                         if self.ao_lines{k}.XData(1) >= aoLineDist(k)
@@ -537,16 +543,10 @@ classdef G4_preview_controller < handle
                 set(self.im,'cdata',self.model.pattern_data(:,:,frame));
 
                  self.model.preview_index = self.model.preview_index + fr_increment;
-%                 if self.model.preview_index > length(self.model.pattern_data(1,1,:))
-%                     self.model.preview_index = 1;
-%                 end
-                    
-                
 
                 drawnow limitrate %nocallbacks
                 timeElapsed = toc(inside);
 
-                %self.frames(i) = getframe(gcf);
 
                 if self.model.is_realtime == 1
                     time_to_pause = 1/self.model.slow_frRate - timeElapsed;
@@ -564,8 +564,6 @@ classdef G4_preview_controller < handle
                     pause(time_to_pause);
 
                 end
-                
-
 
             end
 
@@ -584,13 +582,13 @@ classdef G4_preview_controller < handle
             
             self.model.is_paused = false;
             time = self.model.dur*1000;
+            
             if self.model.is_realtime == 1
                 
                 fr_rate = self.model.rt_frRate;
                 aofr_rate = 1000;
                 fr_increment = floor(fr_rate/self.model.slow_frRate);
                 ao_increment = floor(aofr_rate/self.model.slow_frRate);
-                
                 
             else
                 fr_rate = self.model.slow_frRate;
@@ -602,11 +600,6 @@ classdef G4_preview_controller < handle
             
             num_frames = ceil((self.model.rt_frRate*self.model.dur)/fr_increment);
             
-%             if self.dummy_line == 0
-%                 self.create_error_box("Please make sure you've entered a position function and try again.");
-%             else
-%                 
-                
                 ratio = aofr_rate/fr_rate;
                 count = 1;
                 aoLineDist = [0 0 0 0];
@@ -615,8 +608,6 @@ classdef G4_preview_controller < handle
 
                     ao_increment = ao_increment*ratio;
                 end
-                
-                
                 
                 for i = 1:4
                     if self.ao_lines{i} ~= 0
@@ -630,9 +621,6 @@ classdef G4_preview_controller < handle
                     if self.model.is_paused == true
                         return;
                     end
-                    
-                    
-                    %move ao lines
                     
                     for k = 1:4
                         if self.ao_lines{k} ~= 0
@@ -649,10 +637,6 @@ classdef G4_preview_controller < handle
                         end
                         
                     end
-                    
-                    
-                    
-
 
                     if i == num_frames
                         if time > length(self.model.dummy_data)
@@ -668,9 +652,6 @@ classdef G4_preview_controller < handle
                         self.model.preview_index = 1;
                     end
 
-
-                    
-
                     frame = self.model.dummy_data(self.model.preview_index);
                     set(self.im,'cdata',self.model.pattern_data(:,:,frame));
 
@@ -684,14 +665,8 @@ classdef G4_preview_controller < handle
 
                     self.model.preview_index = self.model.preview_index + fr_increment;
 
-                    %move pos line if it exists
-                    %put up next frame
-                        
-
                     drawnow limitrate %nocallbacks
 
-
-%                         self.frames(i) = getframe(gcf);
                     timeElapsed = toc(inside);
 
                     if self.model.is_realtime == 1
@@ -721,11 +696,12 @@ classdef G4_preview_controller < handle
         
         
         function preview_Mode5(self)
+            
+            %Same as mode 4
         end
         
         function preview_Mode6(self)
-            
-             
+
             
              self.model.is_paused = false;
 
@@ -794,6 +770,9 @@ classdef G4_preview_controller < handle
         end
         
         function preview_Mode7(self)
+            
+            %Same as mode 4
+            
         end
         
         function [func_line] = plot_function(self, fig, func, position, graph_title, x_label, y_label)
@@ -854,36 +833,12 @@ classdef G4_preview_controller < handle
         end
         
         function create_dummy_function(self)
-        
-
-
-            
+ 
             ybound = length(self.model.pattern_data(1,1,:));
 
-            %self.model.dummy_data = zeros(1,(dur*1000));
             
             if self.model.mode == 4 || self.model.mode == 7 || self.model.mode == 6
-%                 frame = 1;
-%                 direction = 'up';
-%                for t = 1:(dur*1000)
-%                    if strcmp(direction,'up') == 1
-%                        
-%                         self.model.dummy_data(t) = frame;
-%                         frame = frame + 1;
-%                    elseif strcmp(direction,'down') == 1
-%                        
-%                        self.model.dummy_data(t) = frame;
-%                        frame = frame - 1;
-%                    end
-%                    if frame >= ybound
-%                        direction = 'down';
-%                    elseif frame <= 1
-%                        direction = 'up';
-%                    end
-%                    
-% 
-%                 %self.model.dummy_data(t) = ybound*sin(2*pi*(t/1000)+(pi/2)) + ybound;
-%                end
+
                 time = self.model.dur*1000;
                 sample_rate = 1;
                 frequency = .001;
@@ -970,7 +925,52 @@ classdef G4_preview_controller < handle
             end
         end
         
+        function [patternSize, pat_xlim, pat_ylim] = get_pattern_axis_sizes(self)
+            patternSize = size(self.model.pattern_data(:,:,1));
+            pat_xlim = [0 length(self.model.pattern_data(1,:,1))];
+            pat_ylim = [0 length(self.model.pattern_data(:,1,1))];
+        end
+        
         function generate_video(self, src, event)
+            
+            self.making_video = 1;
+            [file, path] = uiputfile('*.avi','File Selection','preview');
+            video_savepath = fullfile(path, file);
+            new_figure = figure('Visible', 'off');
+            self.layout(new_figure);
+            self.model.preview_index = 1; 
+            progress = waitbar(.25, 'Creating Frames');
+            
+            if self.model.mode == 1
+                self.preview_Mode1(new_figure)
+            end
+            
+            waitbar(.5, progress, 'Creating video writer');
+            
+            writer = VideoWriter(video_savepath);
+            writer.FrameRate = self.model.slow_frRate;
+            open(writer);
+            
+            waitbar(.75, progress, 'Writing Video');
+            for i = 1:length(self.frames)
+                writeVideo(writer, self.frames{i});
+            end
+            delete(new_figure);
+            close(progress);
+            
+            self.making_video = 0;
+            self.model.preview_index = 1;
+            
+            %reset old figure
+            self.layout();
+            %self.update_layout();
+            
+            
+            
+            
+            
+           
+            
         end
         
         
@@ -1005,6 +1005,10 @@ classdef G4_preview_controller < handle
         function value = get.ao_lines(self)
             value = self.ao_lines_;
         end
+        function value = get.making_video(self)
+            value = self.making_video_;
+        end
+        
         
         %SETTERS
         
@@ -1035,6 +1039,9 @@ classdef G4_preview_controller < handle
         end
         function set.ao_lines(self, value)
             self.ao_lines_ = value;
+        end
+        function set.making_video(self, value)
+            self.making_video_ = value;
         end
         
         

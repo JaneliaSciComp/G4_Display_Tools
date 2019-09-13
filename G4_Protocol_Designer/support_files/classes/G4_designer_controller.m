@@ -598,6 +598,11 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
 
             end
             
+            if y == 13 && new == 0
+                self.deselect_selectAll();
+            end
+                
+            
             if y == 1
                 
                 self.clear_fields(str2num(new));
@@ -751,7 +756,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
  
 %Update the frame rates of channels being collected        
         
-        function update_chan1_rate(self, src, event)
+        function update_chan1_rate(self, src, ~)
             
             new = str2num(src.String);
             if rem(new,1000) ~= 0 && new ~= 0
@@ -770,7 +775,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
             
         end
         
-        function update_chan2_rate(self, src, event)
+        function update_chan2_rate(self, src, ~)
             
             new = str2num(src.String);
             if rem(new,1000) ~= 0
@@ -789,7 +794,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
             
         end
         
-        function update_chan3_rate(self, src, event)
+        function update_chan3_rate(self, src, ~)
             
             new = str2num(src.String);
             if rem(new,1000) ~= 0
@@ -808,7 +813,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
             
         end
         
-        function update_chan4_rate(self, src, event)
+        function update_chan4_rate(self, src, ~)
             
             new = str2num(src.String);
             if rem(new,1000) ~= 0
@@ -854,7 +859,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
 %            self.update_gui();
         end
         
-        function update_experiment_name(self, src, event)
+        function update_experiment_name(self, src, ~)
             
             new_val = src.String;
            
@@ -887,7 +892,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
 %         end
 
 
-        function select_new_file(self, src, event)
+        function select_new_file(self, ~, ~)
         
             new_file = self.listbox_imported_files.String{self.listbox_imported_files.Value};
             
@@ -908,7 +913,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
         end
 
 
-        function create_error_box(self, varargin)
+        function create_error_box(~, varargin)
             if isempty(varargin)
                 return;
             else
@@ -929,7 +934,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
         
 %CLEAR OUT ALL DATA TO START DESIGNING NEW EXPERIMENT----------------------
 
-        function clear_all(self, src, event)
+        function clear_all(self, ~, ~)
             
             question = "Make sure you have saved your experiment, or it will be lost.";
             answer = questdlg(question, 'Confirm Clear All', 'Continue', 'Cancel', 'Cancel');
@@ -942,9 +947,6 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                     clear self.model;
                     delete(self.doc);
                     self.doc = G4_document();
-                    self.doc.experiment_name
-                    
-
                     self.update_gui();
                     
                     
@@ -960,7 +962,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
         
 %ADD ROW AND UPDATE MODEL DATA---------------------------------------------
 
-        function add_trial(self, src, event)
+        function add_trial(self, ~, ~)
 
             checkbox_column_data = horzcat(self.doc.block_trials(1:end, end));
             checked_list = find(cell2mat(checkbox_column_data));
@@ -1009,8 +1011,8 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
 
         function delete_trial(self, src, event)
         
-            checkbox_column_data = horzcat(self.doc.block_trials(1:end, end));
-            checked_list = find(cell2mat(checkbox_column_data));
+            checkbox_column_data = horzcat(self.doc.block_trials{1:end, end});
+            checked_list = find(checkbox_column_data);
             checked_count = length(checked_list);
             %disp(checked_list);
             
@@ -1347,7 +1349,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
 %MAIN MENU CALLBACK FUNCTIONS----------------------------------------------
 
 %Import
-    function import(self, src, event)
+    function import(self, ~, ~)
        
        answer = questdlg('Would you like to import a folder or a file?',...
            'Import', 'Folder', 'File', 'Cancel', 'Folder');
@@ -1451,7 +1453,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
     
 %Save
 
-    function save(self, src, event)
+    function save(self, ~, ~)
     %Controller gets up to data data from the model, then sends to the
     %document to save the file.
         
@@ -1463,7 +1465,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
 
 %Open
 
-    function open_file(self, src, event, filepath)
+    function open_file(self, ~, ~, filepath)
         %document open function opens the file, saves the data, and sends
         %data back to controller. 
 
@@ -1475,7 +1477,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
             [filename, top_folder_path] = uigetfile('*.g4p');
             filepath = fullfile(top_folder_path, filename);
         else
-            [top_folder_path, filename] = fileparts(filepath);
+            [top_folder_path, ~] = fileparts(filepath);
         end
        
         if isequal (top_folder_path,0)
@@ -1484,7 +1486,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
 
             self.doc.top_export_path = top_folder_path;
             self.doc.import_folder(top_folder_path);
-            [exp_path, exp_name, ext] = fileparts(filepath);
+            [~, exp_name, ~] = fileparts(filepath);
 
             if isempty(fieldnames(self.doc.Patterns))
                 %no patterns were successfully imported, so don't autofill
@@ -1543,11 +1545,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                 end
 
             end
-            self.doc.pretrial
-            self.doc.intertrial
-            self.doc.posttrial
-            self.doc.block_trials
-            
+
             self.doc.insert_greyed_cells();     
             self.doc.set_recent_files(filepath);
             self.doc.update_recent_files_file();
@@ -1568,7 +1566,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
  
         
 %Copy to        
-        function copy_to(self, src, event)
+        function copy_to(self, ~, ~)
         
             checkbox_column_data = horzcat(self.doc.block_trials(1:end, end));
             checked = find(cell2mat(checkbox_column_data));
@@ -1623,7 +1621,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
         
 %Set selected values to new trials
 
-        function set_selected(self, src, event)
+        function set_selected(self, ~, ~)
             
         %Check if any rows in the block are checked, add indexes of any
         %checked ones into checked_block
@@ -1694,7 +1692,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
 
 %SELECT ALL CALLBACK-------------------------------------------------------
 
-      function select_all(self, src, event)
+      function select_all(self, src, ~)
         %assuming here that the number parameters will never differ between
         %trials. 
         l = length(self.doc.block_trials(1,:));
@@ -1721,7 +1719,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
       
 %INVERT SELECTION CALLBACK-------------------------------------------------
 
-        function invert_selection(self, src, event)
+        function invert_selection(self, ~, ~)
 
             L = length(self.doc.block_trials(:,1));
             len = length(self.doc.block_trials(1,:));
@@ -1845,7 +1843,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
 
 %FORWARD ONE FRAME ON IN SCREEN PREVIEW------------------------------------
 
-        function frame_forward(self, src, event)
+        function frame_forward(self, ~, ~)
 
             if ~strcmp(self.model.current_preview_file,'') && length(self.model.current_preview_file(1,1,:)) > 1
                 
@@ -1878,7 +1876,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
 
 %ONE FRAME BACK ON IN SCREEN PREVIEW---------------------------------------        
         
-        function frame_back(self, src, event)
+        function frame_back(self, ~, ~)
 
             if ~strcmp(self.model.current_preview_file,'') && length(self.model.current_preview_file(1,1,:)) > 1
                 self.model.auto_preview_index = self.model.auto_preview_index - 1;
@@ -1905,7 +1903,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
 
 %PLAY THE IN SCREEN PREVIEW------------------------------------------------
         
-        function preview_play(self, src, event)
+        function preview_play(self, ~, ~)
 
             self.model.is_paused = false;
 
@@ -2788,6 +2786,12 @@ function [start_index] = check_pattern_dimensions(self, pat_field)
 
 end
 
+function deselect_selectAll(self)
+
+    self.model.isSelect_all = 0;
+
+end
+
 %CLEAR GREY SPACE AND INSERT PATTERN INTO PATTERN CELL---------------------
 
 function [pat_field] = get_or_insert_pattern(self)
@@ -3037,47 +3041,6 @@ function set_mode_dep_props(self, pos, indx, rate, gain, offset)
 
 
 end
-
-
-
-% function mismatched_sample_rates_dialog(self)
-% 
-%     d = dialog('Units','Normalized','Position',[.45,.45,.1,.1],'Name','Configuration File Mismatch');
-%     warning = uicontrol('Parent',d,'Style','text','Units','Normalized','Position',[.1,.9,.75,.1],...
-%         'String','The sample rates in the configuration file do not match those shown on the screen. Do you want to: ');
-%     grp = uibuttongroup('Parent',d,'Units','Normalized','Position',[.1,.1,.75,.75],'SelectionChangedFcn',{@self.mismatched_sample_rates_response,d});
-%     choice1 = uicontrol('Parent',grp,'Style','radiobutton','Units','Normalized','Position',[.1,.7,.75,.2],'String','Change configuration file to match screen.');
-%     choice2 = uicontrol('Parent',grp,'Style','radiobutton','Units','Normalized','Position',[.1,.4,.75,.2],'String','Change screen to match configuration file.');
-%     choice3 = uicontrol('Parent',grp,'Style','radiobutton','Units','Normalized','Position',[.1,.1,.75,.2],'String','Do nothing, will fix manually.');
-% 
-% end
-% 
-% function mismatched_sample_rates_response(self, src, event, d)
-%     
-%     if event.NewValue.Position(2) == .7
-%         
-%         self.doc.update_config_file(self.doc.chan1_rate, 1);
-%         self.doc.update_config_file(self.doc.chan2_rate, 2);
-%         self.doc.update_config_file(self.doc.chan3_rate, 3);
-%         self.doc.update_config_file(self.doc.chan4_rate, 4);
-%         
-%     elseif event.NewValue.Position(2) == .4
-%         
-%         self.doc.set_chan1_rate(str2num(self.configData_{14}(end-3:end)));
-%         self.doc.set_chan2_rate(str2num(self.configData_{15}(end-3:end)));
-%         self.doc.set_chan3_rate(str2num(self.configData_{16}(end-3:end)));
-%         self.doc.set_chan4_rate(str2num(self.configData_{17}(end-3:end)));
-% 
-%     else
-%         %do nothing, they exited out of the dialog box
-%         
-%     end
-%     
-%     delete(d);
-%     self.chan1_rate_box.String = num2str(self.doc.chan1_rate);
-%     
-% end
-
 
 
 

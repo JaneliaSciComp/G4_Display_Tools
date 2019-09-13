@@ -95,9 +95,14 @@ classdef G4_document < handle
 
 %CONSTRUCTOR--------------------------------------------------------------        
         function self = G4_document()
-
-%Set these properties to empty values until they are needed
             
+            %%User needs to change this if the settings file name is
+            %%changed. 
+            settings_file = 'G4_Protocol_Designer_Settings.m';
+            
+            %%constructor sets rest of variables
+%Set these properties to empty values until they are needed
+
             self.top_folder_path = '';
             self.top_export_path = '';
             self.Patterns = struct;
@@ -122,105 +127,37 @@ classdef G4_document < handle
             self.posttrial = self.trial_data.trial_array;
             
 %Get the path to the configuration file from settings and set the config data to the data within the configuration file
-
-            settings_data = strtrim(regexp( fileread('G4_Protocol_Designer_settings.m'),'\n','split'));
-            path_line = find(contains(settings_data,'Configuration File Path:'));
-            path_index = strfind(settings_data{path_line},'Path: ');
-            path = settings_data{path_line}(path_index+6:end);
-            self.configData = strtrim(regexp( fileread(path),'\n','split'));
             
-            color_line = find(contains(settings_data, 'Color'));
-            color_index = strfind(settings_data{color_line}, 'cells: ');
-            self.uneditable_cell_color = settings_data{color_line}(color_index + 7:end);
             
-            filler_line = find(contains(settings_data, 'Text to fill'));
-            filler_index = strfind(settings_data{filler_line}, 'cells: ');
-            self.uneditable_cell_text = settings_data{filler_line}(filler_index+7:end);
+            [settings_data, path_line, path_index] = self.get_setting(settings_file, 'Configuration File Path: ');
+            path = strtrim(settings_data{path_line}(path_index:end));
+%             self.configData = strtrim(regexp( fileread(path),'\n','split'));
+            
+            [settings_data, color_line, color_index] = self.get_setting(settings_file, 'Color to fill uneditable cells: ');
+            self.uneditable_cell_color = settings_data{color_line}(color_index:end);
+            
+            [settings_data, filler_line, filler_index] =  self.get_setting(settings_file, 'Text to fill uneditable cells: ');
+            self.uneditable_cell_text = settings_data{filler_line}(filler_index:end);
             
 %Find line with number of rows and get value -------------------------------------------
-            numRows_line = find(contains(self.configData,'Number of Rows'));
+            [self.configData, numRows_line, index] = self.get_setting(path, 'Number of Rows');
             self.num_rows = str2num(self.configData{numRows_line}(end));
             
 %Determine channel sample rates--------------------------------------------
+            
+           
+            self.chan1_rate = self.get_ending_number_from_file(self.configData, 'ADC0');
+            self.chan2_rate = self.get_ending_number_from_file(self.configData, 'ADC1');
+            self.chan3_rate = self.get_ending_number_from_file(self.configData, 'ADC2');
+            self.chan4_rate = self.get_ending_number_from_file(self.configData, 'ADC3');
 
-            rate1_line = find(contains(self.configData,'ADC0'));
-            rate1 = strtrim(self.configData{rate1_line});
-            
-            %Figure out how many digits are in the last half of this line
-            %in the config file, in order to determine the sample rate
-            
-            digits1 = isstrprop(rate1,'digit');
-            count1 = 0; %the count of 1's in digits, each signifying a number in the rate1 string
-            
-            %Only look at the last half of digits, meaning only numbers in
-            %the last half of the line. This way numbers in the title don't skew results (ie,
-            %in ACD0 Rate (Hz) = 1000 we want to ignore the first 0)
-            
-            for i = round(length(digits1)/2):length(digits1)
-            
-                if digits1(i) == 1
-                    count1 = count1 + 1;
-                end
-            
-            end
-            self.chan1_rate = str2num(rate1((end-count1+1):end));
-            
-%Do the same for channels 2, 3, and 4--------------------------------------
-
-            rate2_line = find(contains(self.configData,'ADC1'));
-            rate2 = strtrim(self.configData{rate2_line});
-            
-            digits2 = isstrprop(rate2,'digit');
-            count2 = 0; %the count of 1's in digits, each signifying a number in the rate1 string
-            for i = round(length(digits2)/2):length(digits2)
-            
-                if digits2(i) == 1
-                    count2 = count2 + 1;
-                end
-            
-            end
-            self.chan2_rate = str2num(rate2((end-count2+1):end));
-            
-            rate3_line = find(contains(self.configData,'ADC2'));
-            rate3 = strtrim(self.configData{rate3_line});
-            
-            digits3 = isstrprop(rate3,'digit');
-            count3 = 0; %the count of 1's in digits, each signifying a number in the rate1 string
-            for i = round(length(digits3)/2):length(digits3)
-            
-                if digits3(i) == 1
-                    count3 = count3 + 1;
-                end
-            
-            end
-            
-            self.chan3_rate = str2num(rate3((end-count3+1):end));
-            
-            rate4_line = find(contains(self.configData,'ADC3'));
-            rate4 = strtrim(self.configData{rate4_line});
-            
-            digits4 = isstrprop(rate4,'digit');
-            count4 = 0; %the count of 1's in digits, each signifying a number in the rate1 string
-            for i = round(length(digits4)/2):length(digits4)
-            
-                if digits4(i) == 1
-                    count4 = count4 + 1;
-                end
-            
-            end
-            
-           ;
-            
-             self.chan4_rate = str2num(rate4((end-count4+1):end));
+%Set rest of default property values
             
             self.repetitions = 1;
             self.is_randomized = 0;
             self.is_chan1 = 0;
-           
             self.is_chan2 = 0;
-           
             self.is_chan3 = 0;
-            
             self.is_chan4 = 0;
             
             %Get the recently opened .g4p files
@@ -2169,6 +2106,47 @@ classdef G4_document < handle
                 index = find(strcmp(fields, ao_name));
             end
         end
+        
+        function [settings_data, path, index] = get_setting(self, file, string_to_find)
+            last_five = string_to_find(end-5:end);
+            settings_data = strtrim(regexp( fileread(file),'\n','split'));
+            path = find(contains(settings_data, string_to_find));
+            index = strfind(settings_data{path},last_five) + 5;
+        
+        end
+        
+        function [digit] = get_ending_number_from_file(self, file, string_to_find)
+            if sum(~strcmp(file, self.configData)) == 0
+                data = self.configData;
+            else
+                
+                data = strtrim(regexp( fileread(file),'\n','split'));
+            end
+            
+            index = find(contains(data,string_to_find));
+            line = strtrim(self.configData{index});
+            
+            %Figure out how many digits are in the last half of this line
+            %in the config file, in order to determine the sample rate
+            
+            digits = isstrprop(line,'digit');
+            count = 0; %the count of 1's in digits, each signifying a number in the rate1 string
+            
+            %Only look at the last half of digits, meaning only numbers in
+            %the last half of the line. This way numbers in the title don't skew results (ie,
+            %in ACD0 Rate (Hz) = 1000 we want to ignore the first 0)
+            
+            for i = round(length(digits)/2):length(digits)
+            
+                if digits(i) == 1
+                    count = count + 1;
+                end
+            
+            end
+            digit = str2num(line((end-count+1):end));
+        
+        end
+        
         
         %Setters
         
