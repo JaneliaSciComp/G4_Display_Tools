@@ -27,7 +27,7 @@ rep_LineWidth = 0.05;
 mean_LineWidth = 1;
 patch_alpha = 0.3; %sets the level of transparency for patch region around timeseries data
 subtitle_FontSize = 8;
-timeseries_ylimits = [-1.1 1.1; -1 6; -1 6; -1 6; 1 192; -1.1 1.1; 2 20]; %[min max] y limits for each datatype
+timeseries_ylimits = [-1.1 1.1; -1 6; -1 6; -1 6; 1 192; -1.1 1.1; 2 20, -1.1 1.1]; %[min max] y limits for each datatype (including 1 additional for 'faLmR' option)
 timeseries_xlimits = [0 4];
 histogram_ylimits = [0 100; -6 6; 2 10];
 
@@ -296,8 +296,8 @@ if ~isempty(OL_conds)
                             timestamps = CombData.timestamps(~nanidx);
                             meandata(nanidx) = []; 
                             semdata(nanidx) = []; 
-                            plot(CombData.timestamps,meandata,'Color',mean_Colors(g,:),'LineWidth',mean_LineWidth);
-                            patch([timestamps fliplr(timestamps)],[meandata+semdata fliplr(meandata-semdata)],'FaceColor',mean_Colors(g,:),'EdgeColor','none','FaceAlpha',patch_alpha)
+                            plot(timestamps,meandata,'Color',mean_Colors(g,:),'LineWidth',mean_LineWidth);
+                            patch([timestamps fliplr(timestamps)],[meandata+semdata fliplr(meandata-semdata)],'k','FaceColor',mean_Colors(g,:),'EdgeColor','none','FaceAlpha',patch_alpha)
                         end
                         titlestr = ['\fontsize{' num2str(subtitle_FontSize) '} Condition #{\color[rgb]{' num2str(mean_Colors(g,:)) '}' num2str(cond)]; 
                         ylim(timeseries_ylimits(d,:));
