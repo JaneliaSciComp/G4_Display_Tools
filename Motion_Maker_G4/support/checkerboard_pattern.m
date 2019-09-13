@@ -48,8 +48,8 @@ q = w1/unit; %width of arena in number of 8-column repeating units
 out_idx_1 = [];
 out_idx_2 = [];
 for quad = 1:q
-    out_idx_2 = [out_idx_2  h1*unit*(quad-1)+(1:h1*4)]; %checkerboard index 1
-    out_idx_1 = [out_idx_1  h1*unit*(quad-0.5)+(1:h1*4)]; %checkerboard index 1
+    out_idx_2 = [out_idx_2  h1*unit*(quad-1)+(1:h1*unit/2)]; %checkerboard index 1
+    out_idx_1 = [out_idx_1  h1*unit*(quad-0.5)+(1:h1*unit/2)]; %checkerboard index 1
 end
 
 in_idx_1 = [];
