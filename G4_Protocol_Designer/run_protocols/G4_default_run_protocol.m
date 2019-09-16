@@ -529,6 +529,10 @@ function [success] = G4_default_run_protocol(runcon, p)
                  if post_mode == 2
                      Panel_com('set_frame_rate', post_frame_rate);
                  end
+                 if post_frame_ind == 0
+                     post_frame_ind = randperm(p.num_posttrial_frames, 1);
+                 end
+                     
                  Panel_com('set_position_x',post_frame_ind);
                  
                  for i = 1:length(post_ao_ind)

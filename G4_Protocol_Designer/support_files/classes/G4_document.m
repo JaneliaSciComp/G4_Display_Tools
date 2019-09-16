@@ -41,6 +41,10 @@ classdef G4_document < handle
         recent_g4p_files_
         recent_files_filepath_
         
+        %filler for disabled cells
+        uneditable_cell_color_
+        uneditable_cell_text_
+        
         
     end
     
@@ -81,6 +85,9 @@ classdef G4_document < handle
         recent_g4p_files
         recent_files_filepath
         
+        uneditable_cell_color
+        uneditable_cell_text
+        
         
     end
     
@@ -88,9 +95,14 @@ classdef G4_document < handle
 
 %CONSTRUCTOR--------------------------------------------------------------        
         function self = G4_document()
-
-%Set these properties to empty values until they are needed
             
+            %%User needs to change this if the settings file name is
+            %%changed. 
+            settings_file = 'G4_Protocol_Designer_Settings.m';
+            
+            %%constructor sets rest of variables
+%Set these properties to empty values until they are needed
+
             self.top_folder_path = '';
             self.top_export_path = '';
             self.Patterns = struct;
@@ -115,95 +127,37 @@ classdef G4_document < handle
             self.posttrial = self.trial_data.trial_array;
             
 %Get the path to the configuration file from settings and set the config data to the data within the configuration file
-
-            settings_data = strtrim(regexp( fileread('G4_Protocol_Designer_settings.m'),'\n','split'));
-            path_line = find(contains(settings_data,'Configuration File Path:'));
-            path_index = strfind(settings_data{path_line},'Path: ');
-            path = settings_data{path_line}(path_index+6:end);
-            self.configData = strtrim(regexp( fileread(path),'\n','split'));
+            
+            
+            [settings_data, path_line, path_index] = self.get_setting(settings_file, 'Configuration File Path: ');
+            path = strtrim(settings_data{path_line}(path_index:end));
+%             self.configData = strtrim(regexp( fileread(path),'\n','split'));
+            
+            [settings_data, color_line, color_index] = self.get_setting(settings_file, 'Color to fill uneditable cells: ');
+            self.uneditable_cell_color = settings_data{color_line}(color_index:end);
+            
+            [settings_data, filler_line, filler_index] =  self.get_setting(settings_file, 'Text to fill uneditable cells: ');
+            self.uneditable_cell_text = settings_data{filler_line}(filler_index:end);
             
 %Find line with number of rows and get value -------------------------------------------
-            numRows_line = find(contains(self.configData,'Number of Rows'));
+            [self.configData, numRows_line, index] = self.get_setting(path, 'Number of Rows');
             self.num_rows = str2num(self.configData{numRows_line}(end));
             
 %Determine channel sample rates--------------------------------------------
+            
+           
+            self.chan1_rate = self.get_ending_number_from_file(self.configData, 'ADC0');
+            self.chan2_rate = self.get_ending_number_from_file(self.configData, 'ADC1');
+            self.chan3_rate = self.get_ending_number_from_file(self.configData, 'ADC2');
+            self.chan4_rate = self.get_ending_number_from_file(self.configData, 'ADC3');
 
-            rate1_line = find(contains(self.configData,'ADC0'));
-            rate1 = strtrim(self.configData{rate1_line});
-            
-            %Figure out how many digits are in the last half of this line
-            %in the config file, in order to determine the sample rate
-            
-            digits1 = isstrprop(rate1,'digit');
-            count1 = 0; %the count of 1's in digits, each signifying a number in the rate1 string
-            
-            %Only look at the last half of digits, meaning only numbers in
-            %the last half of the line. This way numbers in the title don't skew results (ie,
-            %in ACD0 Rate (Hz) = 1000 we want to ignore the first 0)
-            
-            for i = round(length(digits1)/2):length(digits1)
-            
-                if digits1(i) == 1
-                    count1 = count1 + 1;
-                end
-            
-            end
-            self.chan1_rate = str2num(rate1((end-count1+1):end));
-            
-%Do the same for channels 2, 3, and 4--------------------------------------
-
-            rate2_line = find(contains(self.configData,'ADC1'));
-            rate2 = strtrim(self.configData{rate2_line});
-            
-            digits2 = isstrprop(rate2,'digit');
-            count2 = 0; %the count of 1's in digits, each signifying a number in the rate1 string
-            for i = round(length(digits2)/2):length(digits2)
-            
-                if digits2(i) == 1
-                    count2 = count2 + 1;
-                end
-            
-            end
-            self.chan2_rate = str2num(rate2((end-count2+1):end));
-            
-            rate3_line = find(contains(self.configData,'ADC2'));
-            rate3 = strtrim(self.configData{rate3_line});
-            
-            digits3 = isstrprop(rate3,'digit');
-            count3 = 0; %the count of 1's in digits, each signifying a number in the rate1 string
-            for i = round(length(digits3)/2):length(digits3)
-            
-                if digits3(i) == 1
-                    count3 = count3 + 1;
-                end
-            
-            end
-            
-            self.chan3_rate = str2num(rate3((end-count3+1):end));
-            
-            rate4_line = find(contains(self.configData,'ADC3'));
-            rate4 = strtrim(self.configData{rate4_line});
-            
-            digits4 = isstrprop(rate4,'digit');
-            count4 = 0; %the count of 1's in digits, each signifying a number in the rate1 string
-            for i = round(length(digits4)/2):length(digits4)
-            
-                if digits4(i) == 1
-                    count4 = count4 + 1;
-                end
-            
-            end
-            
-             self.chan4_rate = str2num(rate4((end-count4+1):end));
+%Set rest of default property values
             
             self.repetitions = 1;
             self.is_randomized = 0;
             self.is_chan1 = 0;
-           
             self.is_chan2 = 0;
-           
             self.is_chan3 = 0;
-            
             self.is_chan4 = 0;
             
             %Get the recently opened .g4p files
@@ -331,52 +285,53 @@ classdef G4_document < handle
             
             %Make sure frame rate is > 0
             
-            if index(2) == 9 && ~strcmp(num2str(new_value),'')
-               if ~isnumeric(new_value)
-                   new_value = str2num(new_value);
-               end
-                if new_value <= 0 
-                    waitfor(errordlg("Your frame rate must be above 0"));
-                    return;
-                end
-               
-            end
-                    
-            %Make sure gain/offset are numerical
-            
-            if index(2) == 10 || index(2) == 11 && ~strcmp(num2str(new_value),'')
-               
-                if ~isnumeric(new_value)
-                    new_value = str2num(new_value);
-                end
-                
-            end
-            
-            if index(2) == 12 && ~strcmp(num2str(new_value),'')
-               
-                if ~isnumeric(new_value)
-                    new_value = str2num(new_value);
-                end
-                if new_value < 0
-                    waitfor(errordlg("You duration must be zero or greater"));
-                    return;
-                end
-                
-            end
+                if index(2) == 9 && ~strcmp(num2str(new_value),'')
+                   if ~isnumeric(new_value)
+                       new_value = str2num(new_value);
+                   end
+                    if new_value <= 0 
+                        waitfor(errordlg("Your frame rate must be above 0"));
+                        return;
+                    end
 
-            if patRows ~= numrows
-                waitfor(errordlg("Watch out! This pattern will not run on the size screen you have selected."));
-            end
-            if patDim < funcDim
-                 waitfor(errordlg("Please make sure the dimension of your pattern and position functions match"));
-            else
+                end
 
-%Set value
-                 self.block_trials{index(1), index(2)} = new_value;
+                %Make sure gain/offset are numerical
+
+                if index(2) == 10 || index(2) == 11 && ~strcmp(num2str(new_value),'')
+
+                    if ~isnumeric(new_value)
+                        new_value = str2num(new_value);
+                    end
+
+                end
+
+                if index(2) == 12 && ~strcmp(num2str(new_value),'')
+
+                    if ~isnumeric(new_value)
+                        new_value = str2num(new_value);
+                    end
+                    if new_value < 0
+                        waitfor(errordlg("You duration must be zero or greater"));
+                        return;
+                    end
+
+                end
+
+                if patRows ~= numrows
+                    waitfor(errordlg("Watch out! This pattern will not run on the size screen you have selected."));
+                end
+                if patDim < funcDim
+                     waitfor(errordlg("Please make sure the dimension of your pattern and position functions match"));
+                else
+
+    %Set value
+                     self.block_trials{index(1), index(2)} = new_value;
+                end
             end
-            end
+            self.insert_greyed_cells();
         end
-        
+
         function set_uneditable_block_trial_property(self, index, new_value)
             
             self.block_trials{index(1), index(2)} = new_value;
@@ -987,7 +942,7 @@ classdef G4_document < handle
            
            for i = 4:7
                if strcmp(self.posttrial{i},'') == 0
-                   ao_list{ao_count} = self.posttrial{i};
+                   ao_list{end+1} = self.posttrial{i};
                end
            end
          
@@ -1014,7 +969,6 @@ classdef G4_document < handle
            end
            
            if ~strcmp(ao_list,'')
-               ao_list
                ao_list = unique(ao_list);
                empty_aocells = cellfun(@isempty, ao_list);
                 for i = 1:length(empty_aocells)
@@ -1439,7 +1393,7 @@ classdef G4_document < handle
                 temp_path = '';
 
             end
-            self.replace_greyed_cell_values();
+            
             waitbar(.5, prog, 'Exporting...');
             export_successful = self.export();% 0 - export was unable to complete 1- export completed successfully 2-user canceled and export not attempted
             if export_successful == 0
@@ -1944,7 +1898,7 @@ classdef G4_document < handle
         
             for i = 1:length(self.pretrial)
                 if strncmp(self.pretrial{i},'<html>',6)
-                    if i >= 3 || i <= 7
+                    if i == 3
                         self.pretrial{i} = '';
                     else
                         self.pretrial{i} = [];
@@ -1953,7 +1907,7 @@ classdef G4_document < handle
             end
             for i = 1:length(self.intertrial)
                 if strncmp(self.intertrial{i},'<html>',6)
-                    if i >= 3 || i <= 7
+                    if i == 3
                         self.intertrial{i} = '';
                     else
                         self.intertrial{i} = [];
@@ -1962,7 +1916,7 @@ classdef G4_document < handle
             end
             for i = 1:length(self.posttrial)
                 if strncmp(self.posttrial{i},'<html>',6)
-                    if i >= 3 || i <= 7
+                    if i == 3
                         self.posttrial{i} = '';
                     else
                         self.posttrial{i} = [];
@@ -1972,7 +1926,7 @@ classdef G4_document < handle
             for i = 1:length(self.block_trials(:,1))
                 for j = 1:length(self.block_trials(1,:))
                     if strncmp(self.block_trials{i,j},'<html>',6)
-                        if j >= 3 || j <= 7
+                        if j == 3
                             self.block_trials{i,j} = '';
                         else
                             self.block_trials{i,j} = [];
@@ -1982,6 +1936,101 @@ classdef G4_document < handle
             end
         
         end
+        
+        function [c] = colorgen(self)
+            color = self.uneditable_cell_color;
+            text = self.uneditable_cell_text;
+            c = ['<html><table border=0 width=400 bgcolor=',color,'><TR><TD>',text,'</TD></TR></table>'];
+        end
+
+         %After saving or running an experiment, convert uneditable cells back to being greyed out       
+        function insert_greyed_cells(self)
+
+            pretrial_mode = self.pretrial{1};
+            intertrial_mode = self.intertrial{1};
+            posttrial_mode = self.posttrial{1};
+            pre_indices_to_color = [];
+            inter_indices_to_color = [];
+            post_indices_to_color = [];
+            indices_to_color = [];
+
+            if pretrial_mode == 1
+                pre_indices_to_color = [9, 10, 11];
+            elseif pretrial_mode == 2
+                pre_indices_to_color = [3, 10, 11];
+            elseif pretrial_mode == 3
+                pre_indices_to_color = [3, 9, 10, 11];
+            elseif pretrial_mode == 4
+                pre_indices_to_color = [3, 9];
+            elseif pretrial_mode == 5 || pretrial_mode == 6
+                pre_indices_to_color = 9;
+            elseif pretrial_mode == 7
+                pre_indices_to_color = [3, 9, 10, 11];
+            end
+
+            if intertrial_mode == 1
+                inter_indices_to_color = [9, 10, 11];
+            elseif intertrial_mode == 2
+                inter_indices_to_color = [3, 10, 11];
+            elseif intertrial_mode == 3
+                inter_indices_to_color = [3, 9, 10, 11];
+            elseif intertrial_mode == 4
+                inter_indices_to_color = [3, 9];
+            elseif intertrial_mode == 5 || intertrial_mode == 6
+                inter_indices_to_color = 9;
+            elseif intertrial_mode == 7
+                inter_indices_to_color = [3, 9, 10, 11];
+            end
+
+            if posttrial_mode == 1
+                post_indices_to_color = [9, 10, 11];
+            elseif posttrial_mode == 2
+                post_indices_to_color = [3, 10, 11];
+            elseif posttrial_mode == 3
+                post_indices_to_color = [3, 9, 10, 11];
+            elseif posttrial_mode == 4
+                post_indices_to_color = [3, 9];
+            elseif posttrial_mode == 5 || posttrial_mode == 6
+                post_indices_to_color = 9;
+            elseif posttrial_mode == 7
+                post_indices_to_color = [3, 9, 10, 11];
+            end
+
+
+            for i = 1:length(pre_indices_to_color)
+                self.set_pretrial_property(pre_indices_to_color(i),self.colorgen());
+
+            end
+            for i = 1:length(inter_indices_to_color)
+                self.set_intertrial_property(inter_indices_to_color(i),self.colorgen());
+            end
+            for i = 1:length(post_indices_to_color)
+                self.set_posttrial_property(post_indices_to_color(i),self.colorgen());
+            end
+
+            for i = 1:length(self.block_trials(:,1))
+                mode = self.block_trials{i,1};
+                if mode == 1
+                    indices_to_color = [9, 10, 11];
+                elseif mode == 2
+                    indices_to_color = [3, 10, 11];
+                elseif mode == 3
+                    indices_to_color = [3, 9, 10, 11];
+                elseif mode == 4
+                    indices_to_color = [3, 9];
+                elseif mode == 5 || mode == 6
+                    indices_to_color = 9;
+                elseif mode == 7
+                    indices_to_color = [3, 9, 10, 11];
+                end
+                for j = 1:length(indices_to_color)
+                    self.set_block_trial_property([i,indices_to_color(j)],self.colorgen());
+                end
+            end
+
+
+
+        end
 
     
 %CREATE STRUCTURE TO SAVE TO .G4P FILE WHEN SAVING------------------------        
@@ -1989,17 +2038,9 @@ classdef G4_document < handle
             
             
             vars.block_trials = self.block_trials();
-            %clear all checked boxes in the saved file without affecting
-            %the currently opened version
-            for i = 1:length(vars.block_trials(:,1))
-                vars.block_trials{i,13} = false;
-            end
             vars.pretrial = self.pretrial();
-            vars.pretrial{13} = false;
             vars.intertrial = self.intertrial();
-            vars.intertrial{13} = false; 
             vars.posttrial = self.posttrial();
-            vars.posttrial{13} = false;
             vars.is_randomized = self.is_randomized();
             vars.repetitions = self.repetitions();
             vars.is_chan1 = self.is_chan1();
@@ -2024,6 +2065,8 @@ classdef G4_document < handle
             end
         
         end
+        
+       
         
 %GET THE INDEX OF A GIVEN PATTERN, POS, OR AO NAME-------------------------
 
@@ -2063,6 +2106,47 @@ classdef G4_document < handle
                 index = find(strcmp(fields, ao_name));
             end
         end
+        
+        function [settings_data, path, index] = get_setting(self, file, string_to_find)
+            last_five = string_to_find(end-5:end);
+            settings_data = strtrim(regexp( fileread(file),'\n','split'));
+            path = find(contains(settings_data, string_to_find));
+            index = strfind(settings_data{path},last_five) + 5;
+        
+        end
+        
+        function [digit] = get_ending_number_from_file(self, file, string_to_find)
+            if sum(~strcmp(file, self.configData)) == 0
+                data = self.configData;
+            else
+                
+                data = strtrim(regexp( fileread(file),'\n','split'));
+            end
+            
+            index = find(contains(data,string_to_find));
+            line = strtrim(self.configData{index});
+            
+            %Figure out how many digits are in the last half of this line
+            %in the config file, in order to determine the sample rate
+            
+            digits = isstrprop(line,'digit');
+            count = 0; %the count of 1's in digits, each signifying a number in the rate1 string
+            
+            %Only look at the last half of digits, meaning only numbers in
+            %the last half of the line. This way numbers in the title don't skew results (ie,
+            %in ACD0 Rate (Hz) = 1000 we want to ignore the first 0)
+            
+            for i = round(length(digits)/2):length(digits)
+            
+                if digits(i) == 1
+                    count = count + 1;
+                end
+            
+            end
+            digit = str2num(line((end-count+1):end));
+        
+        end
+        
         
         %Setters
         
@@ -2184,6 +2268,14 @@ classdef G4_document < handle
          
          function set.recent_files_filepath(self, value)
              self.recent_files_filepath_ = value;
+         end
+         
+         function set.uneditable_cell_color(self, value)
+             self.uneditable_cell_color_ = value;
+         end
+         
+         function set.uneditable_cell_text(self, value)
+             self.uneditable_cell_text_ = value;
          end
         %Getters
         
@@ -2307,6 +2399,14 @@ classdef G4_document < handle
         function output = get.recent_files_filepath(self)
             output = self.recent_files_filepath_;
         end
+        
+        function output = get.uneditable_cell_color(self)
+             output = self.uneditable_cell_color_;
+         end
+         
+         function output = get.uneditable_cell_text(self)
+             output = self.uneditable_cell_text_;
+         end
         
 
     end

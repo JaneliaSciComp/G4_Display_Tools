@@ -13,10 +13,7 @@ classdef G4_preview_model
         mode_
         dur_
         pos_data_
-        ao1_data_
-        ao2_data_
-        ao3_data_
-        ao4_data_
+        ao_data_
         
     end
     
@@ -35,10 +32,7 @@ classdef G4_preview_model
         mode
         dur
         pos_data
-        ao1_data
-        ao2_data
-        ao3_data
-        ao4_data
+        ao_data
         
     end
     
@@ -54,7 +48,6 @@ classdef G4_preview_model
             self.is_paused = false;
             self.is_realtime = false;
             self.slow_frRate = 20;
-            self.rt_frRate = [];
             self.mode = data{1};
             self.pattern_data = self.normalize_matrix();
             pat = self.data{2};
@@ -78,30 +71,15 @@ classdef G4_preview_model
                 self.pos_data = self.doc.Pos_funcs.(posfield).pfnparam.func;
             end
             
-            if strcmp(self.data{4},'') == 0
-                ao1 = self.data{4};
-                ao1field = self.doc.get_aofunc_field_name(ao1);
-                self.ao1_data = self.doc.Ao_funcs.(ao1field).afnparam.func;
+            for i = 4:7
+                
+                if ~isempty(self.data{i})
+                    ao = self.data{i};
+                    aofield = self.doc.get_aofunc_field_name(ao);
+                    self.ao_data{i-3} = self.doc.Ao_funcs.(aofield).afnparam.func;
+                end
             end
-            
-            if strcmp(self.data{5},'') == 0
-                ao2 = self.data{5};
-                ao2field = self.doc.get_aofunc_field_name(ao2);
-                self.ao2_data = self.doc.Ao_funcs.(ao2field).afnparam.func;
-            end
-            
-            if strcmp(self.data{6},'') == 0
-                ao3 = self.data{6};
-                ao3field = self.doc.get_aofunc_field_name(ao3);
-                self.ao3_data = self.doc.Ao_funcs.(ao3field).afnparam.func;
-            end
-            
-            if strcmp(self.data{7},'') == 0
-                ao4 = self.data{7};
-                ao4field = self.doc.get_aofunc_field_name(ao4);
-                self.ao4_data = self.doc.Ao_funcs.(ao4field).afnparam.func;
-            end
-            
+           
             self.dur = self.data{12};
             
         end
@@ -157,18 +135,10 @@ classdef G4_preview_model
         function value = get.pos_data(self)
             value = self.pos_data_;
         end
-        function value = get.ao1_data(self)
-            value = self.ao1_data_;
+        function value = get.ao_data(self)
+            value = self.ao_data_;
         end
-        function value = get.ao2_data(self)
-            value = self.ao2_data_;
-        end
-        function value = get.ao3_data(self)
-            value = self.ao3_data_;
-        end
-        function value = get.ao4_data(self)
-            value = self.ao4_data_;
-        end
+       
         function value = get.doc(self)
             value = self.doc_;
         end
@@ -214,18 +184,10 @@ classdef G4_preview_model
         function self = set.pos_data(self, value)
             self.pos_data_ = value;
         end
-        function self = set.ao1_data(self, value)
-            self.ao1_data_ = value;
+        function self = set.ao_data(self, value)
+            self.ao_data_ = value;
         end
-        function self = set.ao2_data(self, value)
-            self.ao2_data_ = value;
-        end
-        function self = set.ao3_data(self, value)
-            self.ao3_data_ = value;
-        end
-        function self = set.ao4_data(self, value)
-            self.ao4_data_ = value;
-        end
+        
         function self = set.doc(self, value)
             self.doc_ = value;
         end

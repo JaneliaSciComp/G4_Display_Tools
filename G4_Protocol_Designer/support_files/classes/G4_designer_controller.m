@@ -44,8 +44,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
         exp_name_box_
         pageUp_button_
         pageDown_button_
-        uneditable_cell_color_
-        uneditable_cell_text_
+        
         listbox_imported_files_
         recent_g4p_files_
         recent_files_filepath_
@@ -96,6 +95,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
         bg2
         num_rows_3
         num_rows_4
+        isSelect_all
         isRandomized_radio
         isSequential_radio
         bg
@@ -108,8 +108,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
         exp_name_box
         pageUp_button
         pageDown_button
-        uneditable_cell_color
-        uneditable_cell_text
+        
         listbox_imported_files
         recent_g4p_files
         recent_files_filepath
@@ -148,9 +147,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
             %get screensize to calculate gui dimensions
             screensize = get(0, 'screensize');
             
-            %set color and text for uneditable cells
-            self.uneditable_cell_color = '#bdbdbd';
-            self.uneditable_cell_text = '---------';
+           
             
             %create figure
             self.f = figure('Name', 'Fly Experiment Designer', 'NumberTitle', 'off','units', 'pixels', 'MenuBar', 'none', ...
@@ -349,8 +346,8 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                 [pos_panel(1)+ (pos_panel(3)/2) - 200, pos_panel(2) - 100, 400, 30], 'Callback', @self.update_experiment_name);
             
             exp_name_label = uicontrol(self.f, 'Style', 'text', 'String', 'Experiment Name: ', ...
-                'FontSize', 16, 'units', 'pixels', 'Position', [pos_panel(1) + (pos_panel(3)/2) - 395, ...
-                pos_panel(2) - 100, 180, 30]);
+                'FontSize', 16, 'units', 'pixels', 'Position', [pos_panel(1) + (pos_panel(3)/2) - 375, ...
+                pos_panel(2) - 100, 150, 30]);
 
 
        %Drop down menu and associated labels and buttons
@@ -601,12 +598,16 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
 
             end
             
+            if y == 13 && new == 0
+                self.deselect_selectAll();
+            end
+                
+            
             if y == 1
                 
                 self.clear_fields(str2num(new));
             
             end
-            self.deselect_all();
             
 
             self.update_gui();
@@ -755,7 +756,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
  
 %Update the frame rates of channels being collected        
         
-        function update_chan1_rate(self, src, event)
+        function update_chan1_rate(self, src, ~)
             
             new = str2num(src.String);
             if rem(new,1000) ~= 0 && new ~= 0
@@ -774,7 +775,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
             
         end
         
-        function update_chan2_rate(self, src, event)
+        function update_chan2_rate(self, src, ~)
             
             new = str2num(src.String);
             if rem(new,1000) ~= 0
@@ -793,7 +794,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
             
         end
         
-        function update_chan3_rate(self, src, event)
+        function update_chan3_rate(self, src, ~)
             
             new = str2num(src.String);
             if rem(new,1000) ~= 0
@@ -812,7 +813,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
             
         end
         
-        function update_chan4_rate(self, src, event)
+        function update_chan4_rate(self, src, ~)
             
             new = str2num(src.String);
             if rem(new,1000) ~= 0
@@ -858,7 +859,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
 %            self.update_gui();
         end
         
-        function update_experiment_name(self, src, event)
+        function update_experiment_name(self, src, ~)
             
             new_val = src.String;
            
@@ -891,7 +892,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
 %         end
 
 
-        function select_new_file(self, src, event)
+        function select_new_file(self, ~, ~)
         
             new_file = self.listbox_imported_files.String{self.listbox_imported_files.Value};
             
@@ -912,7 +913,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
         end
 
 
-        function create_error_box(self, varargin)
+        function create_error_box(~, varargin)
             if isempty(varargin)
                 return;
             else
@@ -933,7 +934,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
         
 %CLEAR OUT ALL DATA TO START DESIGNING NEW EXPERIMENT----------------------
 
-        function clear_all(self, src, event)
+        function clear_all(self, ~, ~)
             
             question = "Make sure you have saved your experiment, or it will be lost.";
             answer = questdlg(question, 'Confirm Clear All', 'Continue', 'Cancel', 'Cancel');
@@ -961,7 +962,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
         
 %ADD ROW AND UPDATE MODEL DATA---------------------------------------------
 
-        function add_trial(self, src, event)
+        function add_trial(self, ~, ~)
 
             checkbox_column_data = horzcat(self.doc.block_trials(1:end, end));
             checked_list = find(cell2mat(checkbox_column_data));
@@ -1010,8 +1011,8 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
 
         function delete_trial(self, src, event)
         
-            checkbox_column_data = horzcat(self.doc.block_trials(1:end, end));
-            checked_list = find(cell2mat(checkbox_column_data));
+            checkbox_column_data = horzcat(self.doc.block_trials{1:end, end});
+            checked_list = find(checkbox_column_data);
             checked_count = length(checked_list);
             %disp(checked_list);
             
@@ -1237,34 +1238,34 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
         d.set_pretrial_property(4, ao1);
         
         %disable appropriate cells for mode 1
-        d.set_pretrial_property(9, self.colorgen());
-        d.set_pretrial_property(10, self.colorgen());
-        d.set_pretrial_property(11, self.colorgen());
+        d.set_pretrial_property(9, self.doc.colorgen());
+        d.set_pretrial_property(10, self.doc.colorgen());
+        d.set_pretrial_property(11, self.doc.colorgen());
         
         d.set_intertrial_property(2, pat1);
         d.set_intertrial_property(3, pos1);
         d.set_intertrial_property(4, ao1);
         
         %disable appropriate cells for mode 1
-        d.set_intertrial_property(9, self.colorgen());
-        d.set_intertrial_property(10, self.colorgen());
-        d.set_intertrial_property(11, self.colorgen());
+        d.set_intertrial_property(9, self.doc.colorgen());
+        d.set_intertrial_property(10, self.doc.colorgen());
+        d.set_intertrial_property(11, self.doc.colorgen());
         
         d.set_posttrial_property(2, pat1);
         d.set_posttrial_property(3, pos1);
         d.set_posttrial_property(4, ao1);
         
-        d.set_posttrial_property(9, self.colorgen());
-        d.set_posttrial_property(10, self.colorgen());
-        d.set_posttrial_property(11, self.colorgen());
+        d.set_posttrial_property(9, self.doc.colorgen());
+        d.set_posttrial_property(10, self.doc.colorgen());
+        d.set_posttrial_property(11, self.doc.colorgen());
         
         d.set_block_trial_property([1,2], pat1);
         d.set_block_trial_property([1,3], pos1);
         d.set_block_trial_property([1,4], ao1);
         
-        d.set_block_trial_property([1,9], self.colorgen());
-        d.set_block_trial_property([1,10], self.colorgen());
-        d.set_block_trial_property([1,11], self.colorgen());
+        d.set_block_trial_property([1,9], self.doc.colorgen());
+        d.set_block_trial_property([1,10], self.doc.colorgen());
+        d.set_block_trial_property([1,11], self.doc.colorgen());
         
        
         
@@ -1348,7 +1349,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
 %MAIN MENU CALLBACK FUNCTIONS----------------------------------------------
 
 %Import
-    function import(self, src, event)
+    function import(self, ~, ~)
        
        answer = questdlg('Would you like to import a folder or a file?',...
            'Import', 'Folder', 'File', 'Cancel', 'Folder');
@@ -1443,7 +1444,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
         if ~isempty(self.run_con)
             self.run_con.update_run_gui();
         end
-        self.insert_greyed_cells();
+        self.doc.insert_greyed_cells();
         self.update_gui();
         
         
@@ -1452,7 +1453,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
     
 %Save
 
-    function save(self, src, event)
+    function save(self, ~, ~)
     %Controller gets up to data data from the model, then sends to the
     %document to save the file.
         
@@ -1464,7 +1465,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
 
 %Open
 
-    function open_file(self, src, event, filepath)
+    function open_file(self, ~, ~, filepath)
         %document open function opens the file, saves the data, and sends
         %data back to controller. 
 
@@ -1476,7 +1477,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
             [filename, top_folder_path] = uigetfile('*.g4p');
             filepath = fullfile(top_folder_path, filename);
         else
-            [top_folder_path, filename] = fileparts(filepath);
+            [top_folder_path, ~] = fileparts(filepath);
         end
        
         if isequal (top_folder_path,0)
@@ -1485,7 +1486,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
 
             self.doc.top_export_path = top_folder_path;
             self.doc.import_folder(top_folder_path);
-            [exp_path, exp_name, ext] = fileparts(filepath);
+            [~, exp_name, ~] = fileparts(filepath);
 
             if isempty(fieldnames(self.doc.Patterns))
                 %no patterns were successfully imported, so don't autofill
@@ -1544,12 +1545,8 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                 end
 
             end
-            self.doc.pretrial
-            self.doc.intertrial
-            self.doc.posttrial
-            self.doc.block_trials
-            
-            self.insert_greyed_cells();     
+
+            self.doc.insert_greyed_cells();     
             self.doc.set_recent_files(filepath);
             self.doc.update_recent_files_file();
             self.update_gui();
@@ -1569,7 +1566,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
  
         
 %Copy to        
-        function copy_to(self, src, event)
+        function copy_to(self, ~, ~)
         
             checkbox_column_data = horzcat(self.doc.block_trials(1:end, end));
             checked = find(cell2mat(checkbox_column_data));
@@ -1624,7 +1621,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
         
 %Set selected values to new trials
 
-        function set_selected(self, src, event)
+        function set_selected(self, ~, ~)
             
         %Check if any rows in the block are checked, add indexes of any
         %checked ones into checked_block
@@ -1637,19 +1634,19 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                 'Gain:', 'Offset:', 'Duration:'};
             title = 'Trial Values';
             dims = [1 30];
-            definput = {'1', 'default', 'default', '', '', '', '', '1', '60', ...
-                '1', '0', '3'};
+            definput = {'1', 'default', 'default', '', '', '', '', '', '', ...
+                '', '', '3'};
             answer = inputdlg(prompt, title, dims, definput);
-            if length(answer) == 0
+            if isempty(answer)
                 return;
             end
             
-            answer{1} = str2num(answer{1});
-            answer{8} = str2num(answer{8});
-            answer{9} = str2num(answer{9});
-            answer{10} = str2num(answer{10});
-            answer{11} = str2num(answer{11});
-            answer{12} = str2num(answer{12});
+            answer{1} = str2double(answer{1});
+            answer{8} = str2double(answer{8});
+            answer{9} = str2double(answer{9});
+            answer{10} = str2double(answer{10});
+            answer{11} = str2double(answer{11});
+            answer{12} = str2double(answer{12});
 
             answer{end+1} = false;
 
@@ -1660,20 +1657,29 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
             
             
             if self.doc.pretrial{13} == true
-                self.doc.pretrial = adjusted_answer;
+                for i = length(adjusted_answer)
+                    self.doc.set_pretrial_property(i, adjusted_answer{i});
+                end
+               
             end
 
             if self.doc.intertrial{13} == true
-                self.doc.intertrial = adjusted_answer;
+                for i = length(adjusted_answer)
+                    self.doc.set_intertrial_property(i, adjusted_answer{i});
+                end
             end
 
             if self.doc.posttrial{13} == true
-                self.doc.posttrial = adjusted_answer;
+                for i = length(adjusted_answer)
+                    self.doc.set_posttrial_property(i, adjusted_answer{i});
+                end
             end
 
             if checked_block_count ~= 0
                 for i = 1:checked_block_count
-                    self.doc.block_trials(checked_block(i),:) = adjusted_answer;
+                    for k = 1:length(adjusted_answer)
+                        self.doc.set_block_trial_property([checked_block(i),k], adjusted_answer{k}) 
+                    end
                 end
 
             end
@@ -1686,7 +1692,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
 
 %SELECT ALL CALLBACK-------------------------------------------------------
 
-      function select_all(self, src, event)
+      function select_all(self, src, ~)
         %assuming here that the number parameters will never differ between
         %trials. 
         l = length(self.doc.block_trials(1,:));
@@ -1711,24 +1717,9 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
         
       end
       
-%CHECKS IF SELECT ALL NEEDS TO BE DESELECTED-------------------------------      
-      function deselect_all(self)
-          checks = [];
-          for i = 1:length(self.doc.block_trials(:,1))
-              checks(i) = self.doc.block_trials{i, 13};
-          end
-          
-          if ~isempty(find(checks == 0))
-              self.model.isSelect_all = false;
-          end
-          self.update_gui();
-          
-          
-      end
-      
 %INVERT SELECTION CALLBACK-------------------------------------------------
 
-        function invert_selection(self, src, event)
+        function invert_selection(self, ~, ~)
 
             L = length(self.doc.block_trials(:,1));
             len = length(self.doc.block_trials(1,:));
@@ -1824,7 +1815,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
             %Get all parameters that might be needed for preview from
             %the trial the selected cell belongs to.
             
-            if ~strcmp(file,'')
+            if ~strcmp(file,'') && ~strncmp(file, '<html>',6)
                 [frame_rate, dur, patfield, posfield, aofield, file_type] = get_preview_parameters(self, is_table);
 
             %Now actually display the preview of whatever file is
@@ -1852,7 +1843,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
 
 %FORWARD ONE FRAME ON IN SCREEN PREVIEW------------------------------------
 
-        function frame_forward(self, src, event)
+        function frame_forward(self, ~, ~)
 
             if ~strcmp(self.model.current_preview_file,'') && length(self.model.current_preview_file(1,1,:)) > 1
                 
@@ -1885,7 +1876,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
 
 %ONE FRAME BACK ON IN SCREEN PREVIEW---------------------------------------        
         
-        function frame_back(self, src, event)
+        function frame_back(self, ~, ~)
 
             if ~strcmp(self.model.current_preview_file,'') && length(self.model.current_preview_file(1,1,:)) > 1
                 self.model.auto_preview_index = self.model.auto_preview_index - 1;
@@ -1912,7 +1903,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
 
 %PLAY THE IN SCREEN PREVIEW------------------------------------------------
         
-        function preview_play(self, src, event)
+        function preview_play(self, ~, ~)
 
             self.model.is_paused = false;
 
@@ -2046,24 +2037,24 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                %there, set the size (for the axes) to
                %default [1,3] (for an x axis three times the length of y
                %axis)
-           mode = data{1};
-               if mode == 1
-                   self.preview_con.preview_Mode1();
-               elseif mode == 2
-                   self.preview_con.preview_Mode2();
-               elseif mode == 3
-                   self.preview_con.preview_Mode3();
-               elseif mode == 4
-                   self.preview_con.preview_Mode4();
-               elseif mode == 5
-                   self.preview_con.preview_Mode4();
-               elseif mode == 6
-                   self.preview_con.preview_Mode6();
-               elseif mode == 7
-                   self.preview_con.preview_Mode4();
-               else
-                   self.create_error_box("Please make sure you have entered a valid mode and try again.");
-               end
+%           mode = data{1};
+%                if mode == 1
+%                    self.preview_con.preview_Mode1();
+%                elseif mode == 2
+%                    self.preview_con.preview_Mode2();
+%                elseif mode == 3
+%                    self.preview_con.preview_Mode3();
+%                elseif mode == 4
+%                    self.preview_con.preview_Mode4();
+%                elseif mode == 5
+%                    self.preview_con.preview_Mode4();
+%                elseif mode == 6
+%                    self.preview_con.preview_Mode6();
+%                elseif mode == 7
+%                    self.preview_con.preview_Mode4();
+%                else
+%                    self.create_error_box("Please make sure you have entered a valid mode and try again.");
+%                end
 
 %At this point, all axes should have been created and all existing
 %functions should have been plotted. May change plotting method later in
@@ -2795,6 +2786,12 @@ function [start_index] = check_pattern_dimensions(self, pat_field)
 
 end
 
+function deselect_selectAll(self)
+
+    self.model.isSelect_all = 0;
+
+end
+
 %CLEAR GREY SPACE AND INSERT PATTERN INTO PATTERN CELL---------------------
 
 function [pat_field] = get_or_insert_pattern(self)
@@ -2849,11 +2846,11 @@ function clear_fields(self, mode)
 
     pos_fields = fieldnames(self.doc.Pos_funcs);
     pat_fields = fieldnames(self.doc.Patterns);
-    pos = self.colorgen();
+    pos = self.doc.colorgen();
     indx = [];
-    rate = self.colorgen();
-    gain = self.colorgen();
-    offset = self.colorgen();
+    rate = self.doc.colorgen();
+    gain = self.doc.colorgen();
+    offset = self.doc.colorgen();
     
     if mode == 1
         
@@ -2927,42 +2924,42 @@ function clear_fields(self, mode)
         
     elseif isempty(mode)
         
-        pos = self.colorgen();
-        indx = self.colorgen();
-        rate = self.colorgen();
-        gain = self.colorgen();
-        offset = self.colorgen();
+        pos = self.doc.colorgen();
+        indx = self.doc.colorgen();
+        rate = self.doc.colorgen();
+        gain = self.doc.colorgen();
+        offset = self.doc.colorgen();
         self.set_mode_dep_props(pos, indx, rate, gain, offset);
         if strcmp(self.model.current_selected_cell.table,"pre") == 1
-            self.doc.set_pretrial_property(2, self.colorgen());
+            self.doc.set_pretrial_property(2, self.doc.colorgen());
             for i = 4:7
-                self.doc.set_pretrial_property(i,self.colorgen());
+                self.doc.set_pretrial_property(i,self.doc.colorgen());
             end
-            self.doc.set_pretrial_property(12,self.colorgen());
+            self.doc.set_pretrial_property(12,self.doc.colorgen());
             
         elseif strcmp(self.model.current_selected_cell.table,"inter") == 1
-            self.doc.set_intertrial_property(2, self.colorgen());
+            self.doc.set_intertrial_property(2, self.doc.colorgen());
             for i = 4:7
-                self.doc.set_intertrial_property(i,self.colorgen());
+                self.doc.set_intertrial_property(i,self.doc.colorgen());
             end
-            self.doc.set_intertrial_property(12,self.colorgen());
+            self.doc.set_intertrial_property(12,self.doc.colorgen());
             
             
         elseif strcmp(self.model.current_selected_cell.table,"post") == 1
-            self.doc.set_posttrial_property(2, self.colorgen());
+            self.doc.set_posttrial_property(2, self.doc.colorgen());
             for i = 4:7
-                self.doc.set_posttrial_property(i,self.colorgen());
+                self.doc.set_posttrial_property(i,self.doc.colorgen());
             end
-            self.doc.set_posttrial_property(12,self.colorgen());
+            self.doc.set_posttrial_property(12,self.doc.colorgen());
             
             
         else
             x = self.model.current_selected_cell.index(1);
-            self.doc.set_block_trial_property([x,2], self.colorgen());
+            self.doc.set_block_trial_property([x,2], self.doc.colorgen());
             for i = 4:7
-                self.doc.set_block_trial_property([x,i],self.colorgen());
+                self.doc.set_block_trial_property([x,i],self.doc.colorgen());
             end
-            self.doc.set_block_trial_property([x,12],self.colorgen());
+            self.doc.set_block_trial_property([x,12],self.doc.colorgen());
         end
         
     end
@@ -3044,152 +3041,6 @@ function set_mode_dep_props(self, pos, indx, rate, gain, offset)
 
 
 end
-
-function [c] = colorgen(self)
-    color = self.uneditable_cell_color;
-    text = self.uneditable_cell_text;
-    c = ['<html><table border=0 width=400 bgcolor=',color,'><TR><TD>',text,'</TD></TR></table>'];
-end
-
- %After saving or running an experiment, convert uneditable cells back to being greyed out       
-function insert_greyed_cells(self)
-
-    pretrial_mode = self.doc.pretrial{1};
-    intertrial_mode = self.doc.intertrial{1};
-    posttrial_mode = self.doc.posttrial{1};
-    pre_indices_to_color = [];
-    inter_indices_to_color = [];
-    post_indices_to_color = [];
-    indices_to_color = [];
-    
-    if ~isempty(pretrial_mode)
-        if pretrial_mode == 1
-            pre_indices_to_color = [9, 10, 11];
-        elseif pretrial_mode == 2
-            pre_indices_to_color = [3, 10, 11];
-        elseif pretrial_mode == 3
-            pre_indices_to_color = [3, 9, 10, 11];
-        elseif pretrial_mode == 4
-            pre_indices_to_color = [3, 9];
-        elseif pretrial_mode == 5 || pretrial_mode == 6
-            pre_indices_to_color = 9;
-        elseif pretrial_mode == 7
-            pre_indices_to_color = [3, 9, 10, 11];
-        end
-    else
-        pre_indices_to_color = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
-    end
-    
-    if ~isempty(intertrial_mode)
-        if intertrial_mode == 1
-            inter_indices_to_color = [9, 10, 11];
-        elseif intertrial_mode == 2
-            inter_indices_to_color = [3, 10, 11];
-        elseif intertrial_mode == 3
-            inter_indices_to_color = [3, 9, 10, 11];
-        elseif intertrial_mode == 4
-            inter_indices_to_color = [3, 9];
-        elseif intertrial_mode == 5 || intertrial_mode == 6
-            inter_indices_to_color = 9;
-        elseif intertrial_mode == 7
-            inter_indices_to_color = [3, 9, 10, 11];
-        end
-    else
-        inter_indices_to_color = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
-    end
-    
-    if ~isempty(posttrial_mode)
-        if posttrial_mode == 1
-            post_indices_to_color = [9, 10, 11];
-        elseif posttrial_mode == 2
-            post_indices_to_color = [3, 10, 11];
-        elseif posttrial_mode == 3
-            post_indices_to_color = [3, 9, 10, 11];
-        elseif posttrial_mode == 4
-            post_indices_to_color = [3, 9];
-        elseif posttrial_mode == 5 || posttrial_mode == 6
-            post_indices_to_color = 9;
-        elseif posttrial_mode == 7
-            post_indices_to_color = [3, 9, 10, 11];
-        end
-    else
-        post_indices_to_color = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
-    end
-  
-    
-    for i = 1:length(pre_indices_to_color)
-        self.doc.set_pretrial_property(pre_indices_to_color(i),self.colorgen());
-       
-    end
-    for i = 1:length(inter_indices_to_color)
-        self.doc.set_intertrial_property(inter_indices_to_color(i),self.colorgen());
-    end
-    for i = 1:length(post_indices_to_color)
-        self.doc.set_posttrial_property(post_indices_to_color(i),self.colorgen());
-    end
-    
-    for i = 1:length(self.doc.block_trials(:,1))
-        mode = self.doc.block_trials{i,1};
-        if mode == 1
-            indices_to_color = [9, 10, 11];
-        elseif mode == 2
-            indices_to_color = [3, 10, 11];
-        elseif mode == 3
-            indices_to_color = [3, 9, 10, 11];
-        elseif mode == 4
-            indices_to_color = [3, 9];
-        elseif mode == 5 || mode == 6
-            indices_to_color = 9;
-        elseif mode == 7
-            indices_to_color = [3, 9, 10, 11];
-        end
-        for j = 1:length(indices_to_color)
-            self.doc.set_block_trial_property([i,indices_to_color(j)],self.colorgen());
-        end
-    end
-            
-
-
-end
-
-% function mismatched_sample_rates_dialog(self)
-% 
-%     d = dialog('Units','Normalized','Position',[.45,.45,.1,.1],'Name','Configuration File Mismatch');
-%     warning = uicontrol('Parent',d,'Style','text','Units','Normalized','Position',[.1,.9,.75,.1],...
-%         'String','The sample rates in the configuration file do not match those shown on the screen. Do you want to: ');
-%     grp = uibuttongroup('Parent',d,'Units','Normalized','Position',[.1,.1,.75,.75],'SelectionChangedFcn',{@self.mismatched_sample_rates_response,d});
-%     choice1 = uicontrol('Parent',grp,'Style','radiobutton','Units','Normalized','Position',[.1,.7,.75,.2],'String','Change configuration file to match screen.');
-%     choice2 = uicontrol('Parent',grp,'Style','radiobutton','Units','Normalized','Position',[.1,.4,.75,.2],'String','Change screen to match configuration file.');
-%     choice3 = uicontrol('Parent',grp,'Style','radiobutton','Units','Normalized','Position',[.1,.1,.75,.2],'String','Do nothing, will fix manually.');
-% 
-% end
-% 
-% function mismatched_sample_rates_response(self, src, event, d)
-%     
-%     if event.NewValue.Position(2) == .7
-%         
-%         self.doc.update_config_file(self.doc.chan1_rate, 1);
-%         self.doc.update_config_file(self.doc.chan2_rate, 2);
-%         self.doc.update_config_file(self.doc.chan3_rate, 3);
-%         self.doc.update_config_file(self.doc.chan4_rate, 4);
-%         
-%     elseif event.NewValue.Position(2) == .4
-%         
-%         self.doc.set_chan1_rate(str2num(self.configData_{14}(end-3:end)));
-%         self.doc.set_chan2_rate(str2num(self.configData_{15}(end-3:end)));
-%         self.doc.set_chan3_rate(str2num(self.configData_{16}(end-3:end)));
-%         self.doc.set_chan4_rate(str2num(self.configData_{17}(end-3:end)));
-% 
-%     else
-%         %do nothing, they exited out of the dialog box
-%         
-%     end
-%     
-%     delete(d);
-%     self.chan1_rate_box.String = num2str(self.doc.chan1_rate);
-%     
-% end
-
 
 
 
@@ -3408,13 +3259,7 @@ end
              self.pageDown_button_ = value;
          end
          
-         function set.uneditable_cell_color(self, value)
-             self.uneditable_cell_color_ = value;
-         end
          
-         function set.uneditable_cell_text(self, value)
-             self.uneditable_cell_text_ = value;
-         end
          
          function set.listbox_imported_files(self, value)
              self.listbox_imported_files_ = value;
@@ -3581,13 +3426,7 @@ end
              output = self.pageDown_button_;
          end
          
-         function output = get.uneditable_cell_color(self)
-             output = self.uneditable_cell_color_;
-         end
          
-         function output = get.uneditable_cell_text(self)
-             output = self.uneditable_cell_text_;
-         end
          
          function output = get.listbox_imported_files(self)
              output = self.listbox_imported_files_;
