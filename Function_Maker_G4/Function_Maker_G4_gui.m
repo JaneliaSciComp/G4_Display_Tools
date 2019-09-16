@@ -1276,6 +1276,7 @@ time = (1:length(func))/fps;
 %plot function to figure
 plot(time, func);
 grid on
+datacursormode on
 xlabel('time (s)')
 if strcmp(handles.param.type,'pfn') == 1
     ylabel('frame')
