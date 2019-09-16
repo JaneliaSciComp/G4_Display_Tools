@@ -1493,7 +1493,7 @@ if exist('pfnparam','var')
     handles.param = pfnparam;
     set(handles.edit27, 'String',num2str(handles.param.frames));
     set(handles.popupmenu7, 'Value',sqrt(handles.param.gs_val));
-    if ~exist('handles.param.size_speed_ratio','var') %add ability to load functions made before looming option was added
+    if ~isfield(pfnparam,'size_speed_ratio') %add ability to load functions made before looming option was added
         handles.param.size_speed_ratio = 40*ones(size(handles.param.val));
     end
     type = 1;
