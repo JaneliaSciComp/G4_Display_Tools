@@ -1162,6 +1162,7 @@ try
     set(handles.edit12,'String',num2str(rad2deg(handles.param.sa_mask(2))));
     set(handles.edit13,'String',num2str(rad2deg(handles.param.sa_mask(3))));
 
+    sdata = getappdata(handles.tag,'sdata');
     sdata.aa_samples = handles.param.aa_samples;
     sdata.aa_poles = handles.param.aa_poles;
     sdata.phase_shift = handles.param.phase_shift;
@@ -1169,6 +1170,7 @@ try
     sdata.flip_right = handles.param.flip_right;
     sdata.snap_dots = handles.param.snap_dots;
     sdata.dot_re_random = handles.param.dot_re_random;
+    
     s2data.sa_mask = handles.param.sa_mask;
     s2data.long_lat_mask = handles.param.long_lat_mask;
     s2data.enable = [0 0];
