@@ -1312,6 +1312,14 @@ else
 end
 axis([0 max(time) min(func)-1 max(func)+1])
 
+%set function title
+if strcmp(handles.param.type,'pfn')
+    title = ['Position Function @ ' num2str(fps) ' Hz (for ' num2str(handles.param.gs_val) '-bit patterns)'];
+else
+    title = ['Analog Output Function @ ' num2str(fps) ' Hz'];
+end
+set(handles.text22,'String',title);
+
 %set function name
 pfn_dir = 'C:\matlabroot\G4\Position Functions\';
 afn_dir = 'C:\matlabroot\G4\Analog Output Functions\';
