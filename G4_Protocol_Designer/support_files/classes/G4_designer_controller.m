@@ -2071,7 +2071,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
 %RUN A SINGLE TRIAL ON THE LED SCREENS TO MAKE SURE ITS WORKING------------
 
         function dry_run(self, src, event)
-
+            self.doc.replace_greyed_cell_values();
             trial = self.check_one_selected;
             %block_trials = self.doc.block_trials();
             trial_mode = trial{1};

@@ -9,6 +9,7 @@ Fly Sex Sheet GID: 37065023
 Fly Geno Sheet GID: 1459345335
 Experiment Temp Sheet GID: 1073536469
 Rearing Protocol Sheet GID: 2007977020
+Light Cycle Sheet GID: 1154672887
 
 
 Default run protocol file: insert path to protocol file
