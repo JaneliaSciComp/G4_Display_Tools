@@ -16,6 +16,6 @@ plot_height = (1 - gap_y*(H+1))/H;
 plot_x = col*gap_x + (col-1)*plot_width;
 plot_y = row*gap_y + (row-1)*plot_height; %This equation was giving a huge number (200 and something) for a normalized y position. changed equation to match above - LT 8/15
 
-axes('Position', [plot_x, plot_y, plot_width, plot_height]);
+axes('Position', [plot_x, (1 - plot_height) - plot_y, plot_width, plot_height]);
 
 end
