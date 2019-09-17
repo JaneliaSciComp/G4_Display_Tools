@@ -1176,6 +1176,7 @@ set(handles.text18,'visible',vis)
 if isfield(handles, 'param')
     handles = rmfield(handles, 'param');
 end
+handles.dont_load = 0;
 
 %get function parameters
 type_strings = {'pfn', 'afn'};
@@ -1260,12 +1261,38 @@ end
 end
 end
 
+%get frame rate of function
 if strcmp(handles.param.type,'pfn') == 1
     handles.param.frames = str2double(get(handles.edit27, 'String'));
     handles.param.gs_val = get(handles.popupmenu7, 'Value')^2;
     fps = 1000/(sqrt(handles.param.gs_val));
 else
     fps = 1000;
+end
+
+%check if function values are within acceptable limits
+if strcmp(handles.param.type,'pfn') == 1
+    if any([handles.param.val handles.param.low handles.param.high]<0) || any([handles.param.val handles.param.low handles.param.high]>handles.param.frames)
+        handles.param.val(handles.param.val<0) = 1;
+        handles.param.low(handles.param.low<0) = 1;
+        handles.param.high(handles.param.high<0) = 1;
+        handles.param.val(handles.param.val>handles.param.frames) = handles.param.frames;
+        handles.param.low(handles.param.low>handles.param.frames) = handles.param.frames;
+        handles.param.high(handles.param.high>handles.param.frames) = handles.param.frames;
+        handles.dont_load = 1;
+        pushbutton6_Callback(hObject, eventdata, handles)
+    end
+else
+    if any([handles.param.val handles.param.low handles.param.high]<-10) || any([handles.param.val handles.param.low handles.param.high]>10)
+        handles.param.val(handles.param.val<-10) = -10;
+        handles.param.low(handles.param.low<-10) = -10;
+        handles.param.high(handles.param.high<-10) = -10;
+        handles.param.val(handles.param.val>10) = 10;
+        handles.param.low(handles.param.low>10) = 10;
+        handles.param.high(handles.param.high>10) = 10;
+        handles.dont_load = 1;
+        pushbutton6_Callback(hObject, eventdata, handles)
+    end
 end
 
 %calculate function
@@ -1276,6 +1303,7 @@ time = (1:length(func))/fps;
 %plot function to figure
 plot(time, func);
 grid on
+datacursormode on
 xlabel('time (s)')
 if strcmp(handles.param.type,'pfn') == 1
     ylabel('frame')
@@ -1283,6 +1311,14 @@ else
     ylabel('AO voltage')
 end
 axis([0 max(time) min(func)-1 max(func)+1])
+
+%set function title
+if strcmp(handles.param.type,'pfn')
+    title = ['Position Function @ ' num2str(fps) ' Hz (for ' num2str(handles.param.gs_val) '-bit patterns)'];
+else
+    title = ['Analog Output Function @ ' num2str(fps) ' Hz'];
+end
+set(handles.text22,'String',title);
 
 %set function name
 pfn_dir = 'C:\matlabroot\G4\Position Functions\';
@@ -1483,17 +1519,26 @@ function pushbutton6_Callback(hObject, eventdata, handles)
 % hObject    handle to pushbutton6 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-[handles.filename, handles.save_dir] = uigetfile('*.mat');
 
-load(fullfile(handles.save_dir,handles.filename));
-set(handles.text8,'String',handles.save_dir);
-set(handles.text10,'String',[num2str(handles.param.ID,'%04d') '_']);
+if handles.dont_load==0
+    [handles.filename, handles.save_dir] = uigetfile('*.mat');
+    load(fullfile(handles.save_dir,handles.filename));
+    set(handles.text8,'String',handles.save_dir);
+    set(handles.text10,'String',[num2str(handles.param.ID,'%04d') '_']);
+else
+    type = get(handles.popupmenu6, 'Value');
+    if type==1
+        pfnparam = handles.param;
+    else
+        afnparam = handles.param;
+    end
+end
 
 if exist('pfnparam','var')
     handles.param = pfnparam;
     set(handles.edit27, 'String',num2str(handles.param.frames));
     set(handles.popupmenu7, 'Value',sqrt(handles.param.gs_val));
-    if ~exist('handles.param.size_speed_ratio','var') %add ability to load functions made before looming option was added
+    if ~isfield(pfnparam,'size_speed_ratio') %add ability to load functions made before looming option was added
         handles.param.size_speed_ratio = 40*ones(size(handles.param.val));
     end
     type = 1;
@@ -1575,7 +1620,13 @@ if num_sections>1
 end
 
 guidata(hObject, handles);
-pushbutton2_Callback(hObject, eventdata, handles);
+
+if handles.dont_load == 1
+    handles.dont_load = 0;
+    return
+else
+    pushbutton2_Callback(hObject, eventdata, handles);
+end
 set(handles.text10,'String',[num2str(handles.param.ID,'%04d') '_']);
 
 

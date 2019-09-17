@@ -19,15 +19,15 @@ OL_datatypes = {'LmR'}; %datatypes to plot as timeseries
 TC_datatypes = {'LmR'}; %datatypes to plot as tuning curves
 
 %specify plot properties
-rep_Colors = [0.5 0.5 0.5; 1 0.5 0.5; 0.5 0.5 1];
-mean_Colors = [0 0 0;1 0 0; 0 0 1];
+rep_Colors = [0.5 0.5 0.5; 1 0.5 0.5; 0.5 0.5 1]; %default 3 colors supports up to 3 groups (add more colors for more groups)
+mean_Colors = [0 0 0;1 0 0; 0 0 1]; %default 3 colors supports up to 3 groups (add more colors for more groups)
 frame_color = [0.7 0.7 0.7]; %color of the frame position timeseries (if frame_superimpose=1)
 frame_scale = 0.5; %sets the y-size of the superimposed frame timeseries, relative to the y-size of the timeseries data
 rep_LineWidth = 0.05;
 mean_LineWidth = 1;
 patch_alpha = 0.3; %sets the level of transparency for patch region around timeseries data
 subtitle_FontSize = 8;
-timeseries_ylimits = [-1.1 1.1; -1 6; -1 6; -1 6; 1 192; -1.1 1.1; 2 20, -1.1 1.1]; %[min max] y limits for each datatype (including 1 additional for 'faLmR' option)
+timeseries_ylimits = [-1.1 1.1; -1 6; -1 6; -1 6; 1 192; -1.1 1.1; 2 20; -1.1 1.1]; %[min max] y limits for each datatype (including 1 additional for 'faLmR' option)
 timeseries_xlimits = [0 4];
 histogram_ylimits = [0 100; -6 6; 2 10];
 
@@ -87,6 +87,7 @@ if nargin<5
 end
 if nargin<6
     overlap = 0; %by default, don't overlap multiple conditions on same plot
+    frame_superimpose = 0; %by default, don't superimpose frame position on same plot
 end
 overlap = logical(overlap);
 
@@ -99,12 +100,12 @@ for i = 1:length(OL_datatypes)
 end
 for i = 1:length(CL_datatypes)
     ind = find(strcmpi(Data.channelNames.histograms,CL_datatypes{i}));
-    assert(~isempty(ind),['could not find ' OL_datatypes{i} ' datatype'])
+    assert(~isempty(ind),['could not find ' CL_datatypes{i} ' datatype'])
     CL_inds(i) = ind;
 end
 for i = 1:length(TC_datatypes)
     ind = find(strcmpi(Data.channelNames.timeseries,TC_datatypes{i}));
-    assert(~isempty(ind),['could not find ' OL_datatypes{i} ' datatype'])
+    assert(~isempty(ind),['could not find ' TC_datatypes{i} ' datatype'])
     TC_inds(i) = ind;
 end
 
@@ -303,9 +304,9 @@ if ~isempty(OL_conds)
                         ylim(timeseries_ylimits(d,:));
                         xlim(timeseries_xlimits)
                         if frame_superimpose==1
+                            yrange = diff(timeseries_ylimits(d,:));
                             framepos = squeeze(nanmedian(nanmedian(nanmedian(CombData.timeseries(:,:,Frame_ind,cond,:,:),5),2),1))';
                             framepos = (frame_scale*framepos/max(framepos))+timeseries_ylimits(d,1)-frame_scale*yrange;
-                            yrange = diff(timeseries_ylimits(d,:));
                             ylim([timeseries_ylimits(d,1)-frame_scale*yrange timeseries_ylimits(d,2)])
                             plot(CombData.timestamps,framepos,'Color',frame_color,'LineWidth',mean_LineWidth);
                         end
@@ -322,8 +323,8 @@ if ~isempty(OL_conds)
                                     timestamps = CombData.timestamps(~nanidx);
                                     meandata(nanidx) = []; 
                                     semdata(nanidx) = []; 
-                                    plot(CombData.timestamps,meandata,'Color',mean_Colors(g,:),'LineWidth',mean_LineWidth);
-                                    patch([timestamps fliplr(timestamps)],[meandata+semdata fliplr(meandata-semdata)],'FaceColor',mean_Colors(g,:),'EdgeColor','none','FaceAlpha',patch_alpha)
+                                    plot(timestamps,meandata,'Color',mean_Colors(g,:),'LineWidth',mean_LineWidth);
+                                    patch([timestamps fliplr(timestamps)],[meandata+semdata fliplr(meandata-semdata)],'k','FaceColor',mean_Colors(g,:),'EdgeColor','none','FaceAlpha',patch_alpha)
                                 end
                             end
                         end
