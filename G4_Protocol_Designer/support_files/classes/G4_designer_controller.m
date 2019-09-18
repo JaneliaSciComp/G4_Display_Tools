@@ -115,12 +115,6 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
         recent_file_menu_items
         menu_open
 
-        
-%         isRandomized_box
-%         repetitions_box
-%         isSelect_all_box
-
-        %is_ao_visible
 
     end
 
@@ -135,23 +129,13 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
            
             self.model = G4_designer_model();
             self.doc = G4_document();
-            
-            %Get info from log of recently opened .g4p files - now done in
-            %DOC
-%             recent_files_filename = 'recently_opened_g4p_files.m';
-%             filepath = fileparts(which(recent_files_filename));
-%             self.recent_files_filepath = fullfile(filepath, recent_files_filename);
-%             self.recent_g4p_files = strtrim(regexp( fileread(self.recent_files_filepath),'\n','split'));
-%             self.recent_g4p_files = self.recent_g4p_files(~cellfun('isempty',self.recent_g4p_files));
-%             
+          
             %get screensize to calculate gui dimensions
             screensize = get(0, 'screensize');
-            
-           
-            
+
             %create figure
             self.f = figure('Name', 'Fly Experiment Designer', 'NumberTitle', 'off','units', 'pixels', 'MenuBar', 'none', ...
-                'ToolBar', 'none', 'Resize', 'off', 'outerposition', [screensize(3)*.1, screensize(4)*.05, 1600, 1000]);
+                'ToolBar', 'none', 'Resize', 'off', 'outerposition', [screensize(3)*.1, screensize(4)*.07, 1600, 950]);
            
             %ALL REST OF PROPERTIES ARE DEFINED IN LAYOUT         
           self.pre_files = struct('pattern', self.doc.pretrial(2),...
@@ -170,9 +154,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                'position',self.doc.posttrial(3),'ao1',self.doc.posttrial(4),...
                'ao2',self.doc.posttrial(5),'ao3',self.doc.posttrial(6),...
                'ao4',self.doc.posttrial(7));
-           
-           
-           
+
            self.layout_gui() ;
            self.update_gui() ;
            self.set_bg2_selection();
@@ -193,15 +175,11 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
             column_format_ = {'numeric', 'char', 'char', 'char', 'char','char', ...
                 'char', 'char', 'numeric', 'numeric', 'numeric', 'numeric', 'logical'};
             font_size = 10;
-            positions.pre = [350, 870, 1035, 50];
-            %pos_pre_ = [350, 870, 1035, 50];
-            positions.inter = [350, 815, 1035, 50];
-            %pos_inter_ = [350, 815, 1035, 50];
-            positions.block = [350, 585, 1035, 200];
-            %pos_block_ = [350, 585, 1035, 200];
-            positions.post = [350, 525, 1035, 50];
-            %pos_post_ = [350, 525, 1035, 50];
-            pos_panel = [350, 190, 1035, 325];
+            positions.pre = [350, 840, 1035, 50];
+            positions.inter = [350, 785, 1035, 50];
+            positions.block = [350, 455, 1035, 300];
+            positions.post = [350, 390, 1035, 50];
+            pos_panel = [350, 90, 1035, 275];
             pos_menu_ = [15, 875, 105, 40];
 
 
@@ -244,11 +222,11 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
 %             self.colorgen = @(color, text) ['<html><table border=0 width=400 bgcolor=',color,'><TR><TD>',text,'</TD></TR></table>'];
 
             add_trial_button = uicontrol(self.f, 'Style', 'pushbutton','String','Add Trial','units', ...
-            'pixels','Position', [positions.block(1) + positions.block(3), ...
+            'pixels','Position', [positions.block(1) + positions.block(3) + 5, ...
                 positions.block(2) + 20, 75, 20], 'Callback',@self.add_trial);
 
             delete_trial_button = uicontrol(self.f, 'Style', 'pushbutton', 'String', 'Delete Trial', ...
-                'units', 'pixels', 'Position', [positions.block(1) + positions.block(3), positions.block(2), ...
+                'units', 'pixels', 'Position', [positions.block(1) + positions.block(3) + 5, positions.block(2), ...
             75, 20], 'Callback', @self.delete_trial);
 
             self.isSelect_all_box = uicontrol(self.f, 'Style', 'checkbox', 'String', 'Select All', 'Value', self.model.isSelect_all, 'units', ...
@@ -256,15 +234,15 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                 positions.block(2) + positions.block(4) + 2, 78, 22], 'Callback', @self.select_all);
 
             invert_selection = uicontrol(self.f, 'Style', 'pushbutton', 'String', 'Invert Selection', ...
-                 'units', 'pixels', 'Position', [positions.block(1) + positions.block(3), ...
+                 'units', 'pixels', 'Position', [positions.block(1) + positions.block(3) + 5, ...
                 positions.block(2) - 20, 75, 20], 'Callback', @self.invert_selection);
 
             up_button = uicontrol(self.f, 'Style', 'pushbutton', 'String', 'Shift up', 'units', ...
-                'pixels', 'Position', [positions.block(1) + positions.block(3), positions.block(2) + .65*positions.block(4), ...
+                'pixels', 'Position', [positions.block(1) + positions.block(3) + 5, positions.block(2) + .65*positions.block(4), ...
                 75, 20], 'Callback', @self.move_trial_up);
 
             down_button = uicontrol(self.f, 'Style', 'pushbutton', 'String', 'Shift down', 'units', ...
-                'pixels', 'Position', [positions.block(1) + positions.block(3), positions.block(2) + .35*positions.block(4), ...
+                'pixels', 'Position', [positions.block(1) + positions.block(3) + 5, positions.block(2) + .35*positions.block(4), ...
                 75, 20], 'Callback', @self.move_trial_down);
             
             clear_all_button = uicontrol(self.f, 'Style', 'pushbutton', 'String', 'Clear All','FontSize', 12, 'units', ...
@@ -284,8 +262,8 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                 150, 20], 'FontSize', font_size);
             
             self.listbox_imported_files = uicontrol(self.f, 'Style', 'listbox', 'String', {'Imported files here'},  ...
-                'Position', [listbox_files_label.Position(1), listbox_files_label.Position(2) - 255, ...
-                150, 250],'Callback', @self.preview_selection);
+                'Position', [listbox_files_label.Position(1), listbox_files_label.Position(2) - 225, ...
+                150, 220],'Callback', @self.preview_selection);
             
             select_imported_file_button = uicontrol(self.f, 'Style', 'pushbutton', 'String', 'Select', 'Position', ...
                 [self.listbox_imported_files.Position(1) + .5*self.listbox_imported_files.Position(3), ...
@@ -343,11 +321,11 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
             
             self.exp_name_box = uicontrol(self.f, 'Style', 'edit', ...
                 'FontSize', 14, 'units', 'pixels', 'Position', ...
-                [pos_panel(1)+ (pos_panel(3)/2) - 200, pos_panel(2) - 100, 400, 30], 'Callback', @self.update_experiment_name);
+                [pos_panel(1)+ (pos_panel(3)/2) - 200, pos_panel(2) - 80, 400, 30], 'Callback', @self.update_experiment_name);
             
             exp_name_label = uicontrol(self.f, 'Style', 'text', 'String', 'Experiment Name: ', ...
                 'FontSize', 16, 'units', 'pixels', 'Position', [pos_panel(1) + (pos_panel(3)/2) - 375, ...
-                pos_panel(2) - 100, 150, 30]);
+                pos_panel(2) - 80, 150, 30]);
 
 
        %Drop down menu and associated labels and buttons
@@ -453,34 +431,34 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                 'units', 'pixels', 'Position', [121,3, 120, 19]);
             
             key_pan = uipanel(self.f, 'Title', 'Mode Key:', 'BackgroundColor', [.75, .75, .75], 'BorderType', 'none', ...
-                'FontSize', 13, 'units', 'pixels', 'Position', [15, positions.block(2) + positions.block(4) - 720, 280, 420]);
+                'FontSize', 13, 'units', 'pixels', 'Position', [15, positions.block(2) + positions.block(4) - 720, 230, 420]);
             
             mode_1_label = uicontrol(self.f, 'Style', 'text', 'String', 'Mode 1: Position Function', 'BackgroundColor', [.75,.75,.75], ...
-                'HorizontalAlignment', 'left', 'FontSize', 11, 'units', 'pixels', 'Position', [25, positions.block(2) + positions.block(4) - 360, 250, 18]);
+                'HorizontalAlignment', 'left', 'FontSize', 11, 'units', 'pixels', 'Position', [25, positions.block(2) + positions.block(4) - 360, 200, 18]);
             
             mode_2_label = uicontrol(self.f, 'Style', 'text', 'String', 'Mode 2: Constant Rate', 'BackgroundColor', [.75,.75,.75], ...
-                'HorizontalAlignment', 'left','FontSize', 11, 'units', 'pixels', 'Position', [25, mode_1_label.Position(2) - 50, 250, 18]);
+                'HorizontalAlignment', 'left','FontSize', 11, 'units', 'pixels', 'Position', [25, mode_1_label.Position(2) - 50, 200, 18]);
             
             mode_3_label = uicontrol(self.f, 'Style', 'text', 'String', 'Mode 3: Constant Index', 'BackgroundColor', [.75,.75,.75], ...
-                'HorizontalAlignment', 'left','FontSize', 11, 'units', 'pixels', 'Position', [25, mode_2_label.Position(2) - 50, 250, 18]);
+                'HorizontalAlignment', 'left','FontSize', 11, 'units', 'pixels', 'Position', [25, mode_2_label.Position(2) - 50, 200, 18]);
             
             mode_4_label = uicontrol(self.f, 'Style', 'text', 'String', 'Mode 4: Closed-loop sets frame rate', 'BackgroundColor', [.75,.75,.75], ...
-                'HorizontalAlignment', 'left','FontSize', 11, 'units', 'pixels', 'Position', [25, mode_3_label.Position(2) - 50, 250, 18]);
+                'HorizontalAlignment', 'left','FontSize', 11, 'units', 'pixels', 'Position', [25, mode_3_label.Position(2) - 50, 200, 18]);
             
             mode_5_label = uicontrol(self.f, 'Style', 'text', 'String', 'Mode 5: Closed-loop rate + offset', 'BackgroundColor', [.75,.75,.75], ...
-                'HorizontalAlignment', 'left','FontSize', 11, 'units', 'pixels', 'Position', [25, mode_4_label.Position(2) - 50, 250, 18]);
+                'HorizontalAlignment', 'left','FontSize', 11, 'units', 'pixels', 'Position', [25, mode_4_label.Position(2) - 50, 200, 18]);
             
             mode_5_label_cont = uicontrol(self.f, 'Style', 'text', 'String', 'position function', 'BackgroundColor', [.75,.75,.75], 'HorizontalAlignment', ...
                 'left', 'FontSize', 11, 'units', 'pixels', 'Position', [25, mode_5_label.Position(2) - 20, 200, 18]);
             
             mode_6_label = uicontrol(self.f, 'Style', 'text', 'String', 'Mode 6: Closed-loop rate X + position', 'BackgroundColor', [.75,.75,.75], ...
-                'HorizontalAlignment', 'left','FontSize', 11, 'units', 'pixels', 'Position', [25, mode_5_label_cont.Position(2) - 50, 250, 18]);
+                'HorizontalAlignment', 'left','FontSize', 11, 'units', 'pixels', 'Position', [25, mode_5_label_cont.Position(2) - 50, 200, 18]);
             
             mode_6_label_cont = uicontrol(self.f, 'Style', 'text', 'String', 'function Y', 'BackgroundColor', [.75,.75,.75], 'HorizontalAlignment', ...
                 'left', 'FontSize', 11, 'units', 'pixels', 'Position', [25, mode_6_label.Position(2) - 20, 200, 18]);
             
             mode_7_label = uicontrol(self.f, 'Style', 'text', 'String', 'Mode 7: Closed-loop sets frame index', 'BackgroundColor', [.75,.75,.75], ...
-                'HorizontalAlignment', 'left','FontSize', 11, 'units', 'pixels', 'Position', [25, mode_6_label_cont.Position(2) - 50, 250, 18]);
+                'HorizontalAlignment', 'left','FontSize', 11, 'units', 'pixels', 'Position', [25, mode_6_label_cont.Position(2) - 50, 200, 18]);
 
         end
         
@@ -1351,27 +1329,46 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
 %Import
     function import(self, ~, ~)
        
-       answer = questdlg('Would you like to import a folder or a file?',...
-           'Import', 'Folder', 'File', 'Cancel', 'Folder');
+        options = {'Folder', 'File', 'Filtered File'};
+       answer = listdlg('PromptString', 'Would you like to import a folder or a file?',...
+           'SelectionMode', 'Single', 'ListString', options, 'ListSize', [180,60]);
        
-       switch answer
-           case 'Folder'
-               self.import_folder();
+       if answer == 1
+           self.import_folder('');
 
-           case 'File'
-                self.import_file()
+       elseif answer == 2
+           self.import_file('')
+                
+       elseif answer == 3
+           str_to_match = self.get_filter_string();
+           self.import_file(str_to_match);
 
-           case 'Cancel'
-               %do nothing
+       else
+           %do nothing
        end
        
 
 
     end
     
-    function import_folder(self)
+    function [answer] = get_filter_string(self)
+    
+        answer = inputdlg("Please enter the whole or partial filename you wish to match.",...
+            "Filter Import Results");
+        answer = answer{1};
         
-        path = uigetdir;
+    
+    end
+    
+    function import_folder(self, str_to_match)
+        
+        if strcmp(str_to_match,'')
+            
+            path = uigetdir;
+            
+        else
+            path = uigetdir(['*',str_to_match,'*']);
+        end
         
         if isequal(path, 0)
             %do nothing
@@ -1390,9 +1387,12 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
             
     end
     
-    function import_file(self)
-        
-        [imported_file, path] = uigetfile;
+    function import_file(self, str_to_match)
+        if strcmp(str_to_match,'')
+            [imported_file, path] = uigetfile('*.mat');
+        else
+            [imported_file, path] = uigetfile(['*',str_to_match,'*.mat']);
+        end
         
         if isequal(imported_file,0)
             %do nothing
@@ -2290,8 +2290,9 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                     adjusted_matrix = self.model.current_preview_file(:,:,i) ./ max_num(i);
                     adjusted_file(:,:,i) = adjusted_matrix(:,:,1);
                 end
-
-                self.hAxes = axes(self.f, 'units', 'pixels', 'OuterPosition', [245, 135, 1190 ,397], 'XTick', [], 'YTick', [] ,'XLim', x, 'YLim', y);
+                
+                
+                self.hAxes = axes(self.f, 'units', 'pixels', 'OuterPosition', [285, 30, 1100 ,360], 'XTick', [], 'YTick', [] ,'XLim', x, 'YLim', y);
                 im = imshow(adjusted_file(:,:,self.model.auto_preview_index), 'Colormap',gray);
 
                 set(im, 'parent', self.hAxes);
@@ -2302,8 +2303,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
 
 
                 self.model.current_preview_file = self.doc.Pos_funcs.(funcfield).pfnparam.func;
-                self.model.current_preview_file
-                self.hAxes = axes(self.f,'units', 'pixels', 'OuterPosition', [245, 135, 1190 ,397]);
+                self.hAxes = axes(self.f,'units', 'pixels', 'OuterPosition', [285, 30, 1100 ,360]);
                 self.second_axes = axes(self.f, 'units', 'pixels', 'OuterPosition', self.hAxes.OuterPosition, 'XAxisLocation', 'top', 'YAxisLocation', 'right');
                 plot(self.model.current_preview_file, 'parent', self.hAxes);
 
@@ -2330,7 +2330,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
             elseif strcmp(file_type, 'ao')
 
                 self.model.current_preview_file = self.doc.Ao_funcs.(aofield).afnparam.func;
-                self.hAxes = axes(self.f,'units', 'pixels', 'OuterPosition', [245, 135, 1190 ,397]);
+                self.hAxes = axes(self.f,'units', 'pixels', 'OuterPosition', [285, 30, 1100 ,360]);
                 self.second_axes = axes(self.f, 'units', 'pixels', 'OuterPosition', self.hAxes.OuterPosition, 'XAxisLocation', 'top', 'YAxisLocation', 'right');
 
                 plot(self.model.current_preview_file, 'parent', self.hAxes);
@@ -2490,16 +2490,20 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                     
                     if is_table == 0
                         funcfile = self.listbox_imported_files.String{self.listbox_imported_files.Value};
+                        
                     else
                         funcfile = self.doc.pretrial{3};
+                        
                     end
                 end
                 if index(2) > 3 && index(2) < 8 
                     file_type = 'ao';
                     if is_table == 0
                         aofile = self.listbox_imported_files.String{self.listbox_imported_files.Value};
+                        patfile = self.doc.pretrial{2};
                     else
                         aofile = self.doc.pretrial{index(2)};
+                        patfile = self.doc.pretrial{2};
                     end
                 end
                 
@@ -2516,13 +2520,15 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                         else 
                             frame_rate = 500;
                         end
-                    else
-                        frame_rate = 30;
+                    elseif ~strcmp(funcfield,'')
+                        if self.doc.Pos_funcs.(funcfield).pfnparam.gs_val == 1
+                            
+                            frame_rate = 1000;
+                        else
+                            frame_rate = 500;
+                        end
                     end
                 end
-                
-                
-               
                 
                 dur = self.doc.pretrial{12}*1000;
 
@@ -2546,14 +2552,19 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                         funcfile = self.listbox_imported_files.String{self.listbox_imported_files.Value};
                     else
                         funcfile = self.doc.intertrial{3};
+                        patfile = self.doc.intertrial{2};
                     end
+                    
+                   
                 end
                 if index(2) > 3 && index(2) < 8 
                     file_type = 'ao';
                     if is_table == 0
                         aofile = self.listbox_imported_files.String{self.listbox_imported_files.Value};
+                        patfile = self.doc.intertrial{2};
                     else
                         aofile = self.doc.intertrial{index(2)};
+                        patfile = self.doc.intertrial{2};
                     end
                 end
                 
@@ -2570,8 +2581,13 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                         else 
                             frame_rate = 500;
                         end
-                    else
-                        frame_rate = 30;
+                    elseif ~strcmp(funcfield,'')
+                        if self.doc.Pos_funcs.(funcfield).pfnparam.gs_val == 1
+                            
+                            frame_rate = 1000;
+                        else
+                            frame_rate = 500;
+                        end
                     end
                 end
 
@@ -2597,6 +2613,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                         funcfile = self.listbox_imported_files.String{self.listbox_imported_files.Value};
                     else
                         funcfile = self.doc.block_trials{index(1), 3};
+                        patfile = self.doc.block_trials{index(1), 2};
                     end
                 end
                 
@@ -2604,8 +2621,10 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                     file_type = 'ao';
                     if is_table == 0
                         aofile = self.listbox_imported_files.String{self.listbox_imported_files.Value};
+                        patfile = self.doc.block_trials{index(1), 2};
                     else
                         aofile = self.doc.block_trials{index(1), index(2)};
+                        patfile = self.doc.block_trials{index(1), 2};
                     end
                 end
                 
@@ -2613,18 +2632,22 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                 funcfield = self.doc.get_posfunc_field_name(funcfile);
                 aofield = self.doc.get_aofunc_field_name(aofile);
                 
-                if mode == 2
-                    frame_rate = self.doc.block_trials{index(1), 9};
+               if mode == 2
+                    frame_rate = self.doc.block_trials{index(1),9};
                 else
                     if ~strcmp(patfield,'')
-                    
                         if self.doc.Patterns.(patfield).pattern.gs_val == 1
                             frame_rate = 1000;
                         else 
                             frame_rate = 500;
                         end
-                    else
-                        frame_rate = 30;
+                    elseif ~strcmp(funcfield,'')
+                        if self.doc.Pos_funcs.(funcfield).pfnparam.gs_val == 1
+                            
+                            frame_rate = 1000;
+                        else
+                            frame_rate = 500;
+                        end
                     end
                 end
 
@@ -2650,14 +2673,17 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                         funcfile = self.listbox_imported_files.String{self.listbox_imported_files.Value};
                     else
                         funcfile = self.doc.posttrial{3};
+                        patfile = self.doc.posttrial{2};
                     end
                 end
                 if index(2) > 3 && index(2) < 8 
                     file_type = 'ao';
                     if is_table == 0
                         aofile = self.listbox_imported_files.String{self.listbox_imported_files.Value};
+                        patfile = self.doc.posttrial{2};
                     else
                         aofile = self.doc.posttrial{index(2)};
+                        patfile = self.doc.posttrial{2};
                     end
                 end
                 
@@ -2665,7 +2691,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                 funcfield = self.doc.get_posfunc_field_name(funcfile);
                 aofield = self.doc.get_aofunc_field_name(aofile);
                 
-                if mode == 2
+                 if mode == 2
                     frame_rate = self.doc.posttrial{9};
                 else
                     if ~strcmp(patfield,'')
@@ -2674,8 +2700,13 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                         else 
                             frame_rate = 500;
                         end
-                    else
-                        frame_rate = 30;
+                    elseif ~strcmp(funcfield,'')
+                        if self.doc.Pos_funcs.(funcfield).pfnparam.gs_val == 1
+                            
+                            frame_rate = 1000;
+                        else
+                            frame_rate = 500;
+                        end
                     end
                 end
 
@@ -2688,15 +2719,6 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
 
         end
 
-
-
-%ERROR CATCHING FUNCTIONS--------------------------------------------------
-
-%REFERENCE FOR Y INDEX VALUES
-    %MODE y = 1, PAT NAME y = 2, POS FUNC y = 3, AO1-4 y = 4-7, Frame Ind y =
-    %8, Frame Rate y = 9, Gain y = 10, Offset y = 11, Duration y = 12, Select y
-    %= 13
-    
 
 %CHECK IF THE CELL IS EDITABLE---------------------------------------------
 
