@@ -382,6 +382,10 @@ function [success] = G4_default_run_protocol(runcon, p)%input should always be 1
                     if trial_mode == 2
                         Panel_com('set_frame_rate',frame_rate);
                     end
+                    
+                    if frame_ind == 0
+                        frame_ind = randperm(p.num_block_frames(c),1);
+                    end
 
                     Panel_com('set_position_x', frame_ind);
                     

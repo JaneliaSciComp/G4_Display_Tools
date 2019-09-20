@@ -12,13 +12,13 @@ Rearing Protocol Sheet GID: 2007977020
 Light Cycle Sheet GID: 1154672887
 
 
-Default run protocol file: insert path to protocol file
-Default processing file: insert path to processing file
-Default plotting file: insert path to plotting file
+Default run protocol file: C:\matlabroot\G4_Display_Tools\G4_Protocol_Designer\run_protocols\G4_default_run_protocol.m
+Default processing file: C:\matlabroot\G4_Display_Tools\G4_Data_Analysis\data processing\G4_Process_Data_flyingdetector.m
+Default plotting file: C:\matlabroot\G4_Display_Tools\G4_Protocol_Designer\plotting_files\G4_Plot_Data_flyingdetector_pdf.m
 
-Flight test protocol file: U:\G4_Projects\G4_Display_Tools\G4_Protocol_Designer\test_protocols\test_protocol1\test_protocol1.g4p
-Camera walk test protocol file: C:\Users\taylorl\Desktop\CameraWalkTestFile08-05-19_15-51-10\CameraWalkTestFile08-05-19_15-51-10.g4p
-Chip walk test protocol file: C:\Users\taylorl\Desktop\ChipWalkTest08-05-19_15-51-51\ChipWalkTest08-05-19_15-51-51.g4p
+Flight test protocol file: C:\matlabroot\G4_Display_Tools\G4_Protocol_Designer\test_protocols\test_protocol1\test_protocol1.g4p
+Camera walk test protocol file: insert walking test protocol here
+Chip walk test protocol file: insert chip walking test protocl here
 
 Overlapping graphs: 0 %0 for no, 1 for yes
 Color to fill uneditable cells: #bdbdbd

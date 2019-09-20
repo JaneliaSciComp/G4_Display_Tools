@@ -679,6 +679,9 @@ classdef G4_conductor_controller < handle
                 end
                 block_x = length(p.block_trials(:,1));
                 block_y = 1;
+                
+                self.doc.block_trials{1,2} = '';
+                self.doc.block_trials{1,3} = '';
 
                 for j = 1:block_x
                     if j > length(self.doc.block_trials(:,1))

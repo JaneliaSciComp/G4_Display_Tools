@@ -44,6 +44,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
         exp_name_box_
         pageUp_button_
         pageDown_button_
+        exp_length_display_
         
         listbox_imported_files_
         recent_g4p_files_
@@ -108,6 +109,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
         exp_name_box
         pageUp_button
         pageDown_button
+        exp_length_display
         
         listbox_imported_files
         recent_g4p_files
@@ -136,7 +138,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
             %create figure
             self.f = figure('Name', 'Fly Experiment Designer', 'NumberTitle', 'off','units', 'pixels', 'MenuBar', 'none', ...
                 'ToolBar', 'none', 'Resize', 'off', 'outerposition', [screensize(3)*.1, screensize(4)*.07, 1600, 950]);
-           
+
             %ALL REST OF PROPERTIES ARE DEFINED IN LAYOUT         
           self.pre_files = struct('pattern', self.doc.pretrial(2),...
                'position',self.doc.pretrial(3),'ao1',self.doc.pretrial(4),...
@@ -351,6 +353,17 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
             %menu_save = uimenu(menu, 'Text', 'Save', 'Callback', @self.save);
             menu_copy = uimenu(menu, 'Text', 'Copy to...', 'Callback', @self.copy_to);
             menu_set = uimenu(menu, 'Text', 'Set Selected...', 'Callback', @self.set_selected);
+            
+       %Button to calculate estimated length of experiment
+       
+            exp_length_button = uicontrol(self.f, 'Style', 'pushbutton', 'units', 'pixels', 'Position', ...
+                [15, positions.block(2) + positions.block(4) + 55, 140,20],'String', ...
+                'Calculate Experiment Length', 'Callback', @self.calculate_experiment_length);
+            
+            self.exp_length_display = uicontrol(self.f, 'Style', 'text', 'units', 'pixels', 'Position', ...
+                [exp_length_button.Position(1) + exp_length_button.Position(3) + 5, ...
+                exp_length_button.Position(2), 100, 20], 'FontSize', 12, 'String', '');
+                
 
        %Randomization
        
@@ -485,6 +498,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
             self.set_bg2_selection();
             self.set_exp_name();
             self.set_recent_file_menu_items();
+            self.set_exp_length_text();
             
 
 
@@ -849,6 +863,13 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
             end
             
         end
+        
+        function update_exp_length(self, new)
+            self.doc.est_exp_length = new;
+            self.update_gui();
+        
+        
+        end
        
         
 %         function update_config_file(self)
@@ -1097,6 +1118,18 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
 %             end
             self.update_gui();
                 
+        end
+        
+        function calculate_experiment_length(self, src, event)
+        
+            total_dur = self.doc.pretrial{12} + self.doc.posttrial{12};
+            for i = 1:length(self.doc.block_trials(:,1))
+                total_dur = total_dur + (self.doc.block_trials{i,12} + self.doc.intertrial{12})*self.doc.repetitions;
+            end
+            total_dur = total_dur - self.doc.intertrial{12};
+            self.update_exp_length(total_dur);
+            
+        
         end
         
 %Autopopulate button, to be pressed after importing.
@@ -1815,7 +1848,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
             %Get all parameters that might be needed for preview from
             %the trial the selected cell belongs to.
             
-            if ~strcmp(file,'') && ~strncmp(file, '<html>',6)
+            if ~strcmp(file,'') && ~strncmp(file, '<html>',6) && ~isnan(is_table)
                 [frame_rate, dur, patfield, posfield, aofield, file_type] = get_preview_parameters(self, is_table);
 
             %Now actually display the preview of whatever file is
@@ -2276,8 +2309,8 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
 %PREVIEW SELECTED CELL ON IN-SCREEN PREVIEW--------------------------------        
         function display_inscreen_preview(self, frame_rate, dur, patfield, funcfield, aofield, file_type)  
     
-            if strcmp(file_type, 'pat')
-
+            if strcmp(file_type, 'pat') && ~strcmp(patfield,'')
+                
                 self.model.auto_preview_index = self.check_pattern_dimensions(patfield);
                 self.model.current_preview_file = self.doc.Patterns.(patfield).pattern.Pats;
 
@@ -2299,9 +2332,8 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
 
 
 
-            elseif strcmp(file_type, 'pos')
-
-
+            elseif strcmp(file_type, 'pos') && ~strcmp(funcfield,'')
+                
                 self.model.current_preview_file = self.doc.Pos_funcs.(funcfield).pfnparam.func;
                 self.hAxes = axes(self.f,'units', 'pixels', 'OuterPosition', [285, 30, 1100 ,360]);
                 self.second_axes = axes(self.f, 'units', 'pixels', 'OuterPosition', self.hAxes.OuterPosition, 'XAxisLocation', 'top', 'YAxisLocation', 'right');
@@ -2324,10 +2356,16 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                 self.second_axes.XLabel.String = frameLabel;
 
                 if dur <= length(self.model.current_preview_file(1,:))
-                    line('XData', [dur, dur], 'YData', [yax(1), yax(2)], 'Color', [1 0 0], 'LineWidth', 2);
+                    if frame_rate == 500
+                        linedur = [dur/2, dur/2];
+                    else
+                        linedur = [dur, dur];
+                    end
+                    line('XData', linedur, 'YData', yax, 'Color', [1 0 0], 'LineWidth', 2);
                 end
 
-            elseif strcmp(file_type, 'ao')
+
+            elseif strcmp(file_type, 'ao') && ~strcmp(aofield,'')
 
                 self.model.current_preview_file = self.doc.Ao_funcs.(aofield).afnparam.func;
                 self.hAxes = axes(self.f,'units', 'pixels', 'OuterPosition', [285, 30, 1100 ,360]);
@@ -2353,6 +2391,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                 self.second_axes.XLabel.String = frameLabel;
 
             end
+            
 
 
 
@@ -2464,7 +2503,6 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
  
 %PULLS PARAMETERS FROM TRIAL CONTAINING A SELECTED CELL FOR PREVIEWING-----        
         function [frame_rate, dur, patfield, funcfield, aofield, file_type] = get_preview_parameters(self, is_table)
-            
             index = self.model.current_selected_cell.index;
             table = self.model.current_selected_cell.table;
             file_type = '';
@@ -2527,6 +2565,8 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                         else
                             frame_rate = 500;
                         end
+                    else
+                        frame_rate = 1000;
                     end
                 end
                 
@@ -2588,6 +2628,8 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                         else
                             frame_rate = 500;
                         end
+                    else
+                        frame_rate = 1000;
                     end
                 end
 
@@ -2648,6 +2690,8 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                         else
                             frame_rate = 500;
                         end
+                    else
+                        frame_rate = 1000;
                     end
                 end
 
@@ -2707,6 +2751,8 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                         else
                             frame_rate = 500;
                         end
+                    else
+                        frame_rate = 1000;
                     end
                 end
 
@@ -2735,7 +2781,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
             %check that the field is editable based on the mode
             if isempty(mode_val)
                 return;
-            elseif mode_val == 1 && (7 < y) && (12 > y)
+            elseif mode_val == 1 && (8 < y) && (12 > y)
 
                 allow = 0;
 
@@ -2755,7 +2801,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
 
                 allow = 0;
 
-            elseif mode_val == 7 && ( y == 3 || ((y > 7) && (y < 12)))
+            elseif mode_val == 7 && ( y == 3 || ((y > 8) && (y < 12)))
 
                 allow = 0;
 
@@ -3296,6 +3342,10 @@ end
          function set.menu_open(self, value)
              self.menu_open_ = value;
          end
+         
+         function set.exp_length_display(self, value)
+             self.exp_length_display_ = value;
+         end
 
 
 
@@ -3463,6 +3513,10 @@ end
          function output = get.menu_open(self)
              output = self.menu_open_;
          end
+         
+         function output = get.exp_length_display(self)
+             output = self.exp_length_display_;
+         end
 
          
 %SETTERS OF GUI OBJECT VALUES
@@ -3603,6 +3657,12 @@ end
                  end
 
              end
+         end
+         
+         function set_exp_length_text(self)
+         
+            self.exp_length_display.String = [num2str(round(self.doc.est_exp_length/60, 2)), ' minutes'];
+         
          end
          
 

@@ -15,6 +15,8 @@ classdef G4_document < handle
         save_filename_
         currentExp_
         experiment_name_
+        est_exp_length_
+      
         
         %Variables saved to .g4p files
         pretrial_
@@ -62,6 +64,7 @@ classdef G4_document < handle
         save_filename
         currentExp
         experiment_name
+        est_exp_length
         
         pretrial
         block_trials
@@ -118,6 +121,7 @@ classdef G4_document < handle
             self.currentExp = struct;
             self.experiment_name = '';
             self.trial_data = G4_trial_model();
+            self.est_exp_length = 0;
             
 %Make table parameters into a cell array so they work with the tables more easily
 
@@ -177,6 +181,8 @@ classdef G4_document < handle
 %Adding a new row
 
             if index(1) > size(self.block_trials,1)
+                posfield = self.get_posfunc_field_name(new_value{3});
+                new_value{12} = length(self.Pos_funcs.(posfield).pfnparam.func)/1000;
                 self.block_trials = [self.block_trials;new_value];
 %                 block_data = self.block_trials;
             
@@ -237,6 +243,8 @@ classdef G4_document < handle
                     funcDim = max(self.Pos_funcs.(posfield).pfnparam.func);
                     patRows = 0;
                     numrows = 0;
+                    
+                    self.block_trials{index(1),12} = length(self.Pos_funcs.(posfield).pfnparam.func)/1000;
                 else
                     patDim = 0;
                     funcDim = 0;
@@ -382,7 +390,7 @@ classdef G4_document < handle
                     
                 end
                     
-            elseif index == 3 && strcmp(string(new_value),'') == 0 && strcmp(string(self.pretrial{2}),'') == 0
+            elseif index == 3 && ~strcmp(string(new_value),'') && ~strcmp(string(self.pretrial{2}),'')
                 posfile = new_value;
                 posfield = self.get_posfunc_field_name(posfile);
                 if strcmp(posfield,'') && ~strcmp(new_value,'')
@@ -395,6 +403,8 @@ classdef G4_document < handle
                 funcDim = max(self.Pos_funcs.(posfield).pfnparam.func);
                 patRows = 0;
                 numrows = 0;
+                
+                self.pretrial{12} = length(self.Pos_funcs.(posfield).pfnparam.func)/1000;
             else
                 patDim = 0;
                 funcDim = 0;
@@ -552,6 +562,8 @@ classdef G4_document < handle
                 funcDim = max(self.Pos_funcs.(posfield).pfnparam.func);
                 patRows = 0;
                 numrows = 0;
+                
+                self.intertrial{12} = length(self.Pos_funcs.(posfield).pfnparam.func)/1000;
             else
                 patDim = 0;
                 funcDim = 0;
@@ -705,6 +717,8 @@ classdef G4_document < handle
                 funcDim = max(self.Pos_funcs.(posfield).pfnparam.func);
                 patRows = 0;
                 numrows = 0;
+                
+                self.posttrial{12} = length(self.Pos_funcs.(posfield).pfnparam.func)/1000;
             else
                 patDim = 0;
                 funcDim = 0;
@@ -2277,6 +2291,10 @@ classdef G4_document < handle
          function set.uneditable_cell_text(self, value)
              self.uneditable_cell_text_ = value;
          end
+         
+         function set.est_exp_length(self, value)
+             self.est_exp_length_ = value;
+         end
         %Getters
         
         
@@ -2406,6 +2424,10 @@ classdef G4_document < handle
          
          function output = get.uneditable_cell_text(self)
              output = self.uneditable_cell_text_;
+         end
+         
+         function output = get.est_exp_length(self)
+             output = self.est_exp_length_;
          end
         
 
