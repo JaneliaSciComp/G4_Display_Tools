@@ -221,7 +221,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
             %add_trial_button
             uicontrol(self.f, 'Style', 'pushbutton','String','Add Trial','units', ...
                 'pixels','Position', [positions.block(1) + positions.block(3) + 5, ...
-                positions.block(2) + 20, 75, 20], 'Callback',@self.add_trial);
+                positions.block(2) + 20, 75, 20], 'Callback',@self.add_trials_callback);
 
             %delete_trial_button
             uicontrol(self.f, 'Style', 'pushbutton', 'String', 'Delete Trial', ...
@@ -506,22 +506,18 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                     self.doc.set_pretrial_property(y,new);
                 end
 
-
             else
 
                 self.create_error_box("You cannot edit that field in this mode.");
 
-
             end
             if y == 1
                
-               self.clear_fields(str2num(new));
+               self.clear_fields(str2double(new));
                 
             end
             
              self.update_gui();
-
-
         end
         
         %Update block trials model data        
@@ -785,40 +781,25 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
       %% Table manipulation callback functions  
        
         % Add a new row to the block trials table
-
-        function add_trial(self, ~, ~)
-            
+        function add_trials_callback(self, ~, ~)
+        
             [checked_count, checked_list] = self.check_num_trials_selected();
-
-            x = size(self.doc.block_trials,1) + 1; %vertical index of new trial
-
+            
             if checked_count == 0
-                newRow = self.doc.block_trials(end,1:end);
-                y = 1;
-                self.doc.set_block_trial_property([x,y],newRow);
+                self.add_trial(0)
             elseif checked_count == 1
-                newRow = self.doc.block_trials(checked_list(1),1:end-1);
-                newRow{:,end+1} = false;
-                y = 1;
+                self.add_trial(checked_list(1));
+            else
+                for i = 1:length(checked_list)
+                    self.add_trial(checked_list(i));
+                end
+            end
                 
-                self.doc.set_block_trial_property([x,y], newRow);
                 
-            else 
-                self.create_error_box("you can only have one row checked for this functionality");
-                      
-            end    
-            self.block_files.pattern(end + 1) = string(cell2mat(newRow(2)));
-            self.block_files.position(end + 1) = string(cell2mat(newRow(3)));
-            self.block_files.ao1(end + 1) = string(cell2mat(newRow(4)));
-            self.block_files.ao2(end + 1) = string(cell2mat(newRow(5)));
-            self.block_files.ao3(end + 1) = string(cell2mat(newRow(6)));
-            self.block_files.ao4(end + 1) = string(cell2mat(newRow(7)));
-
-            self.update_gui();
-            
-            
         
         end
+
+
         
         % Delete a row from the block trials table
 
@@ -1859,6 +1840,34 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
         end
         
 %% Additional Table Manipulation Functions
+        
+        %Add a trial which is a copy of the inputted index (index of 0
+        %defaults to adding a copy of the last trial)
+        function add_trial(self, index)
+
+            x = size(self.doc.block_trials,1) + 1; %vertical index of new trial
+            y = 1;
+            if index == 0
+                newRow = self.doc.block_trials(end,1:end-1);
+            else
+                newRow = self.doc.block_trials(index,1:end-1);
+            end
+            newRow{end+1} = false;
+            self.doc.set_block_trial_property([x,y],newRow);
+
+   
+            self.block_files.pattern(end + 1) = string(cell2mat(newRow(2)));
+            self.block_files.position(end + 1) = string(cell2mat(newRow(3)));
+            self.block_files.ao1(end + 1) = string(cell2mat(newRow(4)));
+            self.block_files.ao2(end + 1) = string(cell2mat(newRow(5)));
+            self.block_files.ao3(end + 1) = string(cell2mat(newRow(6)));
+            self.block_files.ao4(end + 1) = string(cell2mat(newRow(7)));
+
+            self.update_gui();
+            
+            
+        
+        end
 
         % Moves a single trial up in the block table
         function move_trial_up(self, index)
