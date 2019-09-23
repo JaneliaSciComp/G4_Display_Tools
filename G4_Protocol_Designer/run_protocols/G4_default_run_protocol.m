@@ -1,10 +1,11 @@
 %% Default protocol by which to run a flight experiment. 
 
-%The first input is the currently open instance (called runcon) of the run_gui's class.
-%This allows this script to access the figure, progress bar, etc.
-
-%The second input is a struct p which contains all the parameters needed to
-%run the experiment on the screens. The structure is as follows: 
+%Notice that the inputs can be variable. In fact, there should only ever be
+%one or two inputs. The first should always be a struct of the experiment
+%parameters, following the format listed below. The second is the handle to
+%the run_gui instance that is currently open. If you are running this from
+%the command line, leave the second input out, but when running from the
+%GUI, it is needed to access the progress bar and other GUI items. 
 
 %PARAMETERS BELONGING TO EACH TRIAL
  %p.pretrial - cell array with all table values
@@ -46,15 +47,18 @@
  %p.active_ao_channels lists the channels that are active - [0 2 3] for
  %example means channels 1, 3, and 4 are active.
 
-function [success] = G4_default_run_protocol(runcon, p)
+function [success] = G4_default_run_protocol(runcon, p)%input should always be 1 or 2 items
 
-%% Get access to the figure and progress bar in the run gui.
+%% Get access to the figure and progress bar in the run gui IF it was passed in.
 
-    fig = runcon.fig;
+%        fig = runcon.fig;
     progress_bar = runcon.progress_bar;
     progress_axes = runcon.progress_axes;
     axes_label = runcon.axes_label;
     expected_time = runcon.expected_time;
+    elapsed_time = runcon.elapsed_time;
+    remaining_time = runcon.remaining_time;
+
 
  %% Set up parameters 
  %pretrial params-----------------------------------------------------
@@ -210,10 +214,10 @@ function [success] = G4_default_run_protocol(runcon, p)
             
             %Update the progress bar's label to reflect the expected
             %duration.
-           
             axes_label.String = "Estimated experiment duration: " + num2str(total_time/60) + " minutes.";
             expected_time.String = num2str(round(total_time/60, 2)) + " minutes.";
-            
+            elapsed_time.String = '0 minutes.';
+            remaining_time.String = num2str(round(total_time/60,2)) + " minutes.";
             %Will increment this every time a trial is completed to track how far along 
             %in the experiment we are
             num_trial_of_total = 0;
@@ -224,7 +228,7 @@ function [success] = G4_default_run_protocol(runcon, p)
              pause(1);
 
 %% run pretrial if it exists----------------------------------------
-
+             tic;
              if pre_start == 1
                  %First update the progress bar to show pretrial is running----
                  progress_axes.Title.String = "Running Pre-trial..."; 
@@ -308,7 +312,7 @@ function [success] = G4_default_run_protocol(runcon, p)
                     Panel_com('start_display', (pre_dur*10));
                     pause(pre_dur + .01);
                  else
-                     Panel_com('start_display', 2000);
+                     Panel_com('start_display', 20000);
                      w = waitforbuttonpress; %If pretrial duration is set to zero, this
                      %causes it to loop until you press a button.
                  end
@@ -323,6 +327,9 @@ function [success] = G4_default_run_protocol(runcon, p)
                 return;
              
              end
+             
+             elapsed_time.String = num2str(round(toc/60,2)) + " minutes";
+             remaining_time.String = num2str(round((total_time - toc)/60,2)) + " minutes";
 
 %% Loop to run the block/inter trials --------------------------------------
 
@@ -375,6 +382,10 @@ function [success] = G4_default_run_protocol(runcon, p)
                     if trial_mode == 2
                         Panel_com('set_frame_rate',frame_rate);
                     end
+                    
+                    if frame_ind == 0
+                        frame_ind = randperm(p.num_block_frames(c),1);
+                    end
 
                     Panel_com('set_position_x', frame_ind);
                     
@@ -417,7 +428,9 @@ function [success] = G4_default_run_protocol(runcon, p)
                         success = 0;
                         return;
                   
-                     end
+                    end
+                    elapsed_time.String = num2str(round(toc/60,2)) + " minutes";
+                    remaining_time.String = num2str(round((total_time - toc)/60, 2)) + " minutes";
 
                     %Tells loop to skip the intertrial if this is the last iteration of the last rep
                     if r == reps && c == num_cond
@@ -501,6 +514,13 @@ function [success] = G4_default_run_protocol(runcon, p)
                             return;
                          
                          end
+                         
+                         elapsed_time.String = num2str(round(toc/60,2)) + " minutes";
+                         time_left = total_time - toc;
+                         if time_left < 0
+                             time_left = 0;
+                         end
+                        remaining_time.String = num2str(round(time_left/60,2)) + " minutes";
                     end 
                  end
              end
@@ -576,6 +596,12 @@ function [success] = G4_default_run_protocol(runcon, p)
                     return;
                  
                  end
+                 elapsed_time.String = num2str(round(toc/60,2)) + " minutes";
+                 time_left = total_time - toc;
+                 if time_left < 0
+                     time_left = 0;
+                 end
+                 remaining_time.String = num2str(round(time_left/60,2)) + " minutes";
                  
                  
             end

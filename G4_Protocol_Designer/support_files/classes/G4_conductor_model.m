@@ -10,6 +10,8 @@ classdef G4_conductor_model < handle
         experiment_temp_;
         experiment_type_;
         rearing_protocol_
+        light_cycle_
+        metadata_comments_
         do_plotting_;
         do_processing_;
         plotting_file_;
@@ -32,6 +34,8 @@ classdef G4_conductor_model < handle
         experiment_temp;
         experimenter;
         rearing_protocol
+        light_cycle
+        metadata_comments
         experiment_type;
         do_plotting;
         do_processing;
@@ -68,10 +72,10 @@ classdef G4_conductor_model < handle
             end
             
             %This list must be in the same order as the gid strings list. 
-            list_of_metadata_fields = {'experimenter', 'fly_age', 'fly_sex', 'fly_geno', 'exp_temp', 'rearing'};
+            list_of_metadata_fields = {'experimenter', 'fly_age', 'fly_sex', 'fly_geno', 'exp_temp', 'rearing', 'light_cycle'};
            
             list_of_gid_strings = {'Users Sheet GID: ','Fly Age Sheet GID: ', 'Fly Sex Sheet GID: ', ...
-                'Fly Geno Sheet GID: ', 'Experiment Temp Sheet GID: ', 'Rearing Protocol Sheet GID: '};
+                'Fly Geno Sheet GID: ', 'Experiment Temp Sheet GID: ', 'Rearing Protocol Sheet GID: ', 'Light Cycle Sheet GID: '};
             self.list_of_gids = {};
             for i = 1:length(list_of_gid_strings)
                 [settings_data, path, index] = self.get_setting(list_of_gid_strings{i});
@@ -87,15 +91,18 @@ classdef G4_conductor_model < handle
             %%Set initial values of properties - default to first item on
             %%each metadata list.
             self.fly_name = '';
+            self.metadata_comments = '';
             self.fly_genotype = self.metadata_options.fly_geno{1};
             self.fly_age = self.metadata_options.fly_age{1};
             self.fly_sex = self.metadata_options.fly_sex{1};
             self.experiment_temp = self.metadata_options.exp_temp{1};
             self.experimenter = self.metadata_options.experimenter{1};
             self.rearing_protocol = self.metadata_options.rearing{1};
+            self.light_cycle = self.metadata_options.light_cycle{1};
             self.experiment_type = 1;
             self.do_plotting = 1;
             self.do_processing = 1;
+            self.num_tests_conducted = 0;
            
             
             
@@ -133,6 +140,41 @@ classdef G4_conductor_model < handle
             index = strfind(settings_data{path},last_five) + 5;
         
         end
+        
+        function [fly_name] = create_fly_name(self, filepath)
+            
+            results_folder = fullfile(filepath,'Results');
+            if ~exist(results_folder)
+                fly_name = 'fly001';
+            else
+
+                %count number of folders in the results folder
+                items = dir(results_folder);
+                folders = items([items(:).isdir]==1);
+                cleaned_folders = folders(~ismember({folders(:).name},{'.','..'}));
+
+                num_folders = length(cleaned_folders);
+                repeat = 1;
+                while repeat == 1
+                    if num_folders + 1 < 10
+                        num_string = ['00',num2str(num_folders+1)];
+                    elseif num_folders + 1 >= 10 && num_folders + 1 <= 99
+                        num_string = ['0',num2str(num_folders+1)];
+                    else
+                        num_string = num2str(num_folders + 1);
+                    end
+
+                    fly_name = ['fly',num_string];
+                    repeat = exist(fullfile(results_folder, self.fly_name),'dir');
+                    if repeat == 1
+                        num_folders = num_folders + 1;
+                    end
+                end
+            end
+
+            
+        end
+        
         
         
         
@@ -208,6 +250,14 @@ classdef G4_conductor_model < handle
         function output = get.rearing_protocol(self)
             output = self.rearing_protocol_;
         end
+        
+        function output = get.metadata_comments(self)
+            output = self.metadata_comments_;
+        end
+        
+        function output = get.light_cycle(self)
+            output = self.light_cycle_;
+        end
             
 
 
@@ -280,6 +330,14 @@ classdef G4_conductor_model < handle
         
         function set.rearing_protocol(self, value)
             self.rearing_protocol_ = value;
+        end
+        
+        function set.metadata_comments(self, value)
+            self.metadata_comments_ = value;
+        end
+        
+        function set.light_cycle(self, value)
+            self.light_cycle_ = value;
         end
         
        
