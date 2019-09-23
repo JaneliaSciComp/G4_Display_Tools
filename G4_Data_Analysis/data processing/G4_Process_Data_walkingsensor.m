@@ -130,7 +130,7 @@ end
 %check intertrial durations for experiment errors
 if trial_options(2)
     median_dur = median(intertrial_durs,2); %find median duration for each intertrial
-    dur_error = abs(intertrial_durs_dur-median_dur)./median_dur; %find intertrial duration error away from median
+    dur_error = abs(intertrial_durs-median_dur)./median_dur; %find intertrial duration error away from median
     bad_intertrials = find(dur_error>0.01); %find bad intertrials (any trial where duration is off by >1%)
     if ~isempty(bad_intertrials) %display bad intertrials
         out = regexp(exp_folder,'\','start');

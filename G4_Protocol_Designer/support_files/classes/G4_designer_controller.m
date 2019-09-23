@@ -1,5 +1,6 @@
 classdef G4_designer_controller < handle %Made this handle class because was having trouble getting setters to work, especially with struct properties. 
 
+%% Properties
     properties
         model_ %contains all data that does not persist with saving
         doc_ %contains all data that is stored in the saved file
@@ -18,6 +19,12 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
         inter_files_
         post_files_
 
+        %GUI parts
+        f_
+        preview_panel_
+        hAxes_
+        second_axes_
+        
         %channel gui objects
         chan1_
         chan1_rate_box_
@@ -27,33 +34,27 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
         chan3_rate_box_
         chan4_
         chan4_rate_box_
-        bg2_
- 
-        %Other gui objects
-        isRandomized_radio_
-        isSequential_radio_
-        bg_
-        repetitions_box_
-        isSelect_all_box_
-        f_
-        preview_panel_
-        hAxes_
-        second_axes_
+        
+        %Settings GUI objects
+        num_rows_buttonGrp_
         num_rows_3_
         num_rows_4_
+        randomize_buttonGrp_
+        isRandomized_radio_
+        isSequential_radio_        
+        repetitions_box_
         exp_name_box_
+        
+        %GUI Manipulation
+        isSelect_all_box_
         pageUp_button_
         pageDown_button_
-        exp_length_display_
-        
+        exp_length_display_       
         listbox_imported_files_
         recent_g4p_files_
         recent_files_filepath_
         recent_file_menu_items_
         menu_open_
-        
-
-        %is_ao_visible_
     end
 
     properties(Dependent)
@@ -93,13 +94,13 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
         chan3_rate_box
         chan4
         chan4_rate_box
-        bg2
+        num_rows_buttonGrp
         num_rows_3
         num_rows_4
         isSelect_all
         isRandomized_radio
         isSequential_radio
-        bg
+        randomize_buttonGrp
         repetitions_box
         isSelect_all_box
         f
@@ -116,16 +117,12 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
         recent_files_filepath
         recent_file_menu_items
         menu_open
-
-
     end
 
-
-    methods
+%% Methods
+    methods 
         
-        
-        
-%CONSTRUCTOR---------------------------------------------------------------
+%% CONSTRUCTOR-------------------------------------------------------------
 
         function self = G4_designer_controller()
            
@@ -159,15 +156,15 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
 
            self.layout_gui() ;
            self.update_gui() ;
-           self.set_bg2_selection();
+           self.set_num_rows_buttonGrp_selection();
         end
 
-%GUI LAYOUT METHOD DECLARES ALL OBJECTS ON SCREEN--------------------------
+%% GUI LAYOUT METHOD DECLARES ALL OBJECTS ON SCREEN------------------------
 
         function layout_gui(self)
 
 
-            %PARAMETERS ONLY USED IN LAYOUT
+            %LAYOUT PARAMETERS TO BE EDITED
 
             column_names_ = {'Mode', 'Pattern Name' 'Position Function', ...
                 'AO 1', 'AO 2', 'AO 3', 'AO 4', ...
@@ -182,76 +179,81 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
             positions.block = [350, 455, 1035, 300];
             positions.post = [350, 390, 1035, 50];
             pos_panel = [350, 90, 1035, 275];
-            pos_menu_ = [15, 875, 105, 40];
+            
+            %NO FURTHER EDITING PARAMETERS
 
-
-
-            pretrial_label_ = uicontrol(self.f, 'Style', 'text', 'String', 'Pre-Trial', ...
-               'Units', 'Pixels', 'FontSize', font_size, ...
-           'Position', [positions.pre(1) - 85, positions.pre(2) + 15, 78, 20]);
+            %pretrial_label
+            uicontrol(self.f, 'Style', 'text', 'String', 'Pre-Trial', ...
+               'Units', 'Pixels', 'FontSize', font_size, 'Position', ...
+               [positions.pre(1) - 85, positions.pre(2) + 15, 78, 20]);
 
             self.pretrial_table = uitable(self.f, 'data', self.doc.pretrial, 'columnname', column_names_, ...
             'units', 'pixels', 'Position', positions.pre, 'ColumnEditable', columns_editable_, 'ColumnFormat', column_format_, ...
            'CellEditCallback', @self.update_model_pretrial, 'CellSelectionCallback', {@self.preview_selection, positions});
 
-            intertrial_label_ = uicontrol(self.f, 'Style', 'text', 'String', 'Inter-Trial', ...
-               'units', 'pixels', 'FontSize', font_size, ...
-           'Position', [positions.inter(1) - 85, positions.inter(2) + 15, 78, 20]);
+            % intertrial_label
+            uicontrol(self.f, 'Style', 'text', 'String', 'Inter-Trial', ...
+               'units', 'pixels', 'FontSize', font_size, 'Position', ...
+               [positions.inter(1) - 85, positions.inter(2) + 15, 78, 20]);
 
             self.intertrial_table = uitable(self.f, 'data', self.doc.intertrial, 'columnname', column_names_, ...
             'units', 'pixels', 'Position', positions.inter, 'ColumnEditable', columns_editable_, 'ColumnFormat', column_format_, ...
             'CellEditCallback', @self.update_model_intertrial, 'CellSelectionCallback', {@self.preview_selection, positions});
 
-            blocktrial_label_ = uicontrol(self.f, 'Style', 'text', 'String', 'Block Trials', ...
-               'units', 'pixels', 'FontSize', font_size, ...
-           'Position', [positions.block(1) - 85, positions.block(2) + .5*positions.block(4), 78, 20]);
+            %blocktrial_label
+            uicontrol(self.f, 'Style', 'text', 'String', 'Block Trials', ...
+               'units', 'pixels', 'FontSize', font_size, 'Position', ...
+               [positions.block(1) - 85, positions.block(2) + .5*positions.block(4), 78, 20]);
 
             self.block_table = uitable(self.f, 'data', self.doc.block_trials, 'columnname', column_names_, ...
             'units', 'pixels', 'Position', positions.block, 'ColumnEditable', columns_editable_, 'ColumnFormat', column_format_, ...
             'CellEditCallback', @self.update_model_block_trials, 'CellSelectionCallback', {@self.preview_selection, positions});
 
-
-            posttrial_label_ = uicontrol(self.f, 'Style', 'text', 'String', 'Post-Trial', ...
+            %posttrial_label
+            uicontrol(self.f, 'Style', 'text', 'String', 'Post-Trial', ...
                'units', 'pixels', 'FontSize', font_size, ...
-           'Position', [positions.post(1) - 85, positions.post(2) + 15, 78, 20]);
+               'Position', [positions.post(1) - 85, positions.post(2) + 15, 78, 20]);
 
             self.posttrial_table = uitable(self.f, 'data', self.doc.posttrial, 'columnname', column_names_, ...
             'units', 'pixels', 'Position', positions.post, 'ColumnEditable', columns_editable_, 'ColumnFormat', column_format_, ...
             'CellEditCallback', @self.update_model_posttrial, 'CellSelectionCallback', {@self.preview_selection, positions});
-            
-%         %Create anonymous function which adds color to particular cells in
-%         %the above tables based on mode. 
-%             self.colorgen = @(color, text) ['<html><table border=0 width=400 bgcolor=',color,'><TR><TD>',text,'</TD></TR></table>'];
 
-            add_trial_button = uicontrol(self.f, 'Style', 'pushbutton','String','Add Trial','units', ...
-            'pixels','Position', [positions.block(1) + positions.block(3) + 5, ...
+            %add_trial_button
+            uicontrol(self.f, 'Style', 'pushbutton','String','Add Trial','units', ...
+                'pixels','Position', [positions.block(1) + positions.block(3) + 5, ...
                 positions.block(2) + 20, 75, 20], 'Callback',@self.add_trial);
 
-            delete_trial_button = uicontrol(self.f, 'Style', 'pushbutton', 'String', 'Delete Trial', ...
+            %delete_trial_button
+            uicontrol(self.f, 'Style', 'pushbutton', 'String', 'Delete Trial', ...
                 'units', 'pixels', 'Position', [positions.block(1) + positions.block(3) + 5, positions.block(2), ...
-            75, 20], 'Callback', @self.delete_trial);
+                75, 20], 'Callback', @self.delete_trial);
 
             self.isSelect_all_box = uicontrol(self.f, 'Style', 'checkbox', 'String', 'Select All', 'Value', self.model.isSelect_all, 'units', ...
                 'pixels','FontSize', font_size, 'Position', [positions.block(1) + positions.block(3) - 45, ... 
                 positions.block(2) + positions.block(4) + 2, 78, 22], 'Callback', @self.select_all);
 
-            invert_selection = uicontrol(self.f, 'Style', 'pushbutton', 'String', 'Invert Selection', ...
+            %invert_selection
+            uicontrol(self.f, 'Style', 'pushbutton', 'String', 'Invert Selection', ...
                  'units', 'pixels', 'Position', [positions.block(1) + positions.block(3) + 5, ...
                 positions.block(2) - 20, 75, 20], 'Callback', @self.invert_selection);
 
-            up_button = uicontrol(self.f, 'Style', 'pushbutton', 'String', 'Shift up', 'units', ...
+            %up_button
+            uicontrol(self.f, 'Style', 'pushbutton', 'String', 'Shift up', 'units', ...
                 'pixels', 'Position', [positions.block(1) + positions.block(3) + 5, positions.block(2) + .65*positions.block(4), ...
-                75, 20], 'Callback', @self.move_trial_up);
+                75, 20], 'Callback', @self.shift_up_callback);
 
-            down_button = uicontrol(self.f, 'Style', 'pushbutton', 'String', 'Shift down', 'units', ...
+            %down_button
+            uicontrol(self.f, 'Style', 'pushbutton', 'String', 'Shift down', 'units', ...
                 'pixels', 'Position', [positions.block(1) + positions.block(3) + 5, positions.block(2) + .35*positions.block(4), ...
-                75, 20], 'Callback', @self.move_trial_down);
+                75, 20], 'Callback', @self.shift_down_callback);
             
-            clear_all_button = uicontrol(self.f, 'Style', 'pushbutton', 'String', 'Clear All','FontSize', 12, 'units', ...
+            % clear_all_button
+            uicontrol(self.f, 'Style', 'pushbutton', 'String', 'Clear All','FontSize', 12, 'units', ...
                 'pixels', 'Position', [positions.block(1) + 1.05*positions.block(3), positions.pre(2), ...
                 85, positions.pre(4)], 'Callback', @self.clear_all);
             
-            autofill_button = uicontrol(self.f, 'Style', 'pushbutton', 'String', 'Auto-Fill', ...
+            %autofill_button
+            uicontrol(self.f, 'Style', 'pushbutton', 'String', 'Auto-Fill', ...
                 'FontSize', 14, 'units', 'pixels', 'Position', [pos_panel(1), pos_panel(2) - 50, 100, 50], ...
                 'Callback', @self.autofill);
 
@@ -267,7 +269,8 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                 'Position', [listbox_files_label.Position(1), listbox_files_label.Position(2) - 225, ...
                 150, 220],'Callback', @self.preview_selection);
             
-            select_imported_file_button = uicontrol(self.f, 'Style', 'pushbutton', 'String', 'Select', 'Position', ...
+             %select_imported_file_button
+             uicontrol(self.f, 'Style', 'pushbutton', 'String', 'Select', 'Position', ...
                 [self.listbox_imported_files.Position(1) + .5*self.listbox_imported_files.Position(3), ...
                 self.listbox_imported_files.Position(2) - 20, 75, 15], 'Callback', @self.select_new_file);
             
@@ -280,27 +283,33 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
             jPanel.getComponent(0).setOpaque(false)
             jPanel.repaint
 
-            preview_button = uicontrol(self.f, 'Style', 'pushbutton', 'String', 'Preview', 'Fontsize', ...
+            %preview_button
+            uicontrol(self.f, 'Style', 'pushbutton', 'String', 'Preview', 'Fontsize', ...
                 font_size, 'units', 'pixels', 'Position', [pos_panel(1) + pos_panel(3) + 2, ...
                 pos_panel(2), 75, 40], 'Callback', @self.full_preview);
 
-            play_button = uicontrol(self.f, 'Style', 'pushbutton', 'String', 'Play', 'FontSize', ...
+            %play_button
+            uicontrol(self.f, 'Style', 'pushbutton', 'String', 'Play', 'FontSize', ...
                 font_size, 'units', 'pixels', 'Position', [pos_panel(1) + .5*pos_panel(3) - 120, ...
                 pos_panel(2) - 35, 75, 20], 'Callback', @self.preview_play);
 
-            pause_button = uicontrol(self.f, 'Style', 'pushbutton', 'String', 'Pause', 'FontSize', ...
+            %pause_button
+            uicontrol(self.f, 'Style', 'pushbutton', 'String', 'Pause', 'FontSize', ...
                 font_size, 'units', 'pixels', 'Position', [pos_panel(1) + .5*pos_panel(3) - 35, ...
                 pos_panel(2) - 35, 75, 20], 'Callback', @self.preview_pause);
 
-            stop_button = uicontrol(self.f, 'Style', 'pushbutton', 'String', 'Stop', 'FontSize', ...
+            %stop_button = 
+            uicontrol(self.f, 'Style', 'pushbutton', 'String', 'Stop', 'FontSize', ...
                 font_size, 'units', 'pixels', 'Position', [pos_panel(1) + .5*pos_panel(3) + 50, ...
                 pos_panel(2) - 35, 75, 20], 'Callback', @self.preview_stop);
 
-            frameBack_button = uicontrol(self.f, 'Style', 'pushbutton', 'String', 'Back Frame', 'FontSize', ...
+            %frameBack_button
+            uicontrol(self.f, 'Style', 'pushbutton', 'String', 'Back Frame', 'FontSize', ...
                 font_size, 'units', 'pixels', 'Position', [pos_panel(1) + .5*pos_panel(3) - 205, ...
                 pos_panel(2) - 35, 75, 20], 'Callback', @self.frame_back);
 
-            frameForward_button = uicontrol(self.f, 'Style', 'pushbutton', 'String', 'Forward Frame', ...
+            %frameForward_button = 
+            uicontrol(self.f, 'Style', 'pushbutton', 'String', 'Forward Frame', ...
                 'FontSize', font_size, 'units', 'pixels', 'Position', [pos_panel(1) + .5*pos_panel(3) ...
                 + 135, pos_panel(2) - 35, 90, 20], 'Callback', @self.frame_forward);
             
@@ -311,21 +320,13 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
             self.pageDown_button = uicontrol(self.f, 'Style', 'pushbutton', 'String', 'Page Down', ...
                 'FontSize', font_size, 'units', 'pixels', 'Position', [pos_panel(1) + .5*pos_panel(3) - 305, ...
                 pos_panel(2) - 35, 90, 20], 'Enable', 'off', 'Callback', @self.page_down_4d);
-
-           % self.hAxes = axes(self.f, 'units', 'pixels', 'OuterPosition', [245, 135, 1190 ,397], 'TickLength', [0,0],'XLim', [0 200], 'YLim', [0 65]);
-            
-
-%             self.second_axes = axes(self.f, 'units', 'pixels', 'OuterPosition', self.hAxes.OuterPosition, ...
-%                 'XAxisLocation','top','YAxisLocation', 'right', 'TickLength',[0,0], 'XLim',[0 200], 'YLim', [0 65]);
-
-            
-            %linkaxes([self.hAxes, self.second_axes]);
             
             self.exp_name_box = uicontrol(self.f, 'Style', 'edit', ...
                 'FontSize', 14, 'units', 'pixels', 'Position', ...
                 [pos_panel(1)+ (pos_panel(3)/2) - 200, pos_panel(2) - 80, 400, 30], 'Callback', @self.update_experiment_name);
             
-            exp_name_label = uicontrol(self.f, 'Style', 'text', 'String', 'Experiment Name: ', ...
+            %exp_name_label
+            uicontrol(self.f, 'Style', 'text', 'String', 'Experiment Name: ', ...
                 'FontSize', 16, 'units', 'pixels', 'Position', [pos_panel(1) + (pos_panel(3)/2) - 375, ...
                 pos_panel(2) - 80, 150, 30]);
 
@@ -334,13 +335,15 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
        
 
             menu = uimenu(self.f, 'Text', 'File');
-            menu_import = uimenu(menu, 'Text', 'Import', 'Callback', @self.import);
+            %menu_import
+            uimenu(menu, 'Text', 'Import', 'Callback', @self.import);
             self.menu_open = uimenu(menu, 'Text', 'Open');
-            menu_recent_files = uimenu(self.menu_open, 'Text', '.g4p file', 'Callback', {@self.open_file, ''});
+            %menu_recent_files
+            uimenu(self.menu_open, 'Text', '.g4p file', 'Callback', {@self.open_file, ''});
             
                 
             for i = 1:length(self.doc.recent_g4p_files)
-                [path, filename] = fileparts(self.doc.recent_g4p_files{i});
+                [~, filename] = fileparts(self.doc.recent_g4p_files{i});
                 self.recent_file_menu_items{i} = uimenu(self.menu_open, 'Text', filename, 'Callback', {@self.open_file, self.doc.recent_g4p_files{i}});
             end
             
@@ -348,11 +351,12 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                 self.recent_file_menu_items = {};
             end
       
-
-            menu_saveas = uimenu(menu, 'Text', 'Save as', 'Callback', @self.saveas);
-            %menu_save = uimenu(menu, 'Text', 'Save', 'Callback', @self.save);
-            menu_copy = uimenu(menu, 'Text', 'Copy to...', 'Callback', @self.copy_to);
-            menu_set = uimenu(menu, 'Text', 'Set Selected...', 'Callback', @self.set_selected);
+            %menu_saveas
+            uimenu(menu, 'Text', 'Save as', 'Callback', @self.saveas);
+            %menu_copy
+            uimenu(menu, 'Text', 'Copy to...', 'Callback', @self.copy_to);
+            %menu_set
+            uimenu(menu, 'Text', 'Set Selected...', 'Callback', @self.set_selected);
             
        %Button to calculate estimated length of experiment
        
@@ -367,30 +371,38 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
 
        %Randomization
        
-            self.bg = uibuttongroup(self.f, 'units', 'pixels', 'Position', [15, positions.block(2) + positions.block(4) - 10, 130, 55], 'SelectionChangedFcn', @self.update_randomize);
+            self.randomize_buttonGrp = uibuttongroup(self.f, 'units', 'pixels', 'Position', ...
+                [15, positions.block(2) + positions.block(4) - 10, 130, 55], ...
+                'SelectionChangedFcn', @self.update_randomize);
        
        
-            self.isRandomized_radio = uicontrol(self.bg, 'Style', 'radiobutton', 'String', 'Randomize Trials', 'FontSize', font_size, ...
+            self.isRandomized_radio = uicontrol(self.randomize_buttonGrp, 'Style', 'radiobutton', ...
+                'String', 'Randomize Trials', 'FontSize', font_size, ...
                 'units', 'pixels', 'Position', [1, 29, 130, 20]);
             
-            self.isSequential_radio = uicontrol(self.bg, 'Style', 'radiobutton', 'String', 'Sequential Trials', 'FontSize', font_size, ...
+            self.isSequential_radio = uicontrol(self.randomize_buttonGrp, 'Style', 'radiobutton', ...
+                'String', 'Sequential Trials', 'FontSize', font_size, ...
                 'units', 'pixels', 'Position', [1,7, 130, 20]);
 
        %Repetitions
 
-            self.repetitions_box = uicontrol(self.f, 'Style', 'edit', 'units', 'pixels', 'Position', ...
-                [90, positions.block(2) + positions.block(4) - 45, 40, 20], 'Callback', @self.update_repetitions);
+            self.repetitions_box = uicontrol(self.f, 'Style', 'edit', 'units', ...
+                'pixels', 'Position', [90, positions.block(2) + positions.block(4) - 45, ...
+                40, 20], 'Callback', @self.update_repetitions);
 
-            repetitions_label = uicontrol(self.f, 'Style', 'text', 'String', 'Repetitions:', 'FontSize', font_size, ...
-                'units', 'pixels', 'Position', [15, positions.block(2) + positions.block(4) - 45, 70, 20]);
+            %repetitions_label
+            uicontrol(self.f, 'Style', 'text', 'String', ...
+                'Repetitions:', 'FontSize', font_size, 'units', 'pixels', ...
+                'Position', [15, positions.block(2) + positions.block(4) - 45, 70, 20]);
 
        %Dry Run
-            dry_run = uicontrol(self.f, 'Style', 'pushbutton', 'String', 'Dry Run', 'FontSize', font_size, 'units', 'pixels', 'Position', ...
+            %dry_run
+            uicontrol(self.f, 'Style', 'pushbutton', 'String', ...
+                'Dry Run', 'FontSize', font_size, 'units', 'pixels', 'Position', ...
                 [pos_panel(1) + pos_panel(3) + 2, pos_panel(2) - 40, 75, 40],'Callback',@self.dry_run);
 
        %Actual run button
-
-            run_button =  uicontrol(self.f, 'Style', 'pushbutton', 'String', 'Run Trials', 'FontSize', font_size, 'units', 'pixels', 'Position', ...
+            uicontrol(self.f, 'Style', 'pushbutton', 'String', 'Run Trials', 'FontSize', font_size, 'units', 'pixels', 'Position', ...
                  [15, positions.block(2) + positions.block(4) - 110, 90, 50], 'Callback', @self.open_run_gui);
 
        %Channels to acquire
@@ -398,52 +410,45 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
             chan_pan = uipanel(self.f, 'Title', 'Analog Input Channels', 'FontSize', font_size, 'units', 'pixels', ...
                 'Position', [15, positions.block(2) + positions.block(4) - 240, 250, 120]);
 
-            %self.chan1 = uicontrol(self.f, 'Style', 'checkbox', 'String', 'Channel 1', 'Value', self.doc.is_chan1, 'FontSize', font_size, ...
-             %   'units', 'pixels', 'Position', [20, positions.block(2) + positions.block(4) - 160, 80, 20], 'Callback', @self.update_chan1);
-
             self.chan1_rate_box = uicontrol(chan_pan, 'Style', 'edit', 'String', num2str(self.doc.chan1_rate), 'units', 'pixels', 'Position', ...
                 [170, 74, 40, 20],'Callback', @self.update_chan1_rate);
 
-            chan1_rate_label = uicontrol(chan_pan, 'Style', 'text', 'String', 'Channel 1 Sample Rate', 'FontSize', font_size, ...
+            %chan1_rate_label
+            uicontrol(chan_pan, 'Style', 'text', 'String', 'Channel 1 Sample Rate', 'FontSize', font_size, ...
                 'units', 'pixels', 'HorizontalAlignment', 'left', 'Position', [15, 74, 150, 20]);
-
-            %self.chan2 = uicontrol(self.f, 'Style', 'checkbox', 'String', 'Channel 2', 'Value', self.doc.is_chan2, 'FontSize', font_size, ...
-            %    'units', 'pixels', 'Position', [20, positions.block(2) + positions.block(4) - 180, 80, 20], 'Callback', @self.update_chan2);
 
             self.chan2_rate_box = uicontrol(chan_pan, 'Style', 'edit', 'String', num2str(self.doc.chan2_rate), 'units', 'pixels', 'Position', ...
                 [170, 51, 40, 20], 'Callback', @self.update_chan2_rate);
 
-            chan2_rate_label = uicontrol(chan_pan, 'Style', 'text', 'String', 'Channel 2 Sample Rate', 'FontSize', font_size, ...
+            %chan2_rate_label
+            uicontrol(chan_pan, 'Style', 'text', 'String', 'Channel 2 Sample Rate', 'FontSize', font_size, ...
                 'units', 'pixels', 'HorizontalAlignment', 'left', 'Position', [15, 51, 150, 20]);
-
-            %self.chan3 = uicontrol(self.f, 'Style', 'checkbox', 'String', 'Channel 3', 'Value', self.doc.is_chan3, 'FontSize', font_size, ...
-             %   'units', 'pixels', 'Position', [20, positions.block(2) + positions.block(4) - 200, 80, 20], 'Callback', @self.update_chan3);
 
             self.chan3_rate_box = uicontrol(chan_pan, 'Style', 'edit', 'String', num2str(self.doc.chan3_rate), 'units', 'pixels', 'Position', ...
                 [170, 28, 40, 20], 'Callback', @self.update_chan3_rate);
 
-            chan3_rate_label = uicontrol(chan_pan, 'Style', 'text', 'String', 'Channel 3 Sample Rate', 'FontSize', font_size, ...
+            %chan3_rate_label
+            uicontrol(chan_pan, 'Style', 'text', 'String', 'Channel 3 Sample Rate', 'FontSize', font_size, ...
                 'HorizontalAlignment', 'left', 'units', 'pixels', 'Position', [15, 28, 150, 20]);
-
-            %self.chan4 = uicontrol(self.f, 'Style', 'checkbox', 'String', 'Channel 4', 'Value', self.doc.is_chan4, 'FontSize', font_size, ...
-             %   'units', 'pixels', 'Position', [20, positions.block(2) + positions.block(4) - 220, 80, 20], 'Callback', @self.update_chan4);
 
             self.chan4_rate_box = uicontrol(chan_pan, 'Style', 'edit', 'String', num2str(self.doc.chan4_rate), 'units', 'pixels', 'Position', ...
                 [170, 5, 40, 20], 'Callback', @self.update_chan4_rate);
 
-            chan4_rate_label = uicontrol(chan_pan, 'Style', 'text', 'String', 'Channel 4 Sample Rate', 'FontSize', font_size, ...
+            %chan4_rate_label
+            uicontrol(chan_pan, 'Style', 'text', 'String', 'Channel 4 Sample Rate', 'FontSize', font_size, ...
                 'HorizontalAlignment', 'left', 'units', 'pixels', 'Position', [15, 5, 150, 20]);
 
-            self.bg2 = uibuttongroup(self.f, 'units', 'pixels', 'Position', [15, positions.block(2) + positions.block(4) - 270, 250, 25], 'SelectionChangedFcn', @self.update_rowNum);
+            self.num_rows_buttonGrp = uibuttongroup(self.f, 'units', 'pixels', 'Position', [15, positions.block(2) + positions.block(4) - 270, 250, 25], 'SelectionChangedFcn', @self.update_rowNum);
        
        
-            self.num_rows_3 = uicontrol(self.bg2, 'Style', 'radiobutton', 'String', '3 Row Screen', 'FontSize', font_size, ...
+            self.num_rows_3 = uicontrol(self.num_rows_buttonGrp, 'Style', 'radiobutton', 'String', '3 Row Screen', 'FontSize', font_size, ...
                 'units', 'pixels', 'Position', [1, 3, 120, 19]);
             
-            self.num_rows_4 = uicontrol(self.bg2, 'Style', 'radiobutton', 'String', '4 Row Screen', 'FontSize', font_size, ...
+            self.num_rows_4 = uicontrol(self.num_rows_buttonGrp, 'Style', 'radiobutton', 'String', '4 Row Screen', 'FontSize', font_size, ...
                 'units', 'pixels', 'Position', [121,3, 120, 19]);
             
-            key_pan = uipanel(self.f, 'Title', 'Mode Key:', 'BackgroundColor', [.75, .75, .75], 'BorderType', 'none', ...
+            %key_pan = 
+            uipanel(self.f, 'Title', 'Mode Key:', 'BackgroundColor', [.75, .75, .75], 'BorderType', 'none', ...
                 'FontSize', 13, 'units', 'pixels', 'Position', [15, positions.block(2) + positions.block(4) - 720, 230, 420]);
             
             mode_1_label = uicontrol(self.f, 'Style', 'text', 'String', 'Mode 1: Position Function', 'BackgroundColor', [.75,.75,.75], ...
@@ -475,54 +480,18 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
 
         end
         
-%UPDATE THE GUI VALUES FROM UPDATED MODEL DATA-----------------------------
+%% CALLBACK FUNCTIONS------------------------------------------------------
+    %% Edit callbacks to update values in the model
+        %(Update functions which do not serve as a callback toward end)
+    
+        %Update pretrial model data
 
-        function update_gui(self)
-
-
-            self.set_pretrial_table_data();
-            self.set_intertrial_table_data();
-            self.set_block_table_data();
-            self.set_posttrial_table_data();
-            self.set_bg_selection();
-            self.set_repetitions_box_val();
-            self.set_isSelect_all_box_val();
-            self.set_chan1_val();
-            self.set_chan2_val();
-            self.set_chan3_val();
-            self.set_chan4_val();
-            self.set_chan1_rate_box_val();
-            self.set_chan2_rate_box_val();
-            self.set_chan3_rate_box_val();
-            self.set_chan4_rate_box_val();
-            self.set_bg2_selection();
-            self.set_exp_name();
-            self.set_recent_file_menu_items();
-            self.set_exp_length_text();
-            
-
-
-        end
-        
-%         function update_gui_block(self, x, y)
-%             
-%             self.set_block_table_data_xy(x, y);
-%             
-%         end
-     
-%UPDATE MODEL DATA FROM USER INPUT-----------------------------------------
-
-%Update pretrial model data
-
-        function update_model_pretrial(self, src, event)
+        function update_model_pretrial(self, ~, event)
 
             mode = self.doc.pretrial{1};
             new = event.EditData;
-            x = event.Indices(1);
             y = event.Indices(2);
             allow = self.check_editable(mode, y);
-            %within_bounds = self.check_constraints(y, new); %Doesn't work
-            %yet
 
             if allow == 1 %&& within_bounds == 1
                 if y >= 2 && y <= 7
@@ -538,16 +507,9 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                 end
 
 
-
-    %             elseif within_bounds == 0
-    %                 
-    %                 self.create_error_box("The value you provided is out of bounds."));
-    %                 self.layout_gui();
-
             else
 
                 self.create_error_box("You cannot edit that field in this mode.");
-                %self.layout_gui();
 
 
             end
@@ -558,13 +520,13 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
             end
             
              self.update_gui();
-             %disp(self.pre_files);
+
 
         end
         
-%Update block trials model data        
+        %Update block trials model data        
         
-        function update_model_block_trials(self, src, event)
+        function update_model_block_trials(self, ~, event)
             
             new = event.EditData;
             x = event.Indices(1);
@@ -607,9 +569,9 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
             
         end
         
-%Update intertrial model data        
+        %Update intertrial model data        
         
-        function update_model_intertrial(self, src, event)
+        function update_model_intertrial(self, ~, event)
             
             new = event.EditData;
             x = event.Indices(1);
@@ -644,9 +606,9 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
             %disp(self.inter_files);
         end
         
-%Update posttrial model data
+        %Update posttrial model data
 
-        function update_model_posttrial(self, src, event)
+        function update_model_posttrial(self, ~, event)
             new = event.EditData;
             x = event.Indices(1);
             y = event.Indices(2);
@@ -681,9 +643,9 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
         
         end
         
-%Update repetitions        
+        %Update repetitions        
         
-        function update_repetitions(self, src, event)
+        function update_repetitions(self, src, ~)
         
             new = str2num(src.String);
             self.doc.repetitions = new;
@@ -692,9 +654,9 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
         
         end
 
-%Update Randomization
+        %Update Randomization
 
-        function update_randomize(self, src, event)
+        function update_randomize(self, ~, event)
             
             new = event.NewValue.String;
             if strcmp(new, 'Randomize Trials') == 1
@@ -707,47 +669,8 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
             %self.doc.is_randomized
             
         end
-        
-%Update channels being acquired (each separately)
-        
-%         function update_chan1(self, src, event)
-%             
-%             new = src.Value;
-%             self.doc.is_chan1 = new;
-%             self.update_gui();
-%             %self.doc.is_chan1
-%         
-%         end
-%         
-%         function update_chan2(self, src, event)
-% 
-%             new = src.Value;
-%             self.doc.is_chan2 = new;
-%             self.update_gui();
-%             %self.doc.is_chan2
-% 
-%         end
-%         
-%         function update_chan3(self, src, event)
-% 
-%             new = src.Value;
-%             self.doc.is_chan3 = new;
-%             self.update_gui();
-%             %self.doc.is_chan3
-% 
-%         end
-%         
-%         function update_chan4(self, src, event)
-% 
-%             new = src.Value;
-%             self.doc.is_chan4 = new;
-%             self.update_gui();
-%             %self.model.is_chan4
-%         
-%         end
- 
-%Update the frame rates of channels being collected        
-        
+       
+        %Update channel sample rates
         function update_chan1_rate(self, src, ~)
             
             new = str2num(src.String);
@@ -824,16 +747,9 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
             
         end
         
-%         function update_doc(self, new_value)
-%             
-%             self.doc = new_value;
-%         end
-%         
-        function update_preview_con(self, new_value)
-            self.preview_con = new_value;
-        end
         
-        function update_rowNum(self, src, event)
+        %Update the screen type (3 or 4 rows)
+        function update_rowNum(self, ~, event)
             new = event.NewValue.String;
             if strcmp(new, '3 Row Screen') == 1
                 new_val = 3;
@@ -846,11 +762,12 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
             self.doc.num_rows = new_val;%do this for other config updating
             self.doc.set_config_data(new_val, 0);
             self.doc.update_config_file();
-            self.set_bg2_selection();
+            self.set_num_rows_buttonGrp_selection();
 
 %            self.update_gui();
         end
         
+        %Update the experiment name
         function update_experiment_name(self, src, ~)
             
             new_val = src.String;
@@ -864,38 +781,386 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
             
         end
         
-        function update_exp_length(self, new)
-            self.doc.est_exp_length = new;
-            self.update_gui();
         
+      %% Table manipulation callback functions  
+       
+        % Add a new row to the block trials table
+
+        function add_trial(self, ~, ~)
+            
+            [checked_count, checked_list] = self.check_num_trials_selected();
+
+            x = size(self.doc.block_trials,1) + 1; %vertical index of new trial
+
+            if checked_count == 0
+                newRow = self.doc.block_trials(end,1:end);
+                y = 1;
+                self.doc.set_block_trial_property([x,y],newRow);
+            elseif checked_count == 1
+                newRow = self.doc.block_trials(checked_list(1),1:end-1);
+                newRow{:,end+1} = false;
+                y = 1;
+                
+                self.doc.set_block_trial_property([x,y], newRow);
+                
+            else 
+                self.create_error_box("you can only have one row checked for this functionality");
+                      
+            end    
+            self.block_files.pattern(end + 1) = string(cell2mat(newRow(2)));
+            self.block_files.position(end + 1) = string(cell2mat(newRow(3)));
+            self.block_files.ao1(end + 1) = string(cell2mat(newRow(4)));
+            self.block_files.ao2(end + 1) = string(cell2mat(newRow(5)));
+            self.block_files.ao3(end + 1) = string(cell2mat(newRow(6)));
+            self.block_files.ao4(end + 1) = string(cell2mat(newRow(7)));
+
+            self.update_gui();
+            
+            
         
         end
-       
         
-%         function update_config_file(self)
-%             %open config file
-%             %change appropriate rate
-%             %save and close config file
-%             configData = self.doc.configData;
-% 
-%             settings_data = strtrim(regexp( fileread('G4_Protocol_Designer_Settings.m'),'\n','split'));
-%             filepath_line = find(contains(settings_data,'Configuration File Path:'));
-%             exp = 'Path:';
-%             startIndex = regexp(settings_data{filepath_line},exp);
-%             start_filepath_index = startIndex + 6;
-%             config_filepath = settings_data{filepath_line}(start_filepath_index:end);
-%             fid = fopen(config_filepath,'w');
-%             fprintf(fid, '%s\n', configData{:});
-%             fclose(fid);
-%             
-%         end
+        % Delete a row from the block trials table
+
+        function delete_trial(self, ~, ~)
+            
+            [checked_count, checked_list] = self.check_num_trials_selected();
+      
+            if checked_count == 0
+                self.create_error_box("You didn't select a trial to delete.");
+            else
+                
+                for i = 1:checked_count
+                     
+                     self.doc.block_trials(checked_list(i) - (i-1),:) = [];
+
+                end
+                
+            end
+            
+            self.update_gui();
+ 
+        end
+        
+        %Shift one or more trials up in the block trials table
+
+        function shift_up_callback(self, ~, ~)
+            
+            [checked_count, checked_rows] = self.check_num_trials_selected();
+            
+            if checked_count == 0
+                
+                self.create_error_box("Please select a trial to shift upward");
+                
+            elseif checked_count == 1
+                
+                self.move_trial_up(checked_rows);
+                
+            else
+                
+                for i = 1:length(checked_rows)
+                    
+                    self.move_trial_up(checked_rows(i));
+                
+                end
+            end
+        end
+
+        % Shift one or more trials down in the block trials table
+
+        function shift_down_callback(self, ~, ~)
+
+            [checked_count, checked_rows] = self.check_num_trials_selected();
+            
+            if checked_count == 0
+                
+                self.create_error_box("Please select a trial to shift downward");
+                
+            elseif checked_count == 1
+                
+                self.move_trial_down(checked_rows);
+                
+            else
+                
+                for i = 0:length(checked_rows) - 1
+                    
+                    index = length(checked_rows) - i;
+                    self.move_trial_down(checked_rows(index));
+                
+                end
+            end
+        end
+        
+        % Select (or deselect) all trials in the block trials table
+
+        function select_all(self, src, ~)
+          %assuming here that the number parameters will never differ between
+          %trials. 
+        
+            l = length(self.doc.block_trials(1,:));
+            if src.Value == false  
+                for i = 1:length(self.doc.block_trials(:,1))
+                    if self.doc.block_trials{i, l} == 1
+                        self.doc.set_block_trial_property([i, l], false);
+                    end
+                end
+
+            else
+                for i = 1:length(self.doc.block_trials(:,1))
+                    if cell2mat(self.doc.block_trials(i, l)) == 0
+                        self.doc.set_block_trial_property([i, l], true);
+                    end
+                end
+
+            end
+            self.model.isSelect_all = src.Value;
+            self.update_gui();
+        
+        end
+        
+        % Invert which trials in the block trial are selected
+
+        function invert_selection(self, ~, ~)
+
+            num = length(self.doc.block_trials(:,1));
+            len = length(self.doc.block_trials(1,:));
+
+            for i = 1:num
+                if cell2mat(self.doc.block_trials(i,len)) == 0
+                    self.doc.set_block_trial_property([i, len], true);
+                elseif cell2mat(self.doc.block_trials(i,len)) == 1
+                    self.doc.set_block_trial_property([i,len], false);
+                else
+                    disp('There has been an error, the selected value must be true or false');
+                end
+            end
+
+            self.update_gui();
+
+        end
+        
+        % Button to auto populate tables with the imported files in a
+        % semi-intelligent way
+        
+%%%%%%%%%%%%%TO DO - AUTOFILL FUNCTION IS LARGE, BREAK IT UP        
+        function autofill(self, ~, ~)
+
+            pat_index = 1; %Keeps track of the indices of patterns that are actually displayed (not cut due to screen size discrepancy)
+            pat_indices = []; %A record of all pattern indices that match the screen size.
+
+            d = self.doc;
+
+            pat_fields = fieldnames(d.Patterns);
+            %Create an array of ID values from each pattern field
+            for i = 1:length(pat_fields)
+                pattern_ids{i} = d.Patterns.(pat_fields{i}).pattern.param.ID;
+            end
+
+            %Create an array of actual pattern names in order by ID, so if you
+            %imported pattern0008, then pattern0001, then pattern0003, it will
+            %still autofill 0001, 0003, 0008.
+            pat_names = cell(length(pat_fields),1);
+            for k = 1:length(pat_fields)
+                [val, idx] = min(cell2mat(pattern_ids));
+                pat_names{k} = d.Patterns.(pat_fields{idx}).filename;
+                pattern_ids{idx} = 100000;
+
+            end
+
+            if ~isempty(fieldnames(d.Pos_funcs))
+
+                pos_fields = fieldnames(d.Pos_funcs);
+                pos_names = cell(length(pos_fields),1);
+                for i = 1:length(pos_fields)
+                    pos_ids{i} = d.Pos_funcs.(pos_fields{i}).pfnparam.ID;
+                end
+                for j = 1:length(pos_fields)
+                    [val, idx] = min(cell2mat(pos_ids));
+                    pos_names{j} = d.Pos_funcs.(pos_fields{idx}).filename;
+                    pos_ids{idx} = 100000;
+                end
+
+            else
+                pos_names = [];
+            end
+            if ~isempty(fieldnames(d.Ao_funcs))
+
+                ao_fields = fieldnames(d.Ao_funcs);
+                ao_names = cell(length(ao_fields),1);
+                for i = 1:length(ao_fields)
+                    ao_ids{i} = d.Ao_funcs.(ao_fields{i}).afnparam.ID;
+                end
+                for j = 1:length(ao_fields)
+                    [val, idx] = min(cell2mat(ao_ids));
+                    ao_names{j} = d.Ao_funcs.(ao_fields{idx}).filename;
+                    ao_ids{idx} = 100000;
+                end
+            else
+                ao_names = [];
+            end
+
+            num_pats = length(pat_names);
+            num_pos = length(pos_names);
+            num_ao = length(ao_names);
+
+            pat1 = pat_names{pat_index};
+            pat1_field = d.get_pattern_field_name(pat1);
+
+            if length(d.Patterns.(pat1_field).pattern.Pats(:,1,1))/16 ~= self.doc.num_rows
+                while length(d.Patterns.(pat1_field).pattern.Pats(:,1,1)) ~= self.doc.num_rows && pat_index < length(pat_names)
+                    pat_index = pat_index + 1;
+                    pat1 = pat_names{pat_index};
+                end
+
+            end
+
+            if pat_index == length(pat_names) && length(d.Patterns.(pat1_field).pattern.Pats(:,1,1))/16 ~= self.doc.num_rows
+                self.create_error_box("None of the patterns imported match the screen size selected. Please import a different folder or select a new screen size");
+                return;
+            end
+
+            pat_indices(1) = pat_index;
+            if pat_index <= num_pos
+                pos_index = pat_index;
+            else 
+                pos_index = 1;
+            end
+            if pat_index <= num_ao
+                ao_index = pat_index;
+            else
+                ao_index = 1;
+            end
+
+            if num_pos ~= 0
+                pos1 = pos_names{pos_index}; %Set initial position and ao functions to correspond to initial pattern.
+                pos1_field = d.get_posfunc_field_name(pos1);
+                if length(d.Patterns.(pat1_field).pattern.Pats(1,1,:)) < ...
+                    max(d.Pos_funcs.(pos1_field).pfnparam.func)
+                pos1 = '';
+                end
+            else
+                pos1 = '';
+
+            end
+            if num_ao ~= 0
+                ao1 = ao_names{ao_index};
+                ao1_field = d.get_aofunc_field_name(ao1);
+            else
+                ao1 = '';
+            end    
+
+            d.set_pretrial_property(2, pat1);
+            d.set_pretrial_property(3, pos1);
+            d.set_pretrial_property(4, ao1);
+
+            %disable appropriate cells for mode 1
+            d.set_pretrial_property(9, self.doc.colorgen());
+            d.set_pretrial_property(10, self.doc.colorgen());
+            d.set_pretrial_property(11, self.doc.colorgen());
+
+            d.set_intertrial_property(2, pat1);
+            d.set_intertrial_property(3, pos1);
+            d.set_intertrial_property(4, ao1);
+
+            %disable appropriate cells for mode 1
+            d.set_intertrial_property(9, self.doc.colorgen());
+            d.set_intertrial_property(10, self.doc.colorgen());
+            d.set_intertrial_property(11, self.doc.colorgen());
+
+            d.set_posttrial_property(2, pat1);
+            d.set_posttrial_property(3, pos1);
+            d.set_posttrial_property(4, ao1);
+
+            d.set_posttrial_property(9, self.doc.colorgen());
+            d.set_posttrial_property(10, self.doc.colorgen());
+            d.set_posttrial_property(11, self.doc.colorgen());
+
+            d.set_block_trial_property([1,2], pat1);
+            d.set_block_trial_property([1,3], pos1);
+            d.set_block_trial_property([1,4], ao1);
+
+            d.set_block_trial_property([1,9], self.doc.colorgen());
+            d.set_block_trial_property([1,10], self.doc.colorgen());
+            d.set_block_trial_property([1,11], self.doc.colorgen());
+
+            j = 1; %will end up as the count of how many patterns are used. Acts as the indices to "pat_indices"
+            pat_index = pat_index + 1;
+            pos_index = pos_index + 1;
+            ao_index = ao_index + 1;
+
+            if pat_index < num_pats
+
+                for i = pat_index:num_pats
+
+                    pat = pat_names{pat_index};
+                    pat_field = d.get_pattern_field_name(pat);
+                    if num_pos ~= 0
+                        if pos_index > num_pos %Make sure indices are in range 
+                            pos_index = 1;
+                        end
+                        pos = pos_names{pos_index};
+                        pos_field = d.get_posfunc_field_name(pos);
+                    else
+
+                        pos = '';
+                    end
+
+                    if num_ao ~= 0
+
+                        if ao_index > num_ao
+                            ao_index = 1;
+                        end
+                        ao = ao_names{ao_index};
+                        ao_field = d.get_aofunc_field_name(ao);
+                    else
+                        ao = '';
+                    end
 
 
+                    if length(d.Patterns.(pat_field).pattern.Pats(:,1,1))/16 ~= d.num_rows
+                        pat_index = pat_index + 1;
+                        pos_index = pos_index + 1;
+                        ao_index = ao_index + 1;
+
+                        continue;
+                    end
+                    %Only executes if previous if statement did not. Sets new row's pattern
+                    newrow = self.doc.block_trials(end, 1:end);
+                    newrow{2} = pat; 
+
+                    newrow{3} = pos; 
+
+                    newrow{4} = ao; 
+                    pat_indices(j) = pat_index;
+                    j = j + 1;
+                    pat_index = pat_index + 1;
+                    pos_index = pos_index + 1;
+                    ao_index = ao_index + 1;
+
+                    if ~strcmp(newrow{3},'')
+                        if length(d.Patterns.(pat_field).pattern.Pats(1,1,:)) < ...
+                               max(d.Pos_funcs.(pos_field).pfnparam.func)
+                            newrow{3} = '';
+                        end
+                    end
+
+                    d.set_block_trial_property([j,1],newrow);
+                    self.block_files.pattern(end + 1) = string(newrow{2});
+                    self.block_files.position(end + 1) = string(newrow{3});
+
+
+                end
+            end
+            self.update_gui();
+        end
+        
+        %Replace the currently selected cell in the tables with the
+        %currently selected file in the imported files list.
+        
         function select_new_file(self, ~, ~)
         
             new_file = self.listbox_imported_files.String{self.listbox_imported_files.Value};
-            
-            
+
             if strcmp(self.model.current_selected_cell.table, "pre")
                 self.doc.set_pretrial_property(self.model.current_selected_cell.index(2), new_file);
             elseif strcmp(self.model.current_selected_cell.table, "inter")
@@ -907,709 +1172,181 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
             end
             
             self.update_gui();
-            
-        
-        end
-
-
-        function create_error_box(~, varargin)
-            if isempty(varargin)
-                return;
-            else
-                msg = varargin{1};
-                if length(varargin) >= 2
-                    title = varargin{2};
-                else
-                    title = "";
-                end
-
-                e = errordlg(msg, title);
-                set(e, 'Resize', 'on');
-                waitfor(e);
-
-            end
-
         end
         
-%CLEAR OUT ALL DATA TO START DESIGNING NEW EXPERIMENT----------------------
-
-        function clear_all(self, ~, ~)
-            
-            question = "Make sure you have saved your experiment, or it will be lost.";
-            answer = questdlg(question, 'Confirm Clear All', 'Continue', 'Cancel', 'Cancel');
-            switch answer
-                case 'Cancel'
-                    return;
-                case 'Continue'
-                    
-                     %keep instances of each class but clear all data
-                    clear self.model;
-                    delete(self.doc);
-                    self.doc = G4_document();
-                    self.update_gui();
-                    
-                    
-            end
-            
-        end
-        
+        %Callback upon right click of table cell (does nothing atm)
         function right_click(self, src, event)
            
             disp("You right clicked the cell!");
             
         end
         
-%ADD ROW AND UPDATE MODEL DATA---------------------------------------------
-
-        function add_trial(self, ~, ~)
-
-            checkbox_column_data = horzcat(self.doc.block_trials(1:end, end));
-            checked_list = find(cell2mat(checkbox_column_data));
-            checked_count = length(checked_list);
-            x = size(self.doc.block_trials,1) + 1;
-            
-          
-            if checked_count == 0
-                newRow = self.doc.block_trials(end,1:end);
-                y = 1;
-                self.doc.set_block_trial_property([x,y],newRow);
-            elseif checked_count == 1
-                newRow = self.doc.block_trials(checked_list(1),1:end-1);
-                newRow{:,end+1} = false;
-                %disp(newRow);
-                y = 1;
-                self.doc.set_block_trial_property([x,y], newRow);
-                
-                
-            else 
-                self.create_error_box("you can only have one row checked for this functionality");
-                      
-                  
-                
-            end    
-            self.block_files.pattern(end + 1) = string(cell2mat(newRow(2)));
-            self.block_files.position(end + 1) = string(cell2mat(newRow(3)));
-            self.block_files.ao1(end + 1) = string(cell2mat(newRow(4)));
-            self.block_files.ao2(end + 1) = string(cell2mat(newRow(5)));
-            self.block_files.ao3(end + 1) = string(cell2mat(newRow(6)));
-            self.block_files.ao4(end + 1) = string(cell2mat(newRow(7)));
-            
-%             for i = 1:13
-%                 
-%                 self.update_gui_block(x, i)
-%                 
-%             end
-
-            self.update_gui();
-            
-            
+     %% File menu callback functions
         
+        %Import a folder or file
+        function import(self, ~, ~)
+
+           options = {'Folder', 'File', 'Filtered File'};
+           answer = listdlg('PromptString', 'Would you like to import a folder or a file?',...
+               'SelectionMode', 'Single', 'ListString', options, 'ListSize', [180,60]);
+
+           if answer == 1
+               self.import_folder('');
+
+           elseif answer == 2
+               self.import_file('')
+
+           elseif answer == 3
+               str_to_match = self.get_filter_string();
+               self.import_file(str_to_match);
+
+           else
+               %do nothing
+           end
         end
-
-%DELETE ROW AND UPDATE MODEL DATA------------------------------------------
-
-        function delete_trial(self, src, event)
         
-            checkbox_column_data = horzcat(self.doc.block_trials{1:end, end});
-            checked_list = find(checkbox_column_data);
-            checked_count = length(checked_list);
-            %disp(checked_list);
+        %Open a .g4p file. Optionally input a filepath
+        function open_file(self, ~, ~, filepath)
             
-            if checked_count == 0
-                self.create_error_box("You didn't select a trial to delete.");
+            %Get filepath if one has not been inputted
+            if strcmp(filepath,'')
+                [filename, top_folder_path] = uigetfile('*.g4p');
+                filepath = fullfile(top_folder_path, filename);
             else
-                
-                for i = 1:checked_count
-%                     for j = 1:13
-%                          new = [];
-%                
-%                          x = checked_list(i) - (i - 1);
-%                          self.doc.set_block_trial_property( ,new);
-%                          self.doc.block_trials
-%                     
-                        self.doc.block_trials(checked_list(i) - (i-1),:) = [];
-                        %disp(self.doc.block_trials);
-%                     end
-                
-                end
-                
+                [top_folder_path, ~] = fileparts(filepath);
             end
-            
-            self.update_gui();
-                
-        
-        end
-        
-        
-%MOVE TRIAL UP AND UPDATE MODEL DATA---------------------------------------
 
-        function move_trial_up(self, src, event)
-        
-            checkbox_column_data = horzcat(self.doc.block_trials(1:end, end));
-            checked = find(cell2mat(checkbox_column_data));
-            checked_count = length(checked);
-            
-            if checked_count == 0
-                self.create_error_box("Please select a trial to shift upward.");
-            elseif checked_count > 1
-                self.create_error_box("Please select only one trial to shift upward.");
-            else 
-            
-                selected = self.doc.block_trials(checked, :);
-                if checked == 1
-                    self.create_error_box("I can't shift up any more.");
+            if isequal (top_folder_path,0)
+                return; %Return if user canceled
+            else
+
+                self.doc.top_export_path = top_folder_path;
+                self.doc.import_folder(top_folder_path);
+                [~, exp_name, ~] = fileparts(filepath);
+
+                if isempty(fieldnames(self.doc.Patterns))
+                    %no patterns were successfully imported, so don't autofill
                     return;
-                else
-                    above_selected = self.doc.block_trials(checked - 1, :);
                 end
- 
-               
-                self.doc.block_trials(checked , :) = above_selected;
-                self.doc.block_trials(checked - 1, :) = selected;
 
-                
-            end
-            
-%             for i = 1:13
-%                 self.update_gui_block(checked, i);
-%                 self.update_gui_block(checked - 1, i);
-%             end
-              self.update_gui();
-            
-      
-        end
-        
-        
-%MOVE TRIAL DOWN AND UPDATE MODEL DATA-------------------------------------
+                data = self.doc.open(filepath);
+                m = self.doc;
+                d = data.exp_parameters;
 
-        function move_trial_down(self, src, event)
+                %Set parameters outside tables
+                self.doc.experiment_name = exp_name;
+                self.set_exp_name();
+                m.repetitions = d.repetitions;
+                m.is_randomized = d.is_randomized;
+                m.is_chan1 = d.is_chan1;
+                m.is_chan2 = d.is_chan2;
+                m.is_chan3 = d.is_chan3;
+                m.is_chan4 = d.is_chan4;
+                m.chan1_rate = d.chan1_rate;
+                m.set_config_data(d.chan1_rate, 1);
+                m.chan2_rate = d.chan2_rate;
+                m.set_config_data(d.chan2_rate, 2);
+                m.chan3_rate = d.chan3_rate;
+                m.set_config_data(d.chan3_rate, 3);
+                m.chan4_rate = d.chan4_rate;
+                m.set_config_data(d.chan4_rate, 4);
+                m.num_rows = d.num_rows;
+                m.set_config_data(d.num_rows, 0);
+                self.doc.update_config_file();
 
-            
-            checkbox_column_data = horzcat(self.doc.block_trials(1:end, end));
-            checked = find(cell2mat(checkbox_column_data));
-            checked_count = length(checked);
-            
-            if checked_count == 0
-                self.create_error_box("Please select a trial to shift downward");
-            elseif checked_count > 1
-                self.create_error_box("Please select only one trial to shift downward");
-            else 
-                
-                selected = self.doc.block_trials(checked, :);
-                
-                if checked == length(self.doc.block_trials(:,1))
-                    self.create_error_box("I can't shift down any further.");
-                    return;
-                else
-                    below_selected = self.doc.block_trials(checked + 1, :);
+
+                for k = 1:13
+
+                    m.set_pretrial_property(k, d.pretrial{k});
+                    m.set_intertrial_property(k, d.intertrial{k});
+                    m.set_posttrial_property(k, d.posttrial{k});
+
                 end
-                    
 
-                
-                self.doc.block_trials(checked, :) = below_selected;
-                self.doc.block_trials(checked + 1, :) = selected;
+                for i = 2:length(m.block_trials(:, 1))
+                    m.block_trials((i-(i-2)),:) = [];
+                end
+                block_x = length(d.block_trials(:,1));
+                block_y = 1;
 
-                
-            end
-%             
-%             for i = 1:13
-%                 self.update_gui_block(checked, i);
-%                 self.update_gui_block(checked + 1, i);
-%             end
-            self.update_gui();
-                
-        end
-        
-        function calculate_experiment_length(self, src, event)
-        
-            total_dur = self.doc.pretrial{12} + self.doc.posttrial{12};
-            for i = 1:length(self.doc.block_trials(:,1))
-                total_dur = total_dur + (self.doc.block_trials{i,12} + self.doc.intertrial{12})*self.doc.repetitions;
-            end
-            total_dur = total_dur - self.doc.intertrial{12};
-            self.update_exp_length(total_dur);
-            
-        
-        end
-        
-%Autopopulate button, to be pressed after importing.
-    function autofill(self, src, event)
-        
-        pat_index = 1; %Keeps track of the indices of patterns that are actually displayed (not cut due to screen size discrepancy)
-        pat_indices = []; %A record of all pattern indices that match the screen size.
-        
-        d = self.doc;
-        
-        pat_fields = fieldnames(d.Patterns);
-        %Create an array of ID values from each pattern field
-        for i = 1:length(pat_fields)
-            pattern_ids{i} = d.Patterns.(pat_fields{i}).pattern.param.ID;
-        end
-        
-        %Create an array of actual pattern names in order by ID, so if you
-        %imported pattern0008, then pattern0001, then pattern0003, it will
-        %still autofill 0001, 0003, 0008.
-        pat_names = cell(length(pat_fields),1);
-        for k = 1:length(pat_fields)
-            [val, idx] = min(cell2mat(pattern_ids));
-            pat_names{k} = d.Patterns.(pat_fields{idx}).filename;
-            pattern_ids{idx} = 100000;
-        
-        end
-        
-        if ~isempty(fieldnames(d.Pos_funcs))
-            
-            pos_fields = fieldnames(d.Pos_funcs);
-            pos_names = cell(length(pos_fields),1);
-            for i = 1:length(pos_fields)
-                pos_ids{i} = d.Pos_funcs.(pos_fields{i}).pfnparam.ID;
-            end
-            for j = 1:length(pos_fields)
-                [val, idx] = min(cell2mat(pos_ids));
-                pos_names{j} = d.Pos_funcs.(pos_fields{idx}).filename;
-                pos_ids{idx} = 100000;
-            end
-        
-        else
-            pos_names = [];
-        end
-        if ~isempty(fieldnames(d.Ao_funcs))
-            
-            ao_fields = fieldnames(d.Ao_funcs);
-            ao_names = cell(length(ao_fields),1);
-            for i = 1:length(ao_fields)
-                ao_ids{i} = d.Ao_funcs.(ao_fields{i}).afnparam.ID;
-            end
-            for j = 1:length(ao_fields)
-                [val, idx] = min(cell2mat(ao_ids));
-                ao_names{j} = d.Ao_funcs.(ao_fields{idx}).filename;
-                ao_ids{idx} = 100000;
-            end
-        else
-            ao_names = [];
-        end
-        
-        num_pats = length(pat_names);
-        num_pos = length(pos_names);
-        num_ao = length(ao_names);
-
-        pat1 = pat_names{pat_index};
-        pat1_field = d.get_pattern_field_name(pat1);
-        
-        if length(d.Patterns.(pat1_field).pattern.Pats(:,1,1))/16 ~= self.doc.num_rows
-            while length(d.Patterns.(pat1_field).pattern.Pats(:,1,1)) ~= self.doc.num_rows && pat_index < length(pat_names)
-                pat_index = pat_index + 1;
-                pat1 = pat_names{pat_index};
-            end
-            
-        end
-        
-        if pat_index == length(pat_names) && length(d.Patterns.(pat1_field).pattern.Pats(:,1,1))/16 ~= self.doc.num_rows
-            self.create_error_box("None of the patterns imported match the screen size selected. Please import a different folder or select a new screen size");
-            return;
-        end
-        
-        pat_indices(1) = pat_index;
-        if pat_index <= num_pos
-            pos_index = pat_index;
-        else 
-            pos_index = 1;
-        end
-        if pat_index <= num_ao
-            ao_index = pat_index;
-        else
-            ao_index = 1;
-        end
-        
-        if num_pos ~= 0
-            pos1 = pos_names{pos_index}; %Set initial position and ao functions to correspond to initial pattern.
-            pos1_field = d.get_posfunc_field_name(pos1);
-            if length(d.Patterns.(pat1_field).pattern.Pats(1,1,:)) < ...
-                max(d.Pos_funcs.(pos1_field).pfnparam.func)
-            pos1 = '';
-            end
-        else
-            pos1 = '';
-            
-        end
-        if num_ao ~= 0
-            ao1 = ao_names{ao_index};
-            ao1_field = d.get_aofunc_field_name(ao1);
-        else
-            ao1 = '';
-        end    
-        
-        
-        
-        
-
-        
-        d.set_pretrial_property(2, pat1);
-        d.set_pretrial_property(3, pos1);
-        d.set_pretrial_property(4, ao1);
-        
-        %disable appropriate cells for mode 1
-        d.set_pretrial_property(9, self.doc.colorgen());
-        d.set_pretrial_property(10, self.doc.colorgen());
-        d.set_pretrial_property(11, self.doc.colorgen());
-        
-        d.set_intertrial_property(2, pat1);
-        d.set_intertrial_property(3, pos1);
-        d.set_intertrial_property(4, ao1);
-        
-        %disable appropriate cells for mode 1
-        d.set_intertrial_property(9, self.doc.colorgen());
-        d.set_intertrial_property(10, self.doc.colorgen());
-        d.set_intertrial_property(11, self.doc.colorgen());
-        
-        d.set_posttrial_property(2, pat1);
-        d.set_posttrial_property(3, pos1);
-        d.set_posttrial_property(4, ao1);
-        
-        d.set_posttrial_property(9, self.doc.colorgen());
-        d.set_posttrial_property(10, self.doc.colorgen());
-        d.set_posttrial_property(11, self.doc.colorgen());
-        
-        d.set_block_trial_property([1,2], pat1);
-        d.set_block_trial_property([1,3], pos1);
-        d.set_block_trial_property([1,4], ao1);
-        
-        d.set_block_trial_property([1,9], self.doc.colorgen());
-        d.set_block_trial_property([1,10], self.doc.colorgen());
-        d.set_block_trial_property([1,11], self.doc.colorgen());
-        
-       
-        
-        j = 1; %will end up as the count of how many patterns are used. Acts as the indices to "pat_indices"
-        pat_index = pat_index + 1;
-        pos_index = pos_index + 1;
-        ao_index = ao_index + 1;
-        
-        if pat_index < num_pats
-        
-            for i = pat_index:num_pats
-                
-                pat = pat_names{pat_index};
-                pat_field = d.get_pattern_field_name(pat);
-                if num_pos ~= 0
-                    if pos_index > num_pos %Make sure indices are in range 
-                        pos_index = 1;
+                for j = 1:block_x
+                    if j > length(m.block_trials(:,1))
+                        newrow = d.block_trials(j,1:end);
+                        m.set_block_trial_property([j, block_y], newrow);
+                    else
+                        for n = 1:13
+                            m.set_block_trial_property([j, n], d.block_trials{j,n});
+                        end
                     end
-                    pos = pos_names{pos_index};
-                    pos_field = d.get_posfunc_field_name(pos);
-                else
-                    
-                    pos = '';
-                end
-                
-                if num_ao ~= 0
 
-                    if ao_index > num_ao
-                        ao_index = 1;
-                    end
-                    ao = ao_names{ao_index};
-                    ao_field = d.get_aofunc_field_name(ao);
-                else
-                    ao = '';
-                end
-                
-                
-                if length(d.Patterns.(pat_field).pattern.Pats(:,1,1))/16 ~= d.num_rows
-                    pat_index = pat_index + 1;
-                    pos_index = pos_index + 1;
-                    ao_index = ao_index + 1;
-                    
-                    continue;
-                end
-                %Only executes if previous if statement did not. Sets new row's pattern
-                newrow = self.doc.block_trials(end, 1:end);
-                newrow{2} = pat; 
-
-                newrow{3} = pos; 
-
-                newrow{4} = ao; 
-                pat_indices(j) = pat_index;
-                j = j + 1;
-                pat_index = pat_index + 1;
-                pos_index = pos_index + 1;
-                ao_index = ao_index + 1;
-                
-                if ~strcmp(newrow{3},'')
-                    if length(d.Patterns.(pat_field).pattern.Pats(1,1,:)) < ...
-                           max(d.Pos_funcs.(pos_field).pfnparam.func)
-                        newrow{3} = '';
-                    end
                 end
 
-                d.set_block_trial_property([j,1],newrow);
-                self.block_files.pattern(end + 1) = string(newrow{2});
-                self.block_files.position(end + 1) = string(newrow{3});
- 
+                self.doc.insert_greyed_cells();     
+                self.doc.set_recent_files(filepath);
+                self.doc.update_recent_files_file();
+                self.update_gui();
 
+                if ~isempty(self.run_con)
+                    self.run_con.update_run_gui();
+                end
+                set(self.num_rows_3, 'Enable', 'off');
+                set(self.num_rows_4, 'Enable', 'off');
+            end
+        end
+        
+        %Save current experiment as a .g4p file and export necessary files
+
+        function saveas(self, ~, ~)
+
+            cut_date_off_name = regexp(self.doc.experiment_name,'-','split');
+            
+            if length(cut_date_off_name) > 1
+                exp_name = cut_date_off_name{1}(1:end-2);
+            else
+                exp_name = self.doc.experiment_name;
             end
             
-        end
+            dateFormat = 'mm-dd-yy_HH-MM-SS';
+            dated_exp_name = strcat(exp_name, datestr(now, dateFormat));
+            self.doc.experiment_name = dated_exp_name;
+            [file, path] = uiputfile('*.mat','File Selection', self.doc.experiment_name);
+            full_path = fullfile(path, file);
 
-        
-        self.update_gui();
-
-
-    end
-
-        
-%MAIN MENU CALLBACK FUNCTIONS----------------------------------------------
-
-%Import
-    function import(self, ~, ~)
-       
-        options = {'Folder', 'File', 'Filtered File'};
-       answer = listdlg('PromptString', 'Would you like to import a folder or a file?',...
-           'SelectionMode', 'Single', 'ListString', options, 'ListSize', [180,60]);
-       
-       if answer == 1
-           self.import_folder('');
-
-       elseif answer == 2
-           self.import_file('')
-                
-       elseif answer == 3
-           str_to_match = self.get_filter_string();
-           self.import_file(str_to_match);
-
-       else
-           %do nothing
-       end
-       
-
-
-    end
-    
-    function [answer] = get_filter_string(self)
-    
-        answer = inputdlg("Please enter the whole or partial filename you wish to match.",...
-            "Filter Import Results");
-        answer = answer{1};
-        
-    
-    end
-    
-    function import_folder(self, str_to_match)
-        
-        if strcmp(str_to_match,'')
-            
-            path = uigetdir;
-            
-        else
-            path = uigetdir(['*',str_to_match,'*']);
-        end
-        
-        if isequal(path, 0)
-            %do nothing
-        else
-
-                
-            self.doc.import_folder(path);
-            self.set_exp_name();
-            set(self.num_rows_3, 'Enable', 'off');
-            set(self.num_rows_4, 'Enable', 'off');
-            
-            self.update_gui();
-            
-                
-        end
-            
-    end
-    
-    function import_file(self, str_to_match)
-        if strcmp(str_to_match,'')
-            [imported_file, path] = uigetfile('*.mat');
-        else
-            [imported_file, path] = uigetfile(['*',str_to_match,'*.mat']);
-        end
-        
-        if isequal(imported_file,0)
-            %do nothing
-        else
-
-
-            self.doc.import_single_file(imported_file, path);
-
-            set(self.num_rows_3, 'Enable', 'off');
-            set(self.num_rows_4, 'Enable', 'off');
-            self.update_gui();
-
-        end
-     end
-        
-        
-       
-    
-    
-    
-    
-
-%Save As
-
-    function saveas(self, src, event)
-        
-        cut_date_off_name = regexp(self.doc.experiment_name,'-','split');
-        if length(cut_date_off_name) > 1
-            exp_name = cut_date_off_name{1}(1:end-2);
-        else
-            exp_name = self.doc.experiment_name;
-        end
-        dateFormat = 'mm-dd-yy_HH-MM-SS';
-        %dateFormat = 30; %ISO8601 format, yyyymmddTHHMMSS (year, month, date, T for time, hours, minutes, seconds) - see matlab docs
-        dated_exp_name = strcat(exp_name, datestr(now, dateFormat));
-        self.doc.experiment_name = dated_exp_name;
-        [file, path] = uiputfile('*.mat','File Selection', self.doc.experiment_name);
-        full_path = fullfile(path, file);
-        
-        if file == 0
-            return;
-        end
-        
-        prog = waitbar(0,'Please wait...');
-        
-        waitbar(.33,prog,'Saving...');
-        self.doc.replace_greyed_cell_values();
-        self.doc.saveas(full_path, prog);
-        if ~isempty(self.run_con)
-            self.run_con.update_run_gui();
-        end
-        self.doc.insert_greyed_cells();
-        self.update_gui();
-        
-        
-
-    end
-    
-%Save
-
-    function save(self, ~, ~)
-    %Controller gets up to data data from the model, then sends to the
-    %document to save the file.
-        
-    %Get up to date variables from the model.
-
-        self.doc.save();
-
-    end
-
-%Open
-
-    function open_file(self, ~, ~, filepath)
-        %document open function opens the file, saves the data, and sends
-        %data back to controller. 
-
-        %controller then sends updated data to model and updates gui.
-        
-        %check if there is a doc_ - if not, import the parent folder of the
-        %.g4p file.
-        if strcmp(filepath,'')
-            [filename, top_folder_path] = uigetfile('*.g4p');
-            filepath = fullfile(top_folder_path, filename);
-        else
-            [top_folder_path, ~] = fileparts(filepath);
-        end
-       
-        if isequal (top_folder_path,0)
-            return;
-        else
-
-            self.doc.top_export_path = top_folder_path;
-            self.doc.import_folder(top_folder_path);
-            [~, exp_name, ~] = fileparts(filepath);
-
-            if isempty(fieldnames(self.doc.Patterns))
-                %no patterns were successfully imported, so don't autofill
+            if file == 0
                 return;
             end
+
+            prog = waitbar(0,'Please wait...');
+
+            waitbar(.33,prog,'Saving...');
             
-
-            data = self.doc.open(filepath);
-            m = self.doc;
-            d = data.exp_parameters;
-            
-            %Set parameters outside tables
-            self.doc.experiment_name = exp_name;
-            self.set_exp_name();
-            m.repetitions = d.repetitions;
-            m.is_randomized = d.is_randomized;
-            m.is_chan1 = d.is_chan1;
-            m.is_chan2 = d.is_chan2;
-            m.is_chan3 = d.is_chan3;
-            m.is_chan4 = d.is_chan4;
-            m.chan1_rate = d.chan1_rate;
-            m.set_config_data(d.chan1_rate, 1);
-            m.chan2_rate = d.chan2_rate;
-            m.set_config_data(d.chan2_rate, 2);
-            m.chan3_rate = d.chan3_rate;
-            m.set_config_data(d.chan3_rate, 3);
-            m.chan4_rate = d.chan4_rate;
-            m.set_config_data(d.chan4_rate, 4);
-            m.num_rows = d.num_rows;
-            m.set_config_data(d.num_rows, 0);
-            self.doc.update_config_file();
-
-            
-            for k = 1:13
-
-                m.set_pretrial_property(k, d.pretrial{k});
-                m.set_intertrial_property(k, d.intertrial{k});
-                m.set_posttrial_property(k, d.posttrial{k});
-
-            end
-
-            for i = 2:length(m.block_trials(:, 1))
-                m.block_trials((i-(i-2)),:) = [];
-            end
-            block_x = length(d.block_trials(:,1));
-            block_y = 1;
-
-            for j = 1:block_x
-                if j > length(m.block_trials(:,1))
-                    newrow = d.block_trials(j,1:end);
-                    m.set_block_trial_property([j, block_y], newrow);
-                else
-                    for n = 1:13
-                        m.set_block_trial_property([j, n], d.block_trials{j,n});
-                    end
-                end
-
-            end
-
-            self.doc.insert_greyed_cells();     
-            self.doc.set_recent_files(filepath);
-            self.doc.update_recent_files_file();
-            self.update_gui();
+            self.doc.replace_greyed_cell_values();
+            self.doc.saveas(full_path, prog);
             
             if ~isempty(self.run_con)
                 self.run_con.update_run_gui();
             end
-            set(self.num_rows_3, 'Enable', 'off');
-            set(self.num_rows_4, 'Enable', 'off');
+            
+            self.doc.insert_greyed_cells();
+            self.update_gui();
+
+
+
         end
-    end
-    
-  
-    
-    
-    
- 
         
-%Copy to        
+        %Copy selected block trial cell to the pretrial, intertrial, and/or posttrial       
         function copy_to(self, ~, ~)
-        
-            checkbox_column_data = horzcat(self.doc.block_trials(1:end, end));
-            checked = find(cell2mat(checkbox_column_data));
-            checked_count = length(checked);
+            [checked_count, checked] = self.check_num_trials_selected();
             
             if checked_count == 0
             
-                disp("You must select a trial to copy over");
-            
-            elseif checked_count == 1
+                self.create_error_box("You must select a trial to copy over");
+                
+            elseif checked_count > 1
+                
+                self.create_error_box("You can only select one trial to copy");
+                
+            else 
                 
                 selected = self.doc.block_trials(checked,1:end-1);
                 selected{:,end+1} = false;
@@ -1618,8 +1355,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                 [indx,tf] = listdlg('ListString', list, 'PromptString', 'Select all desired locations');
                 
                 if tf == 0
-                    %do nothing
-                    
+                    %do nothing     
                 else
                     
                     for i = 1:length(indx)
@@ -1639,28 +1375,22 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                         else
                             disp("There has been an error, please try again.");
                         end
-                    
                     end
-                    
                 end
                 
                 self.update_gui();
-                
-            else
-                disp("You can only select one trial for this functionality");
-            end
-            
+            end 
         end
         
-%Set selected values to new trials
+        %Prompt the users for parameter values with which to populate all
+        %selected trials
 
         function set_selected(self, ~, ~)
             
         %Check if any rows in the block are checked, add indexes of any
         %checked ones into checked_block
-            checkbox_block_data = horzcat(self.doc.block_trials(1:end, end));
-            checked_block = find(cell2mat(checkbox_block_data));
-            checked_block_count = length(checked_block);
+        
+            [checked_block_count, checked_block] = self.check_num_trials_selected();
         
             prompt = {'Trial Mode:', 'Pattern Name:', 'Position Function:', ...
                 'AO1:', 'AO2:', 'AO3:', 'AO4:', 'Frame Index:', 'Frame Rate:', ...
@@ -1683,7 +1413,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
 
             answer{end+1} = false;
 
-            
+            %converts all data types properly
             for i = 1:length(answer)
                 adjusted_answer{1,i} = answer{i};
             end
@@ -1720,91 +1450,17 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
             self.update_gui();
             %disp(self.doc.block_trials(2,13));
         end
-
-%END OF MAIN MENU CALLBACKS------------------------------------------------
-
-%SELECT ALL CALLBACK-------------------------------------------------------
-
-      function select_all(self, src, ~)
-        %assuming here that the number parameters will never differ between
-        %trials. 
-        l = length(self.doc.block_trials(1,:));
-        if src.Value == false  
-        %disp(length(self.doc.block_trials(:,1)));
-            for i = 1:length(self.doc.block_trials(:,1))
-                if self.doc.block_trials{i, l} == 1
-                    self.doc.set_block_trial_property([i, l], false);
-                end
-            end
-            
-        else
-            for i = 1:length(self.doc.block_trials(:,1))
-                if cell2mat(self.doc.block_trials(i, l)) == 0
-                    self.doc.set_block_trial_property([i, l], true);
-                end
-            end
-            
-        end
-        self.model.isSelect_all = src.Value;
-        self.update_gui();
         
-      end
-      
-%INVERT SELECTION CALLBACK-------------------------------------------------
-
-        function invert_selection(self, ~, ~)
-
-            L = length(self.doc.block_trials(:,1));
-            len = length(self.doc.block_trials(1,:));
-
-            for i = 1:L
-                if cell2mat(self.doc.block_trials(i,len)) == 0
-                    self.doc.set_block_trial_property([i, len], true);
-                elseif cell2mat(self.doc.block_trials(i,len)) == 1
-                    self.doc.set_block_trial_property([i,len], false);
-                else
-                    disp('There has been an error, the selected value must be true or false');
-                end
-            end
-
-            self.update_gui();
-
-        end
+        %% In screen preview related callbacks
         
-        function [file] = check_table_selected(self, src, event, positions)
-        
-            x_event_index = event.Indices(1);
-            y_event_index = event.Indices(2);
-            self.model.current_selected_cell.index = event.Indices;
-            if y_event_index > 1 && y_event_index< 8
-
-                file = string(src.Data(x_event_index, y_event_index));
-
-            else
-
-                file = '';
-
-            end
-            if src.Position == positions.pre
-                self.model.current_selected_cell.table = "pre";
-            elseif src.Position == positions.inter
-                self.model.current_selected_cell.table = "inter";
-            elseif src.Position == positions.block
-                self.model.current_selected_cell.table = "block";
-            elseif src.Position == positions.post
-                self.model.current_selected_cell.table = "post";
-            end
-        
-        end
-        
-
-
-%IN SCREEN PREVIEW OF SELECTED CELL----------------------------------------
+         % Display preview of file when an appropriate table cell is
+         % selected
 
         function preview_selection(self, varargin)
             
-    %When a new cell is selected, first delete the current preview axes if
-    %there
+        %When a new cell is selected, first delete the current preview axes if
+        %there
+        
             delete(self.hAxes);
             delete(self.second_axes);
             
@@ -1861,80 +1517,9 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
             
 
         end
-
-       
-        
-      
         
         
-        function page_up_4d(self, src, event)
-        end
-        
-        function page_down_4d(self, src, event)
-        end
-
-
-%FORWARD ONE FRAME ON IN SCREEN PREVIEW------------------------------------
-
-        function frame_forward(self, ~, ~)
-
-            if ~strcmp(self.model.current_preview_file,'') && length(self.model.current_preview_file(1,1,:)) > 1
-                
-                self.model.auto_preview_index = self.model.auto_preview_index + 1;
-                if self.model.auto_preview_index > length(self.model.current_preview_file(1,1,:))
-                    self.model.auto_preview_index = 1;
-                end
-                preview_data = self.model.current_preview_file(:,:,self.model.auto_preview_index);
-                
-                xax = [0 length(preview_data(1,:))];
-                yax = [0 length(preview_data(:,1))];
-                 
-                max_num = max(preview_data,[],[1 2]);    
-                adjusted_matrix = preview_data ./ max_num;
-                
-          
-
-                % black = [1 1 1];
-                 %white = [0 0 0];
-
-                %for i = 1:30
-                im = imshow(adjusted_matrix(:,:), 'Colormap', gray);
-                set(im, 'parent', self.hAxes);
-                set(self.hAxes, 'XLim', xax, 'YLim', yax);
-
-            end
-
-
-        end
-
-%ONE FRAME BACK ON IN SCREEN PREVIEW---------------------------------------        
-        
-        function frame_back(self, ~, ~)
-
-            if ~strcmp(self.model.current_preview_file,'') && length(self.model.current_preview_file(1,1,:)) > 1
-                self.model.auto_preview_index = self.model.auto_preview_index - 1;
-
-                if self.model.auto_preview_index < 1
-                    self.model.auto_preview_index = length(self.model.current_preview_file(1,1,:));
-                end
-                
-                data = self.model.current_preview_file;
-                preview_data = data(:,:,self.model.auto_preview_index);
-                
-                xax = [0 length(preview_data(1,:))];
-                yax = [0 length(preview_data(:,1))];
-                 
-                max_num = max(preview_data,[],[1 2]);    
-                adjusted_matrix = preview_data ./ max_num;
-
-                im = imshow(adjusted_matrix(:,:), 'Colormap', gray);
-                set(im, 'parent', self.hAxes);
-                set(self.hAxes, 'XLim', xax, 'YLim', yax);
-            end
-
-        end
-
-%PLAY THE IN SCREEN PREVIEW------------------------------------------------
+        %Play through the pattern library in in-screen preview
         
         function preview_play(self, ~, ~)
 
@@ -1975,61 +1560,58 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                 else
                     fr_rate = 30;
                 end
+                
             else
                 self.create_error_box("Please make sure you have selected a cell and try again");
                 return;
             end
-            
-            
-        
+
             if ~strcmp(self.model.current_preview_file,'') && length(self.model.current_preview_file(1,1,:)) > 1
                 len = length(self.model.current_preview_file(1,1,:));
                 xax = [0 length(self.model.current_preview_file(1,:,1))];
                 yax = [0 length(self.model.current_preview_file(:,1,1))];
                 max_num = max(self.model.current_preview_file,[],[1 2]);
                 adjusted_file = zeros(yax(2), xax(2), len);
+                
                 for i = 1:len
                     adjusted_matrix = self.model.current_preview_file(:,:,i) ./ max_num(i);
                     adjusted_file(:,:,i) = adjusted_matrix(:,:,1);
-
-                    
                 end
+                
                 im = imshow(adjusted_file(:,:,self.model.auto_preview_index), 'Colormap', gray);
                 set(im,'parent', self.hAxes);
                 set(self.hAxes, 'XLim', xax, 'YLim', yax );
-
-                %while self.model.is_paused == 0    
-                    for i = 1:len
-                        if self.model.is_paused == false
-                            self.model.auto_preview_index = self.model.auto_preview_index + 1;
-                            if self.model.auto_preview_index > len
-                                self.model.auto_preview_index = 1;
-                            end
-                            %imagesc(self.model.current_preview_file.pattern.Pats(:,:,self.model.auto_preview_index), 'parent', hAxes);
-                            set(im,'cdata',adjusted_file(:,:,self.model.auto_preview_index), 'parent', self.hAxes);
-                            drawnow
-
-                            pause(1/fr_rate);
-
-
-
+  
+                for i = 1:len
+                    if self.model.is_paused == false
+                        self.model.auto_preview_index = self.model.auto_preview_index + 1;
+                        if self.model.auto_preview_index > len
+                            self.model.auto_preview_index = 1;
                         end
-                     end
+                        %imagesc(self.model.current_preview_file.pattern.Pats(:,:,self.model.auto_preview_index), 'parent', hAxes);
+                        set(im,'cdata',adjusted_file(:,:,self.model.auto_preview_index), 'parent', self.hAxes);
+                        drawnow
+
+                        pause(1/fr_rate);
+
+
+
+                    end
+                 end
             end
         end
-
-%PAUSE THE CURRENTLY PLAYING IN SCREEN PREVIEW-----------------------------        
         
-        function preview_pause(self, src, event)
-
+        %Pause the currently playing in-screen preview      
+        
+        function preview_pause(self, ~, ~)
 
             self.model.is_paused = true;
 
         end
-
-%STOP THE CURRENTLY PLAYING IN SCREEN PREVIEW------------------------------
         
-        function preview_stop(self,src,event)
+        %Stop the currently playing in-screen preview (returns to frame 1)
+        
+        function preview_stop(self, ~, ~)
             
             if strcmp(self.model.current_selected_cell.table, "")
                 self.create_error_box("Please make sure you've selected a cell.");
@@ -2052,8 +1634,72 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                         
         end
 
+        %Move forward a single frame through pattern library in in-screen
+        %preview
 
-%OPEN A FULL PREVIEW WINDOW OF SELECTED TRIAL------------------------------
+        function frame_forward(self, ~, ~)
+
+            if ~strcmp(self.model.current_preview_file,'') && length(self.model.current_preview_file(1,1,:)) > 1
+                
+                self.model.auto_preview_index = self.model.auto_preview_index + 1;
+                if self.model.auto_preview_index > length(self.model.current_preview_file(1,1,:))
+                    self.model.auto_preview_index = 1;
+                end
+                preview_data = self.model.current_preview_file(:,:,self.model.auto_preview_index);
+                
+                xax = [0 length(preview_data(1,:))];
+                yax = [0 length(preview_data(:,1))];
+                 
+                max_num = max(preview_data,[],[1 2]);    
+                adjusted_matrix = preview_data ./ max_num;
+
+                im = imshow(adjusted_matrix(:,:), 'Colormap', gray);
+                set(im, 'parent', self.hAxes);
+                set(self.hAxes, 'XLim', xax, 'YLim', yax);
+
+            end
+
+
+        end
+        
+        %Move backward a single frame through pattern library in in-screen preview     
+        
+        function frame_back(self, ~, ~)
+
+            if ~strcmp(self.model.current_preview_file,'') && length(self.model.current_preview_file(1,1,:)) > 1
+                self.model.auto_preview_index = self.model.auto_preview_index - 1;
+
+                if self.model.auto_preview_index < 1
+                    self.model.auto_preview_index = length(self.model.current_preview_file(1,1,:));
+                end
+                
+                data = self.model.current_preview_file;
+                preview_data = data(:,:,self.model.auto_preview_index);
+                
+                xax = [0 length(preview_data(1,:))];
+                yax = [0 length(preview_data(:,1))];
+                 
+                max_num = max(preview_data,[],[1 2]);    
+                adjusted_matrix = preview_data ./ max_num;
+
+                im = imshow(adjusted_matrix(:,:), 'Colormap', gray);
+                set(im, 'parent', self.hAxes);
+                set(self.hAxes, 'XLim', xax, 'YLim', yax);
+            end
+
+        end
+        
+        %Page up in fourth dimension through 4D pattern library (not yet
+        %working)
+        function page_up_4d(self, src, event)
+        end
+        
+        %Page down in fourth dimension through 4D pattern library (not yet
+        %working)
+        function page_down_4d(self, src, event)
+        end
+
+        % Open a full, cohesive preview of the selected trial
 
         function full_preview(self, src, event)
                 
@@ -2064,46 +1710,52 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                
                minicon = G4_preview_controller(data, self.doc);
                self.update_preview_con(minicon);
-               
-               %For all cells that have a file, set the object in question
-               %equal to a variable and get its size. If there's not one
-               %there, set the size (for the axes) to
-               %default [1,3] (for an x axis three times the length of y
-               %axis)
-%           mode = data{1};
-%                if mode == 1
-%                    self.preview_con.preview_Mode1();
-%                elseif mode == 2
-%                    self.preview_con.preview_Mode2();
-%                elseif mode == 3
-%                    self.preview_con.preview_Mode3();
-%                elseif mode == 4
-%                    self.preview_con.preview_Mode4();
-%                elseif mode == 5
-%                    self.preview_con.preview_Mode4();
-%                elseif mode == 6
-%                    self.preview_con.preview_Mode6();
-%                elseif mode == 7
-%                    self.preview_con.preview_Mode4();
-%                else
-%                    self.create_error_box("Please make sure you have entered a valid mode and try again.");
-%                end
-
-%At this point, all axes should have been created and all existing
-%functions should have been plotted. May change plotting method later in
-%order to have the AO functions draw themselves in time.
-
-
-
-            end
-
-
-
+           
+           end
         end
         
-%RUN A SINGLE TRIAL ON THE LED SCREENS TO MAKE SURE ITS WORKING------------
+        
+     %% General experiment callbacks
+        %Clear out all current data to design a new experiment
 
-        function dry_run(self, src, event)
+        function clear_all(self, ~, ~)
+            
+            question = "Make sure you have saved your experiment, or it will be lost.";
+            answer = questdlg(question, 'Confirm Clear All', 'Continue', 'Cancel', 'Cancel');
+            switch answer
+                case 'Cancel'
+                    return;
+                case 'Continue'
+                    
+                     %keep instances of each class but clear all data
+                    clear self.model;
+                    delete(self.doc);
+                    self.doc = G4_document();
+                    self.update_gui();
+                    
+                    
+            end
+            
+        end
+        
+        %Calculate the approximate length of the current experiment and
+        %display on the designer
+        
+        function calculate_experiment_length(self, ~, ~)
+        
+            total_dur = self.doc.pretrial{12} + self.doc.posttrial{12};
+            for i = 1:length(self.doc.block_trials(:,1))
+                total_dur = total_dur + (self.doc.block_trials{i,12} + self.doc.intertrial{12})*self.doc.repetitions;
+            end
+            total_dur = total_dur - self.doc.intertrial{12};
+            self.update_exp_length(total_dur);
+            
+        
+        end
+        
+        %Run a single trial on the screens (no analog input/output)
+
+        function dry_run(self, ~, ~)
             self.doc.replace_greyed_cell_values();
             trial = self.check_one_selected;
             %block_trials = self.doc.block_trials();
@@ -2144,51 +1796,45 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
             end
             
             connectHost;
-            pause(15);
+            pause(10);
+            
             Panel_com('change_root_directory', experiment_folder)
-            pause(.5);
             start = questdlg('Start Dry Run?','Confirm Start','Start','Cancel','Start');
             switch start
                 case 'Cancel'
+                    
                     Panel_com('stop_display')
                     disconnectHost;
                     return;
+                    
                 case 'Start'
             
                     pattern_index = self.doc.get_pattern_index(trial{2});
                     func_index = self.doc.get_posfunc_index(trial{3});
                     
-                    %ao_index = self.doc.get_ao_index(trial{4});
-                    
                     Panel_com('set_control_mode', trial_mode);
-                    pause(.1);
                     Panel_com('set_pattern_id', pattern_index); 
-                    pause(.1);
                     
-                   % Panel_com('set_gain_bias', [LmR_gain LmR_offset])
                    if func_index ~= 0
                         Panel_com('set_pattern_func_id', func_index);
-                        pause(.1);
-                       
+   
                    end
-                    %Panel_com('set_ao_function_id',[0, ao_index]);
+                    
                     if ~isempty(trial{10})
                         Panel_com('set_gain_bias',[LmR_gain LmR_offset]);
-                        pause(.1);
                        
                     end
+                    
                     if trial_mode == 2
                         Panel_com('set_frame_rate', trial_fr_rate);
-                        pause(.1);
                         
                     end
+                    
                     Panel_com('set_position_x', trial_frame_index);
-                    pause(.1);
                     
                     if trial_duration ~= 0
   
                         Panel_com('start_display', (trial_duration*10)); %duration expected in 100ms units
-                    
                         pause(trial_duration + 0.01)
                         
                     else
@@ -2201,203 +1847,70 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                     end
                     Panel_com('stop_display');
                     disconnectHost;
-                    %Panel_com('reset_display');
-                    %end of trial portion
-            end
-                  
-            
-        end
 
-
-        
-
-%FULL PREVIEW FOR MODE 1---------------------------------------------------
-
-        
-        function animateMode1(self, src, event, data, pos_pos, ao1_pos, ao2_pos, ao3_pos, ao4_pos, f, pos_data, im, pat_obj)
-            
-             [pos, ao1, ao2, ao3, ao4] = self.create_preview_objects(data, pos_pos, ao1_pos, ao2_pos, ao3_pos, ao4_pos, f); %CREATE THIS FUNCTION TO RETURN AXES
-
-            if pos == 0
-                self.create_error_box("Please make sure you have entered a position function and try again.");
-            else
-
-
-                for i = self.model.auto_preview_index:length(pos_data)
-                    
-                    if self.model.is_paused == false
-
-                        frame = pos_data(i);
-                        disp(frame);
-                        set(im,'cdata',pat_obj(:,:,frame));
-
-                        pos.XData = [self.model.auto_preview_index + 1, self.model.auto_preview_index + 1];
-
-                        if ao1 ~= 0
-                            ao1.XData = [self.model.auto_preview_index + 1, self.model.auto_preview_index + 1];
-                        end
-                        if ao2 ~= 0
-                            ao2.XData = [self.model.auto_preview_index + 1, self.model.auto_preview_index + 1];
-                        end
-                        if ao3 ~= 0
-                            ao3.XData = [self.model.auto_preview_index + 1, self.model.auto_preview_index + 1];
-                        end
-                        if ao4 ~= 0
-                            ao4.XData = [self.model.auto_preview_index + 1, self.model.auto_preview_index + 1];
-                        end
-
-                        drawnow limitrate nocallbacks
-                        java.lang.Thread.sleep(17);
-                        
-                        self.model.auto_preview_index = self.model.auto_preview_index + 1;
-                        
-                    else
-                        
-                        self.model.auto_preview_index = i;
-                        
-                    end
-                       
-
-
-                end
             end
         end
         
-
-
-%CHECK IF PARTICULAR FILE EXISTS-------------------------------------------
-
-        function [loaded_file] = check_file_exists(self, filename)
-
-            if isfile(filename) == 0
-                self.create_error_box("This file doesn't exist");
-                loaded_file = 0;
-            else
-                loaded_file = load(filename);
-            end
-
-
-        end
-
-%PLOT A POSITION OR AO FUNCTION--------------------------------------------
-
-        function [func_line] = plot_function(self, fig, func, position, graph_title, x_label, y_label)
-
-                xlim = [0 length(func(1,:))];
-                ylim = [min(func) max(func)];
-                func_axes = axes(fig, 'units','pixels','Position', position, ...
-                    'XLim', xlim, 'YLim', ylim);
-                %title(func_axes, graph_title);
-        %         xlabel(func_axes, x_label);
-        %         ylabel(func_axes, y_label);
-                p = plot(func);
-                set(p, 'parent', func_axes);
-                func_line = line('XData',[self.model.auto_preview_index,self.model.auto_preview_index],'YData',[ylim(1), ylim(2)]);
-                title(graph_title);
-                xlabel(x_label);
-                ylabel(y_label);
-                
-
-        end
-        
-        function open_run_gui(self, src, event)
+        %Open the conductor to run an experiment
+        function open_run_gui(self, ~, ~)
             
             self.run_con = G4_conductor_controller(self.doc);
             
         end
         
-%PREVIEW SELECTED CELL ON IN-SCREEN PREVIEW--------------------------------        
-        function display_inscreen_preview(self, frame_rate, dur, patfield, funcfield, aofield, file_type)  
-    
-            if strcmp(file_type, 'pat') && ~strcmp(patfield,'')
-                
-                self.model.auto_preview_index = self.check_pattern_dimensions(patfield);
-                self.model.current_preview_file = self.doc.Patterns.(patfield).pattern.Pats;
+%% Additional Table Manipulation Functions
 
-                x = [0 length(self.model.current_preview_file(1,:,1))];
-                y = [0 length(self.model.current_preview_file(:,1,1))];
-                adjusted_file = zeros(y(2),x(2),length(self.model.current_preview_file(1,1,:)));
-                max_num = max(max(self.model.current_preview_file,[],2));
-                for i = 1:length(self.model.current_preview_file(1,1,:))
+        % Moves a single trial up in the block table
+        function move_trial_up(self, index)
 
-                    adjusted_matrix = self.model.current_preview_file(:,:,i) ./ max_num(i);
-                    adjusted_file(:,:,i) = adjusted_matrix(:,:,1);
-                end
-                
-                
-                self.hAxes = axes(self.f, 'units', 'pixels', 'OuterPosition', [285, 30, 1100 ,360], 'XTick', [], 'YTick', [] ,'XLim', x, 'YLim', y);
-                im = imshow(adjusted_file(:,:,self.model.auto_preview_index), 'Colormap',gray);
-
-                set(im, 'parent', self.hAxes);
-
-
-
-            elseif strcmp(file_type, 'pos') && ~strcmp(funcfield,'')
-                
-                self.model.current_preview_file = self.doc.Pos_funcs.(funcfield).pfnparam.func;
-                self.hAxes = axes(self.f,'units', 'pixels', 'OuterPosition', [285, 30, 1100 ,360]);
-                self.second_axes = axes(self.f, 'units', 'pixels', 'OuterPosition', self.hAxes.OuterPosition, 'XAxisLocation', 'top', 'YAxisLocation', 'right');
-                plot(self.model.current_preview_file, 'parent', self.hAxes);
-
-                time_in_ms = length(self.model.current_preview_file(1,:));
-                xax = [0 time_in_ms];
-                yax = [min(self.model.current_preview_file) max(self.model.current_preview_file)];
-                timeLabel = 'Time (ms)';
-                patLabel = 'Pattern';
-                frameLabel = 'Frame Number';
-                set(self.hAxes, 'XLim', xax, 'YLim', yax, 'TickLength',[0,0]);
-                self.hAxes.XLabel.String = timeLabel;
-                self.hAxes.YLabel.String = patLabel;
-
-                num_frames = frame_rate*(1/1000)*time_in_ms;
-                xax2 = [0 num_frames];
-                yax2 = yax;
-                set(self.second_axes, 'Position', self.hAxes.Position, 'XLim', xax2, 'YLim', yax2, 'TickLength', [0,0], 'Color', 'none');
-                self.second_axes.XLabel.String = frameLabel;
-
-                if dur <= length(self.model.current_preview_file(1,:))
-                    if frame_rate == 500
-                        linedur = [dur/2, dur/2];
-                    else
-                        linedur = [dur, dur];
-                    end
-                    line('XData', linedur, 'YData', yax, 'Color', [1 0 0], 'LineWidth', 2);
-                end
-
-
-            elseif strcmp(file_type, 'ao') && ~strcmp(aofield,'')
-
-                self.model.current_preview_file = self.doc.Ao_funcs.(aofield).afnparam.func;
-                self.hAxes = axes(self.f,'units', 'pixels', 'OuterPosition', [285, 30, 1100 ,360]);
-                self.second_axes = axes(self.f, 'units', 'pixels', 'OuterPosition', self.hAxes.OuterPosition, 'XAxisLocation', 'top', 'YAxisLocation', 'right');
-
-                plot(self.model.current_preview_file, 'parent', self.hAxes);
-                time_in_ms = length(self.model.current_preview_file(1,:));
-
-                xax = [0 length(self.model.current_preview_file(1,:))];
-                yax = [min(self.model.current_preview_file) max(self.model.current_preview_file)];
-
-                timeLabel = 'Time (ms)';
-                patLabel = 'Pattern';
-                frameLabel = 'Frame Number';
-                set(self.hAxes, 'XLim', xax, 'YLim', yax, 'TickLength',[0,0]);
-                self.hAxes.XLabel.String = timeLabel;
-                self.hAxes.YLabel.String = patLabel;
-
-                num_frames = frame_rate*(1/1000)*time_in_ms;
-                xax2 = [0 num_frames];
-                yax2 = yax;
-                set(self.second_axes, 'Position', self.hAxes.Position, 'XLim', xax2, 'YLim', yax2, 'TickLength', [0,0], 'Color', 'none');
-                self.second_axes.XLabel.String = frameLabel;
-
-            end
             
+            selected = self.doc.block_trials(index, :);
+            if index == 1
+                self.create_error_box("I can't shift up any more.");
+                return;
+            else
+                above_selected = self.doc.block_trials(index - 1, :);
+            end
 
 
+            self.doc.block_trials(index, :) = above_selected;
+            self.doc.block_trials(index - 1, :) = selected;
+
+            self.update_gui();
+            
+      
+        end
+        
+        % Moves a single trial down in the block table
+        function move_trial_down(self, index)
+            
+            %index = first index of selected row in the block trials
+            %cell array
+            selected = self.doc.block_trials(index, :);
+
+            if index == length(self.doc.block_trials(:,1))
+                self.create_error_box("I can't shift down any further.");
+                return;
+            else
+                below_selected = self.doc.block_trials(index + 1, :);
+            end
+
+            self.doc.block_trials(index,:) = below_selected;
+            self.doc.block_trials(index + 1, :) = selected;
+
+            self.update_gui();
+                
+        end
+        
+        % Deselect the "Select All" box when any trial is deselected
+        function deselect_selectAll(self)
+
+            self.model.isSelect_all = 0;
 
         end
         
-%PROVIDES LIST OF IMPORTED FILES TO CHOOSE FROM WHEN EMPTY CELL IS SELECTED        
+        % When a table cell is selected, this populates the imported files box with
+        % all imported files available to fill that cell
         function provide_file_list(self, event)
 
             if event.Indices(2) == 2
@@ -2500,8 +2013,409 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
 
 
         end
- 
-%PULLS PARAMETERS FROM TRIAL CONTAINING A SELECTED CELL FOR PREVIEWING-----        
+        
+        % When the mode is change, clear and disable appropriate fields
+        function clear_fields(self, mode)
+
+            pos_fields = fieldnames(self.doc.Pos_funcs);
+            pat_fields = fieldnames(self.doc.Patterns);
+            pos = self.doc.colorgen();
+            indx = [];
+            rate = self.doc.colorgen();
+            gain = self.doc.colorgen();
+            offset = self.doc.colorgen();
+
+            if mode == 1
+
+                pat_field = self.get_or_insert_pattern();
+                index_of_pat = find(strcmp(pat_fields(:), pat_field));
+
+                if index_of_pat > length(pos_fields)
+                    index_of_pat = rem(length(pos_fields), index_of_pat);
+                end
+                if ~isempty(index_of_pat)
+                    pos_field = pos_fields{index_of_pat};
+                    pos = self.doc.Pos_funcs.(pos_field).filename;
+
+                end
+                self.set_mode_dep_props(pos, indx, rate, gain, offset);
+
+            elseif mode == 2
+
+                pat_field = self.get_or_insert_pattern();
+                rate = 60;
+                self.set_mode_dep_props(pos, indx, rate, gain, offset);
+                %frame rate, clear others
+
+
+            elseif mode == 3
+
+                pat_field = self.get_or_insert_pattern();
+
+                indx = 1;
+                self.set_mode_dep_props(pos, indx, rate, gain, offset);
+                %frame index, clear others
+
+            elseif mode == 4
+                pat_field = self.get_or_insert_pattern();
+                gain = 1;
+                offset = 0;
+                self.set_mode_dep_props(pos, indx, rate, gain, offset);
+                %gain, offset, clear others
+
+            elseif mode == 5
+                pat_field = self.get_or_insert_pattern();
+                index_of_pat = find(strcmp(pat_fields(:), pat_field));
+                if index_of_pat > length(pos_fields)
+                    index_of_pat = rem(length(pos_fields), index_of_pat);
+                end
+                pos_field = pos_fields{index_of_pat};
+                pos = self.doc.Pos_funcs.(pos_field).filename;
+                gain = 1;
+                offset = 0;
+                self.set_mode_dep_props(pos, indx, rate, gain, offset);
+                %pos, gain, offset, clear others
+
+            elseif mode == 6
+
+                pat_field = self.get_or_insert_pattern();
+                index_of_pat = find(strcmp(pat_fields(:), pat_field));
+                if index_of_pat > length(pos_fields)
+                    index_of_pat = rem(length(pos_fields), index_of_pat);
+                end
+                pos_field = pos_fields{index_of_pat};
+                pos = self.doc.Pos_funcs.(pos_field).filename;
+                gain = 1;
+                offset = 0;
+                self.set_mode_dep_props(pos, indx, rate, gain, offset);
+                %pos, gain, offset, clear others
+
+            elseif mode == 7
+                pat_field = self.get_or_insert_pattern();
+                self.set_mode_dep_props(pos, indx, rate, gain, offset);
+                %clear all
+
+            elseif isempty(mode)
+
+                pos = self.doc.colorgen();
+                indx = self.doc.colorgen();
+                rate = self.doc.colorgen();
+                gain = self.doc.colorgen();
+                offset = self.doc.colorgen();
+                self.set_mode_dep_props(pos, indx, rate, gain, offset);
+                if strcmp(self.model.current_selected_cell.table,"pre") == 1
+                    self.doc.set_pretrial_property(2, self.doc.colorgen());
+                    for i = 4:7
+                        self.doc.set_pretrial_property(i,self.doc.colorgen());
+                    end
+                    self.doc.set_pretrial_property(12,self.doc.colorgen());
+
+                elseif strcmp(self.model.current_selected_cell.table,"inter") == 1
+                    self.doc.set_intertrial_property(2, self.doc.colorgen());
+                    for i = 4:7
+                        self.doc.set_intertrial_property(i,self.doc.colorgen());
+                    end
+                    self.doc.set_intertrial_property(12,self.doc.colorgen());
+
+
+                elseif strcmp(self.model.current_selected_cell.table,"post") == 1
+                    self.doc.set_posttrial_property(2, self.doc.colorgen());
+                    for i = 4:7
+                        self.doc.set_posttrial_property(i,self.doc.colorgen());
+                    end
+                    self.doc.set_posttrial_property(12,self.doc.colorgen());
+
+
+                else
+                    x = self.model.current_selected_cell.index(1);
+                    self.doc.set_block_trial_property([x,2], self.doc.colorgen());
+                    for i = 4:7
+                        self.doc.set_block_trial_property([x,i],self.doc.colorgen());
+                    end
+                    self.doc.set_block_trial_property([x,12],self.doc.colorgen());
+                end
+
+            end
+
+        end
+        
+        % Set all properties dependent on the mode
+        function set_mode_dep_props(self, pos, indx, rate, gain, offset)
+
+            if strcmp(self.model.current_selected_cell.table,"pre") == 1
+                self.doc.set_pretrial_property(3, pos);
+                self.doc.set_pretrial_property(8, indx);
+                self.doc.set_pretrial_property(9, rate);
+                self.doc.set_pretrial_property(10, gain);
+                self.doc.set_pretrial_property(11, offset);
+                self.set_pretrial_files_(3, pos);
+
+                if ~isempty(self.doc.pretrial{1})
+                    self.doc.set_pretrial_property(4,'');
+                    self.doc.set_pretrial_property(5,'');
+                    self.doc.set_pretrial_property(6,'');
+                    self.doc.set_pretrial_property(7,'');
+                    self.doc.set_pretrial_property(12,self.doc.trial_data.trial_array{12});
+                end
+
+            elseif strcmp(self.model.current_selected_cell.table,"inter") == 1
+                self.doc.set_intertrial_property(3, pos);
+                self.doc.set_intertrial_property(8, indx);
+                self.doc.set_intertrial_property(9, rate);
+                self.doc.set_intertrial_property(10, gain);
+                self.doc.set_intertrial_property(11, offset);
+                self.set_intertrial_files_(3,pos);
+
+                if ~isempty(self.doc.intertrial{1})
+                    self.doc.set_intertrial_property(4,'');
+                    self.doc.set_intertrial_property(5,'');
+                    self.doc.set_intertrial_property(6,'');
+                    self.doc.set_intertrial_property(7,'');
+                    self.doc.set_intertrial_property(12,self.doc.trial_data.trial_array{12});
+                end
+
+            elseif strcmp(self.model.current_selected_cell.table,"post") == 1
+                self.doc.set_posttrial_property(3, pos);
+                self.doc.set_posttrial_property(8, indx);
+                self.doc.set_posttrial_property(9, rate);
+                self.doc.set_posttrial_property(10, gain);
+                self.doc.set_posttrial_property(11, offset);
+                self.set_posttrial_files_(3,pos);
+
+                if ~isempty(self.doc.posttrial{1})
+                    self.doc.set_posttrial_property(4,'');
+                    self.doc.set_posttrial_property(5,'');
+                    self.doc.set_posttrial_property(6,'');
+                    self.doc.set_posttrial_property(7,'');
+                    self.doc.set_posttrial_property(12,self.doc.trial_data.trial_array{12});
+                end
+
+
+            else
+                x = self.model.current_selected_cell.index(1);
+                self.doc.set_block_trial_property([x,3], pos);
+                self.doc.set_block_trial_property([x,8], indx);
+                self.doc.set_block_trial_property([x,9], rate);
+                self.doc.set_block_trial_property([x,10], gain);
+                self.doc.set_block_trial_property([x,11], offset);
+                self.set_blocktrial_files_(self.model.current_selected_cell.index(1),3,pos);
+
+                if ~isempty(self.doc.block_trials{x,1})
+                    self.doc.set_block_trial_property([x,4],'');
+                    self.doc.set_block_trial_property([x,5],'');
+                    self.doc.set_block_trial_property([x,6],'');
+                    self.doc.set_block_trial_property([x,7],'');
+                    self.doc.set_block_trial_property([x,12],self.doc.trial_data.trial_array{12});
+                end
+            end
+            self.update_gui();
+        end
+        
+        % Check which and how many block trials are selected
+        function [num_checked, checked_rows] = check_num_trials_selected(self)
+
+            checkbox_data = horzcat(self.doc.block_trials(1:end,end));
+            checked_rows = find(cell2mat(checkbox_data));
+            num_checked = length(checked_rows);
+
+        end
+        
+        % Check which table the currently selected cell belongs to
+        function [file] = check_table_selected(self, src, event, positions)
+        
+            x_event_index = event.Indices(1);
+            y_event_index = event.Indices(2);
+            self.model.current_selected_cell.index = event.Indices;
+            if y_event_index > 1 && y_event_index< 8
+
+                file = string(src.Data(x_event_index, y_event_index));
+
+            else
+
+                file = '';
+
+            end
+            if src.Position == positions.pre
+                self.model.current_selected_cell.table = "pre";
+            elseif src.Position == positions.inter
+                self.model.current_selected_cell.table = "inter";
+            elseif src.Position == positions.block
+                self.model.current_selected_cell.table = "block";
+            elseif src.Position == positions.post
+                self.model.current_selected_cell.table = "post";
+            end
+        
+        end
+        
+        % Get data from selected trial or throw error if more than one
+        % trial is selected
+
+        function [data] = check_one_selected(self)
+
+            [checked_block_count,checked_block] = self.check_num_trials_selected();
+
+             %Figures out which table has the selected row and ensures no more than
+             %one table has a selected row
+            if checked_block_count ~= 0
+                checked_trial = 'block';
+            end
+
+
+            if self.doc.pretrial{13} == 1
+                pretrial_checked = 1;
+                checked_trial = 'pre';
+            else 
+                pretrial_checked = 0;
+
+            end
+
+            if self.doc.intertrial{13} == 1
+                intertrial_checked = 1;
+                checked_trial = 'inter';
+            else 
+                intertrial_checked = 0;
+            end
+
+            if self.doc.posttrial{13} == 1
+                posttrial_checked = 1;
+                checked_trial = 'post';
+            else 
+                posttrial_checked = 0;
+            end
+
+            all_checked = checked_block_count + pretrial_checked + intertrial_checked ...
+                + posttrial_checked;
+
+      %throw error if more or less than one is selected
+            if all_checked == 0 
+                self.create_error_box("You must selected a trial for this functionality");
+                data = [];
+            elseif all_checked > 1
+                self.create_error_box("You can only select one trial for this functionality");
+                data = [];
+            else
+      %set data to correct table
+                if strcmp(checked_trial,'pre')
+                    data = self.doc.pretrial;
+                elseif strcmp(checked_trial,'inter')
+                    data = self.doc.intertrial;
+                elseif strcmp(checked_trial, 'block')
+                    data = self.doc.block_trials(checked_block(1),:);
+                elseif strcmp(checked_trial, 'post')
+                    data = self.doc.posttrial;
+                else
+                    self.create_error_box("Something went wrong. Please make sure you have exactly one trial selected and try again.");
+                end
+            end
+        end
+
+
+        
+%% Additional Previewing Functions
+    
+        % Plot a position or AO function
+        function [func_line] = plot_function(self, fig, func, position, graph_title, x_label, y_label)
+
+                xlim = [0 length(func(1,:))];
+                ylim = [min(func) max(func)];
+                func_axes = axes(fig, 'units','pixels','Position', position, ...
+                    'XLim', xlim, 'YLim', ylim);
+                p = plot(func);
+                set(p, 'parent', func_axes);
+                func_line = line('XData',[self.model.auto_preview_index,self.model.auto_preview_index],'YData',[ylim(1), ylim(2)]);
+                title(graph_title);
+                xlabel(x_label);
+                ylabel(y_label);
+        end
+        
+        % Display the in-screen preview
+%%%%%%TO DO: THIS FUNCTION IS LONG, SEE IF YOU CAN BREAK IT UP    
+        function display_inscreen_preview(self, frame_rate, dur, patfield, funcfield, aofield, file_type)  
+    
+            if strcmp(file_type, 'pat') && ~strcmp(patfield,'')
+                
+                self.model.auto_preview_index = self.check_pattern_dimensions(patfield);
+                self.model.current_preview_file = self.doc.Patterns.(patfield).pattern.Pats;
+
+                x = [0 length(self.model.current_preview_file(1,:,1))];
+                y = [0 length(self.model.current_preview_file(:,1,1))];
+                adjusted_file = zeros(y(2),x(2),length(self.model.current_preview_file(1,1,:)));
+                max_num = max(max(self.model.current_preview_file,[],2));
+                for i = 1:length(self.model.current_preview_file(1,1,:))
+
+                    adjusted_matrix = self.model.current_preview_file(:,:,i) ./ max_num(i);
+                    adjusted_file(:,:,i) = adjusted_matrix(:,:,1);
+                end
+                
+                
+                self.hAxes = axes(self.f, 'units', 'pixels', 'OuterPosition', [285, 30, 1100 ,360], 'XTick', [], 'YTick', [] ,'XLim', x, 'YLim', y);
+                im = imshow(adjusted_file(:,:,self.model.auto_preview_index), 'Colormap',gray);
+
+                set(im, 'parent', self.hAxes);
+
+            elseif strcmp(file_type, 'pos') && ~strcmp(funcfield,'')
+                
+                self.model.current_preview_file = self.doc.Pos_funcs.(funcfield).pfnparam.func;
+                self.hAxes = axes(self.f,'units', 'pixels', 'OuterPosition', [285, 30, 1100 ,360]);
+                self.second_axes = axes(self.f, 'units', 'pixels', 'OuterPosition', self.hAxes.OuterPosition, 'XAxisLocation', 'top', 'YAxisLocation', 'right');
+                plot(self.model.current_preview_file, 'parent', self.hAxes);
+
+                time_in_ms = length(self.model.current_preview_file(1,:));
+                xax = [0 time_in_ms];
+                yax = [min(self.model.current_preview_file) max(self.model.current_preview_file)];
+                timeLabel = 'Time (ms)';
+                patLabel = 'Pattern';
+                frameLabel = 'Frame Number';
+                set(self.hAxes, 'XLim', xax, 'YLim', yax, 'TickLength',[0,0]);
+                self.hAxes.XLabel.String = timeLabel;
+                self.hAxes.YLabel.String = patLabel;
+
+                num_frames = frame_rate*(1/1000)*time_in_ms;
+                xax2 = [0 num_frames];
+                yax2 = yax;
+                set(self.second_axes, 'Position', self.hAxes.Position, 'XLim', xax2, 'YLim', yax2, 'TickLength', [0,0], 'Color', 'none');
+                self.second_axes.XLabel.String = frameLabel;
+
+                if dur <= length(self.model.current_preview_file(1,:))
+                    if frame_rate == 500
+                        linedur = [dur/2, dur/2];
+                    else
+                        linedur = [dur, dur];
+                    end
+                    line('XData', linedur, 'YData', yax, 'Color', [1 0 0], 'LineWidth', 2);
+                end
+
+            elseif strcmp(file_type, 'ao') && ~strcmp(aofield,'')
+
+                self.model.current_preview_file = self.doc.Ao_funcs.(aofield).afnparam.func;
+                self.hAxes = axes(self.f,'units', 'pixels', 'OuterPosition', [285, 30, 1100 ,360]);
+                self.second_axes = axes(self.f, 'units', 'pixels', 'OuterPosition', self.hAxes.OuterPosition, 'XAxisLocation', 'top', 'YAxisLocation', 'right');
+
+                plot(self.model.current_preview_file, 'parent', self.hAxes);
+                time_in_ms = length(self.model.current_preview_file(1,:));
+
+                xax = [0 length(self.model.current_preview_file(1,:))];
+                yax = [min(self.model.current_preview_file) max(self.model.current_preview_file)];
+
+                timeLabel = 'Time (ms)';
+                patLabel = 'Pattern';
+                frameLabel = 'Frame Number';
+                set(self.hAxes, 'XLim', xax, 'YLim', yax, 'TickLength',[0,0]);
+                self.hAxes.XLabel.String = timeLabel;
+                self.hAxes.YLabel.String = patLabel;
+
+                num_frames = frame_rate*(1/1000)*time_in_ms;
+                xax2 = [0 num_frames];
+                yax2 = yax;
+                set(self.second_axes, 'Position', self.hAxes.Position, 'XLim', xax2, 'YLim', yax2, 'TickLength', [0,0], 'Color', 'none');
+                self.second_axes.XLabel.String = frameLabel;
+
+            end
+        end
+        
+        
+        % Pulls parameters from trial containing currently selected cell to inform the
+        % in screen preview
         function [frame_rate, dur, patfield, funcfield, aofield, file_type] = get_preview_parameters(self, is_table)
             index = self.model.current_selected_cell.index;
             table = self.model.current_selected_cell.table;
@@ -2755,21 +2669,51 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                         frame_rate = 1000;
                     end
                 end
-
                 dur = self.doc.posttrial{12}*1000;
             end
-            
-            
-            
-            
+        end
+        
+        %Check the pattern being previewed for three or four dimensions
+        function [start_index] = check_pattern_dimensions(self, pat_field)
+            if ~strcmp(pat_field,'')
+               num_dim = ndims(self.doc.Patterns.(pat_field).pattern.Pats);
+               if num_dim == 3
+                   start_index = 1;
+               elseif num_dim == 4
+                   start_index = [1,1];
+                   set(self.pageUp_button, 'Enable', 'on');
+                   set(self.pageDown_button, 'Enable', 'on');
+               else
+                   start_index = 0;
+               end
+            end
 
         end
 
+%% Error handling Functions
+        
+        %display an error box to the user
+        function create_error_box(self, varargin)
+            if isempty(varargin)
+                return;
+            else
+                msg = varargin{1};
+                if length(varargin) >= 2
+                    title = varargin{2};
+                else
+                    title = "";
+                end
 
-%CHECK IF THE CELL IS EDITABLE---------------------------------------------
+                e = errordlg(msg, title);
+                set(e, 'Resize', 'on');
+                waitfor(e);
 
-%Return true or false, on true the update function continues, on false the 
-%gui is updated with the old data and an error message is displayed. 
+            end
+
+        end
+        
+        %check that the parameter the user is trying to edit is allowed to
+        %be edited
         function [allow] = check_editable(self, mode_val, y) 
 
 
@@ -2808,720 +2752,202 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
             end
 
         end
-
-%CHECK THAT THE VALUE ENTERED IS WITHIN BOUNDS-----------------------------        
         
-function [within_bounds] = check_constraints(self, y, new)
-%Something's wrong with this function, get error with correct values, not
-%sure why yet
-    within_bounds = 1;
-    if y == 1
-        if new > 7 || new < 1
-            within_bounds = 0;
-        end
-    elseif y == 8
-        if new < 1
-            within_bounds = 0;
-        end
-    elseif y == 9 
-        %can you check the input for non-numeric characters somehow?
-    elseif y == 10
-        %same as above
-    elseif y == 11
-        %same as above
-    elseif y == 12
-        if new < 1
-            within_bounds = 0;
-        end
-    end
-end
+        %Checks if a file exists before loading it
+        function [loaded_file] = check_file_exists(self, filename)
 
-%CHECK PATTERN BEING PREVIEWED FOR THREE OR FOUR DIMENSIONS----------------
-
-function [start_index] = check_pattern_dimensions(self, pat_field)
-    if ~strcmp(pat_field,'')
-       num_dim = ndims(self.doc.Patterns.(pat_field).pattern.Pats);
-       if num_dim == 3
-           start_index = 1;
-       elseif num_dim == 4
-           start_index = [1,1];
-           set(self.pageUp_button, 'Enable', 'on');
-           set(self.pageDown_button, 'Enable', 'on');
-       else
-           start_index = 0;
-       end
-    end
-
-end
-
-function deselect_selectAll(self)
-
-    self.model.isSelect_all = 0;
-
-end
-
-%CLEAR GREY SPACE AND INSERT PATTERN INTO PATTERN CELL---------------------
-
-function [pat_field] = get_or_insert_pattern(self)
-
-    pat_fields = fieldnames(self.doc.Patterns);
-    
-    if strcmp(self.model.current_selected_cell.table,"pre")
-        if ~isempty(self.doc.pretrial{2}) && ~self.doc.check_if_cell_disabled(self.doc.pretrial{2})
-            pat_field = self.doc.get_pattern_field_name(self.doc.pretrial{2});
-        elseif ~isempty(self.doc.imported_pattern_names)
-            pat_field = pat_fields{1};
-            self.doc.set_pretrial_property(2,self.doc.Patterns.(pat_field).filename);
-        else
-            pat_field = '';
-        end
-
-    elseif strcmp(self.model.current_selected_cell.table,"inter")
-        if ~isempty(self.doc.intertrial{2}) && ~self.doc.check_if_cell_disabled(self.doc.intertrial{2})
-            pat_field = self.doc.get_pattern_field_name(self.doc.intertrial{2});
-        elseif ~isempty(self.doc.imported_pattern_names)
-            pat_field = pat_fields{1};
-            self.doc.set_intertrial_property(2,self.doc.Patterns.(pat_field).filename);
-        else
-            pat_field = '';
-        end
-    elseif strcmp(self.model.current_selected_cell.table,"post")
-        if ~isempty(self.doc.posttrial{2}) && ~self.doc.check_if_cell_disabled(self.doc.posttrial{2})
-            pat_field = self.doc.get_pattern_field_name(self.doc.posttrial{2});
-        elseif ~isempty(self.doc.imported_pattern_names)
-            pat_field = pat_fields{1};
-            self.doc.set_posttrial_property(2,self.doc.Patterns.(pat_field).filename);
-        else
-            pat_field = '';
-        end
-    else
-        if ~isempty(self.doc.block_trials{self.model.current_selected_cell.index(1),2}) && ...
-                ~self.doc.check_if_cell_disabled(self.doc.block_trials{self.model.current_selected_cell.index(1),2})
-            pat_field = self.doc.get_pattern_field_name(self.doc.block_trials{self.model.current_selected_cell.index(1),2});            
-        elseif ~isempty(self.doc.imported_pattern_names)
-            pat_field = pat_fields{1};
-            self.doc.set_block_trial_property([self.model.current_selected_cell.index(1),2],self.doc.Patterns.(pat_field).filename);
-        else
-            pat_field = '';
-        end
-
-    end
-
-end
-%CLEAR APPROPRIATE FIELDS WHEN THE MODE IS CHANGED-------------------------
-
-function clear_fields(self, mode)
-
-    pos_fields = fieldnames(self.doc.Pos_funcs);
-    pat_fields = fieldnames(self.doc.Patterns);
-    pos = self.doc.colorgen();
-    indx = [];
-    rate = self.doc.colorgen();
-    gain = self.doc.colorgen();
-    offset = self.doc.colorgen();
-    
-    if mode == 1
-        
-        pat_field = self.get_or_insert_pattern();
-        index_of_pat = find(strcmp(pat_fields(:), pat_field));
-
-        if index_of_pat > length(pos_fields)
-            index_of_pat = rem(length(pos_fields), index_of_pat);
-        end
-        if ~isempty(index_of_pat)
-            pos_field = pos_fields{index_of_pat};
-            pos = self.doc.Pos_funcs.(pos_field).filename;
-
-        end
-        self.set_mode_dep_props(pos, indx, rate, gain, offset);
-        
-    elseif mode == 2
-        
-        pat_field = self.get_or_insert_pattern();
-        rate = 60;
-        self.set_mode_dep_props(pos, indx, rate, gain, offset);
-        %frame rate, clear others
-        
-        
-    elseif mode == 3
-        
-        pat_field = self.get_or_insert_pattern();
-
-        indx = 1;
-        self.set_mode_dep_props(pos, indx, rate, gain, offset);
-        %frame index, clear others
-        
-    elseif mode == 4
-        pat_field = self.get_or_insert_pattern();
-        gain = 1;
-        offset = 0;
-        self.set_mode_dep_props(pos, indx, rate, gain, offset);
-        %gain, offset, clear others
-        
-    elseif mode == 5
-        pat_field = self.get_or_insert_pattern();
-        index_of_pat = find(strcmp(pat_fields(:), pat_field));
-        if index_of_pat > length(pos_fields)
-            index_of_pat = rem(length(pos_fields), index_of_pat);
-        end
-        pos_field = pos_fields{index_of_pat};
-        pos = self.doc.Pos_funcs.(pos_field).filename;
-        gain = 1;
-        offset = 0;
-        self.set_mode_dep_props(pos, indx, rate, gain, offset);
-        %pos, gain, offset, clear others
-        
-    elseif mode == 6
-        
-        pat_field = self.get_or_insert_pattern();
-        index_of_pat = find(strcmp(pat_fields(:), pat_field));
-        if index_of_pat > length(pos_fields)
-            index_of_pat = rem(length(pos_fields), index_of_pat);
-        end
-        pos_field = pos_fields{index_of_pat};
-        pos = self.doc.Pos_funcs.(pos_field).filename;
-        gain = 1;
-        offset = 0;
-        self.set_mode_dep_props(pos, indx, rate, gain, offset);
-        %pos, gain, offset, clear others
-        
-    elseif mode == 7
-        pat_field = self.get_or_insert_pattern();
-        self.set_mode_dep_props(pos, indx, rate, gain, offset);
-        %clear all
-        
-    elseif isempty(mode)
-        
-        pos = self.doc.colorgen();
-        indx = self.doc.colorgen();
-        rate = self.doc.colorgen();
-        gain = self.doc.colorgen();
-        offset = self.doc.colorgen();
-        self.set_mode_dep_props(pos, indx, rate, gain, offset);
-        if strcmp(self.model.current_selected_cell.table,"pre") == 1
-            self.doc.set_pretrial_property(2, self.doc.colorgen());
-            for i = 4:7
-                self.doc.set_pretrial_property(i,self.doc.colorgen());
-            end
-            self.doc.set_pretrial_property(12,self.doc.colorgen());
-            
-        elseif strcmp(self.model.current_selected_cell.table,"inter") == 1
-            self.doc.set_intertrial_property(2, self.doc.colorgen());
-            for i = 4:7
-                self.doc.set_intertrial_property(i,self.doc.colorgen());
-            end
-            self.doc.set_intertrial_property(12,self.doc.colorgen());
-            
-            
-        elseif strcmp(self.model.current_selected_cell.table,"post") == 1
-            self.doc.set_posttrial_property(2, self.doc.colorgen());
-            for i = 4:7
-                self.doc.set_posttrial_property(i,self.doc.colorgen());
-            end
-            self.doc.set_posttrial_property(12,self.doc.colorgen());
-            
-            
-        else
-            x = self.model.current_selected_cell.index(1);
-            self.doc.set_block_trial_property([x,2], self.doc.colorgen());
-            for i = 4:7
-                self.doc.set_block_trial_property([x,i],self.doc.colorgen());
-            end
-            self.doc.set_block_trial_property([x,12],self.doc.colorgen());
-        end
-        
-    end
-
-end
-
-function set_mode_dep_props(self, pos, indx, rate, gain, offset)
-
-    if strcmp(self.model.current_selected_cell.table,"pre") == 1
-        self.doc.set_pretrial_property(3, pos);
-        self.doc.set_pretrial_property(8, indx);
-        self.doc.set_pretrial_property(9, rate);
-        self.doc.set_pretrial_property(10, gain);
-        self.doc.set_pretrial_property(11, offset);
-        self.set_pretrial_files_(3, pos);
-        
-        if ~isempty(self.doc.pretrial{1})
-            self.doc.set_pretrial_property(4,'');
-            self.doc.set_pretrial_property(5,'');
-            self.doc.set_pretrial_property(6,'');
-            self.doc.set_pretrial_property(7,'');
-            self.doc.set_pretrial_property(12,self.doc.trial_data.trial_array{12});
-        end
-            
-    elseif strcmp(self.model.current_selected_cell.table,"inter") == 1
-        self.doc.set_intertrial_property(3, pos);
-        self.doc.set_intertrial_property(8, indx);
-        self.doc.set_intertrial_property(9, rate);
-        self.doc.set_intertrial_property(10, gain);
-        self.doc.set_intertrial_property(11, offset);
-        self.set_intertrial_files_(3,pos);
-        
-        if ~isempty(self.doc.intertrial{1})
-            self.doc.set_intertrial_property(4,'');
-            self.doc.set_intertrial_property(5,'');
-            self.doc.set_intertrial_property(6,'');
-            self.doc.set_intertrial_property(7,'');
-            self.doc.set_intertrial_property(12,self.doc.trial_data.trial_array{12});
-        end
-
-    elseif strcmp(self.model.current_selected_cell.table,"post") == 1
-        self.doc.set_posttrial_property(3, pos);
-        self.doc.set_posttrial_property(8, indx);
-        self.doc.set_posttrial_property(9, rate);
-        self.doc.set_posttrial_property(10, gain);
-        self.doc.set_posttrial_property(11, offset);
-        self.set_posttrial_files_(3,pos);
-        
-        if ~isempty(self.doc.posttrial{1})
-            self.doc.set_posttrial_property(4,'');
-            self.doc.set_posttrial_property(5,'');
-            self.doc.set_posttrial_property(6,'');
-            self.doc.set_posttrial_property(7,'');
-            self.doc.set_posttrial_property(12,self.doc.trial_data.trial_array{12});
-        end
-
-
-    else
-        x = self.model.current_selected_cell.index(1);
-        self.doc.set_block_trial_property([x,3], pos);
-        self.doc.set_block_trial_property([x,8], indx);
-        self.doc.set_block_trial_property([x,9], rate);
-        self.doc.set_block_trial_property([x,10], gain);
-        self.doc.set_block_trial_property([x,11], offset);
-        self.set_blocktrial_files_(self.model.current_selected_cell.index(1),3,pos);
-        
-        if ~isempty(self.doc.block_trials{x,1})
-            self.doc.set_block_trial_property([x,4],'');
-            self.doc.set_block_trial_property([x,5],'');
-            self.doc.set_block_trial_property([x,6],'');
-            self.doc.set_block_trial_property([x,7],'');
-            self.doc.set_block_trial_property([x,12],self.doc.trial_data.trial_array{12});
-        end
-
-
-    end
-    
-    self.update_gui();
-
-
-end
-
-
-
-
-%CHECK THAT ONLY ONE TRIAL IS SELECTED-------------------------------------
-
-%returns the data of the trial that is selected or an error if 0 or >1
-%trials are selected
-
-        function [data] = check_one_selected(self)
-
-     %find selected rows in ALL tables
-
-     %finds checked rows in block table
-            checkbox_block_data = horzcat(self.doc.block_trials(1:end, end));
-            checked_block = find(cell2mat(checkbox_block_data));
-            checked_block_count = length(checked_block);
-
-     %Figures out which table has the selected row and ensures no more than
-     %one table has a selected row
-            if checked_block_count ~= 0
-                checked_trial = 'block';
-            end
-
-
-            if cell2mat(self.doc.pretrial(13)) == 1
-                pretrial_checked = 1;
-                checked_trial = 'pre';
-            else 
-                pretrial_checked = 0;
-
-            end
-
-            if cell2mat(self.doc.intertrial(13)) == 1
-                intertrial_checked = 1;
-                checked_trial = 'inter';
-            else 
-                intertrial_checked = 0;
-            end
-
-            if cell2mat(self.doc.posttrial(13)) == 1
-                posttrial_checked = 1;
-                checked_trial = 'post';
-            else 
-                posttrial_checked = 0;
-            end
-
-            all_checked = checked_block_count + pretrial_checked + intertrial_checked ...
-                + posttrial_checked;
-
-      %throw error if more or less than one is selected
-            if all_checked == 0 
-                self.create_error_box("You must selected a trial to preview");
-                data = [];
-            elseif all_checked > 1
-                self.create_error_box("You can only select one trial at a time to preview");
-                data = [];
+            if isfile(filename) == 0
+                self.create_error_box("This file doesn't exist");
+                loaded_file = 0;
             else
-      %set data to correct table
-                if strcmp(checked_trial,'pre')
-                    data = self.doc.pretrial;
-                elseif strcmp(checked_trial,'inter')
-                    data = self.doc.intertrial;
-                elseif strcmp(checked_trial, 'block')
-                    data = self.doc.block_trials(checked_block(1),:);
-                elseif strcmp(checked_trial, 'post')
-                    data = self.doc.posttrial;
-                else
-                    self.create_error_box("Something went wrong. Please make sure you have exactly one trial selected and try again.");
+                loaded_file = load(filename);
+            end
+
+
+        end
+        
+        %Check that the value entered is within bounds       
+        function [within_bounds] = check_constraints(self, y, new)
+        %Something's wrong with this function, get error with correct values, not
+        %sure why yet
+            within_bounds = 1;
+            if y == 1
+                if new > 7 || new < 1
+                    within_bounds = 0;
+                end
+            elseif y == 8
+                if new < 1
+                    within_bounds = 0;
+                end
+            elseif y == 9 
+                %can you check the input for non-numeric characters somehow?
+            elseif y == 10
+                %same as above
+            elseif y == 11
+                %same as above
+            elseif y == 12
+                if new < 1
+                    within_bounds = 0;
                 end
             end
         end
-
-        %SETTERS
         
-         function set.model(self, value)
-            self.model_ = value;
+%% Additional Menu functions
+        
+        % Get the string by which the user wants to filter their file
+        % options during Import
+        function [answer] = get_filter_string(self)
+
+            answer = inputdlg("Please enter the whole or partial filename you wish to match.",...
+                "Filter Import Results");
+            answer = answer{1};
         end
         
-        function set.preview_con(self, value)
-            self.preview_con_ = value;
+        % Import a folder
+        function import_folder(self, str_to_match)
+
+            if strcmp(str_to_match,'')
+
+                path = uigetdir;
+
+            else
+                path = uigetdir(['*',str_to_match,'*']);
+            end
+
+            if isequal(path, 0)
+                %do nothing
+            else
+
+                self.doc.import_folder(path);
+                self.set_exp_name();
+                set(self.num_rows_3, 'Enable', 'off');
+                set(self.num_rows_4, 'Enable', 'off');
+
+                self.update_gui();
+            end
         end
         
-        function set.run_con(self, value)
-            self.run_con_ = value;
+        % Import a file
+        function import_file(self, str_to_match)
+            if strcmp(str_to_match,'')
+                [imported_file, path] = uigetfile('*.mat');
+            else
+                [imported_file, path] = uigetfile(['*',str_to_match,'*.mat']);
+            end
+
+            if isequal(imported_file,0)
+                %do nothing
+            else
+                self.doc.import_single_file(imported_file, path);
+
+                set(self.num_rows_3, 'Enable', 'off');
+                set(self.num_rows_4, 'Enable', 'off');
+                self.update_gui();
+            end
         end
         
-         function set.pretrial_table(self, value)
-            self.pretrial_table_ = value;
-         end
+        % Save over current file (Not currently in use)
+        function save(self, ~, ~)
 
-         function set.intertrial_table(self, value)
-            self.intertrial_table_ = value;
-         end
+            self.doc.save();
 
-         function set.posttrial_table(self, value)
-            self.posttrial_table_ = value;
-         end
-
-         function set.block_table(self, value)
-            self.block_table_ = value;
-         end
-         
-         function set.pre_files(self, value)
-             self.pre_files_ = value;
-         end
-         
-         function set.block_files(self, value)
-             self.block_files_ = value;
-         end
-         
-         function set.inter_files(self, value)
-             self.inter_files_ = value;
-         end
-         
-         function set.post_files(self, value)
-             self.post_files_ = value;
-         end
-         
-         
-
-         function set.chan1(self, value)
-            self.chan1_ = value;
-         end
-
-         function set.chan2(self, value)
-            self.chan2_ = value;
-         end
-
-         function set.chan3(self, value)
-            self.chan3_ = value;
-         end
-         
-         function set.chan4(self, value)
-            self.chan4_ = value;
-         end
-         
-         function set.chan1_rate_box(self, value)
-            self.chan1_rate_box_ = value;
-         end
-         
-         function set.chan2_rate_box(self, value)
-            self.chan2_rate_box_ = value;
-         end
-         
-         function set.chan3_rate_box(self, value)
-            self.chan3_rate_box_ = value;
-         end
-         
-         function set.chan4_rate_box(self, value)
-            self.chan4_rate_box_ = value;
-         end
-
-         
-         function set.isRandomized_radio(self, value)
-            self.isRandomized_radio_ = value;
-         end
-         
-         function set.isSequential_radio(self, value)
-             self.isSequential_radio_ = value;
-         end
-         
-         function set.repetitions_box(self, value)
-            self.repetitions_box_ = value;
-         end
-         
-         function set.bg2(self, value)
-             self.bg2_ = value;
-         end
-         
-         function set.num_rows_3(self, value)
-             self.num_rows_3_ = value;
-         end
-         
-         function set.num_rows_4(self, value)
-             self.num_rows_4_ = value;
-         end
-         
-         function set.bg(self, value)
-             self.bg_ = value;
-         end
-         
-         function set.isSelect_all_box(self, value)
-             self.isSelect_all_box_ = value;
-         end
-         
-         function set.f(self, value)
-             self.f_ = value;
-         end
-         
-         function set.preview_panel(self, value)
-             self.preview_panel_ = value;
-         end
-         
-         function set.hAxes(self, value)
-             self.hAxes_ = value;
-         end
-         
-         function set.exp_name_box(self, value)
-             self.exp_name_box_ = value;
-         end
-         
-         function set.doc(self, value)
-            self.doc_ = value;
-         end
-         
-         function set.second_axes(self, value)
-             self.second_axes_ = value;
-         end
-         
-         function set.pageUp_button(self, value)
-             self.pageUp_button_ = value;
-         end
-         
-         function set.pageDown_button(self, value)
-             self.pageDown_button_ = value;
-         end
-         
-         
-         
-         function set.listbox_imported_files(self, value)
-             self.listbox_imported_files_ = value;
-         end
-         
-         
-         
-         function set.recent_file_menu_items(self, value)
-             self.recent_file_menu_items_ = value;
-         end
-         
-         function set.menu_open(self, value)
-             self.menu_open_ = value;
-         end
-         
-         function set.exp_length_display(self, value)
-             self.exp_length_display_ = value;
-         end
-
-
-
-
-% GETTERS
+        end
 
         
-        function output = get.model(self)
-            output = self.model_;
+%% Additional General Functions
+    
+        % Get pattern field associated with selected cell, or clear grey 
+        % space and insert first pattern
+
+        function [pat_field] = get_or_insert_pattern(self)
+
+            pat_fields = fieldnames(self.doc.Patterns);
+
+            if strcmp(self.model.current_selected_cell.table,"pre")
+                if ~isempty(self.doc.pretrial{2}) && ~self.doc.check_if_cell_disabled(self.doc.pretrial{2})
+                    pat_field = self.doc.get_pattern_field_name(self.doc.pretrial{2});
+                elseif ~isempty(self.doc.imported_pattern_names)
+                    pat_field = pat_fields{1};
+                    self.doc.set_pretrial_property(2,self.doc.Patterns.(pat_field).filename);
+                else
+                    pat_field = '';
+                end
+
+            elseif strcmp(self.model.current_selected_cell.table,"inter")
+                if ~isempty(self.doc.intertrial{2}) && ~self.doc.check_if_cell_disabled(self.doc.intertrial{2})
+                    pat_field = self.doc.get_pattern_field_name(self.doc.intertrial{2});
+                elseif ~isempty(self.doc.imported_pattern_names)
+                    pat_field = pat_fields{1};
+                    self.doc.set_intertrial_property(2,self.doc.Patterns.(pat_field).filename);
+                else
+                    pat_field = '';
+                end
+            elseif strcmp(self.model.current_selected_cell.table,"post")
+                if ~isempty(self.doc.posttrial{2}) && ~self.doc.check_if_cell_disabled(self.doc.posttrial{2})
+                    pat_field = self.doc.get_pattern_field_name(self.doc.posttrial{2});
+                elseif ~isempty(self.doc.imported_pattern_names)
+                    pat_field = pat_fields{1};
+                    self.doc.set_posttrial_property(2,self.doc.Patterns.(pat_field).filename);
+                else
+                    pat_field = '';
+                end
+            else
+                if ~isempty(self.doc.block_trials{self.model.current_selected_cell.index(1),2}) && ...
+                        ~self.doc.check_if_cell_disabled(self.doc.block_trials{self.model.current_selected_cell.index(1),2})
+                    pat_field = self.doc.get_pattern_field_name(self.doc.block_trials{self.model.current_selected_cell.index(1),2});            
+                elseif ~isempty(self.doc.imported_pattern_names)
+                    pat_field = pat_fields{1};
+                    self.doc.set_block_trial_property([self.model.current_selected_cell.index(1),2],self.doc.Patterns.(pat_field).filename);
+                else
+                    pat_field = '';
+                end
+
+            end
+
+        end
+
+%% Additional Update functions
+
+        %Update the preview controller property
+        function update_preview_con(self, new_value)
+            self.preview_con = new_value;
         end
         
-        function output = get.preview_con(self)
-            output = self.preview_con_;
+         %Update the predicted experiment length
+        function update_exp_length(self, new)
+            self.doc.est_exp_length = new;
+            self.update_gui();
         end
-        
-        function output = get.run_con(self)
-            output = self.run_con_;
+                
+        % Update the GUI to reflect the up to date model values
+        function update_gui(self)
+
+
+            self.set_pretrial_table_data();
+            self.set_intertrial_table_data();
+            self.set_block_table_data();
+            self.set_posttrial_table_data();
+            self.set_randomize_buttonGrp_selection();
+            self.set_repetitions_box_val();
+            self.set_isSelect_all_box_val();
+            self.set_chan1_val();
+            self.set_chan2_val();
+            self.set_chan3_val();
+            self.set_chan4_val();
+            self.set_chan1_rate_box_val();
+            self.set_chan2_rate_box_val();
+            self.set_chan3_rate_box_val();
+            self.set_chan4_rate_box_val();
+            self.set_num_rows_buttonGrp_selection();
+            self.set_exp_name();
+            self.set_recent_file_menu_items();
+            self.set_exp_length_text();
+            
+
+
         end
-        
-         function output = get.pretrial_table(self)
-            output = self.pretrial_table_;
-         end
 
-         function output = get.intertrial_table(self)
-            output = self.intertrial_table_;
-         end
-
-         function output = get.posttrial_table(self)
-            output = self.posttrial_table_;
-         end
-
-         function output = get.block_table(self)
-            output = self.block_table_;
-         end
-         
-         function output = get.pre_files(self)
-             output = self.pre_files_;
-         end
-         
-         function output = get.block_files(self)
-             output = self.block_files_;
-         end
-         
-         function output = get.inter_files(self)
-             output = self.inter_files_;
-         end
-         
-         function output = get.post_files(self)
-             output = self.post_files_;
-         end
-         
-
-
-
-         function output = get.chan1(self)
-            output = self.chan1_;
-         end
-
-         function output = get.chan2(self)
-            output = self.chan2_;
-         end
-
-         function output = get.chan3(self)
-            output = self.chan3_;
-         end
-         
-         function output = get.chan4(self)
-            output = self.chan4_;
-         end
-         
-         function output = get.chan1_rate_box(self)
-            output = self.chan1_rate_box_;
-         end
-         
-         function output = get.chan2_rate_box(self)
-            output = self.chan2_rate_box_;
-         end
-         
-         function output = get.chan3_rate_box(self)
-            output = self.chan3_rate_box_;
-         end
-         
-         function output = get.chan4_rate_box(self)
-            output = self.chan4_rate_box_;
-         end
-         
-
-         
-         function output = get.isRandomized_radio(self)
-            output = self.isRandomized_radio_;
-         end
-         
-         function output = get.isSequential_radio(self)
-             output = self.isSequential_radio_;
-         end
-         
-         function output = get.repetitions_box(self)
-            output = self.repetitions_box_;
-         end
-         
-         function output = get.bg2(self)
-             output = self.bg2_;
-         end
-         
-         function output = get.num_rows_3(self)
-             output = self.num_rows_3_;
-         end
-         
-         function output = get.num_rows_4(self)
-             output = self.num_rows_4_;
-         end
-         
-         function output = get.bg(self)
-             output = self.bg_;
-         end
-         
-         function output = get.isSelect_all_box(self)
-             output = self.isSelect_all_box_;
-         end
-         
-         function output = get.f(self)
-             output = self.f_;
-         end
-         
-         function output = get.preview_panel(self)
-             output = self.preview_panel_;
-         end
-         
-         function output = get.hAxes(self)
-             output = self.hAxes_;
-         end
-         
-         function output = get.exp_name_box(self)
-             output = self.exp_name_box_;
-         end
-         
-         function output = get.doc(self)
-            output = self.doc_;
-         end
-         
-         function output = get.second_axes(self)
-             output = self.second_axes_;
-         end
-         
-         function output = get.pageUp_button(self)
-             output = self.pageUp_button_;
-         end
-         
-         function output = get.pageDown_button(self)
-             output = self.pageDown_button_;
-         end
-         
-         
-         
-         function output = get.listbox_imported_files(self)
-             output = self.listbox_imported_files_;
-         end
-         
-         
-             
-         function output = get.recent_file_menu_items(self)
-             output = self.recent_file_menu_items_;
-         end
-         
-         function output = get.menu_open(self)
-             output = self.menu_open_;
-         end
-         
-         function output = get.exp_length_display(self)
-             output = self.exp_length_display_;
-         end
-
-         
-%SETTERS OF GUI OBJECT VALUES
-
-
+ %% Functions to set the value of each GUI object       
 
          function set_pretrial_table_data(self)
             self.pretrial_table.Data = self.doc.pretrial;
@@ -3537,48 +2963,31 @@ end
 
          end
 
-%          function set_block_table_data_xy(self, x, y)
- 
-%              
-%              
-%              %disp(self.doc.block_trials);
-% 
-%              
-%             self.block_table_.Data{x, y} = self.doc.block_trials{x,y};
-%             
-%             
-%             %set(self.block_table_, 'data', self.doc.block_trials);
-%          end
-         
          function set_block_table_data(self)
              
                %%%%%%%%%%%%%%%%%%THIS IS NOT A GOOD PERMANENT SOLUTION FOR
 %              %%%%%%%%%%%%%%%%%%THE SCROLLBAR JUMPING ISSUE. USING PAUSE CAN
 %              %%%%%%%%%%%%%%%%%%UNDER CERTAIN CIRCUMSTANCES HAVE WEIRD
 %              %%%%%%%%%%%%%%%%%%RESULTS, AND JAVA INTERVENTIONS MAY STOP
-%              %%%%%%%%%%%%%%%%%%WORKING WITH ANY RELEASE. FIGURE OUT WHY
-%              %%%%%%%%%%%%%%%%%%ADAM'S TABLE DOESN'T JUMP. -- ITS A
-%              %%%%%%%%%%%%%%%%%%DIFFERENCE BETWEEN RELEASES. DOWNLOAD 2019
-%              %%%%%%%%%%%%%%%%%%and see if that fixes it, if not, ask Mike
-                %%%%%%%%%%%%%%%%%%if they have a release preference. 
-             
+%              %%%%%%%%%%%%%%%%%%WORKING WITH ANY RELEASE. CHECK NEW
+%              RELEASES TO SEE IF THIS BUG HAS BEEN FIXED
+
             jTable = findjobj(self.block_table);
             jScrollPane = jTable.getComponent(0);
             javaObjectEDT(jScrollPane);
             currentViewPos = jScrollPane.getViewPosition;
              
              self.block_table.Data = self.doc.block_trials;
-             
-                         
+   
             pause(0);
             jScrollPane.setViewPosition(currentViewPos);
          end
 
-         function set_bg_selection(self)
+         function set_randomize_buttonGrp_selection(self)
             if self.doc.is_randomized == 1
-                set(self.bg,'SelectedObject',self.isRandomized_radio);
+                set(self.randomize_buttonGrp,'SelectedObject',self.isRandomized_radio);
             else
-                set(self.bg,'SelectedObject',self.isSequential_radio);
+                set(self.randomize_buttonGrp,'SelectedObject',self.isSequential_radio);
             end
          end
 
@@ -3607,18 +3016,15 @@ end
          end
          
          function set_chan1_rate_box_val(self)
-
             self.chan1_rate_box.String = num2str(self.doc.chan1_rate);
          end
          
          function set_chan2_rate_box_val(self)
-
             self.chan2_rate_box.String = num2str(self.doc.chan2_rate);
 
          end
 
          function set_chan3_rate_box_val(self)
-
             self.chan3_rate_box.String = num2str(self.doc.chan3_rate);
          end
          
@@ -3626,16 +3032,16 @@ end
             self.chan4_rate_box.String = num2str(self.doc.chan4_rate);
          end
          
-         function set_bg2_selection(self)
+         function set_num_rows_buttonGrp_selection(self)
             
              value = get(self.num_rows_3, 'Enable');
              if strcmp(value,'off') == 1
                  %do nothing
              else
                 if self.doc.num_rows == 3
-                    set(self.bg2,'SelectedObject',self.num_rows_3);
+                    set(self.num_rows_buttonGrp,'SelectedObject',self.num_rows_3);
                 else
-                    set(self.bg2,'SelectedObject',self.num_rows_4);
+                    set(self.num_rows_buttonGrp,'SelectedObject',self.num_rows_4);
                 end
              end
             
@@ -3647,7 +3053,7 @@ end
          
          function set_recent_file_menu_items(self)
              for i = 1:length(self.doc.recent_g4p_files)
-                 [path,filename] = fileparts(self.doc.recent_g4p_files{i});
+                 [~,filename] = fileparts(self.doc.recent_g4p_files{i});
                  if i > length(self.recent_file_menu_items)
                      self.recent_file_menu_items{end + 1} = uimenu(self.menu_open, 'Text', filename, 'MenuSelectedFcn', {@self.open_file, self.doc.recent_g4p_files{i}});
                  else
@@ -3655,27 +3061,12 @@ end
                     set(self.recent_file_menu_items{i},'Text',filename);
                     set(self.recent_file_menu_items{i}, 'MenuSelectedFcn', {@self.open_file, self.doc.recent_g4p_files{i}});
                  end
-
              end
          end
          
          function set_exp_length_text(self)
-         
             self.exp_length_display.String = [num2str(round(self.doc.est_exp_length/60, 2)), ' minutes'];
-         
          end
-         
-
-         
-             
-         
-         
-%          function [self] = setfield(self.pre_files,'pattern', new)
-%          
-%             self.pre_files.pattern = new;
-%              
-%          end
-         
          
          function  set_pretrial_files_(self, y, new_value)
             
@@ -3756,7 +3147,6 @@ end
              new_value = string(new_value);
             
             if y == 2
-                %disp(self.block_files.pattern(x));
                 self.block_files.pattern(x) = new_value;
             end
             if y == 3
@@ -3775,15 +3165,326 @@ end
                 self.block_files.ao4(x) = new_value;
             end
          end
- 
-%          function self = set.pre_selected_index_(self, value)
-%              self.pre_selected_index_ = value;
-%          end
-%          
-%          function self = set.auto_preview_index_(self, value)
-%              self.model.auto_preview_index_ = value;
-%          end
-%          
+
+%% SETTERS
+        
+         function set.model(self, value)
+            self.model_ = value;
+        end
+        
+        function set.preview_con(self, value)
+            self.preview_con_ = value;
+        end
+        
+        function set.run_con(self, value)
+            self.run_con_ = value;
+        end
+        
+         function set.pretrial_table(self, value)
+            self.pretrial_table_ = value;
+         end
+
+         function set.intertrial_table(self, value)
+            self.intertrial_table_ = value;
+         end
+
+         function set.posttrial_table(self, value)
+            self.posttrial_table_ = value;
+         end
+
+         function set.block_table(self, value)
+            self.block_table_ = value;
+         end
+         
+         function set.pre_files(self, value)
+             self.pre_files_ = value;
+         end
+         
+         function set.block_files(self, value)
+             self.block_files_ = value;
+         end
+         
+         function set.inter_files(self, value)
+             self.inter_files_ = value;
+         end
+         
+         function set.post_files(self, value)
+             self.post_files_ = value;
+         end
+
+         function set.chan1(self, value)
+            self.chan1_ = value;
+         end
+
+         function set.chan2(self, value)
+            self.chan2_ = value;
+         end
+
+         function set.chan3(self, value)
+            self.chan3_ = value;
+         end
+         
+         function set.chan4(self, value)
+            self.chan4_ = value;
+         end
+         
+         function set.chan1_rate_box(self, value)
+            self.chan1_rate_box_ = value;
+         end
+         
+         function set.chan2_rate_box(self, value)
+            self.chan2_rate_box_ = value;
+         end
+         
+         function set.chan3_rate_box(self, value)
+            self.chan3_rate_box_ = value;
+         end
+         
+         function set.chan4_rate_box(self, value)
+            self.chan4_rate_box_ = value;
+         end
+
+         
+         function set.isRandomized_radio(self, value)
+            self.isRandomized_radio_ = value;
+         end
+         
+         function set.isSequential_radio(self, value)
+             self.isSequential_radio_ = value;
+         end
+         
+         function set.repetitions_box(self, value)
+            self.repetitions_box_ = value;
+         end
+         
+         function set.num_rows_buttonGrp(self, value)
+             self.num_rows_buttonGrp_ = value;
+         end
+         
+         function set.num_rows_3(self, value)
+             self.num_rows_3_ = value;
+         end
+         
+         function set.num_rows_4(self, value)
+             self.num_rows_4_ = value;
+         end
+         
+         function set.randomize_buttonGrp(self, value)
+             self.randomize_buttonGrp_ = value;
+         end
+         
+         function set.isSelect_all_box(self, value)
+             self.isSelect_all_box_ = value;
+         end
+         
+         function set.f(self, value)
+             self.f_ = value;
+         end
+         
+         function set.preview_panel(self, value)
+             self.preview_panel_ = value;
+         end
+         
+         function set.hAxes(self, value)
+             self.hAxes_ = value;
+         end
+         
+         function set.exp_name_box(self, value)
+             self.exp_name_box_ = value;
+         end
+         
+         function set.doc(self, value)
+            self.doc_ = value;
+         end
+         
+         function set.second_axes(self, value)
+             self.second_axes_ = value;
+         end
+         
+         function set.pageUp_button(self, value)
+             self.pageUp_button_ = value;
+         end
+         
+         function set.pageDown_button(self, value)
+             self.pageDown_button_ = value;
+         end
+
+         function set.listbox_imported_files(self, value)
+             self.listbox_imported_files_ = value;
+         end
+
+         function set.recent_file_menu_items(self, value)
+             self.recent_file_menu_items_ = value;
+         end
+         
+         function set.menu_open(self, value)
+             self.menu_open_ = value;
+         end
+         
+         function set.exp_length_display(self, value)
+             self.exp_length_display_ = value;
+         end
+
+%% GETTERS
+
+        function output = get.model(self)
+            output = self.model_;
+        end
+        
+        function output = get.preview_con(self)
+            output = self.preview_con_;
+        end
+        
+        function output = get.run_con(self)
+            output = self.run_con_;
+        end
+        
+         function output = get.pretrial_table(self)
+            output = self.pretrial_table_;
+         end
+
+         function output = get.intertrial_table(self)
+            output = self.intertrial_table_;
+         end
+
+         function output = get.posttrial_table(self)
+            output = self.posttrial_table_;
+         end
+
+         function output = get.block_table(self)
+            output = self.block_table_;
+         end
+         
+         function output = get.pre_files(self)
+             output = self.pre_files_;
+         end
+         
+         function output = get.block_files(self)
+             output = self.block_files_;
+         end
+         
+         function output = get.inter_files(self)
+             output = self.inter_files_;
+         end
+         
+         function output = get.post_files(self)
+             output = self.post_files_;
+         end
+
+         function output = get.chan1(self)
+            output = self.chan1_;
+         end
+
+         function output = get.chan2(self)
+            output = self.chan2_;
+         end
+
+         function output = get.chan3(self)
+            output = self.chan3_;
+         end
+         
+         function output = get.chan4(self)
+            output = self.chan4_;
+         end
+         
+         function output = get.chan1_rate_box(self)
+            output = self.chan1_rate_box_;
+         end
+         
+         function output = get.chan2_rate_box(self)
+            output = self.chan2_rate_box_;
+         end
+         
+         function output = get.chan3_rate_box(self)
+            output = self.chan3_rate_box_;
+         end
+         
+         function output = get.chan4_rate_box(self)
+            output = self.chan4_rate_box_;
+         end
+
+         function output = get.isRandomized_radio(self)
+            output = self.isRandomized_radio_;
+         end
+         
+         function output = get.isSequential_radio(self)
+             output = self.isSequential_radio_;
+         end
+         
+         function output = get.repetitions_box(self)
+            output = self.repetitions_box_;
+         end
+         
+         function output = get.num_rows_buttonGrp(self)
+             output = self.num_rows_buttonGrp_;
+         end
+         
+         function output = get.num_rows_3(self)
+             output = self.num_rows_3_;
+         end
+         
+         function output = get.num_rows_4(self)
+             output = self.num_rows_4_;
+         end
+         
+         function output = get.randomize_buttonGrp(self)
+             output = self.randomize_buttonGrp_;
+         end
+         
+         function output = get.isSelect_all_box(self)
+             output = self.isSelect_all_box_;
+         end
+         
+         function output = get.f(self)
+             output = self.f_;
+         end
+         
+         function output = get.preview_panel(self)
+             output = self.preview_panel_;
+         end
+         
+         function output = get.hAxes(self)
+             output = self.hAxes_;
+         end
+         
+         function output = get.exp_name_box(self)
+             output = self.exp_name_box_;
+         end
+         
+         function output = get.doc(self)
+            output = self.doc_;
+         end
+         
+         function output = get.second_axes(self)
+             output = self.second_axes_;
+         end
+         
+         function output = get.pageUp_button(self)
+             output = self.pageUp_button_;
+         end
+         
+         function output = get.pageDown_button(self)
+             output = self.pageDown_button_;
+         end
+
+         function output = get.listbox_imported_files(self)
+             output = self.listbox_imported_files_;
+         end
+
+         function output = get.recent_file_menu_items(self)
+             output = self.recent_file_menu_items_;
+         end
+         
+         function output = get.menu_open(self)
+             output = self.menu_open_;
+         end
+         
+         function output = get.exp_length_display(self)
+             output = self.exp_length_display_;
+         end
+
+         
+
 
 
      end

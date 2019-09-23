@@ -1212,7 +1212,7 @@ classdef G4_conductor_controller < handle
             path_to_experiment = strtrim(settings_data{line_path}(index:end));
 
             self.open_g4p_file(src, event, path_to_experiment);
-            self.model.fly_name = ['test', num2str(self.model.num_tests_conducted)];
+            self.model.fly_name = real_fly_name;
             self.update_run_gui();
             self.run(src, event);
             
