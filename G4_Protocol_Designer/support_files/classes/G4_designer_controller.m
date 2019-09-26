@@ -24,6 +24,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
         preview_panel_
         hAxes_
         second_axes_
+        inscreen_plot_
         
         %channel gui objects
         chan1_
@@ -117,6 +118,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
         recent_files_filepath
         recent_file_menu_items
         menu_open
+        inscreen_plot
     end
 
 %% Methods
@@ -133,8 +135,10 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
             screensize = get(0, 'screensize');
 
             %create figure
-            self.f = figure('Name', 'Fly Experiment Designer', 'NumberTitle', 'off','units', 'pixels', 'MenuBar', 'none', ...
-                'ToolBar', 'none', 'Resize', 'off', 'outerposition', [screensize(3)*.1, screensize(4)*.07, 1600, 950]);
+            self.f = figure('Name', 'Fly Experiment Designer', 'NumberTitle', 'off','units', 'normalized', 'MenuBar', 'none', ...
+                'ToolBar', 'none', 'outerposition', [.05 .05, .9, .9]);
+            
+            %, 'Resize', 'off'
 
             %ALL REST OF PROPERTIES ARE DEFINED IN LAYOUT         
           self.pre_files = struct('pattern', self.doc.pretrial(2),...
@@ -166,113 +170,118 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
 
             %LAYOUT PARAMETERS TO BE EDITED
 
-            column_names_ = {'Mode', 'Pattern Name' 'Position Function', ...
+            column_names = {'Mode', 'Pattern Name' 'Position Function', ...
                 'AO 1', 'AO 2', 'AO 3', 'AO 4', ...
                 'Frame Index', 'Frame Rate', 'Gain', 'Offset', 'Duration' ...
                 'Select'};
-            columns_editable_ = true;
-            column_format_ = {'numeric', 'char', 'char', 'char', 'char','char', ...
+            columns_editable = true;
+            column_format = {'numeric', 'char', 'char', 'char', 'char','char', ...
                 'char', 'char', 'numeric', 'numeric', 'numeric', 'numeric', 'logical'};
             font_size = 10;
-            positions.pre = [350, 840, 1035, 50];
-            positions.inter = [350, 785, 1035, 50];
-            positions.block = [350, 455, 1035, 300];
-            positions.post = [350, 390, 1035, 50];
-            pos_panel = [350, 90, 1035, 275];
+            
+            positions.pre = [.2, .92, .682, .06];
+            positions.inter = [.2, .84, .682, .06];
+            positions.block = [.2, .45, .682, .35];
+            positions.post = [.2, .37, .682, .06];
+            pos_panel = [.2, .08, .682, .27];
+            left_margin = .003;
+            chan_label_height = .1;
+            chan_label_margin = .05;
+            chan_label_width = .9;
             
             %NO FURTHER EDITING PARAMETERS
 
             %pretrial_label
             uicontrol(self.f, 'Style', 'text', 'String', 'Pre-Trial', ...
-               'Units', 'Pixels', 'FontSize', font_size, 'Position', ...
-               [positions.pre(1) - 85, positions.pre(2) + 15, 78, 20]);
+               'Units', 'normalized', 'FontSize', font_size, 'Position', ...
+               [positions.pre(1) - .04, positions.pre(2) + .025, .04, .015]);
 
-            self.pretrial_table = uitable(self.f, 'data', self.doc.pretrial, 'columnname', column_names_, ...
-            'units', 'pixels', 'Position', positions.pre, 'ColumnEditable', columns_editable_, 'ColumnFormat', column_format_, ...
+            self.pretrial_table = uitable(self.f, 'data', self.doc.pretrial, 'columnname', column_names, ...
+            'units', 'normalized', 'Position', positions.pre, 'ColumnEditable', columns_editable, 'ColumnFormat', column_format, ...
            'CellEditCallback', @self.update_model_pretrial, 'CellSelectionCallback', {@self.preview_selection, positions});
 
             % intertrial_label
             uicontrol(self.f, 'Style', 'text', 'String', 'Inter-Trial', ...
-               'units', 'pixels', 'FontSize', font_size, 'Position', ...
-               [positions.inter(1) - 85, positions.inter(2) + 15, 78, 20]);
+               'units', 'normalized', 'FontSize', font_size, 'Position', ...
+               [positions.inter(1) - .04, positions.inter(2) + .025, .04, .015]);
 
-            self.intertrial_table = uitable(self.f, 'data', self.doc.intertrial, 'columnname', column_names_, ...
-            'units', 'pixels', 'Position', positions.inter, 'ColumnEditable', columns_editable_, 'ColumnFormat', column_format_, ...
+            self.intertrial_table = uitable(self.f, 'data', self.doc.intertrial, 'columnname', column_names, ...
+            'units', 'normalized', 'Position', positions.inter, 'ColumnEditable', columns_editable, 'ColumnFormat', column_format, ...
             'CellEditCallback', @self.update_model_intertrial, 'CellSelectionCallback', {@self.preview_selection, positions});
 
             %blocktrial_label
             uicontrol(self.f, 'Style', 'text', 'String', 'Block Trials', ...
-               'units', 'pixels', 'FontSize', font_size, 'Position', ...
-               [positions.block(1) - 85, positions.block(2) + .5*positions.block(4), 78, 20]);
+               'units', 'normalized', 'FontSize', font_size, 'Position', ...
+               [positions.block(1) - .04, positions.block(2) + .5*positions.block(4), .04, .015]);
 
-            self.block_table = uitable(self.f, 'data', self.doc.block_trials, 'columnname', column_names_, ...
-            'units', 'pixels', 'Position', positions.block, 'ColumnEditable', columns_editable_, 'ColumnFormat', column_format_, ...
+            self.block_table = uitable(self.f, 'data', self.doc.block_trials, 'columnname', column_names, ...
+            'units', 'normalized', 'Position', positions.block, 'ColumnEditable', columns_editable, 'ColumnFormat', column_format, ...
             'CellEditCallback', @self.update_model_block_trials, 'CellSelectionCallback', {@self.preview_selection, positions});
 
             %posttrial_label
             uicontrol(self.f, 'Style', 'text', 'String', 'Post-Trial', ...
-               'units', 'pixels', 'FontSize', font_size, ...
-               'Position', [positions.post(1) - 85, positions.post(2) + 15, 78, 20]);
+               'units', 'normalized', 'FontSize', font_size, ...
+               'Position', [positions.post(1) - .04, positions.post(2) + .025, .04, .015]);
 
-            self.posttrial_table = uitable(self.f, 'data', self.doc.posttrial, 'columnname', column_names_, ...
-            'units', 'pixels', 'Position', positions.post, 'ColumnEditable', columns_editable_, 'ColumnFormat', column_format_, ...
+            self.posttrial_table = uitable(self.f, 'data', self.doc.posttrial, 'columnname', column_names, ...
+            'units', 'normalized', 'Position', positions.post, 'ColumnEditable', columns_editable, 'ColumnFormat', column_format, ...
             'CellEditCallback', @self.update_model_posttrial, 'CellSelectionCallback', {@self.preview_selection, positions});
 
             %add_trial_button
             uicontrol(self.f, 'Style', 'pushbutton','String','Add Trial','units', ...
-                'pixels','Position', [positions.block(1) + positions.block(3) + 5, ...
-                positions.block(2) + 20, 75, 20], 'Callback',@self.add_trials_callback);
+                'normalized','Position', [positions.block(1) + positions.block(3) + left_margin, ...
+                positions.block(2) + .02, .05, .02], 'Callback',@self.add_trials_callback);
 
             %delete_trial_button
             uicontrol(self.f, 'Style', 'pushbutton', 'String', 'Delete Trial', ...
-                'units', 'pixels', 'Position', [positions.block(1) + positions.block(3) + 5, positions.block(2), ...
-                75, 20], 'Callback', @self.delete_trial);
+                'units', 'normalized', 'Position', [positions.block(1) + positions.block(3) + left_margin, positions.block(2), ...
+                .05, .02], 'Callback', @self.delete_trial);
 
             self.isSelect_all_box = uicontrol(self.f, 'Style', 'checkbox', 'String', 'Select All', 'Value', self.model.isSelect_all, 'units', ...
-                'pixels','FontSize', font_size, 'Position', [positions.block(1) + positions.block(3) - 45, ... 
-                positions.block(2) + positions.block(4) + 2, 78, 22], 'Callback', @self.select_all);
+                'normalized','FontSize', font_size, 'Position', [positions.block(1) + positions.block(3) - .03, ... 
+                positions.block(2) + positions.block(4) + .0015, .05, .02], 'Callback', @self.select_all);
 
             %invert_selection
             uicontrol(self.f, 'Style', 'pushbutton', 'String', 'Invert Selection', ...
-                 'units', 'pixels', 'Position', [positions.block(1) + positions.block(3) + 5, ...
-                positions.block(2) - 20, 75, 20], 'Callback', @self.invert_selection);
+                 'units', 'normalized', 'Position', [positions.block(1) + positions.block(3) + left_margin, ...
+                positions.block(2) - .021, .05, .02], 'Callback', @self.invert_selection);
 
             %up_button
             uicontrol(self.f, 'Style', 'pushbutton', 'String', 'Shift up', 'units', ...
-                'pixels', 'Position', [positions.block(1) + positions.block(3) + 5, positions.block(2) + .65*positions.block(4), ...
-                75, 20], 'Callback', @self.shift_up_callback);
+                'normalized', 'Position', [positions.block(1) + positions.block(3) + left_margin, positions.block(2) + .65*positions.block(4), ...
+                .05, .02], 'Callback', @self.shift_up_callback);
 
             %down_button
             uicontrol(self.f, 'Style', 'pushbutton', 'String', 'Shift down', 'units', ...
-                'pixels', 'Position', [positions.block(1) + positions.block(3) + 5, positions.block(2) + .35*positions.block(4), ...
-                75, 20], 'Callback', @self.shift_down_callback);
+                'normalized', 'Position', [positions.block(1) + positions.block(3) + left_margin, positions.block(2) + .35*positions.block(4), ...
+                .05, .02], 'Callback', @self.shift_down_callback);
             
             % clear_all_button
             uicontrol(self.f, 'Style', 'pushbutton', 'String', 'Clear All','FontSize', 12, 'units', ...
-                'pixels', 'Position', [positions.block(1) + 1.05*positions.block(3), positions.pre(2), ...
-                85, positions.pre(4)], 'Callback', @self.clear_all);
+                'normalized', 'Position', [positions.block(1) + 1.03*positions.block(3), positions.pre(2), ...
+                .054, positions.pre(4)], 'Callback', @self.clear_all);
             
             %autofill_button
             uicontrol(self.f, 'Style', 'pushbutton', 'String', 'Auto-Fill', ...
-                'FontSize', 14, 'units', 'pixels', 'Position', [pos_panel(1), pos_panel(2) - 50, 100, 50], ...
+                'FontSize', 14, 'units', 'normalized', 'Position', [pos_panel(1), pos_panel(2) - .05, .07, .05], ...
                 'Callback', @self.autofill);
 
 
-            self.preview_panel = uipanel(self.f, 'Title', 'Preview', 'FontSize', font_size, 'units', 'pixels', ...
+            self.preview_panel = uipanel(self.f, 'Title', 'Preview', 'FontSize', font_size, 'units', 'normalized', ...
                 'Position', pos_panel);
             
             listbox_files_label = uicontrol(self.f, 'Style', 'text', 'String', 'Imported files for selected cell:',...
-                'units', 'pixels', 'Position', [pos_panel(1) + pos_panel(3) + 30, pos_panel(2) + pos_panel(4), ...
-                150, 20], 'FontSize', font_size);
+                'units', 'normalized', 'Position', [pos_panel(1) + pos_panel(3) + .01, pos_panel(2) + pos_panel(4) + .02, ...
+                .09, .04], 'FontSize', font_size);
             
             self.listbox_imported_files = uicontrol(self.f, 'Style', 'listbox', 'String', {'Imported files here'},  ...
-                'Position', [listbox_files_label.Position(1), listbox_files_label.Position(2) - 225, ...
-                150, 220],'Callback', @self.preview_selection);
+                'units', 'normalized', 'Position', [listbox_files_label.Position(1), listbox_files_label.Position(2) - .24, ...
+                .09, .24],'Callback', @self.preview_selection);
             
              %select_imported_file_button
-             uicontrol(self.f, 'Style', 'pushbutton', 'String', 'Select', 'Position', ...
+             uicontrol(self.f, 'Style', 'pushbutton', 'String', 'Select', 'units', 'normalized', 'Position', ...
                 [self.listbox_imported_files.Position(1) + .5*self.listbox_imported_files.Position(3), ...
-                self.listbox_imported_files.Position(2) - 20, 75, 15], 'Callback', @self.select_new_file);
+                self.listbox_imported_files.Position(2) - .02, .045, .016], 'Callback', @self.select_new_file);
             
 
             %code to make the above panel transparent, so the preview image
@@ -285,50 +294,50 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
 
             %preview_button
             uicontrol(self.f, 'Style', 'pushbutton', 'String', 'Preview', 'Fontsize', ...
-                font_size, 'units', 'pixels', 'Position', [pos_panel(1) + pos_panel(3) + 2, ...
-                pos_panel(2), 75, 40], 'Callback', @self.full_preview);
+                font_size, 'units', 'normalized', 'Position', [pos_panel(1) + pos_panel(3), ...
+                pos_panel(2), .05, .045], 'Callback', @self.full_preview);
 
             %play_button
             uicontrol(self.f, 'Style', 'pushbutton', 'String', 'Play', 'FontSize', ...
-                font_size, 'units', 'pixels', 'Position', [pos_panel(1) + .5*pos_panel(3) - 120, ...
-                pos_panel(2) - 35, 75, 20], 'Callback', @self.preview_play);
+                font_size, 'units', 'normalized', 'Position', [pos_panel(1) + .5*pos_panel(3) - .08, ...
+                pos_panel(2) - .03, .05, .02], 'Callback', @self.preview_play);
 
             %pause_button
             uicontrol(self.f, 'Style', 'pushbutton', 'String', 'Pause', 'FontSize', ...
-                font_size, 'units', 'pixels', 'Position', [pos_panel(1) + .5*pos_panel(3) - 35, ...
-                pos_panel(2) - 35, 75, 20], 'Callback', @self.preview_pause);
+                font_size, 'units', 'normalized', 'Position', [pos_panel(1) + .5*pos_panel(3) - .025, ...
+                pos_panel(2) - .03, .05, .02], 'Callback', @self.preview_pause);
 
             %stop_button = 
             uicontrol(self.f, 'Style', 'pushbutton', 'String', 'Stop', 'FontSize', ...
-                font_size, 'units', 'pixels', 'Position', [pos_panel(1) + .5*pos_panel(3) + 50, ...
-                pos_panel(2) - 35, 75, 20], 'Callback', @self.preview_stop);
+                font_size, 'units', 'normalized', 'Position', [pos_panel(1) + .5*pos_panel(3) + .03, ...
+                pos_panel(2) - .03, .05, .02], 'Callback', @self.preview_stop);
 
             %frameBack_button
             uicontrol(self.f, 'Style', 'pushbutton', 'String', 'Back Frame', 'FontSize', ...
-                font_size, 'units', 'pixels', 'Position', [pos_panel(1) + .5*pos_panel(3) - 205, ...
-                pos_panel(2) - 35, 75, 20], 'Callback', @self.frame_back);
+                font_size, 'units', 'normalized', 'Position', [pos_panel(1) + .5*pos_panel(3) - .135, ...
+                pos_panel(2) - .03, .05, .02], 'Callback', @self.frame_back);
 
             %frameForward_button = 
             uicontrol(self.f, 'Style', 'pushbutton', 'String', 'Forward Frame', ...
-                'FontSize', font_size, 'units', 'pixels', 'Position', [pos_panel(1) + .5*pos_panel(3) ...
-                + 135, pos_panel(2) - 35, 90, 20], 'Callback', @self.frame_forward);
+                'FontSize', font_size, 'units', 'normalized', 'Position', [pos_panel(1) + .5*pos_panel(3) ...
+                + .085, pos_panel(2) - .03, .07, .02], 'Callback', @self.frame_forward);
             
             self.pageUp_button = uicontrol(self.f, 'Style', 'pushbutton', 'String', 'Page Up', ...
-                'FontSize', font_size, 'units', 'pixels', 'Position', [pos_panel(1) + .5*pos_panel(3) + 235, ...
-                pos_panel(2) - 35, 90, 20], 'Enable', 'off', 'Callback', @self.page_up_4d);
+                'FontSize', font_size, 'units', 'normalized', 'Position', [pos_panel(1) + .5*pos_panel(3) + .16, ...
+                pos_panel(2) - .03, .07, .02], 'Enable', 'off', 'Callback', @self.page_up_4d);
             
             self.pageDown_button = uicontrol(self.f, 'Style', 'pushbutton', 'String', 'Page Down', ...
-                'FontSize', font_size, 'units', 'pixels', 'Position', [pos_panel(1) + .5*pos_panel(3) - 305, ...
-                pos_panel(2) - 35, 90, 20], 'Enable', 'off', 'Callback', @self.page_down_4d);
+                'FontSize', font_size, 'units', 'normalized', 'Position', [pos_panel(1) + .5*pos_panel(3) - .21, ...
+                pos_panel(2) - .03, .07, .02], 'Enable', 'off', 'Callback', @self.page_down_4d);
             
             self.exp_name_box = uicontrol(self.f, 'Style', 'edit', ...
-                'FontSize', 14, 'units', 'pixels', 'Position', ...
-                [pos_panel(1)+ (pos_panel(3)/2) - 200, pos_panel(2) - 80, 400, 30], 'Callback', @self.update_experiment_name);
+                'FontSize', 14, 'units', 'normalized', 'Position', ...
+                [pos_panel(1)+ (pos_panel(3)/2) - .125, pos_panel(2) - .07, .25, .03], 'Callback', @self.update_experiment_name);
             
             %exp_name_label
             uicontrol(self.f, 'Style', 'text', 'String', 'Experiment Name: ', ...
-                'FontSize', 16, 'units', 'pixels', 'Position', [pos_panel(1) + (pos_panel(3)/2) - 375, ...
-                pos_panel(2) - 80, 150, 30]);
+                'FontSize', 16, 'units', 'normalized', 'Position', [pos_panel(1) + (pos_panel(3)/2) - .25, ...
+                pos_panel(2) - .07, .1, .03]);
 
 
        %Drop down menu and associated labels and buttons
@@ -360,123 +369,139 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
             
        %Button to calculate estimated length of experiment
        
-            exp_length_button = uicontrol(self.f, 'Style', 'pushbutton', 'units', 'pixels', 'Position', ...
-                [15, positions.block(2) + positions.block(4) + 55, 140,20],'String', ...
+            exp_length_button = uicontrol(self.f, 'Style', 'pushbutton', 'units', 'normalized', 'Position', ...
+                [left_margin, positions.block(2) + positions.block(4) + .04, .09,.02],'String', ...
                 'Calculate Experiment Length', 'Callback', @self.calculate_experiment_length);
             
-            self.exp_length_display = uicontrol(self.f, 'Style', 'text', 'units', 'pixels', 'Position', ...
-                [exp_length_button.Position(1) + exp_length_button.Position(3) + 5, ...
-                exp_length_button.Position(2), 100, 20], 'FontSize', 12, 'String', '');
+            self.exp_length_display = uicontrol(self.f, 'Style', 'text', 'units', 'normalized', 'Position', ...
+                [exp_length_button.Position(1) + exp_length_button.Position(3) + left_margin, ...
+                exp_length_button.Position(2), .07, .02], 'FontSize', 12, 'String', '');
                 
 
        %Randomization
        
-            self.randomize_buttonGrp = uibuttongroup(self.f, 'units', 'pixels', 'Position', ...
-                [15, positions.block(2) + positions.block(4) - 10, 130, 55], ...
+            self.randomize_buttonGrp = uibuttongroup(self.f, 'units', 'normalized', 'Position', ...
+                [left_margin, positions.block(2) + positions.block(4) - .05, .08, .06], ...
                 'SelectionChangedFcn', @self.update_randomize);
        
        
             self.isRandomized_radio = uicontrol(self.randomize_buttonGrp, 'Style', 'radiobutton', ...
                 'String', 'Randomize Trials', 'FontSize', font_size, ...
-                'units', 'pixels', 'Position', [1, 29, 130, 20]);
+                'units', 'normalized', 'Position', [.001, .55, .95, .4]);
             
             self.isSequential_radio = uicontrol(self.randomize_buttonGrp, 'Style', 'radiobutton', ...
                 'String', 'Sequential Trials', 'FontSize', font_size, ...
-                'units', 'pixels', 'Position', [1,7, 130, 20]);
-
+                'units', 'normalized', 'Position', [.001,.1, .95, .4]);
+% 
        %Repetitions
 
             self.repetitions_box = uicontrol(self.f, 'Style', 'edit', 'units', ...
-                'pixels', 'Position', [90, positions.block(2) + positions.block(4) - 45, ...
-                40, 20], 'Callback', @self.update_repetitions);
+                'normalized', 'Position', [.05, positions.block(2) + positions.block(4) - .08, ...
+                .035, .02], 'Callback', @self.update_repetitions);
 
             %repetitions_label
             uicontrol(self.f, 'Style', 'text', 'String', ...
-                'Repetitions:', 'FontSize', font_size, 'units', 'pixels', ...
-                'Position', [15, positions.block(2) + positions.block(4) - 45, 70, 20]);
+                'Repetitions:', 'FontSize', font_size, 'units', 'normalized', ...
+                'Position', [left_margin, positions.block(2) + positions.block(4) - .08, .04, .02]);
 
-       %Dry Run
+%        %Dry Run
             %dry_run
             uicontrol(self.f, 'Style', 'pushbutton', 'String', ...
-                'Dry Run', 'FontSize', font_size, 'units', 'pixels', 'Position', ...
-                [pos_panel(1) + pos_panel(3) + 2, pos_panel(2) - 40, 75, 40],'Callback',@self.dry_run);
+                'Dry Run', 'FontSize', font_size, 'units', 'normalized', 'Position', ...
+                [pos_panel(1) + pos_panel(3), pos_panel(2) - .04, .05, .045],'Callback',@self.dry_run);
 
        %Actual run button
-            uicontrol(self.f, 'Style', 'pushbutton', 'String', 'Run Trials', 'FontSize', font_size, 'units', 'pixels', 'Position', ...
-                 [15, positions.block(2) + positions.block(4) - 110, 90, 50], 'Callback', @self.open_run_gui);
+            uicontrol(self.f, 'Style', 'pushbutton', 'String', 'Run Trials', 'FontSize', font_size, 'units', 'normalized', 'Position', ...
+                 [left_margin, positions.block(2) + positions.block(4) - .15, .06, .06], 'Callback', @self.open_run_gui);
 
        %Channels to acquire
 
-            chan_pan = uipanel(self.f, 'Title', 'Analog Input Channels', 'FontSize', font_size, 'units', 'pixels', ...
-                'Position', [15, positions.block(2) + positions.block(4) - 240, 250, 120]);
+            chan_pan = uipanel(self.f, 'Title', 'Analog Input Channels', 'FontSize', font_size, 'units', 'normalized', ...
+                'Position', [left_margin, positions.block(2) + positions.block(4) - .31, .15, .13]);
 
-            self.chan1_rate_box = uicontrol(chan_pan, 'Style', 'edit', 'String', num2str(self.doc.chan1_rate), 'units', 'pixels', 'Position', ...
-                [170, 74, 40, 20],'Callback', @self.update_chan1_rate);
+            self.chan1_rate_box = uicontrol(chan_pan, 'Style', 'edit', 'String', num2str(self.doc.chan1_rate), 'units', 'normalized', 'Position', ...
+                [.65, .72, .25, .15],'Callback', @self.update_chan1_rate);
 
             %chan1_rate_label
             uicontrol(chan_pan, 'Style', 'text', 'String', 'Channel 1 Sample Rate', 'FontSize', font_size, ...
-                'units', 'pixels', 'HorizontalAlignment', 'left', 'Position', [15, 74, 150, 20]);
+                'units', 'normalized', 'HorizontalAlignment', 'left', 'Position', [.05, .7, .5, .17]);
 
-            self.chan2_rate_box = uicontrol(chan_pan, 'Style', 'edit', 'String', num2str(self.doc.chan2_rate), 'units', 'pixels', 'Position', ...
-                [170, 51, 40, 20], 'Callback', @self.update_chan2_rate);
+            self.chan2_rate_box = uicontrol(chan_pan, 'Style', 'edit', 'String', num2str(self.doc.chan2_rate), 'units', 'normalized', 'Position', ...
+                [.65, .52, .25, .17], 'Callback', @self.update_chan2_rate);
 
             %chan2_rate_label
             uicontrol(chan_pan, 'Style', 'text', 'String', 'Channel 2 Sample Rate', 'FontSize', font_size, ...
-                'units', 'pixels', 'HorizontalAlignment', 'left', 'Position', [15, 51, 150, 20]);
+                'units', 'normalized', 'HorizontalAlignment', 'left', 'Position', [.05, .5, .5, .17]);
 
-            self.chan3_rate_box = uicontrol(chan_pan, 'Style', 'edit', 'String', num2str(self.doc.chan3_rate), 'units', 'pixels', 'Position', ...
-                [170, 28, 40, 20], 'Callback', @self.update_chan3_rate);
+            self.chan3_rate_box = uicontrol(chan_pan, 'Style', 'edit', 'String', num2str(self.doc.chan3_rate), 'units', 'normalized', 'Position', ...
+                [.65, .32, .25, .17], 'Callback', @self.update_chan3_rate);
 
             %chan3_rate_label
             uicontrol(chan_pan, 'Style', 'text', 'String', 'Channel 3 Sample Rate', 'FontSize', font_size, ...
-                'HorizontalAlignment', 'left', 'units', 'pixels', 'Position', [15, 28, 150, 20]);
+                'HorizontalAlignment', 'left', 'units', 'normalized', 'Position', [.05, .3, .5, .17]);
 
-            self.chan4_rate_box = uicontrol(chan_pan, 'Style', 'edit', 'String', num2str(self.doc.chan4_rate), 'units', 'pixels', 'Position', ...
-                [170, 5, 40, 20], 'Callback', @self.update_chan4_rate);
+            self.chan4_rate_box = uicontrol(chan_pan, 'Style', 'edit', 'String', num2str(self.doc.chan4_rate), 'units', 'normalized', 'Position', ...
+                [.65, .12, .25, .17], 'Callback', @self.update_chan4_rate);
 
             %chan4_rate_label
             uicontrol(chan_pan, 'Style', 'text', 'String', 'Channel 4 Sample Rate', 'FontSize', font_size, ...
-                'HorizontalAlignment', 'left', 'units', 'pixels', 'Position', [15, 5, 150, 20]);
+                'HorizontalAlignment', 'left', 'units', 'normalized', 'Position', [.05, .1, .5, .17]);
 
-            self.num_rows_buttonGrp = uibuttongroup(self.f, 'units', 'pixels', 'Position', [15, positions.block(2) + positions.block(4) - 270, 250, 25], 'SelectionChangedFcn', @self.update_rowNum);
+            self.num_rows_buttonGrp = uibuttongroup(self.f, 'units', 'normalized', ...
+                'Position', [left_margin, chan_pan.Position(2) - .05, chan_pan.Position(3), .04], 'SelectionChangedFcn', @self.update_rowNum);
        
        
-            self.num_rows_3 = uicontrol(self.num_rows_buttonGrp, 'Style', 'radiobutton', 'String', '3 Row Screen', 'FontSize', font_size, ...
-                'units', 'pixels', 'Position', [1, 3, 120, 19]);
+            self.num_rows_3 = uicontrol(self.num_rows_buttonGrp, 'Style', ...
+                'radiobutton', 'String', '3 Row Screen', 'FontSize', font_size, ...
+                'units', 'normalized', 'Position', [.05, .05, .45, .9]);
             
             self.num_rows_4 = uicontrol(self.num_rows_buttonGrp, 'Style', 'radiobutton', 'String', '4 Row Screen', 'FontSize', font_size, ...
-                'units', 'pixels', 'Position', [121,3, 120, 19]);
+                'units', 'normalized', 'Position', [.5, .05, .45, .9]);
             
-            %key_pan = 
-            uipanel(self.f, 'Title', 'Mode Key:', 'BackgroundColor', [.75, .75, .75], 'BorderType', 'none', ...
-                'FontSize', 13, 'units', 'pixels', 'Position', [15, positions.block(2) + positions.block(4) - 720, 230, 420]);
+             
+            key_pan = uipanel(self.f, 'Title', 'Mode Key:', 'BackgroundColor', [.75, .75, .75], ...
+                'BorderType', 'none', 'FontSize', 13, 'units', 'normalized', ...
+                'Position', [left_margin, self.num_rows_buttonGrp.Position(2) - .41, ...
+                self.num_rows_buttonGrp.Position(3), .4]);
             
-            mode_1_label = uicontrol(self.f, 'Style', 'text', 'String', 'Mode 1: Position Function', 'BackgroundColor', [.75,.75,.75], ...
-                'HorizontalAlignment', 'left', 'FontSize', 11, 'units', 'pixels', 'Position', [25, positions.block(2) + positions.block(4) - 360, 200, 18]);
             
-            mode_2_label = uicontrol(self.f, 'Style', 'text', 'String', 'Mode 2: Constant Rate', 'BackgroundColor', [.75,.75,.75], ...
-                'HorizontalAlignment', 'left','FontSize', 11, 'units', 'pixels', 'Position', [25, mode_1_label.Position(2) - 50, 200, 18]);
+            mode_1_label = uicontrol(key_pan, 'Style', 'text', 'String', ...
+                'Mode 1: Position Function', 'BackgroundColor', [.75,.75,.75], ...
+                'HorizontalAlignment', 'left', 'FontSize', 11, 'units', 'normalized', ...
+                'Position', [chan_label_margin, .85, chan_label_width, chan_label_height]);
             
-            mode_3_label = uicontrol(self.f, 'Style', 'text', 'String', 'Mode 3: Constant Index', 'BackgroundColor', [.75,.75,.75], ...
-                'HorizontalAlignment', 'left','FontSize', 11, 'units', 'pixels', 'Position', [25, mode_2_label.Position(2) - 50, 200, 18]);
+            mode_2_label = uicontrol(key_pan, 'Style', 'text', 'String', 'Mode 2: Constant Rate', ...
+                'BackgroundColor', [.75,.75,.75], 'HorizontalAlignment', 'left',...
+                'FontSize', 11, 'units', 'normalized', 'Position', [chan_label_margin, ...
+                mode_1_label.Position(2) - chan_label_height, chan_label_width, chan_label_height]);
             
-            mode_4_label = uicontrol(self.f, 'Style', 'text', 'String', 'Mode 4: Closed-loop sets frame rate', 'BackgroundColor', [.75,.75,.75], ...
-                'HorizontalAlignment', 'left','FontSize', 11, 'units', 'pixels', 'Position', [25, mode_3_label.Position(2) - 50, 200, 18]);
+            mode_3_label = uicontrol(key_pan, 'Style', 'text', 'String', 'Mode 3: Constant Index', 'BackgroundColor', [.75,.75,.75], ...
+                'HorizontalAlignment', 'left','FontSize', 11, 'units', 'normalized', 'Position', ...
+                [chan_label_margin, mode_2_label.Position(2) - chan_label_height, chan_label_width, chan_label_height]);
             
-            mode_5_label = uicontrol(self.f, 'Style', 'text', 'String', 'Mode 5: Closed-loop rate + offset', 'BackgroundColor', [.75,.75,.75], ...
-                'HorizontalAlignment', 'left','FontSize', 11, 'units', 'pixels', 'Position', [25, mode_4_label.Position(2) - 50, 200, 18]);
+            mode_4_label = uicontrol(key_pan, 'Style', 'text', 'String', 'Mode 4: Closed-loop sets frame rate', 'BackgroundColor', [.75,.75,.75], ...
+                'HorizontalAlignment', 'left','FontSize', 11, 'units', 'normalized', 'Position', ...
+                [chan_label_margin, mode_3_label.Position(2) - chan_label_height, chan_label_width, chan_label_height]);
             
-            mode_5_label_cont = uicontrol(self.f, 'Style', 'text', 'String', 'position function', 'BackgroundColor', [.75,.75,.75], 'HorizontalAlignment', ...
-                'left', 'FontSize', 11, 'units', 'pixels', 'Position', [25, mode_5_label.Position(2) - 20, 200, 18]);
+            mode_5_label = uicontrol(key_pan, 'Style', 'text', 'String', 'Mode 5: Closed-loop rate + offset', 'BackgroundColor', [.75,.75,.75], ...
+                'HorizontalAlignment', 'left','FontSize', 11, 'units', 'normalized', 'Position', ...
+                [chan_label_margin, mode_4_label.Position(2) - chan_label_height/2, chan_label_width, chan_label_height/2]);
             
-            mode_6_label = uicontrol(self.f, 'Style', 'text', 'String', 'Mode 6: Closed-loop rate X + position', 'BackgroundColor', [.75,.75,.75], ...
-                'HorizontalAlignment', 'left','FontSize', 11, 'units', 'pixels', 'Position', [25, mode_5_label_cont.Position(2) - 50, 200, 18]);
+            mode_5_label_cont = uicontrol(key_pan, 'Style', 'text', 'String', 'position function', 'BackgroundColor', [.75,.75,.75], 'HorizontalAlignment', ...
+                'left', 'FontSize', 11, 'units', 'normalized', 'Position', ...
+                [chan_label_margin, mode_5_label.Position(2) - chan_label_height, chan_label_width, chan_label_height]);
             
-            mode_6_label_cont = uicontrol(self.f, 'Style', 'text', 'String', 'function Y', 'BackgroundColor', [.75,.75,.75], 'HorizontalAlignment', ...
-                'left', 'FontSize', 11, 'units', 'pixels', 'Position', [25, mode_6_label.Position(2) - 20, 200, 18]);
+            mode_6_label = uicontrol(key_pan, 'Style', 'text', 'String', 'Mode 6: Closed-loop rate X + position', 'BackgroundColor', [.75,.75,.75], ...
+                'HorizontalAlignment', 'left','FontSize', 11, 'units', 'normalized', 'Position', ...
+                [chan_label_margin, mode_5_label_cont.Position(2) - chan_label_height/2, chan_label_width, chan_label_height/2]);
             
-            mode_7_label = uicontrol(self.f, 'Style', 'text', 'String', 'Mode 7: Closed-loop sets frame index', 'BackgroundColor', [.75,.75,.75], ...
-                'HorizontalAlignment', 'left','FontSize', 11, 'units', 'pixels', 'Position', [25, mode_6_label_cont.Position(2) - 50, 200, 18]);
+            mode_6_label_cont = uicontrol(key_pan, 'Style', 'text', 'String', 'function Y', 'BackgroundColor', [.75,.75,.75], 'HorizontalAlignment', ...
+                'left', 'FontSize', 11, 'units', 'normalized', 'Position', ... 
+                [chan_label_margin, mode_6_label.Position(2) - chan_label_height, chan_label_width, chan_label_height]);
+            
+            mode_7_label = uicontrol(key_pan, 'Style', 'text', 'String', 'Mode 7: Closed-loop sets frame index', 'BackgroundColor', [.75,.75,.75], ...
+                'HorizontalAlignment', 'left','FontSize', 11, 'units', 'normalized', 'Position', ...
+                [chan_label_margin, mode_6_label_cont.Position(2) - chan_label_height, chan_label_width, chan_label_height]);
 
         end
         
@@ -1055,10 +1080,12 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
             d.set_posttrial_property(9, self.doc.colorgen());
             d.set_posttrial_property(10, self.doc.colorgen());
             d.set_posttrial_property(11, self.doc.colorgen());
-
+            
+            block_dur = d.Pos_funcs.(pos1_field).pfnparam.size/1000;
             d.set_block_trial_property([1,2], pat1);
             d.set_block_trial_property([1,3], pos1);
             d.set_block_trial_property([1,4], ao1);
+            d.set_block_trial_property([1,12], block_dur);
 
             d.set_block_trial_property([1,9], self.doc.colorgen());
             d.set_block_trial_property([1,10], self.doc.colorgen());
@@ -1081,6 +1108,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                         end
                         pos = pos_names{pos_index};
                         pos_field = d.get_posfunc_field_name(pos);
+                        dur = d.Pos_funcs.(pos_field).pfnparam.size/1000;
                     else
 
                         pos = '';
@@ -1112,6 +1140,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                     newrow{3} = pos; 
 
                     newrow{4} = ao; 
+                    newrow{12} = dur;
                     pat_indices(j) = pat_index;
                     j = j + 1;
                     pat_index = pat_index + 1;
@@ -2244,13 +2273,17 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                 file = '';
 
             end
-            if src.Position == positions.pre
+
+            tol = eps(src.Position);
+            
+            
+            if src.Position - positions.pre <= tol
                 self.model.current_selected_cell.table = "pre";
-            elseif src.Position == positions.inter
+            elseif src.Position - positions.inter <= tol
                 self.model.current_selected_cell.table = "inter";
-            elseif src.Position == positions.block
+            elseif src.Position - positions.block <= tol
                 self.model.current_selected_cell.table = "block";
-            elseif src.Position == positions.post
+            elseif src.Position - positions.post <= tol
                 self.model.current_selected_cell.table = "post";
             end
         
@@ -2327,7 +2360,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
 
                 xlim = [0 length(func(1,:))];
                 ylim = [min(func) max(func)];
-                func_axes = axes(fig, 'units','pixels','Position', position, ...
+                func_axes = axes(fig, 'units','normalized','Position', position, ...
                     'XLim', xlim, 'YLim', ylim);
                 p = plot(func);
                 set(p, 'parent', func_axes);
@@ -2357,7 +2390,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                 end
                 
                 
-                self.hAxes = axes(self.f, 'units', 'pixels', 'OuterPosition', [285, 30, 1100 ,360], 'XTick', [], 'YTick', [] ,'XLim', x, 'YLim', y);
+                self.hAxes = axes(self.preview_panel, 'units', 'normalized', 'OuterPosition', [.1, .04, .8 ,.9], 'XTick', [], 'YTick', [] ,'XLim', x, 'YLim', y);
                 im = imshow(adjusted_file(:,:,self.model.auto_preview_index), 'Colormap',gray);
 
                 set(im, 'parent', self.hAxes);
@@ -2365,26 +2398,16 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
             elseif strcmp(file_type, 'pos') && ~strcmp(funcfield,'')
                 
                 self.model.current_preview_file = self.doc.Pos_funcs.(funcfield).pfnparam.func;
-                self.hAxes = axes(self.f,'units', 'pixels', 'OuterPosition', [285, 30, 1100 ,360]);
-                self.second_axes = axes(self.f, 'units', 'pixels', 'OuterPosition', self.hAxes.OuterPosition, 'XAxisLocation', 'top', 'YAxisLocation', 'right');
-                plot(self.model.current_preview_file, 'parent', self.hAxes);
-
+                
+                self.second_axes = axes(self.preview_panel, 'units', 'normalized', 'Position', [.1, .15, .8 ,.7], 'XAxisLocation', 'top', 'YAxisLocation', 'right');
+                self.hAxes = axes(self.preview_panel,'units', 'normalized', 'Position', self.second_axes.Position);
                 time_in_ms = length(self.model.current_preview_file(1,:));
                 xax = [0 time_in_ms];
                 yax = [min(self.model.current_preview_file) max(self.model.current_preview_file)];
-                timeLabel = 'Time (ms)';
-                patLabel = 'Pattern';
-                frameLabel = 'Frame Number';
-                set(self.hAxes, 'XLim', xax, 'YLim', yax, 'TickLength',[0,0]);
-                self.hAxes.XLabel.String = timeLabel;
-                self.hAxes.YLabel.String = patLabel;
 
-                num_frames = frame_rate*(1/1000)*time_in_ms;
-                xax2 = [0 num_frames];
-                yax2 = yax;
-                set(self.second_axes, 'Position', self.hAxes.Position, 'XLim', xax2, 'YLim', yax2, 'TickLength', [0,0], 'Color', 'none');
-                self.second_axes.XLabel.String = frameLabel;
-
+                 
+                
+                self.inscreen_plot = plot(self.model.current_preview_file, 'parent', self.hAxes);
                 if dur <= length(self.model.current_preview_file(1,:))
                     if frame_rate == 500
                         linedur = [dur/2, dur/2];
@@ -2393,13 +2416,36 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                     end
                     line('XData', linedur, 'YData', yax, 'Color', [1 0 0], 'LineWidth', 2);
                 end
+                
+                timeLabel = 'Time (ms)';
+                patLabel = 'Pattern';
+                frameLabel = 'Frame Number';
+                
+                
+                self.second_axes.XLabel.String = frameLabel;
+                
+                set(self.hAxes, 'XLim', xax, 'YLim', yax, 'TickLength',[0,0]);
+                self.hAxes.XLabel.String = timeLabel;
+                self.hAxes.YLabel.String = patLabel;
+                
+                num_frames = frame_rate*(1/1000)*time_in_ms;
+                xax2 = [0 num_frames];
+                yax2 = yax;
+                set(self.second_axes, 'Position', self.hAxes.Position, 'XLim', xax2, 'YLim', yax2, 'TickLength', [0,0], 'Color', 'none');
+                
+
+                
+
+                datacursormode on;
+                
 
             elseif strcmp(file_type, 'ao') && ~strcmp(aofield,'')
 
                 self.model.current_preview_file = self.doc.Ao_funcs.(aofield).afnparam.func;
-                self.hAxes = axes(self.f,'units', 'pixels', 'OuterPosition', [285, 30, 1100 ,360]);
-                self.second_axes = axes(self.f, 'units', 'pixels', 'OuterPosition', self.hAxes.OuterPosition, 'XAxisLocation', 'top', 'YAxisLocation', 'right');
+                self.second_axes = axes(self.preview_panel, 'units', 'normalized', 'OuterPosition', [.1, .04, .8 ,.9], 'XAxisLocation', 'top', 'YAxisLocation', 'right');
 
+                self.hAxes = axes(self.preview_panel,'units', 'normalized', 'OuterPosition', [.1, .04, .8 ,.9]);
+                
                 plot(self.model.current_preview_file, 'parent', self.hAxes);
                 time_in_ms = length(self.model.current_preview_file(1,:));
 
@@ -2418,11 +2464,103 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                 yax2 = yax;
                 set(self.second_axes, 'Position', self.hAxes.Position, 'XLim', xax2, 'YLim', yax2, 'TickLength', [0,0], 'Color', 'none');
                 self.second_axes.XLabel.String = frameLabel;
+                
+                 datacursormode on;
+ 
 
             end
         end
         
+        function mouse_over_plot(self, src, ~)
+            fig = src;
+            obj = hittest(fig);
+
+            
+            
+            if isprop(obj, 'Position') && length(obj.Position) == 4
+                
+                tol = eps(obj.Position);
+  
+                if obj.Position - self.hAxes.Position <= tol
+                        
+                    point = get(self.f, 'currentpoint');
+                    pause(.1);
+                    point2 = get(self.f,'currentpoint');
+                    
+                    if point == point2
+                        xclick = point(1,1,1);
+                        yclick = point(1,2,1);
+                        [xidx, yidx] = self.findclosestpoint2D(xclick,yclick);
+                        
+                        %make a "tool tip" that displays this animal.
+                        xoffset=5;
+                        yoffset=2;
+
+                        delete(findobj(self.f,'tag','mytooltip')); %delete last tool tip
+                        text(yidx + xoffset,self.model.current_preview_file(yidx)...
+                        + yoffset, ['Point: ',yidx, ', ', self.model.current_preview_file(yidx)]);
+                    %,'backgroundcolor',[1 1 .8],'tag','mytooltip', 'edgecolor',[0 0 0]
+                        
+                    end
+
+
+                    
+                  
+                else
+                    delete(findobj(fig,'tag','mytooltip')); %delete last tool tip
+
+                end
+            end
+            
+        end
         
+        function [thispointx, thispointy] = findclosestpoint2D(self, xclick,yclick)
+            %this function checks which point in the plotted line "datasource"
+            %is closest to the point specified by xclick/yclick. It's kind of 
+            %complicated, but this isn't really what this demo is about...
+            xclick_adjusted = xclick - ...
+                (self.preview_panel.Position(3)*self.hAxes.Position(1) + self.preview_panel.Position(1));
+            yclick_adjusted = yclick - ...
+                (self.preview_panel.Position(4)*self.hAxes.Position(2) + self.preview_panel.Position(2));
+            total_pix = getpixelposition(self.f);
+            xclick_pixels = xclick*total_pix(3);
+            yclick_pixels = yclick*total_pix(4);
+            xclick_pixels_adjusted = xclick_pixels - ((xclick - xclick_adjusted)*total_pix(3));
+            yclick_pixels_adjusted = yclick_pixels - ((yclick-yclick_adjusted)*total_pix(4));
+            
+            datasource = self.inscreen_plot;
+            xdata=get(datasource,'xdata');
+            ydata=get(datasource,'ydata');
+
+            activegraph=get(datasource,'parent');
+
+            pos = getpixelposition(activegraph);
+            xlim=get(activegraph,'xlim');
+            ylim=get(activegraph,'ylim');
+
+            %make conversion factors, units to pixels:
+            xconvert=(xlim(2)-xlim(1))/pos(3);
+            yconvert=(ylim(2)-ylim(1))/pos(4);
+
+            Xdata=(xdata-xlim(1))/xconvert;
+            Ydata=(ydata-ylim(1))/yconvert;
+
+            Xdiff=Xdata-xclick_pixels_adjusted;
+            Ydiff=Ydata-yclick_pixels_adjusted;
+
+            distnce=sqrt(Xdiff.^2+Ydiff.^2);
+
+            index=distnce==min(distnce);
+
+            index=index(:); %make sure it's a column.
+            [thispointx, thispointy] = find(distnce==min(distnce),1);
+
+            if sum(index)>=1
+                thispoint=find(distnce==min(distnce),1);
+                index=false(size(distnce));
+                index(thispoint)=true;
+            end
+        end
         % Pulls parameters from trial containing currently selected cell to inform the
         % in screen preview
         function [frame_rate, dur, patfield, funcfield, aofield, file_type] = get_preview_parameters(self, is_table)
@@ -2432,6 +2570,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
             patfile = '';
             funcfile = '';
             aofile = '';
+            
             
             if strcmp(table, "pre")
 
@@ -3333,6 +3472,10 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
          function set.exp_length_display(self, value)
              self.exp_length_display_ = value;
          end
+         
+         function set.inscreen_plot(self, value)
+             self.inscreen_plot_ = value;
+         end
 
 %% GETTERS
 
@@ -3490,6 +3633,10 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
          
          function output = get.exp_length_display(self)
              output = self.exp_length_display_;
+         end
+         
+         function output = get.inscreen_plot(self)
+             output = self.inscreen_plot_;
          end
 
          

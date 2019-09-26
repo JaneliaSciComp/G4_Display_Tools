@@ -418,7 +418,10 @@ classdef G4_preview_controller < handle
                     if self.model.preview_index > length(self.model.pos_data)
                         self.model.preview_index = 1;
                     end
-
+                    if self.model.preview_index == 0
+                        self.model.preview_index = 1;
+                    end
+                    
                     frame = self.model.pos_data(self.model.preview_index);
                     set(self.im,'cdata',self.model.pattern_data(:,:,frame));
 
