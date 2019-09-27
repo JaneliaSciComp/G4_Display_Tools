@@ -23,17 +23,25 @@ function G4_Plot_Data_flyingdetector_pdf(exp_folder, trial_options, metadata_for
 % .pdf must also be part of this function. The disp commands below will
 % list the metadata in the .pdf before the graphs.
 
-     disp("Timestamp:   " + metadata_for_publishing.timestamp + newline);
+    disp("Timestamp:   " + metadata_for_publishing.timestamp + newline);
     disp("Experimenter:   " + metadata_for_publishing.experimenter + newline);
     disp("Experiment Name:   " + metadata_for_publishing.experiment_name + newline);
     disp("Experiment Type:   " + metadata_for_publishing.experiment_type + newline);
     disp("Experiment Protocol Used:   " + metadata_for_publishing.experiment_protocol + newline);
     disp("Fly Name:   " + metadata_for_publishing.fly_name + newline);
     disp("Fly Genotype:   " + metadata_for_publishing.genotype + newline);
+    disp("Fly Age:  " + metadata_for_publishing.fly_age + newline);
+    disp("Fly Sex:  " + metadata_for_publishing.fly_sex + newline);
+    disp("Experiment Temperature:  " + metadata_for_publishing.experiment_temp + newline);
+    disp("Fly Rearing Protocol:  " + metadata_for_publishing.rearing_protocol + newline);
+    disp("Light Cycle:  " + metadata_for_publishing.light_cycle + newline);
     disp("Processing performed?   " + metadata_for_publishing.do_processing + newline);
     disp("Plotting performed?   " + metadata_for_publishing.do_plotting + newline);
     disp("Processing Protocol Used:   " + metadata_for_publishing.processing_protocol + newline);
     disp("Plotting Protocol Used:   " + metadata_for_publishing.plotting_protocol + newline);
+    disp("Results Folder Location:  " + metadata_for_publishing.fly_results_folder + newline);
+    
+    disp("Other Metadata Comments:  " + metadata_for_publishing.comments + newline);
     
 %%%% user-defined parameters
 %datatype options: 'LmR_chan', 'L_chan', 'R_chan', 'F_chan', 'Frame Position', 'LmR', 'LpR'
