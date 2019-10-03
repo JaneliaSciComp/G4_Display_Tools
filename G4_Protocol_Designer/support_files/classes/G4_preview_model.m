@@ -14,6 +14,8 @@ classdef G4_preview_model
         dur_
         pos_data_
         ao_data_
+        fr_increment_
+        ao_increment_
         
     end
     
@@ -33,6 +35,8 @@ classdef G4_preview_model
         dur
         pos_data
         ao_data
+        fr_increment
+        ao_increment
         
     end
     
@@ -50,6 +54,8 @@ classdef G4_preview_model
             self.slow_frRate = 20;
             self.mode = data{1};
             self.pattern_data = self.normalize_matrix();
+            self.fr_increment = 1;
+            self.ao_increment = 1;
             pat = self.data{2};
             patfield = self.doc.get_pattern_field_name(pat);
             
@@ -145,6 +151,12 @@ classdef G4_preview_model
         function value = get.data(self)
             value = self.data_;
         end
+        function value = get.fr_increment(self)
+            value = self.fr_increment_;
+        end
+        function value = get.ao_increment(self)
+            value = self.ao_increment_;
+        end
 
         
         
@@ -190,6 +202,12 @@ classdef G4_preview_model
         
         function self = set.doc(self, value)
             self.doc_ = value;
+        end
+        function self = set.fr_increment(self, value)
+            self.fr_increment_ = value;
+        end
+        function self = set.ao_increment(self, value)
+            self.ao_increment_ = value;
         end
         
     end

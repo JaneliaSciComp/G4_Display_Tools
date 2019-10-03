@@ -1319,7 +1319,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
             dateFormat = 'mm-dd-yy_HH-MM-SS';
             dated_exp_name = strcat(exp_name, datestr(now, dateFormat));
             self.doc.experiment_name = dated_exp_name;
-            [file, path] = uiputfile('*.mat','File Selection', self.doc.experiment_name);
+            [file, path] = uiputfile('*.g4p','File Selection', self.doc.experiment_name);
             full_path = fullfile(path, file);
 
             if file == 0
@@ -1337,7 +1337,12 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                 self.run_con.update_run_gui();
             end
             
+            [path, file] = fileparts(full_path);
+            file = [file,'.g4p'];
+            g4p_path = fullfile(path, self.doc.experiment_name, file);
             self.doc.insert_greyed_cells();
+            self.doc.set_recent_files(g4p_path);
+            self.doc.update_recent_files_file();
             self.update_gui();
 
 
@@ -2274,16 +2279,13 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
 
             end
 
-            tol = eps(src.Position);
-            
-            
-            if src.Position - positions.pre <= tol
+            if round(src.Position,4) - round(positions.pre,4) == 0
                 self.model.current_selected_cell.table = "pre";
-            elseif src.Position - positions.inter <= tol
+            elseif round(src.Position,4) - round(positions.inter,4) == 0
                 self.model.current_selected_cell.table = "inter";
-            elseif src.Position - positions.block <= tol
+            elseif round(src.Position,4) - round(positions.block,4) == 0
                 self.model.current_selected_cell.table = "block";
-            elseif src.Position - positions.post <= tol
+            elseif round(src.Position,4) - round(positions.post,4) == 0
                 self.model.current_selected_cell.table = "post";
             end
         

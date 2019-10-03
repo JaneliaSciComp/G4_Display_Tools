@@ -1374,7 +1374,7 @@ classdef G4_document < handle
 
         %Replace .mat extension with homemade one
             
-            [savepath, name, ext] = fileparts(path);
+            [savepath, name, ~] = fileparts(path);
             savename = strcat(name, homemade_ext);
             self.top_export_path = fullfile(savepath, self.experiment_name);
         %Get path to file you want to save including new extension    
