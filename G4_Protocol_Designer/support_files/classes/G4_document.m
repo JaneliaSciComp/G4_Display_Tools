@@ -182,7 +182,7 @@ classdef G4_document < handle
 
             if index(1) > size(self.block_trials,1)
                 posfield = self.get_posfunc_field_name(new_value{3});
-                new_value{12} = length(self.Pos_funcs.(posfield).pfnparam.func)/1000;
+                %new_value{12} = length(self.Pos_funcs.(posfield).pfnparam.func)/1000;
                 self.block_trials = [self.block_trials;new_value];
 %                 block_data = self.block_trials;
             
@@ -244,7 +244,7 @@ classdef G4_document < handle
                     patRows = 0;
                     numrows = 0;
                     
-                    self.block_trials{index(1),12} = length(self.Pos_funcs.(posfield).pfnparam.func)/1000;
+                    self.block_trials{index(1),12} = self.Pos_funcs.(posfield).pfnparam.size/1000;
                 else
                     patDim = 0;
                     funcDim = 0;
@@ -404,7 +404,7 @@ classdef G4_document < handle
                 patRows = 0;
                 numrows = 0;
                 
-                self.pretrial{12} = length(self.Pos_funcs.(posfield).pfnparam.func)/1000;
+                self.pretrial{12} = self.Pos_funcs.(posfield).pfnparam.size/1000;
             else
                 patDim = 0;
                 funcDim = 0;
@@ -563,7 +563,7 @@ classdef G4_document < handle
                 patRows = 0;
                 numrows = 0;
                 
-                self.intertrial{12} = length(self.Pos_funcs.(posfield).pfnparam.func)/1000;
+                self.intertrial{12} = self.Pos_funcs.(posfield).pfnparam.size/1000;
             else
                 patDim = 0;
                 funcDim = 0;
@@ -718,7 +718,7 @@ classdef G4_document < handle
                 patRows = 0;
                 numrows = 0;
                 
-                self.posttrial{12} = length(self.Pos_funcs.(posfield).pfnparam.func)/1000;
+                self.posttrial{12} = self.Pos_funcs.(posfield).pfnparam.size/1000;
             else
                 patDim = 0;
                 funcDim = 0;
@@ -1374,7 +1374,7 @@ classdef G4_document < handle
 
         %Replace .mat extension with homemade one
             
-            [savepath, name, ext] = fileparts(path);
+            [savepath, name, ~] = fileparts(path);
             savename = strcat(name, homemade_ext);
             self.top_export_path = fullfile(savepath, self.experiment_name);
         %Get path to file you want to save including new extension    

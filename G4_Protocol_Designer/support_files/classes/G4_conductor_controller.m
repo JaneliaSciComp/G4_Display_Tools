@@ -1112,7 +1112,7 @@ classdef G4_conductor_controller < handle
                 plot_file = strcat(plot_name, plot_ext);
                 %Put all metadata in a struct to be passed to the
                 %function which creates the pdf.
-                
+
                 metadata = struct;
                 metadata.experimenter = self.model.experimenter;
                 metadata.experiment_name = self.doc.experiment_name;
@@ -1152,6 +1152,7 @@ classdef G4_conductor_controller < handle
                 metadata.fly_results_folder = fly_results_folder;
                 metadata.trial_options = trial_options;
                 metadata.comments = self.model.metadata_comments;
+                metadata.light_cycle = self.model.light_cycle;
                 
                 
                 
@@ -1212,7 +1213,7 @@ classdef G4_conductor_controller < handle
             path_to_experiment = strtrim(settings_data{line_path}(index:end));
 
             self.open_g4p_file(src, event, path_to_experiment);
-            self.model.fly_name = ['test', num2str(self.model.num_tests_conducted)];
+            self.model.fly_name = ['trial',num2str(self.model.num_tests_conducted)];
             self.update_run_gui();
             self.run(src, event);
             

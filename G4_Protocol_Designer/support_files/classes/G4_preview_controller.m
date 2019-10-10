@@ -14,6 +14,8 @@ classdef G4_preview_controller < handle
         frames_;
         
         making_video_;
+        fr_increment_box_;
+        pattern_only_;
          
     end
     
@@ -30,6 +32,9 @@ classdef G4_preview_controller < handle
         frames
         
         making_video;
+        fr_increment_box;
+        pattern_only;
+        
 
     end
     
@@ -41,7 +46,7 @@ classdef G4_preview_controller < handle
             self.model = G4_preview_model(data, doc);
             
             self.fig = figure( 'Name', 'Trial Preview', 'NumberTitle', 'off','units', 'pixels'); 
-            self.frames = struct('cdata', [], 'colormap', []);
+            self.frames = {};
             self.making_video = 0;
 
 
@@ -179,6 +184,15 @@ classdef G4_preview_controller < handle
            generate_video = uicontrol(currentFig, 'Style', 'pushbutton', 'String', 'Generate Video', 'FontSize', ...
                14, 'units', 'pixels', 'Position', [ ao_positions{1}(1) + .5*ao_positions{1}(3) - 75, realtime.Position(2), 150, realtime.Position(4)], ...
                'Callback', @self.generate_video);
+           pattern_only_box = uicontrol(currentFig, 'Style', 'checkbox', 'String', 'Pattern Only Video', 'FontSize', ...
+               14, 'units', 'pixels', 'Position', [generate_video.Position(1), generate_video.Position(2) + generate_video.Position(4) + 5, ...
+               250, 25], 'Callback', @self.update_pattern_only);
+           self.fr_increment_box = uicontrol(currentFig, 'Style', 'edit', 'String', num2str(self.model.fr_increment),...
+               'units', 'pixels', 'Position', [stopButton.Position(1), stopButton.Position(2) - 35, 50, 25], 'Callback', @self.update_fr_increment);
+           fr_increment_label = uicontrol(currentFig, 'Style', 'text', 'String', 'Frame Increment', ...
+               'units', 'pixels', 'FontSize', 14, 'Position', [self.fr_increment_box.Position(1) + self.fr_increment_box.Position(3) + 5, self.fr_increment_box.Position(2),...
+               150,25]);
+               
           
 
            
@@ -209,6 +223,27 @@ classdef G4_preview_controller < handle
                 end
             end
             
+        end
+
+        
+        function update_fr_increment(self, src, event)
+            
+            if mod(str2double(src.String),1) == 0 && self.model.is_realtime == 0
+                self.model.fr_increment = str2double(src.String);
+                self.model.ao_increment = self.model.fr_increment;% * (self.model.rt_frRate/1000);
+            end
+            self.set_fr_increment();
+        
+        end
+        
+        function update_pattern_only(self, src, event)
+        
+            if self.pattern_only == 1
+                self.pattern_only = 0;
+            else
+                self.pattern_only = 1;
+            end
+        
         end
         
         function [fig_pos, pat_pos, pos_pos, ao1_pos, ao2_pos, ao3_pos, ao4_pos] ...
@@ -333,26 +368,14 @@ classdef G4_preview_controller < handle
                 currentFig = self.fig;
             end
             
+            screen_fr_rate = 20;
+            ao_to_fr_ratio = 1000/self.model.rt_frRate;
             self.model.is_paused = false;
             time = self.model.dur*1000;
-            if self.model.is_realtime == 1
-                
-                fr_rate = self.model.rt_frRate;
-                aofr_rate = 1000;
-                fr_increment = floor(fr_rate/self.model.slow_frRate);
-                ao_increment = floor(aofr_rate/self.model.slow_frRate);
-                
-                
-            else
-                fr_rate = self.model.slow_frRate;
-                aofr_rate = 1000*(self.model.slow_frRate/self.model.rt_frRate);
-                fr_increment = 1;
-                ao_increment = 1;
-                
-            end
-            frame_count = 1; 
-             
-            num_frames = ceil((self.model.rt_frRate*self.model.dur)/fr_increment);
+            time_between_frames = 1/screen_fr_rate;
+            num_frames = round((self.model.dur * self.model.rt_frRate)/self.model.fr_increment);
+            self.model.fr_increment = self.model.fr_increment*ao_to_fr_ratio;
+            frame_count = 1;
             self.frames = cell(1, num_frames);
 
             if self.pos_line == 0
@@ -361,32 +384,23 @@ classdef G4_preview_controller < handle
                 
             else
 
-                ratio = aofr_rate/fr_rate;
-                count = 1;
                 aoLineDist = [0 0 0 0];
-                fr_increment = fr_increment*ratio;
+                self.model.ao_increment = self.model.fr_increment;
                 
-                if self.model.is_realtime == 0
 
-                    ao_increment = ao_increment*ratio;
-                end
-                
-                
-                
                 for i = 1:4
                     if self.ao_lines{i} ~= 0
                         aoLineDist(i) = length(self.model.ao_data{i});
                     end
                 end
                 
-                for i = floor(self.model.preview_index/fr_increment):num_frames
+                for i = floor(self.model.preview_index/self.model.fr_increment):num_frames
                     inside = tic;
 
                     if self.model.is_paused == true
                         return;
                     end
-                    
-                    
+   
                     %move ao lines
                     
                     for k = 1:4
@@ -394,12 +408,12 @@ classdef G4_preview_controller < handle
                             if self.ao_lines{k}.XData(1) >= aoLineDist(k)
                                 self.ao_lines{k}.XData = [1,1];
                             else
-                                self.ao_lines{k}.XData = [self.ao_lines{k}.XData(1) + ao_increment, self.ao_lines{k}.XData(2) + ao_increment];
+                                self.ao_lines{k}.XData = [self.ao_lines{k}.XData(1) + self.model.ao_increment, self.ao_lines{k}.XData(2) + self.model.ao_increment];
                             end
                             
-                        if i == num_frames
-                            self.ao_lines{k}.XData = [aoLineDist(k), aoLineDist(k)];
-                        end
+                            if i == num_frames
+                                self.ao_lines{k}.XData = [aoLineDist(k), aoLineDist(k)];
+                            end
 
                         end
                         
@@ -415,9 +429,10 @@ classdef G4_preview_controller < handle
 
                     end
 
-                    if self.model.preview_index > length(self.model.pos_data)
+                    if self.model.preview_index > length(self.model.pos_data) || self.model.preview_index == 0
                         self.model.preview_index = 1;
                     end
+                    self.model.preview_index
 
                     frame = self.model.pos_data(self.model.preview_index);
                     set(self.im,'cdata',self.model.pattern_data(:,:,frame));
@@ -430,77 +445,63 @@ classdef G4_preview_controller < handle
                         end
                     end
 
-                    self.model.preview_index = self.model.preview_index + fr_increment;
+                    self.model.preview_index = self.model.preview_index + self.model.fr_increment;
 
                     drawnow limitrate %nocallbacks
                     
                     if self.making_video == 1
+                        if self.pattern_only == 1
+                            self.frames{frame_count} = getframe(self.pat_axes);
+                        else
                         
-                        self.frames{frame_count} = getframe(currentFig);
+                            self.frames{frame_count} = getframe(currentFig);
+                        end
                         frame_count = frame_count + 1;
                     end
                         
 
                     timeElapsed = toc(inside);
+                    if self.making_video == 0
 
-                    if self.model.is_realtime == 1
-                        time_to_pause = 1/self.model.slow_frRate - timeElapsed;%if realtime, ao line moves once every millsecond no matter what.
+                        time_to_pause = time_between_frames - timeElapsed;%if realtime, ao line moves once every millsecond no matter what.
                         if time_to_pause < 0
                             time_to_pause = 0;
                         end
                         pause(time_to_pause);
-
-                    else
-
-                        time_to_pause = ((1/fr_rate)/ratio) - timeElapsed;%if slow, ao line still moves same number of times but at ratio of whatever the pattern frame rate is.
-                        if time_to_pause < 0
-                            time_to_pause = 0;
-                        end 
-                        pause(time_to_pause);
-
                     end
-                    
 
-                
                 end
-            
+ 
+            end
+  
+
+            if self.model.is_paused == 0
+                
+                self.stop('','');
             end
 
         end
 
         
-        function preview_Mode2(self)
+        function preview_Mode2(self, varargin)
             
+            if ~isempty(varargin) && self.making_video == 1
+                currentFig = varargin{1};
+            else
+                currentFig = self.fig;
+            end
+            
+            screen_fr_rate = 20;
+            ao_to_fr_ratio = 1000/self.model.rt_frRate;
             self.model.is_paused = false;
             time = self.model.dur*1000;
-            if self.model.is_realtime == 1
-                
-                fr_rate = self.model.rt_frRate;
-                aofr_rate = 1000;
-                fr_increment = floor(fr_rate/self.model.slow_frRate);
-                ao_increment = floor(aofr_rate/self.model.slow_frRate);
-                
-                
-            else
-                fr_rate = self.model.slow_frRate;
-                aofr_rate = 1000*(self.model.slow_frRate/self.model.rt_frRate);
-                fr_increment = 1;
-                ao_increment = 1;
-                
-            end
-            
-            num_frames = ceil((self.model.rt_frRate*self.model.dur)/fr_increment);
-            
-            
-            ratio = floor(aofr_rate/fr_rate);
-            count = 1;
+            time_between_frames = 1/screen_fr_rate;
+            num_frames = round((self.model.dur * self.model.rt_frRate)/self.model.fr_increment);
+
+            frame_count = 1;
+            self.frames = cell(1, num_frames);
+
             aoLineDist = [0 0 0 0];
-            fr_increment = fr_increment*ratio;
-            if self.model.is_realtime == 0
-
-                ao_increment = ao_increment*ratio;
-            end
-
 
 
             for i = 1:4
@@ -509,20 +510,21 @@ classdef G4_preview_controller < handle
                 end
             end
 
-            for i = floor(self.model.preview_index/fr_increment):num_frames
+            for i = floor(self.model.preview_index/self.model.fr_increment):num_frames
                 inside = tic;
 
                 if self.model.is_paused == true
                     return;
                 end
 
+                %move ao lines
 
                 for k = 1:4
                     if self.ao_lines{k} ~= 0
                         if self.ao_lines{k}.XData(1) >= aoLineDist(k)
                             self.ao_lines{k}.XData = [1,1];
                         else
-                            self.ao_lines{k}.XData = [self.ao_lines{k}.XData(1) + ao_increment, self.ao_lines{k}.XData(2) + ao_increment];
+                            self.ao_lines{k}.XData = [self.ao_lines{k}.XData(1) + self.model.ao_increment, self.ao_lines{k}.XData(2) + self.model.ao_increment];
                         end
 
                         if i == num_frames
@@ -532,41 +534,48 @@ classdef G4_preview_controller < handle
                     end
 
                 end
-                
-               
-                frame = rem(self.model.preview_index,length(self.model.pattern_data(1,1,:)));
-                
-                if frame == 0
-                    frame = 1;
-                end
-                
-                set(self.im,'cdata',self.model.pattern_data(:,:,frame));
 
-                 self.model.preview_index = self.model.preview_index + fr_increment;
+
+                if self.model.preview_index > length(self.model.pattern_data(1,1,:)) || self.model.preview_index == 0
+                    self.model.preview_index = 1;
+                end
+
+                
+                set(self.im,'cdata',self.model.pattern_data(:,:,self.model.preview_index));
+
+                self.model.preview_index = self.model.preview_index + self.model.fr_increment;
 
                 drawnow limitrate %nocallbacks
+
+                if self.making_video == 1
+                    if self.pattern_only == 1
+                        self.frames{frame_count} = getframe(self.pat_axes);
+                    else
+
+                        self.frames{frame_count} = getframe(currentFig);
+                    end
+                    frame_count = frame_count + 1;
+                end
+
+
                 timeElapsed = toc(inside);
+                if self.making_video == 0
 
-
-                if self.model.is_realtime == 1
-                    time_to_pause = 1/self.model.slow_frRate - timeElapsed;
+                    time_to_pause = time_between_frames - timeElapsed;%if realtime, ao line moves once every millsecond no matter what.
                     if time_to_pause < 0
                         time_to_pause = 0;
                     end
                     pause(time_to_pause);
-
-                else
-
-                    time_to_pause = 1/self.model.slow_frRate - timeElapsed;
-                    if time_to_pause < 0
-                        time_to_pause = 0;
-                    end 
-                    pause(time_to_pause);
-
                 end
 
+ 
             end
+  
 
+            if self.model.is_paused == 0
+                
+                self.stop('','');
+            end
         end
         
                  
@@ -578,61 +587,60 @@ classdef G4_preview_controller < handle
             
         end
         
-        function preview_Mode4(self)
+        function preview_Mode4(self, varargin)
             
-            self.model.is_paused = false;
-            time = self.model.dur*1000;
-            
-            if self.model.is_realtime == 1
-                
-                fr_rate = self.model.rt_frRate;
-                aofr_rate = 1000;
-                fr_increment = floor(fr_rate/self.model.slow_frRate);
-                ao_increment = floor(aofr_rate/self.model.slow_frRate);
-                
+            if ~isempty(varargin) && self.making_video == 1
+                currentFig = varargin{1};
             else
-                fr_rate = self.model.slow_frRate;
-                aofr_rate = 1000*(self.model.slow_frRate/self.model.rt_frRate);
-                fr_increment = 1;
-                ao_increment = 1;
-                
+                currentFig = self.fig;
             end
             
-            num_frames = ceil((self.model.rt_frRate*self.model.dur)/fr_increment);
-            
-                ratio = aofr_rate/fr_rate;
-                count = 1;
-                aoLineDist = [0 0 0 0];
-                fr_increment = fr_increment*ratio;
-                if self.model.is_realtime == 0
+            screen_fr_rate = 20;
+            ao_to_fr_ratio = 1000/self.model.rt_frRate;
+            self.model.is_paused = false;
+            time = self.model.dur*1000;
+            time_between_frames = 1/screen_fr_rate;
+            num_frames = round((self.model.dur * self.model.rt_frRate)/self.model.fr_increment);
+            self.model.fr_increment = self.model.fr_increment*ao_to_fr_ratio;
+            frame_count = 1;
+            self.frames = cell(1, num_frames);
 
-                    ao_increment = ao_increment*ratio;
-                end
+            if self.pos_line == 0
                 
+                self.create_error_box("Please make sure you've entered a position function and try again.");
+                
+            else
+
+                aoLineDist = [0 0 0 0];
+                self.model.ao_increment = self.model.fr_increment;
+                
+
                 for i = 1:4
                     if self.ao_lines{i} ~= 0
                         aoLineDist(i) = length(self.model.ao_data{i});
                     end
                 end
                 
-                for i = floor(self.model.preview_index/fr_increment):num_frames
+                for i = floor(self.model.preview_index/self.model.fr_increment):num_frames
                     inside = tic;
 
                     if self.model.is_paused == true
                         return;
                     end
+   
+                    %move ao lines
                     
                     for k = 1:4
                         if self.ao_lines{k} ~= 0
                             if self.ao_lines{k}.XData(1) >= aoLineDist(k)
                                 self.ao_lines{k}.XData = [1,1];
                             else
-                                self.ao_lines{k}.XData = [self.ao_lines{k}.XData(1) + ao_increment, self.ao_lines{k}.XData(2) + ao_increment];
+                                self.ao_lines{k}.XData = [self.ao_lines{k}.XData(1) + self.model.ao_increment, self.ao_lines{k}.XData(2) + self.model.ao_increment];
                             end
                             
-                        if i == num_frames
-                            self.ao_lines{k}.XData = [aoLineDist(k), aoLineDist(k)];
-                        end
+                            if i == num_frames
+                                self.ao_lines{k}.XData = [aoLineDist(k), aoLineDist(k)];
+                            end
 
                         end
                         
@@ -648,7 +656,7 @@ classdef G4_preview_controller < handle
 
                     end
 
-                    if self.model.preview_index > length(self.model.dummy_data)
+                    if self.model.preview_index > length(self.model.dummy_data) || self.model.preview_index == 0
                         self.model.preview_index = 1;
                     end
 
@@ -663,34 +671,41 @@ classdef G4_preview_controller < handle
                         end
                     end
 
-                    self.model.preview_index = self.model.preview_index + fr_increment;
+                    self.model.preview_index = self.model.preview_index + self.model.fr_increment;
 
                     drawnow limitrate %nocallbacks
+                    
+                    if self.making_video == 1
+                        if self.pattern_only == 1
+                            self.frames{frame_count} = getframe(self.pat_axes);
+                        else
+                        
+                            self.frames{frame_count} = getframe(currentFig);
+                        end
+                        frame_count = frame_count + 1;
+                    end
+                        
 
                     timeElapsed = toc(inside);
+                    if self.making_video == 0
 
-                    if self.model.is_realtime == 1
-                        time_to_pause = 1/self.model.slow_frRate - timeElapsed;%if realtime, ao line moves once every millsecond no matter what.
+                        time_to_pause = time_between_frames - timeElapsed;%if realtime, ao line moves once every millsecond no matter what.
                         if time_to_pause < 0
                             time_to_pause = 0;
                         end
                         pause(time_to_pause);
-
-                    else
-
-                        time_to_pause = ((1/fr_rate)/ratio) - timeElapsed;%if slow, ao line still moves same number of times but at ratio of whatever the pattern frame rate is.
-                        if time_to_pause < 0
-                            time_to_pause = 0;
-                        end 
-                        pause(time_to_pause);
-
                     end
-                    
 
-                
                 end
-            
+ 
             end
+  
+            if self.model.is_paused == 0
+                
+                self.stop('','');
+            end        
+            
+        end
             
             
         
@@ -884,6 +899,9 @@ classdef G4_preview_controller < handle
         
             self.model.is_paused = true;
             self.model.preview_index = self.model.preview_index + 1;
+            if self.model.mode == 1 
+                self.model.fr_increment = self.model.fr_increment/(1000/self.model.rt_frRate);
+            end
         
         end
         
@@ -904,25 +922,46 @@ classdef G4_preview_controller < handle
             else
                 self.preview_Mode4();
             end
+
         end
         
         function stop(self, src, event)
-        
-            
+
             self.model.is_paused = true;
             self.model.preview_index = 1;
+            if self.model.mode == 1 || self.model.mode == 4
+                ratio = 1000/self.model.rt_frRate;
+                self.model.fr_increment = self.model.fr_increment/ratio;
+            end
             self.update_layout();
-            
 
-        
         end
         
         function set_realtime(self, src, event)
             if self.model.is_realtime == 0
                 self.model.is_realtime = 1;
+                
             else
                 self.model.is_realtime = 0;
+                
             end
+            self.calculate_fr_increment();
+        end
+        
+        function calculate_fr_increment(self)
+        
+            if self.model.is_realtime == 0
+                self.model.fr_increment = 1;
+                self.model.ao_increment = 1;
+            else
+                self.model.fr_increment = floor(self.model.rt_frRate/self.model.slow_frRate);
+                self.model.ao_increment = floor(1000/self.model.slow_frRate);
+                
+            end
+            
+            self.set_fr_increment();
+            
+
         end
         
         function [patternSize, pat_xlim, pat_ylim] = get_pattern_axis_sizes(self)
@@ -943,7 +982,15 @@ classdef G4_preview_controller < handle
             
             if self.model.mode == 1
                 self.preview_Mode1(new_figure)
+            elseif self.model.mode == 2
+                self.preview_Mode2(new_figure)
+            elseif self.model.mode == 4 || self.model.mode == 5 || self.model.mode == 7
+                self.preview_Mode4(new_figure)
+            elseif self.model.mode == 6
+                self.create_error_box("We are still working on video functionality for mode 6!");
+                return;
             end
+
             
             waitbar(.5, progress, 'Creating video writer');
             
@@ -963,15 +1010,21 @@ classdef G4_preview_controller < handle
             
             %reset old figure
             self.layout();
-            %self.update_layout();
-            
-            
-            
-            
-            
-           
             
         end
+
+        function set_fr_increment(self)
+        
+            self.fr_increment_box.String = num2str(self.model.fr_increment);
+        
+        end
+        
+        function pattern_only_video(self)
+            
+        
+        end
+        
+            
         
         
         %GETTERS
@@ -1008,6 +1061,14 @@ classdef G4_preview_controller < handle
         function value = get.making_video(self)
             value = self.making_video_;
         end
+        function value = get.fr_increment_box(self)
+            value = self.fr_increment_box_;
+        end
+        function value = get.pattern_only(self)
+            value = self.pattern_only_;
+        end
+        
+            
         
         
         %SETTERS
@@ -1042,6 +1103,12 @@ classdef G4_preview_controller < handle
         end
         function set.making_video(self, value)
             self.making_video_ = value;
+        end
+        function set.fr_increment_box(self, value)
+            self.fr_increment_box_ = value;
+        end
+        function set.pattern_only(self, value)
+            self.pattern_only_ = value;
         end
         
         

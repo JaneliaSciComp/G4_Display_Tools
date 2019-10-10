@@ -23,10 +23,18 @@ function G4_Plot_Data_walkingsensor(exp_folder, trial_options, metadata_for_publ
     disp("Experiment Protocol Used:   " + metadata_for_publishing.experiment_protocol + newline);
     disp("Fly Name:   " + metadata_for_publishing.fly_name + newline);
     disp("Fly Genotype:   " + metadata_for_publishing.genotype + newline);
+    disp("Fly Age:  " + metadata_for_publishing.fly_age + newline);
+    disp("Fly Sex:  " + metadata_for_publishing.fly_sex + newline);
+    disp("Experiment Temperature:  " + metadata_for_publishing.experiment_temp + newline);
+    disp("Fly Rearing Protocol:  " + metadata_for_publishing.rearing_protocol + newline);
+    disp("Light Cycle:  " + metadata_for_publishing.light_cycle + newline);
     disp("Processing performed?   " + metadata_for_publishing.do_processing + newline);
     disp("Plotting performed?   " + metadata_for_publishing.do_plotting + newline);
     disp("Processing Protocol Used:   " + metadata_for_publishing.processing_protocol + newline);
     disp("Plotting Protocol Used:   " + metadata_for_publishing.plotting_protocol + newline);
+     disp("Results Folder Location:  " + metadata_for_publishing.fly_results_folder + newline);
+    
+    disp("Other Metadata Comments:  " + metadata_for_publishing.comments + newline);
     
     
 %%%% user-defined parameters
