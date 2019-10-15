@@ -1,4 +1,4 @@
-classdef G4_preview_model
+classdef G4_preview_model < handle
     
     properties
         doc_
@@ -43,21 +43,27 @@ classdef G4_preview_model
     methods
 %CONSTRUCTOR
         
-        function self = G4_preview_model(data, doc)
+        function self = G4_preview_model(doc)
             
             self.doc = doc;
-            self.data = data;
+            self.data = {};
             self.dummy_data = [];
             self.preview_index = 1;
             self.is_paused = false;
             self.is_realtime = false;
             self.slow_frRate = 20;
-            self.mode = data{1};
-            self.pattern_data = self.normalize_matrix();
+            self.mode = [];
             self.fr_increment = 1;
             self.ao_increment = 1;
-            pat = self.data{2};
+
+        end
+        
+        function update_trial_data(self, data)
+            self.data = data;
+            self.mode = data{1};
+            pat = data{2};
             patfield = self.doc.get_pattern_field_name(pat);
+            self.pattern_data = self.normalize_matrix();
             
             if self.mode == 2
                 self.rt_frRate = self.data{9};
@@ -162,51 +168,51 @@ classdef G4_preview_model
         
         
 %SETTERS        
-        function self = set.data(self, value)
+        function set.data(self, value)
             self.data_ = value;
         end
         
-        function self = set.dummy_data(self, value)
+        function set.dummy_data(self, value)
             self.dummy_data_ = value;
         end
-        function self = set.preview_index(self, value)
+        function set.preview_index(self, value)
             self.preview_index_ = value;
         end
-        function self = set.is_paused(self, value)
+        function set.is_paused(self, value)
             self.is_paused_ = value;
         end
-        function self = set.is_realtime(self, value)
+        function set.is_realtime(self, value)
             self.is_realtime_ = value;
         end
-        function self = set.slow_frRate(self, value)
+        function set.slow_frRate(self, value)
             self.slow_frRate_ = value;
         end
-        function self = set.rt_frRate(self, value)
+        function set.rt_frRate(self, value)
             self.rt_frRate_ = value;
         end
-        function self = set.pattern_data(self, value)
+        function set.pattern_data(self, value)
             self.pattern_data_ = value;
         end
-        function self = set.mode(self, value)
+        function set.mode(self, value)
             self.mode_ = value;
         end
-        function self = set.dur(self, value)
+        function set.dur(self, value)
             self.dur_ = value;
         end
-        function self = set.pos_data(self, value)
+        function set.pos_data(self, value)
             self.pos_data_ = value;
         end
-        function self = set.ao_data(self, value)
+        function set.ao_data(self, value)
             self.ao_data_ = value;
         end
         
-        function self = set.doc(self, value)
+        function set.doc(self, value)
             self.doc_ = value;
         end
-        function self = set.fr_increment(self, value)
+        function set.fr_increment(self, value)
             self.fr_increment_ = value;
         end
-        function self = set.ao_increment(self, value)
+        function set.ao_increment(self, value)
             self.ao_increment_ = value;
         end
         

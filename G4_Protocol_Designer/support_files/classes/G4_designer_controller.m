@@ -6,6 +6,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
         doc_ %contains all data that is stored in the saved file
         preview_con_ %controller for the fullscreen preview
         run_con_ %controller for the run window - can be opened independently
+        settings_con_ %controller (containing the view and model) for the settings panel
         
 %tables that show the trial data        
         pretrial_table_
@@ -63,6 +64,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
         preview_con
         run_con
         doc
+        settings_con
 
         pretrial_table
         intertrial_table
@@ -130,6 +132,8 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
            
             self.model = G4_designer_model();
             self.doc = G4_document();
+            self.settings_con = G4_settings_controller();
+            self.preview_con = G4_preview_controller(self.doc);
           
             %get screensize to calculate gui dimensions
             screensize = get(0, 'screensize');
@@ -366,6 +370,8 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
             uimenu(menu, 'Text', 'Copy to...', 'Callback', @self.copy_to);
             %menu_set
             uimenu(menu, 'Text', 'Set Selected...', 'Callback', @self.set_selected);
+            %menu_settings
+            uimenu(menu, 'Text', 'Settings', 'Callback', @self.open_settings);
             
        %Button to calculate estimated length of experiment
        
@@ -1466,6 +1472,12 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
             %disp(self.doc.block_trials(2,13));
         end
         
+        function open_settings(self, ~, ~)
+           
+            self.settings_con.layout_view();
+            
+        end
+        
         %% In screen preview related callbacks
         
          % Display preview of file when an appropriate table cell is
@@ -1722,10 +1734,8 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
            if isempty(data)
                %do nothing
            else
-               
-               minicon = G4_preview_controller(data, self.doc);
-               self.update_preview_con(minicon);
-           
+               self.preview_con.model.update_trial_data(data);
+               self.preview_con.layout_view();
            end
         end
         
@@ -1869,7 +1879,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
         %Open the conductor to run an experiment
         function open_run_gui(self, ~, ~)
             
-            self.run_con = G4_conductor_controller(self.doc);
+            self.run_con = G4_conductor_controller(self.doc, self.settings_con);
             
         end
         
@@ -3478,6 +3488,10 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
          function set.inscreen_plot(self, value)
              self.inscreen_plot_ = value;
          end
+         
+         function set.settings_con(self, value)
+             self.settings_con_ = value;
+         end
 
 %% GETTERS
 
@@ -3639,6 +3653,10 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
          
          function output = get.inscreen_plot(self)
              output = self.inscreen_plot_;
+         end
+         
+         function output = get.settings_con(self)
+             output = self.settings_con_;
          end
 
          

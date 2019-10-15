@@ -1,39 +1,20 @@
 classdef G4_preview_controller < handle
 
     properties
-         model_;
-
-        fig_;
-        im_;
-        pat_axes_;
-        pos_line_;
-        
-        ao_lines_;
-      
-        dummy_line_;
-        frames_;
-        
-        making_video_;
-        fr_increment_box_;
-        pattern_only_;
+        model_
+        view_
+        frames_
+        making_video_
+        pattern_only_
          
     end
     
     properties (Dependent)
-         model;
-
-        fig;
-        im;
-        pat_axes;
-        pos_line;
-       
-        ao_lines;
-        dummy_line;
-        frames
-        
-        making_video;
-        fr_increment_box;
-        pattern_only;
+        model
+        view
+        frames        
+        making_video
+        pattern_only
         
 
     end
@@ -42,302 +23,37 @@ classdef G4_preview_controller < handle
     
     methods
  %CONSTRUCTOR
-        function self = G4_preview_controller(data, doc)
-            self.model = G4_preview_model(data, doc);
-            
-            self.fig = figure( 'Name', 'Trial Preview', 'NumberTitle', 'off','units', 'pixels'); 
+        function self = G4_preview_controller(doc)
+            self.model = G4_preview_model(doc);
             self.frames = {};
             self.making_video = 0;
-
-
-            self.layout();
-            self.update_layout();
-            
-        
-        end
-        
-        
-        function layout(self, varargin)
-
-            if ~isempty(varargin) && self.making_video == 1
-                currentFig = varargin{1};
-            else
-                currentFig = self.fig;
-            end
-            pix = get(0, 'screensize'); 
-            
-            [patternSize, pat_xlim, pat_ylim] = self.get_pattern_axis_sizes();
-            %ratios of y direction to x direction in pattern/function
-            %files so images don't get squished forced into axes that
-            %don't fit the data correctly.
-
-            yTOx_pat_ratio = patternSize(2)/patternSize(1);
-
-            
-            if self.model.mode ~= 6 %There only needs to be a spot for one position function
-
-                
-                [fig_pos, pat_pos, pos_pos, ao1_pos, ao2_pos, ao3_pos, ao4_pos] ...
-                = self.set_object_positions(pix, yTOx_pat_ratio);
-                
-
-            else %There needs to be space for two position functions
-                [fig_pos, pat_pos, pos_pos, dum_pos, ao1_pos, ao2_pos, ao3_pos, ao4_pos] ...
-                = self.set_object_positions_mode6(pix, yTOx_pat_ratio);
-                
-            end
-
-                    %pat_num_frames = length(self.model.pattern_data(1,1,:));
-            ao_xlabel = 'Time';
-            ao_ylabel = 'Volts';
-            
-            set(currentFig, 'Position', fig_pos); %create overall figure for preview
-            %Files are all loaded, now create figure and axes
-            self.pat_axes = axes(currentFig, 'units', 'pixels', 'Position', pat_pos, ...
-                'XLim', pat_xlim, 'YLim', pat_ylim);
-            
-            first_frame = self.get_first_frame();
-            
-%%%%%%%%%%%%%Make plotting a frame a different function 
-            self.im = imshow(self.model.pattern_data(:,:,first_frame), 'Colormap', gray);
-            set(self.im, 'parent', self.pat_axes);
-            title(self.pat_axes, 'Pattern Preview');
-
-
-           %Check for a position function and graph it according to mode
-           if self.model.mode == 1
-               if strcmp(self.model.data(3),'')
-                   self.create_error_box("To preview in mode one please enter a position function");
-                   return;
-               else
-                   
-                   pos_title = 'Position Function Preview';
-                   pos_xlabel = 'Time';
-                   pos_ylabel = 'Frame Index';
-                   self.pos_line = self.plot_function(currentFig, self.model.pos_data, pos_pos, pos_title, ...
-                           pos_xlabel, pos_ylabel);
-                   self.place_red_dur_line(self.model.pos_data);
-               end
-           end
-               
-           if self.model.mode == 4 || self.model.mode == 5 || self.model.mode == 7
-               
-               self.create_dummy_function();
-               if self.model.mode == 4 || self.model.mode == 7
-                   pos_title = "Closed-loop displayed as 1 Hz sine wave";
-               else
-                   pos_title = "Closed-loop displayed as combination dummy function";
-               end
-               pos_xlabel = 'Time';
-               pos_ylabel = 'Frame Index';
-               self.dummy_line = self.plot_function(currentFig, self.model.dummy_data, pos_pos, pos_title, ...
-                    pos_xlabel, pos_ylabel);
-                self.place_red_dur_line(self.model.dummy_data);
-               
-           end
-           
-           if self.model.mode == 6
-           
-
-                pos_title = 'Position Function Preview';
-                pos_xlabel = 'Time';
-                pos_ylabel = 'Frame Index';
-                
-                self.create_dummy_function();
-                dummy_title = "closed loop displayed as 1 Hz sine wave";
-                
-                self.dummy_line = self.plot_function(currentFig, self.model.dummy_data, dum_pos, ...
-                    dummy_title, pos_xlabel, pos_ylabel);
-                self.pos_line = self.plot_function(currentFig, self.model.pos_data, pos_pos, ...
-                    pos_title, pos_xlabel, pos_ylabel);
-                self.place_red_dur_line(self.model.pos_data);
-                self.place_red_dur_line(self.model.dummy_data);
-           
-           
-           end
-           
-           %Cycle through ao functions and graph any that are present. 
-           ao_positions = {ao1_pos, ao2_pos, ao3_pos, ao4_pos};
-           
-           
-           for i = 1:4
-               aoTitle = "Analog Output " + (i);
-               if ~strcmp(self.model.data(i+3),'')
-                   self.ao_lines{i} = self.plot_function(currentFig, self.model.ao_data{i}, ...
-                       ao_positions{i}, aoTitle, ao_xlabel, ao_ylabel);
-                   self.place_red_dur_line(self.model.ao_data{i});
-               else
-                   self.ao_lines{i} = 0;
-               end
-           end
-
-           
-           playButton = uicontrol(currentFig, 'Style', 'pushbutton', 'String', 'Play', 'FontSize', ...
-                14, 'units', 'pixels', 'Position', [(pat_pos(1) + pat_pos(3))/2 + 25, 75, 50, 25], 'Callback', @self.play);
-           stopButton = uicontrol(currentFig, 'Style', 'pushbutton', 'String', 'Stop', 'FontSize', ...
-                14, 'units', 'pixels', 'Position', [(pat_pos(1) + pat_pos(3))/2 - 50, 75, 50, 25], 'Callback', @self.stop);
-           pauseButton = uicontrol(currentFig, 'Style', 'pushbutton', 'String', 'Pause', 'FontSize', ...
-                14, 'units', 'pixels', 'Position', [ (pat_pos(1) + pat_pos(3))/2 + 100, 75, 90, 25], 'Callback', @self.pause);
-           realtime = uicontrol(currentFig, 'Style', 'checkbox', 'String', 'Real-time speed', 'Value', ...
-               self.model.is_realtime, 'FontSize', 14, 'Position', [ ((pat_pos(1) + pat_pos(3))/2 +215), 75, 200, 25],...
-               'Callback', @self.set_realtime); 
-           generate_video = uicontrol(currentFig, 'Style', 'pushbutton', 'String', 'Generate Video', 'FontSize', ...
-               14, 'units', 'pixels', 'Position', [ ao_positions{1}(1) + .5*ao_positions{1}(3) - 75, realtime.Position(2), 150, realtime.Position(4)], ...
-               'Callback', @self.generate_video);
-           pattern_only_box = uicontrol(currentFig, 'Style', 'checkbox', 'String', 'Pattern Only Video', 'FontSize', ...
-               14, 'units', 'pixels', 'Position', [generate_video.Position(1), generate_video.Position(2) + generate_video.Position(4) + 5, ...
-               250, 25], 'Callback', @self.update_pattern_only);
-           self.fr_increment_box = uicontrol(currentFig, 'Style', 'edit', 'String', num2str(self.model.fr_increment),...
-               'units', 'pixels', 'Position', [stopButton.Position(1), stopButton.Position(2) - 35, 50, 25], 'Callback', @self.update_fr_increment);
-           fr_increment_label = uicontrol(currentFig, 'Style', 'text', 'String', 'Frame Increment', ...
-               'units', 'pixels', 'FontSize', 14, 'Position', [self.fr_increment_box.Position(1) + self.fr_increment_box.Position(3) + 5, self.fr_increment_box.Position(2),...
-               150,25]);
-               
-          
-
-           
-        
-        
-        end
-        
-        
-        function update_layout(self)
-            first_frame = self.get_first_frame();
-
-            set(self.im,'cdata',self.model.pattern_data(:,:,first_frame))
-            
-            xdata = [1,1];
-            if self.pos_line ~= 0
-                self.pos_line.XData = xdata;
-      
-            end
-            if self.dummy_line ~= 0
-                self.dummy_line.XData = xdata;
-                %set dummy_line position
-            end
-            
-            %cycle through ao functions and update their data
-            for i = 1:4
-                if self.ao_lines{i} ~= 0
-                    self.ao_lines{i}.XData = xdata;
-                end
-            end
+            self.pattern_only = 0;
             
         end
-
         
-        function update_fr_increment(self, src, event)
+        function layout_view(self)
             
-            if mod(str2double(src.String),1) == 0 && self.model.is_realtime == 0
-                self.model.fr_increment = str2double(src.String);
-                self.model.ao_increment = self.model.fr_increment;% * (self.model.rt_frRate/1000);
-            end
-            self.set_fr_increment();
-        
+            self.view = G4_preview_view(self);
+            self.view.layout();
+            self.view.update_layout();
         end
         
-        function update_pattern_only(self, src, event)
+        function update_fr_increment(self, new_value)
+            
+            if mod(new_value,1) == 0 && self.model.is_realtime == 0
+                self.model.fr_increment = new_value;
+                self.model.ao_increment = self.model.fr_increment;
+            end
+            self.view.set_fr_increment();        
+        end
+        
+        function update_pattern_only(self)
         
             if self.pattern_only == 1
                 self.pattern_only = 0;
             else
                 self.pattern_only = 1;
             end
-        
-        end
-        
-        function [fig_pos, pat_pos, pos_pos, ao1_pos, ao2_pos, ao3_pos, ao4_pos] ...
-                = set_object_positions(self, pix, yTOx_pat_ratio)
-        
-            fig_height = pix(4)*.65;
-            fig_width = pix(3)*.9;
-            fig_x = (pix(3) - fig_width)/2;
-            fig_y = (pix(4)-fig_height)/2;
-            fig_pos = [fig_x, fig_y, fig_width, fig_height];
-
-
-            %charts h/w
-            chart_height = fig_height/2 - pix(4)*.18;
-            pat_chart_width = chart_height*yTOx_pat_ratio;
-            pos_chart_width = pat_chart_width;
-            aoChart_height = chart_height/2 - pix(4)*.02;
-            aoChart_width = pat_chart_width/2;
-%             ao2Chart_width = pat_chart_width/2;
-%             ao3Chart_width = pat_chart_width/2;
-%             ao4Chart_width = pat_chart_width/2;
-
-
-
-            %title height plus buffer
-            title_height = pix(4)*.1;
-            aoTitle_height = title_height*.75;
-            buffer = pix(4)*.05;
-
-            %x/y positions of charts in figure
-            patpos_x = pix(3)*.05;
-            pos_y = pix(4)*.18;
-            pat_y = pos_y + chart_height + title_height + buffer;
-            ao_x = patpos_x + pat_chart_width + pix(3)*.15;
-            ao1_y = pat_y + aoChart_height;
-            ao2_y = ao1_y - aoTitle_height - aoChart_height;
-            ao3_y = ao2_y - aoTitle_height - aoChart_height;
-            ao4_y = ao3_y - aoTitle_height - aoChart_height;
-
-            pat_pos = [patpos_x, pat_y, pat_chart_width, chart_height];
-            pos_pos = [patpos_x, pos_y, pos_chart_width, chart_height];
-            ao1_pos = [ao_x, ao1_y, aoChart_width, aoChart_height];
-            ao2_pos = [ao_x, ao2_y, aoChart_width, aoChart_height];
-            ao3_pos = [ao_x, ao3_y, aoChart_width, aoChart_height];
-            ao4_pos = [ao_x, ao4_y, aoChart_width, aoChart_height];
-
-        
-        end
-        
-        function [fig_pos, pat_pos, pos_pos, dum_pos, ao1_pos, ao2_pos, ao3_pos, ao4_pos] ...
-                = set_object_positions_mode6(self, pix, yTOx_pat_ratio)
-        
-        %figure
-            fig_height = pix(4)*.85;
-            fig_width = pix(3)*.97;
-            fig_x = (pix(3) - fig_width)/2;
-            fig_y = (pix(4)-fig_height)/2;
-            fig_pos = [fig_x, fig_y, fig_width, fig_height];
-
-
-            %charts h/w
-            chart_height = fig_height/3 - 200;
-            pat_chart_width = chart_height*yTOx_pat_ratio;
-            aoChart_height = chart_height/2 - 20;
-            aoChart_width = pat_chart_width/2;
-%             ao2Chart_width = pat_chart_width/2;
-%             ao3Chart_width = pat_chart_width/2;
-%             ao4Chart_width = pat_chart_width/2;
-
-
-
-            %title height plus buffer
-            title_height = 100;
-            aoTitle_height = title_height*.75;
-            buffer = 50;
-
-            %x/y positions of charts in figure
-            patpos_x = 100;
-            dummy_y = 150;
-            pos_y = dummy_y + chart_height + title_height + buffer;
-            pat_y = pos_y + chart_height + title_height + buffer;
-            ao_x = patpos_x + pat_chart_width + 150;
-            ao1_y = pat_y + aoChart_height;
-            ao2_y = ao1_y - aoTitle_height - aoChart_height;
-            ao3_y = ao2_y - aoTitle_height - aoChart_height;
-            ao4_y = ao3_y - aoTitle_height - aoChart_height;
-
-            pat_pos = [patpos_x, pat_y, pat_chart_width, chart_height];
-            pos_pos = [patpos_x, pos_y, pat_chart_width, chart_height];
-            dum_pos = [patpos_x, dummy_y, pat_chart_width, chart_height];
-            ao1_pos = [ao_x, ao1_y, aoChart_width, aoChart_height];
-            ao2_pos = [ao_x, ao2_y, aoChart_width, aoChart_height];
-            ao3_pos = [ao_x, ao3_y, aoChart_width, aoChart_height];
-            ao4_pos = [ao_x, ao4_y, aoChart_width, aoChart_height];
         
         end
 
@@ -365,7 +81,7 @@ classdef G4_preview_controller < handle
             if ~isempty(varargin) && self.making_video == 1
                 currentFig = varargin{1};
             else
-                currentFig = self.fig;
+                currentFig = self.view.fig;
             end
             
             screen_fr_rate = 20;
@@ -378,7 +94,7 @@ classdef G4_preview_controller < handle
             frame_count = 1;
             self.frames = cell(1, num_frames);
 
-            if self.pos_line == 0
+            if self.view.pos_line == 0
                 
                 self.create_error_box("Please make sure you've entered a position function and try again.");
                 
@@ -389,7 +105,7 @@ classdef G4_preview_controller < handle
                 
 
                 for i = 1:4
-                    if self.ao_lines{i} ~= 0
+                    if self.view.ao_lines{i} ~= 0
                         aoLineDist(i) = length(self.model.ao_data{i});
                     end
                 end
@@ -404,15 +120,15 @@ classdef G4_preview_controller < handle
                     %move ao lines
                     
                     for k = 1:4
-                        if self.ao_lines{k} ~= 0
-                            if self.ao_lines{k}.XData(1) >= aoLineDist(k)
-                                self.ao_lines{k}.XData = [1,1];
+                        if self.view.ao_lines{k} ~= 0
+                            if self.view.ao_lines{k}.XData(1) >= aoLineDist(k)
+                                self.view.ao_lines{k}.XData = [1,1];
                             else
-                                self.ao_lines{k}.XData = [self.ao_lines{k}.XData(1) + self.model.ao_increment, self.ao_lines{k}.XData(2) + self.model.ao_increment];
+                                self.view.ao_lines{k}.XData = [self.view.ao_lines{k}.XData(1) + self.model.ao_increment, self.view.ao_lines{k}.XData(2) + self.model.ao_increment];
                             end
                             
                             if i == num_frames
-                                self.ao_lines{k}.XData = [aoLineDist(k), aoLineDist(k)];
+                                self.view.ao_lines{k}.XData = [aoLineDist(k), aoLineDist(k)];
                             end
 
                         end
@@ -426,32 +142,31 @@ classdef G4_preview_controller < handle
                             self.model.preview_index = time;
                         end
                      
-
                     end
 
                     if self.model.preview_index > length(self.model.pos_data) || self.model.preview_index == 0
                         self.model.preview_index = 1;
                     end
+                    
                     self.model.preview_index
-
                     frame = self.model.pos_data(self.model.preview_index);
-                    set(self.im,'cdata',self.model.pattern_data(:,:,frame));
+                    set(self.view.im,'cdata',self.model.pattern_data(:,:,frame));
 
-                    if self.pos_line ~= 0
-                        if self.pos_line.XData(1) >= length(self.model.pos_data)
-                            self.pos_line.XData = [1,1];
+                    if self.view.pos_line ~= 0
+                        if self.view.pos_line.XData(1) >= length(self.model.pos_data)
+                            self.view.pos_line.XData = [1,1];
                         else
-                            self.pos_line.XData = [self.model.preview_index,self.model.preview_index];
+                            self.view.pos_line.XData = [self.model.preview_index,self.model.preview_index];
                         end
                     end
 
                     self.model.preview_index = self.model.preview_index + self.model.fr_increment;
-
-                    drawnow limitrate %nocallbacks
+                    
+                    self.view.draw();
                     
                     if self.making_video == 1
                         if self.pattern_only == 1
-                            self.frames{frame_count} = getframe(self.pat_axes);
+                            self.frames{frame_count} = getframe(self.view.pat_axes);
                         else
                         
                             self.frames{frame_count} = getframe(currentFig);
@@ -477,7 +192,7 @@ classdef G4_preview_controller < handle
 
             if self.model.is_paused == 0
                 
-                self.stop('','');
+                self.stop();
             end
 
         end
@@ -488,7 +203,7 @@ classdef G4_preview_controller < handle
             if ~isempty(varargin) && self.making_video == 1
                 currentFig = varargin{1};
             else
-                currentFig = self.fig;
+                currentFig = self.view.fig;
             end
             
             screen_fr_rate = 20;
@@ -505,7 +220,7 @@ classdef G4_preview_controller < handle
 
 
             for i = 1:4
-                if self.ao_lines{i} ~= 0
+                if self.view.ao_lines{i} ~= 0
                     aoLineDist(i) = length(self.model.ao_data{i});
                 end
             end
@@ -520,15 +235,15 @@ classdef G4_preview_controller < handle
                 %move ao lines
 
                 for k = 1:4
-                    if self.ao_lines{k} ~= 0
-                        if self.ao_lines{k}.XData(1) >= aoLineDist(k)
-                            self.ao_lines{k}.XData = [1,1];
+                    if self.view.ao_lines{k} ~= 0
+                        if self.view.ao_lines{k}.XData(1) >= aoLineDist(k)
+                            self.view.ao_lines{k}.XData = [1,1];
                         else
-                            self.ao_lines{k}.XData = [self.ao_lines{k}.XData(1) + self.model.ao_increment, self.ao_lines{k}.XData(2) + self.model.ao_increment];
+                            self.view.ao_lines{k}.XData = [self.view.ao_lines{k}.XData(1) + self.model.ao_increment, self.view.ao_lines{k}.XData(2) + self.model.ao_increment];
                         end
 
                         if i == num_frames
-                            self.ao_lines{k}.XData = [aoLineDist(k), aoLineDist(k)];
+                            self.view.ao_lines{k}.XData = [aoLineDist(k), aoLineDist(k)];
                         end
 
                     end
@@ -541,7 +256,7 @@ classdef G4_preview_controller < handle
                 end
 
                 
-                set(self.im,'cdata',self.model.pattern_data(:,:,self.model.preview_index));
+                set(self.view.im,'cdata',self.model.pattern_data(:,:,self.model.preview_index));
 
                 self.model.preview_index = self.model.preview_index + self.model.fr_increment;
 
@@ -549,7 +264,7 @@ classdef G4_preview_controller < handle
 
                 if self.making_video == 1
                     if self.pattern_only == 1
-                        self.frames{frame_count} = getframe(self.pat_axes);
+                        self.frames{frame_count} = getframe(self.view.pat_axes);
                     else
 
                         self.frames{frame_count} = getframe(currentFig);
@@ -574,7 +289,7 @@ classdef G4_preview_controller < handle
 
             if self.model.is_paused == 0
                 
-                self.stop('','');
+                self.stop();
             end
         end
         
@@ -592,7 +307,7 @@ classdef G4_preview_controller < handle
             if ~isempty(varargin) && self.making_video == 1
                 currentFig = varargin{1};
             else
-                currentFig = self.fig;
+                currentFig = self.view.fig;
             end
             
             screen_fr_rate = 20;
@@ -605,7 +320,7 @@ classdef G4_preview_controller < handle
             frame_count = 1;
             self.frames = cell(1, num_frames);
 
-            if self.pos_line == 0
+            if self.view.pos_line == 0
                 
                 self.create_error_box("Please make sure you've entered a position function and try again.");
                 
@@ -616,7 +331,7 @@ classdef G4_preview_controller < handle
                 
 
                 for i = 1:4
-                    if self.ao_lines{i} ~= 0
+                    if self.view.ao_lines{i} ~= 0
                         aoLineDist(i) = length(self.model.ao_data{i});
                     end
                 end
@@ -631,15 +346,15 @@ classdef G4_preview_controller < handle
                     %move ao lines
                     
                     for k = 1:4
-                        if self.ao_lines{k} ~= 0
-                            if self.ao_lines{k}.XData(1) >= aoLineDist(k)
-                                self.ao_lines{k}.XData = [1,1];
+                        if self.view.ao_lines{k} ~= 0
+                            if self.view.ao_lines{k}.XData(1) >= aoLineDist(k)
+                                self.view.ao_lines{k}.XData = [1,1];
                             else
-                                self.ao_lines{k}.XData = [self.ao_lines{k}.XData(1) + self.model.ao_increment, self.ao_lines{k}.XData(2) + self.model.ao_increment];
+                                self.view.ao_lines{k}.XData = [self.view.ao_lines{k}.XData(1) + self.model.ao_increment, self.view.ao_lines{k}.XData(2) + self.model.ao_increment];
                             end
                             
                             if i == num_frames
-                                self.ao_lines{k}.XData = [aoLineDist(k), aoLineDist(k)];
+                                self.view.ao_lines{k}.XData = [aoLineDist(k), aoLineDist(k)];
                             end
 
                         end
@@ -661,13 +376,13 @@ classdef G4_preview_controller < handle
                     end
 
                     frame = self.model.dummy_data(self.model.preview_index);
-                    set(self.im,'cdata',self.model.pattern_data(:,:,frame));
+                    set(self.view.im,'cdata',self.model.pattern_data(:,:,frame));
 
-                    if self.dummy_line ~= 0
-                        if self.dummy_line.XData(1) >= length(self.model.dummy_data)
-                            self.dummy_line.XData = [1,1];
+                    if self.view.dummy_line ~= 0
+                        if self.view.dummy_line.XData(1) >= length(self.model.dummy_data)
+                            self.view.dummy_line.XData = [1,1];
                         else
-                            self.dummy_line.XData = [self.model.preview_index,self.model.preview_index];
+                            self.view.dummy_line.XData = [self.model.preview_index,self.model.preview_index];
                         end
                     end
 
@@ -677,7 +392,7 @@ classdef G4_preview_controller < handle
                     
                     if self.making_video == 1
                         if self.pattern_only == 1
-                            self.frames{frame_count} = getframe(self.pat_axes);
+                            self.frames{frame_count} = getframe(self.view.pat_axes);
                         else
                         
                             self.frames{frame_count} = getframe(currentFig);
@@ -702,7 +417,7 @@ classdef G4_preview_controller < handle
   
             if self.model.is_paused == 0
                 
-                self.stop('','');
+                self.stop();
             end        
             
         end
@@ -729,7 +444,7 @@ classdef G4_preview_controller < handle
 
            
 
-            if self.pos_line == 0
+            if self.view.pos_line == 0
                 self.create_error_box("Please make sure you have entered a position function and try again.");
             else
                 
@@ -745,17 +460,17 @@ classdef G4_preview_controller < handle
                             frame1 = self.model.dummy_data(i);
                             frame2 = self.model.pos_data(i);
 
-                            set(self.im,'cdata',self.model.pattern_data(:,:,frame1, frame2));
-                            if self.pos_line ~= 0
-                                self.pos_line.XData = [self.pos_line.XData(1) + 1, self.pos_line.XData(2) + 1];
+                            set(self.view.im,'cdata',self.model.pattern_data(:,:,frame1, frame2));
+                            if self.view.pos_line ~= 0
+                                self.view.pos_line.XData = [self.view.pos_line.XData(1) + 1, self.view.pos_line.XData(2) + 1];
                             end
                             
-                            if self.dummy_line ~= 0
-                                self.dummy_line.XData = [self.dummy_line.XData(1) + 1, self.dummy_line.XData(2) + 1];
+                            if self.view.dummy_line ~= 0
+                                self.view.dummy_line.XData = [self.view.dummy_line.XData(1) + 1, self.view.dummy_line.XData(2) + 1];
                             end
                             for k = 1:4
-                                if self.ao_lines{k} ~= 0
-                                    self.ao_lines{k}.XData = [self.ao_lines{k}.XData(1) + 1, self.ao_lines{k}.XData(2) + 1];
+                                if self.view.ao_lines{k} ~= 0
+                                    self.view.ao_lines{k}.XData = [self.view.ao_lines{k}.XData(1) + 1, self.view.ao_lines{k}.XData(2) + 1];
                                 end
                             end
 
@@ -790,25 +505,6 @@ classdef G4_preview_controller < handle
             
         end
         
-        function [func_line] = plot_function(self, fig, func, position, graph_title, x_label, y_label)
-            
-            xlim = [0 length(func(1,:))];
-            ylim = [min(func) max(func)];
-            func_axes = axes(fig, 'units','pixels','Position', position, ...
-                'XLim', xlim, 'YLim', ylim);
-            %title(func_axes, graph_title);
-    %         xlabel(func_axes, x_label);
-    %         ylabel(func_axes, y_label);
-            p = plot(func);
-            set(p, 'parent', func_axes);
-            func_line = line('XData',[self.model.preview_index, self.model.preview_index],'YData',[ylim(1), ylim(2)]);
-            title(graph_title);
-            xlabel(x_label);
-            ylabel(y_label);
-                
-
-        end
-        
         function [first_frame] = get_first_frame(self)
 
 
@@ -834,24 +530,12 @@ classdef G4_preview_controller < handle
         
         end
         
-        function [dur_line] = place_red_dur_line(self, data)
-            dur = self.model.dur*1000;
-            len = length(data(1,:));
-            yax = [min(data) max(data)];
-            if dur <= len
-                 dur_line = line('XData', [dur, dur], 'YData', yax, 'Color', [1 0 0], 'LineWidth', 2);
-            else
-                dur_line = 0;
-            end
-
         
-        end
         
         function create_dummy_function(self)
  
             ybound = length(self.model.pattern_data(1,1,:));
 
-            
             if self.model.mode == 4 || self.model.mode == 7 || self.model.mode == 6
 
                 time = self.model.dur*1000;
@@ -864,10 +548,8 @@ classdef G4_preview_controller < handle
             elseif self.model.mode == 5
 
                 xlim = length(self.model.pos_data);
-                dummy = zeros(1,xlim);
-                ybnd = ybound/2;
                 
-
+                ybnd = ybound/2;
                 time = xlim;
                 sample_rate = 1;
                 frequency = .001;
@@ -895,7 +577,7 @@ classdef G4_preview_controller < handle
 
 
         
-        function pause(self, src, event)
+        function pause(self)
         
             self.model.is_paused = true;
             self.model.preview_index = self.model.preview_index + 1;
@@ -905,27 +587,9 @@ classdef G4_preview_controller < handle
         
         end
         
-        function play(self, src, event)
-
-            if self.model.mode == 1
-               self.preview_Mode1();
-            elseif self.model.mode == 2
-                self.preview_Mode2();
-            elseif self.model.mode == 3
-                self.preview_Mode3();
-            elseif self.model.mode == 4 
-                self.preview_Mode4();
-            elseif self.model.mode == 5
-                self.preview_Mode4();
-            elseif self.model.mode == 6
-                self.preview_Mode6();
-            else
-                self.preview_Mode4();
-            end
-
-        end
         
-        function stop(self, src, event)
+        
+        function stop(self)
 
             self.model.is_paused = true;
             self.model.preview_index = 1;
@@ -933,11 +597,11 @@ classdef G4_preview_controller < handle
                 ratio = 1000/self.model.rt_frRate;
                 self.model.fr_increment = self.model.fr_increment/ratio;
             end
-            self.update_layout();
+            
 
         end
         
-        function set_realtime(self, src, event)
+        function set_realtime(self)
             if self.model.is_realtime == 0
                 self.model.is_realtime = 1;
                 
@@ -959,7 +623,7 @@ classdef G4_preview_controller < handle
                 
             end
             
-            self.set_fr_increment();
+            self.view.set_fr_increment();
             
 
         end
@@ -970,13 +634,18 @@ classdef G4_preview_controller < handle
             pat_ylim = [0 length(self.model.pattern_data(:,1,1))];
         end
         
-        function generate_video(self, src, event)
+        function generate_video(self)
             
             self.making_video = 1;
             [file, path] = uiputfile('*.avi','File Selection','preview');
             video_savepath = fullfile(path, file);
             new_figure = figure('Visible', 'off');
-            self.layout(new_figure);
+            if ~isempty(self.view)
+                self.view.layout(new_figure);
+            else
+                self.view = G4_preview_view(self, new_figure);
+                self.view.layout(new_figure)
+            end
             self.model.preview_index = 1; 
             progress = waitbar(.25, 'Creating Frames');
             
@@ -1009,23 +678,12 @@ classdef G4_preview_controller < handle
             self.model.preview_index = 1;
             
             %reset old figure
-            self.layout();
+            self.view.layout();
             
         end
 
-        function set_fr_increment(self)
         
-            self.fr_increment_box.String = num2str(self.model.fr_increment);
-        
-        end
-        
-        function pattern_only_video(self)
-            
-        
-        end
-        
-            
-        
+
         
         %GETTERS
 
@@ -1034,36 +692,18 @@ classdef G4_preview_controller < handle
             value = self.model_;
         end
         
-        
-        function value = get.fig(self)
-            value = self.fig_;
+        function value = get.view(self)
+            value = self.view_;
         end
         
-        function value = get.im(self)
-            value = self.im_;
-        end
-        function value = get.pat_axes(self)
-            value = self.pat_axes_;
-        end
-        function value = get.pos_line(self)
-            value = self.pos_line_;
-        end
-
-        function value = get.dummy_line(self)
-            value = self.dummy_line_;
-        end
         function value = get.frames(self)
             value = self.frames_;
         end
-        function value = get.ao_lines(self)
-            value = self.ao_lines_;
-        end
+        
         function value = get.making_video(self)
             value = self.making_video_;
         end
-        function value = get.fr_increment_box(self)
-            value = self.fr_increment_box_;
-        end
+        
         function value = get.pattern_only(self)
             value = self.pattern_only_;
         end
@@ -1076,37 +716,19 @@ classdef G4_preview_controller < handle
         function set.model(self, value)
             self.model_ = value;
         end
-
         
-        function set.fig(self, value)
-            self.fig_ = value;
-        end
-        
-        function set.im(self, value)
-            self.im_ = value;
-        end
-        function set.pat_axes(self, value)
-            self.pat_axes_ = value;
-        end
-        function set.pos_line(self, value)
-            self.pos_line_ = value;
+        function set.view(self, value)
+            self.view_ = value;
         end
 
-        function set.dummy_line(self, value)
-            self.dummy_line_ = value;
-        end
         function set.frames(self, value)
             self.frames_ = value;
         end
-        function set.ao_lines(self, value)
-            self.ao_lines_ = value;
-        end
+        
         function set.making_video(self, value)
             self.making_video_ = value;
         end
-        function set.fr_increment_box(self, value)
-            self.fr_increment_box_ = value;
-        end
+        
         function set.pattern_only(self, value)
             self.pattern_only_ = value;
         end

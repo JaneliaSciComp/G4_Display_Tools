@@ -4,6 +4,7 @@ classdef G4_conductor_controller < handle
         model_;
         doc_;
         fig_;
+        settings_con_
         
         
         %GUI objects
@@ -65,6 +66,7 @@ classdef G4_conductor_controller < handle
         model;
         doc;
         fig;
+        settings_con
 
         progress_axes;
         axes_label;
@@ -137,9 +139,11 @@ classdef G4_conductor_controller < handle
                 
                 self.doc = varargin{1};
                 self.model.fly_name = self.model.create_fly_name(self.doc.top_export_path);
+                self.settings_con = varargin{2};
             else
                 
                 self.doc = G4_document();
+                self.settings_con = G4_settings_controller();
                 
             end
             
@@ -148,8 +152,6 @@ classdef G4_conductor_controller < handle
            
             self.layout();
 
-            
-            
         
         end
 
@@ -162,6 +164,7 @@ classdef G4_conductor_controller < handle
            menu = uimenu(self.fig, 'Text', 'File');
            self.menu_open = uimenu(menu, 'Text', 'Open');
            menu_recent_files = uimenu(self.menu_open, 'Text', '.g4p file', 'Callback', {@self.open_g4p_file, ''});
+           %menu_settings = uimenu(menu, 'Text', 'Settings', 'Callback', @self.open_settings);
             
                 
             for i = 1:length(self.doc.recent_g4p_files)
@@ -583,6 +586,15 @@ classdef G4_conductor_controller < handle
             drawnow;
             
         end
+        
+        function open_settings(self, ~, ~)
+        
+            self.settings_con.layout_view();
+%             self.model = [];
+%             self.model = G4_conductor_model();
+        
+        end
+        
         
         function create_error_box(self, varargin)
   
@@ -1489,6 +1501,10 @@ classdef G4_conductor_controller < handle
         function set.light_cycle_box(self, value)
             self.light_cycle_box_ = value;
         end
+        
+        function set.settings_con(self, value)
+            self.settings_con_ = value;
+        end
 
 
         %GETTERS
@@ -1668,6 +1684,9 @@ classdef G4_conductor_controller < handle
         end
         function output = get.light_cycle_box(self)
             output = self.light_cycle_box_;
+        end
+        function output = get.settings_con(self)
+            output = self.settings_con_;
         end
 
    

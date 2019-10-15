@@ -2122,6 +2122,7 @@ classdef G4_document < handle
         end
         
         function [settings_data, path, index] = get_setting(self, file, string_to_find)
+
             last_five = string_to_find(end-5:end);
             settings_data = strtrim(regexp( fileread(file),'\n','split'));
             path = find(contains(settings_data, string_to_find));
