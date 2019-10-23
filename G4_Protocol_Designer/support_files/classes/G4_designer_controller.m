@@ -544,7 +544,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
             end
             if y == 1
                
-               self.clear_fields(str2double(new));
+               self.clear_fields(str2num(new));
                 
             end
             
@@ -1598,14 +1598,14 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                 xax = [0 length(self.model.current_preview_file(1,:,1))];
                 yax = [0 length(self.model.current_preview_file(:,1,1))];
                 max_num = max(self.model.current_preview_file,[],[1 2]);
-                adjusted_file = zeros(yax(2), xax(2), len);
+%                 adjusted_file = zeros(yax(2), xax(2), len);
+%                 
+%                 for i = 1:len
+%                     adjusted_matrix = self.model.current_preview_file(:,:,i) ./ max_num(i);
+%                     adjusted_file(:,:,i) = adjusted_matrix(:,:,1);
+%                 end
                 
-                for i = 1:len
-                    adjusted_matrix = self.model.current_preview_file(:,:,i) ./ max_num(i);
-                    adjusted_file(:,:,i) = adjusted_matrix(:,:,1);
-                end
-                
-                im = imshow(adjusted_file(:,:,self.model.auto_preview_index), 'Colormap', gray);
+                im = imshow(self.model.current_preview_file(:,:,self.model.auto_preview_index), 'Colormap', gray);
                 set(im,'parent', self.hAxes);
                 set(self.hAxes, 'XLim', xax, 'YLim', yax );
   
@@ -1616,7 +1616,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                             self.model.auto_preview_index = 1;
                         end
                         %imagesc(self.model.current_preview_file.pattern.Pats(:,:,self.model.auto_preview_index), 'parent', hAxes);
-                        set(im,'cdata',adjusted_file(:,:,self.model.auto_preview_index), 'parent', self.hAxes);
+                        set(im,'cdata',self.model.current_preview_file(:,:,self.model.auto_preview_index), 'parent', self.hAxes);
                         drawnow
 
                         pause(1/fr_rate);
@@ -1652,10 +1652,10 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
             x = [0 length(self.model.current_preview_file(1,:,1))];
             y = [0 length(self.model.current_preview_file(:,1,1))];
      
-            max_num = max(self.model.current_preview_file,[],[1 2]);    
-            adjusted_matrix = self.model.current_preview_file(:,:,self.model.auto_preview_index) ./ max_num(self.model.auto_preview_index);
+%             max_num = max(self.model.current_preview_file,[],[1 2]);    
+%             adjusted_matrix = self.model.current_preview_file(:,:,self.model.auto_preview_index) ./ max_num(self.model.auto_preview_index);
 
-            im = imshow(adjusted_matrix(:,:), 'Colormap', gray);
+            im = imshow(self.model.current_preview_file(:,:), 'Colormap', gray);
             set(im, 'parent', self.hAxes);
             set(self.hAxes, 'XLim', x, 'YLim', y);
                         
@@ -1677,10 +1677,10 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                 xax = [0 length(preview_data(1,:))];
                 yax = [0 length(preview_data(:,1))];
                  
-                max_num = max(preview_data,[],[1 2]);    
-                adjusted_matrix = preview_data ./ max_num;
+%                 max_num = max(preview_data,[],[1 2]);    
+%                 adjusted_matrix = preview_data ./ max_num;
 
-                im = imshow(adjusted_matrix(:,:), 'Colormap', gray);
+                im = imshow(preview_data(:,:), 'Colormap', gray);
                 set(im, 'parent', self.hAxes);
                 set(self.hAxes, 'XLim', xax, 'YLim', yax);
 
@@ -1706,10 +1706,10 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                 xax = [0 length(preview_data(1,:))];
                 yax = [0 length(preview_data(:,1))];
                  
-                max_num = max(preview_data,[],[1 2]);    
-                adjusted_matrix = preview_data ./ max_num;
+%                 max_num = max(preview_data,[],[1 2]);    
+%                 adjusted_matrix = preview_data ./ max_num;
 
-                im = imshow(adjusted_matrix(:,:), 'Colormap', gray);
+                im = imshow(preview_data(:,:), 'Colormap', gray);
                 set(im, 'parent', self.hAxes);
                 set(self.hAxes, 'XLim', xax, 'YLim', yax);
             end
@@ -2390,16 +2390,19 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                 
                 self.model.auto_preview_index = self.check_pattern_dimensions(patfield);
                 self.model.current_preview_file = self.doc.Patterns.(patfield).pattern.Pats;
+                grayscale_val = self.doc.Patterns.(patfield).pattern.gs_val;
 
                 x = [0 length(self.model.current_preview_file(1,:,1))];
                 y = [0 length(self.model.current_preview_file(:,1,1))];
                 adjusted_file = zeros(y(2),x(2),length(self.model.current_preview_file(1,1,:)));
-                max_num = max(max(self.model.current_preview_file,[],2));
+                %max_num = max(max(self.model.current_preview_file,[],2));
+                max_num = (2^grayscale_val) - 1;
                 for i = 1:length(self.model.current_preview_file(1,1,:))
 
-                    adjusted_matrix = self.model.current_preview_file(:,:,i) ./ max_num(i);
+                    adjusted_matrix = self.model.current_preview_file(:,:,i) ./ max_num;
                     adjusted_file(:,:,i) = adjusted_matrix(:,:,1);
                 end
+                self.model.current_preview_file = adjusted_file;
                 
                 
                 self.hAxes = axes(self.preview_panel, 'units', 'normalized', 'OuterPosition', [.1, .04, .8 ,.9], 'XTick', [], 'YTick', [] ,'XLim', x, 'YLim', y);

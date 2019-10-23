@@ -1967,47 +1967,56 @@ classdef G4_document < handle
             inter_indices_to_color = [];
             post_indices_to_color = [];
             indices_to_color = [];
-
-            if pretrial_mode == 1
-                pre_indices_to_color = [9, 10, 11];
-            elseif pretrial_mode == 2
-                pre_indices_to_color = [3, 10, 11];
-            elseif pretrial_mode == 3
-                pre_indices_to_color = [3, 9, 10, 11];
-            elseif pretrial_mode == 4
-                pre_indices_to_color = [3, 9];
-            elseif pretrial_mode == 5 || pretrial_mode == 6
-                pre_indices_to_color = 9;
-            elseif pretrial_mode == 7
-                pre_indices_to_color = [3, 9, 10, 11];
+            if ~isempty(pretrial_mode)
+                if pretrial_mode == 1
+                    pre_indices_to_color = [9, 10, 11];
+                elseif pretrial_mode == 2
+                    pre_indices_to_color = [3, 10, 11];
+                elseif pretrial_mode == 3
+                    pre_indices_to_color = [3, 9, 10, 11];
+                elseif pretrial_mode == 4
+                    pre_indices_to_color = [3, 9];
+                elseif pretrial_mode == 5 || pretrial_mode == 6
+                    pre_indices_to_color = 9;
+                elseif pretrial_mode == 7
+                    pre_indices_to_color = [3, 9, 10, 11];
+                end
             end
+            
+            if ~isempty(intertrial_mode)
 
-            if intertrial_mode == 1
-                inter_indices_to_color = [9, 10, 11];
-            elseif intertrial_mode == 2
-                inter_indices_to_color = [3, 10, 11];
-            elseif intertrial_mode == 3
-                inter_indices_to_color = [3, 9, 10, 11];
-            elseif intertrial_mode == 4
-                inter_indices_to_color = [3, 9];
-            elseif intertrial_mode == 5 || intertrial_mode == 6
-                inter_indices_to_color = 9;
-            elseif intertrial_mode == 7
-                inter_indices_to_color = [3, 9, 10, 11];
+                if intertrial_mode == 1
+                    inter_indices_to_color = [9, 10, 11];
+                elseif intertrial_mode == 2
+                    inter_indices_to_color = [3, 10, 11];
+                elseif intertrial_mode == 3
+                    inter_indices_to_color = [3, 9, 10, 11];
+                elseif intertrial_mode == 4
+                    inter_indices_to_color = [3, 9];
+                elseif intertrial_mode == 5 || intertrial_mode == 6
+                    inter_indices_to_color = 9;
+                elseif intertrial_mode == 7
+                    inter_indices_to_color = [3, 9, 10, 11];
+                end
+                
             end
+            
+            if ~isempty(posttrial_mode)
 
-            if posttrial_mode == 1
-                post_indices_to_color = [9, 10, 11];
-            elseif posttrial_mode == 2
-                post_indices_to_color = [3, 10, 11];
-            elseif posttrial_mode == 3
-                post_indices_to_color = [3, 9, 10, 11];
-            elseif posttrial_mode == 4
-                post_indices_to_color = [3, 9];
-            elseif posttrial_mode == 5 || posttrial_mode == 6
-                post_indices_to_color = 9;
-            elseif posttrial_mode == 7
-                post_indices_to_color = [3, 9, 10, 11];
+                if posttrial_mode == 1
+                    post_indices_to_color = [9, 10, 11];
+                elseif posttrial_mode == 2
+                    post_indices_to_color = [3, 10, 11];
+                elseif posttrial_mode == 3
+                    post_indices_to_color = [3, 9, 10, 11];
+                elseif posttrial_mode == 4
+                    post_indices_to_color = [3, 9];
+                elseif posttrial_mode == 5 || posttrial_mode == 6
+                    post_indices_to_color = 9;
+                elseif posttrial_mode == 7
+                    post_indices_to_color = [3, 9, 10, 11];
+                end
+                
             end
 
 
