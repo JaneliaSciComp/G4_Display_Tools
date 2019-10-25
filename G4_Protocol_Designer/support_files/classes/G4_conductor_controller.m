@@ -1,43 +1,18 @@
 classdef G4_conductor_controller < handle
    
     properties
-        model_;
-        doc_;
-        fig_;
+        model_
+        doc_
         settings_con_
+        view_
         
-        
-        %GUI objects
-        progress_axes_;
-        axes_label_;
-        progress_bar_;
-        experimenter_box_
-        exp_name_box_
-        fly_name_box_
-        fly_genotype_box_
-        date_and_time_box_
-        sex_box_
-        temperature_box_
-        age_box_
-        rearing_protocol_box_
-        light_cycle_box_
-        comments_box_
-        exp_type_menu_
-        plotting_checkbox_
-        plotting_textbox_
-        processing_checkbox_
-        processing_textbox_
-        run_textbox_
-        current_running_trial_
-        browse_button_plotting_
-        browse_button_processing_
-        browse_button_run_
-        expected_time_
+        %Time tracking
+
         elapsed_time_
         remaining_time_
+        is_aborted_
 
-        %These are pieces of text in the updates panel that are updated
-        %every trial
+        %These values are updated every trial
         
         current_mode_
         current_pat_
@@ -52,53 +27,18 @@ classdef G4_conductor_controller < handle
         current_offset_
         current_duration_
         
-        is_aborted_
         
-
-        recent_file_menu_items_
-        menu_open_
 
         
     end
     
     
     properties (Dependent)
-        model;
-        doc;
-        fig;
+        model
+        doc
         settings_con
+        view
 
-        progress_axes;
-        axes_label;
-        progress_bar;
-        experimenter_box
-        exp_name_box
-        fly_name_box
-        fly_genotype_box
-        date_and_time_box
-        sex_box
-        temperature_box
-        age_box
-        rearing_protocol_box
-        light_cycle_box
-        comments_box
-        exp_type_menu
-        plotting_checkbox
-        plotting_textbox
-        processing_checkbox
-        processing_textbox
-        run_textbox
-        current_running_trial
-        browse_button_plotting
-        browse_button_processing
-        browse_button_run
-        expected_time
-        elapsed_time
-        remaining_time
-       % total_trials;
-
-
-       
         %These are pieces of text in the updates panel that are updated
         %every trial
         
@@ -115,10 +55,12 @@ classdef G4_conductor_controller < handle
         current_offset
         current_duration
         
+        elapsed_time
+        remaining_time
+        
         is_aborted
 
-        recent_file_menu_items
-        menu_open
+        
         
         
     end
@@ -129,10 +71,9 @@ classdef G4_conductor_controller < handle
         
         %constructor
         function self = G4_conductor_controller(varargin)
-            self.fig = figure('Name', 'Fly Experiment Conductor', 'NumberTitle', 'off', 'units','pixels','MenuBar', 'none', ...
-                'ToolBar', 'none', 'Resize', 'off');
+           
             self.model = G4_conductor_model();
-            self.doc = G4_document();
+            self.elapsed_time = 0;
             
 
             if ~isempty(varargin)
@@ -140,6 +81,7 @@ classdef G4_conductor_controller < handle
                 self.doc = varargin{1};
                 self.model.fly_name = self.model.create_fly_name(self.doc.top_export_path);
                 self.settings_con = varargin{2};
+                
             else
                 
                 self.doc = G4_document();
@@ -147,456 +89,319 @@ classdef G4_conductor_controller < handle
                 
             end
             
+            exp_time = self.doc.calc_exp_length();
+            self.model.set_expected_time(exp_time);
+            self.remaining_time = self.model.expected_time;
+            
+            self.current_mode = '';
+            self.current_pat = '';
+            self.current_pos = '';
+            self.current_ao1 = '';
+            self.current_ao2 = '';
+            self.current_ao3 = '';
+            self.current_ao4 = '';
+            self.current_frInd = '';
+            self.current_frRate = '';
+            self.current_gain = '';
+            self.current_offset = '';
+            self.current_duration = '';
             self.is_aborted = 0;
-            
-           
-            self.layout();
 
-        
         end
-
+        
         function layout(self)
-           pix = get(0, 'screensize');
-           fig_size = [.25*pix(3), .25*pix(4), .5*pix(3), .5*pix(4)];
-           set(self.fig,'Position',fig_size);
+            
+            self.view = G4_conductor_view(self);
+            
+        end
 
-           
-           menu = uimenu(self.fig, 'Text', 'File');
-           self.menu_open = uimenu(menu, 'Text', 'Open');
-           menu_recent_files = uimenu(self.menu_open, 'Text', '.g4p file', 'Callback', {@self.open_g4p_file, ''});
-           %menu_settings = uimenu(menu, 'Text', 'Settings', 'Callback', @self.open_settings);
+        
+        function update_fly_name(self, new_val)
             
-                
-            for i = 1:length(self.doc.recent_g4p_files)
-                [path, filename] = fileparts(self.doc.recent_g4p_files{i});
-                self.recent_file_menu_items{i} = uimenu(self.menu_open, 'Text', filename, 'Callback', {@self.open_g4p_file, self.doc.recent_g4p_files{i}});
-            end
-         %  menu_clear = uimenu(menu, 'Text', 'Clear', 'Callback', @self.clear_data);
-           
-            start_button = uicontrol(self.fig,'Style','pushbutton', 'String', 'Run', ...
-                'units', 'pixels', 'Position', [15, fig_size(4)- 305, 115, 85],'Callback', @self.run);
-            abort_button = uicontrol(self.fig,'Style','pushbutton', 'String', 'Abort Experiment',...
-                'units', 'pixels', 'Position', [140, fig_size(4) - 305, 115, 85], 'Callback', @self.abort_experiment);
-            settings_pan = uipanel(self.fig, 'Title', 'Settings', 'FontSize', 13, 'units', 'pixels', ...
-                'Position', [15, fig_size(4) - 215, 370, 200]);
-            metadata_pan = uipanel(self.fig, 'Title', 'Metadata', 'units', 'pixels', ...
-                'FontSize', 13, 'Position', [fig_size(3) - 300, fig_size(4) - 305, 275, 305]);
-            status_pan = uipanel(self.fig, 'Title', 'Status', 'FontSize', 13, 'units', 'pixels', ...
-                'Position', [15, 15, fig_size(3) - 30, fig_size(4)*.2]); 
-            open_google_sheet_button = uicontrol(self.fig, 'Style', 'pushbutton', 'String', 'Open Metadata Google Sheet', ...
-                'units', 'pixels', 'Position', [metadata_pan.Position(1), metadata_pan.Position(2) - 30,...
-                150, 25],'Callback', @self.open_google_sheet);
-            
-            
-            %Labels for status update showing current trial parameters
-            current_trial = uicontrol(status_pan, 'Style', 'text', 'String', 'Current Trial:', 'FontSize', 10.5, ...
-                'HorizontalAlignment', 'center', 'units', 'pixels', 'Position', [0, 45, 70, 15]);
-            
-            
-            mode_label = uicontrol(status_pan, 'Style', 'text', 'String', 'Mode', 'FontSize', 10.5, ...
-                'HorizontalAlignment', 'center', 'units', 'pixels', 'Position', ...
-                [current_trial.Position(1) + current_trial.Position(3) + 5, current_trial.Position(2) + 25, 50, 15]);
-            pat_label = uicontrol(status_pan, 'Style', 'text', 'String', 'Pattern', 'FontSize', 10.5, ...
-                'HorizontalAlignment', 'center', 'units', 'pixels', 'Position', [mode_label.Position(1) + mode_label.Position(3) + 10, ...
-                current_trial.Position(2) + 25, 50, 15]);
-            pos_label = uicontrol(status_pan, 'Style', 'text', 'String', 'Position', 'FontSize', 10.5, ...
-                'HorizontalAlignment', 'center', 'units', 'pixels', 'Position', ...
-                [pat_label.Position(1) + pat_label.Position(3) + 10, current_trial.Position(2) + 25, 50, 15]);
-            ao1_label = uicontrol(status_pan, 'Style', 'text', 'String', 'AO1', 'FontSize', 10.5, ...
-                'HorizontalAlignment', 'center', 'units', 'pixels', 'Position', ...
-                [pos_label.Position(1) + pos_label.Position(3) + 10, current_trial.Position(2) + 25, 50, 15]);
-            ao2_label = uicontrol(status_pan, 'Style', 'text', 'String', 'AO2', 'FontSize', 10.5, ...
-                'HorizontalAlignment', 'center', 'units', 'pixels', 'Position', ...
-                [ao1_label.Position(1) + ao1_label.Position(3) + 10, current_trial.Position(2) + 25, 50, 15]);
-            ao3_label = uicontrol(status_pan, 'Style', 'text', 'String', 'AO3', 'FontSize', 10.5, ...
-                'HorizontalAlignment', 'center', 'units', 'pixels', 'Position', ...
-                [ao2_label.Position(1) + ao2_label.Position(3) + 10, current_trial.Position(2) + 25, 50, 15]);
-            ao4_label = uicontrol(status_pan, 'Style', 'text', 'String', 'AO4', 'FontSize', 10.5, ...
-                'HorizontalAlignment', 'center', 'units', 'pixels', 'Position', ...
-                [ao3_label.Position(1) + ao3_label.Position(3) + 10, current_trial.Position(2) + 25, 50, 15]);
-            frameInd_label = uicontrol(status_pan, 'Style', 'text', 'String', 'Fr. Index', 'FontSize', 10.5, ...
-                'HorizontalAlignment', 'center', 'units', 'pixels', 'Position', ...
-                [ao4_label.Position(1) + ao4_label.Position(3) + 10, current_trial.Position(2) + 25, 50, 15]);
-            frRate_label = uicontrol(status_pan, 'Style', 'text', 'String', 'Fr. Rate', 'FontSize', 10.5, ...
-                'HorizontalAlignment', 'center', 'units', 'pixels', 'Position', ...
-                [frameInd_label.Position(1) + frameInd_label.Position(3) + 10, current_trial.Position(2) + 25,50, 15]);
-            gain_label = uicontrol(status_pan, 'Style', 'text', 'String', 'Gain', 'FontSize', 10.5, ...
-                'HorizontalAlignment', 'center', 'units', 'pixels', 'Position', ...
-                [frRate_label.Position(1) + frRate_label.Position(3) + 10, current_trial.Position(2) + 25, 50, 15]);
-            off_label = uicontrol(status_pan, 'Style', 'text', 'String', 'Offset', 'FontSize', 10.5, ...
-                'HorizontalAlignment', 'center', 'units', 'pixels', 'Position', ...
-                [gain_label.Position(1) + gain_label.Position(3) + 10, current_trial.Position(2) + 25, 50, 15]);
-            dur_label = uicontrol(status_pan, 'Style', 'text', 'String', 'Duration', 'FontSize', 10.5, ...
-                'HorizontalAlignment', 'center', 'units', 'pixels', 'Position', ...
-                [off_label.Position(1) + off_label.Position(3) + 10, current_trial.Position(2) + 25, 50, 15]);
-            exp_time_label = uicontrol(status_pan, 'Style', 'text', 'String', 'Expected Experiment Length:', 'FontSize', ...
-                10.5, 'HorizontalAlignment', 'center', 'units', 'pixels', 'Position', [0, 5, 200, 20]);
-            elapsed_time_label = uicontrol(status_pan, 'Style', 'text', 'String', 'Elapsed Time:', 'FontSize', ...
-                10.5, 'HorizontalAlignment', 'center', 'units', 'pixels', 'Position', [350, 5, 100, 20]);
-            remaining_time_label = uicontrol(status_pan, 'Style', 'text', 'String', 'Remaining Time:', 'FontSize', ...
-                10.5, 'HorizontalAlignment', 'center', 'units', 'pixels','Position', [590, 5, 120, 20]);
-            
-            %Parameter values in status panel which change with every trial
-            
-            self.current_mode =  uicontrol(status_pan, 'Style', 'text', 'String', '', 'FontSize', 10.5, ...
-                'HorizontalAlignment', 'center', 'units', 'pixels', 'Position',...
-                [mode_label.Position(1) + 5, current_trial.Position(2), mode_label.Position(3) - 10, 15]);
-            self.current_pat = uicontrol(status_pan, 'Style', 'text', 'String', '', 'FontSize', 10.5, ...
-                'HorizontalAlignment', 'center', 'units', 'pixels', 'Position', ...
-                [pat_label.Position(1) + 5, current_trial.Position(2), pat_label.Position(3) - 10, 15]);
-            self.current_pos = uicontrol(status_pan, 'Style', 'text', 'String', '', 'FontSize', 10.5, ...
-                'HorizontalAlignment', 'center', 'units', 'pixels', 'Position', ...
-                [pos_label.Position(1) + 5, current_trial.Position(2), pos_label.Position(3) - 10, 15]);
-            self.current_ao1 = uicontrol(status_pan, 'Style', 'text', 'String', '', 'FontSize', 10.5, ...
-                'HorizontalAlignment', 'center', 'units', 'pixels', 'Position', ...
-                [ao1_label.Position(1) + 5, current_trial.Position(2), ao1_label.Position(3) - 10, 15]);
-            self.current_ao2 = uicontrol(status_pan, 'Style', 'text', 'String', '', 'FontSize', 10.5, ...
-                'HorizontalAlignment', 'center', 'units', 'pixels', 'Position', ...
-                [ao2_label.Position(1) + 5, current_trial.Position(2), ao2_label.Position(3) - 10, 15]);
-            self.current_ao3 = uicontrol(status_pan, 'Style', 'text', 'String', '', 'FontSize', 10.5, ...
-                'HorizontalAlignment', 'center', 'units', 'pixels', 'Position', ...
-                [ao3_label.Position(1) + 5, current_trial.Position(2), ao3_label.Position(3) - 10, 15]);
-            self.current_ao4 = uicontrol(status_pan, 'Style', 'text', 'String', '', 'FontSize', 10.5, ...
-                'HorizontalAlignment', 'center', 'units', 'pixels', 'Position', ...
-                [ao4_label.Position(1) + 5, current_trial.Position(2), ao4_label.Position(3) - 10, 15]);
-             self.current_frInd = uicontrol(status_pan, 'Style', 'text', 'String', '', 'FontSize', 10.5, ...
-                'HorizontalAlignment', 'center', 'units', 'pixels', 'Position', ...
-                [frameInd_label.Position(1) + 5, current_trial.Position(2), frameInd_label.Position(3) - 10, 15]);
-            self.current_frRate = uicontrol(status_pan, 'Style', 'text', 'String', '', 'FontSize', 10.5, ...
-                'HorizontalAlignment', 'center', 'units', 'pixels', 'Position', ...
-                [frRate_label.Position(1) + 5, current_trial.Position(2), frRate_label.Position(3) - 10, 15]);
-            self.current_gain = uicontrol(status_pan, 'Style', 'text', 'String', '', 'FontSize', 10.5, ...
-                'HorizontalAlignment', 'center', 'units', 'pixels', 'Position', ...
-                [gain_label.Position(1) + 5, current_trial.Position(2), gain_label.Position(3) - 10, 15]);
-            self.current_offset = uicontrol(status_pan, 'Style', 'text', 'String', '', 'FontSize', 10.5, ...
-                'HorizontalAlignment', 'center', 'units', 'pixels', 'Position', ...
-                [off_label.Position(1) + 5, current_trial.Position(2), off_label.Position(3) - 10, 15]);
-            self.current_duration = uicontrol(status_pan, 'Style', 'text', 'String', '', 'FontSize', 10.5, ...
-                'HorizontalAlignment', 'center', 'units', 'pixels', 'Position', ...
-                [dur_label.Position(1) + 5, current_trial.Position(2), dur_label.Position(3) - 10, 15]);
-            self.expected_time = uicontrol(status_pan, 'Style', 'text', 'String', '', 'FontSize', ...
-                10.5, 'HorizontalAlignment', 'left', 'units', 'pixels', 'Position', ...
-                [exp_time_label.Position(1) + exp_time_label.Position(3) + 10, 5, 120, 20]);
-            self.elapsed_time = uicontrol(status_pan, 'Style', 'text', 'String', '', 'FontSize', ...
-                10.5, 'HorizontalAlignment', 'left', 'Units', 'pixels', 'Position', ...
-                [elapsed_time_label.Position(1) + elapsed_time_label.Position(3) + 10, 5, 120, 20]);
-            self.remaining_time = uicontrol(status_pan, 'Style', 'text', 'String', '', 'FontSize', ...
-                10.5, 'HorizontalAlignment', 'left', 'Units', 'pixels', 'Position', ...
-                [remaining_time_label.Position(1) + remaining_time_label.Position(3) + 10, 5, 120, 20]);
-      
-            
-            
-            self.progress_axes = axes(self.fig, 'units','pixels', 'Position', [15, fig_size(4)*.2+30, fig_size(3) - 30 ,50]);
-            self.axes_label = uicontrol(self.fig, 'Style', 'text', 'String', 'Progress:', 'FontSize', 13, ...
-                'HorizontalAlignment', 'left', 'units', 'pixels', 'Position', [15, fig_size(4)*.2 + 85, 100, 20]);
-            self.progress_bar = barh(0, 'Parent', self.progress_axes,'BaseValue', 0);
-            self.progress_axes.XAxis.Limits = [0 1];
-           % self.progress_axes.YAxis.Visible = 'off';
-           % self.progress_axes.XAxis.Visible = 'off';
-           self.progress_axes.YTickLabel = [];
-           self.progress_axes.XTickLabel = [];
-           self.progress_axes.XTick = [];
-           self.progress_axes.YTick = [];
-           reps = self.doc.repetitions;
-           total_steps = self.doc.repetitions * length(self.doc.block_trials(:,1));
-           if ~isempty(self.doc.intertrial{1})
-               total_steps = total_steps + ((length(self.doc.block_trials(:,1)) - 1)*reps);
-           end
-           
-           if ~isempty(self.doc.pretrial{1})
-               total_steps = total_steps + 1;
-           end
-           if ~isempty(self.doc.posttrial{1})
-               total_steps = total_steps + 1;
-           end
-           for i = 1:reps
-               x = (i/reps);% + 1/total_steps;
-               line('XData', [x, x], 'YDATA', [0,2]);
-           end
-
-            
-            metadata_label_position = [10, metadata_pan.Position(4) - 45, 100, 15];
-            metadata_box_position = [115, metadata_pan.Position(4) - 45, 150, 18];
-            %Settings required from user
-            experimenter_label = uicontrol(metadata_pan, 'Style', 'text', 'String', 'Experimenter:', ...
-                'HorizontalAlignment', 'left', 'units', 'pixels', 'Position', metadata_label_position);
-%             self.experimenter_box = uicontrol(metadata_pan, 'Style', 'edit', 'units', 'pixels', ...
-%                 'String', self.model.experimenter, 'Position', metadata_box_position, 'Callback', @self.update_experimenter);
-            
-           self.experimenter_box = uicontrol(metadata_pan, 'Style', 'popupmenu', 'String', self.model.metadata_options.experimenter, ...
-               'Value', 1, 'Position', metadata_box_position, 'Callback', @self.update_experimenter);
-           
-            
-            metadata_label_position(2) = metadata_label_position(2) - 25;
-            metadata_box_position(2) = metadata_box_position(2) - 25;
-            
-            exp_name_label = uicontrol(metadata_pan, 'Style', 'text', 'String', 'Experiment Name:', ...
-                'HorizontalAlignment', 'left', 'units', 'pixels', 'Position', metadata_label_position);
-            
-            self.exp_name_box = uicontrol(metadata_pan, 'Style', 'edit', 'String', self.doc.experiment_name, 'units', 'pixels', 'Position', ...
-                metadata_box_position, 'Callback', @self.update_experiment_name);
-            
-            metadata_label_position(2) = metadata_label_position(2) - 25;
-            metadata_box_position(2) = metadata_box_position(2) - 25;
-            
-            fly_name_label = uicontrol(metadata_pan, 'Style', 'text', 'String', 'Fly Name:', ...
-                'HorizontalAlignment', 'left', 'units', 'pixels', 'Position', metadata_label_position);
-            self.fly_name_box = uicontrol(metadata_pan, 'Style', 'edit', 'String', self.model.fly_name, ...
-                'units', 'pixels', 'Position', metadata_box_position, 'Callback', @self.update_fly_name);
-            
-            
-            metadata_label_position(2) = metadata_label_position(2) - 25;
-            metadata_box_position(2) = metadata_box_position(2) - 25;
-            
-            fly_genotype_label = uicontrol(metadata_pan, 'Style', 'text', 'String', 'Fly Genotype', ...
-                'HorizontalAlignment', 'left', 'units', 'pixels', 'Position', metadata_label_position);
-            
-            self.fly_genotype_box = uicontrol(metadata_pan, 'Style', 'popupmenu', 'units', 'pixels', 'Value', 1, ...
-                'String', self.model.metadata_options.fly_geno, 'Position', metadata_box_position, 'Callback', @self.update_genotype);
-            
-            
-            metadata_label_position(2) = metadata_label_position(2) - 25;
-            metadata_box_position(2) = metadata_box_position(2) - 25;
-            
-            fly_age_label = uicontrol(metadata_pan, 'Style', 'text', 'String', 'Fly Age:', ...
-                'HorizontalAlignment', 'left', 'units', 'pixels', 'Position', metadata_label_position);
-            self.age_box = uicontrol(metadata_pan, 'Style', 'popupmenu', 'units', 'pixels', 'Value', 1, ...
-                'String', self.model.metadata_options.fly_age, 'Position', metadata_box_position, 'Callback', @self.update_age);
-            
-            metadata_label_position(2) = metadata_label_position(2) - 25;
-            metadata_box_position(2) = metadata_box_position(2) - 25;
-            
-            fly_sex_label =  uicontrol(metadata_pan, 'Style', 'text', 'String', 'Fly Sex:', ...
-                'HorizontalAlignment', 'left', 'units', 'pixels', 'Position', metadata_label_position);
-            self.sex_box = uicontrol(metadata_pan, 'Style', 'popupmenu', 'units', 'pixels', 'Value', 1, ...
-                'String', self.model.metadata_options.fly_sex, 'Position', metadata_box_position, 'Callback', @self.update_sex);
-            
-            metadata_label_position(2) = metadata_label_position(2) - 25;
-            metadata_box_position(2) = metadata_box_position(2) - 25;
-            
-            experiment_temp_label =  uicontrol(metadata_pan, 'Style', 'text', 'String', 'Experiment Temp:', ...
-                'HorizontalAlignment', 'left', 'units', 'pixels', 'Position', metadata_label_position);
-            self.temperature_box = uicontrol(metadata_pan, 'Style', 'popupmenu', 'units', 'pixels', 'Value', 1, ...
-                'String', self.model.metadata_options.exp_temp, 'Position', metadata_box_position, 'Callback', @self.update_temp);
-            
-            metadata_label_position(2) = metadata_label_position(2) - 25;
-            metadata_box_position(2) = metadata_box_position(2) - 25;
-            
-            rearing_label = uicontrol(metadata_pan, 'Style', 'text', 'String', 'Rearing Protocol:', ...
-                'HorizontalAlignment', 'left', 'units', 'pixels', 'Position', metadata_label_position);
-            
-            self.rearing_protocol_box = uicontrol(metadata_pan, 'Style', 'popupmenu', 'Value', 1, 'units', 'pixels', ...
-                'String', self.model.metadata_options.rearing, 'Position', metadata_box_position, 'Callback', @self.update_rearing);
-            
-            metadata_label_position(2) = metadata_label_position(2) - 25;
-            metadata_box_position(2) = metadata_box_position(2) - 25;
-            
-            lightCycle_label = uicontrol(metadata_pan, 'Style', 'text', 'String', 'Light Cycle:', ...
-                'HorizontalAlignment', 'left', 'Units', 'pixels', 'Position', metadata_label_position);
-            
-            self.light_cycle_box = uicontrol(metadata_pan, 'Style', 'popupmenu', 'Value', 1, 'units', 'pixels', ...
-                'String', self.model.metadata_options.light_cycle, 'Position', metadata_box_position, 'Callback', @self.update_light_cycle);
-            
-            metadata_label_position(2) = metadata_label_position(2) - 25;
-            metadata_box_position(2) = metadata_box_position(2) - 25;
-            
-            
-            date_and_time_label = uicontrol(metadata_pan, 'Style', 'text', 'String', 'Date and Time:', ...
-                'HorizontalAlignment', 'left', 'units', 'pixels', 'Position', metadata_label_position);
-            self.date_and_time_box = uicontrol(metadata_pan, 'Style', 'edit', 'String', datestr(now, 'mm-dd-yyyy HH:MM:SS'), ...
-                'units', 'pixels', 'Position', metadata_box_position);
-            
-            metadata_label_position(2) = metadata_label_position(2) - 25;
-            metadata_box_position(2) = metadata_box_position(2) - 25;
-            
-            comments_label = uicontrol(metadata_pan, 'Style', 'text', 'String', 'Comments:', ...
-                'HorizontalAlignment', 'left', 'units', 'pixels', 'Position', metadata_label_position);
-            self.comments_box = uicontrol(metadata_pan, 'Style', 'edit', 'String', self.model.metadata_comments, ...
-                'units', 'pixels', 'Position', metadata_box_position, 'Callback', @self.update_comments);
-            
-            
-            
-            exp_type_label = uicontrol(settings_pan, 'Style', 'text', 'String', 'Experiment Type:', ...
-                'HorizontalAlignment', 'left', 'units', 'pixels', 'Position', [10, 150, 100, 15]);
-            self.exp_type_menu = uicontrol(settings_pan, 'Style', 'popupmenu', 'String', {'Flight','Camera walk', 'Chip walk'}, ...
-                'units', 'pixels', 'Position', [115, 150, 150, 18], 'Callback', @self.update_experiment_type);
-            test_button = uicontrol(settings_pan, 'Style', 'pushbutton', 'String', 'Run Test Protocol', ...
-                'units', 'pixels', 'Position', [210, 120, 150, 20], 'Callback', @self.run_test);
-            plotting_checkbox_label = uicontrol(settings_pan, 'Style', 'text', 'String', 'Plotting?', ...
-                'HorizontalAlignment', 'left', 'units', 'pixels', 'Position', [10, 120, 45, 15]);
-            self.plotting_checkbox = uicontrol(settings_pan, 'Style', 'checkbox', 'Value', self.model.do_plotting, ...
-                'units', 'pixels', 'Position', [60, 120, 15, 15], 'Callback', @self.update_do_plotting);
-            plotting_filename_label = uicontrol(settings_pan, 'Style', 'text', 'String', 'Plotting Protocol:', ...
-                'HorizontalAlignment', 'left', 'units', 'pixels', 'Position', [10, 95, 105, 15]);
-            self.plotting_textbox = uicontrol(settings_pan, 'Style', 'edit', 'units', 'pixels', ...
-                'String', self.model.plotting_file, 'Position', [120, 95, 160, 18], 'Callback', @self.update_plotting_file);
-            self.browse_button_plotting = uicontrol(settings_pan, 'Style', 'pushbutton', 'units', 'pixels', ...
-                'String', 'Browse', 'Position', [285, 95, 65, 18], 'Callback', @self.browse_plot_protocol);
-            
-            processing_checkbox_label = uicontrol(settings_pan, 'Style', 'text', 'String', 'Processing?', ...
-                'HorizontalAlignment', 'left', 'units', 'pixels', 'Position', [90, 120, 65, 15]);
-            self.processing_checkbox = uicontrol(settings_pan, 'Style', 'checkbox', 'Value', self.model.do_processing, ...
-                'units', 'pixels', 'Position', [160, 120, 15, 15], 'Callback', @self.update_do_processing);
-            processing_filename_label = uicontrol(settings_pan, 'Style', 'text', 'String', 'Processing Protocol:', ...
-                'HorizontalAlignment', 'left', 'units', 'pixels', 'Position', [10, 70, 105, 15]);
-            self.processing_textbox = uicontrol(settings_pan, 'Style', 'edit', 'units', 'pixels', ...
-                'String', self.model.processing_file, 'Position', [120, 70, 160, 18], 'Callback', @self.update_processing_file);
-            self.browse_button_processing = uicontrol(settings_pan, 'Style', 'pushbutton', 'units', 'pixels', ...
-                'String', 'Browse', 'Position', [285, 70, 65, 18], 'Callback', @self.browse_process_protocol);
-            
-            run_filename_label = uicontrol(settings_pan, 'Style', 'text', 'String', 'Run Protocol:', ...
-                'HorizontalAlignment', 'left', 'units', 'pixels', 'Position', [10, 45, 105, 15]);
-            self.run_textbox = uicontrol(settings_pan, 'Style', 'edit', 'units', 'pixels', ...
-                'String', self.model.run_protocol_file, 'Position', [80, 45, 200, 18]);
-            self.browse_button_run = uicontrol(settings_pan, 'Style', 'pushbutton', 'units', 'pixels', ...
-                'String', 'Browse', 'Position', [285, 45, 65, 18], 'Callback', @self.browse_run_protocol);
-            
+            % no error checking
+            self.model.set_fly_name(new_val);
             
         end
         
-        function update_run_gui(self)
-           
-            self.experimenter_box.Value = find(strcmp(self.model.metadata_options.experimenter,self.model.experimenter));
-            self.exp_name_box.String = self.doc.experiment_name;
-            self.fly_name_box.String = self.model.fly_name;
-            self.fly_genotype_box.Value = find(strcmp(self.model.metadata_options.fly_geno,self.model.fly_genotype));
-            self.date_and_time_box.String = datestr(now, 'mm-dd-yyyy HH:MM:SS');
-            self.age_box.Value = find(strcmp(self.model.metadata_options.fly_age,self.model.fly_age));
-            self.sex_box.Value = find(strcmp(self.model.metadata_options.fly_sex, self.model.fly_sex));
-            self.temperature_box.Value = find(strcmp(self.model.metadata_options.exp_temp, self.model.experiment_temp));
-            self.rearing_protocol_box.Value = find(strcmp(self.model.metadata_options.rearing, self.model.rearing_protocol));
-            self.light_cycle_box.Value = find(strcmp(self.model.metadata_options.light_cycle, self.model.light_cycle));
-            self.comments_box.String = self.model.metadata_comments;
-            self.plotting_checkbox.Value = self.model.do_plotting;
-            self.plotting_textbox.String = self.model.plotting_file;
-            self.processing_checkbox.Value = self.model.do_processing;
-            self.processing_textbox.String = self.model.processing_file;
-            self.exp_type_menu.Value = self.model.experiment_type;
-            self.run_textbox.String = self.model.run_protocol_file;
-            self.set_recent_file_menu_items();
+        function update_experimenter(self, new_val)
+            
+            % no error checking
+            self.model.set_experimenter(new_val);
             
         end
         
-        function update_fly_name(self, src, event)
+        function update_experiment_name(self, ~)
             
-            self.model.fly_name = src.String;
-            self.update_run_gui();
-            
-        end
-        
-        function update_experimenter(self, src, event)
-
-            self.model.experimenter = self.model.metadata_options.experimenter{src.Value};
-            self.update_run_gui();
-            
-        end
-        
-        function update_experiment_name(self, src, event)
-            
+            % Experiment name presently cannot be changed from conductor.
             errormsg = "The experiment has already been saved under this name. " ...
                 + "If you would like to change the experiment name, close this window " ...
                 + "and save it under the new name in the designer view.";
             self.create_error_box(errormsg);
-            self.exp_name_box.String = self.doc.experiment_name;
-            self.update_run_gui();
-        end
-        
-        function update_genotype(self, src, event)
-            self.model.fly_genotype = self.model.metadata_options.fly_geno{src.Value};
-            self.update_run_gui();
-        end
-        
-        function update_do_plotting(self, src, event)
-            self.model.do_plotting = src.Value;
-            if self.model.do_plotting == 1
-                set(self.plotting_textbox, 'enable', 'on');
-                set(self.browse_button_plotting, 'enable','on');
-            elseif self.model.do_plotting == 0
-                set(self.plotting_textbox, 'enable', 'off');
-                set(self.browse_button_plotting, 'enable','off');
-                self.model.plotting_file = '';
-            end
-            self.update_run_gui();
-        end
-        
-        function update_do_processing(self, src, event)
-            self.model.do_processing = src.Value;
-            if self.model.do_processing == 1
-                set(self.processing_textbox,'enable', 'on');
-                set(self.browse_button_processing, 'enable','on');
-            elseif self.model.do_processing == 0
-                set(self.processing_textbox, 'enable', 'off');
-                set(self.browse_button_processing, 'enable', 'off');
-                self.model.processing_file = '';
-            end
-            self.update_run_gui();
-        end
-        
-        function update_plotting_file(self, src, event)
-            self.model.plotting_file = src.String;
-            self.update_run_gui();
-        end
-        
-        function update_processing_file(self, src, event)
-            self.model.processing_file = src.String;
-            self.update_run_gui();
-        end
-        
-        function update_experiment_type(self, src, event)
-            self.model.experiment_type = src.Value;
-            self.update_run_gui();
-        end
-        function update_age(self, src, event)
-            
-            self.model.fly_age = self.model.metadata_options.fly_age{src.Value};
-            self.update_run_gui();
-        end
-        function update_sex(self, src, event)
-            self.model.fly_sex = self.model.metadata_options.fly_sex{src.Value};
-            self.update_run_gui();
-        end
-        function update_temp(self, src, event)
-            self.model.experiment_temp = self.model.metadata_options.exp_temp{src.Value};
-            self.update_run_gui();
-        end
-        
-        function update_rearing(self, src, event)
-            self.model.rearing_protocol = self.model.metadata_options.rearing{src.Value};
-            self.update_run_gui();
-        end
-        
-        function update_light_cycle(self, src, event)
-            self.model.light_cycle = self.model.metadata_options.light_cycle{src.Value};
-            self.update_run_gui();
-        end
-        
-        function update_comments(self, src, event)
-            self.model.metadata_comments = src.String;
-            self.update_run_gui();
-        end
-        
-        function update_progress(self, rep, trial, cond)
-            increment = 1/(self.doc.repetitions * length(self.doc.block_trials(:,1)));
+            %Do not update the model.
 
-            distance = ((rep - 1)*length(self.doc.block_trials(:,1)) + trial)*increment;
-            self.progress_axes.Title.String = "Rep " + rep + " of " + self.doc.repetitions +...
-                ", Trial " + trial + " of " + length(self.doc.block_trials(:,1)) + ". Condition number: " + cond;
-            self.progress_bar.YData = distance;
+        end
+        
+        function update_genotype(self, new_val)
             
-            drawnow;
+            % no error checking
+            self.model.set_fly_genotype(new_val);
+
+        end
+        
+        function update_do_plotting(self, new_val)
+            
+            % no error checking
+            self.model.set_do_plotting(new_val);
+            self.engage_plotting_textbox();
+
+        end
+        
+        function update_do_processing(self, new_val)
+            
+            self.model.set_do_processing(new_val);
+            self.engage_processing_textbox();
+
+        end
+
+        function update_plotting_file(self, filepath)
+            
+            %check to make sure file exists
+            if isfile(filepath)
+                self.model.set_plotting_file(filepath)
+            else
+                errormsg = "This plotting file does not exist. Please check the path.";
+                self.create_error_box(errormsg);
+            end
+            
+        end
+        
+        function update_processing_file(self, filepath)
+            
+            %check to make sure file exists
+            if isfile(filepath)
+                self.model.set_processing_file(filepath);
+            else
+                errormsg = "This processing file does not exist. Please check the path.";
+                self.create_error_box(errormsg);
+            end
+
+        end
+        
+        function update_experiment_type(self, new_val)
+            
+            %Make sure the number falls within range
+            %%%%%%%%%%TODO right now the types are hardcoded into the view
+            %%%%%%%%%%- switch this to the model!
+            self.model.set_experiment_type(new_val);
+
+        end
+        
+        function update_age(self, new_val)
+            
+            %make sure number falls within range
+            if new_val > length(self.model.metadata_options.fly_age) || new_val < 1
+                errormsg = "There are only " + length(self.model.metadata_options.fly_age) + ...
+                    " items in the list of possible fly ages. Please make sure your entry is between " + ...
+                    "one and this number.";
+                self.create_error_box(errormsg);
+            else
+                self.model.set_fly_age(new_val);
+            end
+            
+        end
+        
+        function update_sex(self, new_val)
+            if new_val > length(self.model.metadata_options.fly_sex) || new_val < 1
+                errormsg = "There are only " + length(self.model.metadata_options.fly_sex) + ...
+                    " items in the list of possible fly sexes. Please make sure your entry is between " + ...
+                    "one and this number.";
+                self.create_error_box(errormsg);
+            else
+                self.model.set_fly_sex(new_val);
+            end
+        end
+        function update_temp(self, new_val)
+            
+            if new_val > length(self.model.metadata_options.exp_temp) || new_val < 1
+                errormsg = "There are only " + length(self.model.metadata_options.exp_temp) + ...
+                    " items in the list of possible experiment temperatures. Please make sure your entry is between " + ...
+                    "one and this number.";
+                self.create_error_box(errormsg);
+            else
+                self.model.set_temp(new_val);
+            end
+
+        end
+        
+        function update_rearing(self, new_val)
+            
+            if new_val > length(self.model.metadata_options.rearing) || new_val < 1
+                errormsg = "There are only " + length(self.model.metadata_options.rearing) + ...
+                    " items in the list of possible rearing protocols. Please make sure your entry is between " + ...
+                    "one and this number.";
+                self.create_error_box(errormsg);
+            else
+                self.model.set_rearing(new_val);
+            end
+        end
+        
+        function update_light_cycle(self, new_val)
+            
+            if new_val > length(self.model.metadata_options.light_cycle) || new_val < 1
+                errormsg = "There are only " + length(self.model.metadata_options.light_cycle) + ...
+                    " items in the list of possible light cycles. Please make sure your entry is between " + ...
+                    "one and this number.";
+                self.create_error_box(errormsg);
+            else
+                self.model.set_light_cycle(new_val);
+            end
+
+        end
+        
+        function update_comments(self, new_val)
+            
+            %no error checking
+            self.model.set_metadata_comments(new_val)
+
+        end
+        
+        function update_elapsed_time(self, new_val)
+            
+            self.elapsed_time = new_val;
+            self.remaining_time = self.model.expected_time - new_val;
+            self.update_view_if_exists();
+            
+        end
+        
+        
+        
+        function update_progress(self, trial_type, varargin)
+            
+            trials = length(self.doc.block_trials(:,1)) * self.doc.repetitions;
+            if ~isempty(self.doc.intertrial{1})
+                trials = trials*2 - 1;
+            end
+            if ~isempty(self.doc.pretrial{1})
+                trials = trials + 1;
+            end
+            if ~isempty(self.doc.posttrial{1})
+                trials = trials + 1;
+            end
+
+            
+            if strcmp(trial_type, 'pre')
+
+                data = 1/trials;
+                if ~isempty(self.view)
+                    self.view.update_progress_bar(trial_type, data);
+                end
+                
+            elseif strcmp(trial_type, 'block')
+                rep = varargin{1};
+                reps = varargin{2};
+                block_trial = varargin{3};
+                num_cond = varargin{4};
+                cond = varargin{5};
+                total_trial = varargin{6};
+                
+                data = total_trial/trials;
+                if ~isempty(self.view)
+                    self.view.update_progress_bar(trial_type, data, rep, reps, ...
+                        block_trial, num_cond, cond)
+                end
+                
+                
+            elseif strcmp(trial_type, 'inter')
+
+                rep = varargin{1};
+                reps = varargin{2};
+                block_trial = varargin{3};
+                num_cond = varargin{4};
+                total_trial = varargin{5};
+                data = total_trial/trials;
+                if ~isempty(self.view)
+                    self.view.update_progress_bar(trial_type, data, rep, reps, block_trial, num_cond);
+                end
+            elseif strcmp(trial_type, 'post')
+                
+                total_trial = varargin{1};
+                data = total_trial/trials;
+                if ~isempty(self.view)
+                    self.view.update_progress_bar(trial_type, data);
+                end
+            else
+                disp("I couldn't update the progress bar");
+                return
+            end
+         
+            
+        end
+        
+        function update_current_trial_parameters(self, mode, pat, pos, active_channels, ...
+                ao_inds, frInd, frRate, gain, offset, dur)
+           
+            for i = 1:length(active_channels) %This figures out which ao channel to put the ao function index under.
+                if active_channels(i) == 0
+                    self.current_ao1 = num2str(ao_inds(i));
+                elseif active_channels(i) == 1
+                    self.current_ao2 = num2str(ao_inds(i));
+                elseif active_channels(i) == 2
+                    self.current_ao3 = num2str(ao_inds(i));
+                else
+                    self.current_ao4 = num2str(ao_inds(i));
+                end
+            end
+             
+            self.current_mode = num2str(mode);
+            self.current_pat = num2str(pat);
+            self.current_pos = num2str(pos);
+            self.current_frInd = num2str(frInd);
+            self.current_frRate = num2str(frRate);
+            self.current_gain = num2str(gain);
+            self.current_offset = num2str(offset);
+            self.current_duration = num2str(dur);
+            
+            self.update_view_if_exists();
             
         end
         
         function open_settings(self, ~, ~)
         
             self.settings_con.layout_view();
-%             self.model = [];
-%             self.model = G4_conductor_model();
         
         end
         
+        function engage_plotting_textbox(self)
+            if self.model.do_plotting == 1
+                if ~isempty(self.view)
+                    set(self.view.plotting_textbox, 'enable', 'on');
+                    set(self.view.browse_button_plotting, 'enable','on');
+                end
+            elseif self.model.do_plotting == 0
+                if ~isempty(self.view)
+                    set(self.view.plotting_textbox, 'enable', 'off');
+                    set(self.view.browse_button_plotting, 'enable','off');
+                end
+
+            end
+        end
         
-        function create_error_box(self, varargin)
+        function engage_processing_textbox(self)
+            if self.model.do_processing == 1
+                if ~isempty(self.view)
+                    set(self.view.processing_textbox,'enable', 'on');
+                    set(self.view.browse_button_processing, 'enable','on');
+                end
+            elseif self.model.do_processing == 0
+                if ~isempty(self.view)
+                    set(self.view.processing_textbox, 'enable', 'off');
+                    set(self.view.browse_button_processing, 'enable', 'off');
+                end
+
+            end
+        end
+        
+        function create_error_box(~, varargin)
   
             if isempty(varargin)
                 return;
@@ -616,43 +421,24 @@ classdef G4_conductor_controller < handle
    
         end
         
-        function test_progress_bar(self, src, event)
-        
-            reps = self.doc.repetitions;
-            trials = length(self.doc.block_trials(:,1));
-            for i = 1:reps
-                for j = 1:trials
-                    
-                    self.update_progress(i,j);
-                    pause(1);
-                end
-            end
-        
-        
-        end
-        
-     
-        function open_g4p_file(self, src, event, filepath)
+        function open_g4p_file(self, varargin)
             
-            if strcmp(filepath,'')
-           
+            if ~isempty(varargin)
+                filepath = varargin{1};
+                [top_folder_path, filename] = fileparts(filepath);
+            else
                 [filename, top_folder_path] = uigetfile('*.g4p');
                 filepath = fullfile(top_folder_path, filename);
-                
-            else
-                
-                [top_folder_path, filename] = fileparts(filepath);
             end
        
             if isequal (top_folder_path,0)
             
-            %They hit cancel, do nothing
-            return;
+                %They hit cancel, do nothing
+                return;
             else
                 
                 self.doc.import_folder(top_folder_path);
                 [exp_path, exp_name, ext] = fileparts(filepath);
-              % [exp_path, exp_name] = fileparts(self.doc.top_folder_path_);
                 self.doc.experiment_name = exp_name;
                 self.doc.save_filename = top_folder_path;
                 self.doc.top_export_path = top_folder_path;
@@ -710,7 +496,8 @@ classdef G4_conductor_controller < handle
                 self.doc.set_recent_files(filepath);
                 self.doc.update_recent_files_file();
                 self.model.fly_name = self.model.create_fly_name(top_folder_path);
-                self.update_run_gui();
+
+                self.update_view_if_exists();
                 
                 
             end
@@ -718,7 +505,7 @@ classdef G4_conductor_controller < handle
             
         end
         
-        function open_google_sheet(self, src, event)
+        function open_google_sheet(self)
         
             base_url = 'https://docs.google.com/spreadsheets/d/';
             full_link = [base_url,self.model.google_sheet_key];
@@ -731,17 +518,13 @@ classdef G4_conductor_controller < handle
             aborted = self.is_aborted;
         end
         
-        function abort_experiment(self, src, event)
+        function abort_experiment(self)
         
             self.is_aborted = 1;
 
-        
         end
-        
-        
-        
 
-        function run(self, src, event)
+        function run(self)
             
             self.is_aborted = false; %change aborted back to zero in case the experiment was aborted earlier. 
             
@@ -780,7 +563,7 @@ classdef G4_conductor_controller < handle
                 for i = 1:length(items)
                     folders(i) = items(i).isdir;
                 end
-                folders(find(~folders)) = [];
+                folders(~folders) = [];
                 
                 if length(itemnames) > length(folders)
                     
@@ -1046,33 +829,24 @@ classdef G4_conductor_controller < handle
                 return;
             end
             
-            
-            %For some reason, if I gave the stop display and log commands
-            %in the G4_default_run_protocol script, they were not received. But if I
-            %place them here instead, they work. Something to look into in
-            %the future.
-%             Panel_com('stop_display');
-%             pause(10);
-% 
-%             Panel_com('stop_log');
-%             pause(10);
-% 
-%             disconnectHost;
-%             pause(10);
-            
             if success == 0
                 return;
             end
+            
             %Move the log files to the results file under the fly name
             movefile([experiment_folder '\Log Files\*'],fullfile(experiment_folder,'Results',self.model.fly_name));
             self.create_metadata_file();
                         
             if self.model.do_processing == 1 || self.model.do_plotting == 1
-                self.progress_axes.Title.String = "Experiment Completed. Running post-processing.";
-                drawnow;
+                if ~isempty(self.view)
+                    self.view.set_progress_title("Experiment Completed. Running post-processing.");
+                    drawnow;
+                end
             else
-                self.progress_axes.Title.String = "Skipping post-processing.";
-                drawnow;
+                if ~isempty(self.view)
+                    self.view.set_progress_title("Skipping post-processing.");
+                    drawnow;
+                end
             end
             
             %Run required post processing script that converts the TDMS
@@ -1141,7 +915,11 @@ classdef G4_conductor_controller < handle
                 end
                 metadata.fly_name = self.model.fly_name;
                 metadata.genotype = self.model.fly_genotype;
-                metadata.timestamp = self.date_and_time_box.String;
+                if ~isempty(self.view)
+                    metadata.timestamp = self.view.date_and_time_box.String;
+                else
+                    metadata.timestamp = datestr(now, 'mm-dd-yyyy HH:MM:SS');
+                end
                 metadata.fly_age = self.model.fly_age;
                 metadata.fly_sex = self.model.fly_sex;
                 metadata.experiment_temp = self.model.experiment_temp;
@@ -1192,23 +970,20 @@ classdef G4_conductor_controller < handle
                 
                 
             end
-            
-            self.progress_axes.Title.String = "Finished.";
-            drawnow;
+            if ~isempty(self.view)
+                self.view.set_progress_title('Finished.');
+                drawnow;
+            end
 
         end
-        
-       
-        
-        
-        function run_test(self, src, event)
+
+        function run_test(self)
             
             self.model.num_tests_conducted = self.model.num_tests_conducted + 1;
             [real_exp_path, real_experiment_name, real_ext] =  fileparts(self.doc.save_filename);
             real_file = [real_experiment_name, real_ext];
             real_fly_name = self.model.fly_name;
-%             test_con = G4_conductor_controller();
-%             set(test_con, 'Visible', 'off');
+
             %Get filepath to the test protocol
             if self.model.experiment_type == 1
                 %Get the flight filepath from settings
@@ -1224,11 +999,12 @@ classdef G4_conductor_controller < handle
             [settings_data, line_path, index] = self.model.get_setting(line_to_match);
             path_to_experiment = strtrim(settings_data{line_path}(index:end));
 
-            self.open_g4p_file(src, event, path_to_experiment);
+            self.open_g4p_file(path_to_experiment);
             self.model.fly_name = ['trial',num2str(self.model.num_tests_conducted)];
-            self.update_run_gui();
-            self.run(src, event);
-            
+            if ~isempty(self.view)
+                self.update_view_if_exists();
+            end
+            self.run();
 
             [test_exp_path, ~, ~] = fileparts(self.doc.save_filename);
             if exist(fullfile(test_exp_path,'Results'))
@@ -1244,53 +1020,42 @@ classdef G4_conductor_controller < handle
                 rmdir(fullfile(test_exp_path,'Log Files'), 's');
             end
             original_exp_path = fullfile(real_exp_path, real_file);
-            self.open_g4p_file(src, event, original_exp_path);
+            self.open_g4p_file(original_exp_path);
             self.model.fly_name = real_fly_name;
-            self.update_run_gui();
+            self.update_view_if_exists();
 
-            
-            
-   
         end
         
-        function browse_run_protocol(self, src, event)
-        
+        function browse_file(self, which_file)
+           
             [file, path] = uigetfile('*.m');
-            self.model.run_protocol_file = fullfile(path,file);
-            self.update_run_gui();
-        
-        end
-        
-        function browse_plot_protocol(self, src, event)
-            
-            [file, path] = uigetfile('*.m');
-            self.model.plotting_file = fullfile(path,file);
-            self.update_run_gui();
-        end
-        
-        function browse_process_protocol(self, src, event)
-            
-            [file,path] = uigetfile('*.m');
-            self.model.processing_file = fullfile(path,file);
-            self.update_run_gui();
-        end
-        
-  
-        
-        function set_recent_file_menu_items(self)
-             for i = 1:length(self.doc.recent_g4p_files)
-                 [path,filename] = fileparts(self.doc.recent_g4p_files{i});
-                 if i > length(self.recent_file_menu_items)
-                     self.recent_file_menu_items{end + 1} = uimenu(self.menu_open, 'Text', filename, 'MenuSelectedFcn', {@self.open_g4p_file, self.doc.recent_g4p_files{i}});
-                 else
-                
-                    set(self.recent_file_menu_items{i},'Text',filename);
-                    set(self.recent_file_menu_items{i}, 'MenuSelectedFcn', {@self.open_g4p_file, self.doc.recent_g4p_files{i}});
-                 end
+            filepath = fullfile(path,file);
+            if ~isfile(filepath)
+                errormsg = "The file you entered does not exist.";
+                self.create_error_box(errormsg);
+                return;
+            end
+            if strcmp(which_file, 'run')
+                self.model.set_run_file(filepath);
+            elseif strcmp(which_file, 'plot')
+                self.model.set_plot_file(filepath);
+            elseif strcmp(which_file, 'proc')
+                self.model.set_proc_file(filepath);
+            else
+                errormsg = 'You must tell me which file this is. Please enter run, plot, or proc.';
+                self.create_error_box(errormsg);
+            end
 
-             end
         end
-         
+        
+        function update_view_if_exists(self)
+
+            if ~isempty(self.view)
+                self.view.update_run_gui();
+            end
+
+        end
+
         function create_metadata_file(self)
         
             metadata_names = {"experimenter", "experiment_name", "timestamp", "fly_name", "fly_genotype", "fly_age", "fly_sex", "experiment_temp", ...
@@ -1300,8 +1065,7 @@ classdef G4_conductor_controller < handle
                 self.model.fly_age, self.model.fly_sex, self.model.experiment_temp, ...
                 self.model.experiment_type, self.model.rearing_protocol, self.model.light_cycle, self.model.do_plotting, self.model.do_processing, ...
                 self.model.plotting_file, self.model.processing_file, self.model.run_protocol_file, self.model.metadata_comments};
-            
-        
+
         
             metadata = struct;
             
@@ -1324,77 +1088,9 @@ classdef G4_conductor_controller < handle
             self.model_ = value;
         end
         
-        function set.fig(self, value)
-            self.fig_ = value;
-        end
-        
-%         function set.fly_name(self, value)
-%             self.model.fly_name_ = value;
-%         end
-        
-        function set.progress_axes(self, value)
-            self.progress_axes_ = value;
-        end
-        
-        function set.progress_bar(self, value)
-            self.progress_bar_ = value;
-        end
-        
         function set.doc(self, value)
             self.doc_ = value;
-        end
-        
-        function set.experimenter_box(self, value)
-            self.experimenter_box_ = value;
-        end
-        
-        function set.exp_name_box(self, value)
-            self.exp_name_box_ = value;
-        end
-        
-        function set.fly_name_box(self, value)
-            self.fly_name_box_ = value;
-        end
-        
-        function set.fly_genotype_box(self, value)
-            self.fly_genotype_box_ = value;
-        end
-        
-        function set.date_and_time_box(self, value)
-            self.date_and_time_box_ = value;
-        end
-        
-        function set.exp_type_menu(self, value)
-            self.exp_type_menu_ = value;
-        end
-        
-        function set.plotting_checkbox(self, value)
-            self.plotting_checkbox_ = value;
-        end
-        
-        function set.plotting_textbox(self, value)
-            self.plotting_textbox_ = value;
-        end
-        
-        function set.processing_checkbox(self, value)
-            self.processing_checkbox_ = value;
-        end
-        
-        function set.processing_textbox(self, value)
-            self.processing_textbox_ = value;
-        end
-        
-        function set.axes_label(self, value)
-            self.axes_label_ = value;
-        end
-        
-        function set.run_textbox(self, value)
-            self.run_textbox_ = value;
-        end
-        
-        function set.current_running_trial(self, value)
-            self.current_running_trial_ = value;
-        end
+        end       
         
         function set.current_mode(self, value)
             self.current_mode_ = value;
@@ -1444,48 +1140,10 @@ classdef G4_conductor_controller < handle
             self.current_duration_ = value;
         end
         
-        function set.browse_button_plotting(self, value)
-            self.browse_button_plotting_ = value;
-        end
-        
-        function set.browse_button_processing(self, value)
-            self.browse_button_processing_ = value;
-        end
-        
-        function set.browse_button_run(self, value)
-            self.browse_button_run_ = value;
-        end
-        
-        function set.expected_time(self, value)
-            self.expected_time_ = value;
-        end
-        
         function set.is_aborted(self, value)
             self.is_aborted_ = value;
         end
         
-        function set.recent_file_menu_items(self, value)
-             self.recent_file_menu_items_ = value;
-        end
-         
-        function set.menu_open(self, value)
-             self.menu_open_ = value;
-        end
-         
-        function set.sex_box(self, value)
-            self.sex_box_ = value;
-        end
-        function set.temperature_box(self, value)
-            self.temperature_box_ = value;
-        end
-        
-        function set.age_box(self, value)
-            self.age_box_ = value;
-        end
-        
-        function set.rearing_protocol_box(self, value)
-            self.rearing_protocol_box_ = value;
-        end
         function set.elapsed_time(self, value)
             self.elapsed_time_ = value;
         end
@@ -1493,17 +1151,13 @@ classdef G4_conductor_controller < handle
         function set.remaining_time(self, value)
             self.remaining_time_ = value;
         end
-        
-        function set.comments_box(self, value)
-            self.comments_box_ = value;
-        end
-        
-        function set.light_cycle_box(self, value)
-            self.light_cycle_box_ = value;
-        end
-        
+
         function set.settings_con(self, value)
             self.settings_con_ = value;
+        end
+        
+        function set.view(self, value)
+            self.view_ = value;
         end
 
 
@@ -1512,77 +1166,9 @@ classdef G4_conductor_controller < handle
         function value = get.model(self)
            value = self.model_;
         end
-        
-        function value = get.fig(self)
-            value = self.fig_;
-        end
-        
-%         function value = get.fly_name(self)
-%             value = self.model.fly_name_;
-%         end
-        
-        function value = get.progress_axes(self)
-            value = self.progress_axes_;
-        end
-        
-        function value = get.progress_bar(self)
-            value = self.progress_bar_;
-        end
-        
+
         function value = get.doc(self)
             value = self.doc_;
-        end
-        
-        function value = get.experimenter_box(self)
-            value = self.experimenter_box_;
-        end
-        
-        function value = get.exp_name_box(self)
-            value = self.exp_name_box_;
-        end
-        
-        function value = get.fly_name_box(self)
-            value = self.fly_name_box_;
-        end
-        
-        function value = get.fly_genotype_box(self)
-            value = self.fly_genotype_box_;
-        end
-        
-        function value = get.date_and_time_box(self)
-            value = self.date_and_time_box_;
-        end
-        
-        function value = get.exp_type_menu(self)
-            value = self.exp_type_menu_;
-        end
-        
-        function value = get.plotting_checkbox(self)
-            value = self.plotting_checkbox_;
-        end
-        
-        function value = get.plotting_textbox(self)
-            value = self.plotting_textbox_;
-        end
-        
-        function value = get.processing_checkbox(self)
-            value = self.processing_checkbox_;
-        end
-        
-        function value = get.processing_textbox(self)
-            value = self.processing_textbox_;
-        end
-        
-        function value = get.axes_label(self)
-            value = self.axes_label_;
-        end
-        
-        function value = get.run_textbox(self)
-            value = self.run_textbox_;
-        end
-        
-        function value = get.current_running_trial(self)
-            value = self.current_running_trial_;
         end
         
         function value = get.current_mode(self)
@@ -1632,46 +1218,11 @@ classdef G4_conductor_controller < handle
         function value = get.current_duration(self)
             value = self.current_duration_;
         end
-        
-        function value = get.browse_button_plotting(self)
-            value = self.browse_button_plotting_;
-        end
-        
-        function value = get.browse_button_processing(self)
-            value = self.browse_button_processing_;
-        end
-        
-        function value = get.browse_button_run(self)
-            value = self.browse_button_run_;
-        end
-        
-        function value = get.expected_time(self)
-            value = self.expected_time_;
-        end
-        
+
         function value = get.is_aborted(self)
             value = self.is_aborted_;
         end
         
-        function value = get.recent_file_menu_items(self)
-             value = self.recent_file_menu_items_;
-        end
-         
-        function output = get.menu_open(self)
-             output = self.menu_open_;
-        end
-        function output = get.sex_box(self)
-            output = self.sex_box_;
-        end
-        function output = get.temperature_box(self)
-            output = self.temperature_box_;
-        end
-        function output = get.age_box(self)
-            output = self.age_box_;
-        end
-        function output = get.rearing_protocol_box(self)
-            output = self.rearing_protocol_box_;
-        end
         function output = get.elapsed_time(self)
             output = self.elapsed_time_;
         end
@@ -1679,14 +1230,12 @@ classdef G4_conductor_controller < handle
         function output = get.remaining_time(self)
             output = self.remaining_time_;
         end
-        function output = get.comments_box(self)
-            output = self.comments_box_;
-        end
-        function output = get.light_cycle_box(self)
-            output = self.light_cycle_box_;
-        end
+
         function output = get.settings_con(self)
             output = self.settings_con_;
+        end
+        function output = get.view(self)
+            output = self.view_;
         end
 
    

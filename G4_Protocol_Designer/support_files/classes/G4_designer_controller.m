@@ -1880,6 +1880,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
         function open_run_gui(self, ~, ~)
             
             self.run_con = G4_conductor_controller(self.doc, self.settings_con);
+            self.run_con.layout();
             
         end
         

@@ -22,6 +22,7 @@ classdef G4_conductor_model < handle
         metadata_array_
         metadata_options_
        num_tests_conducted_
+       expected_time_
         
     end
     
@@ -47,6 +48,7 @@ classdef G4_conductor_model < handle
         metadata_array
         metadata_options
         num_tests_conducted
+        expected_time
     end
     
     
@@ -103,10 +105,7 @@ classdef G4_conductor_model < handle
             self.do_plotting = 1;
             self.do_processing = 1;
             self.num_tests_conducted = 0;
-           
-            
-            
-            
+ 
         end
         
         %%methods
@@ -170,9 +169,73 @@ classdef G4_conductor_model < handle
                         num_folders = num_folders + 1;
                     end
                 end
-            end
-
-            
+            end  
+        end
+        
+        %% Functions to update model values
+        
+        function set_fly_name(self, new_val)
+            self.fly_name = new_val;
+        end
+        
+        function set_experimenter(self, new_val)
+            self.experimenter = self.metadata_options.experimenter{new_val};
+        end
+        
+        function set_fly_genotype(self, new_val)
+            self.fly_genotype = self.metadata_options.fly_geno{new_val};
+        end
+        
+        function set_do_plotting(self, new_val)
+            self.do_plotting = new_val;
+        end
+        
+        function set_do_processing(self, new_val)
+            self.do_processing = new_val;
+        end
+        
+        function set_plot_file(self, filepath)
+            self.plotting_file = filepath;
+        end
+        
+        function set_proc_file(self, filepath)
+            self.processing_file = filepath;
+        end
+        
+        function set_run_file(self, filepath)
+            self.run_protocol_file = filepath;
+        end
+        
+        function set_experiment_type(self, new_val)
+            self.experiment_type = new_val;
+        end
+        
+        function set_fly_age(self, new_val)
+            self.fly_age = self.metadata_options.fly_age{new_val};
+        end
+        
+        function set_fly_sex(self, new_val)
+            self.fly_sex = self.metadata_options.fly_sex{new_val};
+        end
+        
+        function set_temp(self, new_val)
+            self.experiment_temp = self.metadata_options.exp_temp{new_val};
+        end
+        
+        function set_rearing(self, new_val)
+            self.rearing_protocol = self.metadata_options.rearing{new_val};
+        end
+        
+        function set_light_cycle(self, new_val)
+            self.light_cycle = self.metadata_options.light_cycle{new_val};
+        end
+        
+        function set_metadata_comments(self, new_val)
+            self.metadata_comments = new_val;
+        end
+        
+        function set_expected_time(self, new_val)
+            self.expected_time = new_val;
         end
         
         
@@ -258,6 +321,10 @@ classdef G4_conductor_model < handle
         function output = get.light_cycle(self)
             output = self.light_cycle_;
         end
+        
+        function value = get.expected_time(self)
+            value = self.expected_time_;
+        end
             
 
 
@@ -339,6 +406,12 @@ classdef G4_conductor_model < handle
         function set.light_cycle(self, value)
             self.light_cycle_ = value;
         end
+        
+        function set.expected_time(self, value)
+            self.expected_time_ = value;
+        end
+        
+        
         
        
     end

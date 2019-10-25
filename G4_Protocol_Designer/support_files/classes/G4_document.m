@@ -1995,6 +1995,17 @@ classdef G4_document < handle
         
         end
         
+        function [total_dur] = calc_exp_length(self)
+            
+            total_dur = self.pretrial{12} + self.posttrial{12};
+            for i = 1:length(self.block_trials(:,1))
+                total_dur = total_dur + (self.block_trials{i,12} + self.intertrial{12})*self.repetitions;
+            end
+            total_dur = total_dur - self.intertrial{12};
+
+            
+        end
+        
        
         
 %GET THE INDEX OF A GIVEN PATTERN, POS, OR AO NAME-------------------------
