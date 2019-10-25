@@ -1756,6 +1756,8 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                     clear self.model;
                     delete(self.doc);
                     self.doc = G4_document();
+                    self.settings_con = G4_settings_controller();
+                    self.preview_con = G4_preview_controller(self.doc);
                     self.update_gui();
                     
                     

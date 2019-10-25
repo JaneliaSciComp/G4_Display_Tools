@@ -10,6 +10,7 @@ classdef G4_preview_view < handle
         ao_lines_
         dummy_line_
         fr_increment_box_
+        frame_rate_box_
         
     end
     
@@ -23,6 +24,7 @@ classdef G4_preview_view < handle
         ao_lines
         dummy_line
         fr_increment_box
+        frame_rate_box
         
     end
     
@@ -160,12 +162,20 @@ classdef G4_preview_view < handle
            realtime = uicontrol(currentFig, 'Style', 'checkbox', 'String', 'Real-time speed', 'Value', ...
                self.con.model.is_realtime, 'FontSize', 14, 'Position', [ ((pat_pos(1) + pat_pos(3))/2 +215), 75, 200, 25],...
                'Callback', @self.change_realtime); 
-           generate_video = uicontrol(currentFig, 'Style', 'pushbutton', 'String', 'Generate Video', 'FontSize', ...
-               14, 'units', 'pixels', 'Position', [ ao_positions{1}(1) + .5*ao_positions{1}(3) - 75, realtime.Position(2), 150, realtime.Position(4)], ...
-               'Callback', @self.video);
-           pattern_only_box = uicontrol(currentFig, 'Style', 'checkbox', 'String', 'Pattern Only Video', 'FontSize', ...
-               14, 'units', 'pixels', 'Value', self.con.pattern_only, 'Position', [generate_video.Position(1), generate_video.Position(2) + generate_video.Position(4) + 5, ...
-               250, 25], 'Callback', @self.change_pat_only);
+           video_panel = uipanel(currentFig, 'Title', 'Video Generation', 'FontSize', 12, 'units', 'pixels', 'Position', ...
+               [ao_positions{1}(1), 5, ao_positions{1}(3), 105]);
+           generate_video = uicontrol(video_panel, 'Style', 'pushbutton', 'String', 'Generate Video', 'FontSize', ...
+               14, 'units', 'normalized', 'Position', [.05, .05, .9, .25], 'Callback', @self.video);
+           frame_rate_label = uicontrol(video_panel, 'Style', 'text', 'String', 'Video Frame Rate: ', ...
+               'FontSize', 14, 'units', 'normalized', 'HorizontalAlignment', 'left', 'Position', [.05, .4, .5, .25]);
+           self.frame_rate_box = uicontrol(video_panel, 'Style', 'edit', 'String', num2str(self.con.model.slow_frRate), ...
+               'units', 'normalized', 'Position', [.6, .4, .3, .25], 'Callback', @self.change_slow_frRate);
+           pattern_only_box = uicontrol(video_panel, 'Style', 'checkbox', 'String', 'Pattern Only Video', 'FontSize', ...
+               14, 'units', 'normalized', 'Value', self.con.pattern_only, 'Position', [.05, .7, .9, .25],'Callback', @self.change_pat_only);
+           note = uicontrol(currentFig, 'Style', 'text', 'String', "Please note: Video frame rates above 20 will make the on screen preview choppy or slow, " + ...
+               "but video frame rates up to 60 will produce accurate, high-quality videos.", 'FontSize', 12, 'Position', ...
+               [video_panel.Position(1) + video_panel.Position(3) + 10, video_panel.Position(2), ...
+               250, 100]);
            self.fr_increment_box = uicontrol(currentFig, 'Style', 'edit', 'String', num2str(self.con.model.fr_increment),...
                'units', 'pixels', 'Position', [stopButton.Position(1), stopButton.Position(2) - 35, 50, 25], 'Callback', @self.change_fr_increment);
            fr_increment_label = uicontrol(currentFig, 'Style', 'text', 'String', 'Frame Increment', ...
@@ -199,6 +209,14 @@ classdef G4_preview_view < handle
             
         end
         
+        function update_variables(self)
+           
+            self.fr_increment_box.String = num2str(self.con.model.fr_increment);
+            self.frame_rate_box.String = num2str(self.con.model.slow_frRate);
+
+            
+        end
+        
         function set_fr_increment(self)
         
             self.fr_increment_box.String = num2str(self.con.model.fr_increment);
@@ -210,10 +228,12 @@ classdef G4_preview_view < handle
         function change_pat_only(self, ~, ~)
             self.con.update_pattern_only();
         end
+        
         function change_fr_increment(self, src, ~)
             self.con.update_fr_increment(str2double(src.String));
-        
+            self.update_variables();
         end
+        
         function play(self, ~, ~)
 
             if self.con.model.mode == 1
@@ -255,6 +275,15 @@ classdef G4_preview_view < handle
         
         function video(self, ~, ~)
             self.con.generate_video();
+        end
+        
+        function change_slow_frRate(self, src, ~)
+            new_val = str2double(src.String);
+            self.con.update_slow_frRate(new_val);
+            if self.con.model.is_realtime == 1
+                self.con.calculate_fr_increment();
+            end
+            self.update_variables(); 
         end
         
         %% General functions
@@ -411,6 +440,10 @@ classdef G4_preview_view < handle
             self.dummy_line_ = value;
         end
         
+        function set.frame_rate_box(self, value)
+            self.frame_rate_box_ = value;
+        end
+        
         %% Getters
         
         function value = get.con(self)
@@ -439,6 +472,10 @@ classdef G4_preview_view < handle
 
         function value = get.dummy_line(self)
             value = self.dummy_line_;
+        end
+        
+        function value = get.frame_rate_box(self)
+            value = self.frame_rate_box_;
         end
         
         

@@ -51,7 +51,7 @@ classdef G4_preview_model < handle
             self.preview_index = 1;
             self.is_paused = false;
             self.is_realtime = false;
-            self.slow_frRate = 20;
+            self.slow_frRate = 30;
             self.mode = [];
             self.fr_increment = 1;
             self.ao_increment = 1;
@@ -59,6 +59,7 @@ classdef G4_preview_model < handle
         end
         
         function update_trial_data(self, data)
+            
             self.data = data;
             self.mode = data{1};
             pat = data{2};
@@ -94,6 +95,10 @@ classdef G4_preview_model < handle
            
             self.dur = self.data{12};
             
+        end
+        
+        function set_slow_frRate(self, new_value)
+            self.slow_frRate = new_value;
         end
         
         function [adjusted_data] = normalize_matrix(self)

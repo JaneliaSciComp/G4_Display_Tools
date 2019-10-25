@@ -44,7 +44,7 @@ classdef G4_preview_controller < handle
                 self.model.fr_increment = new_value;
                 self.model.ao_increment = self.model.fr_increment;
             end
-            self.view.set_fr_increment();        
+            self.view.update_variables();        
         end
         
         function update_pattern_only(self)
@@ -56,8 +56,19 @@ classdef G4_preview_controller < handle
             end
         
         end
+        
+        function update_slow_frRate(self, new_value)
+           
+            if new_value > 60 || new_value < 1
+                self.create_error_box("Please choose a frame rate between 1 and 60");
+                return;
+            else
+                self.model.set_slow_frRate(new_value);
+            end
+            
+        end
 
-        function create_error_box(varargin)
+        function create_error_box(self, varargin)
             if isempty(varargin)
                 return;
             else
@@ -84,7 +95,7 @@ classdef G4_preview_controller < handle
                 currentFig = self.view.fig;
             end
             
-            screen_fr_rate = 20;
+            screen_fr_rate = self.model.slow_frRate;
             ao_to_fr_ratio = 1000/self.model.rt_frRate;
             self.model.is_paused = false;
             time = self.model.dur*1000;
@@ -147,8 +158,7 @@ classdef G4_preview_controller < handle
                     if self.model.preview_index > length(self.model.pos_data) || self.model.preview_index == 0
                         self.model.preview_index = 1;
                     end
-                    
-                    self.model.preview_index
+
                     frame = self.model.pos_data(self.model.preview_index);
                     set(self.view.im,'cdata',self.model.pattern_data(:,:,frame));
 
@@ -206,7 +216,7 @@ classdef G4_preview_controller < handle
                 currentFig = self.view.fig;
             end
             
-            screen_fr_rate = 20;
+            screen_fr_rate = self.model.slow_frRate;
             ao_to_fr_ratio = 1000/self.model.rt_frRate;
             self.model.is_paused = false;
             time = self.model.dur*1000;
@@ -310,7 +320,7 @@ classdef G4_preview_controller < handle
                 currentFig = self.view.fig;
             end
             
-            screen_fr_rate = 20;
+            screen_fr_rate = self.model.slow_frRate;
             ao_to_fr_ratio = 1000/self.model.rt_frRate;
             self.model.is_paused = false;
             time = self.model.dur*1000;
@@ -573,10 +583,7 @@ classdef G4_preview_controller < handle
 
                 
         end
-         
 
-
-        
         function pause(self)
         
             self.model.is_paused = true;
@@ -586,16 +593,16 @@ classdef G4_preview_controller < handle
             end
         
         end
-        
-        
-        
+
         function stop(self)
 
             self.model.is_paused = true;
             self.model.preview_index = 1;
+
             if self.model.mode == 1 || self.model.mode == 4
                 ratio = 1000/self.model.rt_frRate;
                 self.model.fr_increment = self.model.fr_increment/ratio;
+
             end
             
 
@@ -623,7 +630,7 @@ classdef G4_preview_controller < handle
                 
             end
             
-            self.view.set_fr_increment();
+            self.view.update_variables();
             
 
         end
