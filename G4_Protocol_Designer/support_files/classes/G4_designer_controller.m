@@ -1297,7 +1297,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
 
                 end
 
-                self.doc.insert_greyed_cells();     
+                self.insert_greyed_cells();     
                 self.doc.set_recent_files(filepath);
                 self.doc.update_recent_files_file();
                 self.update_gui();
@@ -1346,7 +1346,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
             [path, file] = fileparts(full_path);
             file = [file,'.g4p'];
             g4p_path = fullfile(path, self.doc.experiment_name, file);
-            self.doc.insert_greyed_cells();
+            self.insert_greyed_cells();
             self.doc.set_recent_files(g4p_path);
             self.doc.update_recent_files_file();
             self.update_gui();
@@ -2067,9 +2067,9 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
 
         end
         
-        % When the mode is change, clear and disable appropriate fields
+        % When the mode is changed, clear and disable appropriate fields
         function clear_fields(self, mode)
-
+            
             pos_fields = fieldnames(self.doc.Pos_funcs);
             pat_fields = fieldnames(self.doc.Patterns);
             pos = self.doc.colorgen();
@@ -2156,14 +2156,14 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                 gain = self.doc.colorgen();
                 offset = self.doc.colorgen();
                 self.set_mode_dep_props(pos, indx, rate, gain, offset);
-                if strcmp(self.model.current_selected_cell.table,"pre") == 1
+                if strcmp(self.model.current_selected_cell.table,"pre")
                     self.doc.set_pretrial_property(2, self.doc.colorgen());
                     for i = 4:7
                         self.doc.set_pretrial_property(i,self.doc.colorgen());
                     end
                     self.doc.set_pretrial_property(12,self.doc.colorgen());
 
-                elseif strcmp(self.model.current_selected_cell.table,"inter") == 1
+                elseif strcmp(table,'inter') || strcmp(self.model.current_selected_cell.table,"inter") == 1
                     self.doc.set_intertrial_property(2, self.doc.colorgen());
                     for i = 4:7
                         self.doc.set_intertrial_property(i,self.doc.colorgen());
@@ -2171,7 +2171,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                     self.doc.set_intertrial_property(12,self.doc.colorgen());
 
 
-                elseif strcmp(self.model.current_selected_cell.table,"post") == 1
+                elseif strcmp(table, 'post') || strcmp(self.model.current_selected_cell.table,"post") == 1
                     self.doc.set_posttrial_property(2, self.doc.colorgen());
                     for i = 4:7
                         self.doc.set_posttrial_property(i,self.doc.colorgen());
@@ -2193,9 +2193,9 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
         end
         
         % Set all properties dependent on the mode
-        function set_mode_dep_props(self, pos, indx, rate, gain, offset)
+        function set_mode_dep_props(self, pos, indx, rate, gain, offset, varargin)
 
-            if strcmp(self.model.current_selected_cell.table,"pre") == 1
+            if strcmp(self.model.current_selected_cell.table,"pre") 
                 self.doc.set_pretrial_property(3, pos);
                 self.doc.set_pretrial_property(8, indx);
                 self.doc.set_pretrial_property(9, rate);
@@ -2954,6 +2954,123 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                 end
             end
         end
+        
+         %After saving or running an experiment, convert uneditable cells back to being greyed out       
+        function insert_greyed_cells(self)
+
+            pretrial_mode = self.doc.pretrial{1};
+            intertrial_mode = self.doc.intertrial{1};
+            posttrial_mode = self.doc.posttrial{1};
+            pre_indices_to_color = [];
+            inter_indices_to_color = [];
+            post_indices_to_color = [];
+            indices_to_color = [];
+            if ~isempty(pretrial_mode)
+                if pretrial_mode == 1
+                    pre_indices_to_color = [9, 10, 11];
+                elseif pretrial_mode == 2
+                    pre_indices_to_color = [3, 10, 11];
+                elseif pretrial_mode == 3
+                    pre_indices_to_color = [3, 9, 10, 11];
+                elseif pretrial_mode == 4
+                    pre_indices_to_color = [3, 9];
+                elseif pretrial_mode == 5 || pretrial_mode == 6
+                    pre_indices_to_color = 9;
+                elseif pretrial_mode == 7
+                    pre_indices_to_color = [3, 9, 10, 11];
+                end
+            else
+%                 self.model.current_selected_cell.table = "pre";
+%                 self.model.current_selected_cell.index = [1,1];
+%                 self.clear_fields(pretrial_mode)
+                pre_indices_to_color = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+
+
+            end
+            
+            if ~isempty(intertrial_mode)
+
+                if intertrial_mode == 1
+                    inter_indices_to_color = [9, 10, 11];
+                elseif intertrial_mode == 2
+                    inter_indices_to_color = [3, 10, 11];
+                elseif intertrial_mode == 3
+                    inter_indices_to_color = [3, 9, 10, 11];
+                elseif intertrial_mode == 4
+                    inter_indices_to_color = [3, 9];
+                elseif intertrial_mode == 5 || intertrial_mode == 6
+                    inter_indices_to_color = 9;
+                elseif intertrial_mode == 7
+                    inter_indices_to_color = [3, 9, 10, 11];
+                end
+                
+            else
+%                 self.model.current_selected_cell.table = "inter";
+%                 self.model.current_selected_cell.index = [1,1];
+%                 self.clear_fields(intertrial_mode);
+                inter_indices_to_color = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+                
+            end
+            
+            if ~isempty(posttrial_mode)
+
+                if posttrial_mode == 1
+                    post_indices_to_color = [9, 10, 11];
+                elseif posttrial_mode == 2
+                    post_indices_to_color = [3, 10, 11];
+                elseif posttrial_mode == 3
+                    post_indices_to_color = [3, 9, 10, 11];
+                elseif posttrial_mode == 4
+                    post_indices_to_color = [3, 9];
+                elseif posttrial_mode == 5 || posttrial_mode == 6
+                    post_indices_to_color = 9;
+                elseif posttrial_mode == 7
+                    post_indices_to_color = [3, 9, 10, 11];
+                end
+            else
+%                 self.model.current_selected_cell.table = "post";
+%                 self.model.current_selected_cell.index = [1,1];
+%                 self.clear_fields(posttrial_mode);
+                post_indices_to_color = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+                
+            end
+
+
+            for i = 1:length(pre_indices_to_color)
+                self.doc.set_pretrial_property(pre_indices_to_color(i),self.doc.colorgen());
+
+            end
+            for i = 1:length(inter_indices_to_color)
+                self.doc.set_intertrial_property(inter_indices_to_color(i),self.doc.colorgen());
+            end
+            for i = 1:length(post_indices_to_color)
+                self.doc.set_posttrial_property(post_indices_to_color(i),self.doc.colorgen());
+            end
+
+            for i = 1:length(self.doc.block_trials(:,1))
+                mode = self.doc.block_trials{i,1};
+                if mode == 1
+                    indices_to_color = [9, 10, 11];
+                elseif mode == 2
+                    indices_to_color = [3, 10, 11];
+                elseif mode == 3
+                    indices_to_color = [3, 9, 10, 11];
+                elseif mode == 4
+                    indices_to_color = [3, 9];
+                elseif mode == 5 || mode == 6
+                    indices_to_color = 9;
+                elseif mode == 7
+                    indices_to_color = [3, 9, 10, 11];
+                end
+                for j = 1:length(indices_to_color)
+                    self.doc.set_block_trial_property([i,indices_to_color(j)],self.doc.colorgen());
+                end
+            end
+
+
+
+        end
+
         
 %% Additional Menu functions
         

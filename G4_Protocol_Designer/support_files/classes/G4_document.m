@@ -204,7 +204,7 @@ classdef G4_document < handle
                     end
                 end
                 
-                if index(2) == 2 && ~strcmp(string(new_value),'')
+                if index(2) == 2 && ~strcmp(string(new_value),'') && ~isempty(new_value)
                     patfile = new_value;
                     patfield = self.get_pattern_field_name(patfile);
                     if strcmp(patfield, '')
@@ -228,7 +228,7 @@ classdef G4_document < handle
 
                     end
 
-                elseif index(2) == 3 && ~strcmp(string(new_value),'') && ~strcmp(string(self.block_trials{index(1),2}),'')
+                elseif index(2) == 3 && ~strcmp(string(new_value),'') && ~isempty(new_value) && ~strcmp(string(self.block_trials{index(1),2}),'')
 
                     posfile = new_value;
                     posfield = self.get_posfunc_field_name(posfile);
@@ -252,7 +252,7 @@ classdef G4_document < handle
                     numrows = 0;
                 end
                 
-                if index(2) > 3 && index(2) < 8 && ~strcmp(string(new_value),'')
+                if index(2) > 3 && index(2) < 8 && ~strcmp(string(new_value),'') && ~isempty(new_value)
                     aofile = new_value;
                     aofield = self.get_aofunc_field_name(aofile);
                     if strcmp(aofield,'')
@@ -390,7 +390,7 @@ classdef G4_document < handle
                     
                 end
                     
-            elseif index == 3 && ~strcmp(string(new_value),'') && ~strcmp(string(self.pretrial{2}),'')
+            elseif index == 3 && ~strcmp(string(new_value),'') && ~strcmp(string(self.pretrial{2}),'') && ~isempty(new_value)
                 posfile = new_value;
                 posfield = self.get_posfunc_field_name(posfile);
                 if strcmp(posfield,'') && ~strcmp(new_value,'')
@@ -412,7 +412,7 @@ classdef G4_document < handle
                 numrows = 0;
             end
             
-            if index > 3 && index < 8 && ~strcmp(string(new_value),'')
+            if index > 3 && index < 8 && ~strcmp(string(new_value),'') && ~isempty(new_value)
                 aofile = new_value;
                 aofield = self.get_aofunc_field_name(aofile);
                 if strcmp(aofield,'')
@@ -571,7 +571,7 @@ classdef G4_document < handle
                 numrows = 0;
            end
             
-           if index > 3 && index < 8 && ~strcmp(string(new_value),'')
+           if index > 3 && index < 8 && ~strcmp(string(new_value),'') && ~isempty(new_value)
                 aofile = new_value;
                 aofield = self.get_aofunc_field_name(aofile);
                 if ~isfield(self.Ao_funcs, aofield) && ~strcmp(aofield,'')
@@ -703,7 +703,7 @@ classdef G4_document < handle
                     
                 end
                     
-            elseif index == 3 && ~strcmp(string(new_value),'') && ~strcmp(string(self.posttrial{2}),'')
+            elseif index == 3 && ~strcmp(string(new_value),'') && ~isempty(new_value) && ~strcmp(string(self.posttrial{2}),'')
                 posfile = new_value;
                 posfield = self.get_posfunc_field_name(posfile);
                 if ~isfield(self.Pos_funcs, posfield) && ~strcmp(posfield,'')
@@ -726,7 +726,7 @@ classdef G4_document < handle
                 numrows = 0;
             end
             
-            if index > 3 && index < 8 && ~strcmp(string(new_value),'')
+            if index > 3 && index < 8 && ~strcmp(string(new_value),'') && ~isempty(new_value)
                 aofile = new_value;
                 aofield = self.get_aofunc_field_name(aofile);
                 if strcmp(aofield,'')
@@ -969,37 +969,40 @@ classdef G4_document < handle
         
 
            if ~strcmp(func_list{1},'')
-
-                func_list = unique(func_list);
                 empty_cells = cellfun(@isempty, func_list);
-                for i = 1:length(empty_cells)
+                for i = length(empty_cells):-1:1
                     if empty_cells(i) == 1
                         func_list(i) = [];
                     end
                 end
+                func_list = unique(func_list);
+                
                 
            else
                func_list = {''};
            end
            
            if ~strcmp(ao_list,'')
-               ao_list = unique(ao_list);
                empty_aocells = cellfun(@isempty, ao_list);
-                for i = 1:length(empty_aocells)
+                for i = length(empty_aocells):-1:1
                     if empty_aocells(i) == 1
                         ao_list(i) = [];
                     end
                 end
+               ao_list = unique(ao_list);
+               
            else
                ao_list = {''};
            end
-           pat_list = unique(pat_list);
+           
            empty_patcells = cellfun(@isempty, pat_list);
-            for i = 1:length(empty_patcells)
+            for i = length(empty_patcells):-1:1
                 if empty_patcells(i) == 1
                     pat_list(i) = [];
                 end
             end
+           pat_list = unique(pat_list);
+           
         end
         
         function [pats, funcs, aos] = get_bin_list(self, pat_list, func_list, ao_list)
@@ -1912,7 +1915,7 @@ classdef G4_document < handle
         
             for i = 1:length(self.pretrial)
                 if strncmp(self.pretrial{i},'<html>',6)
-                    if i == 3
+                    if i >= 2 && i <= 7
                         self.pretrial{i} = '';
                     else
                         self.pretrial{i} = [];
@@ -1921,7 +1924,7 @@ classdef G4_document < handle
             end
             for i = 1:length(self.intertrial)
                 if strncmp(self.intertrial{i},'<html>',6)
-                    if i == 3
+                    if i >= 2 && i <= 7
                         self.intertrial{i} = '';
                     else
                         self.intertrial{i} = [];
@@ -1930,7 +1933,7 @@ classdef G4_document < handle
             end
             for i = 1:length(self.posttrial)
                 if strncmp(self.posttrial{i},'<html>',6)
-                    if i == 3
+                    if i >= 2 && i <= 7
                         self.posttrial{i} = '';
                     else
                         self.posttrial{i} = [];
@@ -1957,104 +1960,7 @@ classdef G4_document < handle
             c = ['<html><table border=0 width=400 bgcolor=',color,'><TR><TD>',text,'</TD></TR></table>'];
         end
 
-         %After saving or running an experiment, convert uneditable cells back to being greyed out       
-        function insert_greyed_cells(self)
-
-            pretrial_mode = self.pretrial{1};
-            intertrial_mode = self.intertrial{1};
-            posttrial_mode = self.posttrial{1};
-            pre_indices_to_color = [];
-            inter_indices_to_color = [];
-            post_indices_to_color = [];
-            indices_to_color = [];
-            if ~isempty(pretrial_mode)
-                if pretrial_mode == 1
-                    pre_indices_to_color = [9, 10, 11];
-                elseif pretrial_mode == 2
-                    pre_indices_to_color = [3, 10, 11];
-                elseif pretrial_mode == 3
-                    pre_indices_to_color = [3, 9, 10, 11];
-                elseif pretrial_mode == 4
-                    pre_indices_to_color = [3, 9];
-                elseif pretrial_mode == 5 || pretrial_mode == 6
-                    pre_indices_to_color = 9;
-                elseif pretrial_mode == 7
-                    pre_indices_to_color = [3, 9, 10, 11];
-                end
-            end
-            
-            if ~isempty(intertrial_mode)
-
-                if intertrial_mode == 1
-                    inter_indices_to_color = [9, 10, 11];
-                elseif intertrial_mode == 2
-                    inter_indices_to_color = [3, 10, 11];
-                elseif intertrial_mode == 3
-                    inter_indices_to_color = [3, 9, 10, 11];
-                elseif intertrial_mode == 4
-                    inter_indices_to_color = [3, 9];
-                elseif intertrial_mode == 5 || intertrial_mode == 6
-                    inter_indices_to_color = 9;
-                elseif intertrial_mode == 7
-                    inter_indices_to_color = [3, 9, 10, 11];
-                end
-                
-            end
-            
-            if ~isempty(posttrial_mode)
-
-                if posttrial_mode == 1
-                    post_indices_to_color = [9, 10, 11];
-                elseif posttrial_mode == 2
-                    post_indices_to_color = [3, 10, 11];
-                elseif posttrial_mode == 3
-                    post_indices_to_color = [3, 9, 10, 11];
-                elseif posttrial_mode == 4
-                    post_indices_to_color = [3, 9];
-                elseif posttrial_mode == 5 || posttrial_mode == 6
-                    post_indices_to_color = 9;
-                elseif posttrial_mode == 7
-                    post_indices_to_color = [3, 9, 10, 11];
-                end
-                
-            end
-
-
-            for i = 1:length(pre_indices_to_color)
-                self.set_pretrial_property(pre_indices_to_color(i),self.colorgen());
-
-            end
-            for i = 1:length(inter_indices_to_color)
-                self.set_intertrial_property(inter_indices_to_color(i),self.colorgen());
-            end
-            for i = 1:length(post_indices_to_color)
-                self.set_posttrial_property(post_indices_to_color(i),self.colorgen());
-            end
-
-            for i = 1:length(self.block_trials(:,1))
-                mode = self.block_trials{i,1};
-                if mode == 1
-                    indices_to_color = [9, 10, 11];
-                elseif mode == 2
-                    indices_to_color = [3, 10, 11];
-                elseif mode == 3
-                    indices_to_color = [3, 9, 10, 11];
-                elseif mode == 4
-                    indices_to_color = [3, 9];
-                elseif mode == 5 || mode == 6
-                    indices_to_color = 9;
-                elseif mode == 7
-                    indices_to_color = [3, 9, 10, 11];
-                end
-                for j = 1:length(indices_to_color)
-                    self.set_block_trial_property([i,indices_to_color(j)],self.colorgen());
-                end
-            end
-
-
-
-        end
-
+        
     
 %CREATE STRUCTURE TO SAVE TO .G4P FILE WHEN SAVING------------------------        
         function [vars] = create_parameters_structure(self)
@@ -2169,6 +2075,106 @@ classdef G4_document < handle
             end
             digit = str2num(line((end-count+1):end));
         
+        end
+        
+        function insert_greyed_cells(self)
+
+            pretrial_mode = self.pretrial{1};
+            intertrial_mode = self.intertrial{1};
+            posttrial_mode = self.posttrial{1};
+            pre_indices_to_color = [];
+            inter_indices_to_color = [];
+            post_indices_to_color = [];
+            indices_to_color = [];
+            if ~isempty(pretrial_mode)
+                if pretrial_mode == 1
+                    pre_indices_to_color = [9, 10, 11];
+                elseif pretrial_mode == 2
+                    pre_indices_to_color = [3, 10, 11];
+                elseif pretrial_mode == 3
+                    pre_indices_to_color = [3, 9, 10, 11];
+                elseif pretrial_mode == 4
+                    pre_indices_to_color = [3, 9];
+                elseif pretrial_mode == 5 || pretrial_mode == 6
+                    pre_indices_to_color = 9;
+                elseif pretrial_mode == 7
+                    pre_indices_to_color = [3, 9, 10, 11];
+                end
+
+
+
+            end
+            
+            if ~isempty(intertrial_mode)
+
+                if intertrial_mode == 1
+                    inter_indices_to_color = [9, 10, 11];
+                elseif intertrial_mode == 2
+                    inter_indices_to_color = [3, 10, 11];
+                elseif intertrial_mode == 3
+                    inter_indices_to_color = [3, 9, 10, 11];
+                elseif intertrial_mode == 4
+                    inter_indices_to_color = [3, 9];
+                elseif intertrial_mode == 5 || intertrial_mode == 6
+                    inter_indices_to_color = 9;
+                elseif intertrial_mode == 7
+                    inter_indices_to_color = [3, 9, 10, 11];
+                end
+                
+            end
+            
+            if ~isempty(posttrial_mode)
+
+                if posttrial_mode == 1
+                    post_indices_to_color = [9, 10, 11];
+                elseif posttrial_mode == 2
+                    post_indices_to_color = [3, 10, 11];
+                elseif posttrial_mode == 3
+                    post_indices_to_color = [3, 9, 10, 11];
+                elseif posttrial_mode == 4
+                    post_indices_to_color = [3, 9];
+                elseif posttrial_mode == 5 || posttrial_mode == 6
+                    post_indices_to_color = 9;
+                elseif posttrial_mode == 7
+                    post_indices_to_color = [3, 9, 10, 11];
+                end
+                
+            end
+
+
+            for i = 1:length(pre_indices_to_color)
+                self.set_pretrial_property(pre_indices_to_color(i),self.colorgen());
+
+            end
+            for i = 1:length(inter_indices_to_color)
+                self.set_intertrial_property(inter_indices_to_color(i),self.colorgen());
+            end
+            for i = 1:length(post_indices_to_color)
+                self.set_posttrial_property(post_indices_to_color(i),self.colorgen());
+            end
+
+            for i = 1:length(self.block_trials(:,1))
+                mode = self.block_trials{i,1};
+                if mode == 1
+                    indices_to_color = [9, 10, 11];
+                elseif mode == 2
+                    indices_to_color = [3, 10, 11];
+                elseif mode == 3
+                    indices_to_color = [3, 9, 10, 11];
+                elseif mode == 4
+                    indices_to_color = [3, 9];
+                elseif mode == 5 || mode == 6
+                    indices_to_color = 9;
+                elseif mode == 7
+                    indices_to_color = [3, 9, 10, 11];
+                end
+                for j = 1:length(indices_to_color)
+                    self.set_block_trial_property([i,indices_to_color(j)],self.colorgen());
+                end
+            end
+
+
+
         end
         
         
