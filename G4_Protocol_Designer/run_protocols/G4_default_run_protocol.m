@@ -52,12 +52,10 @@ function [success] = G4_default_run_protocol(runcon, p)%input should always be 1
 %% Get access to the figure and progress bar in the run gui IF it was passed in.
 
 %        fig = runcon.fig;
-    progress_bar = runcon.progress_bar;
-    progress_axes = runcon.progress_axes;
-    axes_label = runcon.axes_label;
-    expected_time = runcon.expected_time;
-    elapsed_time = runcon.elapsed_time;
-    remaining_time = runcon.remaining_time;
+    progress_bar = runcon.view.progress_bar;
+    progress_axes = runcon.view.progress_axes;
+    axes_label = runcon.view.axes_label;
+
 
 
  %% Set up parameters 
@@ -215,9 +213,7 @@ function [success] = G4_default_run_protocol(runcon, p)%input should always be 1
             %Update the progress bar's label to reflect the expected
             %duration.
             axes_label.String = "Estimated experiment duration: " + num2str(total_time/60) + " minutes.";
-            expected_time.String = num2str(round(total_time/60, 2)) + " minutes.";
-            elapsed_time.String = '0 minutes.';
-            remaining_time.String = num2str(round(total_time/60,2)) + " minutes.";
+            
             %Will increment this every time a trial is completed to track how far along 
             %in the experiment we are
             num_trial_of_total = 0;
@@ -231,12 +227,9 @@ function [success] = G4_default_run_protocol(runcon, p)%input should always be 1
              tic;
              if pre_start == 1
                  %First update the progress bar to show pretrial is running----
-                 progress_axes.Title.String = "Running Pre-trial..."; 
+                 runcon.update_progress('pre');
                  num_trial_of_total = num_trial_of_total + 1;
-                 progress_bar.YData = num_trial_of_total/total_num_steps;
-                 drawnow;
-                 
-                 
+
                 %Set the panel values appropriately----------------
                  Panel_com('set_control_mode',pre_mode);
                  if pre_mode == 3 %For some reason, mode 3 specifically screws up the run, making subsequent trials glitch. 
@@ -248,8 +241,6 @@ function [success] = G4_default_run_protocol(runcon, p)%input should always be 1
                      pause(.1);
                  end
                     
-                 
-                 
                  %randomize frame index if indicated
                  if pre_frame_ind == 0
                      pre_frame_ind = randperm(p.num_pretrial_frames, 1);
@@ -285,25 +276,8 @@ function [success] = G4_default_run_protocol(runcon, p)%input should always be 1
                  end
                  
                  %Update status panel to show current parameters
-                 runcon.current_mode.String = num2str(pre_mode);
-                 runcon.current_pat.String = num2str(pre_pat);
-                 runcon.current_pos.String = num2str(pre_pos);
-                 for i = 1:length(p.active_ao_channels) %This figures out which ao channel to put the ao function index under.
-                    if p.active_ao_channels(i) == 0
-                        runcon.current_ao1.String = num2str(pre_ao_ind(i));
-                    elseif p.active_ao_channels(i) == 1
-                        runcon.current_ao2.String = num2str(pre_ao_ind(i));
-                    elseif p.active_ao_channels(i) == 2
-                        runcon.current_ao3.String = num2str(pre_ao_ind(i));
-                    else
-                        runcon.current_ao4.String = num2str(pre_ao_ind(i));
-                    end
-                 end
-                 runcon.current_frInd.String = num2str(pre_frame_ind);
-                 runcon.current_frRate.String = num2str(pre_frame_rate);
-                 runcon.current_gain.String = num2str(pre_gain);
-                 runcon.current_offset.String = num2str(pre_offset);
-                 runcon.current_duration.String = num2str(pre_dur);
+                 runcon.update_current_trial_parameters(pre_mode, pre_pat, pre_pos, p.active_ao_channels, ...
+                    pre_ao_ind, pre_frame_ind, pre_frame_rate, pre_gain, pre_offset, pre_dur);
 
                  pause(0.01);
                  
@@ -328,8 +302,8 @@ function [success] = G4_default_run_protocol(runcon, p)%input should always be 1
              
              end
              
-             elapsed_time.String = num2str(round(toc/60,2)) + " minutes";
-             remaining_time.String = num2str(round((total_time - toc)/60,2)) + " minutes";
+             runcon.update_elapsed_time(round(toc,2));
+             
 
 %% Loop to run the block/inter trials --------------------------------------
 
@@ -340,10 +314,8 @@ function [success] = G4_default_run_protocol(runcon, p)%input should always be 1
                     
                     %Update the progress bar--------------------------
                     num_trial_of_total = num_trial_of_total + 1;
-                    progress_axes.Title.String = "Rep " + r + " of " + reps +...
-                        ", Trial " + c + " of " + num_cond + ". Condition number: " + cond;
-                    progress_bar.YData = num_trial_of_total/total_num_steps;
-                    drawnow;
+                    runcon.update_progress('block', r, reps, c, num_cond, cond, num_trial_of_total);
+
                     
                     %define parameters for this trial----------------
                     trial_mode = block_trials{cond,1};
@@ -351,6 +323,8 @@ function [success] = G4_default_run_protocol(runcon, p)%input should always be 1
                     pos_id = p.block_pos_indices(cond);
                     if length(block_ao_indices) >= cond
                         trial_ao_indices = block_ao_indices(cond,:);
+                    else
+                        trial_ao_indices = [];
                     end
                     %Set frame index
                     if isempty(block_trials{cond,8})
@@ -395,25 +369,10 @@ function [success] = G4_default_run_protocol(runcon, p)%input should always be 1
                     end
                     
                     %Update status panel to show current parameters
-                     runcon.current_mode.String = num2str(trial_mode);
-                     runcon.current_pat.String = num2str(pat_id);
-                     runcon.current_pos.String = num2str(pos_id);
-                     for i = 1:length(p.active_ao_channels) %This figures out which ao channel to put the ao function index under.
-                        if p.active_ao_channels(i) == 0
-                            runcon.current_ao1.String = num2str(trial_ao_indices(i));
-                        elseif p.active_ao_channels(i) == 1
-                            runcon.current_ao2.String = num2str(trial_ao_indices(i));
-                        elseif p.active_ao_channels(i) == 2
-                            runcon.current_ao3.String = num2str(trial_ao_indices(i));
-                        else
-                            runcon.current_ao4.String = num2str(trial_ao_indices(i));
-                        end
-                    end
-                     runcon.current_frInd.String = num2str(frame_ind);
-                     runcon.current_frRate.String = num2str(frame_rate);
-                     runcon.current_gain.String = num2str(gain);
-                     runcon.current_offset.String = num2str(offset);
-                     runcon.current_duration.String = num2str(dur);
+                   runcon.update_current_trial_parameters(trial_mode, pat_id, pos_id, p.active_ao_channels, ...
+                      trial_ao_indices, frame_ind, frame_rate, gain, offset, dur);
+            
+ 
                     pause(0.01)
                     
                     %Run block trial--------------------------------------
@@ -429,9 +388,8 @@ function [success] = G4_default_run_protocol(runcon, p)%input should always be 1
                         return;
                   
                     end
-                    elapsed_time.String = num2str(round(toc/60,2)) + " minutes";
-                    remaining_time.String = num2str(round((total_time - toc)/60, 2)) + " minutes";
-
+                    runcon.update_elapsed_time(round(toc,2));
+                    
                     %Tells loop to skip the intertrial if this is the last iteration of the last rep
                     if r == reps && c == num_cond
    
@@ -443,6 +401,7 @@ function [success] = G4_default_run_protocol(runcon, p)%input should always be 1
                     
                         %Update progress bar to indicate start of inter-trial
                         num_trial_of_total = num_trial_of_total + 1;
+                        runcon.update_progress('inter', r, reps, c, num_cond, num_trial_of_total)
                         progress_axes.Title.String = "Rep " + r + " of " + reps +...
                             ", Trial " + c + " of " + num_cond + ". Inter-trial running...";
                         progress_bar.YData = num_trial_of_total/total_num_steps;
@@ -480,28 +439,10 @@ function [success] = G4_default_run_protocol(runcon, p)%input should always be 1
                              end
                          end
                          
-                         %Update status panel on gui w/ intertrial parameters
-                         runcon.current_mode.String = num2str(inter_mode);
-                         runcon.current_pat.String = num2str(inter_pat);
-                         runcon.current_pos.String = num2str(inter_pos);
-                         
-                         for i = 1:length(p.active_ao_channels) %This figures out which ao channel to put the ao function index under.
-                            if p.active_ao_channels(i) == 0
-                                runcon.current_ao1.String = num2str(inter_ao_ind(i));
-                            elseif p.active_ao_channels(i) == 1
-                                runcon.current_ao2.String = num2str(inter_ao_ind(i));
-                            elseif p.active_ao_channels(i) == 2
-                                runcon.current_ao3.String = num2str(inter_ao_ind(i));
-                            else
-                                runcon.current_ao4.String = num2str(inter_ao_ind(i));
-                            end
-                        end
-                         runcon.current_frInd.String = num2str(inter_frame_ind);
-                         runcon.current_frRate.String = num2str(inter_frame_rate);
-                         runcon.current_gain.String = num2str(inter_gain);
-                         runcon.current_offset.String = num2str(inter_offset);
-                         runcon.current_duration.String = num2str(inter_dur);
-
+                          %Update status panel to show current parameters
+                        runcon.update_current_trial_parameters(inter_mode, inter_pat, inter_pos, p.active_ao_channels, ...
+                            inter_ao_ind, inter_frame_ind, inter_frame_rate, inter_gain, inter_offset, inter_dur);
+                        
                          pause(0.01);
                          Panel_com('start_display', (inter_dur*10));
                          pause(inter_dur + .01);
@@ -515,12 +456,8 @@ function [success] = G4_default_run_protocol(runcon, p)%input should always be 1
                          
                          end
                          
-                         elapsed_time.String = num2str(round(toc/60,2)) + " minutes";
-                         time_left = total_time - toc;
-                         if time_left < 0
-                             time_left = 0;
-                         end
-                        remaining_time.String = num2str(round(time_left/60,2)) + " minutes";
+                         runcon.update_elapsed_time(round(toc,2));
+                         
                     end 
                  end
              end
@@ -531,9 +468,8 @@ function [success] = G4_default_run_protocol(runcon, p)%input should always be 1
                 
                 %Update progress bar--------------------------
                 num_trial_of_total = num_trial_of_total + 1;
-                progress_axes.Title.String = "Post-trial running...";
-                progress_bar.YData = num_trial_of_total/total_num_steps;
-                drawnow;
+                runcon.update_progress('post', num_trial_of_total);
+
 
                  Panel_com('set_control_mode', post_mode);
                  
@@ -562,26 +498,10 @@ function [success] = G4_default_run_protocol(runcon, p)%input should always be 1
                      end
                  end
                  
-                 %Update status panel on gui w/ current parameters
-                 runcon.current_mode.String = num2str(post_mode);
-                 runcon.current_pat.String = num2str(post_pat);
-                 runcon.current_pos.String = num2str(post_pos);
-                 for i = 1:length(p.active_ao_channels) %This figures out which ao channel to put the ao function index under.
-                    if p.active_ao_channels(i) == 0
-                        runcon.current_ao1.String = num2str(post_ao_ind(i));
-                    elseif p.active_ao_channels(i) == 1
-                        runcon.current_ao2.String = num2str(post_ao_ind(i));
-                    elseif p.active_ao_channels(i) == 2
-                        runcon.current_ao3.String = num2str(post_ao_ind(i));
-                    else
-                        runcon.current_ao4.String = num2str(post_ao_ind(i));
-                    end
-                end
-                 runcon.current_frInd.String = num2str(post_frame_ind);
-                 runcon.current_frRate.String = num2str(post_frame_rate);
-                 runcon.current_gain.String = num2str(post_gain);
-                 runcon.current_offset.String = num2str(post_offset);
-                 runcon.current_duration.String = num2str(post_dur);
+                  %Update status panel to show current parameters
+                 runcon.update_current_trial_parameters(post_mode, post_pat, post_pos, p.active_ao_channels, ...
+                     post_ao_ind, post_frame_ind, post_frame_rate, post_gain, post_offset, post_dur);
+                
 
                  Panel_com('start_display',post_dur*10);
 
@@ -596,13 +516,7 @@ function [success] = G4_default_run_protocol(runcon, p)%input should always be 1
                     return;
                  
                  end
-                 elapsed_time.String = num2str(round(toc/60,2)) + " minutes";
-                 time_left = total_time - toc;
-                 if time_left < 0
-                     time_left = 0;
-                 end
-                 remaining_time.String = num2str(round(time_left/60,2)) + " minutes";
-                 
+                 runcon.update_elapsed_time(round(toc,2));
                  
             end
 
