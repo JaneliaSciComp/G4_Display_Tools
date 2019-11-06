@@ -1015,15 +1015,18 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
             num_pos = length(pos_names);
             num_ao = length(ao_names);
 
-            pat1 = pat_names{pat_index};
-            pat1_field = d.get_pattern_field_name(pat1);
+            if num_pats ~= 0
+                pat1 = pat_names{pat_index};
+                pat1_field = d.get_pattern_field_name(pat1);
+            end
 
-            if length(d.Patterns.(pat1_field).pattern.Pats(:,1,1))/16 ~= self.doc.num_rows
+            if num_pats ~= 0 && length(d.Patterns.(pat1_field).pattern.Pats(:,1,1))/16 ~= self.doc.num_rows
                 while length(d.Patterns.(pat1_field).pattern.Pats(:,1,1)) ~= self.doc.num_rows && pat_index < length(pat_names)
                     pat_index = pat_index + 1;
                     pat1 = pat_names{pat_index};
                 end
-
+            else
+                pat1 = ''
             end
 
             if pat_index == length(pat_names) && length(d.Patterns.(pat1_field).pattern.Pats(:,1,1))/16 ~= self.doc.num_rows
@@ -1042,11 +1045,11 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
             else
                 ao_index = 1;
             end
-
+            
             if num_pos ~= 0
                 pos1 = pos_names{pos_index}; %Set initial position and ao functions to correspond to initial pattern.
                 pos1_field = d.get_posfunc_field_name(pos1);
-                if length(d.Patterns.(pat1_field).pattern.Pats(1,1,:)) < ...
+                if num_pats ~=0 && length(d.Patterns.(pat1_field).pattern.Pats(1,1,:)) < ...
                     max(d.Pos_funcs.(pos1_field).pfnparam.func)
                 pos1 = '';
                 end
@@ -1087,11 +1090,14 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
             d.set_posttrial_property(10, self.doc.colorgen());
             d.set_posttrial_property(11, self.doc.colorgen());
             
-            block_dur = d.Pos_funcs.(pos1_field).pfnparam.size/1000;
+            if num_pos ~= 0
+                block_dur = d.Pos_funcs.(pos1_field).pfnparam.size/1000;
+                d.set_block_trial_property([1,12], block_dur);
+            end
             d.set_block_trial_property([1,2], pat1);
             d.set_block_trial_property([1,3], pos1);
             d.set_block_trial_property([1,4], ao1);
-            d.set_block_trial_property([1,12], block_dur);
+            
 
             d.set_block_trial_property([1,9], self.doc.colorgen());
             d.set_block_trial_property([1,10], self.doc.colorgen());
