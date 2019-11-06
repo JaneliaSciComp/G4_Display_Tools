@@ -1015,7 +1015,9 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
             num_pos = length(pos_names);
             num_ao = length(ao_names);
 
-            if num_pats ~= 0
+            if num_pats == 0
+                pat1 = ''
+            else
                 pat1 = pat_names{pat_index};
                 pat1_field = d.get_pattern_field_name(pat1);
             end
@@ -1024,9 +1026,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                 while length(d.Patterns.(pat1_field).pattern.Pats(:,1,1)) ~= self.doc.num_rows && pat_index < length(pat_names)
                     pat_index = pat_index + 1;
                     pat1 = pat_names{pat_index};
-                end
-            else
-                pat1 = ''
+                end                          
             end
 
             if pat_index == length(pat_names) && length(d.Patterns.(pat1_field).pattern.Pats(:,1,1))/16 ~= self.doc.num_rows
