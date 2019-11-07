@@ -504,17 +504,17 @@ classdef G4_conductor_controller < handle
 
             
         end
-        
+
+        %% Open  Google Sheet in browser
+        %
+        % Uses GoogleSheet key from Settings
         function open_google_sheet(self)
-        
-            base_url = 'https://urldefense.com/v3/__https://docs.google.com/spreadsheets/d/__;!oCotSwSxbw8!QSQ4kPbDfCAFBoGm6NP6gwC6wSHaNp0cT_nRMNkTbm-EDnUV419YTDNpAHkS2RXfJ6s$ ';
+            base_url = 'https://docs.google.com/spreadsheets/d/';
             full_link = [base_url,self.model.google_sheet_key];
             web(full_link, '-browser');
-        
         end
         
         function [aborted] = check_if_aborted(self)
-            
             aborted = self.is_aborted;
         end
         
