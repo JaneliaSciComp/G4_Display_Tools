@@ -1853,7 +1853,7 @@ classdef G4_document < handle
                     
                         if ~isempty(folders)
                             for j = 1:length(folders)
-                                next_folders_list{end+1} = folders{j};
+                                next_folders_list{end+1} = strcat(folder_names{i},'\',folders{j});
                             end
                             
                         end
@@ -1866,6 +1866,7 @@ classdef G4_document < handle
                 else
                     no_more_subfolders = 1;
                 end
+                folder_names = next_folders_list;
                 %waitbar(1,prog,'Finishing...');
                 %close(prog);
             end
