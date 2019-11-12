@@ -988,19 +988,48 @@ classdef G4_conductor_controller < handle
             if self.model.experiment_type == 1
                 %Get the flight filepath from settings
                 line_to_match = 'Flight test protocol file: ';
+                
             elseif self.model.experiment_type == 2
                 %Get path to camera test file
                 line_to_match = 'Camera walk test protocol file: ';
+                
                
             else
                 %Get path to chip test file
                 line_to_match = 'Chip walk test protocol file: ';
             end
+            
             [settings_data, line_path, index] = self.model.get_setting(line_to_match);
             path_to_experiment = strtrim(settings_data{line_path}(index:end));
-
+            
+            % Open test g4p file
             self.open_g4p_file(path_to_experiment);
+            
+            
+            line_to_match = 'Default test run protocol file: ';
+            %Get default run protocol file for tests
+            [settingsData, linePath, idx] = self.model.get_setting(line_to_match);
+            path_to_run_protocol = strtrim(settingsData{linePath}(idx:end));
+            
+            line_to_match = 'Default test processing file: ';
+            
+            %Get default processing file for tests
+            [settingsData, linePath, idx] = self.model.get_setting(line_to_match);
+            path_to_proc_protocol = strtrim(settingsData{linePath}(idx:end));
+            
+            line_to_match = 'Default test plotting file: ';
+            
+            %Get default plotting file for tests
+            [settingsData, linePath, idx] = self.model.get_setting(line_to_match);
+            path_to_plot_protocol = strtrim(settingsData{linePath}(idx:end));
+            
+            %Set test specific values
             self.model.fly_name = ['trial',num2str(self.model.num_tests_conducted)];
+            self.model.set_run_file(path_to_run_protocol);
+            self.model.set_plot_file(path_to_plot_protocol);
+            self.model.set_proc_file(path_to_proc_protocol);
+            
+            
             if ~isempty(self.view)
                 self.update_view_if_exists();
             end

@@ -176,6 +176,8 @@ classdef G4_conductor_model < handle
         
         function set_fly_name(self, new_val)
             self.fly_name = new_val;
+            self.reset_num_tests_conducted();
+            
         end
         
         function set_experimenter(self, new_val)
@@ -238,6 +240,9 @@ classdef G4_conductor_model < handle
             self.expected_time = new_val;
         end
         
+        function reset_num_tests_conducted(self)
+            self.num_tests_conducted = 0;
+        end
         
         
         
