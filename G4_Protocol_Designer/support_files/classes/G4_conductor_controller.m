@@ -980,6 +980,7 @@ classdef G4_conductor_controller < handle
         function run_test(self)
             
             self.model.num_tests_conducted = self.model.num_tests_conducted + 1;
+            repeat = 1;
             [real_exp_path, real_experiment_name, real_ext] =  fileparts(self.doc.save_filename);
             real_file = [real_experiment_name, real_ext];
             real_fly_name = self.model.fly_name;
@@ -1033,21 +1034,33 @@ classdef G4_conductor_controller < handle
             if ~isempty(self.view)
                 self.update_view_if_exists();
             end
-            self.run();
+            
+            while repeat == 1
+                self.run();
 
-            [test_exp_path, ~, ~] = fileparts(self.doc.save_filename);
-            if exist(fullfile(test_exp_path,'Results'))
-                movefile(fullfile(test_exp_path,'Results',self.model.fly_name,'*'),fullfile(real_exp_path,'Results',real_fly_name,self.model.fly_name));
-                rmdir(fullfile(test_exp_path,'Results', self.model.fly_name));
-                rmdir(fullfile(test_exp_path,'Results'));
+                [test_exp_path, ~, ~] = fileparts(self.doc.save_filename);
+                if exist(fullfile(test_exp_path,'Results'))
+                    movefile(fullfile(test_exp_path,'Results',self.model.fly_name,'*'),fullfile(real_exp_path,'Results',real_fly_name,self.model.fly_name));
+                    rmdir(fullfile(test_exp_path,'Results', self.model.fly_name));
+                    rmdir(fullfile(test_exp_path,'Results'));
+
+                else
+                    self.model.num_tests_conducted = self.model.num_tests_conducted - 1;
+
+                end
+                if exist(fullfile(test_exp_path,'Log Files'))
+                    rmdir(fullfile(test_exp_path,'Log Files'), 's');
+                end
                 
-            else
-                self.model.num_tests_conducted = self.model.num_tests_conducted - 1;
+                answer = questdlg('Would you like to repeat the test protocol?', 'Repeat', 'Yes', 'No', 'No');
+                if strcmp(answer, 'Yes')
+                    self.model.num_tests_conducted = self.model.num_tests_conducted + 1;
+                    self.model.fly_name = ['trial',num2str(self.model.num_tests_conducted)];
+                else
+                    repeat = 0;
+                end
+            end
                 
-            end
-            if exist(fullfile(test_exp_path,'Log Files'))
-                rmdir(fullfile(test_exp_path,'Log Files'), 's');
-            end
             original_exp_path = fullfile(real_exp_path, real_file);
             self.open_g4p_file(original_exp_path);
             self.model.fly_name = real_fly_name;
