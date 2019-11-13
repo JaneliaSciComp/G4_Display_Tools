@@ -555,7 +555,7 @@ classdef G4_conductor_view < handle
         function open(self, ~, ~, filepath)
            
             self.con.open_g4p_file(filepath);
-            self.updat_run_gui();
+            self.update_run_gui();
             
         end
         
