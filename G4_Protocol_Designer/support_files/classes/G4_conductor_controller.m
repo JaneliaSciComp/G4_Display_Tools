@@ -507,8 +507,8 @@ classdef G4_conductor_controller < handle
         
         function open_google_sheet(self)
         
-            base_url = 'https://urldefense.com/v3/__https://docs.google.com/spreadsheets/d/__;!oCotSwSxbw8!QSQ4kPbDfCAFBoGm6NP6gwC6wSHaNp0cT_nRMNkTbm-EDnUV419YTDNpAHkS2RXfJ6s$ ';
-            full_link = [base_url,self.model.google_sheet_key];
+            base_url = 'https://docs.google.com/spreadsheets/d/';
+            full_link = [base_url,self.model.google_sheet_key,'/edit?usp=sharing'];
             web(full_link, '-browser');
         
         end
