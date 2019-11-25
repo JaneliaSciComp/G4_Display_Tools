@@ -106,14 +106,23 @@ classdef G4_preview_model < handle
             pat = self.data{2};
             patfield = self.doc.get_pattern_field_name(pat);
             original_data = self.doc.Patterns.(patfield).pattern.Pats;
-            x = length(original_data(1,:,1));
-            y = length(original_data(:,1,1));
-            z = length(original_data(1,1,:));
-            adjusted_data = zeros(y,x,z);
-            max_num = max(max(original_data,[],2));
-            for i = 1:z
-                
-                adjusted_matrix(:,:,1) = original_data(:,:,i) ./ max_num(i);
+            grayscale_val = self.doc.Patterns.(patfield).pattern.gs_val;
+            
+            x = [0 length(original_data(1,:,1))];
+            y = [0 length(original_data(:,1,1))];
+            adjusted_data = zeros(y(2),x(2),length(original_data(1,1,:)));
+            max_num = (2^grayscale_val) - 1;
+            
+%             x = length(original_data(1,:,1));
+%             y = length(original_data(:,1,1));
+%             z = length(original_data(1,1,:));
+%             
+%             adjusted_file = zeros(y(2),x(2),length(self.model.current_preview_file(1,1,:)));
+%             adjusted_data = zeros(y,x,z);
+
+            for i = 1:length(original_data(1,1,:))
+
+                adjusted_matrix = original_data(:,:,i) ./ max_num;
                 adjusted_data(:,:,i) = adjusted_matrix(:,:,1);
             
             end

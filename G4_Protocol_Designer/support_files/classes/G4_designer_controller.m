@@ -803,7 +803,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
             self.set_exp_name();
             self.update_gui();
             if ~isempty(self.run_con)
-                self.run_con.update_run_gui();
+                self.run_con.view.update_run_gui();
             end
             
         end
@@ -1303,7 +1303,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                 self.update_gui();
 
                 if ~isempty(self.run_con)
-                    self.run_con.update_run_gui();
+                    self.run_con.view.update_run_gui();
                 end
                 set(self.num_rows_3, 'Enable', 'off');
                 set(self.num_rows_4, 'Enable', 'off');
@@ -1340,7 +1340,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
             self.doc.saveas(full_path, prog);
             
             if ~isempty(self.run_con)
-                self.run_con.update_run_gui();
+                self.run_con.view.update_run_gui();
             end
             
             [path, file] = fileparts(full_path);
@@ -2400,6 +2400,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                 adjusted_file = zeros(y(2),x(2),length(self.model.current_preview_file(1,1,:)));
                 %max_num = max(max(self.model.current_preview_file,[],2));
                 max_num = (2^grayscale_val) - 1;
+                
                 for i = 1:length(self.model.current_preview_file(1,1,:))
 
                     adjusted_matrix = self.model.current_preview_file(:,:,i) ./ max_num;
@@ -2427,12 +2428,10 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                 
                 self.inscreen_plot = plot(self.model.current_preview_file, 'parent', self.hAxes);
                 if dur <= length(self.model.current_preview_file(1,:))
-                    if frame_rate == 500
-                        linedur = [dur/2, dur/2];
-                    else
-                        linedur = [dur, dur];
-                    end
+
+                    linedur = [dur, dur];
                     line('XData', linedur, 'YData', yax, 'Color', [1 0 0], 'LineWidth', 2);
+                    
                 end
                 
                 timeLabel = 'Time (ms)';

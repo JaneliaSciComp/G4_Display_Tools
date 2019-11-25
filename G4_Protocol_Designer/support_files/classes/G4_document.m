@@ -244,7 +244,11 @@ classdef G4_document < handle
                     patRows = 0;
                     numrows = 0;
                     
-                    self.block_trials{index(1),12} = self.Pos_funcs.(posfield).pfnparam.size/1000;
+                    if self.Pos_funcs.(posfield).pfnparam.gs_val == 1
+                        self.block_trials{index(1),12} = self.Pos_funcs.(posfield).pfnparam.size/2000;
+                    else
+                        self.block_trials{index(1),12} = self.Pos_funcs.(posfield).pfnparam.size/1000;
+                    end
                 else
                     patDim = 0;
                     funcDim = 0;
@@ -404,7 +408,12 @@ classdef G4_document < handle
                 patRows = 0;
                 numrows = 0;
                 
-                self.pretrial{12} = self.Pos_funcs.(posfield).pfnparam.size/1000;
+                if self.Pos_funcs.(posfield).pfnparam.gs_val == 1
+                    self.pretrial{12} = self.Pos_funcs.(posfield).pfnparam.size/2000;
+                else
+                    self.pretrial{12} = self.Pos_funcs.(posfield).pfnparam.size/1000;
+                end
+
             else
                 patDim = 0;
                 funcDim = 0;
@@ -563,7 +572,11 @@ classdef G4_document < handle
                 patRows = 0;
                 numrows = 0;
                 
-                self.intertrial{12} = self.Pos_funcs.(posfield).pfnparam.size/1000;
+                if self.Pos_funcs.(posfield).pfnparam.gs_val == 1
+                    self.intertrial{12} = self.Pos_funcs.(posfield).pfnparam.size/2000;
+                else
+                    self.intertrial{12} = self.Pos_funcs.(posfield).pfnparam.size/1000;
+                end
             else
                 patDim = 0;
                 funcDim = 0;
@@ -718,7 +731,11 @@ classdef G4_document < handle
                 patRows = 0;
                 numrows = 0;
                 
-                self.posttrial{12} = self.Pos_funcs.(posfield).pfnparam.size/1000;
+                if self.Pos_funcs.(posfield).pfnparam.gs_val == 1
+                    self.posttrial{12} = self.Pos_funcs.(posfield).pfnparam.size/2000;
+                else
+                    self.posttrial{12} = self.Pos_funcs.(posfield).pfnparam.size/1000;
+                end
             else
                 patDim = 0;
                 funcDim = 0;
