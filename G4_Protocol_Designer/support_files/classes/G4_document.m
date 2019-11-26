@@ -244,7 +244,11 @@ classdef G4_document < handle
                     patRows = 0;
                     numrows = 0;
                     
-                    self.block_trials{index(1),12} = self.Pos_funcs.(posfield).pfnparam.size/1000;
+                    if self.Pos_funcs.(posfield).pfnparam.gs_val == 1
+                        self.block_trials{index(1),12} = self.Pos_funcs.(posfield).pfnparam.size/2000;
+                    else
+                        self.block_trials{index(1),12} = self.Pos_funcs.(posfield).pfnparam.size/1000;
+                    end
                 else
                     patDim = 0;
                     funcDim = 0;
@@ -404,7 +408,12 @@ classdef G4_document < handle
                 patRows = 0;
                 numrows = 0;
                 
-                self.pretrial{12} = self.Pos_funcs.(posfield).pfnparam.size/1000;
+                if self.Pos_funcs.(posfield).pfnparam.gs_val == 1
+                    self.pretrial{12} = self.Pos_funcs.(posfield).pfnparam.size/2000;
+                else
+                    self.pretrial{12} = self.Pos_funcs.(posfield).pfnparam.size/1000;
+                end
+
             else
                 patDim = 0;
                 funcDim = 0;
@@ -563,7 +572,11 @@ classdef G4_document < handle
                 patRows = 0;
                 numrows = 0;
                 
-                self.intertrial{12} = self.Pos_funcs.(posfield).pfnparam.size/1000;
+                if self.Pos_funcs.(posfield).pfnparam.gs_val == 1
+                    self.intertrial{12} = self.Pos_funcs.(posfield).pfnparam.size/2000;
+                else
+                    self.intertrial{12} = self.Pos_funcs.(posfield).pfnparam.size/1000;
+                end
             else
                 patDim = 0;
                 funcDim = 0;
@@ -718,7 +731,11 @@ classdef G4_document < handle
                 patRows = 0;
                 numrows = 0;
                 
-                self.posttrial{12} = self.Pos_funcs.(posfield).pfnparam.size/1000;
+                if self.Pos_funcs.(posfield).pfnparam.gs_val == 1
+                    self.posttrial{12} = self.Pos_funcs.(posfield).pfnparam.size/2000;
+                else
+                    self.posttrial{12} = self.Pos_funcs.(posfield).pfnparam.size/1000;
+                end
             else
                 patDim = 0;
                 funcDim = 0;
@@ -1622,31 +1639,122 @@ classdef G4_document < handle
             if strcmp(bin_ext,'.pat')
                 field_name = strcat('pat', fileid);
                 if isfield(self.binary_files.pats, field_name)
-                    waitfor(errordlg("Your file was imported, but the .pat file was not. A pattern with that ID has already been imported."));
-                    return;
+                    %errordlg("Your file was imported, but the .pat file was not. A pattern with that ID has already been imported. I am attempting to reconcile the conflict now.");
+                    highestID_imported = self.get_highest_ID_imported('pattern');
+                    new_ID = highestID_imported + 1;
+                    fileData.pattern.param.ID = new_ID;
+                    
+                    num_zeroes_to_add = 4 - numel(num2str(new_ID));
+                    new_fileid = '';
+                    for i = 1:num_zeroes_to_add
+                        new_fileid = strcat(new_fileid,'0');
+                    end
+                    new_fileid = strcat(new_fileid,num2str(new_ID));
+                    new_field_name = strcat('pat',new_fileid);
+                    self.binary_files.pats.(new_field_name) = binData;
+                    fieldname = "Pattern" + length(self.imported_pattern_names);
+                    self.Patterns.(fieldname) = fileData;
+                    
+                    warndlg("The file you tried to import has had a new ID assigned to it of " + num2str(new_ID) + " because its ID matched another imported pattern.");
+                    %return;
+                else
+                    self.binary_files.pats.(field_name) = binData;
                 end
-                self.binary_files.pats.(field_name) = binData;
             elseif strcmp(bin_ext,'.pfn')
                 field_name = strcat('fun',fileid);
                 if isfield(self.binary_files.funcs, field_name)
-                    waitfor(errordlg("Your file was imported but the .pfn file was not. A function with that ID has already been imported."));
-                    return;
+                    
+                    highestID_imported = self.get_highest_ID_imported('pos');
+                    new_ID = highestID_imported + 1;
+                    fileData.pfnparam.ID = new_ID;
+                   
+                    num_zeroes_to_add = 4 - numel(num2str(new_ID));
+                    new_fileid = '';
+                    for i = 1:num_zeroes_to_add
+                        new_fileid = strcat(new_fileid,'0');
+                    end
+                    new_fileid = strcat(new_fileid,num2str(new_ID));
+                    new_field_name = strcat('fun',new_fileid);
+                    self.binary_files.funcs.(new_field_name) = binData;
+                    fieldname = "Function" + length(self.imported_posfunc_names);
+                    self.Pos_funcs.(fieldname) = fileData;
+                    
+                    warndlg("The file you tried to import has had a new ID assigned to it of " + num2str(new_ID) + " because its ID matched another imported position function.");
+
+                    
+%                     waitfor(errordlg("Your file was imported but the .pfn file was not. A function with that ID has already been imported."));
+%                     return;
+                else
+                    self.binary_files.funcs.(field_name) = binData;
                 end
-                self.binary_files.funcs.(field_name) = binData;
 
             elseif strcmp(bin_ext,'.afn')
                 field_name = strcat('ao',fileid);
                 if isfield(self.binary_files.ao, field_name)
-                    waitfor(errordlg("Your file was imported but the .afn file was not. An AO function with that ID has already been imported."));
-                    return;
-                end
-                self.binary_files.ao.(field_name) = binData;
+                    
+                    highestID_imported = self.get_highest_ID_imported('ao');
+                    new_ID = highestID_imported + 1;
+                    fileData.afnparam.ID = new_ID;
+                   
+                    num_zeroes_to_add = 4 - numel(num2str(new_ID));
+                    new_fileid = '';
+                    for i = 1:num_zeroes_to_add
+                        new_fileid = strcat(new_fileid,'0');
+                    end
+                    new_fileid = strcat(new_fileid,num2str(new_ID));
+                    new_field_name = strcat('ao',new_fileid);
+                    self.binary_files.ao.(new_field_name) = binData;
+                    fieldname = "AOFunction" + length(self.imported_aofunc_names);
+                    self.Ao_funcs.(fieldname) = fileData;
+                    
+                    warndlg("The file you tried to import has had a new ID assigned to it of " + num2str(new_ID) + " because its ID matched another imported AO function.");
 
+                    
+%                     waitfor(errordlg("Your file was imported but the .afn file was not. An AO function with that ID has already been imported."));
+%                     return;
+                else
+                    self.binary_files.ao.(field_name) = binData;
+                end
 
             end
             
             waitfor(msgbox(success_message));
 
+        end
+        
+        function [highest_ID] = get_highest_ID_imported(self, filetype)
+            if strcmp(filetype,'pattern')
+                fn = fieldnames(self.Patterns);
+
+                for i = 1:length(fn)
+                    ids(i) = self.Patterns.(fn{i}).pattern.param.ID;
+                end
+                highest_ID = max(ids);
+              
+                
+            elseif strcmp(filetype,'pos')
+                
+                fn = fieldnames(self.Pos_funcs);
+                
+                for i = 1:length(fn)
+                    ids(i) = self.Pos_funcs.(fn{i}).pfnparam.ID;
+                end
+                highest_ID = max(ids);
+
+            elseif strcmp(filetype,'ao')
+                
+                fn = fieldnames(self.Ao_funcs);
+                for i = 1:length(fn)
+                    ids(i) = self.Ao_funcs.(fn{i}).afnparam.ID;
+                end
+                highest_ID = max(ids);
+                
+            else
+                
+            end
+              
+            
+            
         end
 
         
