@@ -834,7 +834,7 @@ classdef G4_conductor_controller < handle
             end
             
             %Move the log files to the results file under the fly name
-            movefile([experiment_folder '\Log Files\*'],fullfile(experiment_folder,'Results',self.model.fly_name));
+            movefile(fullfile(experiment_folder,'Log Files','*'),fullfile(experiment_folder,'Results',self.model.fly_name));
             self.create_metadata_file();
                         
             if self.model.do_processing == 1 || self.model.do_plotting == 1
@@ -974,6 +974,8 @@ classdef G4_conductor_controller < handle
                 self.view.set_progress_title('Finished.');
                 drawnow;
             end
+            
+            waitfor(errordlg("Please remember to update the fly name before attempting to run your next experiment."));
 
         end
 

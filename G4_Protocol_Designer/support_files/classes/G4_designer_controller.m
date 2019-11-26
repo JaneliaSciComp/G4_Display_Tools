@@ -2420,39 +2420,44 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                 
                 self.second_axes = axes(self.preview_panel, 'units', 'normalized', 'Position', [.1, .15, .8 ,.7], 'XAxisLocation', 'top', 'YAxisLocation', 'right');
                 self.hAxes = axes(self.preview_panel,'units', 'normalized', 'Position', self.second_axes.Position);
-                time_in_ms = length(self.model.current_preview_file(1,:));
-                xax = [0 time_in_ms];
-                yax = [min(self.model.current_preview_file) max(self.model.current_preview_file)];
-
-                 
-                
-                self.inscreen_plot = plot(self.model.current_preview_file, 'parent', self.hAxes);
-                if dur <= length(self.model.current_preview_file(1,:))
-
-                    linedur = [dur, dur];
-                    line('XData', linedur, 'YData', yax, 'Color', [1 0 0], 'LineWidth', 2);
-                    
-                end
                 
                 timeLabel = 'Time (ms)';
                 patLabel = 'Pattern';
                 frameLabel = 'Frame Number';
+                yax = [min(self.model.current_preview_file) max(self.model.current_preview_file)];
                 
+                if frame_rate == 1000
+                    time_in_ms = length(self.model.current_preview_file(1,:));
+                    num_frames = frame_rate*(1/1000)*time_in_ms;
+                    
+                else
+                    time_in_ms = length(self.model.current_preview_file(1,:))*2;
+                    num_frames = frame_rate*(1/1000)*time_in_ms;
+                    
+                end
                 
-                self.second_axes.XLabel.String = frameLabel;
-                
+                xax = [0 num_frames];
+                xax2 = [0 time_in_ms];
+
+                self.inscreen_plot = plot(self.model.current_preview_file, 'parent', self.hAxes);
+                self.hAxes.XLabel.String = frameLabel;
+                self.second_axes.XLabel.String = timeLabel;
                 set(self.hAxes, 'XLim', xax, 'YLim', yax, 'TickLength',[0,0]);
-                self.hAxes.XLabel.String = timeLabel;
                 self.hAxes.YLabel.String = patLabel;
-                
-                num_frames = frame_rate*(1/1000)*time_in_ms;
-                xax2 = [0 num_frames];
                 yax2 = yax;
                 set(self.second_axes, 'Position', self.hAxes.Position, 'XLim', xax2, 'YLim', yax2, 'TickLength', [0,0], 'Color', 'none');
-                
 
-                
+                if dur <= xax2(2)
+                    if frame_rate == 1000
+                        linedur = [dur, dur];
+                        
+                    else
+                        linedur = [dur/2, dur/2];
+                    end
 
+                    line('XData', linedur, 'YData', yax, 'parent', self.hAxes, 'Color', [1 0 0], 'LineWidth', 2);
+
+                end
                 datacursormode on;
                 
 
