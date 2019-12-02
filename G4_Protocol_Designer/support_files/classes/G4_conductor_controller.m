@@ -1043,8 +1043,8 @@ classdef G4_conductor_controller < handle
                 [test_exp_path, ~, ~] = fileparts(self.doc.save_filename);
                 if exist(fullfile(test_exp_path,'Results',self.model.fly_name))
                     movefile(fullfile(test_exp_path,'Results',self.model.fly_name,'*'),fullfile(real_exp_path,'Results',real_fly_name,self.model.fly_name));
-                    rmdir(fullfile(test_exp_path,'Results', self.model.fly_name));
-                    rmdir(fullfile(test_exp_path,'Results'));
+                    %rmdir(fullfile(test_exp_path,'Results', self.model.fly_name));
+                    rmdir(fullfile(test_exp_path,'Results'),'s');
 
                 else
                     self.model.num_tests_conducted = self.model.num_tests_conducted - 1;
