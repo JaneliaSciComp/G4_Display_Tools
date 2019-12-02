@@ -198,7 +198,7 @@ classdef G4_document < handle
                     if ~isnumeric(new_value)
                         new_value = str2num(new_value);
                     end
-                    if new_value < 1 || new_value > 7
+                    if ~isempty(new_value) && (new_value < 1 || new_value > 7)
                         waitfor(errordlg("Mode must be 1-7 or left empty."));
                         return;
                     end
@@ -1961,7 +1961,7 @@ classdef G4_document < handle
                     
                         if ~isempty(folders)
                             for j = 1:length(folders)
-                                next_folders_list{end+1} = folders{j};
+                                next_folders_list{end+1} = strcat(folder_names{i},'\',folders{j});
                             end
                             
                         end
@@ -1974,6 +1974,7 @@ classdef G4_document < handle
                 else
                     no_more_subfolders = 1;
                 end
+                folder_names = next_folders_list;
                 %waitbar(1,prog,'Finishing...');
                 %close(prog);
             end
@@ -2196,6 +2197,10 @@ classdef G4_document < handle
         
         end
         
+        %% Color inactive cells depending on the current mode of the trial
+        %
+        % Reads 1st column from trial values, modifies properties via
+        % set_*_property()
         function insert_greyed_cells(self)
 
             pretrial_mode = self.pretrial{1};
@@ -2219,13 +2224,9 @@ classdef G4_document < handle
                 elseif pretrial_mode == 7
                     pre_indices_to_color = [3, 9, 10, 11];
                 end
-
-
-
             end
             
             if ~isempty(intertrial_mode)
-
                 if intertrial_mode == 1
                     inter_indices_to_color = [9, 10, 11];
                 elseif intertrial_mode == 2
@@ -2239,7 +2240,6 @@ classdef G4_document < handle
                 elseif intertrial_mode == 7
                     inter_indices_to_color = [3, 9, 10, 11];
                 end
-                
             end
             
             if ~isempty(posttrial_mode)
@@ -2257,13 +2257,11 @@ classdef G4_document < handle
                 elseif posttrial_mode == 7
                     post_indices_to_color = [3, 9, 10, 11];
                 end
-                
             end
 
 
             for i = 1:length(pre_indices_to_color)
                 self.set_pretrial_property(pre_indices_to_color(i),self.colorgen());
-
             end
             for i = 1:length(inter_indices_to_color)
                 self.set_intertrial_property(inter_indices_to_color(i),self.colorgen());
@@ -2274,30 +2272,29 @@ classdef G4_document < handle
 
             for i = 1:length(self.block_trials(:,1))
                 mode = self.block_trials{i,1};
-                if mode == 1
-                    indices_to_color = [9, 10, 11];
-                elseif mode == 2
-                    indices_to_color = [3, 10, 11];
-                elseif mode == 3
-                    indices_to_color = [3, 9, 10, 11];
-                elseif mode == 4
-                    indices_to_color = [3, 9];
-                elseif mode == 5 || mode == 6
-                    indices_to_color = 9;
-                elseif mode == 7
-                    indices_to_color = [3, 9, 10, 11];
+                if ~isempty(mode)
+                    if mode == 1
+                        indices_to_color = [9, 10, 11];
+                    elseif mode == 2
+                        indices_to_color = [3, 10, 11];
+                    elseif mode == 3
+                        indices_to_color = [3, 9, 10, 11];
+                    elseif mode == 4
+                        indices_to_color = [3, 9];
+                    elseif mode == 5 || mode == 6
+                        indices_to_color = 9;
+                    elseif mode == 7
+                        indices_to_color = [3, 9, 10, 11];
+                    end
                 end
                 for j = 1:length(indices_to_color)
                     self.set_block_trial_property([i,indices_to_color(j)],self.colorgen());
                 end
             end
-
-
-
         end
         
         
-        %Setters
+        %% Setters
         
         function set.top_folder_path(self, value)
             self.top_folder_path_ = value;
