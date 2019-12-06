@@ -327,6 +327,9 @@ classdef G4_document < handle
                         waitfor(errordlg("You duration must be zero or greater"));
                         return;
                     end
+                    %round to 1 decimal place, since the panel_com only takes
+                    %numbers to 1 decimal place. 
+                    new_value = round(new_value, 1);
 
                 end
 
@@ -492,6 +495,9 @@ classdef G4_document < handle
                     waitfor(errordlg("You duration must be zero or greater"));
                     return;
                 end
+                %round to 1 decimal place, since the panel_com only takes
+                %numbers to 1 decimal place. 
+                new_value = round(new_value, 1);
             end
                
             if patRows ~= numrows
@@ -653,6 +659,9 @@ classdef G4_document < handle
                     waitfor(errordlg("You duration must be zero or greater"));
                     return;
                 end
+                %round to 1 decimal place, since the panel_com only takes
+                %numbers to 1 decimal place. 
+                new_value = round(new_value, 1);
             end 
            
             if patRows ~= numrows
@@ -811,6 +820,9 @@ classdef G4_document < handle
                     waitfor(errordlg("You duration must be zero or greater"));
                     return;
                 end
+                %round to 1 decimal place, since the panel_com only takes
+                %numbers to 1 decimal place. 
+                new_value = round(new_value, 1);
             end
             
             if patRows ~= numrows

@@ -239,9 +239,12 @@ classdef G4_settings_controller < handle
         end
         
         %% General browse function
-        function new_file = browse(self)
-           
-            [file, path] = uigetfile;
+        function new_file = browse(self,filter)
+            if ~isempty(filter)
+                [file, path] = uigetfile(filter);
+            else
+                [file, path] = uigetfile;
+            end
             
             if file == 0
                 new_file = 0;

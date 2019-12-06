@@ -349,7 +349,7 @@ classdef G4_settings_view < handle
         
         function browse_for_run(self, ~, ~)
             
-            new_file = self.con.browse();
+            new_file = self.con.browse('*.m');
             if new_file ~= 0
                 self.run_protocol_textbox.String = new_file;
                 
@@ -358,7 +358,7 @@ classdef G4_settings_view < handle
         
         function browse_for_plot(self, ~, ~)
             
-            new_file = self.con.browse();
+            new_file = self.con.browse('*.m');
             if new_file ~= 0
                 self.plot_protocol_textbox.String = new_file;
                 
@@ -367,7 +367,7 @@ classdef G4_settings_view < handle
         
         function browse_for_proc(self, ~, ~)
             
-            new_file = self.con.browse();
+            new_file = self.con.browse('*.m');
             if new_file ~= 0
                 self.proc_protocol_textbox.String = new_file;
                 
@@ -376,7 +376,7 @@ classdef G4_settings_view < handle
         
         function browse_for_flight(self, ~, ~)
             
-            new_file = self.con.browse();
+            new_file = self.con.browse('*.g4p');
             if new_file ~= 0
                 self.flight_test_textbox.String = new_file;
                 
@@ -385,7 +385,7 @@ classdef G4_settings_view < handle
         
         function browse_for_walkCam(self, ~, ~)
             
-            new_file = self.con.browse();
+            new_file = self.con.browse('*.g4p');
             if new_file ~= 0
                 self.walkCam_test_textbox.String = new_file;
                 
@@ -394,7 +394,7 @@ classdef G4_settings_view < handle
         
         function browse_for_walkChip(self, ~, ~)
             
-            new_file = self.con.browse();
+            new_file = self.con.browse('*.g4p');
             if new_file ~= 0
                 self.walkChip_test_textbox.String = new_file;
                 
