@@ -9,7 +9,7 @@ function G4_Process_Data_flyingdetector(exp_folder, trial_options, manual_first_
 
 %% user-defined parameters
 %specify timeseries data channels
-channel_order = {'LmR_chan', 'L_chan', 'R_chan', 'F_chan', 'Frame Position', 'LmR', 'LpR'};
+channel_order = {'LmR_chan', 'L_chan', 'R_chan', 'F_chan', 'Frame Position', 'LmR', 'LpR','faLmR'};
 
 %specify time ranges for parsing and data analysis
 data_rate = 1000; % rate (in Hz) which all data will be aligned to
@@ -19,6 +19,7 @@ da_start = 0.05; %seconds after start of trial to start data analysis
 da_stop = 0.15; %seconds before end of trial to end data analysis
 time_conv = 1000000; %converts seconds to microseconds (TDMS timestamps are in micros)
 common_cond_dur = 0; %sets whether all condition durations are the same (1) or not (0), for error-checking
+processed_file_name = 'smallfield_V2_G4_Processed_Data.mat';
 
 
 %% configure data processing
@@ -116,7 +117,7 @@ if common_cond_dur == 1
     dur_error = abs(cond_dur-median_dur)./median_dur; %find condition duration error away from median
     [bad_conds, bad_reps] = find(dur_error>0.01); %find bad trials (any trial where duration is off by >1%)
     if ~isempty(bad_conds) %display bad trials
-        out = regexp(exp_folder,'\','start');
+        out = regexp(exp_folder,filesep,'start');
         exp_name = exp_folder(out(end)+1:end);
         fprintf([exp_name ' excluded trials' ])
         fprintf(' - cond %d, rep %d',[bad_conds bad_reps]')
@@ -133,7 +134,7 @@ if trial_options(2)
     dur_error = abs(intertrial_durs-median_dur)./median_dur; %find intertrial duration error away from median
     bad_intertrials = find(dur_error>0.01); %find bad intertrials (any trial where duration is off by >1%)
     if ~isempty(bad_intertrials) %display bad intertrials
-        out = regexp(exp_folder,'\','start');
+        out = regexp(exp_folder,filesep,'start');
         exp_name = exp_folder(out(end)+1:end);
         fprintf([exp_name ' excluded intertrials' ])
         fprintf(' - trial %d',[bad_intertrials]')
@@ -144,6 +145,7 @@ end
 %get indices for all datatypes
 Frame_ind = strcmpi(channel_order,'Frame Position');
 LmR_ind = find(strcmpi(channel_order,'LmR'));
+faLmR_ind = find(strcmpi(channel_order,'faLmR'));
 LpR_ind = find(strcmpi(channel_order,'LpR'));
 % LmR_chan_idx = strcmpi(channel_order,'LmR_chan');
 L_chan_idx = strcmpi(channel_order,'L_chan');
@@ -162,7 +164,7 @@ ts_data = nan([num_ts_datatypes num_conds num_reps length(ts_time)]);
 if trial_options(2) %if intertrials were run
     inter_ts_time = 0:1/data_rate:max(intertrial_durs)+0.01; 
     inter_ts_data = nan([num_trials-1 length(inter_ts_time)]);
-end
+end 
 
 %loop for every trial
 for trial=1:num_trials
@@ -208,6 +210,34 @@ end
 ts_data(LmR_ind,:,:,:) = ts_data(L_chan_idx,:,:,:) - ts_data(R_chan_idx,:,:,:); % + = right turns, - = left turns
 ts_data(LpR_ind,:,:,:) = ts_data(L_chan_idx,:,:,:) + ts_data(R_chan_idx,:,:,:); % + = increased amplitude, - = decreased
 
+%small field Experiment0002 - RK %sweeps and looms
+%%flip data for all conditions starting on the right side 
+ts_data(:,:,:,:,2) = nan; %duplicate ts_data along new dimension
+ts_data(faLmR_ind,:,:,:,:,1) = ts_data(LmR_ind,:,:,:,:,1); %1st set of values = LmR
+ts_data(faLmR_ind,1:2:32,:,:,2) = -ts_data(faLmR_ind,2:2:32,:,:,1); %2nd set of values = flipped LmR of the opposite condition (conditions from left side of panel) %small-field patterns
+ts_data(faLmR_ind,41:2:44,:,:,2) = -ts_data(faLmR_ind,42:2:44,:,:,1); %wide-field patterns (from left side of panel)
+ts_data(faLmR_ind,2:2:32,:,:,2) = -ts_data(faLmR_ind,1:2:32,:,:,1); %2nd set of values = flipped LmR of the opposite condition (conditions from right side of panel)%small-field patterns
+ts_data(faLmR_ind,42:2:44,:,:,2) = -ts_data(faLmR_ind,41:2:44,:,:,1);%wide-field patterns (from right side of panel)
+ts_data = nanmean(ts_data,5); %average together the 2 sets of values (only for faLmR, everything else stays the same)
+
+%average ts_data over number of reps
+timeseries_avg_over_reps = squeeze(nanmean(ts_data, 3));
+
+%average LmR data over number of reps
+LmR_avg_over_reps = squeeze(nanmean(ts_data(LmR_ind,:,:,:),3));
+
+%average LpR data over number of reps
+LpR_avg_over_reps = squeeze(nanmean(ts_data(LpR_ind,:,:,:),3));
+
+%average ts_data over all trials
+timeseries_avg_all_trials = squeeze(nanmean(timeseries_avg_over_reps,2));
+
+%average LmR data over all trials
+LmR_avg_all_trials = squeeze(nanmean(LmR_avg_over_reps,1));
+
+%average LpR data over all trials
+LpR_avg_all_trials = squeeze(nanmean(LpR_avg_over_reps,1));
+
 %duplicate ts_data and exclude all datapoints outside data analysis window (da_start:da_stop)
 da_data = ts_data;
 da_start_ind = find(ts_time>=da_start,1);
@@ -251,13 +281,17 @@ end
 
 
 %% save data
-Data.channelNames.timeseries = channel_order; %cell array of channel names for timeseries data
-Data.channelNames.histograms = hist_datatypes; %cell array of channel names for histograms
-Data.histograms = hist_data; %[datatype, condition, repetition, pattern-position]
-Data.interhistogram = inter_hist_data; %[repetition, pattern-position]
-Data.timestamps = ts_time; %[1 timestamp]
-Data.timeseries = ts_data; %[datatype, condition, repition, datapoint]
-Data.summaries = tc_data; %[datatype, condition, repition]
-Data.conditionModes = cond_modes(:,1); %[condition]
-save(fullfile(exp_folder,'G4_Processed_Data.mat'),'Data');
+channelNames.timeseries = channel_order; %cell array of channel names for timeseries data
+channelNames.histograms = hist_datatypes; %cell array of channel names for histograms
+histograms = hist_data; %[datatype, condition, repetition, pattern-position]
+interhistogram = inter_hist_data; %[repetition, pattern-position]
+timestamps = ts_time; %[1 timestamp]
+timeseries = ts_data; %[datatype, condition, repition, datapoint]
+summaries = tc_data; %[datatype, condition, repition]
+conditionModes = cond_modes(:,1); %[condition]
+
+save(fullfile(exp_folder,processed_file_name),'channelNames', 'histograms', ...
+    'interhistogram', 'timestamps', 'timeseries', 'summaries', 'conditionModes', ...
+    'timeseries_avg_over_reps', 'LmR_avg_over_reps', 'LpR_avg_over_reps', ...
+    'timeseries_avg_all_trials', 'LmR_avg_all_trials', 'LpR_avg_all_trials');
 
