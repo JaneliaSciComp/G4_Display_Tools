@@ -2434,14 +2434,15 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                 
                 if frame_rate == 1000
                     time_in_ms = length(self.model.current_preview_file(1,:));
-                    num_frames = frame_rate*(1/1000)*time_in_ms;
+                    
                     
                 else
                     time_in_ms = length(self.model.current_preview_file(1,:))*2;
-                    num_frames = frame_rate*(1/1000)*time_in_ms;
+                    
                     
                 end
                 
+                num_frames = frame_rate*(1/1000)*time_in_ms;
                 xax = [0 num_frames];
                 xax2 = [0 time_in_ms];
 

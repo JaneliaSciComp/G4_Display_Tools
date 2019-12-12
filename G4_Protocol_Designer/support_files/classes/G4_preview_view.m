@@ -77,6 +77,7 @@ classdef G4_preview_view < handle
             end
 
             ao_xlabel = 'Time';
+            ao_xlabel_top = '';
             ao_ylabel = 'Volts';
             
             set(currentFig, 'Position', fig_pos); %create overall figure for preview
@@ -95,10 +96,19 @@ classdef G4_preview_view < handle
                else
                    
                    pos_title = 'Position Function Preview';
-                   pos_xlabel = 'Time';
+                   pos_xlabel_top = 'Time (ms)';
+                   pos_xlabel_bottom = 'Total Frames Elapsed';
                    pos_ylabel = 'Frame Index';
+                   
+                   position_func_filename = self.con.model.data{3};
+                   position_field = self.con.model.doc.get_posfunc_field_name(position_func_filename);
+                   if self.con.model.doc.Pos_funcs.(position_field).pfnparam.gs_val == 1
+                       frame_rate = 1000;
+                   else
+                       frame_rate = 500;
+                   end
                    self.pos_line = self.plot_function(currentFig, self.con.model.pos_data, pos_pos, pos_title, ...
-                           pos_xlabel, pos_ylabel);
+                           pos_xlabel_bottom, pos_xlabel_top, pos_ylabel, frame_rate);
                    self.place_red_dur_line(self.con.model.pos_data);
                end
            end
@@ -111,10 +121,19 @@ classdef G4_preview_view < handle
                else
                    pos_title = "Closed-loop displayed as combination dummy function";
                end
-               pos_xlabel = 'Time';
+               
+               pat_filename = self.con.model.data{2};
+               pat_fieldname = self.con.model.doc.get_pattern_field_name(pat_filename);
+               if self.con.model.doc.Patterns.(pat_fieldname).pattern.gs_val == 1
+                   frame_rate = 1000;
+               else
+                   frame_rate = 500;
+               end
+               pos_xlabel = 'Time (ms)';
+               pos_xlabel_bottom = 'Frames elapsed';
                pos_ylabel = 'Frame Index';
                self.dummy_line = self.plot_function(currentFig, self.con.model.dummy_data, pos_pos, pos_title, ...
-                    pos_xlabel, pos_ylabel);
+                    pos_xlabel_bottom, pos_xlabel, pos_ylabel, frame_rate);
                 self.place_red_dur_line(self.con.model.dummy_data);
                
            end
@@ -123,15 +142,24 @@ classdef G4_preview_view < handle
            
                 pos_title = 'Position Function Preview';
                 pos_xlabel = 'Time';
+                pos_xlabel_bottom = 'Frames elapsed';
                 pos_ylabel = 'Frame Index';
                 
                 self.con.create_dummy_function();
                 dummy_title = "closed loop displayed as 1 Hz sine wave";
                 
+                pat_filename = self.con.model.data{2};
+                pat_fieldname = self.con.model.doc.get_pattern_field_name(pat_filename);
+                if self.con.model.doc.Patterns.(pat_fieldname).pattern.gs_val == 1
+                   frame_rate = 1000;
+                else
+                   frame_rate = 500;
+                end
+               
                 self.dummy_line = self.plot_function(currentFig, self.con.model.dummy_data, dum_pos, ...
-                    dummy_title, pos_xlabel, pos_ylabel);
+                    dummy_title, pos_xlabel_bottom, pos_xlabel, pos_ylabel, frame_rate);
                 self.pos_line = self.plot_function(currentFig, self.con.model.pos_data, pos_pos, ...
-                    pos_title, pos_xlabel, pos_ylabel);
+                    pos_title, pos_xlabel_bottom, pos_xlabel, pos_ylabel, frame_rate);
                 self.place_red_dur_line(self.con.model.pos_data);
                 self.place_red_dur_line(self.con.model.dummy_data);
            
@@ -145,7 +173,7 @@ classdef G4_preview_view < handle
                aoTitle = "Analog Output " + (i);
                if ~strcmp(self.con.model.data(i+3),'')
                    self.ao_lines{i} = self.plot_function(currentFig, self.con.model.ao_data{i}, ...
-                       ao_positions{i}, aoTitle, ao_xlabel, ao_ylabel);
+                       ao_positions{i}, aoTitle, ao_xlabel, ao_xlabel_top, ao_ylabel, 1000);
                    self.place_red_dur_line(self.con.model.ao_data{i});
                else
                    self.ao_lines{i} = 0;
@@ -310,19 +338,34 @@ classdef G4_preview_view < handle
         
         end
         
-        function [func_line] = plot_function(self, fig, func, position, graph_title, x_label, y_label)
+        function [func_line] = plot_function(self, fig, func, position, graph_title, x_label_bottom, x_label_top, y_label, frame_rate)
             
-            xlim = [0 length(func(1,:))];
+            if frame_rate == 1000
+                time_in_ms = length(func(1,:));
+            else
+                time_in_ms = length(func(1,:))*2;
+            end
+            num_frames = frame_rate*(1/1000)*time_in_ms;
+            
+            xlim = [0 num_frames];
+            xlim2 = [0 time_in_ms];
             ylim = [min(func) max(func)];
+            
             func_axes = axes(fig, 'units','pixels','Position', position, ...
-                'XLim', xlim, 'YLim', ylim);
-            p = plot(func);
-            set(p, 'parent', func_axes);
+                'XLim', xlim, 'YLim', ylim, 'TickLength',[0,0]);
+            func_axes_top = axes(fig, 'units','pixels','Position', position, ...
+                'XLim',xlim2,'YLim',ylim,'XAxisLocation','top','YAxisLocation','right');
+            p = plot(func, 'parent', func_axes);
+            func_axes.XLabel.String = x_label_bottom;
+            func_axes_top.XLabel.String = x_label_top;
+            func_axes.YLabel.String = y_label;
+            set(func_axes_top, 'TickLength', [0,0], 'Color', 'none');
+            
             func_line = line('XData',[self.con.model.preview_index, self.con.model.preview_index],'YData',[ylim(1), ylim(2)]);
             title(graph_title);
-            xlabel(x_label);
-            ylabel(y_label);
-                
+%             xlabel(x_label);
+%             ylabel(y_label);
+            
 
         end
         
