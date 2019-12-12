@@ -1016,7 +1016,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
             num_ao = length(ao_names);
 
             if num_pats == 0
-                pat1 = ''
+                pat1 = '';
             else
                 pat1 = pat_names{pat_index};
                 pat1_field = d.get_pattern_field_name(pat1);
@@ -1091,7 +1091,12 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
             d.set_posttrial_property(11, self.doc.colorgen());
             
             if num_pos ~= 0
-                block_dur = d.Pos_funcs.(pos1_field).pfnparam.size/1000;
+                if d.Pos_funcs.(pos1_field).pfnparam.gs_val == 1
+                    
+                    block_dur = round(d.Pos_funcs.(pos1_field).pfnparam.size/2000,1);
+                else
+                    block_dur = round(d.Pos_funcs.(pos1_field).pfnparam.size/1000,1);
+                end
                 d.set_block_trial_property([1,12], block_dur);
             end
             d.set_block_trial_property([1,2], pat1);
@@ -1120,7 +1125,11 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                         end
                         pos = pos_names{pos_index};
                         pos_field = d.get_posfunc_field_name(pos);
-                        dur = d.Pos_funcs.(pos_field).pfnparam.size/1000;
+                        if d.Pos_funcs.(pos_field).pfnparam.gs_val == 1
+                            dur = round(d.Pos_funcs.(pos_field).pfnparam.size/2000,1);
+                        else
+                            dur = round(d.Pos_funcs.(pos_field).pfnparam.size/1000,1);
+                        end
                     else
 
                         pos = '';
@@ -1147,7 +1156,9 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                     end
                     %Only executes if previous if statement did not. Sets new row's pattern
                     newrow = self.doc.block_trials(end, 1:end);
+                   
                     newrow{2} = pat; 
+                   
 
                     newrow{3} = pos; 
 
@@ -2643,19 +2654,22 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                 if mode == 2
                     frame_rate = self.doc.pretrial{9};
                 else
-                    if ~strcmp(patfield,'')
-                        if self.doc.Patterns.(patfield).pattern.gs_val == 1
-                            frame_rate = 1000;
-                        else 
-                            frame_rate = 500;
-                        end
-                    elseif ~strcmp(funcfield,'')
+                    if ~strcmp(funcfield,'')
                         if self.doc.Pos_funcs.(funcfield).pfnparam.gs_val == 1
                             
                             frame_rate = 1000;
                         else
                             frame_rate = 500;
                         end
+                        
+                    elseif ~strcmp(patfield,'')
+                        
+                        if self.doc.Patterns.(patfield).pattern.gs_val == 1
+                            frame_rate = 1000;
+                        else 
+                            frame_rate = 500;
+                        end
+                    
                     else
                         frame_rate = 1000;
                     end
@@ -2706,17 +2720,19 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                 if mode == 2
                     frame_rate = self.doc.intertrial{9};
                 else
-                    if ~strcmp(patfield,'')
-                        if self.doc.Patterns.(patfield).pattern.gs_val == 1
-                            frame_rate = 1000;
-                        else 
-                            frame_rate = 500;
-                        end
-                    elseif ~strcmp(funcfield,'')
+                     if ~strcmp(funcfield,'')
                         if self.doc.Pos_funcs.(funcfield).pfnparam.gs_val == 1
                             
                             frame_rate = 1000;
                         else
+                            frame_rate = 500;
+                        end
+                        
+                    elseif ~strcmp(patfield,'')
+                        
+                        if self.doc.Patterns.(patfield).pattern.gs_val == 1
+                            frame_rate = 1000;
+                        else 
                             frame_rate = 500;
                         end
                     else
@@ -2768,17 +2784,19 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                if mode == 2
                     frame_rate = self.doc.block_trials{index(1),9};
                 else
-                    if ~strcmp(patfield,'')
-                        if self.doc.Patterns.(patfield).pattern.gs_val == 1
-                            frame_rate = 1000;
-                        else 
-                            frame_rate = 500;
-                        end
-                    elseif ~strcmp(funcfield,'')
+                    if ~strcmp(funcfield,'')
                         if self.doc.Pos_funcs.(funcfield).pfnparam.gs_val == 1
                             
                             frame_rate = 1000;
                         else
+                            frame_rate = 500;
+                        end
+                        
+                    elseif ~strcmp(patfield,'')
+                        
+                        if self.doc.Patterns.(patfield).pattern.gs_val == 1
+                            frame_rate = 1000;
+                        else 
                             frame_rate = 500;
                         end
                     else
@@ -2829,17 +2847,19 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                  if mode == 2
                     frame_rate = self.doc.posttrial{9};
                 else
-                    if ~strcmp(patfield,'')
-                        if self.doc.Patterns.(patfield).pattern.gs_val == 1
-                            frame_rate = 1000;
-                        else 
-                            frame_rate = 500;
-                        end
-                    elseif ~strcmp(funcfield,'')
+                     if ~strcmp(funcfield,'')
                         if self.doc.Pos_funcs.(funcfield).pfnparam.gs_val == 1
                             
                             frame_rate = 1000;
                         else
+                            frame_rate = 500;
+                        end
+                        
+                    elseif ~strcmp(patfield,'')
+                        
+                        if self.doc.Patterns.(patfield).pattern.gs_val == 1
+                            frame_rate = 1000;
+                        else 
                             frame_rate = 500;
                         end
                     else
