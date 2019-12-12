@@ -113,6 +113,7 @@ classdef G4_preview_controller < handle
 
                 aoLineDist = [0 0 0 0];
                 self.model.ao_increment = self.model.fr_increment;
+          
                 
 
                 for i = 1:4
@@ -147,19 +148,38 @@ classdef G4_preview_controller < handle
                     end
 
                     if i == num_frames
-                        if time > length(self.model.pos_data)
-                            self.model.preview_index = rem(time,length(self.model.pos_data));
-                        else
-                            self.model.preview_index = time;
+                        if self.model.rt_frRate == 1000
+                            if time > length(self.model.pos_data)
+                                self.model.preview_index = rem(time,length(self.model.pos_data));
+                            else
+                                self.model.preview_index = time;
+                            
+                            end
+                            
+                        elseif self.model.rt_frRate == 500
+                            if time > length(self.model.pos_data)*2
+                                self.model.preview_index = rem(time,length(self.model.pos_data)*2);
+                            else
+                                self.model.preview_index = time;
+                            
+                            end
                         end
                      
                     end
-
-                    if self.model.preview_index > length(self.model.pos_data) || self.model.preview_index == 0
-                        self.model.preview_index = 1;
+                    if self.model.rt_frRate == 1000
+                        if self.model.preview_index > length(self.model.pos_data) || self.model.preview_index == 0
+                            self.model.preview_index = 1;
+                        end
+                    elseif self.model.rt_frRate == 500
+                        if self.model.preview_index > length(self.model.pos_data)*2 || self.model.preview_index == 0
+                            self.model.preview_index = 1;
+                        end
                     end
-
-                    frame = self.model.pos_data(self.model.preview_index);
+                    if self.model.rt_frRate == 500
+                        frame = self.model.pos_data(round(self.model.preview_index/2,0));
+                    else
+                        frame = self.model.pos_data(self.model.preview_index);
+                    end
                     set(self.view.im,'cdata',self.model.pattern_data(:,:,frame));
 
                     if self.view.pos_line ~= 0

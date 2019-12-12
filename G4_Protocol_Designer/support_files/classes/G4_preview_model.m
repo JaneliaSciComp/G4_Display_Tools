@@ -68,7 +68,20 @@ classdef G4_preview_model < handle
             
             if self.mode == 2
                 self.rt_frRate = self.data{9};
+            end
+            
+            if ~strcmp(self.data{3},'') && ~self.doc.check_if_cell_disabled(self.data{3})
+                pos = self.data{3};
+                posfield = self.doc.get_posfunc_field_name(pos);
+                self.pos_data = self.doc.Pos_funcs.(posfield).pfnparam.func;
+                if self.doc.Pos_funcs.(posfield).pfnparam.gs_val == 1
+                    self.rt_frRate = 1000;
+                else
+                    self.rt_frRate = 500;
+                end
+           
             else
+                
                 if self.doc.Patterns.(patfield).pattern.gs_val == 1
                     self.rt_frRate = 1000;
                 elseif self.doc.Patterns.(patfield).pattern.gs_val == 4
@@ -78,11 +91,7 @@ classdef G4_preview_model < handle
                 end
             end
             
-            if ~strcmp(self.data{3},'') && ~self.doc.check_if_cell_disabled(self.data{3})
-                pos = self.data{3};
-                posfield = self.doc.get_posfunc_field_name(pos);
-                self.pos_data = self.doc.Pos_funcs.(posfield).pfnparam.func;
-            end
+            
             
             for i = 4:7
                 
