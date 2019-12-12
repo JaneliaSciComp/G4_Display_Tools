@@ -1106,6 +1106,7 @@ classdef G4_conductor_controller < handle
                 "experiment_type", "rearing_protocol", "light_cycle", "do_plotting", "do_processing", "plotting_file", "processing_file", "run_protocol_file", ...
                 "comments"};
             if ~isempty(self.view)
+                waitfor(errordlg("Please add any comments you would like to the metadata, then click OK to continue."));
                 self.model.set_metadata_comments(self.view.comments_box.String);
             end
             model_metadata = {self.model.experimenter, self.doc.experiment_name, self.view.date_and_time_box.String, self.model.fly_name, self.model.fly_genotype, ...
