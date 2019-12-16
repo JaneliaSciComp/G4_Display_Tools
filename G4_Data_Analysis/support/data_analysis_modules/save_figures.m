@@ -7,6 +7,12 @@ function save_figures(save_settings, genotype)
     orientation = save_settings.orientation;
     x_width = save_settings.x_width;
     y_width = save_settings.y_width;
+    if ~ischar(genotype)
+        for i = 1:length(genotype)
+            genotype{i} = char(genotype{i});
+        end
+    end
+    
     
 
     h =  findobj('type','figure');

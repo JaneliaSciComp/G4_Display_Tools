@@ -59,7 +59,7 @@ classdef create_data_analysis_tool < handle
             % exp_folder: cell array of paths containing G4_Processed_Data.mat files
             % trial_options: 1x3 logical array [pre-trial, intertrial, post-trial]
             
-            %% Get plot settings from DA_plot_settings.m
+            % Get plot settings from DA_plot_settings.m
             [self.normalize_settings, self.histogram_plot_settings, self.histogram_annotation_settings, ...
     self.CL_hist_plot_settings, self.timeseries_plot_settings, self.TC_plot_settings, self.save_settings] = DA_plot_settings();
 
@@ -72,7 +72,7 @@ classdef create_data_analysis_tool < handle
             self.save_settings.save_path = '/Users/taylorl/Desktop/data_analysis/old_data';
             
         %Genotype(s) being compared
-            genotypes = ['empty-split', 'LPLC-2', 'LC-18', 'T4_T5', 'LC-15', 'LC-25', 'LC-11', 'LC-17', 'LC-4'];
+            genotypes = ["empty-split", "LPLC-2", "LC-18", "T4_T5", "LC-15", "LC-25", "LC-11", "LC-17", "LC-4"];
             for i = 1:length(genotypes)
                 self.genotype{i} = genotypes(i);
             end
@@ -98,7 +98,7 @@ classdef create_data_analysis_tool < handle
             patterns = ["3x1", "3x3", "3x3 ON", "8x8", "16x16", "64x3", "63x3 ON", "64x16"];
             looms = ["Left", "Right"];
             wf = ["Yaw", "Sideslip"];
-            for p = 1:8  % 8 patterns % 2 sweeps
+            for p = 1:length(patterns)  % 8 patterns % 2 sweeps
                 self.timeseries_plot_settings.cond_name{1+4*(p-1)} = [patterns(p) ' L 0.35 Hz Sweep'];
                 self.timeseries_plot_settings.cond_name{2+4*(p-1)} = [patterns(p) ' R 0.35 Hz Sweep'];
                 self.timeseries_plot_settings.cond_name{3+4*(p-1)} = [patterns(p) ' L 1.07 Hz Sweep'];
