@@ -1044,6 +1044,7 @@ classdef G4_conductor_controller < handle
                 if exist(fullfile(test_exp_path,'Results',self.model.fly_name))
                     movefile(fullfile(test_exp_path,'Results',self.model.fly_name,'*'),fullfile(real_exp_path,'Results',real_fly_name,self.model.fly_name));
                     %rmdir(fullfile(test_exp_path,'Results', self.model.fly_name));
+                    pause(1);
                     rmdir(fullfile(test_exp_path,'Results'),'s');
 
                 else
