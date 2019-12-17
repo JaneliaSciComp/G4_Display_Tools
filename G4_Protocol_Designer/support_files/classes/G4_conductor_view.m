@@ -358,7 +358,7 @@ classdef G4_conductor_view < handle
             date_and_time_label = uicontrol(metadata_pan, 'Style', 'text', 'String', 'Date and Time:', ...
                 'HorizontalAlignment', 'left', 'units', 'pixels', 'Position', metadata_label_position);
             self.date_and_time_box = uicontrol(metadata_pan, 'Style', 'edit', 'String', datestr(now, 'mm-dd-yyyy HH:MM:SS'), ...
-                'units', 'pixels', 'Position', metadata_box_position);
+                'units', 'pixels', 'Position', metadata_box_position, 'Callback', @self.new_timestamp);
             
             metadata_label_position(2) = metadata_label_position(2) - 25;
             metadata_box_position(2) = metadata_box_position(2) - 25;
@@ -546,6 +546,12 @@ classdef G4_conductor_view < handle
             
         end
         
+        function new_timestamp(self, src, ~)
+            
+            self.con.update_timestamp(src.String)
+            self.update_run_gui();
+        end
+        
         function new_comments(self, src, ~)
             
             self.con.update_comments(src.String);
@@ -572,7 +578,15 @@ classdef G4_conductor_view < handle
         end
         
         function run_test_exp(self, ~, ~)
-            self.con.run_test();
+            self.con.prepare_test_exp();
+            [original_filepath, original_fly_name] = self.con.run_test();
+            repeat = self.con.check_if_repeat();
+            while repeat > 0
+                [~, ~] = self.con.run_test(original_filepath, original_fly_name);
+                repeat = self.con.check_if_repeat();
+            end
+            self.con.reopen_original_experiment(original_filepath, original_fly_name);
+            
         end
         
         function run_browse(self, ~, ~)

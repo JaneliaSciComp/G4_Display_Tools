@@ -52,10 +52,11 @@ function [success] = G4_default_run_protocol(runcon, p)%input should always be 1
 %% Get access to the figure and progress bar in the run gui IF it was passed in.
 
 %        fig = runcon.fig;
+if ~isempty(runcon.view)
     progress_bar = runcon.view.progress_bar;
     progress_axes = runcon.view.progress_axes;
     axes_label = runcon.view.axes_label;
-
+end
 
 
  %% Set up parameters 
@@ -159,7 +160,11 @@ function [success] = G4_default_run_protocol(runcon, p)%input should always be 1
      end
      
 %% confirm start experiment
-     start = questdlg('Start Experiment?','Confirm Start','Start','Cancel','Start');
+    if ~isempty(runcon.view)
+        start = questdlg('Start Experiment?','Confirm Start','Start','Cancel','Start');
+    else
+        start = 'Start';
+    end
  
      switch start
      

@@ -1225,6 +1225,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
 
            if answer == 1
                self.import_folder('');
+               
 
            elseif answer == 2
                self.import_file('')
@@ -1254,7 +1255,8 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
             else
 
                 self.doc.top_export_path = top_folder_path;
-                self.doc.import_folder(top_folder_path);
+                import_success = self.doc.import_folder(top_folder_path);
+                waitfor(msgbox(import_success, 'Import successful!'));
                 [~, exp_name, ~] = fileparts(filepath);
 
                 if isempty(fieldnames(self.doc.Patterns))
@@ -3132,7 +3134,9 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                 %do nothing
             else
 
-                self.doc.import_folder(path);
+                import_success = self.doc.import_folder(path);
+                waitfor(msgbox(import_success, 'Import Successful!'));
+                
                 self.set_exp_name();
                 set(self.num_rows_3, 'Enable', 'off');
                 set(self.num_rows_4, 'Enable', 'off');

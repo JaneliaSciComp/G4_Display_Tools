@@ -26,10 +26,7 @@ classdef G4_conductor_controller < handle
         current_gain_
         current_offset_
         current_duration_
-        
-        
 
-        
     end
     
     
@@ -115,7 +112,10 @@ classdef G4_conductor_controller < handle
             
         end
 
-        
+        function update_timestamp(self, new_val)
+            %No error checking
+            self.model.set_timestamp(new_val);
+        end
         function update_fly_name(self, new_val)
             
             % no error checking
@@ -167,7 +167,7 @@ classdef G4_conductor_controller < handle
             
             %check to make sure file exists
             if isfile(filepath)
-                self.model.set_plotting_file(filepath)
+                self.model.set_plot_file(filepath)
             else
                 errormsg = "This plotting file does not exist. Please check the path.";
                 self.create_error_box(errormsg);
@@ -179,7 +179,7 @@ classdef G4_conductor_controller < handle
             
             %check to make sure file exists
             if isfile(filepath)
-                self.model.set_processing_file(filepath);
+                self.model.set_proc_file(filepath);
             else
                 errormsg = "This processing file does not exist. Please check the path.";
                 self.create_error_box(errormsg);
@@ -437,7 +437,10 @@ classdef G4_conductor_controller < handle
                 return;
             else
                 
-                self.doc.import_folder(top_folder_path);
+                import_success = self.doc.import_folder(top_folder_path);
+                if ~isempty(self.view)
+                    waitfor(msgbox(import_success, 'Import successful!'));
+                end
                 [exp_path, exp_name, ext] = fileparts(filepath);
                 self.doc.experiment_name = exp_name;
                 self.doc.save_filename = top_folder_path;
@@ -535,8 +538,12 @@ classdef G4_conductor_controller < handle
             
             %returns if you forgot to save the experiment.
             if strcmp(self.doc.save_filename,'') == 1
-                self.create_error_box("You didn't save this experiment. Please go back and save then run the experiment again.", "Please save.");
-                return
+                if ~isempty(self.view)
+                    self.create_error_box("You didn't save this experiment. Please go back and save then run the experiment again.", "Please save.");
+                else
+                    disp('Failed: Experiment has not been saved.');
+                end
+                return;
             end
             
             %gets path to experiment folder
@@ -551,8 +558,12 @@ classdef G4_conductor_controller < handle
             %check if log files already present or if a fly by that name
             %already has results in this experiment folder.
             
-            if length(dir([experiment_folder '\Log Files\']))>2
-                self.create_error_box('unsorted files present in "Log Files" folder, remove before restarting experiment\n');
+            if length(dir(fullfile(experiment_folder, 'Log Files')))>2
+                if ~isempty(self.view)
+                    self.create_error_box('unsorted files present in "Log Files" folder, remove before restarting experiment\n');
+                else
+                    disp('Failed: There are unsorted files in the "Log Files" folder. Please remove them and try again.');
+                end
                 return;
             end
             if exist(fullfile(experiment_folder, 'Results', self.model.fly_name),'dir')
@@ -566,13 +577,16 @@ classdef G4_conductor_controller < handle
                 folders(~folders) = [];
                 
                 if length(itemnames) > length(folders)
-                    
-                    self.create_error_box('Results folder of that fly name already has data in it\n');
+                    if ~isempty(self.view)
+                        self.create_error_box('Results folder of that fly name already has data in it\n');
+                    else
+                        disp('Failed: That fly already has data in the results folder.');
+                    end
                     return;
                 end
             end
             
-            %create .mat file of metadata
+            
             
             
             %-------------------------------------------------------------
@@ -795,14 +809,18 @@ classdef G4_conductor_controller < handle
 
             end
             
-            save([experiment_folder '\Log Files\exp_order.mat'],'exp_order')
+            save(fullfile(experiment_folder,'Log Files','exp_order.mat'),'exp_order')
             
             parameters.exp_order = exp_order;
             parameters.experiment_folder = experiment_folder;
             
             %Make sure the run file entered exists
             if ~isfile(self.model.run_protocol_file)
-                self.create_error_box("Please make sure you've entered a valid .m file to run the experiment.");
+                if ~isempty(self.view)
+                    self.create_error_box("Please make sure you've entered a valid .m file to run the experiment.");
+                else
+                    disp('Failed: The run protocol is not a valid .m file.');
+                end
                 return;
             end
             
@@ -817,24 +835,39 @@ classdef G4_conductor_controller < handle
             pause(3);
             
             if self.check_if_aborted()
-                [logs_removed, msg] = rmdir([experiment_folder '\Log Files\'], 's');
+                [logs_removed, msg] = rmdir(fullfile(experiment_folder, 'Log Files'), 's');
                 if logs_removed == 0
-                    self.create_error_box("Matlab was unable to delete the log files. Please delete manually.");
+                    if ~isempty(self.view)
+    
+                        self.create_error_box("Matlab was unable to delete the log files. Please delete manually.");
+                    else
+                        disp('Failed to delete the log files from the Log Files folder when aborting experiment. Please remove them manually.');
+                    end
                     disp(msg);
                 else
-                    self.create_error_box("Experiment aborted successfully.");
+                    if ~isempty(self.view)
+                        self.create_error_box("Experiment aborted successfully.");
+                    else
+                        disp('Experiment aborted succesfully');
+                    end
                 end
                 self.is_aborted = 0;
                     
                 return;
             end
             
-            if success == 0
+            if success == 0 
+                if isempty(self.view)
+                    disp('Experiment failed for unknown reason.');
+                end
+                [logs_removed, msg] = rmdir(fullfile(experiment_folder, 'Log Files'), 's');
                 return;
             end
             
             %Move the log files to the results file under the fly name
             movefile(fullfile(experiment_folder,'Log Files','*'),fullfile(experiment_folder,'Results',self.model.fly_name));
+            
+            %create .mat file of metadata
             self.create_metadata_file();
                         
             if self.model.do_processing == 1 || self.model.do_plotting == 1
@@ -880,7 +913,11 @@ classdef G4_conductor_controller < handle
             
             %Run post processing and plotting scripts if selected
             if self.model.do_processing == 1 && (strcmp(self.model.processing_file,'') || ~isfile(self.model.processing_file))
-                self.create_error_box("Processing script was not run because the processing file could not be found. Please run manually.");
+                if ~isempty(self.view)
+                    self.create_error_box("Processing script was not run because the processing file could not be found. Please run manually.");
+                else
+                    disp('Processing file could not be found. Please run manually.');
+                end
      
             elseif self.model.do_processing == 1 && isfile(self.model.processing_file)
                 [proc_path, proc_name, proc_ext] = fileparts(self.model.processing_file);
@@ -891,7 +928,11 @@ classdef G4_conductor_controller < handle
             end
             
             if self.model.do_plotting == 1 && (strcmp(self.model.plotting_file,'') || ~isfile(self.model.plotting_file))
-                self.create_error_box("Plotting script was not run because the plotting file could not be found. Please run manually.");
+                if ~isempty(self.view)
+                    self.create_error_box("Plotting script was not run because the plotting file could not be found. Please run manually.");
+                else
+                    disp('Plotting file could not be found. Please run manually.');
+                end
             elseif self.model.do_plotting == 1 && isfile(self.model.plotting_file)
                 [plot_path, plot_name, plot_ext] = fileparts(self.model.plotting_file);
                 plotting_command = plot_name + "(metadata.fly_results_folder, metadata.trial_options)";
@@ -943,15 +984,12 @@ classdef G4_conductor_controller < handle
                 metadata.trial_options = trial_options;
                 metadata.comments = self.model.metadata_comments;
                 metadata.light_cycle = self.model.light_cycle;
-                
-                
-                
+            
                 %assigns the metadata struct to metadata in the base
                 %workspace so publish can use it.
                 assignin('base','metadata',metadata);
                 assignin('base','fly_results_folder',fly_results_folder);
                 assignin('base','trial_options',trial_options);
-
 
                 %publishes the output (but not code) "create_pdf_script" to
                 %a pdf file.
@@ -966,8 +1004,7 @@ classdef G4_conductor_controller < handle
                 pdf_path = fullfile(fly_results_folder,plot_filename);
                 new_pdf_path = fullfile(fly_results_folder,new_plot_filename);
                 movefile(pdf_path, new_pdf_path);
-                
-                
+
                 
             end
             if ~isempty(self.view)
@@ -975,40 +1012,14 @@ classdef G4_conductor_controller < handle
                 drawnow;
             end
             
-            waitfor(errordlg("Please remember to update the fly name before attempting to run your next experiment."));
+            if ~isempty(self.view)
+                waitfor(errordlg("Please remember to update the fly name before attempting to run your next experiment."));
+            end
 
         end
+        
+        function prepare_test_exp(self)
 
-        function run_test(self)
-            
-            self.model.num_tests_conducted = self.model.num_tests_conducted + 1;
-            repeat = 1;
-            [real_exp_path, real_experiment_name, real_ext] =  fileparts(self.doc.save_filename);
-            real_file = [real_experiment_name, real_ext];
-            real_fly_name = self.model.fly_name;
-
-            %Get filepath to the test protocol
-            if self.model.experiment_type == 1
-                %Get the flight filepath from settings
-                line_to_match = 'Flight test protocol file: ';
-                
-            elseif self.model.experiment_type == 2
-                %Get path to camera test file
-                line_to_match = 'Camera walk test protocol file: ';
-                
-               
-            else
-                %Get path to chip test file
-                line_to_match = 'Chip walk test protocol file: ';
-            end
-            
-            [settings_data, line_path, index] = self.model.get_setting(line_to_match);
-            path_to_experiment = strtrim(settings_data{line_path}(index:end));
-            
-            % Open test g4p file
-            self.open_g4p_file(path_to_experiment);
-            
-            
             line_to_match = 'Default test run protocol file: ';
             %Get default run protocol file for tests
             [settingsData, linePath, idx] = self.model.get_setting(line_to_match);
@@ -1026,50 +1037,124 @@ classdef G4_conductor_controller < handle
             [settingsData, linePath, idx] = self.model.get_setting(line_to_match);
             path_to_plot_protocol = strtrim(settingsData{linePath}(idx:end));
             
-            %Set test specific values
-            self.model.fly_name = ['trial',num2str(self.model.num_tests_conducted)];
             self.model.set_run_file(path_to_run_protocol);
             self.model.set_plot_file(path_to_plot_protocol);
             self.model.set_proc_file(path_to_proc_protocol);
             
+        end
+
+        function [original_exp_path, real_fly_name] = run_test(self, original_experiment, original_fly_name)
             
+            self.model.num_tests_conducted = self.model.num_tests_conducted + 1;
+            %repeat = 1;
+            if ~exist('original_experiment','var')
+                original_experiment = self.doc.save_filename;
+            end
+            original_exp_path = original_experiment;
+            [real_file_path, ~, ~] = fileparts(original_experiment);
+            if ~exist('original_fly_name','var')
+                original_fly_name = self.model.fly_name;
+            end
+            real_fly_name = original_fly_name;
+           
+            %Get filepath to the test protocol
+            if self.model.experiment_type == 1
+                %Get the flight filepath from settings
+                line_to_match = 'Flight test protocol file: ';
+                
+            elseif self.model.experiment_type == 2
+                %Get path to camera test file
+                line_to_match = 'Camera walk test protocol file: ';
+    
+            else
+                %Get path to chip test file
+                line_to_match = 'Chip walk test protocol file: ';
+            end
+            
+            [settings_data, line_path, index] = self.model.get_setting(line_to_match);
+            path_to_experiment = strtrim(settings_data{line_path}(index:end));
+            
+            % Open test g4p file
+            self.open_g4p_file(path_to_experiment);
+            
+            %Set test specific values
+            self.model.fly_name = ['trial',num2str(self.model.num_tests_conducted)];
+
             if ~isempty(self.view)
                 self.update_view_if_exists();
             end
             
-            while repeat == 1
-                self.run();
+%             while repeat == 1
+            self.run();
 
-                [test_exp_path, ~, ~] = fileparts(self.doc.save_filename);
-                if exist(fullfile(test_exp_path,'Results',self.model.fly_name))
-                    movefile(fullfile(test_exp_path,'Results',self.model.fly_name,'*'),fullfile(real_exp_path,'Results',real_fly_name,self.model.fly_name));
-                    %rmdir(fullfile(test_exp_path,'Results', self.model.fly_name));
-                    pause(1);
-                    rmdir(fullfile(test_exp_path,'Results'),'s');
+            [test_exp_path, ~, ~] = fileparts(self.doc.save_filename);
+            if exist(fullfile(test_exp_path,'Results',self.model.fly_name))
+                movefile(fullfile(test_exp_path,'Results',self.model.fly_name,'*'),fullfile(real_file_path,'Results',real_fly_name,self.model.fly_name),'f');
+                %rmdir(fullfile(test_exp_path,'Results', self.model.fly_name));
+                pause(.5);
+                rmdir(fullfile(test_exp_path,'Results'),'s');
 
-                else
-                    self.model.num_tests_conducted = self.model.num_tests_conducted - 1;
+            else
+                self.model.num_tests_conducted = self.model.num_tests_conducted - 1;
 
-                end
-                if exist(fullfile(test_exp_path,'Log Files'))
-                    rmdir(fullfile(test_exp_path,'Log Files'), 's');
-                end
-                
+            end
+            if exist(fullfile(test_exp_path,'Log Files'))
+                rmdir(fullfile(test_exp_path,'Log Files'), 's');
+            end
+            
+
+        end
+        
+        function repeat = check_if_repeat(self)
+           
+            if ~isempty(self.view)
                 answer = questdlg('Would you like to repeat the test protocol?', 'Repeat', 'Yes', 'No', 'No');
                 if strcmp(answer, 'Yes')
-                    self.model.num_tests_conducted = self.model.num_tests_conducted + 1;
-                    self.model.fly_name = ['trial',num2str(self.model.num_tests_conducted)];
+                    repeat = 1;
+                else
+                    repeat = 0;
+                end
+            else
+                answer = input('Would you like to repeat the test? Enter "Y" for yes or "N" for no.','s');
+                if strcmp(answer,"Y")
+                    repeat = 1;
                 else
                     repeat = 0;
                 end
             end
-                
-            original_exp_path = fullfile(real_exp_path, real_file);
-            self.open_g4p_file(original_exp_path);
-            self.model.fly_name = real_fly_name;
-            self.update_view_if_exists();
-
+            
         end
+        
+        function reopen_original_experiment(self, filepath, fly_name)
+            
+            line_to_match = 'Default run protocol file: ';
+            %Get default run protocol file for tests
+            [settingsData, linePath, idx] = self.model.get_setting(line_to_match);
+            path_to_run_protocol = strtrim(settingsData{linePath}(idx:end));
+            
+            line_to_match = 'Default processing file: ';
+            
+            %Get default processing file for tests
+            [settingsData, linePath, idx] = self.model.get_setting(line_to_match);
+            path_to_proc_protocol = strtrim(settingsData{linePath}(idx:end));
+            
+            line_to_match = 'Default plotting file: ';
+            
+            %Get default plotting file for tests
+            [settingsData, linePath, idx] = self.model.get_setting(line_to_match);
+            path_to_plot_protocol = strtrim(settingsData{linePath}(idx:end));
+            
+            self.model.set_run_file(path_to_run_protocol);
+            self.model.set_plot_file(path_to_plot_protocol);
+            self.model.set_proc_file(path_to_proc_protocol);
+            
+            self.open_g4p_file(filepath);
+            self.model.fly_name = fly_name;
+            self.update_view_if_exists();
+            
+        end
+        
+
         
         function browse_file(self, which_file)
            
@@ -1110,7 +1195,7 @@ classdef G4_conductor_controller < handle
                 waitfor(errordlg("Please add any comments you would like to the metadata, then click OK to continue."));
                 self.model.set_metadata_comments(self.view.comments_box.String);
             end
-            model_metadata = {self.model.experimenter, self.doc.experiment_name, self.view.date_and_time_box.String, self.model.fly_name, self.model.fly_genotype, ...
+            model_metadata = {self.model.experimenter, self.doc.experiment_name, self.model.timestamp, self.model.fly_name, self.model.fly_genotype, ...
                 self.model.fly_age, self.model.fly_sex, self.model.experiment_temp, ...
                 self.model.experiment_type, self.model.rearing_protocol, self.model.light_cycle, self.model.do_plotting, self.model.do_processing, ...
                 self.model.plotting_file, self.model.processing_file, self.model.run_protocol_file, self.model.metadata_comments};

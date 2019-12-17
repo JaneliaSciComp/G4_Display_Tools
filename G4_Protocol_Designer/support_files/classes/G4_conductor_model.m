@@ -23,6 +23,8 @@ classdef G4_conductor_model < handle
         metadata_options_
        num_tests_conducted_
        expected_time_
+       timestamp_
+       
         
     end
     
@@ -49,6 +51,7 @@ classdef G4_conductor_model < handle
         metadata_options
         num_tests_conducted
         expected_time
+        timestamp
     end
     
     
@@ -153,8 +156,8 @@ classdef G4_conductor_model < handle
                 cleaned_folders = folders(~ismember({folders(:).name},{'.','..'}));
 
                 num_folders = length(cleaned_folders);
-                repeat = 1;
-                while repeat == 1
+                repeat = 7;
+                while repeat == 7
                     if num_folders + 1 < 10
                         num_string = ['00',num2str(num_folders+1)];
                     elseif num_folders + 1 >= 10 && num_folders + 1 <= 99
@@ -164,8 +167,8 @@ classdef G4_conductor_model < handle
                     end
 
                     fly_name = ['fly',num_string];
-                    repeat = exist(fullfile(results_folder, self.fly_name),'dir');
-                    if repeat == 1
+                    repeat = exist(fullfile(results_folder, fly_name),'dir');
+                    if repeat == 7
                         num_folders = num_folders + 1;
                     end
                 end
@@ -238,6 +241,10 @@ classdef G4_conductor_model < handle
         
         function set_expected_time(self, new_val)
             self.expected_time = new_val;
+        end
+        
+        function set_timestamp(self, new_val)
+            self.timestamp = new_val;
         end
         
         function reset_num_tests_conducted(self)
@@ -330,6 +337,10 @@ classdef G4_conductor_model < handle
         function value = get.expected_time(self)
             value = self.expected_time_;
         end
+        
+        function value = get.timestamp(self)
+            value = self.timestamp_;
+        end
             
 
 
@@ -414,6 +425,10 @@ classdef G4_conductor_model < handle
         
         function set.expected_time(self, value)
             self.expected_time_ = value;
+        end
+        
+        function set.timestamp(self, value)
+            self.timestamp_ = value;
         end
         
         

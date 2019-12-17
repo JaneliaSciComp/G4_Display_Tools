@@ -1917,7 +1917,7 @@ classdef G4_document < handle
             
         end
 %Import a folder, called from the controller and calls more specific import functions for each type of folder ---------------------------------        
-        function import_folder(self, path)
+        function success_statement = import_folder(self, path)
             
            % prog = waitbar(0, 'Importing...', 'WindowStyle', 'modal'); %start waiting bar
             self.top_folder_path = path;
@@ -2024,7 +2024,8 @@ classdef G4_document < handle
                     success_statement = success_statement + aos_imported_statement + newline;
                 end
  
-                waitfor(msgbox(success_statement, 'Import Successful'));
+                
+%                 waitfor(msgbox(success_statement, 'Import Successful'));
             
 
 
