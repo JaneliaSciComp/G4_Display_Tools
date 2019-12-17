@@ -212,13 +212,13 @@ ts_data(LpR_ind,:,:,:) = ts_data(L_chan_idx,:,:,:) + ts_data(R_chan_idx,:,:,:); 
 
 %small field Experiment0002 - RK %sweeps and looms
 %%flip data for all conditions starting on the right side 
-ts_data(:,:,:,:,2) = nan; %duplicate ts_data along new dimension
-ts_data(faLmR_ind,:,:,:,:,1) = ts_data(LmR_ind,:,:,:,:,1); %1st set of values = LmR
-ts_data(faLmR_ind,1:2:32,:,:,2) = -ts_data(faLmR_ind,2:2:32,:,:,1); %2nd set of values = flipped LmR of the opposite condition (conditions from left side of panel) %small-field patterns
-ts_data(faLmR_ind,41:2:44,:,:,2) = -ts_data(faLmR_ind,42:2:44,:,:,1); %wide-field patterns (from left side of panel)
-ts_data(faLmR_ind,2:2:32,:,:,2) = -ts_data(faLmR_ind,1:2:32,:,:,1); %2nd set of values = flipped LmR of the opposite condition (conditions from right side of panel)%small-field patterns
-ts_data(faLmR_ind,42:2:44,:,:,2) = -ts_data(faLmR_ind,41:2:44,:,:,1);%wide-field patterns (from right side of panel)
-ts_data = nanmean(ts_data,5); %average together the 2 sets of values (only for faLmR, everything else stays the same)
+% ts_data(:,:,:,:,2) = nan; %duplicate ts_data along new dimension
+% ts_data(faLmR_ind,:,:,:,:,1) = ts_data(LmR_ind,:,:,:,:,1); %1st set of values = LmR
+% ts_data(faLmR_ind,1:2:32,:,:,2) = -ts_data(faLmR_ind,2:2:32,:,:,1); %2nd set of values = flipped LmR of the opposite condition (conditions from left side of panel) %small-field patterns
+% ts_data(faLmR_ind,41:2:44,:,:,2) = -ts_data(faLmR_ind,42:2:44,:,:,1); %wide-field patterns (from left side of panel)
+% ts_data(faLmR_ind,2:2:32,:,:,2) = -ts_data(faLmR_ind,1:2:32,:,:,1); %2nd set of values = flipped LmR of the opposite condition (conditions from right side of panel)%small-field patterns
+% ts_data(faLmR_ind,42:2:44,:,:,2) = -ts_data(faLmR_ind,41:2:44,:,:,1);%wide-field patterns (from right side of panel)
+% ts_data = nanmean(ts_data,5); %average together the 2 sets of values (only for faLmR, everything else stays the same)
 
 %average ts_data over number of reps
 timeseries_avg_over_reps = squeeze(nanmean(ts_data, 3));
