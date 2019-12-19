@@ -836,6 +836,7 @@ classdef G4_conductor_controller < handle
             
             if self.check_if_aborted()
                 [logs_removed, msg] = rmdir(fullfile(experiment_folder, 'Log Files'), 's');
+                pause(1);
                 if logs_removed == 0
                     if ~isempty(self.view)
     
@@ -861,6 +862,7 @@ classdef G4_conductor_controller < handle
                     disp('Experiment failed for unknown reason.');
                 end
                 [logs_removed, msg] = rmdir(fullfile(experiment_folder, 'Log Files'), 's');
+                pause(1);
                 return;
             end
             

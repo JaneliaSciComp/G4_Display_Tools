@@ -1985,6 +1985,7 @@ classdef G4_document < handle
                     
                 else
                     no_more_subfolders = 1;
+                    next_folders_list = {};
                 end
                 folder_names = next_folders_list;
                 %waitbar(1,prog,'Finishing...');

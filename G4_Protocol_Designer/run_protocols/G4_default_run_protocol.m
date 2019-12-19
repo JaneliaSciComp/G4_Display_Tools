@@ -299,6 +299,7 @@ end
              
              if runcon.check_if_aborted()
                 Panel_com('stop_display');
+                pause(.1);
                 Panel_com('stop_log');
                 pause(1);
                 disconnectHost;
@@ -386,6 +387,7 @@ end
                     isAborted = runcon.check_if_aborted();
                     if isAborted == 1
                         Panel_com('stop_display');
+                        pause(.1);
                         Panel_com('stop_log');
                         pause(1);
                         disconnectHost;
@@ -453,6 +455,7 @@ end
                          pause(inter_dur + .01);
                          if runcon.check_if_aborted() == 1
                             Panel_com('stop_display');
+                            pause(.1);
                             Panel_com('stop_log');
                             pause(1);
                             disconnectHost;
