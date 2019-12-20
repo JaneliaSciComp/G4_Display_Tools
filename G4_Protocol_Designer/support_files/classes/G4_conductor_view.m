@@ -559,7 +559,10 @@ classdef G4_conductor_view < handle
         end
         
         function open(self, ~, ~, filepath)
-           
+           if ~exist('filepath','var')
+               [file, path] = uigetfile();
+               filepath = fullfile(path,file);
+           end
             self.con.open_g4p_file(filepath);
             self.update_run_gui();
             
