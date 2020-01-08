@@ -21,7 +21,6 @@ function [normalize_settings, histogram_plot_settings, histogram_annotation_sett
     %% Annotation settings for basic Histograms
     histogram_annotation_settings = struct;
     histogram_annotation_settings.textbox = [0.3 0.0001 0.7 0.027];
-    histogram_annotation_settings.date_range = "08/08/19 to 08/13/19";
     histogram_annotation_settings.font_size = 10;
     histogram_annotation_settings.font_name = 'Arial';
     histogram_annotation_settings.line_style = '-';
@@ -48,6 +47,7 @@ function [normalize_settings, histogram_plot_settings, histogram_annotation_sett
     timeseries_plot_settings.timeseries_ylimits = [-1.1 1.1; -1 6; -1 6; -1 6; 1 192; -1.1 1.1; 2 20; -2 4]; %[min max] y limits for each datatype (including 1 additional for 'faLmR' option)
     timeseries_plot_settings.timeseries_xlimits = [0 4];
     timeseries_plot_settings.subtitle_fontSize = 8;
+    timeseries_plot_settings.legend_fontSize = 6;
     timeseries_plot_settings.overlap = 0;
     timeseries_plot_settings.rep_colors = [0.5 0.5 0.5; 1 0.5 0.5; 0.5 0.5 1];
     timeseries_plot_settings.rep_lineWidth = 0.05;
@@ -58,9 +58,6 @@ function [normalize_settings, histogram_plot_settings, histogram_annotation_sett
     timeseries_plot_settings.frame_scale = .5;
     timeseries_plot_settings.frame_color = [0.7 0.7 0.7];
     timeseries_plot_settings.frame_superimpose = 0;%plots the frame position underneath each timeseries plot
-    
-   
-
 
     %% Plot settings for tuning curves
     TC_plot_settings = struct;

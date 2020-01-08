@@ -23,11 +23,17 @@ classdef create_data_analysis_tool < handle
         timeseries_plot_option
         OL_datatypes        
         OL_conds
+        OL_conds_durations
+        OL_conds_axis_labels
         timeseries_plot_settings
         patterns
         looms
         wf
         cond_name
+        timeseries_top_left_place
+        timeseries_bottom_left_places
+        timeseries_left_column_places
+        timeseries_bottom_row_places
         
         TC_plot_option
         TC_datatypes
@@ -77,6 +83,9 @@ classdef create_data_analysis_tool < handle
                 self.genotype{i} = genotypes(i);
             end
             
+        %Update dates
+            self.histogram_annotation_settings.date_range = "08/08/19 to 08/13/19";
+            
             % CL_conds: matrix of closed-loop (CL) conditions to plot as histograms
             % OL_conds: matrix of open-loop (OL) conditions to plot as timeseries
             % TC_conds: matrix of open-loop conditions to plot as tuning curves (TC)
@@ -89,9 +98,25 @@ classdef create_data_analysis_tool < handle
             self.OL_conds{2} = [17 19; 21 23; 25 27; 29 31]; %16x16, 64x3, 64x3 ON, 64x16 (4 x 2 plots)
             self.OL_conds{3} = [33 34; 35 36; 37 38; 39 40]; %left and right Looms (4 x 2 plots)
             self.OL_conds{4} = [41; 43]; %yaw and sideslip (2 x 1 plots)
+            
             %self.OL_conds = [];
             self.CL_conds = []; 
             self.TC_conds = []; 
+            
+            %Durations of the trials are used to set the x-axis limits for each
+            %graph
+
+            self.OL_conds_durations{1} = [3.5 1.62; 3.5 1.62; 3.5 1.62; 3.5 1.62];
+            self.OL_conds_durations{2} = [3.5 1.62; 3.5 1.62; 3.5 1.62; 3.5 1.62];
+            self.OL_conds_durations{3} = [0.75 1.35; 1.65 0.95; 0.75 1.35; 1.65 0.95];
+            self.OL_conds_durations{4} = [2.35 2.35];
+            
+            %each figure should be of graphs that have the same x and y
+            %labels.  Save them as an array [x-label, y-label]
+            self.OL_conds_axis_labels{1} = ["Time(sec)", "LmR"];
+            self.OL_conds_axis_labels{2} = ["Time(sec)", "LmR"];
+            self.OL_conds_axis_labels{3} = ["Time(sec)", "LmR"];
+            self.OL_conds_axis_labels{4} = ["Time(sec)", "LmR"];
             
         %% Generate condition names for timeseries plot titles
             self.timeseries_plot_settings.cond_name = cell(1,81);
@@ -116,6 +141,8 @@ classdef create_data_analysis_tool < handle
                 self.timeseries_plot_settings.cond_name{41+2*(w-1)} = [wf(w) ' CW 10 Hz'];
                 self.timeseries_plot_settings.cond_name{42+2*(w-1)} = [wf(w) ' CCW 10 Hz'];   
             end
+            
+           
             
         %% Datatypes
         %datatype options for flying data: 'LmR_chan', 'L_chan', 'R_chan', 'F_chan', 'Frame Position', 'LmR', 'LpR', 'faLmR'
@@ -145,6 +172,63 @@ classdef create_data_analysis_tool < handle
             self.exp_folder = exp_folder;
             [self.num_groups, self.num_exps] = size(exp_folder);
             self.trial_options = trial_options;
+            
+            %Determine which graphs are in the leftmost column so we know
+            %to keep their y-axes turned on.
+            
+            %place refers to the count of the graph in order from top left
+            %to bottom right. So for example, an OL_conds of [1 3 5; 7 8 9;
+            %11 13 15;] shows a three by three grid of plots of those
+            %condition numbers. The places would be [ 1 4 7; 2 5 8; 3 6 9;]
+            %so conditions 1 7, and 11 would be in places 1, 2, and 3 and
+            %would be marked as being the leftmost plots. The bottom row,
+            %conditions 11, 13, and 15, would be in places 3, 6, and 9.
+            %It's done this way because of the indexing in matlab. In this
+            %example OL_conds, OL_conds(4) would be 3, because it goes down
+            %columns, not across rows, and index increases. 
+
+            %Top left place and bottom left place (1 and 3 in the above
+            %example, or conditions 1 and 11), are calculated separately
+            %because these two positions will additionally have a label on
+            %their y and x-axes. 
+            
+           
+            if ~isempty(self.OL_conds)
+                self.timeseries_top_left_place = 1;
+                for i = 1:length(self.OL_conds)
+                    self.timeseries_bottom_left_places{i} = size(self.OL_conds{i},1);
+                    %self.timeseries_plot_settings.bottom_left_place{i} = size(self.OL_conds{i},1)*size(self.OL_conds{i},2)-(size(self.OL_conds{i},2) - 1);
+                    count = 1;
+                    if size(self.OL_conds{i},1) ~= 1
+                        for j = 1:size(self.OL_conds{i},1)*size(self.OL_conds{i},2)
+                            if mod(j, size(self.OL_conds{i},1)) == 0
+                                self.timeseries_bottom_row_places{i}(count) = j;
+                                count = count + 1;
+                            end
+                            
+                        end
+                        for m = 1:size(self.OL_conds{i},1)
+                            self.timeseries_left_column_places{i}(m) = m;
+                        end
+                        
+                        
+                    else
+                        for k = 1:length(self.OL_conds{i})
+                            self.timeseries_bottom_row_places{i}(k) = k;
+                        end
+                        self.timeseries_left_column_places{i} = 1;
+                    end
+                    
+                    
+                end
+            end
+            
+            % Same thing as above but now we're finding out which places
+            % are the bottom row so we know to keep their x-axes turned on.
+            
+            
+            
+          
                         
         
             
@@ -235,6 +319,8 @@ classdef create_data_analysis_tool < handle
                 self.datatype_indices.TC_inds] = get_datatype_indices(channelNames, self.OL_datatypes, ...
                 self.CL_datatypes, self.TC_datatypes);
             
+            self.run_safety_checks();
+            
             
             %% Run Data analysis based on settings
             
@@ -271,8 +357,11 @@ classdef create_data_analysis_tool < handle
             if self.timeseries_plot_option == 1
                 for k = 1:numel(self.OL_conds)
                     plot_OL_timeseries(self.CombData.timeseries_avg_over_reps, ...
-                        self.CombData.timestamps, self.OL_conds{k}, self.datatype_indices.OL_inds, ...
-                        self.datatype_indices.Frame_ind, self.num_groups, self.genotype, self.timeseries_plot_settings);
+                        self.CombData.timestamps, self.OL_conds{k}, self.OL_conds_durations{k}, ...
+                        self.datatype_indices.OL_inds, self.OL_conds_axis_labels{k}, ...
+                        self.datatype_indices.Frame_ind, self.num_groups, self.genotype, self.timeseries_plot_settings,...
+                        self.timeseries_top_left_place, self.timeseries_bottom_left_places{k}, ...
+                        self.timeseries_left_column_places{k}, self.timeseries_bottom_row_places{k});
                 end
                 
             end
@@ -293,6 +382,33 @@ classdef create_data_analysis_tool < handle
             
             save_figures(self.save_settings, self.genotype);
 
+            
+        end
+        
+        function run_safety_checks(self)
+           
+            if ~isempty(self.OL_conds) && ~isempty(self.OL_conds_durations)
+                
+                %OL_conds and OL_conds_durations must be exactly the same
+                %dimensions
+                
+                if size(self.OL_conds) ~= size(self.OL_conds_durations)
+                    errordlg("Your OL_conds and OL_conds_durations must be exaclty the same size.")
+                    return;
+                end
+                
+                for i = 1:length(self.OL_conds)
+                    if size(self.OL_conds{i}) ~= size(self.OL_conds_durations{i})
+                        errordlg("Your OL_conds and OL_conds_durations must be exaclty the same size.");
+                        return;
+                    end
+                end
+                
+                      
+                    
+                
+            end
+                
             
         end
         
