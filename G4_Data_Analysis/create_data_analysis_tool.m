@@ -109,7 +109,7 @@ classdef create_data_analysis_tool < handle
             self.OL_conds_durations{1} = [3.5 1.62; 3.5 1.62; 3.5 1.62; 3.5 1.62];
             self.OL_conds_durations{2} = [3.5 1.62; 3.5 1.62; 3.5 1.62; 3.5 1.62];
             self.OL_conds_durations{3} = [0.75 1.35; 1.65 0.95; 0.75 1.35; 1.65 0.95];
-            self.OL_conds_durations{4} = [2.35 2.35];
+            self.OL_conds_durations{4} = [2.35; 2.35];
             
             %each figure should be of graphs that have the same x and y
             %labels.  Save them as an array [x-label, y-label]
