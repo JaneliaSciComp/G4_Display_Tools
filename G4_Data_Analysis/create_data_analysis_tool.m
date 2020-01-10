@@ -1,4 +1,4 @@
-
+ 
 
 classdef create_data_analysis_tool < handle
     
@@ -10,6 +10,9 @@ classdef create_data_analysis_tool < handle
         CombData
         processed_data_file
         flags
+        
+        group_analysis
+        single_analysis
         
         histogram_plot_option
         histogram_plot_settings
@@ -33,7 +36,7 @@ classdef create_data_analysis_tool < handle
         timeseries_top_left_place
         timeseries_bottom_left_places
         timeseries_left_column_places
-        timeseries_bottom_row_places
+        %timeseries_bottom_row_places
         
         TC_plot_option
         TC_datatypes
@@ -51,6 +54,8 @@ classdef create_data_analysis_tool < handle
         num_exps
         
         data_needed
+        
+        group_being_analyzed_name
     
         %% TO ADD A NEW MODULE
 %         new_module_option
@@ -77,11 +82,21 @@ classdef create_data_analysis_tool < handle
         %Filepath at which to save plots
             self.save_settings.save_path = '/Users/taylorl/Desktop/data_analysis/old_data';
             
+        %This should be the filepath to the folder which contains all
+        %experiment folders (or results folders) being analyzed. It is
+        %where the group analysis log file will be saved. 
+            self.save_settings.results_path = "/Users/taylorl/Desktop/forLisa/";
+            
         %Genotype(s) being compared
             genotypes = ["empty-split", "LPLC-2", "LC-18", "T4_T5", "LC-15", "LC-25", "LC-11", "LC-17", "LC-4"];
             for i = 1:length(genotypes)
                 self.genotype{i} = genotypes(i);
             end
+            
+        %This is the group name that the data analysis log file will be saved under. For example if you're analyzing
+        %all the flies put through an experimental protocol, this should be
+        %the name of the protocol
+            self.group_being_analyzed_name = 'protocol-1';
             
         %Update dates
             self.histogram_annotation_settings.date_range = "08/08/19 to 08/13/19";
@@ -166,6 +181,8 @@ classdef create_data_analysis_tool < handle
             self.CL_histogram_plot_option = 0;
             self.timeseries_plot_option = 0;
             self.TC_plot_option = 0;
+            self.single_analysis = 0;
+            self.group_analysis = 0;
 
 
         %% Settings based on inputs
@@ -173,54 +190,11 @@ classdef create_data_analysis_tool < handle
             [self.num_groups, self.num_exps] = size(exp_folder);
             self.trial_options = trial_options;
             
-            %Determine which graphs are in the leftmost column so we know
-            %to keep their y-axes turned on.
             
-            %place refers to the count of the graph in order from top left
-            %to bottom right. So for example, an OL_conds of [1 3 5; 7 8 9;
-            %11 13 15;] shows a three by three grid of plots of those
-            %condition numbers. The places would be [ 1 4 7; 2 5 8; 3 6 9;]
-            %so conditions 1 7, and 11 would be in places 1, 2, and 3 and
-            %would be marked as being the leftmost plots. The bottom row,
-            %conditions 11, 13, and 15, would be in places 3, 6, and 9.
-            %It's done this way because of the indexing in matlab. In this
-            %example OL_conds, OL_conds(4) would be 3, because it goes down
-            %columns, not across rows, and index increases. 
-
-            %Top left place and bottom left place (1 and 3 in the above
-            %example, or conditions 1 and 11), are calculated separately
-            %because these two positions will additionally have a label on
-            %their y and x-axes. 
             
            
             if ~isempty(self.OL_conds)
-                self.timeseries_top_left_place = 1;
-                for i = 1:length(self.OL_conds)
-                    self.timeseries_bottom_left_places{i} = size(self.OL_conds{i},1);
-                    %self.timeseries_plot_settings.bottom_left_place{i} = size(self.OL_conds{i},1)*size(self.OL_conds{i},2)-(size(self.OL_conds{i},2) - 1);
-                    count = 1;
-                    if size(self.OL_conds{i},1) ~= 1
-                        for j = 1:size(self.OL_conds{i},1)*size(self.OL_conds{i},2)
-                            if mod(j, size(self.OL_conds{i},1)) == 0
-                                self.timeseries_bottom_row_places{i}(count) = j;
-                                count = count + 1;
-                            end
-                            
-                        end
-                        for m = 1:size(self.OL_conds{i},1)
-                            self.timeseries_left_column_places{i}(m) = m;
-                        end
-                        
-                        
-                    else
-                        for k = 1:length(self.OL_conds{i})
-                            self.timeseries_bottom_row_places{i}(k) = k;
-                        end
-                        self.timeseries_left_column_places{i} = 1;
-                    end
-                    
-                    
-                end
+                
             end
             
             % Same thing as above but now we're finding out which places
@@ -270,6 +244,15 @@ classdef create_data_analysis_tool < handle
                         
                         self.TC_plot_option = 1;
                         
+                    case '-Single'
+                        
+                        self.single_analysis = 1;
+                        
+                    case '-Group'
+                        
+                        self.group_analysis = 1;
+                        
+                        
                     %% Add new module
                     %Add a new flag to indicate your module and add a case
                     %for it. 
@@ -305,7 +288,54 @@ classdef create_data_analysis_tool < handle
             
             if self.timeseries_plot_option == 1 && isempty(self.OL_conds)
                 self.OL_conds = create_default_OL_plot_layout(conditionModes, self.OL_conds);
+                
             end
+                
+                %Determine which graphs are in the leftmost column so we know
+            %to keep their y-axes turned on.
+            
+            %place refers to the count of the graph in order from top left
+            %to bottom right. So for example, an OL_conds of [1 3 5; 7 8 9;
+            %11 13 15;] shows a three by three grid of plots of those
+            %condition numbers. The places would be [ 1 4 7; 2 5 8; 3 6 9;]
+            %so conditions 1 7, and 11 would be in places 1, 2, and 3 and
+            %would be marked as being the leftmost plots. The bottom row,
+            %conditions 11, 13, and 15, would be in places 3, 6, and 9.
+            %It's done this way because of the indexing in matlab. In this
+            %example OL_conds, OL_conds(4) would be 3, because it goes down
+            %columns, not across rows, and index increases. 
+
+            %Top left place and bottom left place (1 and 3 in the above
+            %example, or conditions 1 and 11), are calculated separately
+            %because these two positions will additionally have a label on
+            %their y and x-axes. 
+            
+            self.timeseries_top_left_place = 1;
+            for i = 1:length(self.OL_conds)
+                self.timeseries_bottom_left_places{i} = size(self.OL_conds{i},1);
+                %self.timeseries_plot_settings.bottom_left_place{i} = size(self.OL_conds{i},1)*size(self.OL_conds{i},2)-(size(self.OL_conds{i},2) - 1);
+                %count = 1;
+                if size(self.OL_conds{i},1) ~= 1
+%                     for j = 1:size(self.OL_conds{i},1)*size(self.OL_conds{i},2)
+%                         if mod(j, size(self.OL_conds{i},1)) == 0
+%                             self.timeseries_bottom_row_places{i}(count) = j;
+%                             count = count + 1;
+%                         end
+% 
+%                     end
+                    for m = 1:size(self.OL_conds{i},1)
+                        self.timeseries_left_column_places{i}(m) = m;
+                    end
+
+
+                else
+%                     for k = 1:length(self.OL_conds{i})
+%                         self.timeseries_bottom_row_places{i}(k) = k;
+%                     end
+                    self.timeseries_left_column_places{i} = 1;
+                end
+            end
+            
             
             if self.CL_histogram_plot_option == 1 && isempty(self.CL_conds)
                 self.CL_conds = create_default_CL_plot_layout(conditionModes, self.CL_conds);
@@ -314,6 +344,7 @@ classdef create_data_analysis_tool < handle
             if self.TC_plot_option == 1 && isempty(self.TC_conds)
                 self.TC_conds = create_default_TC_plot_layout(conditionModes, self.TC_conds);
             end
+
         
             [self.datatype_indices.Frame_ind, self.datatype_indices.OL_inds, self.datatype_indices.CL_inds, ...
                 self.datatype_indices.TC_inds] = get_datatype_indices(channelNames, self.OL_datatypes, ...
@@ -330,12 +361,48 @@ classdef create_data_analysis_tool < handle
         
         function run_analysis(self)
             
-            [num_positions, num_datatypes, num_conds, num_datapoints, self.CombData] ...
+            if self.single_analysis
+                
+                self.run_single_analysis();
+                               
+            elseif self.group_analysis
+                
+                self.run_group_analysis();
+                
+            else
+                
+                disp("You must enter either the '-Group' or '-Single' flag");
+                
+            end
+                        
+            save_figures(self.save_settings, self.genotype);
+            
+            
+
+            
+        end
+        
+        function run_single_analysis(self)
+            
+            disp("Single fly analysis coming soon");
+            
+        end
+        
+        function run_group_analysis(self)
+            
+            analyses_run = {};
+            
+            [num_positions, num_datatypes, num_conds, num_datapoints, self.CombData, files_excluded] ...
                 = load_specified_data(self.exp_folder, self.CombData, self.data_needed, self.processed_data_file);
            
             if self.normalize_option ~= 0
                 
                 self.CombData = normalize_data(self, num_conds, num_datapoints, num_datatypes, num_positions);
+                if self.normalize_option == 1
+                    analyses_run{end+1} = "Normalization 1";
+                else
+                    analyses_run{end+1} = "Normalization 2";
+                end
                 
             end
             
@@ -343,6 +410,8 @@ classdef create_data_analysis_tool < handle
                 plot_basic_histograms(self.CombData.timeseries_avg_over_reps, self.CombData.interhistogram, ...
                     self.TC_datatypes, self.histogram_plot_settings, self.num_groups, self.num_exps,...
                     self.genotype, self.datatype_indices.TC_inds, self.trial_options, self.histogram_annotation_settings);
+                
+                analyses_run{end+1} = "Basic histograms";
             end
             
             if self.CL_histogram_plot_option == 1
@@ -351,6 +420,8 @@ classdef create_data_analysis_tool < handle
                     plot_CL_histograms(self.CL_conds{k}, self.datatype_indices.CL_inds, ...
                         self.CombData.histograms, self.num_groups, self.CL_hist_plot_settings);
                 end
+                
+                analyses_run{end+1} = "CL histograms";
 
             end
             
@@ -361,8 +432,12 @@ classdef create_data_analysis_tool < handle
                         self.datatype_indices.OL_inds, self.OL_conds_axis_labels{k}, ...
                         self.datatype_indices.Frame_ind, self.num_groups, self.genotype, self.timeseries_plot_settings,...
                         self.timeseries_top_left_place, self.timeseries_bottom_left_places{k}, ...
-                        self.timeseries_left_column_places{k}, self.timeseries_bottom_row_places{k});
+                        self.timeseries_left_column_places{k});
+                    
+                    
                 end
+                
+                analyses_run{end+1} = "Timeseries Plots";
                 
             end
             
@@ -372,6 +447,8 @@ classdef create_data_analysis_tool < handle
                        self.TC_plot_settings.overlap, self.num_groups, self.CombData);
                 end
                 
+                analyses_run{end+1} = "Tuning Curves";
+                
             end
             
             %% ADD NEW MODULE
@@ -379,9 +456,8 @@ classdef create_data_analysis_tool < handle
 %             if self.new_module_option == 1
 %                 new_mod_test();
 %             end
-            
-            save_figures(self.save_settings, self.genotype);
 
+            update_analysis_file_group(self.group_being_analyzed_name, self.save_settings.results_path, self.save_settings.save_path, analyses_run, files_excluded);
             
         end
         

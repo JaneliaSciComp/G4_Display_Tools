@@ -1,5 +1,5 @@
 %% load all data files
-function [num_positions, num_datatypes, num_conds, num_datapoints, CombData] = load_specified_data(exp_folder, CombData, fields_to_load, processed_filename)
+function [num_positions, num_datatypes, num_conds, num_datapoints, CombData, files_excluded] = load_specified_data(exp_folder, CombData, fields_to_load, processed_filename)
     [num_groups, num_exps] = size(exp_folder);
 %    CombData.conditionModes = CombData.conditionModes; 
 %    CombData.channelNames = CombData.channelNames;
@@ -13,14 +13,17 @@ function [num_positions, num_datatypes, num_conds, num_datapoints, CombData] = l
     CombData.LmR_avg_over_reps = [];
     CombData.LpR_avg_over_reps = [];
     
+    files_excluded = {};
+    
     %Load the first file to create initial array sizes
     
     files = dir(exp_folder{1,1});
+    
     try
         Data_name = files(contains({files.name},{processed_filename})).name;
     catch
         
-        error(['cannot find G4_Processed_Data file in ' exp_folder{1,1}]);
+        error(['cannot find ' processed_filename ' file in ' exp_folder{1,1}]);
     end
 
     fields = load(fullfile(exp_folder{1,1},Data_name), fields_to_load{1:end});
@@ -64,7 +67,8 @@ function [num_positions, num_datatypes, num_conds, num_datapoints, CombData] = l
                     Data_name = files(contains({files.name},{processed_filename})).name;
                 catch
                     
-                    disp(['cannot find G4_Processed_Data file in ' exp_folder{g,e}])
+                    disp(['cannot find ' processed_filename ' file in ' exp_folder{g,e}])
+                    files_excluded{end+1} = [exp_folder{g,e}, "could not find processed file"];
                     continue;
                    
                 end
@@ -72,8 +76,13 @@ function [num_positions, num_datatypes, num_conds, num_datapoints, CombData] = l
                 fields = load(fullfile(exp_folder{g,e},Data_name), fields_to_load{1:end});
                 
                 if ~isempty(CombData.timeseries_avg_over_reps) && ~isempty(CombData.timeseries)
-                    assert(all(size(squeeze(CombData.timeseries_avg_over_reps(1,1,:,:,1)))==size(squeeze(CombData.timeseries(1,1,:,:,1,1)))),...
-                    ['Data in ' exp_folder{g,e} 'appears to be the incorrect size']);
+                    if ~all(size(squeeze(CombData.timeseries_avg_over_reps(1,1,:,:,1)))==size(squeeze(CombData.timeseries(1,1,:,:,1,1))))
+                        
+                        disp(['Data in ' exp_folder{g,e} 'appears to be the incorrect size']);
+                        files_excluded{end+1} = [exp_folder{g,e}, "timeseries data and avg timeseries data different sizes"];
+                        continue;
+                    end
+                    
 
                 end
                 
@@ -82,6 +91,7 @@ function [num_positions, num_datatypes, num_conds, num_datapoints, CombData] = l
                     if size(fields.timeseries_avg_over_reps,3) > 2*size(CombData.timeseries_avg_over_reps,5)
                         
                         disp(['Timeseries data in ' exp_folder{g,e} ' appears to be too large. It has been removed from this analysis.']);
+                        files_excluded{end+1} = [exp_folder{g,e}, "timeseries data too large"];
                         continue;
                     end
                     

@@ -8,7 +8,7 @@
 
 function plot_OL_timeseries(timeseries_data, timestampsIN, OL_conds, OL_durations, OL_inds, ...
     axis_labels, Frame_ind, num_groups, genotype, plot_settings, top_left_place, bottom_left_place, ...
-    left_col_places, bottom_row_places)
+    left_col_places)
 
     overlap = plot_settings.overlap;
     rep_Colors = plot_settings.rep_colors;
