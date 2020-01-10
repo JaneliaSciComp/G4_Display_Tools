@@ -73,7 +73,7 @@ function plot_OL_timeseries(timeseries_data, timestampsIN, OL_conds, OL_duration
                                 framepos = squeeze(nanmedian(nanmedian(timeseries_data(:,:,Frame_ind,cond,:),2),1))';
                                 framepos = (frame_scale*framepos/max(framepos))+timeseries_ylimits(d,1)-frame_scale*yrange;
                                 ylim([timeseries_ylimits(d,1)-frame_scale*yrange timeseries_ylimits(d,2)])
-                                plot(timestamps,framepos,'Color',frame_color,'LineWidth',mean_LineWidth);
+                                plot(timestampsIN,framepos,'Color',frame_color,'LineWidth',mean_LineWidth);
                             end
                             if overlap==1
                                 cond = OL_conds(row*2,col,fig);
