@@ -1095,6 +1095,7 @@ classdef G4_conductor_controller < handle
                 %rmdir(fullfile(test_exp_path,'Results', self.model.fly_name));
                 pause(.5);
                 rmdir(fullfile(test_exp_path,'Results'),'s');
+                pause(.1);
 
             else
                 self.model.num_tests_conducted = self.model.num_tests_conducted - 1;
@@ -1102,6 +1103,7 @@ classdef G4_conductor_controller < handle
             end
             if exist(fullfile(test_exp_path,'Log Files'))
                 rmdir(fullfile(test_exp_path,'Log Files'), 's');
+                pause(.1);
             end
             
 
