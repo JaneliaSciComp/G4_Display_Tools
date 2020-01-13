@@ -24,7 +24,12 @@ function [OL_conds] = create_default_OL_plot_layout(conditionModes, OL_condsIn)
         for i = 1:length(OL_conds(1,1,:))
             OL_conds_cell{i} = OL_conds(:,:,i);
         end
+
         OL_conds = OL_conds_cell;
     end
+    
+    %create matching durations cell array
+    
+    
 
 end

@@ -210,7 +210,8 @@ classdef create_data_analysis_tool < handle
             self.flags = varargin;
             self.data_needed = {'conditionModes', 'channelNames', 'summaries'};
             for i = 1:length(self.flags)
-                switch self.flags{i}
+                
+                switch lower(self.flags{i})
                     case '-norm1' %Normalize over each fly
                         
                         self.normalize_option = 1;
@@ -230,27 +231,28 @@ classdef create_data_analysis_tool < handle
                         self.data_needed{end+1} = 'timeseries_avg_over_reps';
                         self.data_needed{end+1} = 'interhistogram';
                         
-                    case '-CLhist' %Do closed loop histogram plots
+                    case '-clhist' %Do closed loop histogram plots
                         
                         self.CL_histogram_plot_option = 1;
                         self.data_needed{end+1} = 'histograms';
                         
-                    case '-TSplot' %Do timeseries plots
+                    case '-tsplot' %Do timeseries plots
                         
                         self.timeseries_plot_option = 1;
                         self.data_needed{end+1} = 'timeseries_avg_over_reps';
                         
-                    case '-TCplot' %Do tuning curve plots
+                    case '-tcplot' %Do tuning curve plots
                         
-                        self.TC_plot_option = 1;
+                        self.TC_plot_option = 1;                     
                         
-                    case '-Single'
+                    case '-single'
                         
                         self.single_analysis = 1;
                         
-                    case '-Group'
+                    case '-group'
                         
                         self.group_analysis = 1;
+
                         
                         
                     %% Add new module
@@ -276,10 +278,12 @@ classdef create_data_analysis_tool < handle
                 error('cannot find TDMSlogs file in specified folder')
             end
 
-            load(fullfile(exp_folder{1,1},Data_name), 'channelNames', 'conditionModes', 'timestamps');
+            load(fullfile(exp_folder{1,1},Data_name), 'channelNames', 'conditionModes', 'timestamps', 'timeseries_avg_over_reps');
             self.CombData.timestamps = timestamps;
             self.CombData.channelNames = channelNames;
             self.CombData.conditionModes = conditionModes;
+            
+            
             
             %% Variables that must be calculated
             
@@ -289,6 +293,12 @@ classdef create_data_analysis_tool < handle
             if self.timeseries_plot_option == 1 && isempty(self.OL_conds)
                 self.OL_conds = create_default_OL_plot_layout(conditionModes, self.OL_conds);
                 
+            end
+            
+            if isempty(self.OL_conds_durations)
+                    
+                 self.OL_conds_durations = create_default_OL_durations(self.OL_conds, timeseries_avg_over_reps, self.CombData.timestamps);
+                %run module to set durations (x axis limits)
             end
                 
                 %Determine which graphs are in the leftmost column so we know
@@ -377,9 +387,7 @@ classdef create_data_analysis_tool < handle
                         
             save_figures(self.save_settings, self.genotype);
             
-            
 
-            
         end
         
         function run_single_analysis(self)
@@ -426,6 +434,7 @@ classdef create_data_analysis_tool < handle
             end
             
             if self.timeseries_plot_option == 1
+                
                 for k = 1:numel(self.OL_conds)
                     plot_OL_timeseries(self.CombData.timeseries_avg_over_reps, ...
                         self.CombData.timestamps, self.OL_conds{k}, self.OL_conds_durations{k}, ...
@@ -469,13 +478,13 @@ classdef create_data_analysis_tool < handle
                 %dimensions
                 
                 if size(self.OL_conds) ~= size(self.OL_conds_durations)
-                    errordlg("Your OL_conds and OL_conds_durations must be exaclty the same size.")
+                    errordlg("Your OL_conds and OL_conds_durations arrays must be exaclty the same size.")
                     return;
                 end
                 
                 for i = 1:length(self.OL_conds)
                     if size(self.OL_conds{i}) ~= size(self.OL_conds_durations{i})
-                        errordlg("Your OL_conds and OL_conds_durations must be exaclty the same size.");
+                        errordlg("Your OL_conds and OL_conds_durations arrays must be exaclty the same size.");
                         return;
                     end
                 end

@@ -119,8 +119,9 @@ function plot_OL_timeseries(timeseries_data, timestampsIN, OL_conds, OL_duration
                         if place == bottom_left_place
                             xlabel(axis_labels(1)) %7th subplot - Bottom Left
                         end
-
-                        xlim([0, OL_durations(place)]);
+                        if ~isnan(OL_durations(place))
+                            xlim([0, OL_durations(place)]);
+                        end
 
 %                         % setting figures
 %                         if OL_conds == 41 
