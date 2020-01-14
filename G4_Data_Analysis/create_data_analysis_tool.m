@@ -392,13 +392,14 @@ classdef create_data_analysis_tool < handle
         
         function run_single_analysis(self)
             
+            analyses_run = {'Single'};
             disp("Single fly analysis coming soon");
             
         end
         
         function run_group_analysis(self)
             
-            analyses_run = {};
+            analyses_run = {'Group'};
             
             [num_positions, num_datatypes, num_conds, num_datapoints, self.CombData, files_excluded] ...
                 = load_specified_data(self.exp_folder, self.CombData, self.data_needed, self.processed_data_file);
@@ -407,9 +408,9 @@ classdef create_data_analysis_tool < handle
                 
                 self.CombData = normalize_data(self, num_conds, num_datapoints, num_datatypes, num_positions);
                 if self.normalize_option == 1
-                    analyses_run{end+1} = "Normalization 1";
+                    analyses_run{end+1} = 'Normalization 1';
                 else
-                    analyses_run{end+1} = "Normalization 2";
+                    analyses_run{end+1} = 'Normalization 2';
                 end
                 
             end
@@ -419,7 +420,7 @@ classdef create_data_analysis_tool < handle
                     self.TC_datatypes, self.histogram_plot_settings, self.num_groups, self.num_exps,...
                     self.genotype, self.datatype_indices.TC_inds, self.trial_options, self.histogram_annotation_settings);
                 
-                analyses_run{end+1} = "Basic histograms";
+                analyses_run{end+1} = 'Basic histograms';
             end
             
             if self.CL_histogram_plot_option == 1
@@ -429,7 +430,7 @@ classdef create_data_analysis_tool < handle
                         self.CombData.histograms, self.num_groups, self.CL_hist_plot_settings);
                 end
                 
-                analyses_run{end+1} = "CL histograms";
+                analyses_run{end+1} = 'CL histograms';
 
             end
             
@@ -446,7 +447,7 @@ classdef create_data_analysis_tool < handle
                     
                 end
                 
-                analyses_run{end+1} = "Timeseries Plots";
+                analyses_run{end+1} = 'Timeseries Plots';
                 
             end
             
@@ -456,7 +457,7 @@ classdef create_data_analysis_tool < handle
                        self.TC_plot_settings.overlap, self.num_groups, self.CombData);
                 end
                 
-                analyses_run{end+1} = "Tuning Curves";
+                analyses_run{end+1} = 'Tuning Curves';
                 
             end
             
@@ -466,7 +467,12 @@ classdef create_data_analysis_tool < handle
 %                 new_mod_test();
 %             end
 
-            update_analysis_file_group(self.group_being_analyzed_name, self.save_settings.results_path, self.save_settings.save_path, analyses_run, files_excluded);
+            update_analysis_file_group(self.group_being_analyzed_name, self.save_settings.results_path, ...
+                self.save_settings.save_path, analyses_run, files_excluded, ...
+                self.OL_datatypes, self.CL_datatypes, self.TC_datatypes, self.genotype);
+            
+            update_individual_fly_log_files(self.exp_folder, self.save_settings.save_path, ...
+                analyses_run, files_excluded);
             
         end
         
