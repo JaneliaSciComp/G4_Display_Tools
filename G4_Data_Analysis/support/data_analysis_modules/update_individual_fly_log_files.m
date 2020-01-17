@@ -21,13 +21,13 @@ function update_individual_fly_log_files(exp_folder, save_path, analyses_run, fi
                fid = fopen(log_filepath, 'a');
 
                if ~isempty(find(strcmp(files, fly_path),1))
-
+                   index = strcmp(files, fly_path);
                    fprintf(fid, '%s\n%s\n\n%s\n', "Date:", date, "Analyses Attempted:");
                    for j = 1:length(analyses_run)
                        fprintf(fid, '%s\n', analyses_run{j});
                    end
 
-                   fprintf(fid, '\n%s\n%s\n\n%s\n%s\n\n', "Fly not included because:", reasons(i), ...
+                   fprintf(fid, '\n%s\n%s\n\n%s\n%s\n\n', "Fly not included because:", reasons(index), ...
                        "Analysis results located at:", save_path);
 
                else

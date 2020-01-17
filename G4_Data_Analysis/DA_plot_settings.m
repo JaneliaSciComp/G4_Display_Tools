@@ -13,8 +13,8 @@ function [normalize_settings, histogram_plot_settings, histogram_annotation_sett
     histogram_plot_settings = struct;
     histogram_plot_settings.histogram_ylimits = [0 100; -6 6; 2 10];
     histogram_plot_settings.subtitle_FontSize = 8;
-    histogram_plot_settings.rep_colors = [0 0 0; 1 0 0; 0 0 1; 0 1 0; 1 1 1; 1 1 0; 1 0 1; 0 1 1; .5 .5 .5]; %default 3 colors supports up to 3 groups (add more colors for more groups)
-    histogram_plot_settings.mean_colors = [0 0 0; 1 0 0; 0 0 1; 0 1 0; 1 1 1; 1 1 0; 1 0 1; 0 1 1; .5 .5 .5]; %default 3 colors supports up to 3 groups (add more colors for more groups)
+    histogram_plot_settings.rep_colors = [0.5 0.5 0.5; 1 0.5 0.5; 0.25 0.75 0.25; 0.5 0.5 1; 1 0.75 0.25; 0.75 0.5 1; 0.5 1 0.5; 0.5 1 1; 1 0.5 1; 1 1 0.5]; %default 10 colors supports up to 10 groups (add more colors for more groups)
+    histogram_plot_settings.mean_colors = [0 0 0; 1 0 0; 0 0.5 0; 0 0 1; 1 0.5 0; .75 0 1; 0 1 0; 0 1 1; 1 0 1; 1 1 0]; %default 10 colors supports up to 10 groups (add more colors for more groups)
     histogram_plot_settings.rep_LineWidth = 0.05;
     histogram_plot_settings.mean_LineWidth = 1;
 
@@ -49,9 +49,9 @@ function [normalize_settings, histogram_plot_settings, histogram_annotation_sett
     timeseries_plot_settings.subtitle_fontSize = 8;
     timeseries_plot_settings.legend_fontSize = 6;
     timeseries_plot_settings.overlap = 0;
-    timeseries_plot_settings.rep_colors = [0.5 0.5 0.5; 1 0.5 0.5; 0.5 0.5 1];
+    timeseries_plot_settings.rep_colors = [0 0 0; 1 0 0; 0 0.5 0; 0 0 1; 1 0.5 0; .75 0 1; 0 1 0; 0 1 1; 1 0 1; 1 1 0]; %default 10 colors supports up to 10 groups (add more colors for more groups)
     timeseries_plot_settings.rep_lineWidth = 0.05;
-    timeseries_plot_settings.mean_colors = [0 0 0; 1 0 0; 0 0 1; 0 1 0; 1 1 1; 1 1 0; 1 0 1; 0 1 1; .5 .5 .5];
+    timeseries_plot_settings.mean_colors = [0 0 0; 1 0 0; 0 0.5 0; 0 0 1; 1 0.5 0; .75 0 1; 0 1 0; 0 1 1; 1 0 1; 1 1 0]; %default 10 colors supports up to 10 groups (add more colors for more groups)
     timeseries_plot_settings.mean_lineWidth = 1;
     timeseries_plot_settings.edgeColor = 'none';
     timeseries_plot_settings.patch_alpha = 0.3; %sets the level of transparency for patch region around timeseries data
@@ -65,8 +65,8 @@ function [normalize_settings, histogram_plot_settings, histogram_annotation_sett
     TC_plot_settings.rep_lineWidth = 0.05;
     TC_plot_settings.mean_lineWidth = 1;
     TC_plot_settings.timeseries_ylimits = [-1.1 1.1; -1 6; -1 6; -1 6; 1 192; -1.1 1.1; 2 20; 0 5.1];
-    TC_plot_settings.rep_colors = [0.5 0.5 0.5; 1 0.5 0.5; 0.5 0.5 1; 0.5 0.75 0.5; 1 0.5 1 ]; %default 3 colors supports up to 3 groups (add more colors for more groups)
-    TC_plot_settings.mean_colors = [0 0 0; 1 0 0; 0 0 1; 0 0.5 0; 1 0 1; 0 1 1];
+    TC_plot_settings.rep_colors = [0 0 0; 0.75 0 0; 0 0.25 0; 0 0 0.75; 0.75 0.25 0; .5 0 0.75; 0 0.75 0; 0 0.75 0.75; 0.75 0 0.75; 0.75 0.75 0]; %default 10 colors supports up to 10 groups (add more colors for more groups)
+    TC_plot_settings.mean_colors = [0 0 0; 1 0 0; 0 0.5 0; 0 0 1; 1 0.5 0; .75 0 1; 0 1 0; 0 1 1; 1 0 1; 1 1 0]; %default 10 colors supports up to 10 groups (add more colors for more groups)
     TC_plot_settings.subtitle_fontSize = 8;
 
     %% Save settings
