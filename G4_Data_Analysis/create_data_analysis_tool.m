@@ -114,9 +114,14 @@ classdef create_data_analysis_tool < handle
             self.OL_conds{3} = [33 34; 35 36; 37 38; 39 40]; %left and right Looms (4 x 2 plots)
             self.OL_conds{4} = [41; 43]; %yaw and sideslip (2 x 1 plots)
             
-            %self.OL_conds = [];
+%            self.OL_conds = [];
             self.CL_conds = []; 
-            self.TC_conds = []; 
+
+            self.TC_conds{1} = [1 3; 5 7; 9 11; 13 15]; %3x1, 3x3, 3x3 ON, 8x8 (4 x 2 plots)
+            self.TC_conds{2} = [17 19; 21 23; 25 27; 29 31]; %16x16, 64x3, 64x3 ON, 64x16 (4 x 2 plots)
+            self.TC_conds{3} = [33 34; 35 36; 37 38; 39 40]; %left and right Looms (4 x 2 plots)
+            self.TC_conds{4} = [41; 43]; %yaw and sideslip (2 x 1 plots)
+   %         self.TC_conds = []; 
             
             %Durations of the trials are used to set the x-axis limits for each
             %graph
@@ -393,7 +398,15 @@ classdef create_data_analysis_tool < handle
         function run_single_analysis(self)
             
             analyses_run = {'Single'};
-            disp("Single fly analysis coming soon");
+            %in this case, exp_folder should be a cell array with one
+            %element, the path to the processed data file. 
+            
+            metadata_file = fullfile(self.exp_folder{1}, 'metadata.mat');
+            load(metadata_file, 'metadata');
+            G4_Plot_Data_flyingdetector_pdf(self.exp_folder{1}, self.trial_options, ...
+                metadata, self.processed_data_file);
+            %disp("Single fly analysis coming soon");
+            
             
         end
         
@@ -452,6 +465,7 @@ classdef create_data_analysis_tool < handle
             end
             
             if self.TC_plot_option == 1
+                
                 for k = 1:numel(self.TC_conds)
                     plot_TC_specified_OLtrials(self.TC_plot_settings, self.TC_conds{k}, self.datatype_indices.TC_inds, ...
                        self.TC_plot_settings.overlap, self.num_groups, self.CombData);
