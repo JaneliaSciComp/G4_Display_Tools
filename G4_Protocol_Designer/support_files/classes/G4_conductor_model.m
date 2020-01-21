@@ -24,6 +24,7 @@ classdef G4_conductor_model < handle
        num_tests_conducted_
        expected_time_
        timestamp_
+       aborted_count_
        
         
     end
@@ -52,6 +53,7 @@ classdef G4_conductor_model < handle
         num_tests_conducted
         expected_time
         timestamp
+        aborted_count
     end
     
     
@@ -108,6 +110,7 @@ classdef G4_conductor_model < handle
             self.do_plotting = 1;
             self.do_processing = 1;
             self.num_tests_conducted = 0;
+            self.aborted_count = 0;
  
         end
         
@@ -180,6 +183,7 @@ classdef G4_conductor_model < handle
         function set_fly_name(self, new_val)
             self.fly_name = new_val;
             self.reset_num_tests_conducted();
+            self.reset_aborted_count();
             
         end
         
@@ -249,6 +253,10 @@ classdef G4_conductor_model < handle
         
         function reset_num_tests_conducted(self)
             self.num_tests_conducted = 0;
+        end
+        
+        function reset_aborted_count(self)
+            self.aborted_count = 0;
         end
         
         
@@ -341,6 +349,10 @@ classdef G4_conductor_model < handle
         function value = get.timestamp(self)
             value = self.timestamp_;
         end
+        
+        function value = get.aborted_count(self)
+            value = self.aborted_count_;
+        end
             
 
 
@@ -429,6 +441,10 @@ classdef G4_conductor_model < handle
         
         function set.timestamp(self, value)
             self.timestamp_ = value;
+        end
+        
+        function set.aborted_count(self, value)
+            self.aborted_count_ = value;
         end
         
         

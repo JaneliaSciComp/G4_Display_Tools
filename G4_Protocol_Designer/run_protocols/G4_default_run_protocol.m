@@ -50,6 +50,7 @@
 function [success] = G4_default_run_protocol(runcon, p)%input should always be 1 or 2 items
 
 %% Get access to the figure and progress bar in the run gui IF it was passed in.
+global ctrl;
 
 %        fig = runcon.fig;
 if ~isempty(runcon.view)
@@ -142,10 +143,16 @@ end
      
  
  %% Start host and switch to correct directory
+    if ~isempty(ctrl)
+        if ctrl.isOpen() == 1
+           ctrl.close()
+        end
+    end
+    connectHost;
+    pause(10);
+    Panel_com('change_root_directory', p.experiment_folder);
  
-     connectHost;
-     pause(10);
-     Panel_com('change_root_directory', p.experiment_folder);
+        
      
      
  
@@ -299,7 +306,7 @@ end
              
              if runcon.check_if_aborted()
                 Panel_com('stop_display');
-                pause(1);
+                pause(.1);
                 Panel_com('stop_log');
                 pause(1);
                 disconnectHost;
@@ -387,7 +394,6 @@ end
                     isAborted = runcon.check_if_aborted();
                     if isAborted == 1
                         Panel_com('stop_display');
-                        pause(1);
                         Panel_com('stop_log');
                         pause(1);
                         disconnectHost;
@@ -455,7 +461,7 @@ end
                          pause(inter_dur + .01);
                          if runcon.check_if_aborted() == 1
                             Panel_com('stop_display');
-                            pause(1);
+                            pause(.1);
                             Panel_com('stop_log');
                             pause(1);
                             disconnectHost;
@@ -515,16 +521,16 @@ end
 
                  pause(post_dur);
                  
-%                  if runcon.check_if_aborted() == 1
-%                     Panel_com('stop_display');
-%                     pause(1);
-%                     Panel_com('stop_log');
-%                     pause(1);
-%                     disconnectHost;
-%                     success = 0;
-%                     return;
-%                  
-                 %end
+                 if runcon.check_if_aborted() == 1
+                    Panel_com('stop_display');
+                    pause(.1);
+                    Panel_com('stop_log');
+                    pause(1);
+                    disconnectHost;
+                    success = 0;
+                    return;
+                 
+                 end
                  runcon.update_elapsed_time(round(toc,2));
                  
             end
@@ -533,10 +539,14 @@ end
             
             pause(1);
 
-            Panel_com('stop_log');
-            
-            pause(1);
-            
+            %Panel_com('stop_log');
+            stop_log_response = send_tcp( char([1 hex2dec('40')]), 1);
+            if stop_log_response.success == 1
+                waitfor(errordlg("Stop Log command failed, please stop log manually then hit a key"));
+                waitforbuttonpress;
+            end
+
+            pause(1);          
 
             disconnectHost;
             

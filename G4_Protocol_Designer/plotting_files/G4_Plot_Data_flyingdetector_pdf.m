@@ -6,7 +6,7 @@
 %options.outputDir = path to the fly's results folder;
 %options.showCode = false;
 
-function G4_Plot_Data_flyingdetector_pdf(exp_folder, trial_options, metadata_for_publishing, CL_conds, OL_conds, TC_conds, overlap)
+function G4_Plot_Data_flyingdetector_pdf(exp_folder, trial_options, metadata_for_publishing, processed_filename, CL_conds, OL_conds, TC_conds, overlap)
 % Inputs:
 % exp_folder: path containing G4_Processed_Data.mat file
 % trial_options: 1x3 logical array [pre-trial, intertrial, post-trial]
@@ -27,9 +27,9 @@ function G4_Plot_Data_flyingdetector_pdf(exp_folder, trial_options, metadata_for
     disp("Experimenter:   " + metadata_for_publishing.experimenter + newline);
     disp("Experiment Name:   " + metadata_for_publishing.experiment_name + newline);
     disp("Experiment Type:   " + metadata_for_publishing.experiment_type + newline);
-    disp("Experiment Protocol Used:   " + metadata_for_publishing.experiment_protocol + newline);
+    disp("Experiment Protocol Used:   " + metadata_for_publishing.run_protocol_file + newline);
     disp("Fly Name:   " + metadata_for_publishing.fly_name + newline);
-    disp("Fly Genotype:   " + metadata_for_publishing.genotype + newline);
+    disp("Fly Genotype:   " + metadata_for_publishing.fly_genotype + newline);
     disp("Fly Age:  " + metadata_for_publishing.fly_age + newline);
     disp("Fly Sex:  " + metadata_for_publishing.fly_sex + newline);
     disp("Experiment Temperature:  " + metadata_for_publishing.experiment_temp + newline);
@@ -37,11 +37,19 @@ function G4_Plot_Data_flyingdetector_pdf(exp_folder, trial_options, metadata_for
     disp("Light Cycle:  " + metadata_for_publishing.light_cycle + newline);
     disp("Processing performed?   " + metadata_for_publishing.do_processing + newline);
     disp("Plotting performed?   " + metadata_for_publishing.do_plotting + newline);
-    disp("Processing Protocol Used:   " + metadata_for_publishing.processing_protocol + newline);
-    disp("Plotting Protocol Used:   " + metadata_for_publishing.plotting_protocol + newline);
+    disp("Processing Protocol Used:   " + metadata_for_publishing.processing_file + newline);
+    disp("Plotting Protocol Used:   " + metadata_for_publishing.plotting_file + newline);
     disp("Results Folder Location:  " + metadata_for_publishing.fly_results_folder + newline);
     
     disp("Other Metadata Comments:  " + metadata_for_publishing.comments + newline);
+    
+    if iscell(exp_folder)
+        exp_folder = exp_folder{1};
+    end
+    
+    if nargin < 4
+        processed_filename = 'smallfield_V2_G4_Processed_Data';
+    end
     
 %%%% user-defined parameters
 %datatype options: 'LmR_chan', 'L_chan', 'R_chan', 'F_chan', 'Frame Position', 'LmR', 'LpR'
@@ -67,8 +75,9 @@ if nargin==0
     trial_options = [1 1 1];
 end
 files = dir(exp_folder);
+
 try
-    Data_name = files(contains({files.name},{'G4_Processed_Data'})).name;
+    Data_name = files(contains({files.name},{processed_filename})).name;
 catch
     error('cannot find G4_Processed_Data file in specified folder')
 end
@@ -76,7 +85,7 @@ load(fullfile(exp_folder,Data_name),'channelNames', 'conditionModes', ...
     'histograms', 'interhistogram', 'summaries', 'timestamps', 'timeseries');
 
 %create default matrices for plotting all conditions
-if nargin<6 
+if nargin<7 
     default_W = [2 2 2 2 3 3 3 3 3 3 3 3 4 4 4 4 4 4 4 4 5 5 5 5 5 5 5 5 5 5]; %width of figure by number of subplots
     default_H = [1 1 2 2 2 2 3 3 3 4 4 4 4 4 4 4 5 5 5 5 5 5 5 5 5 6 6 6 6 6]; %height of figure by number of subplots
     
@@ -113,7 +122,7 @@ if nargin<6
     TC_conds = []; %by default, don't plot any tuning curves
     
 end
-if nargin < 7
+if nargin < 8
     overlap = 0; %by default, don't overlap multiple conditions on same plot
 end
 overlap = logical(overlap);

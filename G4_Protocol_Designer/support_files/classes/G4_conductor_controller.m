@@ -835,14 +835,21 @@ classdef G4_conductor_controller < handle
             pause(3);
             
             if self.check_if_aborted()
-                [logs_removed, msg] = rmdir(fullfile(experiment_folder, 'Log Files'), 's');
-                pause(1);
+                
+                self.model.aborted_count = self.model.aborted_count + 1;
+                aborted_filename = ['Aborted_exp_data',num2str(self.model.aborted_count)];
+                [logs_removed, msg] = movefile(fullfile(experiment_folder,'Log Files','*'),fullfile(experiment_folder,'Results',self.model.fly_name,aborted_filename));
+                pause(.5);
+                self.create_metadata_file();
+                
+%                 [logs_removed, msg] = rmdir(fullfile(experiment_folder, 'Log Files'), 's');
+%                 pause(1);
                 if logs_removed == 0
                     if ~isempty(self.view)
     
-                        self.create_error_box("Matlab was unable to delete the log files. Please delete manually.");
+                        self.create_error_box("Matlab was unable to move the log files. Please move manually.");
                     else
-                        disp('Failed to delete the log files from the Log Files folder when aborting experiment. Please remove them manually.');
+                        disp('Failed to move the log files from the Log Files folder when aborting experiment. Please move them manually.');
                     end
                     disp(msg);
                 else
@@ -852,6 +859,7 @@ classdef G4_conductor_controller < handle
                         disp('Experiment aborted succesfully');
                     end
                 end
+                
                 self.is_aborted = 0;
                     
                 return;
@@ -860,9 +868,11 @@ classdef G4_conductor_controller < handle
             if success == 0 
                 if isempty(self.view)
                     disp('Experiment failed for unknown reason.');
+                else
+                    self.create_error_box("Experiment failed for unknown reason.");
                 end
-                [logs_removed, msg] = rmdir(fullfile(experiment_folder, 'Log Files'), 's');
-                pause(1);
+                movefile(fullfile(experiment_folder,'Log Files','*'),fullfile(experiment_folder,'Results',self.model.fly_name,'Failed_exp_data'));                
+                pause(.5);
                 return;
             end
             
@@ -923,7 +933,8 @@ classdef G4_conductor_controller < handle
      
             elseif self.model.do_processing == 1 && isfile(self.model.processing_file)
                 [proc_path, proc_name, proc_ext] = fileparts(self.model.processing_file);
-                processing_command = proc_name + "(fly_results_folder, trial_options)";
+                
+                processing_command = "processed_filename = " + proc_name + "(fly_results_folder, trial_options)";
 
                 eval(processing_command);
             
@@ -945,7 +956,7 @@ classdef G4_conductor_controller < handle
                 metadata = struct;
                 metadata.experimenter = self.model.experimenter;
                 metadata.experiment_name = self.doc.experiment_name;
-                metadata.experiment_protocol = self.model.run_protocol_file;
+                metadata.run_protocol_file = self.model.run_protocol_file;
                 
                 %Turn experiment type (1,2, or 3) to matching word
                 %("Flight", etc)
@@ -957,7 +968,7 @@ classdef G4_conductor_controller < handle
                     metadata.experiment_type = "Chip Walk";
                 end
                 metadata.fly_name = self.model.fly_name;
-                metadata.genotype = self.model.fly_genotype;
+                metadata.fly_genotype = self.model.fly_genotype;
                 if ~isempty(self.view)
                     metadata.timestamp = self.view.date_and_time_box.String;
                 else
@@ -968,8 +979,8 @@ classdef G4_conductor_controller < handle
                 metadata.experiment_temp = self.model.experiment_temp;
                 metadata.rearing_protocol = self.model.rearing_protocol;
                 
-                metadata.plotting_protocol = self.model.plotting_file;
-                metadata.processing_protocol = self.model.processing_file;
+                metadata.plotting_file = self.model.plotting_file;
+                metadata.processing_file = self.model.processing_file;
                 if self.model.do_plotting == 1
                     metadata.do_plotting = "Yes";
                 elseif self.model.do_plotting == 0
@@ -992,10 +1003,11 @@ classdef G4_conductor_controller < handle
                 assignin('base','metadata',metadata);
                 assignin('base','fly_results_folder',fly_results_folder);
                 assignin('base','trial_options',trial_options);
+                assignin('base','processed_filename', processed_filename);
 
                 %publishes the output (but not code) "create_pdf_script" to
                 %a pdf file.
-                options.codeToEvaluate = sprintf('%s(%s,%s,%s)',plot_name,'fly_results_folder','trial_options','metadata');
+                options.codeToEvaluate = sprintf('%s(%s,%s,%s,%s)',plot_name,'fly_results_folder','trial_options','metadata','processed_filename');
                 options.format = 'pdf';
                 options.outputDir = sprintf('%s',fly_results_folder);
                 options.showCode = false;
@@ -1095,7 +1107,6 @@ classdef G4_conductor_controller < handle
                 %rmdir(fullfile(test_exp_path,'Results', self.model.fly_name));
                 pause(.5);
                 rmdir(fullfile(test_exp_path,'Results'),'s');
-                pause(.1);
 
             else
                 self.model.num_tests_conducted = self.model.num_tests_conducted - 1;
@@ -1103,7 +1114,6 @@ classdef G4_conductor_controller < handle
             end
             if exist(fullfile(test_exp_path,'Log Files'))
                 rmdir(fullfile(test_exp_path,'Log Files'), 's');
-                pause(.1);
             end
             
 
@@ -1194,15 +1204,25 @@ classdef G4_conductor_controller < handle
         
             metadata_names = {"experimenter", "experiment_name", "timestamp", "fly_name", "fly_genotype", "fly_age", "fly_sex", "experiment_temp", ...
                 "experiment_type", "rearing_protocol", "light_cycle", "do_plotting", "do_processing", "plotting_file", "processing_file", "run_protocol_file", ...
-                "comments"};
+                "comments", "fly_results_folder"};
             if ~isempty(self.view)
                 waitfor(errordlg("Please add any comments you would like to the metadata, then click OK to continue."));
                 self.model.set_metadata_comments(self.view.comments_box.String);
             end
+            
+            [experiment_path, g4p_filename, ext] = fileparts(self.doc.save_filename);
+            if self.is_aborted == 0
+                fly_folder = fullfile(experiment_path, 'Results', self.model.fly_name);
+            else
+                aborted_filename = ['Aborted_exp_data',num2str(self.model.aborted_count)];
+                fly_folder = fullfile(experiment_path, 'Results', self.model.fly_name, aborted_filename);
+            end
+            
+            
             model_metadata = {self.model.experimenter, self.doc.experiment_name, self.model.timestamp, self.model.fly_name, self.model.fly_genotype, ...
                 self.model.fly_age, self.model.fly_sex, self.model.experiment_temp, ...
                 self.model.experiment_type, self.model.rearing_protocol, self.model.light_cycle, self.model.do_plotting, self.model.do_processing, ...
-                self.model.plotting_file, self.model.processing_file, self.model.run_protocol_file, self.model.metadata_comments};
+                self.model.plotting_file, self.model.processing_file, self.model.run_protocol_file, self.model.metadata_comments, fly_folder};
 
         
             metadata = struct;
@@ -1211,8 +1231,8 @@ classdef G4_conductor_controller < handle
                 metadata.(metadata_names{i}) = model_metadata{i};
             end
             
-            [experiment_path, g4p_filename, ext] = fileparts(self.doc.save_filename);
-            fly_folder = fullfile(experiment_path, 'Results', self.model.fly_name);
+            
+            
             metadata_save_filename = fullfile(fly_folder, 'metadata.mat');
             save(metadata_save_filename, 'metadata');
             

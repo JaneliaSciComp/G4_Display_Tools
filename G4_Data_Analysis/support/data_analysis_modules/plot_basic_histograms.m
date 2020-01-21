@@ -32,6 +32,10 @@ function plot_basic_histograms(timeseries_data, interhistogram_data, ...
                 groups(i) = 5;
             end
         end
+        
+    else
+        
+        groups = num_groups;
     end
     g = 0;
     for k = 1:length(groups)
