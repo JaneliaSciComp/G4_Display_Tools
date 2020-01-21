@@ -97,6 +97,14 @@ function [num_positions, num_datatypes, num_conds, num_datapoints, CombData, fil
                     
                 end
                 
+                if isfield(fields,'interhistogram') && ~isempty(fields.interhistogram) && ~isempty(CombData.interhistogram)
+                    if size(fields.interhistogram) ~= [size(CombData.interhistogram,3) size(CombData.interhistogram,4)]
+                        disp(['Interhistogram data in ' exp_folder{g,e} ' appears to be the wrong size. It has been removed from this analysis.']);
+                        files_excluded{end+1} = [exp_folder{g,e}, "interhistogram data wrong size"];
+                        continue;
+                    end
+                end
+                
                 if ~isempty(find(strcmp(fields_to_load,'histograms'),1)) > 0
                     num_positions = size(fields.histograms,4);
                     if num_positions>size(CombData.histograms,6)
