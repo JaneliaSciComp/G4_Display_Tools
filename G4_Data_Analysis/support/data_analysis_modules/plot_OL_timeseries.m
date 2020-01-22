@@ -134,7 +134,7 @@ function plot_OL_timeseries(timeseries_data, timestampsIN, OL_conds, OL_duration
             if num_groups==1
                 legend1 = legend(genotype,'FontSize',legend_FontSize);
             else
-                legend1 = legend(h(num_groups+1:-1:2),genotype{1:end},'FontSize',legend_FontSize,'Orientation','horizontal');%prints warnings in orange but ignore
+                legend1 = legend(h(num_groups:-1:1),genotype{1:end},'FontSize',legend_FontSize,'Orientation','horizontal');%prints warnings in orange but ignore
             end
 
 
