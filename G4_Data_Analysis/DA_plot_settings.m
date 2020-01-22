@@ -61,10 +61,11 @@ function [normalize_settings, histogram_plot_settings, histogram_annotation_sett
 
     %% Plot settings for tuning curves
     TC_plot_settings = struct;
-    TC_plot_settings.overlap = 0;
+    TC_plot_settings.overlap = 0; %Overlap of 1 not working
     TC_plot_settings.rep_lineWidth = 0.05;
     TC_plot_settings.mean_lineWidth = 1;
-    TC_plot_settings.timeseries_ylimits = [-1.1 1.1; -1 6; -1 6; -1 6; 1 192; -1.1 1.1; 0 2; 0 5.1];
+    TC_plot_settings.timeseries_ylimits = [-1.1 1.1; -1 6; -1 6; -1 6; 1 192; -1.1 1.1; 0 20; 0 5.1];
+    
     TC_plot_settings.rep_colors = [0 0 0; 0.75 0 0; 0 0.25 0; 0 0 0.75; 0.75 0.25 0; .5 0 0.75; 0 0.75 0; 0 0.75 0.75; 0.75 0 0.75; 0.75 0.75 0]; %default 10 colors supports up to 10 groups (add more colors for more groups)
     TC_plot_settings.mean_colors = [0 0 0; 1 0 0; 0 0.5 0; 0 0 1; 1 0.5 0; .75 0 1; 0 1 0; 0 1 1; 1 0 1; 1 1 0]; %default 10 colors supports up to 10 groups (add more colors for more groups)
     TC_plot_settings.subtitle_fontSize = 8;

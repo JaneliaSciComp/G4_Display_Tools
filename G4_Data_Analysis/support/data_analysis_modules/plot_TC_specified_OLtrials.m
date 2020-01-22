@@ -20,34 +20,37 @@ function plot_TC_specified_OLtrials(TC_plot_settings, TC_conds, TC_inds, overlap
         for d = TC_inds
 
             num_plot_rows = size(TC_conds,1);
-            num_plot_cols = size(TC_conds,2);
+            num_plot_cols = 1;
             figure('Position',[100 100 540 540*(num_plot_rows/num_plot_cols)])
             for row = 1:num_plot_rows
                 for col = 1:num_plot_cols
-                    cond = TC_conds(1+(row-1)*(1+overlap),col);
-                    cond(isnan(cond)|cond==0) = [];
+                    conds = TC_conds(1+(row-1)*(1+overlap),:);
+                    conds(isnan(conds)|conds==0) = [];
                     placement = col+num_plot_cols*(row-1);
                     better_subplot(num_plot_rows, num_plot_cols, placement)
                     hold on
                     for g = 1:num_groups
-                        tmpdata = squeeze(nanmean(CombData.summaries(g,:,d,cond,:),5));
+                        tmpdata = squeeze(nanmean(CombData.summaries(g,:,d,conds,:),5));
                         if num_groups==1 && overlap==0 
                             plot(tmpdata','Color',rep_Colors(g,:),'LineWidth',rep_LineWidth);
                         end
-                        plot(squeeze(tmpdata),'Color',mean_Colors(g,:),'LineWidth',mean_LineWidth, 'Marker', marker_type);
+                        plot(nanmean(tmpdata),'Color',mean_Colors(g,:),'LineWidth',mean_LineWidth, 'Marker', marker_type);
                     end
                     ylim(timeseries_ylimits(d,:));
-                    titlestr = ['\fontsize{' num2str(subtitle_FontSize) '} Condition #{\color[rgb]{' num2str(mean_Colors(g,:)) '}' num2str(cond)]; 
+                   % titlestr = ['\fontsize{' num2str(subtitle_FontSize) '} Condition #{\color[rgb]{' num2str(mean_Colors(g,:)) '}' num2str(conds)];
+                    titlestr = "Datatype: " + CombData.channelNames.timeseries(d) + " Condition # " + num2str(conds);
+                    xlabel(TC_plot_settings.xaxis_label);
+                    xticks(TC_plot_settings.xaxis_values);
                     if overlap==1
-                        cond = TC_conds(row*2,col);
-                        cond(isnan(cond)|cond==0) = [];
-                        titlestr = [titlestr ' \color[rgb]{' num2str(rep_Colors(g,:)) '}(' num2str(cond) ')'];
+                        conds = TC_conds(row*2,:);
+                        conds(isnan(conds)|conds==0) = [];
+                        titlestr = string([titlestr ' \color[rgb]{' num2str(rep_Colors(g,:)) '}(' num2str(conds) ')']);
                         for g = 1:num_groups
-                            tmpdata = squeeze(nanmean(CombData.summaries(g,:,d,cond,:),5));
+                            tmpdata = squeeze(nanmean(CombData.summaries(g,:,d,conds,:),5));
                             plot(nanmean(tmpdata),'Color',rep_Colors(g,:),'LineWidth',mean_LineWidth);
                         end
                     end
-                    title([titlestr '}'])
+                    title(titlestr, 'FontSize', subtitle_FontSize)
                 end
             end
         end

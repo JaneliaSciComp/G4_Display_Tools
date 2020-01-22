@@ -115,13 +115,40 @@ classdef create_data_analysis_tool < handle
             self.OL_conds{4} = [41; 43]; %yaw and sideslip (2 x 1 plots)
             
 %            self.OL_conds = [];
-            self.CL_conds = []; 
+            self.CL_conds = [];
+            
+        %TC_conds are different than OL and CL conds. All conditions
+        %being looked at are plotted on a single tuning curve.
 
-            self.TC_conds{1} = [1 3; 5 7; 9 11; 13 15]; %3x1, 3x3, 3x3 ON, 8x8 (4 x 2 plots)
-            self.TC_conds{2} = [17 19; 21 23; 25 27; 29 31]; %16x16, 64x3, 64x3 ON, 64x16 (4 x 2 plots)
-            self.TC_conds{3} = [33 34; 35 36; 37 38; 39 40]; %left and right Looms (4 x 2 plots)
-            self.TC_conds{4} = [41; 43]; %yaw and sideslip (2 x 1 plots)
+        %If you want multiple tuning curves on a single figure,
+        %separate them with ;  For example: 
+
+        %self.TC_conds{1} = [1 2 3 4 5 6 7 8; 9 10 11 12 13 14 15 16]
+        %self.TC_conds{2} = [17 18 19 20 21 22 23 24]
+
+        %In this case, for each datatype there will be two figures. The
+        %first figure will have two tuning curves, one above the other.
+        %The first tuning curve will compare conditions 1-8, the second
+        %will compare conditions 9-16. On the second figure will be a
+        %single tuning curve which compares conditions 17-24. If you
+        %want all conditions on a single tuning curve, you would simply
+        %do  self.TC_conds{1} = [1:24];
+
+            self.TC_conds{1} = [1 3 5 7; 9 11 13 15]; %3x1, 3x3, 3x3 ON, 8x8 (4 x 2 plots)
+            self.TC_conds{2} = [17 19 21 23; 25 27 29 31]; %16x16, 64x3, 64x3 ON, 64x16 (4 x 2 plots)
+            self.TC_conds{3} = [33 34 35 36; 37 38 39 40]; %left and right Looms (4 x 2 plots)
+            
    %         self.TC_conds = []; 
+   
+            %The x axis of your tuning curve depends on what is changing
+            %between the conditions you are comparing. Each condition might
+            %play at a different frequency, have a different speed, or
+            %something else. Set the xaxis label and values appropriately
+            %for this. There should be one value for each condition being
+            %compared. 
+   
+            self.TC_plot_settings.xaxis_label = 'Changing feature here';
+            self.TC_plot_settings.xaxis_values = [0 1 2 3 4 5 6 7 8];
             
             %Durations of the trials are used to set the x-axis limits for each
             %graph
