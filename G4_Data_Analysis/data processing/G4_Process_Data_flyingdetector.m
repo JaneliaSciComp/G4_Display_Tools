@@ -1,4 +1,4 @@
-function G4_Process_Data_flyingdetector(exp_folder, trial_options, manual_first_start)
+function processed_file_name = G4_Process_Data_flyingdetector(exp_folder, trial_options, manual_first_start)
 %FUNCTION G4_Process_Data_flyingdetector(exp_folder, trial_options, manual_first_start)
 % 
 % Inputs:
