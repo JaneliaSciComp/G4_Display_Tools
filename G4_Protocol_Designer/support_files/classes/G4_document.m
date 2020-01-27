@@ -1171,12 +1171,17 @@ classdef G4_document < handle
             startIndex = regexp(settings_data{filepath_line},exp);
             start_filepath_index = startIndex + 6;
             config_filepath = settings_data{filepath_line}(start_filepath_index:end);
-            fid = fopen(config_filepath,'wt');
-            %for i = 1:length(config(:))
+            
+            try
+                fid = fopen(config_filepath,'wt'); 
                 fprintf(fid, '%s\n', config{:});
-                %fprintf(fid, '\n');
-           % end
-            fclose(fid);
+                fclose(fid);
+            catch
+                error("There was a problem updating the configuration file. Please take the following steps: " ...
+                    + newline + "1. Check that the configuration file path in 'G4_Protocol_Designer_settings.m' or in the settings window is accurate." ...
+                    + newline + "2. Check that you have permission to edit the configuration file. You may need to give your user account admin priveleges.");
+                
+            end
             
         end
 %EXPORT--------------------------------------------------------------------        

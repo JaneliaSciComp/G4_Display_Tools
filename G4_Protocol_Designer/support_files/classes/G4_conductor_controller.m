@@ -853,11 +853,9 @@ classdef G4_conductor_controller < handle
                     end
                     disp(msg);
                 else
-                    if ~isempty(self.view)
-                        self.create_error_box("Experiment aborted successfully.");
-                    else
-                        disp('Experiment aborted succesfully');
-                    end
+                    
+                    disp('Experiment aborted succesfully');
+                    
                 end
                 
                 self.is_aborted = 0;
@@ -1209,7 +1207,7 @@ classdef G4_conductor_controller < handle
                 "experiment_type", "rearing_protocol", "light_cycle", "do_plotting", "do_processing", "plotting_file", "processing_file", "run_protocol_file", ...
                 "comments", "fly_results_folder"};
             if ~isempty(self.view)
-                waitfor(errordlg("Please add any comments you would like to the metadata, then click OK to continue."));
+                waitfor(errordlg("Please add any final comments, then click OK to continue."));
                 self.model.set_metadata_comments(self.view.comments_box.String);
             end
             

@@ -97,7 +97,7 @@ classdef G4_settings_controller < handle
                 self.model.default_plot_protocol = filepath;
                 self.model.set_new_setting(self.model.lines_to_match.plot, filepath);
             else
-                self.create_error_box("This plotting file does not exist.");
+                disp("This plotting file does not exist.");
             end
             
         end
@@ -130,7 +130,7 @@ classdef G4_settings_controller < handle
                 self.model.cam_walk_test_protocol = filepath;
                 self.model.set_new_setting(self.model.lines_to_match.cam, filepath);
             else
-                self.create_error_box("This Camera walk test protocol file does not exist.");
+                disp("This Camera walk test protocol file does not exist.");
             end
             
         end
@@ -141,7 +141,7 @@ classdef G4_settings_controller < handle
                 self.model.chip_walk_test_protocol = filepath;
                 self.model.set_new_setting(self.model.lines_to_match.chip, filepath)
             else
-                self.create_error_box("This Chip Walk test protocol file does not exist.");
+                disp("This Chip Walk test protocol file does not exist.");
             end
             
         end
@@ -152,7 +152,7 @@ classdef G4_settings_controller < handle
                 self.model.overlapping_graphs = num2str(value);
                 self.model.set_new_setting(self.model.lines_to_match.overlap, num2str(value));
             else
-                self.create_error_box("Your overlapping graphs value must be 0 or 1");
+                disp("Your overlapping graphs value must be 0 or 1");
             end
             
         end
@@ -239,9 +239,9 @@ classdef G4_settings_controller < handle
         end
         
         %% General browse function
-        function new_file = browse(self,filter)
-            if ~isempty(filter)
-                [file, path] = uigetfile(filter);
+        function new_file = browse(self,varargin)
+            if ~isempty(varargin)
+                [file, path] = uigetfile(varargin{1});
             else
                 [file, path] = uigetfile;
             end
