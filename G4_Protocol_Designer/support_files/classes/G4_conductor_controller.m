@@ -1026,10 +1026,13 @@ classdef G4_conductor_controller < handle
                 drawnow;
             end
             
-            if ~isempty(self.view)
-                waitfor(errordlg("Please remember to update the fly name before attempting to run your next experiment."));
-            end
 
+        end
+        
+        function update_flyName_reminder(self)
+           if ~isempty(self.view)
+                self.create_error_box("If you are changing flies, please remember to update the fly name.");
+           end
         end
         
         function prepare_test_exp(self)
@@ -1122,7 +1125,7 @@ classdef G4_conductor_controller < handle
         function repeat = check_if_repeat(self)
            
             if ~isempty(self.view)
-                answer = questdlg('Would you like to repeat the test protocol?', 'Repeat', 'Yes', 'No', 'No');
+                answer = questdlg('If changing flies, please remember to update the fly name. Would you like to repeat the test protocol?', 'Repeat', 'Yes', 'No', 'No');
                 if strcmp(answer, 'Yes')
                     repeat = 1;
                 else

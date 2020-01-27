@@ -21,6 +21,8 @@ classdef G4_designer_model
 %Other values to keep track of
 
         isSelect_all_
+        host_connected_
+        screen_on_
         
     end
     
@@ -43,6 +45,8 @@ classdef G4_designer_model
 %Other values to keep track of
 
         isSelect_all
+        host_connected
+        screen_on
        
     end
     
@@ -55,6 +59,8 @@ classdef G4_designer_model
             self.current_selected_cell = struct('table', "", 'index', [0,0]);
             self.auto_preview_index = 1;
             self.current_preview_file = '';
+            self.host_connected = 0;
+            self.screen_on = 0;
  
      
         end
@@ -101,6 +107,13 @@ classdef G4_designer_model
             self.isSelect_all_ = value;
         end
         
+        function self = set.host_connected(self, value)
+            self.host_connected_ = value;
+        end
+        
+        function self = set.screen_on(self, value)
+            self.screen_on_ = value;
+        end
 
         
 %GETTERS        
@@ -141,6 +154,13 @@ classdef G4_designer_model
             value = self.isSelect_all_;
         end
         
+        function value = get.host_connected(self)
+            value = self.host_connected_;
+        end
+        
+        function value = get.screen_on(self)
+            value = self.screen_on_;
+        end
         
 
     end

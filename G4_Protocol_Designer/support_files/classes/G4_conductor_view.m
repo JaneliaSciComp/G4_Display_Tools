@@ -579,6 +579,7 @@ classdef G4_conductor_view < handle
         
         function run_exp(self, ~, ~)
             self.con.run();
+            self.con.update_flyName_reminder();
         end
         
         function run_test_exp(self, ~, ~)

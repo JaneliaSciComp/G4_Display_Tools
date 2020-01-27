@@ -1558,6 +1558,12 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
 
 
                 self.display_inscreen_preview(frame_rate, dur, patfield, posfield, aofield, file_type); 
+            elseif self.model.screen_on == 1
+                
+                 
+                    Panel_com('stop_display');
+                    self.model.screen_on = 0;
+               
             end
 
             
@@ -1687,6 +1693,8 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
 
             if ~strcmp(self.model.current_preview_file,'') && length(self.model.current_preview_file(1,1,:)) > 1
                 
+                
+                
                 self.model.auto_preview_index = self.model.auto_preview_index + 1;
                 if self.model.auto_preview_index > length(self.model.current_preview_file(1,1,:))
                     self.model.auto_preview_index = 1;
@@ -1702,6 +1710,8 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                 im = imshow(preview_data(:,:), 'Colormap', gray);
                 set(im, 'parent', self.hAxes);
                 set(self.hAxes, 'XLim', xax, 'YLim', yax);
+                
+                self.update_arena_pattern_index();
 
             end
 
@@ -1731,6 +1741,8 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                 im = imshow(preview_data(:,:), 'Colormap', gray);
                 set(im, 'parent', self.hAxes);
                 set(self.hAxes, 'XLim', xax, 'YLim', yax);
+                
+                self.update_arena_pattern_index();
             end
 
         end
@@ -1829,7 +1841,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                 LmR_offset = 0;
             end
             %pre_start = 0;
-            if strcmp(self.doc.top_export_path,'') == 1
+            if strcmp(self.doc.top_export_path,'')
                 self.create_error_box("You must save the experiment before you can test it on the screens.");
                 return;
             end
@@ -1900,6 +1912,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
         %Open the conductor to run an experiment
         function open_run_gui(self, ~, ~)
             
+            self.check_and_disconnect_host();
             self.run_con = G4_conductor_controller(self.doc, self.settings_con);
             self.run_con.layout();
             
@@ -2410,30 +2423,14 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
     
             if strcmp(file_type, 'pat') && ~strcmp(patfield,'')
                 
-                self.model.auto_preview_index = self.check_pattern_dimensions(patfield);
-                self.model.current_preview_file = self.doc.Patterns.(patfield).pattern.Pats;
-                grayscale_val = self.doc.Patterns.(patfield).pattern.gs_val;
-
-                x = [0 length(self.model.current_preview_file(1,:,1))];
-                y = [0 length(self.model.current_preview_file(:,1,1))];
-                adjusted_file = zeros(y(2),x(2),length(self.model.current_preview_file(1,1,:)));
-                %max_num = max(max(self.model.current_preview_file,[],2));
-                max_num = (2^grayscale_val) - 1;
-                
-                for i = 1:length(self.model.current_preview_file(1,1,:))
-
-                    adjusted_matrix = self.model.current_preview_file(:,:,i) ./ max_num;
-                    adjusted_file(:,:,i) = adjusted_matrix(:,:,1);
-                end
-                self.model.current_preview_file = adjusted_file;
-                
-                
-                self.hAxes = axes(self.preview_panel, 'units', 'normalized', 'OuterPosition', [.1, .04, .8 ,.9], 'XTick', [], 'YTick', [] ,'XLim', x, 'YLim', y);
-                im = imshow(adjusted_file(:,:,self.model.auto_preview_index), 'Colormap',gray);
-
-                set(im, 'parent', self.hAxes);
+                self.inscreen_pattern_preview(patfield);
 
             elseif strcmp(file_type, 'pos') && ~strcmp(funcfield,'')
+                
+                if self.model.screen_on
+                    Panel_com('stop_display');
+                    self.model.screen_on = 0;
+                end
                 
                 self.model.current_preview_file = self.doc.Pos_funcs.(funcfield).pfnparam.func;
                 
@@ -2482,6 +2479,11 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                 
 
             elseif strcmp(file_type, 'ao') && ~strcmp(aofield,'')
+                
+                if self.model.screen_on
+                    Panel_com('stop_display');
+                    self.model.screen_on = 0;
+                end
 
                 self.model.current_preview_file = self.doc.Ao_funcs.(aofield).afnparam.func;
                 self.second_axes = axes(self.preview_panel, 'units', 'normalized', 'OuterPosition', [.1, .04, .8 ,.9], 'XAxisLocation', 'top', 'YAxisLocation', 'right');
@@ -2605,6 +2607,88 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
         end
         % Pulls parameters from trial containing currently selected cell to inform the
         % in screen preview
+        function inscreen_pattern_preview(self, patfield)
+            
+            self.model.auto_preview_index = self.check_pattern_dimensions(patfield);
+            self.model.current_preview_file = self.doc.Patterns.(patfield).pattern.Pats;
+            grayscale_val = self.doc.Patterns.(patfield).pattern.gs_val;
+
+            x = [0 length(self.model.current_preview_file(1,:,1))];
+            y = [0 length(self.model.current_preview_file(:,1,1))];
+            adjusted_file = zeros(y(2),x(2),length(self.model.current_preview_file(1,1,:)));
+            %max_num = max(max(self.model.current_preview_file,[],2));
+            max_num = (2^grayscale_val) - 1;
+
+            for i = 1:length(self.model.current_preview_file(1,1,:))
+
+                adjusted_matrix = self.model.current_preview_file(:,:,i) ./ max_num;
+                adjusted_file(:,:,i) = adjusted_matrix(:,:,1);
+            end
+            self.model.current_preview_file = adjusted_file;
+
+
+            self.hAxes = axes(self.preview_panel, 'units', 'normalized', 'OuterPosition', [.1, .04, .8 ,.9], 'XTick', [], 'YTick', [] ,'XLim', x, 'YLim', y);
+            im = imshow(adjusted_file(:,:,self.model.auto_preview_index), 'Colormap',gray);
+
+            set(im, 'parent', self.hAxes);
+            
+            self.display_pattern_arena(patfield);
+        end
+        
+        function display_pattern_arena(self, patfield)
+            
+            if strcmp(self.doc.top_export_path,'')
+                self.create_error_box("You must save the experiment before you can preview a pattern on the screen.");
+                return;
+            end
+            
+            patfile = self.doc.Patterns.(patfield).filename;
+            patindex = self.doc.get_pattern_index(patfile);
+            disp(patindex);
+            
+            if ~self.model.host_connected
+                self.model.host_connected = connectHost();
+                pause(5);
+            end
+            
+            Panel_com('change_root_directory', self.doc.top_export_path);
+            pause(.05);
+            Panel_com('set_pattern_id', patindex);
+            pause(.05);
+            Panel_com('set_control_mode', 3);
+            pause(.05);
+            Panel_com('set_position_x', self.model.auto_preview_index);
+
+            self.model.screen_on = 1;
+
+            
+            %submit mode, pattern, and display commands (mode 3?)
+                        
+            %give a field to set how many frames you want to skip by each
+            %time you click next. 
+
+        end
+        
+        function check_and_disconnect_host(self)
+            
+            if self.model.host_connected
+                Panel_com('stop_display');
+                disconnectHost();
+                self.model.host_connected = 0;
+            end
+            
+        end
+        
+        function update_arena_pattern_index(self)
+           
+            if self.model.host_connected
+                
+                Panel_com('set_position_x',self.model.auto_preview_index);
+   
+            end
+            
+        end
+        
         function [frame_rate, dur, patfield, funcfield, aofield, file_type] = get_preview_parameters(self, is_table)
             index = self.model.current_selected_cell.index;
             table = self.model.current_selected_cell.table;

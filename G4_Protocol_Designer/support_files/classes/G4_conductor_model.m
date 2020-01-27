@@ -25,6 +25,7 @@ classdef G4_conductor_model < handle
        expected_time_
        timestamp_
        aborted_count_
+
        
         
     end
@@ -54,6 +55,7 @@ classdef G4_conductor_model < handle
         expected_time
         timestamp
         aborted_count
+       
     end
     
     
@@ -353,7 +355,6 @@ classdef G4_conductor_model < handle
         function value = get.aborted_count(self)
             value = self.aborted_count_;
         end
-            
 
 
 %SETTERS------------------------------------------------------------------
@@ -446,6 +447,8 @@ classdef G4_conductor_model < handle
         function set.aborted_count(self, value)
             self.aborted_count_ = value;
         end
+        
+
         
         
         
