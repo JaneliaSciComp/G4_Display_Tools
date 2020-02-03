@@ -1,11 +1,5 @@
 %plot timeseries data for open-loop trials
 
-%Variables i need for this:  overlap, \
-%mean_Colors, mean_LineWidth, EdgeColor, patch_alpha,
-%subtitle_FontSize, timeseries_ylimits, timeseries_xlimits,
-%frame_superimpose, Frame_ind, frame_scale, frame_color, 
-
-
 function plot_OL_timeseries(timeseries_data, timestampsIN, OL_conds, OL_durations, OL_inds, ...
     axis_labels, Frame_ind, num_groups, genotype, plot_settings, top_left_place, bottom_left_place, ...
     left_col_places)
@@ -25,6 +19,7 @@ function plot_OL_timeseries(timeseries_data, timestampsIN, OL_conds, OL_duration
     timeseries_xlimits = plot_settings.timeseries_xlimits;
     rep_LineWidth = plot_settings.rep_lineWidth;
     cond_name = plot_settings.cond_name;
+    plot_opposing_directions = plot_settings.plot_both_directions;
     
 
     
@@ -56,18 +51,33 @@ function plot_OL_timeseries(timeseries_data, timestampsIN, OL_conds, OL_duration
                             timestamps = timestampsIN(~nanidx);
                             meandata(nanidx) = []; 
                             semdata(nanidx) = []; 
-                            if num_groups==1 && overlap==0 
+                            if num_groups==1 && plot_opposing_directions==0 
                                 plot(repmat(timestampsIN',[1 num_exps]),tmpdata','Color',mean_Colors(g,:),'LineWidth',rep_LineWidth);
                             end
                             plot(timestamps,meandata,'Color',mean_Colors(g,:),'LineWidth',mean_LineWidth);
                             if num_groups>1
                                 patch([timestamps fliplr(timestamps)],[meandata+semdata fliplr(meandata-semdata)],'k','FaceColor',mean_Colors(g,:),'EdgeColor','none','FaceAlpha',patch_alpha)
                             end
+                            if plot_opposing_directions == 1
+                            
+                                tmpdata = squeeze(timeseries_data(g,:,d,cond+1,:));
+                                meandata = nanmean(tmpdata);
+                                nanidx = isnan(meandata);
+                                stddata = nanstd(tmpdata);
+                                semdata = stddata./sqrt(sum(max(~isnan(tmpdata),[],2)));
+                                timestamps = timestampsIN(~nanidx);
+                                meandata(nanidx) = []; 
+                                semdata(nanidx) = [];
+
+                                plot(timestamps,meandata,'Color',mean_Colors(g+1,:),'LineWidth',mean_LineWidth);
+
+                            end
                         end
 %                         titlestr = ['\fontsize{' num2str(subtitle_FontSize) '} Condition #{\color[rgb]{' num2str(mean_Colors(g,:)) '}' num2str(cond)]; 
                         title(cond_name{cond},'FontSize',subtitle_FontSize)
                         ylim(timeseries_ylimits(d,:));
                         %xlim(timeseries_xlimits)
+                        
                         if frame_superimpose==1
                             yrange = diff(timeseries_ylimits(d,:));
                             framepos = squeeze(nanmedian(nanmedian(timeseries_data(:,:,Frame_ind,cond,:),2),1))';

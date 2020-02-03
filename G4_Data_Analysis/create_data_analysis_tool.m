@@ -88,10 +88,9 @@ classdef create_data_analysis_tool < handle
             self.save_settings.results_path = "/Users/taylorl/Desktop/forLisa/";
             
         %Genotype(s) being compared
-            genotypes = ["empty-split", "LPLC-2", "LC-18", "T4_T5", "LC-15", "LC-25", "LC-11", "LC-17", "LC-4"];
-            for i = 1:length(genotypes)
-                self.genotype{i} = genotypes(i);
-            end
+            %genotypes = ["empty-split", "LPLC-2", "LC-18", "T4_T5", "LC-15", "LC-25", "LC-11", "LC-17", "LC-4"];
+            genotypes = ["LPLC-2"];
+            
             
         %This is the group name that the data analysis log file will be saved under. For example if you're analyzing
         %all the flies put through an experimental protocol, this should be
@@ -215,6 +214,10 @@ classdef create_data_analysis_tool < handle
             self.TC_plot_option = 0;
             self.single_analysis = 0;
             self.group_analysis = 0;
+            
+            for i = 1:length(genotypes)
+                self.genotype{i} = genotypes(i);
+            end
 
 
         %% Settings based on inputs

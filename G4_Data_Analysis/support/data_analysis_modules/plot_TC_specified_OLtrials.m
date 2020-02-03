@@ -13,6 +13,7 @@ function plot_TC_specified_OLtrials(TC_plot_settings, TC_conds, TC_inds, overlap
     timeseries_ylimits = TC_plot_settings.timeseries_ylimits;
     subtitle_FontSize = TC_plot_settings.subtitle_fontSize;
     marker_type = TC_plot_settings.marker_type;
+    plot_opposing_directions = TC_plot_settings.plot_both_directions;
     
     if ~isempty(TC_conds)
         
@@ -31,10 +32,22 @@ function plot_TC_specified_OLtrials(TC_plot_settings, TC_conds, TC_inds, overlap
                     hold on
                     for g = 1:num_groups
                         tmpdata = squeeze(nanmean(CombData.summaries(g,:,d,conds,:),5));
-                        if num_groups==1 && overlap==0 
+                        if num_groups==1 && plot_opposing_directions == 0 
                             plot(tmpdata','Color',rep_Colors(g,:),'LineWidth',rep_LineWidth);
                         end
                         plot(nanmean(tmpdata),'Color',mean_Colors(g,:),'LineWidth',mean_LineWidth, 'Marker', marker_type);
+                        if plot_opposing_directions == 1
+                            for l = 1:length(conds)
+                                conds(l) = conds(l) + 1;
+                            end
+                            tmpdata = squeeze(nanmean(CombData.summaries(g,:,d,conds,:),5));
+                            plot(nanmean(tmpdata),'Color',mean_Colors(g+1,:),'LineWidth',mean_LineWidth, 'Marker', marker_type);
+                            for i = 1:length(conds)
+                                conds(i) = conds(i) - 1;
+                            end
+                        end
+
+                            
                     end
                     ylim(timeseries_ylimits(d,:));
                    % titlestr = ['\fontsize{' num2str(subtitle_FontSize) '} Condition #{\color[rgb]{' num2str(mean_Colors(g,:)) '}' num2str(conds)];

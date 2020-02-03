@@ -48,28 +48,33 @@ function [normalize_settings, histogram_plot_settings, histogram_annotation_sett
     timeseries_plot_settings.timeseries_xlimits = [0 4];
     timeseries_plot_settings.subtitle_fontSize = 8;
     timeseries_plot_settings.legend_fontSize = 6;
-    timeseries_plot_settings.overlap = 0;
+    timeseries_plot_settings.overlap = 0; %not working
     timeseries_plot_settings.rep_colors = [0 0 0; 1 0 0; 0 0.5 0; 0 0 1; 1 0.5 0; .75 0 1; 0 1 0; 0 1 1; 1 0 1; 1 1 0]; %default 10 colors supports up to 10 groups (add more colors for more groups)
     timeseries_plot_settings.rep_lineWidth = 0.05;
-    timeseries_plot_settings.mean_colors = [0 0 0; 1 0 0; 0 0.5 0; 0 0 1; 1 0.5 0; .75 0 1; 0 1 0; 0 1 1; 1 0 1; 1 1 0]; %default 10 colors supports up to 10 groups (add more colors for more groups)
+    timeseries_plot_settings.mean_colors = [1 0 0; 0 0 1; 0 0.5 0; 0 0 0; 1 0.5 0; .75 0 1; 0 1 0; 0 1 1; 1 0 1; 1 1 0]; %default 10 colors supports up to 10 groups (add more colors for more groups)
+    %timeseries_plot_settings.mean_colors = [1 0 0; 0 0 1]; %Use these when plotting both directions on same plot (only one group)
     timeseries_plot_settings.mean_lineWidth = 1;
     timeseries_plot_settings.edgeColor = 'none';
     timeseries_plot_settings.patch_alpha = 0.3; %sets the level of transparency for patch region around timeseries data
     timeseries_plot_settings.frame_scale = .5;
     timeseries_plot_settings.frame_color = [0.7 0.7 0.7];
     timeseries_plot_settings.frame_superimpose = 1;%plots the frame position underneath each timeseries plot
+    timeseries_plot_settings.plot_both_directions = 1; %1 - you want to plot counter and clockwise directions on same graph.
+                                                       %0 - only plot the condition in OL_conds, not opposing directions
 
     %% Plot settings for tuning curves
     TC_plot_settings = struct;
     TC_plot_settings.overlap = 0; %Overlap of 1 not working
     TC_plot_settings.rep_lineWidth = 0.05;
     TC_plot_settings.mean_lineWidth = 1;
-    TC_plot_settings.timeseries_ylimits = [-1.1 1.1; -1 6; -1 6; -1 6; 1 192; -1.1 1.1; 0 20; 0 5.1];
+    TC_plot_settings.timeseries_ylimits = [-1.1 1.1; -1 6; -1 6; -1 6; 1 192; -2 2; 0 20; 0 5.1];
     
     TC_plot_settings.rep_colors = [0 0 0; 0.75 0 0; 0 0.25 0; 0 0 0.75; 0.75 0.25 0; .5 0 0.75; 0 0.75 0; 0 0.75 0.75; 0.75 0 0.75; 0.75 0.75 0]; %default 10 colors supports up to 10 groups (add more colors for more groups)
-    TC_plot_settings.mean_colors = [0 0 0; 1 0 0; 0 0.5 0; 0 0 1; 1 0.5 0; .75 0 1; 0 1 0; 0 1 1; 1 0 1; 1 1 0]; %default 10 colors supports up to 10 groups (add more colors for more groups)
+    TC_plot_settings.mean_colors = [1 0 0; 0 0 1; 0 0 0; 0 0.5 0;  1 0.5 0; .75 0 1; 0 1 0; 0 1 1; 1 0 1; 1 1 0]; %default 10 colors supports up to 10 groups (add more colors for more groups)
     TC_plot_settings.subtitle_fontSize = 8;
     TC_plot_settings.marker_type = 'o';
+    TC_plot_settings.plot_both_directions = 1; %1 - plot clock/counterclockwise on same plot. 0 - only plot trials indicated (no opposing direction)
+   
 
     %% Save settings
 
