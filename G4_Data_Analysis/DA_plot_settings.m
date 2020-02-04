@@ -53,6 +53,7 @@ function [normalize_settings, histogram_plot_settings, histogram_annotation_sett
     timeseries_plot_settings.rep_lineWidth = 0.05;
     timeseries_plot_settings.mean_colors = [1 0 0; 0 0 1; 0 0.5 0; 0 0 0; 1 0.5 0; .75 0 1; 0 1 0; 0 1 1; 1 0 1; 1 1 0]; %default 10 colors supports up to 10 groups (add more colors for more groups)
     %timeseries_plot_settings.mean_colors = [1 0 0; 0 0 1]; %Use these when plotting both directions on same plot (only one group)
+    timeseries_plot_settings.control_color = [0 0 0];
     timeseries_plot_settings.mean_lineWidth = 1;
     timeseries_plot_settings.edgeColor = 'none';
     timeseries_plot_settings.patch_alpha = 0.3; %sets the level of transparency for patch region around timeseries data
@@ -73,7 +74,7 @@ function [normalize_settings, histogram_plot_settings, histogram_annotation_sett
     TC_plot_settings.mean_colors = [1 0 0; 0 0 1; 0 0 0; 0 0.5 0;  1 0.5 0; .75 0 1; 0 1 0; 0 1 1; 1 0 1; 1 1 0]; %default 10 colors supports up to 10 groups (add more colors for more groups)
     TC_plot_settings.subtitle_fontSize = 8;
     TC_plot_settings.marker_type = 'o';
-    TC_plot_settings.plot_both_directions = 1; %1 - plot clock/counterclockwise on same plot. 0 - only plot trials indicated (no opposing direction)
+    TC_plot_settings.plot_both_directions = 0; %1 - plot clock/counterclockwise on same plot. 0 - only plot trials indicated (no opposing direction)
    
 
     %% Save settings

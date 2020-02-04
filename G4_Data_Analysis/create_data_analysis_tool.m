@@ -6,6 +6,7 @@ classdef create_data_analysis_tool < handle
     properties
         exp_folder
         genotype
+        control_genotype
         trial_options
         CombData
         processed_data_file
@@ -74,9 +75,31 @@ classdef create_data_analysis_tool < handle
             [self.normalize_settings, self.histogram_plot_settings, self.histogram_annotation_settings, ...
     self.CL_hist_plot_settings, self.timeseries_plot_settings, self.TC_plot_settings, self.save_settings] = DA_plot_settings();
 
-        %% USER-UPDATED SETTINGS HERE
-            
-        % Filename of processed data files being read
+        
+            %% For new file system set up
+% %         %Information used to generate exp_folder and trial_options variables
+% %         
+% %             trial_options = [1 1 1];
+% %         
+% %         %How you want to sort flies - must match the field in the metadata
+% %         %file exactly.
+% %             field_to_sort_by = 'fly_genotype';
+% %         
+% %         %Set single_group to 1 if you are only analyzing one group (such as
+% %         %one genotype). If you're comparing multiple groups, set it to 0
+% %             single_group = 0; 
+% %             
+% %         %The value(s) which flies should have for the above metadata field
+% %         %in order to be included in the group. This should be an array of
+% %         %strings and should match the metadata values exactly. 
+% %             field_values = ["OL0048B_UAS_Kir_JFRC49"];
+% %             
+% %         %Path to the protocol folder    
+% %             path_to_protocol =  '/Users/taylorl/Desktop/Protocol_folder';
+% %             
+
+%% USER-UPDATED SETTINGS HERE
+        % Filename of processed data files being read        
             self.processed_data_file = 'smallfield_V2_G4_Processed_Data';
             
         %Filepath at which to save plots
@@ -87,9 +110,18 @@ classdef create_data_analysis_tool < handle
         %where the group analysis log file will be saved. 
             self.save_settings.results_path = "/Users/taylorl/Desktop/forLisa/";
             
-        %Genotype(s) being compared
+        %Genotype(s) being compared. Element 1 should correspond to the
+        %first column in exp_folder, element 2 the second, etc. 
             %genotypes = ["empty-split", "LPLC-2", "LC-18", "T4_T5", "LC-15", "LC-25", "LC-11", "LC-17", "LC-4"];
-            genotypes = ["LPLC-2"];
+            genotypes = ["LPLC-2", "EmptySplit"];
+            
+         %Control genotype - leave = '' if not comparing to control. If
+         %comparing to control, include the control genotype name in the
+         %genotypes array, then set control_genotype to the same genotype
+         %name. Note that the strings in genotypes must be enclosed in
+         %double quotations, " ", while control_genotype needs to be
+         %enclosed in single quotations, ' '. 
+            self.control_genotype = '';
             
             
         %This is the group name that the data analysis log file will be saved under. For example if you're analyzing
@@ -221,9 +253,18 @@ classdef create_data_analysis_tool < handle
 
 
         %% Settings based on inputs
+             %%%For new file system setup
+%            self.exp_folder = get_exp_folder(field_to_sort_by, single_group, field_values, path_to_protocol);
             self.exp_folder = exp_folder;
             [self.num_groups, self.num_exps] = size(exp_folder);
             self.trial_options = trial_options;
+            if ~isempty(self.control_genotype)
+                self.control_genotype = find(strcmp(genotypes,self.control_genotype));
+            else
+                self.control_genotype = 0;
+               
+            end
+                
             
             
             
@@ -483,7 +524,7 @@ classdef create_data_analysis_tool < handle
                     plot_OL_timeseries(self.CombData.timeseries_avg_over_reps, ...
                         self.CombData.timestamps, self.OL_conds{k}, self.OL_conds_durations{k}, ...
                         self.datatype_indices.OL_inds, self.OL_conds_axis_labels{k}, ...
-                        self.datatype_indices.Frame_ind, self.num_groups, self.genotype, self.timeseries_plot_settings,...
+                        self.datatype_indices.Frame_ind, self.num_groups, self.genotype, self.control_genotype, self.timeseries_plot_settings,...
                         self.timeseries_top_left_place, self.timeseries_bottom_left_places{k}, ...
                         self.timeseries_left_column_places{k});
                     

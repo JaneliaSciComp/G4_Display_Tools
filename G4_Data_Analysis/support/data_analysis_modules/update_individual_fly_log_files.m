@@ -1,9 +1,15 @@
 function update_individual_fly_log_files(exp_folder, save_path, analyses_run, files_excluded)
     
     date = (datestr(now, 'dd/mm/yy-HH:MM'));
-    for i = 1:length(files_excluded)
-        files(i) = files_excluded{i}(1);
-        reasons(i) = files_excluded{i}(2);
+    if isempty(files_excluded)
+        files = [];
+        reasons = [];
+    else
+        
+        for i = 1:length(files_excluded)
+            files(i) = files_excluded{i}(1);
+            reasons(i) = files_excluded{i}(2);
+        end
     end
     for i = 1:length(exp_folder(:,1))
         for q = 1:length(exp_folder(1,:))

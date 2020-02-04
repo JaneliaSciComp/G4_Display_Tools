@@ -1,7 +1,7 @@
 %plot timeseries data for open-loop trials
 
 function plot_OL_timeseries(timeseries_data, timestampsIN, OL_conds, OL_durations, OL_inds, ...
-    axis_labels, Frame_ind, num_groups, genotype, plot_settings, top_left_place, bottom_left_place, ...
+    axis_labels, Frame_ind, num_groups, genotype, control_genotype, plot_settings, top_left_place, bottom_left_place, ...
     left_col_places)
 
     overlap = plot_settings.overlap;
@@ -20,6 +20,7 @@ function plot_OL_timeseries(timeseries_data, timestampsIN, OL_conds, OL_duration
     rep_LineWidth = plot_settings.rep_lineWidth;
     cond_name = plot_settings.cond_name;
     plot_opposing_directions = plot_settings.plot_both_directions;
+    control_color = plot_settings.control_color;
     
 
     
@@ -54,9 +55,17 @@ function plot_OL_timeseries(timeseries_data, timestampsIN, OL_conds, OL_duration
                             if num_groups==1 && plot_opposing_directions==0 
                                 plot(repmat(timestampsIN',[1 num_exps]),tmpdata','Color',mean_Colors(g,:),'LineWidth',rep_LineWidth);
                             end
-                            plot(timestamps,meandata,'Color',mean_Colors(g,:),'LineWidth',mean_LineWidth);
+                            if g == control_genotype
+                                plot(timestamps,meandata,'Color',control_color,'LineWidth',mean_LineWidth);
+                            else
+                                plot(timestamps,meandata,'Color',mean_Colors(g,:),'LineWidth',mean_LineWidth);
+                            end
                             if num_groups>1
-                                patch([timestamps fliplr(timestamps)],[meandata+semdata fliplr(meandata-semdata)],'k','FaceColor',mean_Colors(g,:),'EdgeColor','none','FaceAlpha',patch_alpha)
+                                if g == control_genotype
+                                    patch([timestamps fliplr(timestamps)],[meandata+semdata fliplr(meandata-semdata)],'k','FaceColor',control_color,'EdgeColor','none','FaceAlpha',patch_alpha)
+                                else
+                                    patch([timestamps fliplr(timestamps)],[meandata+semdata fliplr(meandata-semdata)],'k','FaceColor',mean_Colors(g,:),'EdgeColor','none','FaceAlpha',patch_alpha)
+                                end
                             end
                             if plot_opposing_directions == 1
                             
@@ -68,9 +77,21 @@ function plot_OL_timeseries(timeseries_data, timestampsIN, OL_conds, OL_duration
                                 timestamps = timestampsIN(~nanidx);
                                 meandata(nanidx) = []; 
                                 semdata(nanidx) = [];
+                                if num_groups == 1
+                                    plot(timestamps,meandata,'Color',mean_Colors(g+1,:),'LineWidth',mean_LineWidth);
+                                else
+                                    if g == control_genotype
+                                        plot(timestamps,meandata,'Color',control_color,'LineWidth',mean_LineWidth);
+                                        patch([timestamps fliplr(timestamps)],[meandata+semdata fliplr(meandata-semdata)],'k','FaceColor',control_color,'EdgeColor','none','FaceAlpha',patch_alpha)
 
-                                plot(timestamps,meandata,'Color',mean_Colors(g+1,:),'LineWidth',mean_LineWidth);
-
+                                    else
+                                        plot(timestamps,meandata,'Color',mean_Colors(g,:),'LineWidth',mean_LineWidth);
+                                        patch([timestamps fliplr(timestamps)],[meandata+semdata fliplr(meandata-semdata)],'k','FaceColor',mean_Colors(g,:),'EdgeColor','none','FaceAlpha',patch_alpha)
+                                
+                                    
+                                    end
+                                end
+                               
                             end
                         end
 %                         titlestr = ['\fontsize{' num2str(subtitle_FontSize) '} Condition #{\color[rgb]{' num2str(mean_Colors(g,:)) '}' num2str(cond)]; 
@@ -141,11 +162,27 @@ function plot_OL_timeseries(timeseries_data, timestampsIN, OL_conds, OL_duration
             end
 
             h = findobj(gcf,'Type','line');
-            if num_groups==1
-                legend1 = legend(genotype,'FontSize',legend_FontSize);
+            if num_groups == 1
+                if frame_superimpose == 0 && plot_opposing_directions == 0
+
+                    legend1 = legend(genotype, 'FontSize', legend_FontSize);
+                else
+                    legend1 = legend(h(end), genotype);
+                    
+                end
             else
-                legend1 = legend(h(num_groups+7:-1:8),genotype{1:end},'FontSize',legend_FontSize,'Orientation','horizontal');%prints warnings in orange but ignore
+                
+                if plot_opposing_directions == 0
+                    
+                    legend1 = legend(h(end:-1:end-(num_groups-1)), genotype{1:end},'Orientation','horizontal');
+                    
+                else
+
+                    legend1 = legend(h(end:-2:end - (num_groups*2-1)),genotype{1:end},'Orientation','horizontal');%prints warnings in orange but ignore
+                    
+                end
             end
+            
 
 
             newPosition = [0.5 0.004 0.001 0.001]; %legend positioning
@@ -153,7 +190,7 @@ function plot_OL_timeseries(timeseries_data, timestampsIN, OL_conds, OL_duration
 
             newUnits = 'normalized';
             legend1.ItemTokenSize = [10,7];
-            set(legend1,'Position', newPosition,'Units', newUnits, 'Interpreter', 'none','Box','off');
+            set(legend1,'Position', newPosition,'FontSize',legend_FontSize, 'Units', newUnits, 'Interpreter', 'none','Box','off');
 
 
 
