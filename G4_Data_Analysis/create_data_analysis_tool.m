@@ -113,7 +113,7 @@ classdef create_data_analysis_tool < handle
         %Genotype(s) being compared. Element 1 should correspond to the
         %first column in exp_folder, element 2 the second, etc. 
             %genotypes = ["empty-split", "LPLC-2", "LC-18", "T4_T5", "LC-15", "LC-25", "LC-11", "LC-17", "LC-4"];
-            genotypes = ["LPLC-2", "EmptySplit"];
+            genotypes = ["LPLC-2","EmptySplit"];
             
          %Control genotype - leave = '' if not comparing to control. If
          %comparing to control, include the control genotype name in the
@@ -121,7 +121,7 @@ classdef create_data_analysis_tool < handle
          %name. Note that the strings in genotypes must be enclosed in
          %double quotations, " ", while control_genotype needs to be
          %enclosed in single quotations, ' '. 
-            self.control_genotype = '';
+            self.control_genotype = 'EmptySplit';
             
             
         %This is the group name that the data analysis log file will be saved under. For example if you're analyzing
@@ -539,7 +539,7 @@ classdef create_data_analysis_tool < handle
                 
                 for k = 1:numel(self.TC_conds)
                     plot_TC_specified_OLtrials(self.TC_plot_settings, self.TC_conds{k}, self.datatype_indices.TC_inds, ...
-                       self.TC_plot_settings.overlap, self.num_groups, self.CombData);
+                       self.genotype, self.control_genotype, self.TC_plot_settings.overlap, self.num_groups, self.CombData);
                 end
                 
                 analyses_run{end+1} = 'Tuning Curves';
