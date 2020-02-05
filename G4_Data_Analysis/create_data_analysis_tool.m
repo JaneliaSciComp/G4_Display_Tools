@@ -113,7 +113,7 @@ classdef create_data_analysis_tool < handle
         %Genotype(s) being compared. Element 1 should correspond to the
         %first column in exp_folder, element 2 the second, etc. 
             %genotypes = ["empty-split", "LPLC-2", "LC-18", "T4_T5", "LC-15", "LC-25", "LC-11", "LC-17", "LC-4"];
-            genotypes = ["LPLC-2"];
+            genotypes = ["LPLC-2", "EmptySplit", "LC-18"];
             
          %Control genotype - leave = '' if not comparing to control. If
          %comparing to control, include the control genotype name in the
@@ -149,25 +149,32 @@ classdef create_data_analysis_tool < handle
             self.CL_conds = [];
             
         %TC_conds are different than OL and CL conds. All conditions
-        %being looked at are plotted on a single tuning curve.
+        %being looked at are plotted on a single tuning curve. So the
+        %layout is TC_conds{fig #}{row #} = [ conds on curve in col1; conds on curve in col2; conds on curve in col3]
 
-        %If you want multiple tuning curves on a single figure,
-        %separate them with ;  For example: 
+        %The size of the first cell array element determines the number of figures. 
+        %The size of the second cell array element determines the number of
+        %rows in the figure. Columns should be separated by a ; in the
+        %regular array. For example: 
 
-        %self.TC_conds{1} = [1 2 3 4 5 6 7 8; 9 10 11 12 13 14 15 16]
-        %self.TC_conds{2} = [17 18 19 20 21 22 23 24]
+        %self.TC_conds{1}{1} = [1 2 3 4 5 6 7 8; 9 10 11 12 13 14 15 16]
+        %self.TC_conds{1}{2} = [17 18 19 20 21 22 23 24; 25 26 27 28 29 30 31 32]
+        %self.TC_conds{2}{1} = [19 20 21 22 23]
+        %self.TC_conds{2}{2} = [26 27 28 29 30]
 
         %In this case, for each datatype there will be two figures. The
-        %first figure will have two tuning curves, one above the other.
-        %The first tuning curve will compare conditions 1-8, the second
-        %will compare conditions 9-16. On the second figure will be a
-        %single tuning curve which compares conditions 17-24. If you
-        %want all conditions on a single tuning curve, you would simply
-        %do  self.TC_conds{1} = [1:24];
+        %first figure will have two rows. The first row will contain two tuning curves - 
+        %the first comparing conditions 1-8, the second comparing conditions 9-16.
+        %The second row of figure one will contain two curves, the first using conds 17-24,
+        %and the second comparing conds 25-28. Figure 2 will contain two
+        %rows and a single column. The top curve will compare conds 19-23
+        %and the bottom curve will compare conds 26-30. If you want to
+        %leave an empty space, replace the condition numbers with 0's ie [1 2 3 4; 0 0 0 0]
 
-            self.TC_conds{1} = [1 3 5 7; 9 11 13 15]; %3x1, 3x3, 3x3 ON, 8x8 (4 x 2 plots)
-            self.TC_conds{2} = [17 19 21 23; 25 27 29 31]; %16x16, 64x3, 64x3 ON, 64x16 (4 x 2 plots)
-            self.TC_conds{3} = [33 34 35 36; 37 38 39 40]; %left and right Looms (4 x 2 plots)
+            self.TC_conds{1}{1} = [1 3 5 7; 9 11 13 15]; %3x1, 3x3, 3x3 ON, 8x8 (4 x 2 plots)
+            self.TC_conds{1}{2} = [17 19 21 23; 0 0 0 0]; %16x16, 64x3, 64x3 ON, 64x16 (4 x 2 plots)
+            self.TC_conds{2}{1} = [25 27 29 31; 33 34 35 36] ;
+            self.TC_conds{2}{2} = [37 38 39 40; 0 0 0 0]; %left and right Looms (4 x 2 plots)
             
    %         self.TC_conds = []; 
    
@@ -531,7 +538,7 @@ classdef create_data_analysis_tool < handle
             
             if self.TC_plot_option == 1
                 
-                for k = 1:numel(self.TC_conds)
+                for k = 1:length(self.TC_conds)
                     plot_TC_specified_OLtrials(self.TC_plot_settings, self.TC_conds{k}, self.datatype_indices.TC_inds, ...
                        self.genotype, self.control_genotype, self.TC_plot_settings.overlap, self.num_groups, self.CombData);
                 end

@@ -23,13 +23,16 @@ function plot_TC_specified_OLtrials(TC_plot_settings, TC_conds, TC_inds, genotyp
         %loop for different data types
         for d = TC_inds
 
-            num_plot_rows = size(TC_conds,1);
-            num_plot_cols = 1;
+            num_plot_rows = size(TC_conds,2);
+            num_plot_cols = size(TC_conds{1},1);
             figure('Position',[100 100 540 540*(num_plot_rows/num_plot_cols)])
             for row = 1:num_plot_rows
                 for col = 1:num_plot_cols
-                    conds = TC_conds(1+(row-1)*(1+overlap),:);
+                    conds = TC_conds{row}(col,:);
                     conds(isnan(conds)|conds==0) = [];
+                    if isempty(conds)
+                        continue;
+                    end
                     placement = col+num_plot_cols*(row-1);
                     better_subplot(num_plot_rows, num_plot_cols, placement)
                     hold on
