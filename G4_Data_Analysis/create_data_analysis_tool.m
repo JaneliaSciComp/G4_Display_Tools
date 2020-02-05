@@ -113,7 +113,7 @@ classdef create_data_analysis_tool < handle
         %Genotype(s) being compared. Element 1 should correspond to the
         %first column in exp_folder, element 2 the second, etc. 
             %genotypes = ["empty-split", "LPLC-2", "LC-18", "T4_T5", "LC-15", "LC-25", "LC-11", "LC-17", "LC-4"];
-            genotypes = ["LPLC-2","EmptySplit"];
+            genotypes = ["LPLC-2"];
             
          %Control genotype - leave = '' if not comparing to control. If
          %comparing to control, include the control genotype name in the
@@ -121,7 +121,7 @@ classdef create_data_analysis_tool < handle
          %name. Note that the strings in genotypes must be enclosed in
          %double quotations, " ", while control_genotype needs to be
          %enclosed in single quotations, ' '. 
-            self.control_genotype = 'EmptySplit';
+            self.control_genotype = '';
             
             
         %This is the group name that the data analysis log file will be saved under. For example if you're analyzing
@@ -145,7 +145,7 @@ classdef create_data_analysis_tool < handle
             self.OL_conds{3} = [33 34; 35 36; 37 38; 39 40]; %left and right Looms (4 x 2 plots)
             self.OL_conds{4} = [41; 43]; %yaw and sideslip (2 x 1 plots)
             
-%            self.OL_conds = [];
+%             self.OL_conds = [];
             self.CL_conds = [];
             
         %TC_conds are different than OL and CL conds. All conditions
@@ -188,6 +188,7 @@ classdef create_data_analysis_tool < handle
             self.OL_conds_durations{2} = [3.5 1.62; 3.5 1.62; 3.5 1.62; 3.5 1.62];
             self.OL_conds_durations{3} = [0.75 1.35; 1.65 0.95; 0.75 1.35; 1.65 0.95];
             self.OL_conds_durations{4} = [2.35; 2.35];
+%            self.OL_conds_durations = [];
             
             %each figure should be of graphs that have the same x and y
             %labels.  Save them as an array [x-label, y-label]
@@ -272,14 +273,7 @@ classdef create_data_analysis_tool < handle
             if ~isempty(self.OL_conds)
                 
             end
-            
-            % Same thing as above but now we're finding out which places
-            % are the bottom row so we know to keep their x-axes turned on.
-            
-            
-            
-          
-                        
+                                    
         
             
         %% Update settings based on flags
@@ -367,7 +361,7 @@ classdef create_data_analysis_tool < handle
             %supplied
             
             if self.timeseries_plot_option == 1 && isempty(self.OL_conds)
-                self.OL_conds = create_default_OL_plot_layout(conditionModes, self.OL_conds);
+                self.OL_conds = create_default_OL_plot_layout(conditionModes, self.OL_conds, self.timeseries_plot_settings.plot_both_directions);
                 
             end
             
