@@ -72,7 +72,7 @@ function plot_TC_specified_OLtrials(TC_plot_settings, TC_conds, TC_inds, genotyp
                    % titlestr = ['\fontsize{' num2str(subtitle_FontSize) '} Condition #{\color[rgb]{' num2str(mean_Colors(g,:)) '}' num2str(conds)];
                     titlestr = "Datatype: " + CombData.channelNames.timeseries(d) + " Condition # " + num2str(conds);
                     xlabel(TC_plot_settings.xaxis_label);
-                    xticks(1:length(TC_conds));
+                    xticks(1:length(TC_conds{row}));
                     xticklabels(TC_plot_settings.xaxis_values);
                     if overlap==1
                         conds = TC_conds(row*2,:);
