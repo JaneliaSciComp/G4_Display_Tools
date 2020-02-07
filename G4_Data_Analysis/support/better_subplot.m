@@ -4,7 +4,7 @@ fig = gcf;
 fig_pos = fig.Position;
 fig_width = fig_pos(3);
 fig_height = fig_pos(4);
-gap_x = 50/fig_width;
+gap_x = 20/fig_width;
 gap_y = 50/fig_height;
 
 row = ceil(N/W);
