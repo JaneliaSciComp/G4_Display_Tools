@@ -21,6 +21,7 @@ function plot_OL_timeseries(timeseries_data, timestampsIN, OL_conds, OL_duration
     cond_name = plot_settings.cond_name;
     plot_opposing_directions = plot_settings.plot_both_directions;
     control_color = plot_settings.control_color;
+    show_ind_flies = plot_settings.show_individual_flies;
     
 
     
@@ -52,7 +53,7 @@ function plot_OL_timeseries(timeseries_data, timestampsIN, OL_conds, OL_duration
                             timestamps = timestampsIN(~nanidx);
                             meandata(nanidx) = []; 
                             semdata(nanidx) = []; 
-                            if num_groups==1 && plot_opposing_directions==0 
+                            if num_groups==1 && plot_opposing_directions==0 && show_ind_flies == 1
                                 plot(repmat(timestampsIN',[1 num_exps]),tmpdata','Color',mean_Colors(g,:),'LineWidth',rep_LineWidth);
                                 plot(timestamps, meandata, 'Color', .5*mean_Colors(g,:),'LineWidth', mean_LineWidth);
                             else
@@ -186,10 +187,6 @@ function plot_OL_timeseries(timeseries_data, timestampsIN, OL_conds, OL_duration
             if control_genotype ~= 0
                 genotype{control_genotype} = erase(genotype{control_genotype}," (control)");
             end
-            
-            
-            
-
 
             newPosition = [0.5 0.004 0.001 0.001]; %legend positioning
 

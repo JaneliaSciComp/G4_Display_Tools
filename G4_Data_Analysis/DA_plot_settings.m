@@ -58,8 +58,9 @@ function [normalize_settings, histogram_plot_settings, histogram_annotation_sett
     timeseries_plot_settings.patch_alpha = 0.3; %sets the level of transparency for patch region around timeseries data
     timeseries_plot_settings.frame_scale = .5;
     timeseries_plot_settings.frame_color = [0.7 0.7 0.7];
+    timeseries_plot_settings.show_individual_flies = 0;
     timeseries_plot_settings.frame_superimpose = 1;%plots the frame position underneath each timeseries plot
-    timeseries_plot_settings.plot_both_directions = 1; %1 - you want to plot counter and clockwise directions on same graph.
+    timeseries_plot_settings.plot_both_directions = 0;%1 - you want to plot counter and clockwise directions on same graph.
                                                        %0 - only plot the condition in OL_conds, not opposing directions
 
     %% Plot settings for tuning curves
