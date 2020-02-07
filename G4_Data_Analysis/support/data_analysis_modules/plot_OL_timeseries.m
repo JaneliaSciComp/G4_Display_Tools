@@ -54,19 +54,17 @@ function plot_OL_timeseries(timeseries_data, timestampsIN, OL_conds, OL_duration
                             semdata(nanidx) = []; 
                             if num_groups==1 && plot_opposing_directions==0 
                                 plot(repmat(timestampsIN',[1 num_exps]),tmpdata','Color',mean_Colors(g,:),'LineWidth',rep_LineWidth);
-                            end
-                            if g == control_genotype
-                                plot(timestamps,meandata,'Color',control_color,'LineWidth',mean_LineWidth);
+                                plot(timestamps, meandata, 'Color', .5*mean_Colors(g,:),'LineWidth', mean_LineWidth);
                             else
-                                plot(timestamps,meandata,'Color',mean_Colors(g,:),'LineWidth',mean_LineWidth);
-                            end
-                            if num_groups>1
                                 if g == control_genotype
+                                    plot(timestamps,meandata,'Color',control_color,'LineWidth',mean_LineWidth);
                                     patch([timestamps fliplr(timestamps)],[meandata+semdata fliplr(meandata-semdata)],'k','FaceColor',control_color,'EdgeColor','none','FaceAlpha',patch_alpha)
                                 else
+                                    plot(timestamps,meandata,'Color',mean_Colors(g,:),'LineWidth',mean_LineWidth);
                                     patch([timestamps fliplr(timestamps)],[meandata+semdata fliplr(meandata-semdata)],'k','FaceColor',mean_Colors(g,:),'EdgeColor','none','FaceAlpha',patch_alpha)
                                 end
                             end
+                            
                             if plot_opposing_directions == 1
                             
                                 tmpdata = squeeze(timeseries_data(g,:,d,cond+1,:));

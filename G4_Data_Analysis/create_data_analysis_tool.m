@@ -103,17 +103,17 @@ classdef create_data_analysis_tool < handle
             self.processed_data_file = 'smallfield_V2_G4_Processed_Data';
             
         %Filepath at which to save plots
-            self.save_settings.save_path = '/Users/taylorl/Desktop/data_analysis/old_data';
+            self.save_settings.save_path = '/Users/taylorl/Desktop';
             
         %This should be the filepath to the folder which contains all
         %experiment folders (or results folders) being analyzed. It is
         %where the group analysis log file will be saved. 
-            self.save_settings.results_path = "/Users/taylorl/Desktop/forLisa/";
+            self.save_settings.results_path = "/Users/taylorl/Desktop/Protocol_folder";
             
         %Genotype(s) being compared. Element 1 should correspond to the
         %first column in exp_folder, element 2 the second, etc. 
             %genotypes = ["empty-split", "LPLC-2", "LC-18", "T4_T5", "LC-15", "LC-25", "LC-11", "LC-17", "LC-4"];
-            genotypes = ["LPLC-2", "EmptySplit", "LC-18"];
+            genotypes = ["LPLC-2"];
             
          %Control genotype - leave = '' if not comparing to control. If
          %comparing to control, include the control genotype name in the
@@ -176,7 +176,7 @@ classdef create_data_analysis_tool < handle
             self.TC_conds{2}{1} = [25 27 29 31; 33 34 35 36] ;
             self.TC_conds{2}{2} = [37 38 39 40; 0 0 0 0]; %left and right Looms (4 x 2 plots)
             
-   %         self.TC_conds = []; 
+%           self.TC_conds = []; 
    
             %The x axis of your tuning curve depends on what is changing
             %between the conditions you are comparing. Each condition might
@@ -273,15 +273,7 @@ classdef create_data_analysis_tool < handle
                
             end
                 
-            
-            
-            
-           
-            if ~isempty(self.OL_conds)
-                
-            end
-                                    
-        
+
             
         %% Update settings based on flags
             self.flags = varargin;
@@ -472,14 +464,75 @@ classdef create_data_analysis_tool < handle
             analyses_run = {'Single'};
             %in this case, exp_folder should be a cell array with one
             %element, the path to the processed data file. 
-            
-            metadata_file = fullfile(self.exp_folder{1}, 'metadata.mat');
-            load(metadata_file, 'metadata');
-            G4_Plot_Data_flyingdetector_pdf(self.exp_folder{1}, self.trial_options, ...
-                metadata, self.processed_data_file);
+%             
+%             metadata_file = fullfile(self.exp_folder{1}, 'metadata.mat');
+%             load(metadata_file, 'metadata');
+%             G4_Plot_Data_flyingdetector_pdf(self.exp_folder{1}, self.trial_options, ...
+%                 metadata, self.processed_data_file);
             %disp("Single fly analysis coming soon");
             
-            
+            [num_positions, num_datatypes, num_conds, num_datapoints, self.CombData, files_excluded] ...
+            = load_specified_data(self.exp_folder, self.CombData, self.data_needed, self.processed_data_file);
+        
+            if self.normalize_option ~= 0
+
+                self.CombData = normalize_data(self, num_conds, num_datapoints, num_datatypes, num_positions);
+                if self.normalize_option == 1
+                    analyses_run{end+1} = 'Normalization 1';
+                else
+                    analyses_run{end+1} = 'Normalization 2';
+                end
+            end
+                    
+            if self.histogram_plot_option == 1
+                plot_basic_histograms(self.CombData.timeseries_avg_over_reps, self.CombData.interhistogram, ...
+                    self.TC_datatypes, self.histogram_plot_settings, self.num_groups, self.num_exps,...
+                    self.genotype, self.datatype_indices.TC_inds, self.trial_options, self.histogram_annotation_settings);
+
+                analyses_run{end+1} = 'Basic histograms';
+            end
+
+            if self.CL_histogram_plot_option == 1
+
+                for k = 1:numel(self.CL_conds)
+                    plot_CL_histograms(self.CL_conds{k}, self.datatype_indices.CL_inds, ...
+                        self.CombData.histograms, self.num_groups, self.CL_hist_plot_settings);
+                end
+
+                analyses_run{end+1} = 'CL histograms';
+
+            end
+            if self.timeseries_plot_option == 1
+
+                for k = 1:numel(self.OL_conds)
+                    plot_OL_timeseries(self.CombData.timeseries_avg_over_reps, ...
+                        self.CombData.timestamps, self.OL_conds{k}, self.OL_conds_durations{k}, ...
+                        self.datatype_indices.OL_inds, self.OL_conds_axis_labels{k}, ...
+                        self.datatype_indices.Frame_ind, self.num_groups, self.genotype, self.control_genotype, self.timeseries_plot_settings,...
+                        self.timeseries_top_left_place, self.timeseries_bottom_left_places{k}, ...
+                        self.timeseries_left_column_places{k});
+
+
+                end
+
+                analyses_run{end+1} = 'Timeseries Plots';
+
+            end
+            if self.TC_plot_option == 1
+
+                for k = 1:length(self.TC_conds)
+                    plot_TC_specified_OLtrials(self.TC_plot_settings, self.TC_conds{k}, self.datatype_indices.TC_inds, ...
+                       self.genotype, self.control_genotype, self.TC_plot_settings.overlap, self.num_groups, self.CombData);
+                end
+
+                analyses_run{end+1} = 'Tuning Curves';
+
+            end
+                    
+            update_individual_fly_log_files(self.exp_folder, self.save_settings.save_path, ...
+            analyses_run, files_excluded);
+
+                
         end
         
         function run_group_analysis(self)
