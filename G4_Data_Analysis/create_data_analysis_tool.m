@@ -133,18 +133,18 @@ classdef create_data_analysis_tool < handle
             
         %% Generate condition names for timeseries plot titles
 
-            patterns = ["Pattern1", "Pattern2", "Pattern3", "Pattern4", "Pattern5", "Pattern6", "Pattern7"];
-            functions = ["Function1", "Function2", "Function3", "Function4", "Function5", "Function6"];
-            
-            for i = 1:length(patterns)
-                for j = 1:length(functions)
-                    self.timeseries_plot_settings.cond_name{i*length(functions) - (length(functions)-j)} = patterns(i) + functions(j);
-                end
-            end
-            
-            for i = 1:length(self.timeseries_plot_settings.cond_name)
-                self.timeseries_plot_settings.cond_name = {self.timeseries_plot_settings.cond_name{1:(i*2-1)}, self.timeseries_plot_settings.cond_name{i*2-1}, self.timeseries_plot_settings.cond_name{i*2:end}};
-            end
+%             patterns = ["Pattern1", "Pattern2", "Pattern3", "Pattern4", "Pattern5", "Pattern6", "Pattern7"];
+%             functions = ["Function1", "Function2", "Function3", "Function4", "Function5", "Function6"];
+%             
+%             for i = 1:length(patterns)
+%                 for j = 1:length(functions)
+%                     self.timeseries_plot_settings.cond_name{i*length(functions) - (length(functions)-j)} = patterns(i) + functions(j);
+%                 end
+%             end
+%             
+%             for i = 1:length(self.timeseries_plot_settings.cond_name)
+%                 self.timeseries_plot_settings.cond_name = {self.timeseries_plot_settings.cond_name{1:(i*2-1)}, self.timeseries_plot_settings.cond_name{i*2-1}, self.timeseries_plot_settings.cond_name{i*2:end}};
+%             end
 %             looms = ["Left", "Right"];
 %             wf = ["Yaw", "Sideslip"];
 %             for p = 1:length(patterns)  % 8 patterns % 2 sweeps
