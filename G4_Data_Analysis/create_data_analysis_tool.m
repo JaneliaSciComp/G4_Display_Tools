@@ -11,6 +11,7 @@ classdef create_data_analysis_tool < handle
         CombData
         processed_data_file
         flags
+        exp_settings
         
         group_analysis
         single_analysis
@@ -72,7 +73,7 @@ classdef create_data_analysis_tool < handle
             % trial_options: 1x3 logical array [pre-trial, intertrial, post-trial]
             
             % Get plot settings from DA_plot_settings.m
-            [self.normalize_settings, self.histogram_plot_settings, self.histogram_annotation_settings, ...
+            [self.exp_settings, self.normalize_settings, self.histogram_plot_settings, self.histogram_annotation_settings, ...
     self.CL_hist_plot_settings, self.timeseries_plot_settings, self.TC_plot_settings, self.save_settings] = DA_plot_settings();
 
         
@@ -97,57 +98,9 @@ classdef create_data_analysis_tool < handle
 % %         %Path to the protocol folder    
 % %             path_to_protocol =  '/Users/taylorl/Desktop/Protocol_folder';
 % %             
+        
 
-%% USER-UPDATED SETTINGS HERE
-        % Filename of processed data files being read        
-            self.processed_data_file = 'smallfield_V2_G4_Processed_Data';
-            
-        %Filepath at which to save plots
-            self.save_settings.save_path = '/Users/taylorl/Desktop';
-            
-        %This should be the filepath to the folder which contains all
-        %experiment folders (or results folders) being analyzed. It is
-        %where the group analysis log file will be saved. 
-            self.save_settings.results_path = "/Users/taylorl/Desktop/Protocol_folder";
-            
-        %Genotype(s) being compared. Element 1 should correspond to the
-        %first column in exp_folder, element 2 the second, etc. 
-            %genotypes = ["empty-split", "LPLC-2", "LC-18", "T4_T5", "LC-15", "LC-25", "LC-11", "LC-17", "LC-4"];
-            genotypes = ["LPLC-2"];
-            
-         %Control genotype - leave = '' if not comparing to control. If
-         %comparing to control, include the control genotype name in the
-         %genotypes array, then set control_genotype to the same genotype
-         %name. Note that the strings in genotypes must be enclosed in
-         %double quotations, " ", while control_genotype needs to be
-         %enclosed in single quotations, ' '. 
-            self.control_genotype = '';
-            
-            
-        %This is the group name that the data analysis log file will be saved under. For example if you're analyzing
-        %all the flies put through an experimental protocol, this should be
-        %the name of the protocol
-            self.group_being_analyzed_name = 'protocol-1';
-            
-        %Update dates
-            self.histogram_annotation_settings.date_range = "08/08/19 to 08/13/19";
-            
-            % CL_conds: matrix of closed-loop (CL) conditions to plot as histograms
-            % OL_conds: matrix of open-loop (OL) conditions to plot as timeseries
-            % TC_conds: matrix of open-loop conditions to plot as tuning curves (TC)
 
-        %Determines the location of each condition number on the plots.
-        %If these are left blank, the plots will be laid out in the
-        %default way
-   
-            self.OL_conds{1} = [1 3; 5 7; 9 11; 13 15]; %3x1, 3x3, 3x3 ON, 8x8 (4 x 2 plots)
-            self.OL_conds{2} = [17 19; 21 23; 25 27; 29 31]; %16x16, 64x3, 64x3 ON, 64x16 (4 x 2 plots)
-            self.OL_conds{3} = [33 34; 35 36; 37 38; 39 40]; %left and right Looms (4 x 2 plots)
-            self.OL_conds{4} = [41; 43]; %yaw and sideslip (2 x 1 plots)
-            
-%             self.OL_conds = [];
-            self.CL_conds = [];
-            
         %TC_conds are different than OL and CL conds. All conditions
         %being looked at are plotted on a single tuning curve. So the
         %layout is TC_conds{fig #}{row #} = [ conds on curve in col1; conds on curve in col2; conds on curve in col3]
@@ -170,82 +123,51 @@ classdef create_data_analysis_tool < handle
         %rows and a single column. The top curve will compare conds 19-23
         %and the bottom curve will compare conds 26-30. If you want to
         %leave an empty space, replace the condition numbers with 0's ie [1 2 3 4; 0 0 0 0]
+% 
+%             self.TC_conds{1}{1} = [1 3 5 7; 9 11 13 15]; %3x1, 3x3, 3x3 ON, 8x8 (4 x 2 plots)
+%             self.TC_conds{1}{2} = [17 19 21 23; 0 0 0 0]; %16x16, 64x3, 64x3 ON, 64x16 (4 x 2 plots)
+%             self.TC_conds{2}{1} = [25 27 29 31; 33 34 35 36] ;
+%             self.TC_conds{2}{2} = [37 38 39 40; 0 0 0 0]; %left and right Looms (4 x 2 plots)
 
-            self.TC_conds{1}{1} = [1 3 5 7; 9 11 13 15]; %3x1, 3x3, 3x3 ON, 8x8 (4 x 2 plots)
-            self.TC_conds{1}{2} = [17 19 21 23; 0 0 0 0]; %16x16, 64x3, 64x3 ON, 64x16 (4 x 2 plots)
-            self.TC_conds{2}{1} = [25 27 29 31; 33 34 35 36] ;
-            self.TC_conds{2}{2} = [37 38 39 40; 0 0 0 0]; %left and right Looms (4 x 2 plots)
-            
-%           self.TC_conds = []; 
-   
-            %The x axis of your tuning curve depends on what is changing
-            %between the conditions you are comparing. Each condition might
-            %play at a different frequency, have a different speed, or
-            %something else. Set the xaxis label and values appropriately
-            %for this. There should be one value for each condition being
-            %compared. 
-   
-            self.TC_plot_settings.xaxis_label = 'Changing feature here';
-            self.TC_plot_settings.xaxis_values = [0 1 2 3 4 5 6 7 8];
-            
-            %Durations of the trials are used to set the x-axis limits for each
-            %graph
 
-            self.OL_conds_durations{1} = [3.5 1.62; 3.5 1.62; 3.5 1.62; 3.5 1.62];
-            self.OL_conds_durations{2} = [3.5 1.62; 3.5 1.62; 3.5 1.62; 3.5 1.62];
-            self.OL_conds_durations{3} = [0.75 1.35; 1.65 0.95; 0.75 1.35; 1.65 0.95];
-            self.OL_conds_durations{4} = [2.35; 2.35];
-%            self.OL_conds_durations = [];
-            
-            %each figure should be of graphs that have the same x and y
-            %labels.  Save them as an array [x-label, y-label]
-            self.OL_conds_axis_labels{1} = ["Time(sec)", "LmR"];
-            self.OL_conds_axis_labels{2} = ["Time(sec)", "LmR"];
-            self.OL_conds_axis_labels{3} = ["Time(sec)", "LmR"];
-            self.OL_conds_axis_labels{4} = ["Time(sec)", "LmR"];
             
         %% Generate condition names for timeseries plot titles
-            self.timeseries_plot_settings.cond_name = cell(1,81);
-            patterns = ["3x1", "3x3", "3x3 ON", "8x8", "16x16", "64x3", "63x3 ON", "64x16"];
-            looms = ["Left", "Right"];
-            wf = ["Yaw", "Sideslip"];
-            for p = 1:length(patterns)  % 8 patterns % 2 sweeps
-                self.timeseries_plot_settings.cond_name{1+4*(p-1)} = [patterns(p) ' L 0.35 Hz Sweep'];
-                self.timeseries_plot_settings.cond_name{2+4*(p-1)} = [patterns(p) ' R 0.35 Hz Sweep'];
-                self.timeseries_plot_settings.cond_name{3+4*(p-1)} = [patterns(p) ' L 1.07 Hz Sweep'];
-                self.timeseries_plot_settings.cond_name{4+4*(p-1)} = [patterns(p) ' R 1.07 Hz Sweep'];
-            end
 
-            for l = 1:2 % 2 looms
-                self.timeseries_plot_settings.cond_name{33+4*(l-1)} = [looms(l) ' R/V 20'];
-                self.timeseries_plot_settings.cond_name{34+4*(l-1)} = [looms(l) ' R/V 40'];
-                self.timeseries_plot_settings.cond_name{35+4*(l-1)} = [looms(l) ' R/V 80'];
-                self.timeseries_plot_settings.cond_name{36+4*(l-1)} = [looms(l) ' 200 deg/s'];
-            end
-
-            for w = 1:2 % 2 wide-field rotations
-                self.timeseries_plot_settings.cond_name{41+2*(w-1)} = [wf(w) ' CW 10 Hz'];
-                self.timeseries_plot_settings.cond_name{42+2*(w-1)} = [wf(w) ' CCW 10 Hz'];   
+            patterns = ["Pattern1", "Pattern2", "Pattern3", "Pattern4", "Pattern5", "Pattern6", "Pattern7"];
+            functions = ["Function1", "Function2", "Function3", "Function4", "Function5", "Function6"];
+            
+            for i = 1:length(patterns)
+                for j = 1:length(functions)
+                    self.timeseries_plot_settings.cond_name{i*length(functions) - (length(functions)-j)} = patterns(i) + functions(j);
+                end
             end
             
-           
-            
-        %% Datatypes
-        %datatype options for flying data: 'LmR_chan', 'L_chan', 'R_chan', 'F_chan', 'Frame Position', 'LmR', 'LpR', 'faLmR'
-        %datatype options for walking data: 'Vx0_chan', 'Vx1_chan', 'Vy0_chan', 'Vy1_chan', 'Frame Position', 'Turning', 'Forward', 'Sideslip'
-           
-            self.CL_datatypes = {'Frame Position'}; %datatypes to plot as histograms
-            self.OL_datatypes = {'faLmR'}; %datatypes to plot as timeseries
-            self.TC_datatypes = {'LmR','LpR'}; %datatypes to plot as tuning curves
+            for i = 1:length(self.timeseries_plot_settings.cond_name)
+                self.timeseries_plot_settings.cond_name = {self.timeseries_plot_settings.cond_name{1:(i*2-1)}, self.timeseries_plot_settings.cond_name{i*2-1}, self.timeseries_plot_settings.cond_name{i*2:end}};
+            end
+%             looms = ["Left", "Right"];
+%             wf = ["Yaw", "Sideslip"];
+%             for p = 1:length(patterns)  % 8 patterns % 2 sweeps
+%                 self.timeseries_plot_settings.cond_name{1+4*(p-1)} = [patterns(p) ' L 0.35 Hz Sweep'];
+%                 self.timeseries_plot_settings.cond_name{2+4*(p-1)} = [patterns(p) ' R 0.35 Hz Sweep'];
+%                 self.timeseries_plot_settings.cond_name{3+4*(p-1)} = [patterns(p) ' L 1.07 Hz Sweep'];
+%                 self.timeseries_plot_settings.cond_name{4+4*(p-1)} = [patterns(p) ' R 1.07 Hz Sweep'];
+%             end
+% 
+%             for l = 1:2 % 2 looms
+%                 self.timeseries_plot_settings.cond_name{33+4*(l-1)} = [looms(l) ' R/V 20'];
+%                 self.timeseries_plot_settings.cond_name{34+4*(l-1)} = [looms(l) ' R/V 40'];
+%                 self.timeseries_plot_settings.cond_name{35+4*(l-1)} = [looms(l) ' R/V 80'];
+%                 self.timeseries_plot_settings.cond_name{36+4*(l-1)} = [looms(l) ' 200 deg/s'];
+%             end
+% 
+%             for w = 1:2 % 2 wide-field rotations
+%                 self.timeseries_plot_settings.cond_name{41+2*(w-1)} = [wf(w) ' CW 10 Hz'];
+%                 self.timeseries_plot_settings.cond_name{42+2*(w-1)} = [wf(w) ' CCW 10 Hz'];   
+%             end
 
-        %% TO ADD A NEW MODULE
-        %If there are any settings necessary for new module, add them here
-        %self.new_module_settings = {};
-            
-        
-        %% END OF USER-DEFINED SETTINGS
-        
-        
+
+
         
             self.normalize_option = 0; %0 = don't normalize, 1 = normalize every fly, 2 = normalize every group
             self.histogram_plot_option = 0;
@@ -255,10 +177,23 @@ classdef create_data_analysis_tool < handle
             self.single_analysis = 0;
             self.group_analysis = 0;
             
-            for i = 1:length(genotypes)
-                self.genotype{i} = genotypes(i);
+            self.processed_data_file = self.exp_settings.processed_data_file;
+            self.group_being_analyzed_name = self.exp_settings.group_being_analyzed_name;
+            
+            for i = 1:length(self.exp_settings.genotypes)
+                self.genotype{i} = self.exp_settings.genotypes(i);
             end
 
+            self.OL_conds = self.timeseries_plot_settings.OL_TS_conds;
+            self.OL_conds_durations = self.timeseries_plot_settings.OL_TS_durations;
+            self.CL_conds = self.CL_hist_plot_settings.CL_hist_conds;
+            self.TC_conds = self.TC_plot_settings.OL_TC_conds;
+            
+            self.CL_datatypes = self.CL_hist_plot_settings.CL_datatypes;
+            self.OL_datatypes = self.timeseries_plot_settings.OL_datatypes;
+            self.TC_datatypes = self.TC_plot_settings.TC_datatypes;
+            
+            self.OL_conds_axis_labels = self.timeseries_plot_settings.OL_TSconds_axis_labels;
 
         %% Settings based on inputs
              %%%For new file system setup
@@ -266,11 +201,10 @@ classdef create_data_analysis_tool < handle
             self.exp_folder = exp_folder;
             [self.num_groups, self.num_exps] = size(exp_folder);
             self.trial_options = trial_options;
-            if ~isempty(self.control_genotype)
-                self.control_genotype = find(strcmp(genotypes,self.control_genotype));
+            if ~isempty(self.exp_settings.control_genotype)
+                self.control_genotype = find(strcmp(self.exp_settings.genotypes,self.exp_settings.control_genotype));
             else
-                self.control_genotype = 0;
-               
+                self.control_genotype = 0;  
             end
                 
 
@@ -281,13 +215,13 @@ classdef create_data_analysis_tool < handle
             for i = 1:length(self.flags)
                 
                 switch lower(self.flags{i})
-                    case '-norm1' %Normalize over each fly
+                    case '-normfly' %Normalize over each fly
                         
                         self.normalize_option = 1;
                         self.data_needed{end+1} = 'timeseries_avg_over_reps';
                         self.data_needed{end+1} = 'histograms';
                         
-                    case '-norm2' %Normalize over groups
+                    case '-normgroup' %Normalize over groups
                         
                         self.normalize_option = 2;
                         self.data_needed{end+1} = 'timeseries_avg_over_reps';
@@ -344,7 +278,7 @@ classdef create_data_analysis_tool < handle
             try
                 Data_name = files(contains({files.name},{self.processed_data_file})).name;
             catch
-                error('cannot find TDMSlogs file in specified folder')
+                error('cannot find processed file in specified folder')
             end
 
             load(fullfile(exp_folder{1,1},Data_name), 'channelNames', 'conditionModes', 'timestamps', 'timeseries_avg_over_reps');
@@ -364,7 +298,7 @@ classdef create_data_analysis_tool < handle
                 
             end
             
-            if isempty(self.OL_conds_durations)
+            if isempty(self.OL_conds_durations) && self.timeseries_plot_option == 1
                     
                  self.OL_conds_durations = create_default_OL_durations(self.OL_conds, timeseries_avg_over_reps, self.CombData.timestamps);
                 %run module to set durations (x axis limits)
@@ -474,16 +408,6 @@ classdef create_data_analysis_tool < handle
             [num_positions, num_datatypes, num_conds, num_datapoints, self.CombData, files_excluded] ...
             = load_specified_data(self.exp_folder, self.CombData, self.data_needed, self.processed_data_file);
         
-            if self.normalize_option ~= 0
-
-                self.CombData = normalize_data(self, num_conds, num_datapoints, num_datatypes, num_positions);
-                if self.normalize_option == 1
-                    analyses_run{end+1} = 'Normalization 1';
-                else
-                    analyses_run{end+1} = 'Normalization 2';
-                end
-            end
-                    
             if self.histogram_plot_option == 1
                 plot_basic_histograms(self.CombData.timeseries_avg_over_reps, self.CombData.interhistogram, ...
                     self.TC_datatypes, self.histogram_plot_settings, self.num_groups, self.num_exps,...
@@ -491,6 +415,18 @@ classdef create_data_analysis_tool < handle
 
                 analyses_run{end+1} = 'Basic histograms';
             end
+        
+            if self.normalize_option ~= 0
+
+                self.CombData = normalize_data(self, num_conds, num_datapoints, num_datatypes, num_positions);
+                if self.normalize_option == 1
+                    analyses_run{end+1} = 'Normalization over fly';
+                else
+                    analyses_run{end+1} = 'Normalization over group';
+                end
+            end
+                    
+            
 
             if self.CL_histogram_plot_option == 1
 
@@ -542,6 +478,14 @@ classdef create_data_analysis_tool < handle
             [num_positions, num_datatypes, num_conds, num_datapoints, self.CombData, files_excluded] ...
                 = load_specified_data(self.exp_folder, self.CombData, self.data_needed, self.processed_data_file);
            
+            if self.histogram_plot_option == 1
+                plot_basic_histograms(self.CombData.timeseries_avg_over_reps, self.CombData.interhistogram, ...
+                    self.TC_datatypes, self.histogram_plot_settings, self.num_groups, self.num_exps,...
+                    self.genotype, self.datatype_indices.TC_inds, self.trial_options, self.histogram_annotation_settings);
+                
+                analyses_run{end+1} = 'Basic histograms';
+            end
+            
             if self.normalize_option ~= 0
                 
                 self.CombData = normalize_data(self, num_conds, num_datapoints, num_datatypes, num_positions);
@@ -553,13 +497,7 @@ classdef create_data_analysis_tool < handle
                 
             end
             
-            if self.histogram_plot_option == 1
-                plot_basic_histograms(self.CombData.timeseries_avg_over_reps, self.CombData.interhistogram, ...
-                    self.TC_datatypes, self.histogram_plot_settings, self.num_groups, self.num_exps,...
-                    self.genotype, self.datatype_indices.TC_inds, self.trial_options, self.histogram_annotation_settings);
-                
-                analyses_run{end+1} = 'Basic histograms';
-            end
+            
             
             if self.CL_histogram_plot_option == 1
                
@@ -593,7 +531,7 @@ classdef create_data_analysis_tool < handle
                 
                 for k = 1:length(self.TC_conds)
                     plot_TC_specified_OLtrials(self.TC_plot_settings, self.TC_conds{k}, self.datatype_indices.TC_inds, ...
-                       self.genotype, self.control_genotype, self.TC_plot_settings.overlap, self.num_groups, self.CombData);
+                       self.genotype, self.control_genotype, self.num_groups, self.CombData);
                 end
                 
                 analyses_run{end+1} = 'Tuning Curves';

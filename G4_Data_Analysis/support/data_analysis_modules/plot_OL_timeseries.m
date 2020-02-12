@@ -4,7 +4,7 @@ function plot_OL_timeseries(timeseries_data, timestampsIN, OL_conds, OL_duration
     axis_labels, Frame_ind, num_groups, genotype, control_genotype, plot_settings, top_left_place, bottom_left_place, ...
     left_col_places)
 
-    overlap = plot_settings.overlap;
+    
     rep_Colors = plot_settings.rep_colors;
     mean_Colors = plot_settings.mean_colors;
     mean_LineWidth = plot_settings.mean_lineWidth;
@@ -38,7 +38,7 @@ function plot_OL_timeseries(timeseries_data, timestampsIN, OL_conds, OL_duration
             figure('Position',[100 100 540 540*(num_plot_rows/num_plot_cols)])
             for row = 1:num_plot_rows
                 for col = 1:num_plot_cols
-                    cond = OL_conds(1+(row-1)*(1+overlap),col);
+                    cond = OL_conds(1+(row-1),col);
                     placement = col+num_plot_cols*(row-1);
                     place = row+num_plot_rows*(col-1);
                     if cond>0
@@ -78,6 +78,7 @@ function plot_OL_timeseries(timeseries_data, timestampsIN, OL_conds, OL_duration
                                 semdata(nanidx) = [];
                                 if num_groups == 1
                                     plot(timestamps,meandata,'Color',mean_Colors(g+1,:),'LineWidth',mean_LineWidth);
+                                    patch([timestamps fliplr(timestamps)],[meandata+semdata fliplr(meandata-semdata)],'k','FaceColor',mean_Colors(g+1,:),'EdgeColor','none','FaceAlpha',patch_alpha)
                                 else
                                     if g == control_genotype
                                         plot(timestamps,meandata,'Color',control_color,'LineWidth',mean_LineWidth);
@@ -105,27 +106,10 @@ function plot_OL_timeseries(timeseries_data, timestampsIN, OL_conds, OL_duration
                             ylim([timeseries_ylimits(d,1)-frame_scale*yrange timeseries_ylimits(d,2)])
                             plot(timestampsIN,framepos,'Color',frame_color,'LineWidth',mean_LineWidth);
                         end
-                        if overlap==1
-                            cond = OL_conds(row*2,col);
-                            if cond>0
-%                                 titlestr = [titlestr ' \color[rgb]{' num2str(rep_Colors(g,:)) '}(' num2str(cond) ')'];
-                                for g = 1:num_groups
-                                    tmpdata = squeeze(timeseries_data(g,:,d,cond,:));
-                                    meandata = nanmean(tmpdata);
-                                    nanidx = isnan(meandata);
-                                    stddata = nanstd(tmpdata);
-                                    semdata = stddata./sqrt(sum(max(~isnan(tmpdata),[],2)));
-                                    timestamps = timestampsIN(~nanidx);
-                                    meandata(nanidx) = []; 
-                                    semdata(nanidx) = []; 
-                                    plot(timestamps,meandata,'Color',mean_Colors(g,:),'LineWidth',mean_LineWidth);
-                                    patch([timestamps fliplr(timestamps)],[meandata+semdata fliplr(meandata-semdata)],'k','FaceColor',mean_Colors(g,:),'EdgeColor','none','FaceAlpha',patch_alpha)
-                                end
-                            end
-                        end
+                        
 %                         title([titlestr '}'])
                         % title
-                        title(cond_name{cond},'FontSize',subtitle_FontSize)
+                        %title(cond_name{cond},'FontSize',subtitle_FontSize)
                         % legend
 
 
