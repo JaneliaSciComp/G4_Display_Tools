@@ -438,9 +438,10 @@ classdef G4_conductor_controller < handle
             else
                 
                 import_success = self.doc.import_folder(top_folder_path);
-                if ~isempty(self.view)
-                    waitfor(msgbox(import_success, 'Import successful!'));
-                end
+%                 if ~isempty(self.view)
+%                     waitfor(msgbox(import_success, 'Import successful!'));
+%                 end
+                disp(import_success);
                 [exp_path, exp_name, ext] = fileparts(filepath);
                 self.doc.experiment_name = exp_name;
                 self.doc.save_filename = top_folder_path;
@@ -853,8 +854,12 @@ classdef G4_conductor_controller < handle
                     end
                     disp(msg);
                 else
-                    
-                    disp('Experiment aborted succesfully');
+                    if ~isempty(self.view)
+                        self.view.set_progress_title("Experiment aborted successfully.");
+                        drawnow;
+                    else
+                        disp('Experiment aborted succesfully');
+                    end
                     
                 end
                 
@@ -1123,7 +1128,7 @@ classdef G4_conductor_controller < handle
         function repeat = check_if_repeat(self)
            
             if ~isempty(self.view)
-                answer = questdlg('If changing flies, please remember to update the fly name. Would you like to repeat the test protocol?', 'Repeat', 'Yes', 'No', 'No');
+                answer = questdlg('Would you like to repeat the test protocol?', 'Repeat', 'Yes', 'No', 'No');
                 if strcmp(answer, 'Yes')
                     repeat = 1;
                 else
@@ -1207,7 +1212,8 @@ classdef G4_conductor_controller < handle
                 "experiment_type", "rearing_protocol", "light_cycle", "do_plotting", "do_processing", "plotting_file", "processing_file", "run_protocol_file", ...
                 "comments", "fly_results_folder"};
             if ~isempty(self.view)
-                waitfor(errordlg("Please add any final comments, then click OK to continue."));
+                waitfor(errordlg("Please add any final comments, then click OK to continue." ...
+                    + newline + newline + " Reminder: if you're changing flies for the next experiment, don't forget to update the fly name."));
                 self.model.set_metadata_comments(self.view.comments_box.String);
             end
             
