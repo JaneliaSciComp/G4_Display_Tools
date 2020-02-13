@@ -1,6 +1,6 @@
 %plot timeseries data for open-loop trials
 
-function plot_OL_timeseries(timeseries_data, timestampsIN, OL_conds, OL_durations, OL_inds, ...
+function plot_OL_timeseries(timeseries_data, timestampsIN, OL_conds, OL_durations, cond_name, OL_inds, ...
     axis_labels, Frame_ind, num_groups, genotype, control_genotype, plot_settings, top_left_place, bottom_left_place, ...
     left_col_places)
 
@@ -18,7 +18,6 @@ function plot_OL_timeseries(timeseries_data, timestampsIN, OL_conds, OL_duration
     timeseries_ylimits = plot_settings.timeseries_ylimits;
     timeseries_xlimits = plot_settings.timeseries_xlimits;
     rep_LineWidth = plot_settings.rep_lineWidth;
-    cond_name = plot_settings.cond_name;
     plot_opposing_directions = plot_settings.plot_both_directions;
     control_color = plot_settings.control_color;
     show_ind_flies = plot_settings.show_individual_flies;
@@ -95,7 +94,9 @@ function plot_OL_timeseries(timeseries_data, timestampsIN, OL_conds, OL_duration
                             end
                         end
 %                         titlestr = ['\fontsize{' num2str(subtitle_FontSize) '} Condition #{\color[rgb]{' num2str(mean_Colors(g,:)) '}' num2str(cond)]; 
-                        title(cond_name{cond},'FontSize',subtitle_FontSize)
+                        if ~isempty(cond_name(1+(row-1),col))
+                            title(cond_name(1+(row-1),col),'FontSize',subtitle_FontSize)
+                        end
                         ylim(timeseries_ylimits(d,:));
                         %xlim(timeseries_xlimits)
                         

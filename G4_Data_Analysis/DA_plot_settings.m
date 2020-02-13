@@ -87,44 +87,11 @@ function [exp_settings, normalize_settings, histogram_plot_settings, histogram_a
     timeseries_plot_settings.plot_both_directions = 1;
     
     %If you want the plots to have their own plot titles, make a cell array
-    %of titles corresponding to the OL_TS_conds array.
-    %timeseries_plot_settings.cond_name = {};
+    %of titles corresponding to the OL_TS_conds array. IF left empty, a
+    %default array will be made with names "Condition #". If you want no
+    %plot titles, set cond_name = 0
+    timeseries_plot_settings.cond_name = [];
     
-     patterns = ["Pattern1", "Pattern2", "Pattern3", "Pattern4", "Pattern5", "Pattern6", "Pattern7"];
-    functions = ["Function1", "Function2", "Function3", "Function4", "Function5", "Function6"];
-
-    for i = 1:length(patterns)
-        for j = 1:length(functions)
-            timeseries_plot_settings.cond_name{i*length(functions) - (length(functions)-j)} = patterns(i) + functions(j);
-        end
-    end
-
-    for i = 1:length(timeseries_plot_settings.cond_name)
-        timeseries_plot_settings.cond_name = {timeseries_plot_settings.cond_name{1:(i*2-1)}, timeseries_plot_settings.cond_name{i*2-1}, timeseries_plot_settings.cond_name{i*2:end}};
-    end
-    
-      
-%             looms = ["Left", "Right"];
-%             wf = ["Yaw", "Sideslip"];
-%             for p = 1:length(patterns)  % 8 patterns % 2 sweeps
-%                 self.timeseries_plot_settings.cond_name{1+4*(p-1)} = [patterns(p) ' L 0.35 Hz Sweep'];
-%                 self.timeseries_plot_settings.cond_name{2+4*(p-1)} = [patterns(p) ' R 0.35 Hz Sweep'];
-%                 self.timeseries_plot_settings.cond_name{3+4*(p-1)} = [patterns(p) ' L 1.07 Hz Sweep'];
-%                 self.timeseries_plot_settings.cond_name{4+4*(p-1)} = [patterns(p) ' R 1.07 Hz Sweep'];
-%             end
-% 
-%             for l = 1:2 % 2 looms
-%                 self.timeseries_plot_settings.cond_name{33+4*(l-1)} = [looms(l) ' R/V 20'];
-%                 self.timeseries_plot_settings.cond_name{34+4*(l-1)} = [looms(l) ' R/V 40'];
-%                 self.timeseries_plot_settings.cond_name{35+4*(l-1)} = [looms(l) ' R/V 80'];
-%                 self.timeseries_plot_settings.cond_name{36+4*(l-1)} = [looms(l) ' 200 deg/s'];
-%             end
-% 
-%             for w = 1:2 % 2 wide-field rotations
-%                 self.timeseries_plot_settings.cond_name{41+2*(w-1)} = [wf(w) ' CW 10 Hz'];
-%                 self.timeseries_plot_settings.cond_name{42+2*(w-1)} = [wf(w) ' CCW 10 Hz'];   
-%             end
-
 
     %Create array to dictate layout of CL histograms or leave empty for def
     CL_hist_plot_settings.CL_hist_conds = [];
