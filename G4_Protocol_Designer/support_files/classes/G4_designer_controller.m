@@ -57,6 +57,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
         recent_files_filepath_
         recent_file_menu_items_
         menu_open_
+        preview_on_arena_
     end
 
     properties(Dependent)
@@ -121,6 +122,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
         recent_file_menu_items
         menu_open
         inscreen_plot
+        preview_on_arena
     end
 
 %% Methods
@@ -134,6 +136,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
             self.doc = G4_document();
             self.settings_con = G4_settings_controller();
             self.preview_con = G4_preview_controller(self.doc);
+            self.preview_on_arena = 0;
           
             %get screensize to calculate gui dimensions
             screensize = get(0, 'screensize');
@@ -300,6 +303,12 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
             uicontrol(self.f, 'Style', 'pushbutton', 'String', 'Preview', 'Fontsize', ...
                 font_size, 'units', 'normalized', 'Position', [pos_panel(1) + pos_panel(3), ...
                 pos_panel(2), .05, .045], 'Callback', @self.full_preview);
+           
+            %Checkbox to turn on/off displaying inscreen previews on the
+            %arena.
+            uicontrol(self.f, 'Style', 'checkbox', 'String', 'Arena preview', ...
+                'Value', self.preview_on_arena, 'units', 'normalized', 'Position', ...
+                [pos_panel(1) + pos_panel(3) + .05, pos_panel(2) - .04, .07, .045], 'Callback', @self.set_preview_on_arena);
 
             %play_button
             uicontrol(self.f, 'Style', 'pushbutton', 'String', 'Play', 'FontSize', ...
@@ -1501,6 +1510,21 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
         
          % Display preview of file when an appropriate table cell is
          % selected
+         
+        function set_preview_on_arena(self, ~, ~)
+            
+             if self.preview_on_arena == 1
+                 self.preview_on_arena = 0;
+                 if self.model.screen_on == 1
+                     Panel_com('stop_display');
+                        self.model.screen_on = 0;
+                 end
+                     
+             else
+                 self.preview_on_arena = 1;
+             end
+             
+         end
 
         function preview_selection(self, varargin)
             
@@ -2632,7 +2656,9 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
 
             set(im, 'parent', self.hAxes);
             
-            self.display_pattern_arena(patfield);
+            if self.preview_on_arena == 1
+                self.display_pattern_arena(patfield);
+            end
         end
         
         function display_pattern_arena(self, patfield)
@@ -3567,6 +3593,8 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                 self.block_files.ao4(x) = new_value;
             end
          end
+         
+         
 
 %% SETTERS
         
@@ -3734,6 +3762,10 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
          function set.settings_con(self, value)
              self.settings_con_ = value;
          end
+         
+         function set.preview_on_arena(self, value)
+             self.preview_on_arena_ = value;
+         end
 
 %% GETTERS
 
@@ -3899,6 +3931,10 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
          
          function output = get.settings_con(self)
              output = self.settings_con_;
+         end
+         
+         function output = get.preview_on_arena(self)
+             output = self.preview_on_arena_;
          end
 
          
