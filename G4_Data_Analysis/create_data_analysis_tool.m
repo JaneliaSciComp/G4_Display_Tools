@@ -293,7 +293,7 @@ classdef create_data_analysis_tool < handle
                 %run module to set durations (x axis limits)
             end
             
-            if self.timeseries_plot_option == 1 && isempty(self.timeseries_plot_settings.cond_name) || self.timeseries_plot_settings.cond_name == 0
+            if self.timeseries_plot_option == 1 && isempty(self.timeseries_plot_settings.cond_name) || ~isempty(self.timeseries_plot_settings.cond_name == 0)
                 self.timeseries_plot_settings.cond_name = create_default_timeseries_plot_titles(self.OL_conds, self.timeseries_plot_settings.cond_name);
             end
                 
