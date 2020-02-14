@@ -2,7 +2,7 @@
 
 function plot_OL_timeseries(timeseries_data, timestampsIN, OL_conds, OL_durations, cond_name, OL_inds, ...
     axis_labels, Frame_ind, num_groups, genotype, control_genotype, plot_settings, top_left_place, bottom_left_place, ...
-    left_col_places)
+    left_col_places, figure_title)
 
     
     rep_Colors = plot_settings.rep_colors;
@@ -21,6 +21,7 @@ function plot_OL_timeseries(timeseries_data, timestampsIN, OL_conds, OL_duration
     plot_opposing_directions = plot_settings.plot_both_directions;
     control_color = plot_settings.control_color;
     show_ind_flies = plot_settings.show_individual_flies;
+    
     
 
     
@@ -144,7 +145,7 @@ function plot_OL_timeseries(timeseries_data, timestampsIN, OL_conds, OL_duration
 %                         end
                 end
             end
-
+            set(gcf, 'Name', figure_title);
             h = findobj(gcf,'Type','line');
             if control_genotype ~= 0 
                 genotype{control_genotype} = genotype{control_genotype} + " (control)";

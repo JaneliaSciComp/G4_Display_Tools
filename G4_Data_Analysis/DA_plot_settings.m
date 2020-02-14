@@ -70,6 +70,12 @@ function [exp_settings, normalize_settings, histogram_plot_settings, histogram_a
     timeseries_plot_settings.OL_TSconds_axis_labels{3} = ["Time(sec)", "LmR"];
     timeseries_plot_settings.OL_TSconds_axis_labels{4} = ["Time(sec)", "LmR"];
     
+     %An array of figure names for each figure of timeseries plots. This is
+    %per datatype. If you are using the default timseries layout, it will
+    %plot 30 timeseries subplots per figure, so divide your total number of
+    %plotted conditions by 30 to determine how many figures there will be. 
+    timeseries_plot_settings.figure_names = ["Name1", "Name2"];
+    
 %datatype options for flying data: 'LmR_chan', 'L_chan', 'R_chan', 'F_chan', 'Frame Position', 'LmR', 'LpR', 'faLmR'
 %datatype options for walking data: 'Vx0_chan', 'Vx1_chan', 'Vy0_chan', 'Vy1_chan', 'Frame Position', 'Turning', 'Forward', 'Sideslip'
     
