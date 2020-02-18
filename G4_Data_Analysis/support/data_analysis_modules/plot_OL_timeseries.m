@@ -2,7 +2,7 @@
 
 function plot_OL_timeseries(timeseries_data, timestampsIN, OL_conds, OL_durations, cond_name, OL_inds, ...
     axis_labels, Frame_ind, num_groups, genotype, control_genotype, plot_settings, top_left_place, bottom_left_place, ...
-    left_col_places, figure_titles)
+    left_col_places, figure_titles, single)
 
     
     rep_Colors = plot_settings.rep_colors;
@@ -55,7 +55,9 @@ function plot_OL_timeseries(timeseries_data, timestampsIN, OL_conds, OL_duration
                             timestamps = timestampsIN(~nanidx);
                             meandata(nanidx) = []; 
                             semdata(nanidx) = []; 
-                            if num_groups==1 && plot_opposing_directions==0 && show_ind_flies == 1
+                            if single == 1
+                                plot(repmat(timestampsIN',[1 num_exps]),tmpdata','Color',mean_Colors(g,:),'LineWidth',rep_LineWidth);
+                            elseif num_groups==1  && show_ind_flies == 1
                                 plot(repmat(timestampsIN',[1 num_exps]),tmpdata','Color',mean_Colors(g,:),'LineWidth',rep_LineWidth);
                                 plot(timestamps, meandata, 'Color', .5*mean_Colors(g,:),'LineWidth', mean_LineWidth);
                             else
@@ -78,7 +80,9 @@ function plot_OL_timeseries(timeseries_data, timestampsIN, OL_conds, OL_duration
                                 timestamps = timestampsIN(~nanidx);
                                 meandata(nanidx) = []; 
                                 semdata(nanidx) = [];
-                                if num_groups == 1
+                                if single == 1
+                                    plot(repmat(timestampsIN',[1 num_exps]),tmpdata','Color',mean_Colors(g+1,:),'LineWidth',rep_LineWidth);
+                                elseif num_groups == 1
                                     plot(timestamps,meandata,'Color',mean_Colors(g+1,:),'LineWidth',mean_LineWidth);
                                     patch([timestamps fliplr(timestamps)],[meandata+semdata fliplr(meandata-semdata)],'k','FaceColor',mean_Colors(g+1,:),'EdgeColor','none','FaceAlpha',patch_alpha)
                                 else

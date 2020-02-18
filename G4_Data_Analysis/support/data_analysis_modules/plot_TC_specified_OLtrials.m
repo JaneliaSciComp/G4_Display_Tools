@@ -4,7 +4,7 @@
 %num_groups, CombData, rep_Colors, rep_LineWidth, mean_Colors,
 %mean_LineWidth, timeseries_ylimits, subtitle_FontSize, 
 function plot_TC_specified_OLtrials(TC_plot_settings, TC_conds, TC_inds, genotype, control_genotype, ...
-    num_groups, CombData)
+    num_groups, CombData, single)
 
     rep_Colors = TC_plot_settings.rep_colors;
     rep_LineWidth = TC_plot_settings.rep_lineWidth;
@@ -43,13 +43,14 @@ function plot_TC_specified_OLtrials(TC_plot_settings, TC_conds, TC_inds, genotyp
                     hold on
                     for g = 1:num_groups
                         tmpdata = squeeze(nanmean(CombData.summaries(g,:,d,conds,:),5));
-                        if num_groups==1 && plot_opposing_directions == 0 
-                            plot(tmpdata','Color',rep_Colors(g,:),'LineWidth',rep_LineWidth);
-                        end
-                        if g == control_genotype
+
+                        if single == 1 
+                            plot(tmpdata','Color',mean_Colors(g,:),'LineWidth',rep_LineWidth, 'Marker', marker_type);
+
+                        elseif g == control_genotype
                             plot(nanmean(tmpdata),'Color',control_color,'LineWidth',mean_LineWidth, 'Marker', marker_type);
                         else
-                            
+
                             plot(nanmean(tmpdata),'Color',mean_Colors(g,:),'LineWidth',mean_LineWidth, 'Marker', marker_type);
                         end
                         if plot_opposing_directions == 1
@@ -57,7 +58,9 @@ function plot_TC_specified_OLtrials(TC_plot_settings, TC_conds, TC_inds, genotyp
                                 conds(l) = conds(l) + 1;
                             end
                             tmpdata = squeeze(nanmean(CombData.summaries(g,:,d,conds,:),5));
-                            if num_groups == 1
+                            if single == 1
+                                plot(tmpdata','Color', mean_Colors(g+1,:), 'LineWidth', mean_LineWidth, 'Marker', marker_type);
+                            elseif num_groups == 1
                                 plot(nanmean(tmpdata),'Color',mean_Colors(g+1,:),'LineWidth',mean_LineWidth, 'Marker', marker_type);
                             else
                                 if g == control_genotype

@@ -423,67 +423,69 @@ classdef create_data_analysis_tool < handle
             %disp("Single fly analysis coming soon");
             
             [num_positions, num_datatypes, num_conds, num_datapoints, self.CombData, files_excluded] ...
-            = load_specified_data(self.exp_folder, self.CombData, self.data_needed, self.processed_data_file);
-        
+                = load_specified_data(self.exp_folder, self.CombData, self.data_needed, self.processed_data_file);
+           
             if self.histogram_plot_option == 1
                 plot_basic_histograms(self.CombData.timeseries_avg_over_reps, self.CombData.interhistogram, ...
                     self.TC_datatypes, self.histogram_plot_settings, self.num_groups, self.num_exps,...
                     self.genotype, self.datatype_indices.TC_inds, self.trial_options, self.histogram_annotation_settings);
-
+                
                 analyses_run{end+1} = 'Basic histograms';
             end
-        
+            
             if self.normalize_option ~= 0
-
+                
                 self.CombData = normalize_data(self, num_conds, num_datapoints, num_datatypes, num_positions);
                 if self.normalize_option == 1
-                    analyses_run{end+1} = 'Normalization over fly';
+                    analyses_run{end+1} = 'Normalization 1';
                 else
-                    analyses_run{end+1} = 'Normalization over group';
+                    analyses_run{end+1} = 'Normalization 2';
                 end
+                
             end
-                    
             
-
+            
+            
             if self.CL_histogram_plot_option == 1
-
+               
                 for k = 1:numel(self.CL_conds)
                     plot_CL_histograms(self.CL_conds{k}, self.datatype_indices.CL_inds, ...
                         self.CombData.histograms, self.num_groups, self.CL_hist_plot_settings);
                 end
-
+                
                 analyses_run{end+1} = 'CL histograms';
 
             end
+            
             if self.timeseries_plot_option == 1
-
+                
                 for k = 1:numel(self.OL_conds)
                     plot_OL_timeseries(self.CombData.timeseries_avg_over_reps, ...
                         self.CombData.timestamps, self.OL_conds{k}, self.OL_conds_durations{k}, self.timeseries_plot_settings.cond_name{k}, ...
                         self.datatype_indices.OL_inds, self.OL_conds_axis_labels, ...
                         self.datatype_indices.Frame_ind, self.num_groups, self.genotype, self.control_genotype, self.timeseries_plot_settings,...
                         self.timeseries_top_left_place, self.timeseries_bottom_left_places{k}, ...
-                        self.timeseries_left_column_places{k},self.timeseries_plot_settings.figure_names);
-
-
+                        self.timeseries_left_column_places{k},self.timeseries_plot_settings.figure_names, 1);
+                    
+                    
                 end
-
+                
                 analyses_run{end+1} = 'Timeseries Plots';
-
+                
             end
+            
             if self.TC_plot_option == 1
-
+                
                 for k = 1:length(self.TC_conds)
                     plot_TC_specified_OLtrials(self.TC_plot_settings, self.TC_conds{k}, self.datatype_indices.TC_inds, ...
-                       self.genotype, self.control_genotype, self.num_groups, self.CombData);
+                       self.genotype, self.control_genotype, self.num_groups, self.CombData, 1);
                 end
-
+                
                 analyses_run{end+1} = 'Tuning Curves';
-
-            end
                     
             update_individual_fly_log_files(self.exp_folder, self.save_settings.save_path, ...
             analyses_run, files_excluded);
+            end
 
                 
         end
@@ -535,7 +537,7 @@ classdef create_data_analysis_tool < handle
                         self.datatype_indices.OL_inds, self.OL_conds_axis_labels, ...
                         self.datatype_indices.Frame_ind, self.num_groups, self.genotype, self.control_genotype, self.timeseries_plot_settings,...
                         self.timeseries_top_left_place, self.timeseries_bottom_left_places{k}, ...
-                        self.timeseries_left_column_places{k},self.timeseries_plot_settings.figure_names);
+                        self.timeseries_left_column_places{k},self.timeseries_plot_settings.figure_names, 0);
                     
                     
                 end
@@ -548,7 +550,7 @@ classdef create_data_analysis_tool < handle
                 
                 for k = 1:length(self.TC_conds)
                     plot_TC_specified_OLtrials(self.TC_plot_settings, self.TC_conds{k}, self.datatype_indices.TC_inds, ...
-                       self.genotype, self.control_genotype, self.num_groups, self.CombData);
+                       self.genotype, self.control_genotype, self.num_groups, self.CombData, 0);
                 end
                 
                 analyses_run{end+1} = 'Tuning Curves';
