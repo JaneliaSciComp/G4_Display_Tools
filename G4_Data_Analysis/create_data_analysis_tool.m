@@ -287,6 +287,18 @@ classdef create_data_analysis_tool < handle
                 
             end
             
+            if isempty(self.timeseries_plot_settings.figure_names)
+                self.timeseries_plot_settings.figure_names = string(self.OL_datatypes);
+            end
+                
+            
+            if numel(self.OL_conds) > length(self.timeseries_plot_settings.figure_names)
+                orig_fig_names = self.timeseries_plot_settings.figure_names;
+                while numel(self.OL_conds) > length(self.timeseries_plot_settings.figure_names)
+                    self.timeseries_plot_settings.figure_names = [self.timeseries_plot_settings.figure_names, orig_fig_names];
+                end
+            end
+            
             if isempty(self.OL_conds_durations) && self.timeseries_plot_option == 1
                     
                  self.OL_conds_durations = create_default_OL_durations(self.OL_conds, timeseries_avg_over_reps, self.CombData.timestamps);
@@ -294,7 +306,7 @@ classdef create_data_analysis_tool < handle
             end
             
             if self.timeseries_plot_option == 1 && isempty(self.timeseries_plot_settings.cond_name) || ~isempty(self.timeseries_plot_settings.cond_name == 0)
-                self.timeseries_plot_settings.cond_name = create_default_timeseries_plot_titles(self.OL_conds, self.timeseries_plot_settings.cond_name);
+                self.timeseries_plot_settings.cond_name = create_default_timeseries_plot_titles(self.OL_conds, self.timeseries_plot_settings.cond_name, self.save_settings.results_path);
             end
                 
                 %Determine which graphs are in the leftmost column so we know
@@ -318,7 +330,8 @@ classdef create_data_analysis_tool < handle
             
             self.timeseries_top_left_place = 1;
             for i = 1:length(self.OL_conds)
-                self.timeseries_bottom_left_places{i} = size(self.OL_conds{i},1);
+                a = ~isnan(self.OL_conds{i});
+                self.timeseries_bottom_left_places{i} = sum(a(:,1));
                 %self.timeseries_plot_settings.bottom_left_place{i} = size(self.OL_conds{i},1)*size(self.OL_conds{i},2)-(size(self.OL_conds{i},2) - 1);
                 %count = 1;
                 if size(self.OL_conds{i},1) ~= 1
@@ -343,6 +356,7 @@ classdef create_data_analysis_tool < handle
             end
             
             
+            
             if self.CL_histogram_plot_option == 1 && isempty(self.CL_conds)
                 self.CL_conds = create_default_CL_plot_layout(conditionModes, self.CL_conds);
             end
@@ -350,7 +364,17 @@ classdef create_data_analysis_tool < handle
             if self.TC_plot_option == 1 && isempty(self.TC_conds)
                 self.TC_conds = create_default_TC_plot_layout(conditionModes, self.TC_conds);
             end
-
+            if isempty(self.TC_plot_settings.figure_names)
+                self.TC_plot_settings.figure_names = string(self.TC_datatypes);
+            end
+            if length(self.TC_conds) > length(self.TC_plot_settings.figure_names)
+                orig_fig_names = self.TC_plot_settings.figure_names;
+                while length(self.TC_conds) > length(self.TC_plot_settings.figure_names)
+                    self.TC_plot_settings.figure_names = [self.TC_plot_settings.figure_names, orig_fig_names];
+                end
+            end
+            
+            
         
             [self.datatype_indices.Frame_ind, self.datatype_indices.OL_inds, self.datatype_indices.CL_inds, ...
                 self.datatype_indices.TC_inds] = get_datatype_indices(channelNames, self.OL_datatypes, ...
@@ -435,11 +459,11 @@ classdef create_data_analysis_tool < handle
 
                 for k = 1:numel(self.OL_conds)
                     plot_OL_timeseries(self.CombData.timeseries_avg_over_reps, ...
-                        self.CombData.timestamps, self.OL_conds{k}, self.OL_conds_durations{k}, ...
-                        self.datatype_indices.OL_inds, self.OL_conds_axis_labels{k}, ...
+                        self.CombData.timestamps, self.OL_conds{k}, self.OL_conds_durations{k}, self.timeseries_plot_settings.cond_name{k}, ...
+                        self.datatype_indices.OL_inds, self.OL_conds_axis_labels, ...
                         self.datatype_indices.Frame_ind, self.num_groups, self.genotype, self.control_genotype, self.timeseries_plot_settings,...
                         self.timeseries_top_left_place, self.timeseries_bottom_left_places{k}, ...
-                        self.timeseries_left_column_places{k}, self.timeseries_plot_settings.figure_names(k));
+                        self.timeseries_left_column_places{k},self.timeseries_plot_settings.figure_names);
 
 
                 end
@@ -451,7 +475,7 @@ classdef create_data_analysis_tool < handle
 
                 for k = 1:length(self.TC_conds)
                     plot_TC_specified_OLtrials(self.TC_plot_settings, self.TC_conds{k}, self.datatype_indices.TC_inds, ...
-                       self.genotype, self.control_genotype, self.TC_plot_settings.overlap, self.num_groups, self.CombData);
+                       self.genotype, self.control_genotype, self.num_groups, self.CombData);
                 end
 
                 analyses_run{end+1} = 'Tuning Curves';
@@ -508,10 +532,10 @@ classdef create_data_analysis_tool < handle
                 for k = 1:numel(self.OL_conds)
                     plot_OL_timeseries(self.CombData.timeseries_avg_over_reps, ...
                         self.CombData.timestamps, self.OL_conds{k}, self.OL_conds_durations{k}, self.timeseries_plot_settings.cond_name{k}, ...
-                        self.datatype_indices.OL_inds, self.OL_conds_axis_labels{k}, ...
+                        self.datatype_indices.OL_inds, self.OL_conds_axis_labels, ...
                         self.datatype_indices.Frame_ind, self.num_groups, self.genotype, self.control_genotype, self.timeseries_plot_settings,...
                         self.timeseries_top_left_place, self.timeseries_bottom_left_places{k}, ...
-                        self.timeseries_left_column_places{k},self.timeseries_plot_settings.figure_names(k));
+                        self.timeseries_left_column_places{k},self.timeseries_plot_settings.figure_names);
                     
                     
                 end

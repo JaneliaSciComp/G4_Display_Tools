@@ -2,7 +2,7 @@
 
 function plot_OL_timeseries(timeseries_data, timestampsIN, OL_conds, OL_durations, cond_name, OL_inds, ...
     axis_labels, Frame_ind, num_groups, genotype, control_genotype, plot_settings, top_left_place, bottom_left_place, ...
-    left_col_places, figure_title)
+    left_col_places, figure_titles)
 
     
     rep_Colors = plot_settings.rep_colors;
@@ -21,13 +21,15 @@ function plot_OL_timeseries(timeseries_data, timestampsIN, OL_conds, OL_duration
     plot_opposing_directions = plot_settings.plot_both_directions;
     control_color = plot_settings.control_color;
     show_ind_flies = plot_settings.show_individual_flies;
+    y_fontsize = plot_settings.yLabel_fontSize;
+    x_fontsize = plot_settings.xLabel_fontSize;
     
     
 
     
     if ~isempty(OL_conds)
     
-    num_exps = size(timeseries_data,2);
+        num_exps = size(timeseries_data,2);
     %loop for different data types
         for d = OL_inds
             
@@ -129,11 +131,11 @@ function plot_OL_timeseries(timeseries_data, timestampsIN, OL_conds, OL_duration
                     xlabel('')
                     ylabel('')
                     if place == top_left_place
-                        ylabel(axis_labels(2)) %1st subplot - Top Left
+                        ylabel(axis_labels{OL_inds==d}(2), 'FontSize', y_fontsize) %1st subplot - Top Left
                         set(gca,'YTick');
                     end
                     if place == bottom_left_place
-                        xlabel(axis_labels(1)) %7th subplot - Bottom Left
+                        xlabel(axis_labels{OL_inds==d}(1), 'FontSize', x_fontsize) %7th subplot - Bottom Left
                     end
                     if ~isnan(OL_durations(place))
                         xlim([0, OL_durations(place)]);
@@ -145,7 +147,11 @@ function plot_OL_timeseries(timeseries_data, timestampsIN, OL_conds, OL_duration
 %                         end
                 end
             end
-            set(gcf, 'Name', figure_title);
+            if find(OL_inds==d) <= length(figure_titles)
+                if ~isempty(figure_titles(OL_inds==d))
+                    set(gcf, 'Name', figure_titles(OL_inds==d));
+                end
+            end
             h = findobj(gcf,'Type','line');
             if control_genotype ~= 0 
                 genotype{control_genotype} = genotype{control_genotype} + " (control)";

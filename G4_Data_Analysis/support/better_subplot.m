@@ -13,9 +13,16 @@ col = mod((N-1),W) + 1;
 plot_width = (1 - gap_x*(W+1))/W;
 plot_height = (1 - gap_y*(H+1))/H;
 
+
+
 plot_x = col*gap_x + (col-1)*plot_width;
 plot_y = row*gap_y + (row-1)*plot_height; %This equation was giving a huge number (200 and something) for a normalized y position. changed equation to match above - LT 8/15
 
+if rem(N-1,W) == 0
+    %Then the plot is on the left column. Add 15 pixels to its plot_width
+    %so the y axis label is not cut off
+    plot_x = plot_x+.015;
+end
 axes('Position', [plot_x, (1 - plot_height) - plot_y, plot_width, plot_height]);
 
 end

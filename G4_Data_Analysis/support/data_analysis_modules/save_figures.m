@@ -28,6 +28,7 @@ function save_figures(save_settings, genotype)
             orient(gcf,orientation)
         else
             set(gcf, 'PaperPosition', [0.4 0.4 x_width y_width]);
+            orient(gcf, orientation);
         end
         
         if length(genotype) == 1

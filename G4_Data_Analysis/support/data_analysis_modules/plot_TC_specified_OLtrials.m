@@ -17,6 +17,10 @@ function plot_TC_specified_OLtrials(TC_plot_settings, TC_conds, TC_inds, genotyp
     control_color = TC_plot_settings.control_color;
     legend_FontSize = TC_plot_settings.legend_FontSize;
     axis_FontSize = TC_plot_settings.axis_label_fontSize;
+    xaxis_label = TC_plot_settings.xaxis_label;
+    datatypes = TC_plot_settings.TC_datatypes;
+    xaxis_values = TC_plot_settings.xaxis_values;
+    fig_names = TC_plot_settings.figure_names;
     
     
     if ~isempty(TC_conds)
@@ -72,14 +76,36 @@ function plot_TC_specified_OLtrials(TC_plot_settings, TC_conds, TC_inds, genotyp
                     ylim(timeseries_ylimits(d,:));
                    % titlestr = ['\fontsize{' num2str(subtitle_FontSize) '} Condition #{\color[rgb]{' num2str(mean_Colors(g,:)) '}' num2str(conds)];
                     titlestr = "Datatype: " + CombData.channelNames.timeseries(d) + newline + " Condition # " + num2str(conds);
-                    xlabel(TC_plot_settings.xaxis_label, 'FontSize', axis_FontSize);
-                    xticks(1:length(TC_conds{row}));
-                    xticklabels(TC_plot_settings.xaxis_values);
+                    if row == num_plot_rows && col == 1
+                        xlabel(xaxis_label, 'FontSize', axis_FontSize);
+                        xticks(1:length(TC_conds{row}));
+                        xticklabels(xaxis_values);
+                    else
+                         xlabel('')
+                    end
+                    
+                    if row == 1 && col == 1
+                        yaxis_label = string(datatypes{TC_inds==d});
+                        ylabel(yaxis_label, 'FontSize', axis_FontSize);
+                    else
+                        ylabel('');
+                    end
+                    
+                    if col~=1
+
+                      currGraph = gca; 
+                      currGraph.YAxis.Visible = 'off';
+                    end 
+                       
                     
                     title(titlestr, 'FontSize', subtitle_FontSize)
                 end
             end
-            
+            if find(TC_inds==d) <= length(fig_names)
+                if ~isempty(fig_names(TC_inds==d))
+                    set(gcf, 'Name', fig_names(TC_inds==d));
+                end
+            end
             h = findobj(gcf,'Type','line');
             if control_genotype ~= 0 
                 genotype{control_genotype} = genotype{control_genotype} + " (control)";
