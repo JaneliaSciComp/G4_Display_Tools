@@ -104,7 +104,11 @@ function plot_OL_timeseries(timeseries_data, timestampsIN, OL_conds, OL_duration
                         if ~isempty(cond_name(1+(row-1),col))
                             title(cond_name(1+(row-1),col),'FontSize',subtitle_FontSize)
                         end
-                        ylim(timeseries_ylimits(d,:));
+                        if timeseries_ylimits(d,:) ~= 0
+                            ylim(timeseries_ylimits(d,:));
+                        else
+                            timeseries_ylimits(d,:) = ylim;
+                        end
                         %xlim(timeseries_xlimits)
                         
                         if frame_superimpose==1

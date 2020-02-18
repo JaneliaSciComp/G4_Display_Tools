@@ -76,7 +76,11 @@ function plot_TC_specified_OLtrials(TC_plot_settings, TC_conds, TC_inds, genotyp
 
                             
                     end
-                    ylim(timeseries_ylimits(d,:));
+                    if timeseries_ylimits(d,:) ~= 0
+                        ylim(timeseries_ylimits(d,:));
+                    else
+                        timeseries_ylimits(d,:) = ylim;
+                    end
                    % titlestr = ['\fontsize{' num2str(subtitle_FontSize) '} Condition #{\color[rgb]{' num2str(mean_Colors(g,:)) '}' num2str(conds)];
                     titlestr = "Datatype: " + CombData.channelNames.timeseries(d) + newline + " Condition # " + num2str(conds);
                     if row == num_plot_rows && col == 1
