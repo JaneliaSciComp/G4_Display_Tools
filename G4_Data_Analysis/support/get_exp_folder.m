@@ -94,14 +94,17 @@ function [exp_folder, trial_options] = get_exp_folder()
               %kappagantular and are 3-6 days old. These groups may have
               %some overlap.
     field_to_sort_by{1} = ["fly_genotype"];
-%    field_to_sort_by{2} = ["rearing_protocol", "light_cycle"];
+    field_to_sort_by{2} = ["fly_genotype"];
+
     single_group = 0;
-    single_fly = 1;
+    single_fly = 0;
     field_values{1} = ["emptySplit_JFRC100_JFRC49"];
+    field_values{2} = ["emptySplit_UAS_Kir_JFRC49"];
+
  %   field_values{2} = ["Kir 1", "01 17"];
     %field_values = ["OL0048B_UAS_Kir_JFRC49","emptySplit_UAS_Kir_JFRC49","OL0010B_UAS_Kir_JFRC49"];
     trial_options = [1 1 1];
-    path_to_protocol =  '/Users/taylorl/Desktop/Protocol004_OpticFlow_KirShibire_01-09-20_13-23-42/Results/Experiment001_emptysplit/emptysplit_01';
+    path_to_protocol =  '/Users/taylorl/Desktop/Protocol004_OpticFlow_KirShibire_01-09-20_13-23-42/Results';
     exp_folder = cell(length(field_values),1);
 
 
@@ -140,18 +143,20 @@ function [exp_folder, trial_options] = get_exp_folder()
             else
                 continue;
             end
-            for j = 1:length(field_values)
-                for m = 1:length(field_values{j})
+            for l = 1:length(field_to_sort_by)
+                for j = 1:length(field_to_sort_by{l})
+                    for m = 1:length(field_values{l})
 
-                    if contains(metadata.metadata.(field_to_sort_by{j}(m)),field_values{j}(m))
-                        passed(m) = 1;
-                    else
-                        passed(m) = 0;
-                        
+                        if contains(metadata.metadata.(field_to_sort_by{l}(j)),field_values{l}(m))
+                            passed(m) = 1;
+                        else
+                            passed(m) = 0;
+
+                        end
                     end
-                end
-                if sum(passed) == m
-                    exp_folder{j,end+1} = fly_file;
+                    if sum(passed) == m
+                        exp_folder{l,end+1} = fly_file;
+                    end
                 end
             end
         end
