@@ -21,7 +21,7 @@ function plot_TC_specified_OLtrials(TC_plot_settings, TC_conds, TC_inds, genotyp
     datatypes = TC_plot_settings.TC_datatypes;
     xaxis_values = TC_plot_settings.xaxis_values;
     fig_names = TC_plot_settings.figure_names;
-    
+    xtick_fontSize = TC_plot_settings.xtick_label_fontSize;
     
     if ~isempty(TC_conds)
         
@@ -88,8 +88,13 @@ function plot_TC_specified_OLtrials(TC_plot_settings, TC_conds, TC_inds, genotyp
                         xticks(1:length(TC_conds{row}));
                         xticklabels(xaxis_values);
                     else
-                         xlabel('')
+                         xlabel('');
+                         xticks(1:length(TC_conds{row}));
+                         xticklabels(xaxis_values);
                     end
+                    
+                    a = get(gca, 'XTickLabel');
+                    set(gca, 'XTickLabel',a,'fontsize',xtick_fontSize);
                     
                     if row == 1 && col == 1
                         yaxis_label = axis_labels{TC_inds==d}(2);

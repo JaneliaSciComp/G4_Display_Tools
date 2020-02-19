@@ -5,7 +5,7 @@ function [TC_conds] = create_default_TC_plot_layout(conditionModes, TC_condsIn)
     
 
     %Default number of conditions to plot together in a single tuning curve
-    default_conds_per_curve = 4; 
+    default_conds_per_curve = 7; 
 
     default_W = [1 2 2 2 3 3 3 3 3 4 4 4 4 4 4 4 5 5 5 5]; %width of figure by number of subplots
     default_H = [1 1 2 2 2 2 3 3 3 3 3 3 4 4 4 4 4 4 4 4]; %height of figure by number of subplots

@@ -12,12 +12,12 @@ function [exp_settings, normalize_settings, histogram_plot_settings, histogram_a
     save_settings.save_path = '/Users/taylorl/Desktop';
     
     %The path to the protocol file, where group log files will be saved
-    save_settings.results_path = "/Users/taylorl/Desktop/Protocol004_OpticFlow_KirShibire_01-09-20_13-23-42/Results/Experiment001_emptysplit/emptysplit_01";
+    save_settings.results_path = "/Users/taylorl/Desktop/Protocol004_OpticFlow_KirShibire_01-09-20_13-23-42";
     
 % Experiment settings
     %Genotypes (or values for the group) that are being analyzed. Note that
     %should be in the same order as the genotypes list in get_exp_folder.m
-    exp_settings.genotypes = ["EmptySplit"];
+    exp_settings.genotypes = ["EmptySplit JFRC", "EmptySplit UAS", "Kir 1 Rearing"];
     %genotypes = ["empty-split", "LPLC-2", "LC-18", "T4_T5", "LC-15", "LC-25", "LC-11", "LC-17", "LC-4"];
 
     %If there is a control genotype, set it here
@@ -65,8 +65,10 @@ function [exp_settings, normalize_settings, histogram_plot_settings, histogram_a
     %Axis labels for the timeseries plots [x, y]. For multiple figures,
     %make it a cell array with each cell element corresponding to that
     %figure in the OL_TS_conds array.
-    timeseries_plot_settings.OL_TSconds_axis_labels{1} = ["Time(sec)", "LmR"];
-    timeseries_plot_settings.OL_TSconds_axis_labels{2} = ["Time(sec)", "faLmR"];
+%     timeseries_plot_settings.OL_TSconds_axis_labels{1} = ["Time(sec)", "LmR"];
+%     timeseries_plot_settings.OL_TSconds_axis_labels{2} = ["Time(sec)", "faLmR"];
+
+    timeseries_plot_settings.OL_TSconds_axis_labels = {};
 
     
     %An array of figure names for each figure of timeseries plots. This is
@@ -74,17 +76,17 @@ function [exp_settings, normalize_settings, histogram_plot_settings, histogram_a
     %plot 30 timeseries subplots per figure, so divide your total number of
     %plotted conditions by 30 to determine how many figures there will be. 
     %Should correspond to datatypes.
-    timeseries_plot_settings.figure_names = ["LmR", "faLmR"];
+    timeseries_plot_settings.figure_names = ["LmR"];
     
 %datatype options for flying data: 'LmR_chan', 'L_chan', 'R_chan', 'F_chan', 'Frame Position', 'LmR', 'LpR', 'faLmR'
 %datatype options for walking data: 'Vx0_chan', 'Vx1_chan', 'Vy0_chan', 'Vy1_chan', 'Frame Position', 'Turning', 'Forward', 'Sideslip'
     
     %The datatype to plot as timeseries
-    timeseries_plot_settings.OL_datatypes = {'LmR','faLmR'};
+    timeseries_plot_settings.OL_datatypes = {'LmR'};
     
     %Set this to 1 if you are plotting only a single group and want lines
     %plotted for each fly as well as the average.
-    timeseries_plot_settings.show_individual_flies = 1;
+    timeseries_plot_settings.show_individual_flies = 0;
     
     %plot the frame position under each timeseries plot
     timeseries_plot_settings.frame_superimpose = 1;
@@ -110,11 +112,13 @@ function [exp_settings, normalize_settings, histogram_plot_settings, histogram_a
     TC_plot_settings.OL_TC_conds = [];
     
     %The xaxis label for tuning curves
-    TC_plot_settings.xaxis_label = 'Changing feature here';
+%     TC_plot_settings.TC_axis_labels{1} = ["Frequency(Hz)","LmR"];
+%     TC_plot_settings.TC_axis_labels{2} = ["Frequency(Hz)", "LpR"];
+    TC_plot_settings.TC_axis_labels = {};
     TC_plot_settings.figure_names = [];
     
     %The x-axis values for tuning curves
-    TC_plot_settings.xaxis_values = [0 1 2 3];
+    TC_plot_settings.xaxis_values = [0.625 1.25 2.5 5 10 20 40];
     
     %Datatypes for which to plot tuning curves
     TC_plot_settings.TC_datatypes = {'LmR','LpR'}; 
@@ -189,7 +193,8 @@ function [exp_settings, normalize_settings, histogram_plot_settings, histogram_a
     TC_plot_settings.rep_lineWidth = 0.05;
     TC_plot_settings.mean_lineWidth = 1;
     TC_plot_settings.timeseries_ylimits = [-1.1 1.1; -1 6; -1 6; -1 6; 1 192; 0 0; 0 20; 0 0];
-    TC_plot_settings.axis_label_fontSize = 6;    
+    TC_plot_settings.axis_label_fontSize = 6; 
+    TC_plot_settings.xtick_label_fontSize = 6;
     TC_plot_settings.rep_colors = [0 0 0; 0.75 0 0; 0 0.25 0; 0 0 0.75; 0.75 0.25 0; .5 0 0.75; 0 0.75 0; 0 0.75 0.75; 0.75 0 0.75; 0.75 0.75 0]; %default 10 colors supports up to 10 groups (add more colors for more groups)
     TC_plot_settings.mean_colors = [1 0 0; 0 0 1; 0 0.5 0; 1 0.5 0; .75 0 1; 0 1 0;  1 0.5 1; 0 1 1; 1 0 1; 1 1 0]; %default 10 colors supports up to 10 groups (add more colors for more groups)
     TC_plot_settings.control_color = [0 0 0];

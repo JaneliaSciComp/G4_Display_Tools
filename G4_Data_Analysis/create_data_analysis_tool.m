@@ -182,7 +182,21 @@ classdef create_data_analysis_tool < handle
             self.OL_datatypes = self.timeseries_plot_settings.OL_datatypes;
             self.TC_datatypes = self.TC_plot_settings.TC_datatypes;
             
-            self.OL_conds_axis_labels = self.timeseries_plot_settings.OL_TSconds_axis_labels;
+            if ~isempty(self.timeseries_plot_settings.OL_TSconds_axis_labels)
+                self.OL_conds_axis_labels = self.timeseries_plot_settings.OL_TSconds_axis_labels;
+            else
+                for i = 1:length(self.OL_datatypes)
+                    self.OL_conds_axis_labels{i} = ["Time(sec)", string(self.OL_datatypes{i})];
+                end
+            end
+            
+            if isempty(self.TC_plot_settings.TC_axis_labels)
+                for i = 1:length(self.TC_datatypes)
+                    self.TC_plot_settings.TC_axis_labels{i} = ["Frequency (Hz)", string(self.TC_datatypes{i})];
+                end
+            end
+                
+            
 
         %% Settings based on inputs
              %%%For new file system setup
