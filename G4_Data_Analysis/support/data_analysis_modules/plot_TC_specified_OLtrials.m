@@ -17,7 +17,7 @@ function plot_TC_specified_OLtrials(TC_plot_settings, TC_conds, TC_inds, genotyp
     control_color = TC_plot_settings.control_color;
     legend_FontSize = TC_plot_settings.legend_FontSize;
     axis_FontSize = TC_plot_settings.axis_label_fontSize;
-    xaxis_label = TC_plot_settings.xaxis_label;
+    axis_labels = TC_plot_settings.TC_axis_labels;
     datatypes = TC_plot_settings.TC_datatypes;
     xaxis_values = TC_plot_settings.xaxis_values;
     fig_names = TC_plot_settings.figure_names;
@@ -84,7 +84,7 @@ function plot_TC_specified_OLtrials(TC_plot_settings, TC_conds, TC_inds, genotyp
                    % titlestr = ['\fontsize{' num2str(subtitle_FontSize) '} Condition #{\color[rgb]{' num2str(mean_Colors(g,:)) '}' num2str(conds)];
                     titlestr = "Datatype: " + CombData.channelNames.timeseries(d) + newline + " Condition # " + num2str(conds);
                     if row == num_plot_rows && col == 1
-                        xlabel(xaxis_label, 'FontSize', axis_FontSize);
+                        xlabel(axis_labels{TC_inds==d}(1), 'FontSize', axis_FontSize);
                         xticks(1:length(TC_conds{row}));
                         xticklabels(xaxis_values);
                     else
@@ -92,7 +92,7 @@ function plot_TC_specified_OLtrials(TC_plot_settings, TC_conds, TC_inds, genotyp
                     end
                     
                     if row == 1 && col == 1
-                        yaxis_label = string(datatypes{TC_inds==d});
+                        yaxis_label = axis_labels{TC_inds==d}(2);
                         ylabel(yaxis_label, 'FontSize', axis_FontSize);
                     else
                         ylabel('');
