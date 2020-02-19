@@ -67,16 +67,16 @@ classdef create_data_analysis_tool < handle
     
     methods
 
-        function self = create_data_analysis_tool(exp_folder, trial_options, varargin)
+        function self = create_data_analysis_tool(exp_folder, trial_options,  settings_file, varargin)
             
             % exp_folder: cell array of paths containing G4_Processed_Data.mat files
             % trial_options: 1x3 logical array [pre-trial, intertrial, post-trial]
             
             % Get plot settings from DA_plot_settings.m
-            [self.exp_settings, self.normalize_settings, self.histogram_plot_settings, self.histogram_annotation_settings, ...
-    self.CL_hist_plot_settings, self.timeseries_plot_settings, self.TC_plot_settings, self.save_settings] = DA_plot_settings();
-
-        
+            if ~isfile(settings_file)
+                disp("Cannot find settings file");
+                return;
+            end
             %% For new file system set up
 % %         %Information used to generate exp_folder and trial_options variables
 % %         
@@ -100,63 +100,16 @@ classdef create_data_analysis_tool < handle
 % %             
         
 
-
-        %TC_conds are different than OL and CL conds. All conditions
-        %being looked at are plotted on a single tuning curve. So the
-        %layout is TC_conds{fig #}{row #} = [ conds on curve in col1; conds on curve in col2; conds on curve in col3]
-
-        %The size of the first cell array element determines the number of figures. 
-        %The size of the second cell array element determines the number of
-        %rows in the figure. Columns should be separated by a ; in the
-        %regular array. For example: 
-
-        %self.TC_conds{1}{1} = [1 2 3 4 5 6 7 8; 9 10 11 12 13 14 15 16]
-        %self.TC_conds{1}{2} = [17 18 19 20 21 22 23 24; 25 26 27 28 29 30 31 32]
-        %self.TC_conds{2}{1} = [19 20 21 22 23]
-        %self.TC_conds{2}{2} = [26 27 28 29 30]
-
-        %In this case, for each datatype there will be two figures. The
-        %first figure will have two rows. The first row will contain two tuning curves - 
-        %the first comparing conditions 1-8, the second comparing conditions 9-16.
-        %The second row of figure one will contain two curves, the first using conds 17-24,
-        %and the second comparing conds 25-28. Figure 2 will contain two
-        %rows and a single column. The top curve will compare conds 19-23
-        %and the bottom curve will compare conds 26-30. If you want to
-        %leave an empty space, replace the condition numbers with 0's ie [1 2 3 4; 0 0 0 0]
-% 
-%             self.TC_conds{1}{1} = [1 3 5 7; 9 11 13 15]; %3x1, 3x3, 3x3 ON, 8x8 (4 x 2 plots)
-%             self.TC_conds{1}{2} = [17 19 21 23; 0 0 0 0]; %16x16, 64x3, 64x3 ON, 64x16 (4 x 2 plots)
-%             self.TC_conds{2}{1} = [25 27 29 31; 33 34 35 36] ;
-%             self.TC_conds{2}{2} = [37 38 39 40; 0 0 0 0]; %left and right Looms (4 x 2 plots)
-
-
-            
-        %% Generate condition names for timeseries plot titles
-% 
-%            
-%             looms = ["Left", "Right"];
-%             wf = ["Yaw", "Sideslip"];
-%             for p = 1:length(patterns)  % 8 patterns % 2 sweeps
-%                 self.timeseries_plot_settings.cond_name{1+4*(p-1)} = [patterns(p) ' L 0.35 Hz Sweep'];
-%                 self.timeseries_plot_settings.cond_name{2+4*(p-1)} = [patterns(p) ' R 0.35 Hz Sweep'];
-%                 self.timeseries_plot_settings.cond_name{3+4*(p-1)} = [patterns(p) ' L 1.07 Hz Sweep'];
-%                 self.timeseries_plot_settings.cond_name{4+4*(p-1)} = [patterns(p) ' R 1.07 Hz Sweep'];
-%             end
-% 
-%             for l = 1:2 % 2 looms
-%                 self.timeseries_plot_settings.cond_name{33+4*(l-1)} = [looms(l) ' R/V 20'];
-%                 self.timeseries_plot_settings.cond_name{34+4*(l-1)} = [looms(l) ' R/V 40'];
-%                 self.timeseries_plot_settings.cond_name{35+4*(l-1)} = [looms(l) ' R/V 80'];
-%                 self.timeseries_plot_settings.cond_name{36+4*(l-1)} = [looms(l) ' 200 deg/s'];
-%             end
-% 
-%             for w = 1:2 % 2 wide-field rotations
-%                 self.timeseries_plot_settings.cond_name{41+2*(w-1)} = [wf(w) ' CW 10 Hz'];
-%                 self.timeseries_plot_settings.cond_name{42+2*(w-1)} = [wf(w) ' CCW 10 Hz'];   
-%             end
-
-
-
+            settings = load(settings_file);
+            self.exp_settings = settings.exp_settings;
+            self.normalize_settings = settings.normalize_settings;
+            self.histogram_plot_settings = settings.histogram_plot_settings;
+            self.histogram_annotation_settings = settings.histogram_annotation_settings;
+            self.CL_hist_plot_settings = settings.CL_hist_plot_settings;
+            self.timeseries_plot_settings = settings.timeseries_plot_settings;
+            self.TC_plot_settings = settings.TC_plot_settings;
+            self.save_settings = settings.save_settings;
+   
         
             self.normalize_option = 0; %0 = don't normalize, 1 = normalize every fly, 2 = normalize every group
             self.histogram_plot_option = 0;

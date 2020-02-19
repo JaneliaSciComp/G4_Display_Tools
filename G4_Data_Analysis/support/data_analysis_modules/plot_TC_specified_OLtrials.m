@@ -23,11 +23,12 @@ function plot_TC_specified_OLtrials(TC_plot_settings, TC_conds, TC_inds, genotyp
     fig_names = TC_plot_settings.figure_names;
     xtick_fontSize = TC_plot_settings.xtick_label_fontSize;
     
+    
     if ~isempty(TC_conds)
         
         %loop for different data types
         for d = TC_inds
-
+            ydata = [];
             num_plot_rows = size(TC_conds,2);
             num_plot_cols = size(TC_conds{1},1);
             figure('Position',[100 100 540 540*(num_plot_rows/num_plot_cols)])
@@ -79,7 +80,14 @@ function plot_TC_specified_OLtrials(TC_plot_settings, TC_conds, TC_inds, genotyp
                     if timeseries_ylimits(d,:) ~= 0
                         ylim(timeseries_ylimits(d,:));
                     else
-                        timeseries_ylimits(d,:) = ylim;
+                        lines = findobj(gca, 'Type', 'line');
+                        for l = 1:length(lines)
+                            curr_ydata = lines(l).YData;
+                            mm = [min(curr_ydata), max(curr_ydata)];
+                            ydata = [ydata, mm];
+                        end
+                        
+                       % timeseries_ylimits(d,:) = ylim;
                     end
                    % titlestr = ['\fontsize{' num2str(subtitle_FontSize) '} Condition #{\color[rgb]{' num2str(mean_Colors(g,:)) '}' num2str(conds)];
                     titlestr = "Datatype: " + CombData.channelNames.timeseries(d) + newline + " Condition # " + num2str(conds);
@@ -139,12 +147,21 @@ function plot_TC_specified_OLtrials(TC_plot_settings, TC_conds, TC_inds, genotyp
                 genotype{control_genotype} = erase(genotype{control_genotype}," (control)");
             end
             
-            
+            if timeseries_ylimits(d,:) == 0
+                allax = findall(gcf, 'Type', 'axes');
+                ymin = min(ydata);
+                ymax = max(ydata);
+                for ax = allax
+                
+                    ylim(ax, [ymin, ymax]);
+                end
+            end
             newPosition = [0.5 0.004 0.001 0.001]; %legend positioning
             newUnits = 'normalized';
             legend1.ItemTokenSize = [10,7];
             set(legend1,'Position', newPosition,'FontSize',legend_FontSize, 'Units', newUnits, 'Interpreter', 'none','Box','off');
 
-        end
-    end   
+           
+        end   
+    end
 end

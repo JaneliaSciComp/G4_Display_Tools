@@ -171,7 +171,7 @@ function [exp_settings, normalize_settings, histogram_plot_settings, histogram_a
 %datatype options for flying data: 'LmR_chan', 'L_chan', 'R_chan', 'F_chan', 'Frame Position', 'LmR', 'LpR', 'faLmR'
 %datatype options for walking data: 'Vx0_chan', 'Vx1_chan', 'Vy0_chan', 'Vy1_chan', 'Frame Position', 'Turning', 'Forward', 'Sideslip'
 
-    timeseries_plot_settings.timeseries_ylimits = [-1.1 1.1; -1 6; -1 6; -1 6; 1 192; 0 0; 2 20; 0 0]; %[min max] y limits for each datatype (including 1 additional for 'faLmR' option)
+    timeseries_plot_settings.timeseries_ylimits = [-1.1 1.1; -1 6; -1 6; -1 6; 1 192; 0 0; 0 0; 0 0]; %[min max] y limits for each datatype (including 1 additional for 'faLmR' option)
     timeseries_plot_settings.timeseries_xlimits = [0 4];
     timeseries_plot_settings.subtitle_fontSize = 8;
     timeseries_plot_settings.legend_fontSize = 6;
@@ -192,7 +192,7 @@ function [exp_settings, normalize_settings, histogram_plot_settings, histogram_a
 
     TC_plot_settings.rep_lineWidth = 0.05;
     TC_plot_settings.mean_lineWidth = 1;
-    TC_plot_settings.timeseries_ylimits = [-1.1 1.1; -1 6; -1 6; -1 6; 1 192; 0 0; 0 20; 0 0];
+    TC_plot_settings.timeseries_ylimits = [-1.1 1.1; -1 6; -1 6; -1 6; 1 192; 0 0; 0 0; 0 0];
     TC_plot_settings.axis_label_fontSize = 6; 
     TC_plot_settings.xtick_label_fontSize = 6;
     TC_plot_settings.rep_colors = [0 0 0; 0.75 0 0; 0 0.25 0; 0 0 0.75; 0.75 0.25 0; .5 0 0.75; 0 0.75 0; 0 0.75 0.75; 0.75 0 0.75; 0.75 0.75 0]; %default 10 colors supports up to 10 groups (add more colors for more groups)

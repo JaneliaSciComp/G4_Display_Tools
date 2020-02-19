@@ -32,7 +32,7 @@ function plot_OL_timeseries(timeseries_data, timestampsIN, OL_conds, OL_duration
         num_exps = size(timeseries_data,2);
     %loop for different data types
         for d = OL_inds
-            
+            ydata = [];
             %num_plot_rows = (1-overlap/2)*max(nansum(OL_conds(:,:,fig)>0));
             %num_plot_cols = max(nansum(OL_conds(:,:,fig)>0,2));
             num_plot_rows = size(OL_conds,1);
@@ -107,17 +107,32 @@ function plot_OL_timeseries(timeseries_data, timestampsIN, OL_conds, OL_duration
                         if timeseries_ylimits(d,:) ~= 0
                             ylim(timeseries_ylimits(d,:));
                         else
-                            timeseries_ylimits(d,:) = ylim;
+                            lines = findobj(gca, 'Type', 'line');
+                            for l = 1:length(lines)
+                                curr_ydata = lines(l).YData;
+                                mm = [min(curr_ydata), max(curr_ydata)];
+                                ydata = [ydata, mm];
+                                
+                            end
                         end
-                        %xlim(timeseries_xlimits)
                         
                         if frame_superimpose==1
-                            yrange = diff(timeseries_ylimits(d,:));
+                            curr_ylim = ylim(gca);
+                            yrange = diff(curr_ylim);
                             framepos = squeeze(nanmedian(nanmedian(timeseries_data(:,:,Frame_ind,cond,:),2),1))';
-                            framepos = (frame_scale*framepos/max(framepos))+timeseries_ylimits(d,1)-frame_scale*yrange;
-                            ylim([timeseries_ylimits(d,1)-frame_scale*yrange timeseries_ylimits(d,2)])
+                            framepos = (frame_scale*framepos/max(framepos))+curr_ylim(1)-frame_scale*yrange;
+                            ylim([curr_ylim(1)-frame_scale*yrange curr_ylim(2)])
                             plot(timestampsIN,framepos,'Color',frame_color,'LineWidth',mean_LineWidth);
+                            y = ylim;
+                            mm = [min(y), max(y)];
+                            ydata = [ydata, mm];
                         end
+                        
+                       % timeseries_ylimits(d,:) = ylim;
+ 
+                        %xlim(timeseries_xlimits)
+                        
+                        
                         
 %                         title([titlestr '}'])
                         % title
@@ -148,6 +163,8 @@ function plot_OL_timeseries(timeseries_data, timestampsIN, OL_conds, OL_duration
                     if ~isnan(OL_durations(place))
                         xlim([0, OL_durations(place)]);
                     end
+                    
+                    
 
 %                         % setting figures
 %                         if OL_conds == 41 
@@ -158,6 +175,16 @@ function plot_OL_timeseries(timeseries_data, timestampsIN, OL_conds, OL_duration
             if find(OL_inds==d) <= length(figure_titles)
                 if ~isempty(figure_titles(OL_inds==d))
                     set(gcf, 'Name', figure_titles(OL_inds==d));
+                end
+            end
+            
+            if timeseries_ylimits(d,:) == 0
+                allax = findall(gcf, 'Type', 'axes');
+                ymin = min(ydata);
+                ymax = max(ydata);
+                for ax = allax
+
+                    ylim(ax, [ymin, ymax]);
                 end
             end
             h = findobj(gcf,'Type','line');

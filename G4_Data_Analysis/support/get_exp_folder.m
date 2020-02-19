@@ -94,17 +94,19 @@ function [exp_folder, trial_options] = get_exp_folder()
               %kappagantular and are 3-6 days old. These groups may have
               %some overlap.
     field_to_sort_by{1} = ["fly_genotype"];
-    field_to_sort_by{2} = ["fly_genotype"];
+%     field_to_sort_by{2} = ["fly_genotype"];
+%     field_to_sort_by{3} = ["rearing_protocol"];
 
     single_group = 0;
     single_fly = 0;
     field_values{1} = ["emptySplit_JFRC100_JFRC49"];
-    field_values{2} = ["emptySplit_UAS_Kir_JFRC49"];
+%     field_values{2} = ["emptySplit_UAS_Kir_JFRC49"];
+%     field_values{3} = ["Kir 1"];
 
  %   field_values{2} = ["Kir 1", "01 17"];
     %field_values = ["OL0048B_UAS_Kir_JFRC49","emptySplit_UAS_Kir_JFRC49","OL0010B_UAS_Kir_JFRC49"];
     trial_options = [1 1 1];
-    path_to_protocol =  '/Users/taylorl/Desktop/Protocol004_OpticFlow_KirShibire_01-09-20_13-23-42/Results';
+    path_to_protocol =  '/Users/taylorl/Desktop/Protocol004_OpticFlow_KirShibire_01-09-20_13-23-42';
     exp_folder = cell(length(field_values),1);
 
 
