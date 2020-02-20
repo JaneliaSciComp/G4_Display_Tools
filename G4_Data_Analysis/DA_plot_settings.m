@@ -144,6 +144,7 @@ function [exp_settings, normalize_settings, histogram_plot_settings, histogram_a
     histogram_plot_settings.mean_colors = [0 0 0; 1 0 0; 0 0.5 0; 0 0 1; 1 0.5 0; .75 0 1; 0 1 0; 0 1 1; 1 0 1; 1 1 0]; %default 10 colors supports up to 10 groups (add more colors for more groups)
     histogram_plot_settings.rep_LineWidth = 0.05;
     histogram_plot_settings.mean_LineWidth = 1;
+    histogram_plot_settings.inter_in_degrees = 1;
 
     %% Annotation settings for basic Histograms
 

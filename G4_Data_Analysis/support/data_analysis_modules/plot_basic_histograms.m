@@ -20,6 +20,7 @@ function plot_basic_histograms(timeseries_data, interhistogram_data, ...
     ann_backgroundColor = annotation_settings.background_color;
     ann_color = annotation_settings.color;
     ann_interpreter = annotation_settings.interpreter;
+    plot_in_degrees = plot_settings.inter_in_degrees;
     
 
     num_TC_datatypes = length(TC_datatypes);
@@ -78,10 +79,35 @@ function plot_basic_histograms(timeseries_data, interhistogram_data, ...
             end
 
             if trial_options(2)==1
+                
+                ind_lines = squeeze(nanmean(interhistogram_data(g,:,:,:),3));
+                avg_line = squeeze(nanmean(nanmean(interhistogram_data(g,:,:,:),3),2));
+                if plot_in_degrees == 1
+                
+                    half = size(ind_lines,2)/2;
+                    for i = 1:size(ind_lines,1)
+                    ind_lines(i,:) = [ind_lines(i,half+1:end), ind_lines(i, 1:half)];
+                    end
+                    
+                    avg_line(:,1) = [avg_line(half+1:end); avg_line(1:half)];
+                end
+ 
                 subplot(2+num_TC_datatypes,num_plot_groups,(1+num_TC_datatypes)*num_plot_groups+plot_group)
-                plot(squeeze(nanmean(interhistogram_data(g,:,:,:),3))','Color',rep_Colors(g,:),'LineWidth',rep_LineWidth)
+                plot(ind_lines','Color',rep_Colors(g,:),'LineWidth',rep_LineWidth)
                 hold on
-                plot(squeeze(nanmean(nanmean(interhistogram_data(g,:,:,:),3),2)),'Color',mean_Colors(g,:),'LineWidth',mean_LineWidth)
+                
+                plot(avg_line,'Color',mean_Colors(g,:),'LineWidth',mean_LineWidth)
+                
+                %convert x axis to degrees
+               if plot_in_degrees == 1
+                    for k = 1:11
+                        tick_labels(k) = (-180 + (36*k) - 36);
+                    end
+
+                    xticklabels(string(tick_labels));
+                    xlabel('Degrees');
+               end
+
                 title('Intertrial Pattern Frame','FontSize',subtitle_FontSize)
                 currPlot = gca;
                 set(currPlot, 'FontSize', 8);
