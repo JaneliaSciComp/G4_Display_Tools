@@ -92,7 +92,7 @@ function [exp_settings, normalize_settings, histogram_plot_settings, histogram_a
     timeseries_plot_settings.frame_superimpose = 1;
     
     %plot both directions for each condition on the same axis. 
-    timeseries_plot_settings.plot_both_directions = 1;
+    timeseries_plot_settings.plot_both_directions = 0;
     
 
     
@@ -183,6 +183,7 @@ function [exp_settings, normalize_settings, histogram_plot_settings, histogram_a
     timeseries_plot_settings.yLabel_fontSize = 10;
     timeseries_plot_settings.xLabel_fontSize = 10;
     timeseries_plot_settings.overlap = 0; %not working
+    timeseries_plot_settings.fly_colors = [.95 .95 .95; .9 .9 .9; .85 .85 .85; .8 .8 .8; .75 .75 .75; .7 .7 .7; .65 .65 .65; .6 .6 .6; .55 .55 .55; .5 .5 .5; .45 .45 .45;  .4 .4 .4; .35 .35 .35; .3 .3 .3; .25 .25 .25; .2 .2 .2; .15 .15 .15; .1 .1 .1]; %Colors assigned to individual fly lines
     timeseries_plot_settings.rep_colors = [0 0 0; 1 0 0; 0 0.5 0; 0 0 1; 1 0.5 0; .75 0 1; 0 1 0; 0 1 1; 1 0 1; 1 1 0]; %default 10 colors supports up to 10 groups (add more colors for more groups)
     timeseries_plot_settings.rep_lineWidth = 0.05;
     timeseries_plot_settings.mean_colors = [1 0 0; 0 0 1; 0 0.5 0; 1 0.5 0; .75 0 1; 0 1 0;  1 0.5 1; 0 1 1; 1 0 1; 1 1 0]; %default 10 colors supports up to 10 groups (add more colors for more groups)

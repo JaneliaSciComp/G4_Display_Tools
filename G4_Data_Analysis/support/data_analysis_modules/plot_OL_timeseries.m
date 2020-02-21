@@ -23,6 +23,7 @@ function plot_OL_timeseries(timeseries_data, timestampsIN, OL_conds, OL_duration
     show_ind_flies = plot_settings.show_individual_flies;
     y_fontsize = plot_settings.yLabel_fontSize;
     x_fontsize = plot_settings.xLabel_fontSize;
+    fly_Colors = plot_settings.fly_colors;
     
     
 
@@ -58,8 +59,11 @@ function plot_OL_timeseries(timeseries_data, timestampsIN, OL_conds, OL_duration
                             if single == 1
                                 plot(repmat(timestampsIN',[1 num_exps]),tmpdata','Color',mean_Colors(g,:),'LineWidth',rep_LineWidth);
                             elseif num_groups==1  && show_ind_flies == 1
-                                plot(repmat(timestampsIN',[1 num_exps]),tmpdata','Color',mean_Colors(g,:),'LineWidth',rep_LineWidth);
-                                plot(timestamps, meandata, 'Color', .5*mean_Colors(g,:),'LineWidth', mean_LineWidth);
+                                for exp = 1:num_exps
+                                    plot(repmat(timestampsIN',[1 exp]),tmpdata(exp,:)','Color',fly_Colors(exp,:),'LineWidth',rep_LineWidth);
+                                end
+
+                                plot(timestamps, meandata, 'Color', .75*mean_Colors(g,:),'LineWidth', mean_LineWidth);
                             else
                                 if g == control_genotype
                                     plot(timestamps,meandata,'Color',control_color,'LineWidth',mean_LineWidth);
