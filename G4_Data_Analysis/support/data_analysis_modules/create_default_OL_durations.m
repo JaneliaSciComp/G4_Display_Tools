@@ -12,16 +12,27 @@ function [OL_durs] = create_default_OL_durations(OL_conds, timeseries_data, time
                 
                 m = 1;
                 if nanInd(1) == 1
-                    while(nanInd(m+1)-nanInd(m) == 1)
-                        m = m + 1;                       
+                    while(nanInd(m+1)-nanInd(m) == 1) && m < length(nanInd) - 1
+                        m = m + 1; 
+                        
+                            
                     end
-                    firstNanInd = m + 1;
+                    if m < length(nanInd) - 1
+                        firstNanInd = m + 1;
+                    else
+                        firstNanInd = 0;
+                    end
                 else
                     firstNanInd = 1;
                 end
                 
-                firstNan = nanInd(firstNanInd);
-                time = timestamps(firstNan);
+                if firstNanInd ~= 0
+                   firstNan = nanInd(firstNanInd);
+                   time = timestamps(firstNan);
+                else
+                    time = timestamps(end);
+                end
+
                 
                 OL_durs{i}(j,k) = time;
                 

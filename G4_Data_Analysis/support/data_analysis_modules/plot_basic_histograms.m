@@ -2,7 +2,7 @@
 %calculate overall measurements and plot basic histograms
 function plot_basic_histograms(timeseries_data, interhistogram_data, ...
     TC_datatypes, plot_settings, num_groups, num_exps, genotype, TC_inds, trial_options, ...
-    annotation_settings)
+    annotation_settings, single)
 
     %Set up needed variables
     rep_Colors = plot_settings.rep_colors;
@@ -78,7 +78,7 @@ function plot_basic_histograms(timeseries_data, interhistogram_data, ...
                 set(currPlot, 'FontSize', 8);
             end
 
-            if trial_options(2)==1
+            if trial_options(2)==1 && single == 0
                 
                 ind_lines = squeeze(nanmean(interhistogram_data(g,:,:,:),3));
                 avg_line = squeeze(nanmean(nanmean(interhistogram_data(g,:,:,:),3),2));
@@ -86,7 +86,7 @@ function plot_basic_histograms(timeseries_data, interhistogram_data, ...
                 
                     half = size(ind_lines,2)/2;
                     for i = 1:size(ind_lines,1)
-                    ind_lines(i,:) = [ind_lines(i,half+1:end), ind_lines(i, 1:half)];
+                        ind_lines(i,:) = [ind_lines(i,half+1:end), ind_lines(i, 1:half)];
                     end
                     
                     avg_line(:,1) = [avg_line(half+1:end); avg_line(1:half)];
@@ -94,15 +94,20 @@ function plot_basic_histograms(timeseries_data, interhistogram_data, ...
  
                 subplot(2+num_TC_datatypes,num_plot_groups,(1+num_TC_datatypes)*num_plot_groups+plot_group)
                 plot(ind_lines','Color',rep_Colors(g,:),'LineWidth',rep_LineWidth)
-                hold on
-                
+                hold on   
                 plot(avg_line,'Color',mean_Colors(g,:),'LineWidth',mean_LineWidth)
                 
                 %convert x axis to degrees
                if plot_in_degrees == 1
+                    x = xlim;
+                    x = x(2);
+                    tickgap = x/10;
                     for k = 1:11
                         tick_labels(k) = (-180 + (36*k) - 36);
+                        ticks(k) = k*tickgap - tickgap;
                     end
+
+                    xticks(ticks);
 
                     xticklabels(string(tick_labels));
                     xlabel('Degrees');
@@ -111,6 +116,35 @@ function plot_basic_histograms(timeseries_data, interhistogram_data, ...
                 title('Intertrial Pattern Frame','FontSize',subtitle_FontSize)
                 currPlot = gca;
                 set(currPlot, 'FontSize', 8);
+            
+            elseif trial_options(2) == 1 && single == 1
+                
+                fly_line = squeeze(nanmean(interhistogram_data(g,:,:,:),3));
+                if plot_in_degrees == 1
+                    
+                    half = length(fly_line)/2;
+                    fly_line = [fly_line(half+1:end); fly_line(1:half)];
+                    
+                end
+                
+                subplot(2+num_TC_datatypes,num_plot_groups,(1+num_TC_datatypes)*num_plot_groups+plot_group)
+                plot(fly_line','Color',rep_Colors(g,:),'LineWidth',rep_LineWidth)
+                
+                if plot_in_degrees == 1
+                     x = xlim;
+                    x = x(2);
+                    tickgap = x/10;
+                    for k = 1:11
+                        tick_labels(k) = (-180 + (36*k) - 36);
+                        ticks(k) = k*tickgap - tickgap;
+                    end
+                    xticks(ticks);
+
+                    xticklabels(string(tick_labels));
+                    xlabel('Degrees');
+               end
+                
+            
             end
 
 

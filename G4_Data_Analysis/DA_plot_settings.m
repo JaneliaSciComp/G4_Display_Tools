@@ -17,7 +17,7 @@ function [exp_settings, normalize_settings, histogram_plot_settings, histogram_a
 % Experiment settings
     %Genotypes (or values for the group) that are being analyzed. Note that
     %should be in the same order as the genotypes list in get_exp_folder.m
-    exp_settings.genotypes = ["EmptySplit JFRC", "EmptySplit UAS", "Kir 1 Rearing"];
+    exp_settings.genotypes = ["EmptySplit JFRC"];
     %genotypes = ["empty-split", "LPLC-2", "LC-18", "T4_T5", "LC-15", "LC-25", "LC-11", "LC-17", "LC-4"];
 
     %If there is a control genotype, set it here
@@ -86,13 +86,15 @@ function [exp_settings, normalize_settings, histogram_plot_settings, histogram_a
     
     %Set this to 1 if you are plotting only a single group and want lines
     %plotted for each fly as well as the average.
-    timeseries_plot_settings.show_individual_flies = 0;
+    timeseries_plot_settings.show_individual_flies = 1;
     
     %plot the frame position under each timeseries plot
     timeseries_plot_settings.frame_superimpose = 1;
     
     %plot both directions for each condition on the same axis. 
     timeseries_plot_settings.plot_both_directions = 1;
+    
+
     
     %If you want the plots to have their own plot titles, make a cell array
     %of titles corresponding to the OL_TS_conds array. IF left empty, a
@@ -125,6 +127,8 @@ function [exp_settings, normalize_settings, histogram_plot_settings, histogram_a
     
     %Plots tuning curves for both directions on the same axis
     TC_plot_settings.plot_both_directions = 1; 
+    
+
     
 
 %Further settings that may not need adjusting often    

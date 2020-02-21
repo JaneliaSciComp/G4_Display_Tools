@@ -395,7 +395,7 @@ classdef create_data_analysis_tool < handle
             if self.histogram_plot_option == 1
                 plot_basic_histograms(self.CombData.timeseries_avg_over_reps, self.CombData.interhistogram, ...
                     self.TC_datatypes, self.histogram_plot_settings, self.num_groups, self.num_exps,...
-                    self.genotype, self.datatype_indices.TC_inds, self.trial_options, self.histogram_annotation_settings);
+                    self.genotype, self.datatype_indices.TC_inds, self.trial_options, self.histogram_annotation_settings, 1);
                 
                 analyses_run{end+1} = 'Basic histograms';
             end
@@ -467,7 +467,7 @@ classdef create_data_analysis_tool < handle
             if self.histogram_plot_option == 1
                 plot_basic_histograms(self.CombData.timeseries_avg_over_reps, self.CombData.interhistogram, ...
                     self.TC_datatypes, self.histogram_plot_settings, self.num_groups, self.num_exps,...
-                    self.genotype, self.datatype_indices.TC_inds, self.trial_options, self.histogram_annotation_settings);
+                    self.genotype, self.datatype_indices.TC_inds, self.trial_options, self.histogram_annotation_settings, 0);
                 
                 analyses_run{end+1} = 'Basic histograms';
             end
