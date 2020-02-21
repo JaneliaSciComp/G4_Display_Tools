@@ -41,7 +41,7 @@ function [TC_conds] = create_default_TC_plot_layout(conditionModes, TC_condsIn)
                         num_left = num_conds - default_conds_per_curve*(row*col*fig-1);
                         TC_conds{fig}{row}(col,1:num_left) = conds_vec(fig*row*col*default_conds_per_curve - (default_conds_per_curve-1):end);
                     else
-                        TC_conds{fig}{row}(col,1:end) = conds_vec(fig*row*col*default_conds_per_curve - (default_conds_per_curve-1):fig*row*col*default_conds_per_curve);
+                        TC_conds{fig}{row}(col,1:end) = conds_vec((fig*row*col*default_conds_per_curve - (default_conds_per_curve-1) + (row-1)*(W*default_conds_per_curve - default_conds_per_curve*col)):(fig*row*col*default_conds_per_curve + (row-1)*(W*default_conds_per_curve - default_conds_per_curve*col)));
                     end
                 end
             end
