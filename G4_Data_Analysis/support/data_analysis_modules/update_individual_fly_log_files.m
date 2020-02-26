@@ -17,8 +17,8 @@ function update_individual_fly_log_files(exp_folder, save_path, analyses_run, fi
            fly_path = exp_folder{i,q};
            if ~isempty(fly_path)
                [path, fly_name] = fileparts(fly_path);
-               log_filename = [fly_name,'_DA_history.txt'];
-               log_filepath = fullfile(fly_path, log_filename);
+               log_filename = [char(fly_name),'_DA_history.txt'];
+               log_filepath = fullfile(char(fly_path), log_filename);
 
                if ~isfile(log_filepath)
                    create_new_txt_file(log_filepath);

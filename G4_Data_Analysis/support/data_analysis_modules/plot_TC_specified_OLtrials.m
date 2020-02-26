@@ -4,7 +4,7 @@
 %num_groups, CombData, rep_Colors, rep_LineWidth, mean_Colors,
 %mean_LineWidth, timeseries_ylimits, subtitle_FontSize, 
 function plot_TC_specified_OLtrials(TC_plot_settings, TC_conds, TC_inds, genotype, control_genotype, ...
-    num_groups, CombData, single)
+    num_groups, CombData, single, save_settings, fig_num)
 
     rep_Colors = TC_plot_settings.rep_colors;
     rep_LineWidth = TC_plot_settings.rep_lineWidth;
@@ -160,6 +160,11 @@ function plot_TC_specified_OLtrials(TC_plot_settings, TC_conds, TC_inds, genotyp
             newUnits = 'normalized';
             legend1.ItemTokenSize = [10,7];
             set(legend1,'Position', newPosition,'FontSize',legend_FontSize, 'Units', newUnits, 'Interpreter', 'none','Box','off');
+            
+            figH = gcf;
+            fig_title = figH.Name(~isspace(figH.Name));
+
+            save_figure(save_settings, fig_title, genotype{1:end}, 'TC', num2str(fig_num));
 
            
         end   

@@ -74,72 +74,79 @@
     %those should have the fly folders for all flies run on that date. 
 
 %% This is the function for the new file system arrangement. Find old system below.
-function [exp_folder, trial_options] = get_exp_folder()
+function exp_folder = get_exp_folder(field_to_sort_by, field_values, single_group, single_fly,  path_to_protocol, control)
 
-%     %% User-defined settings
-% 
-%Each cell element of field_to_sort_by represents a single group. So all
-%fields in one cell element will be used to narrow down that single group
-%of flies. 
-
-%For example, field_to_sort_by{1} = ["fly_genotype", "fly_age"];
-%             field_to_sort_by{2} = ["experimenter, "fly_age"];
-%             field_values{1} = ["emptySplit_JFRC100_JFRC49","3-6 days"];
-%             field_values{2} = ["kappagantular", "3-6 days"];
-              
-              %The above will produce two groups of flies, so an exp_folder
-              %of 2 by x. The first group will contain only flies that
-              %have the genotype emptySplit_JFRC100_JFRC49 AND are 3-6 days
-              %old. The second group will contain all flies run by
-              %kappagantular and are 3-6 days old. These groups may have
-              %some overlap.
-    field_to_sort_by{1} = ["fly_genotype"];
-%     field_to_sort_by{2} = ["fly_genotype"];
-%     field_to_sort_by{3} = ["rearing_protocol"];
-
-    single_group = 0;
-    single_fly = 0;
-    field_values{1} = ["emptySplit_JFRC100_JFRC49"];
-%     field_values{2} = ["emptySplit_UAS_Kir_JFRC49"];
-%     field_values{3} = ["Kir 1"];
-
- %   field_values{2} = ["Kir 1", "01 17"];
-    %field_values = ["OL0048B_UAS_Kir_JFRC49","emptySplit_UAS_Kir_JFRC49","OL0010B_UAS_Kir_JFRC49"];
-    trial_options = [1 1 1];
-    path_to_protocol =  '/Users/taylorl/Desktop/Protocol004_OpticFlow_KirShibire_01-09-20_13-23-42';
-    exp_folder = cell(length(field_values),1);
-
-
-    %% End User-defined settings
-    if single_fly == 1
+     if single_fly == 1
         exp_folder = {path_to_protocol};
         return;
+     end
+     [protocol_subFiles, protocol_subFolders] = get_files_and_subdirectories(path_to_protocol);
+     num_dates = length(protocol_subFolders);
+   
+    if isempty(field_values)
+        %Get field values
+        field_values = {};
+        total_fly = 1;
+        for date = 1:num_dates
+            folder_path = fullfile(path_to_protocol, protocol_subFolders(date));
+            [fly_files, fly_folders] = get_files_and_subdirectories(folder_path);
+            num_flies = length(fly_folders);
+            for fly = 1:num_flies
+                fly_file = fullfile(folder_path, fly_folders(fly));
+                if isfile(fullfile(fly_file, 'metadata.mat'))
+                    metadata = load(fullfile(fly_file, 'metadata.mat'));
+                else
+                    continue;
+                end
+                field_values{total_fly} = metadata.metadata.(field_to_sort_by{1}(1));
+                total_fly = total_fly + 1;
+            end
+        end
+        field_values = unique(field_values);
+        
+       
+        
+        if ~isempty(control)
+            
+            %move control genotype to first element in field_values
+            ctrl_ind = find(strcmp(field_values, control));
+            if isempty(ctrl_ind)
+                disp("Could not find control genotype provided in the results. Control will not be plotted.");
+            else
+                for val = ctrl_ind:-1:2
+                    field_values(val) = field_values(val-1);
+                end
+                field_values(1) = {control};
+            end
+            for i = 1:length(field_values)
+                field_values{i} = string(field_values{i});
+            end
+                       
+        else
+            
+            %user wants each group on its own with no control
+            
+        end
+       
+        if length(field_to_sort_by) ~= length(field_values)
+            while length(field_to_sort_by) ~= length(field_values)
+                field_to_sort_by{end+1} = field_to_sort_by{end};
+            end
+        end
+    else
+        
+        
     end
-
-    date_folders = dir(path_to_protocol);
-    allNames = {date_folders(:).name};
-    hidden_ind = startsWith(allNames,'.');
-    date_folders(hidden_ind) = [];
-    dirFlags = [date_folders.isdir];
-    protocol_subFolders = date_folders(dirFlags);
-
-
-    num_dates = length(protocol_subFolders);
+        
+    
+    exp_folder = cell(size(field_values,1));
 
     for i = 1:num_dates
-
-        folder = fullfile(path_to_protocol, protocol_subFolders(i).name);
-        fly_files = dir(folder);
-        fly_names = {fly_files(:).name};
-        hidden_ind = startsWith(fly_names,'.');
-        fly_files(hidden_ind) = [];
-        flyDirFlags = [fly_files.isdir];
-        fly_folders = fly_files(flyDirFlags);
-
+        folder_path = fullfile(path_to_protocol, protocol_subFolders{i});
+        [fly_files, fly_folders] = get_files_and_subdirectories(folder_path);
         num_flies = length(fly_folders);
-
         for k = 1:num_flies
-            fly_file = fullfile(folder, fly_folders(k).name);
+            fly_file = fullfile(folder_path, fly_folders(k));
             if isfile(fullfile(fly_file, 'metadata.mat'))
                 metadata = load(fullfile(fly_file, 'metadata.mat'));
             else
@@ -164,6 +171,7 @@ function [exp_folder, trial_options] = get_exp_folder()
         end
 
     end
+    
 
     if single_group == 0 
         longest_group = 0;

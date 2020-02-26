@@ -2,27 +2,100 @@
 function [exp_settings, normalize_settings, histogram_plot_settings, histogram_annotation_settings, ...
     CL_hist_plot_settings, timeseries_plot_settings, TC_plot_settings, save_settings] = DA_plot_settings()
 
-%% Settings which need updating regularly (more static settings below)
+% Settings which need updating regularly (more static settings below)
 
+%% Settings for exp_folder generation
 
-   
+    %1 - each genotype will be plotted in its own figure against a control. 
+    %You must still provide the control genotype (as it is in the metadata.mat file) but
+    %0 - groups will be plotted as laid out below. 
+    exp_settings.plot_all_genotypes = 1; 
+  
+    
+     %If there is a control genotype, set it here. If control_genotype is
+     %empty and plot_all_genotypes is one, each genotype will be plotted by
+     %itself. If there is a control, each genotype will be plotted by
+     %control. The control must match exactly the metadata genotype value. 
+    exp_settings.control_genotype = 'emptySplit_JFRC100_JFRC49';
+    
+    %[pretrial, intertrial, posttrial]
+    exp_settings.trial_options = [1 1 1];
+
+    %if plot_all_genotypes = 1, this should be an array with string
+    %"fly_genotype". If it is zero, then this should contain the strings of
+    %metadata fields by which you want to group flies. 
+    
+    %Each cell element of field_to_sort_by represents a single group. So all
+%fields in one cell element will be used to narrow down that single group
+%of flies. 
+
+%For example, field_to_sort_by{1} = ["fly_genotype", "fly_age"];
+%             field_to_sort_by{2} = ["experimenter, "fly_age"];
+%             field_values{1} = ["emptySplit_JFRC100_JFRC49","3-6 days"];
+%             field_values{2} = ["kappagantular", "3-6 days"];
+              
+              %The above will produce two groups of flies, so an exp_folder
+              %of 2 by x. The first group will contain only flies that
+              %have the genotype emptySplit_JFRC100_JFRC49 AND are 3-6 days
+              %old. The second group will contain all flies run by
+              %kappagantular and are 3-6 days old. These groups may have
+              %some overlap.
+    
+    exp_settings.field_to_sort_by{1} = ["fly_genotype"];
+  %    exp_settings.field_to_sort_by{2} = ["fly_genotype"];
+   %   exp_settings.field_to_sort_by{3} = ["fly_genotype"];
+
+    exp_settings.single_group = 0;%1-all flies should be in one group, so exp_folder should be 1xX cell array
+    exp_settings.single_fly = 0;%1- only a single fly is being analyzed, the exp_folder will simply be the path to the fly
+    
+    %if plot_all_genotypes is 1, leave field_values empty.
+    
+    exp_settings.field_values = {};
+%    exp_settings.field_values{1} = ["emptySplit_JFRC100_JFRC49"];
+%     exp_settings.field_values{2} = ["SS01001_JFRC100_JFRC49"];
+     %exp_settings.field_values{3} = ["SS00324_JFRC100_JFRC49"];
+%     field_values{3} = ["Kir 1"];
+%     field_values{2} = ["Kir 1", "01 17"];
+      %field_values = ["OL0048B_UAS_Kir_JFRC49","emptySplit_UAS_Kir_JFRC49","OL0010B_UAS_Kir_JFRC49"];
+
+    %This is the path to the protocol
+    save_settings.path_to_protocol = "/Users/taylorl/Desktop/Protocol004_OpticFlow_KirShibire_01-09-20_13-23-42/Results";
+    
+    %Optional array with the names  by which genotypes should be labeled -
+    %simpler more human readable names for each genotype. Control should
+    %come first if there is one, and it should be in the same order as
+    %field_values if field_values is not empty. If field values are empty,
+    %it will be generated in the order of the group folders alphabetically.
+    %IE If your group folders are named Experiment001 - Experiment005, you
+    %should list your genotype labels in that order with the exception that
+    %the control should always be first. 
+    
+    exp_settings.genotypes = ["EmptySplit JFRC",  "T4-T5", "TmY3", "CT1", "Lpc1"];
+    %genotypes = ["empty-split", "LPLC-2", "LC-18", "T4_T5", "LC-15", "LC-25", "LC-11", "LC-17", "LC-4"];
+    
+    %% This will generate your exp_folder, do not edit. 
+    
+   exp_settings.exp_folder = get_exp_folder(exp_settings.field_to_sort_by, exp_settings.field_values, exp_settings.single_group, ...
+        exp_settings.single_fly, save_settings.path_to_protocol, exp_settings.control_genotype);
+    
+%% Save settings
     
 % Save settings   
     %The path where you wish to save the results of the data analysis
     save_settings.save_path = '/Users/taylorl/Desktop';
     
-    %The path to the protocol file, where group log files will be saved
-    save_settings.results_path = "/Users/taylorl/Desktop/Protocol004_OpticFlow_KirShibire_01-09-20_13-23-42";
-    
-% Experiment settings
-    %Genotypes (or values for the group) that are being analyzed. Note that
-    %should be in the same order as the genotypes list in get_exp_folder.m
-    exp_settings.genotypes = ["EmptySplit JFRC"];
-    %genotypes = ["empty-split", "LPLC-2", "LC-18", "T4_T5", "LC-15", "LC-25", "LC-11", "LC-17", "LC-4"];
 
-    %If there is a control genotype, set it here
-    exp_settings.control_genotype = '';
     
+%% Experiment settings
+  
+    %If you want both normalized and unnormalized data to be analyzed, set
+    %this equal to 1 and pass in the normalization type (normfly or
+    %normgroup) as a flag. If this is set to 0 and you pass in a
+    %normalization flag, you will get normalized results only - if you
+    %don't pass it in, you'll get unnormalized results only. 
+     exp_settings.plot_norm_and_unnorm = 1;
+   
+
     %Name of the processed file it should pull data from (note processed
     %files in all fly folders should be named the same way)
     exp_settings.processed_data_file = 'KS_opticflow_G4_Processed_Data';
@@ -32,7 +105,7 @@ function [exp_settings, normalize_settings, histogram_plot_settings, histogram_a
     %Log file will be named using this
     exp_settings.group_being_analyzed_name = 'OpticFlow_Kirshibire';
     
-% Plot settings 
+%% Plot settings 
 
     %Date range displayed on histograms
     histogram_annotation_settings.date_range = "01/21/20 to 01/30/20";
@@ -86,13 +159,13 @@ function [exp_settings, normalize_settings, histogram_plot_settings, histogram_a
     
     %Set this to 1 if you are plotting only a single group and want lines
     %plotted for each fly as well as the average.
-    timeseries_plot_settings.show_individual_flies = 1;
+    timeseries_plot_settings.show_individual_flies = 0;
     
     %plot the frame position under each timeseries plot
     timeseries_plot_settings.frame_superimpose = 1;
     
     %plot both directions for each condition on the same axis. 
-    timeseries_plot_settings.plot_both_directions = 0;
+    timeseries_plot_settings.plot_both_directions = 1;
     
 
     

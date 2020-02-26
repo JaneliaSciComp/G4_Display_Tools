@@ -2,7 +2,7 @@
 
 function plot_OL_timeseries(timeseries_data, timestampsIN, OL_conds, OL_durations, cond_name, OL_inds, ...
     axis_labels, Frame_ind, num_groups, genotype, control_genotype, plot_settings, top_left_place, bottom_left_place, ...
-    left_col_places, figure_titles, single)
+    left_col_places, figure_titles, single, save_settings, fig_num)
 
     
     rep_Colors = plot_settings.rep_colors;
@@ -84,18 +84,36 @@ function plot_OL_timeseries(timeseries_data, timestampsIN, OL_conds, OL_duration
                                 timestamps = timestampsIN(~nanidx);
                                 meandata(nanidx) = []; 
                                 semdata(nanidx) = [];
+                                %adjust color to make opposing direction
+                                %lighter
+                                for rgb = 1:length(mean_Colors(g+1,:))
+                                    if mean_Colors(g+1,rgb) < .5
+                                        color_adjust(rgb) = .5;
+                                    else
+                                        color_adjust(rgb) = 0;
+                                    end
+                                end
                                 if single == 1
-                                    plot(repmat(timestampsIN',[1 num_exps]),tmpdata','Color',mean_Colors(g+1,:),'LineWidth',rep_LineWidth);
+                                    plot(repmat(timestampsIN',[1 num_exps]),tmpdata','Color',mean_Colors(g+1,:)+color_adjust,'LineWidth',rep_LineWidth);
                                 elseif num_groups == 1
-                                    plot(timestamps,meandata,'Color',mean_Colors(g+1,:),'LineWidth',mean_LineWidth);
+                                    plot(timestamps,meandata,'Color',mean_Colors(g+1,:)+color_adjust,'LineWidth',mean_LineWidth);
                                     patch([timestamps fliplr(timestamps)],[meandata+semdata fliplr(meandata-semdata)],'k','FaceColor',mean_Colors(g+1,:),'EdgeColor','none','FaceAlpha',patch_alpha)
                                 else
                                     if g == control_genotype
-                                        plot(timestamps,meandata,'Color',control_color,'LineWidth',mean_LineWidth);
+                                        plot(timestamps,meandata,'Color',control_color + .5,'LineWidth',mean_LineWidth);
                                         patch([timestamps fliplr(timestamps)],[meandata+semdata fliplr(meandata-semdata)],'k','FaceColor',control_color,'EdgeColor','none','FaceAlpha',patch_alpha)
 
                                     else
-                                        plot(timestamps,meandata,'Color',mean_Colors(g,:),'LineWidth',mean_LineWidth);
+                                        
+                                        for rgb = 1:length(mean_Colors(g,:))
+                                            if mean_Colors(g,rgb) < .5
+                                                color_adjust(rgb) = .5;
+                                            else
+                                                color_adjust(rgb) = 0;
+                                            end
+                                        end
+                                        
+                                        plot(timestamps,meandata,'Color',mean_Colors(g,:) + color_adjust,'LineWidth',mean_LineWidth);
                                         patch([timestamps fliplr(timestamps)],[meandata+semdata fliplr(meandata-semdata)],'k','FaceColor',mean_Colors(g,:),'EdgeColor','none','FaceAlpha',patch_alpha)
                                 
                                     
@@ -225,7 +243,11 @@ function plot_OL_timeseries(timeseries_data, timestampsIN, OL_conds, OL_duration
             newUnits = 'normalized';
             legend1.ItemTokenSize = [10,7];
             set(legend1,'Position', newPosition,'FontSize',legend_FontSize, 'Units', newUnits, 'Interpreter', 'none','Box','off');
+            
+            figH = gcf;
+            fig_title = figH.Name(~isspace(figH.Name));
 
+            save_figure(save_settings, fig_title, genotype{1:end}, 'timeseries', num2str(fig_num));
 
 
         end

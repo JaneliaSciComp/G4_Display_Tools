@@ -2,7 +2,7 @@
 %calculate overall measurements and plot basic histograms
 function plot_basic_histograms(timeseries_data, interhistogram_data, ...
     TC_datatypes, plot_settings, num_groups, num_exps, genotype, TC_inds, trial_options, ...
-    annotation_settings, single)
+    annotation_settings, single, save_settings)
 
     %Set up needed variables
     rep_Colors = plot_settings.rep_colors;
@@ -83,10 +83,16 @@ function plot_basic_histograms(timeseries_data, interhistogram_data, ...
                 ind_lines = squeeze(nanmean(interhistogram_data(g,:,:,:),3));
                 avg_line = squeeze(nanmean(nanmean(interhistogram_data(g,:,:,:),3),2));
                 if plot_in_degrees == 1
-                
-                    half = size(ind_lines,2)/2;
-                    for i = 1:size(ind_lines,1)
-                        ind_lines(i,:) = [ind_lines(i,half+1:end), ind_lines(i, 1:half)];
+                    if size(ind_lines,2) > size(ind_lines,1)
+                        half = size(ind_lines,2)/2;
+                        for i = 1:size(ind_lines,1)
+                            ind_lines(i,:) = [ind_lines(i,half+1:end), ind_lines(i, 1:half)];
+                        end
+                    else
+                        half = size(ind_lines,1)/2;
+                        for i = 1:size(ind_lines,2)
+                            ind_lines(:,i) = [ind_lines(half+1:end,i), ind_lines(1:half,i)];
+                        end
                     end
                     
                     avg_line(:,1) = [avg_line(half+1:end); avg_line(1:half)];
@@ -149,6 +155,10 @@ function plot_basic_histograms(timeseries_data, interhistogram_data, ...
 
 
         end
+        
+
+
+        save_figure(save_settings, genotype{1:end}, 'hist', num2str(k));
     end
     
 %     currgraph = gcf;
