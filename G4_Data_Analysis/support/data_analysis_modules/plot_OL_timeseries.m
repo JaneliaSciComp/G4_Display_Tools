@@ -86,30 +86,29 @@ function plot_OL_timeseries(timeseries_data, timestampsIN, OL_conds, OL_duration
                                 semdata(nanidx) = [];
                                 %adjust color to make opposing direction
                                 %lighter
-                                for rgb = 1:length(mean_Colors(g+1,:))
-                                    if mean_Colors(g+1,rgb) < .5
-                                        color_adjust(rgb) = .5;
-                                    else
-                                        color_adjust(rgb) = 0;
-                                    end
-                                end
+  
                                 if single == 1
-                                    plot(repmat(timestampsIN',[1 num_exps]),tmpdata','Color',mean_Colors(g+1,:)+color_adjust,'LineWidth',rep_LineWidth);
+                                    plot(repmat(timestampsIN',[1 num_exps]),tmpdata','Color',mean_Colors(g+1,:),'LineWidth',rep_LineWidth);
                                 elseif num_groups == 1
-                                    plot(timestamps,meandata,'Color',mean_Colors(g+1,:)+color_adjust,'LineWidth',mean_LineWidth);
+                                    plot(timestamps,meandata,'Color',mean_Colors(g+1,:),'LineWidth',mean_LineWidth);
                                     patch([timestamps fliplr(timestamps)],[meandata+semdata fliplr(meandata-semdata)],'k','FaceColor',mean_Colors(g+1,:),'EdgeColor','none','FaceAlpha',patch_alpha)
                                 else
                                     if g == control_genotype
-                                        plot(timestamps,meandata,'Color',control_color + .5,'LineWidth',mean_LineWidth);
+                                        plot(timestamps,meandata,'Color',control_color + .75,'LineWidth',mean_LineWidth);
                                         patch([timestamps fliplr(timestamps)],[meandata+semdata fliplr(meandata-semdata)],'k','FaceColor',control_color,'EdgeColor','none','FaceAlpha',patch_alpha)
 
                                     else
                                         
                                         for rgb = 1:length(mean_Colors(g,:))
-                                            if mean_Colors(g,rgb) < .5
-                                                color_adjust(rgb) = .5;
-                                            else
+                                            if mean_Colors(g,rgb) > .75
                                                 color_adjust(rgb) = 0;
+                                            elseif mean_Colors(g,rgb) > .5
+                                                color_adjust(rgb) = .25;
+                                            elseif mean_Colors(g, rgb) > .25
+                                                color_adjust(rgb) = .5;
+                                            elseif mean_Colors(g,rgb) >= 0
+                                                color_adjust(rgb) = .75;
+                            
                                             end
                                         end
                                         

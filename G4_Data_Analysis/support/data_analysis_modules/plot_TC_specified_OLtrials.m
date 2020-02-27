@@ -65,9 +65,21 @@ function plot_TC_specified_OLtrials(TC_plot_settings, TC_conds, TC_inds, genotyp
                                 plot(nanmean(tmpdata),'Color',mean_Colors(g+1,:),'LineWidth',mean_LineWidth, 'Marker', marker_type);
                             else
                                 if g == control_genotype
-                                    plot(nanmean(tmpdata),'Color',control_color,'LineWidth',mean_LineWidth, 'Marker', marker_type);
+                                    plot(nanmean(tmpdata),'Color',control_color + .5,'LineWidth',mean_LineWidth, 'Marker', marker_type);
                                 else
-                                    plot(nanmean(tmpdata),'Color',mean_Colors(g,:),'LineWidth',mean_LineWidth, 'Marker', marker_type);
+                                    for rgb = 1:length(mean_Colors(g,:))
+                                        if mean_Colors(g,rgb) > .75
+                                            color_adjust(rgb) = 0;
+                                        elseif mean_Colors(g,rgb) > .5
+                                            color_adjust(rgb) = .25;
+                                        elseif mean_Colors(g, rgb) > .25
+                                            color_adjust(rgb) = .5;
+                                        elseif mean_Colors(g,rgb) >= 0
+                                            color_adjust(rgb) = .75;
+
+                                        end
+                                    end
+                                    plot(nanmean(tmpdata),'Color',mean_Colors(g,:) + color_adjust,'LineWidth',mean_LineWidth, 'Marker', marker_type);
                                 end
                             end
                             for i = 1:length(conds)
