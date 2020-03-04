@@ -1,4 +1,4 @@
-function processed_file_name = G4_Process_Data_flyingdetector(exp_folder, trial_options, manual_first_start)
+function processed_file_name = G4_Process_Data_flyingdetector_combinedComm(exp_folder, trial_options, manual_first_start)
 %FUNCTION G4_Process_Data_flyingdetector(exp_folder, trial_options, manual_first_start)
 % 
 % Inputs:
@@ -40,23 +40,26 @@ end
 load(fullfile(exp_folder,TDMS_logs_name),'Log');
 
 %get start times of all trials (including pre/inter/post-trials)
-start_idx = strcmpi(Log.Commands.Name,'Start-Display');
+start_idx = strcmpi(Log.Commands.Name,'Set control mode, pattern id, pattern function id, ao function id, frame rate');
 start_times = Log.Commands.Time(start_idx);
 stop_idx = strcmpi(Log.Commands.Name,'Stop-Display');
 stop_times = Log.Commands.Time(stop_idx);
 if exist('manual_first_start','var') && manual_first_start==1
     start_times = [min(Log.ADC.Time(:,1)) start_times];
 end
-
+combined_data = Log.Commands.Data(start_idx);
+%the pattern ids are now saved in the combined command's data
 %get order of pattern IDs (maybe use for error-checking?)
-set_pattern_idx = strcmpi(Log.Commands.Name,'Set Pattern ID');
-patterndata_order = Log.Commands.Data(set_pattern_idx);
+for i = 1:length(combined_data)
+    patterndata_order{i} = combined_data{i}(3);
+    modedata_order{i} = combined_data{i}(1);
+end
+
 patternID_order = cell2mat(cellfun(@PD_fun, patterndata_order,'UniformOutput',false));
 %error-checking to add: check that patternID orders match condition orders
 
 %get order of control modes
-set_mode_idx = strcmpi(Log.Commands.Name,'Set Control Mode');
-modedata_order = Log.Commands.Data(set_mode_idx);
+
 modeID_order = cell2mat(cellfun(@str2double, modedata_order,'UniformOutput',false));
 %error-checking to add: check that control mode matches conditions to plot
 

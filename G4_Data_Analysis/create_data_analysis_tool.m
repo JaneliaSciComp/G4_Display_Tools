@@ -176,13 +176,13 @@ classdef create_data_analysis_tool < handle
                         
                         self.normalize_option = 1;
                         self.data_needed{end+1} = 'timeseries_avg_over_reps';
-                        self.data_needed{end+1} = 'histograms';
+ %                       self.data_needed{end+1} = 'histograms';
                         
                     case '-normgroup' %Normalize over groups
                         
                         self.normalize_option = 2;
                         self.data_needed{end+1} = 'timeseries_avg_over_reps';
-                        self.data_needed{end+1} = 'histograms';
+%                        self.data_needed{end+1} = 'histograms';
                         
                         
                     case '-hist' %Do basic histogram plots
@@ -194,7 +194,7 @@ classdef create_data_analysis_tool < handle
                     case '-clhist' %Do closed loop histogram plots
                         
                         self.CL_histogram_plot_option = 1;
-                        self.data_needed{end+1} = 'histograms';
+                        self.data_needed{end+1} = 'histograms_CL';
                         
                     case '-tsplot' %Do timeseries plots
                         

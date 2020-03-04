@@ -3,6 +3,7 @@ classdef G4_conductor_model < handle
     properties
         
         fly_name_;
+        fly_save_name_;
         fly_genotype_;
         experimenter_;
         fly_age_;
@@ -25,6 +26,7 @@ classdef G4_conductor_model < handle
        expected_time_
        timestamp_
        aborted_count_
+       date_folder_
 
        
         
@@ -33,6 +35,7 @@ classdef G4_conductor_model < handle
     properties (Dependent)
         
         fly_name;
+        fly_save_name;
         fly_genotype;
         fly_age;
         fly_sex;
@@ -55,6 +58,7 @@ classdef G4_conductor_model < handle
         expected_time
         timestamp
         aborted_count
+        date_folder
        
     end
     
@@ -113,6 +117,8 @@ classdef G4_conductor_model < handle
             self.do_processing = 1;
             self.num_tests_conducted = 0;
             self.aborted_count = 0;
+            self.fly_save_name = [self.fly_genotype,'-',datestr(now, 'HH_MM_SS')];
+            self.date_folder = datestr(now, 'mm_dd_yyyy');
  
         end
         
@@ -150,7 +156,7 @@ classdef G4_conductor_model < handle
         
         function [fly_name] = create_fly_name(self, filepath)
             
-            results_folder = fullfile(filepath,'Results');
+            results_folder = fullfile(filepath,self.date_folder);
             if ~exist(results_folder)
                 fly_name = 'fly001';
             else
@@ -182,6 +188,12 @@ classdef G4_conductor_model < handle
         
         %% Functions to update model values
         
+        function update_fly_save_name(self)
+            
+            self.fly_save_name = [self.fly_genotype,'-',datestr(now, 'HH_MM_SS')];
+            
+        end
+        
         function set_fly_name(self, new_val)
             self.fly_name = new_val;
             self.reset_num_tests_conducted();
@@ -195,6 +207,7 @@ classdef G4_conductor_model < handle
         
         function set_fly_genotype(self, new_val)
             self.fly_genotype = self.metadata_options.fly_geno{new_val};
+            self.update_fly_save_name(self);
         end
         
         function set_do_plotting(self, new_val)
@@ -355,6 +368,15 @@ classdef G4_conductor_model < handle
         function value = get.aborted_count(self)
             value = self.aborted_count_;
         end
+        
+        function value = get.fly_save_name(self)
+            value = self.fly_save_name_;
+        end
+        
+        function value = get.date_folder(self)
+            value = self.date_folder_;
+        end
+            
 
 
 %SETTERS------------------------------------------------------------------
@@ -447,6 +469,15 @@ classdef G4_conductor_model < handle
         function set.aborted_count(self, value)
             self.aborted_count_ = value;
         end
+        
+        function set.fly_save_name(self, value)
+            self.fly_save_name_ = value;
+        end
+        
+        function set.date_folder(self, value)
+            self.date_folder_ = value;
+        end
+        
         
 
         

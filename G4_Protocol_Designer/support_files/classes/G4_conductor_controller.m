@@ -442,7 +442,7 @@ classdef G4_conductor_controller < handle
 %                     waitfor(msgbox(import_success, 'Import successful!'));
 %                 end
                 disp(import_success);
-                [exp_path, exp_name, ext] = fileparts(filepath);
+                [~, exp_name, ~] = fileparts(filepath);
                 self.doc.experiment_name = exp_name;
                 self.doc.save_filename = top_folder_path;
                 self.doc.top_export_path = top_folder_path;
@@ -532,33 +532,27 @@ classdef G4_conductor_controller < handle
             
             self.is_aborted = false; %change aborted back to zero in case the experiment was aborted earlier. 
             
-            
-            %Before creating the data and sending you to the run script,
-            %check to make sure there are no issues that will disrupt the
-            %run:--------------------------------------------------------
-            
-            %returns if you forgot to save the experiment.
-            if strcmp(self.doc.save_filename,'') == 1
-                if ~isempty(self.view)
-                    self.create_error_box("You didn't save this experiment. Please go back and save then run the experiment again.", "Please save.");
-                else
-                    disp('Failed: Experiment has not been saved.');
-                end
-                return;
-            end
-            
-            %gets path to experiment folder
-            [experiment_path, g4p_filename, ext] = fileparts(self.doc.save_filename);
+            %get path to experiment folder
+            [experiment_path, ~, ~] = fileparts(self.doc.save_filename);
             experiment_folder = experiment_path;
+  
+            %Path to save all results for this fly
+            fly_results_folder = fullfile(experiment_folder, self.model.date_folder, self.model.fly_save_name);
             
-            %creates Log Files folder if it doesn't exist
+            %create Log Files folder if it doesn't exist
             if ~exist(fullfile(experiment_folder,'Log Files'),'dir')
                 mkdir(experiment_folder,'Log Files');
             end
             
+%Check for issues that might disrupt the run 
+         
+            %returns if you forgot to save the experiment.            
+            if ~self.check_if_saved 
+                return;
+            end
+  
             %check if log files already present or if a fly by that name
-            %already has results in this experiment folder.
-            
+            %already has results in this experiment folder.            
             if length(dir(fullfile(experiment_folder, 'Log Files')))>2
                 if ~isempty(self.view)
                     self.create_error_box('unsorted files present in "Log Files" folder, remove before restarting experiment\n');
@@ -567,253 +561,6 @@ classdef G4_conductor_controller < handle
                 end
                 return;
             end
-            if exist(fullfile(experiment_folder, 'Results', self.model.fly_name),'dir')
-                items = dir(fullfile(experiment_folder, 'Results', self.model.fly_name));
-                for i = 1:length(items)
-                    itemnames{i} = items(i).name;
-                end
-                for i = 1:length(items)
-                    folders(i) = items(i).isdir;
-                end
-                folders(~folders) = [];
-                
-                if length(itemnames) > length(folders)
-                    if ~isempty(self.view)
-                        self.create_error_box('Results folder of that fly name already has data in it\n');
-                    else
-                        disp('Failed: That fly already has data in the results folder.');
-                    end
-                    return;
-                end
-            end
-            
-            
-            
-            
-            %-------------------------------------------------------------
-            %Go through and replace all the greyed out parameters with
-            %appropriate values to be sent to panel_com
-            
-            self.doc.replace_greyed_cell_values();
-
-            %For ease of use throughout the function
-            pretrial = self.doc.pretrial;
-            intertrial = self.doc.intertrial;
-            posttrial = self.doc.posttrial;
-            block_trials = self.doc.block_trials;
-            
-            
-            %This places all necessary parameters and data for running on
-            %the screens in a struct and passes it all to the external
-            %script at once
-            
-            parameters = struct; 
-            parameters.pretrial = pretrial;
-            
-            %get_pattern_index is a separate function which takes the
-            %string name of a pattern or function and returns its index
-            %number. If the string is empty (ie, there is no position
-            %function) it returns 0 as the index.
-
-            parameters.pretrial_pat_index = self.doc.get_pattern_index(pretrial{2});
-            parameters.pretrial_pos_index = self.doc.get_posfunc_index(pretrial{3});
-
-            
-            parameters.intertrial = intertrial;
-
-            parameters.intertrial_pat_index = self.doc.get_pattern_index(intertrial{2});
-            parameters.intertrial_pos_index = self.doc.get_posfunc_index(intertrial{3});
-
-            
-            parameters.block_trials = block_trials;
-
-            for i = 1:length(self.doc.block_trials(:,1))
-                parameters.block_pat_indices(i) = self.doc.get_pattern_index(block_trials{i,2}); 
-                parameters.block_pos_indices(i) = self.doc.get_posfunc_index(block_trials{i,3});
-            end
-            
-            parameters.posttrial = posttrial;
-
-            parameters.posttrial_pat_index = self.doc.get_pattern_index(posttrial{2});
-            parameters.posttrial_pos_index = self.doc.get_posfunc_index(posttrial{3});
-
-            
-            parameters.repetitions = self.doc.repetitions;
-            parameters.is_randomized = self.doc.is_randomized;
-            parameters.save_filename = self.doc.save_filename;
-            parameters.fly_name = self.model.fly_name;
-            
-            
-            %The following block of code will create an array called
-            %active_ao_channels with the numbers of the active ao channels
-            %(ie [0 2 3] means ao channels 1, 3, and 4 are active. It will also create
-            %four arrays for the pre/inter/post/block trials of the indices of
-            %the ao functions for that trial. 
-            %-------------------------------------------------------------
-            
-                %make cell arrays for each ao channel listing all the
-                %functions called for that channel across all trials.
-            ao1_funcs = {};
-                ao1_funcs{1} = pretrial{4};
-
-                for c = 1:length(block_trials(:,1))
-                    ao1_funcs{c+1} = block_trials{c,4};
-                end
-                ao1_funcs{end + 1} =  intertrial{4};
-                ao1_funcs{end + 1} = posttrial{4};
-                ao1_isnt_empty = ~cellfun('isempty',ao1_funcs);
-            
-            ao2_funcs = {};
-                ao2_funcs{1} = pretrial{5};
-                for c = 1:length(block_trials(:,1))
-                    ao2_funcs{c+1} = block_trials{c,5};
-                end
-                ao2_funcs{end + 1} =  intertrial{5};
-                ao2_funcs{end + 1} = posttrial{5};
-                ao2_isnt_empty = ~cellfun('isempty',ao2_funcs);
-            
-            ao3_funcs = {};
-                ao3_funcs{1} = pretrial{6};
-                for c = 1:length(block_trials(:,1))
-                    ao3_funcs{c+1} = block_trials{c,6};
-                end
-                ao3_funcs{end + 1} =  intertrial{6};
-                ao3_funcs{end + 1} = posttrial{6};
-                ao3_isnt_empty = ~cellfun('isempty',ao3_funcs);
-            
-            
-            ao4_funcs = {};
-                ao4_funcs{1} = pretrial{7};
-                for c = 1:length(block_trials(:,1))
-                    ao4_funcs{c+1} = block_trials{c,7};
-                end
-                ao4_funcs{end + 1} =  intertrial{7};
-                ao4_funcs{end + 1} = posttrial{7};
-                ao4_isnt_empty = ~cellfun('isempty',ao4_funcs);
-                
-
-           
-            
-                %Determine which channels should be active by going through
-                %the arrays we just created and checking if they are empty
-                %or not
-            ao1_active = 0;
-     
-                if sum(ao1_isnt_empty) > 0
-                    ao1_active = 1;
-                end
-           
-            
-            ao2_active = 0;
-
-                if sum(ao2_isnt_empty) > 0
-                    ao2_active = 1;
-                end
-            
-            
-            ao3_active = 0;
-   
-                if sum(ao3_isnt_empty) > 0
-                    ao3_active = 1;
-                end
-          
-            
-            ao4_active = 0;
- 
-                if sum(ao4_isnt_empty) > 0
-                    ao4_active = 1;
-                end
-
-            %channels is now an array of zeros and 1's, a 1 indicating that
-            %channel is active, a 0 indicating it is not. 
-            channels = [ao1_active, ao2_active, ao3_active, ao4_active];
-            channel_nums = [0,1,2,3];
-
-            
-            
-            %create an array of active ao channels which is formatted
-            %correctly to be passed to the panel_com function.
-            j = 1;
-            active_ao_channels = [];
-            for channel = 1:4
-                if channels(channel) == 1
-                    active_ao_channels(j) = channel_nums(channel);
-                    j = j + 1;
-                end
-            end
-
-            
-            %now have active_ao_channels which is an array of 0 - 4
-            %elements indicating which ao channels are active, ie [2 3]
-            %indicates channels 3 and 4 are active.
-            
-            %Create an array for each section with the indices of their
-            %aofunctions (no ao function returns an index of 0)
-            pretrial_ao_indices = [];
-            intertrial_ao_indices = [];
-            ao_indices = [];
-            posttrial_ao_indices = [];
-            
-            for i = 1:length(active_ao_channels)
-                channel_num = active_ao_channels(i);
-                pretrial_ao_indices(i) = self.doc.get_ao_index(pretrial{channel_num + 4});
-                intertrial_ao_indices(i) = self.doc.get_ao_index(intertrial{channel_num + 4});
-                posttrial_ao_indices(i) = self.doc.get_ao_index(posttrial{channel_num + 4});
-            end
-            
-            
-            for m = 1:length(active_ao_channels)
-                channel_num = active_ao_channels(m);
-                for k = 1:length(block_trials(:,1))
-                    ao_indices(k,m) = self.doc.get_ao_index(block_trials{k, channel_num + 4});
-                end
-            end
-            
-
-         
-            %-------------------------------------------------------------
-            parameters.pretrial_ao_indices = pretrial_ao_indices;
-            parameters.intertrial_ao_indices = intertrial_ao_indices;
-            parameters.posttrial_ao_indices = posttrial_ao_indices;
-            parameters.block_ao_indices = ao_indices;
-            parameters.active_ao_channels = active_ao_channels;
-            
-            %Need to know how many frames each pattern in each trial has
-            %in case the frame index on any of them needs to be randomized.
-            if ~isempty(pretrial{1})
-                prepat_field = self.doc.get_pattern_field_name(pretrial{2});
-                parameters.num_pretrial_frames = length(self.doc.Patterns.(prepat_field).pattern.Pats(1,1,:));
-            end
-            if ~isempty(intertrial{1})
-                interpat_field = self.doc.get_pattern_field_name(intertrial{2});
-                parameters.num_intertrial_frames = length(self.doc.Patterns.(interpat_field).pattern.Pats(1,1,:));
-            end
-            if ~isempty(posttrial{1})
-                postpat_field = self.doc.get_pattern_field_name(posttrial{2});
-                parameters.num_posttrial_frames = length(self.doc.Patterns.(postpat_field).pattern.Pats(1,1,:));
-            end
-            for i = 1:length(block_trials(:,1))
-                blockpat_field = self.doc.get_pattern_field_name(block_trials{i,2});
-                parameters.num_block_frames(i) = length(self.doc.Patterns.(blockpat_field).pattern.Pats(1,1,:));
-            end
-            
-            %Create experiment order .mat file and add the trial order to
-            %parameters
-            num_conditions = length(self.doc.block_trials(:,1));
-            if self.doc.is_randomized == 1
-                exp_order = NaN(self.doc.repetitions, num_conditions);
-                for rep_ind = 1:self.doc.repetitions
-                    exp_order(rep_ind,:) = randperm(num_conditions);
-                end
-            else
-                exp_order = repmat(1:num_conditions,self.doc.repetitions,1);
-
-            end
-            
-            save(fullfile(experiment_folder,'Log Files','exp_order.mat'),'exp_order')
-            
-            parameters.exp_order = exp_order;
-            parameters.experiment_folder = experiment_folder;
             
             %Make sure the run file entered exists
             if ~isfile(self.model.run_protocol_file)
@@ -825,8 +572,48 @@ classdef G4_conductor_controller < handle
                 return;
             end
             
+            %Check if the date folder exists - if not, create it.            
+            if ~exist(fullfile(experiment_folder, self.model.date_folder),'dir')
+                self.create_folder(experiment_folder, self.model.date_folder);
+                self.create_folder(fullfile(experiment_folder, self.model.date_folder), self.model.fly_save_name);
+                
+            else
+                %if so, check if the fly folder exists. if not, create it.
+                if ~exist(fullfile(experiment_folder, self.model.date_folder, self.model.fly_save_name),'dir')
+                    self.create_folder(fullfile(experiment_folder, self.model.date_folder), self.model.fly_save_name);
+                else
+                    %if so, make sure there are not already results in it.
+                    if self.check_for_files(fullfile(experiment_folder, self.model.date_folder, self.model.fly_save_name))
+
+                        %experimental data already exists in this fly folder
+                        return;
+                    end
+                end
+                
+            end
+            
+            
+            
+            %Go through and replace all the greyed out parameters with
+            %appropriate values to be sent to panel_com       
+            self.doc.replace_greyed_cell_values();
+            
+            %get_parameters_struct creates a struct of all parameters so they 
+            %can easily be passed to the run protocol. It calls a number of 
+            %other functions in order to determine parameter values. It handles getting the
+            %active ao channels, indices for various functions, creating
+            %exp_order, etc. Check this subfunction for details on how each
+            %parameter is calculated. 
+            parameters = self.get_parameters_struct();
+            
+            parameters.experiment_folder = experiment_folder;
+            
+            %save the experiment order
+            exp_order = parameters.exp_order;
+            save(fullfile(experiment_folder,'Log Files','exp_order.mat'),'exp_order')
+
             %Get function name of the script which will run the experiment
-            [run_path, run_name, ext] = fileparts(self.model.run_protocol_file);
+            [~, run_name, ~] = fileparts(self.model.run_protocol_file);
             
             %Create the full command
             run_command = "success = " + run_name + "(self, parameters);";
@@ -836,11 +623,12 @@ classdef G4_conductor_controller < handle
             pause(3);
             
             if self.check_if_aborted()
-                
+                %experiment has been aborted
                 self.model.aborted_count = self.model.aborted_count + 1;
                 aborted_filename = ['Aborted_exp_data',num2str(self.model.aborted_count)];
-                [logs_removed, msg] = movefile(fullfile(experiment_folder,'Log Files','*'),fullfile(experiment_folder,'Results',self.model.fly_name,aborted_filename));
+                [logs_removed, logs_msg] = movefile(fullfile(experiment_folder,'Log Files','*'),fullfile(fly_results_folder,aborted_filename));
                 pause(.5);
+                
                 self.create_metadata_file();
                 
 %                 [logs_removed, msg] = rmdir(fullfile(experiment_folder, 'Log Files'), 's');
@@ -852,7 +640,7 @@ classdef G4_conductor_controller < handle
                     else
                         disp('Failed to move the log files from the Log Files folder when aborting experiment. Please move them manually.');
                     end
-                    disp(msg);
+                    disp(logs_msg);
                 else
                     if ~isempty(self.view)
                         self.view.set_progress_title("Experiment aborted successfully.");
@@ -874,13 +662,14 @@ classdef G4_conductor_controller < handle
                 else
                     self.create_error_box("Experiment failed for unknown reason.");
                 end
-                movefile(fullfile(experiment_folder,'Log Files','*'),fullfile(experiment_folder,'Results',self.model.fly_name,'Failed_exp_data'));                
+                movefile(fullfile(experiment_folder,'Log Files','*'),fullfile(fly_results_folder,'Failed_exp_data'));                
                 pause(.5);
                 return;
             end
             
             %Move the log files to the results file under the fly name
-            movefile(fullfile(experiment_folder,'Log Files','*'),fullfile(experiment_folder,'Results',self.model.fly_name));
+            movefile(fullfile(experiment_folder,'Log Files','*'),fly_results_folder);
+            pause(.5);
             
             %create .mat file of metadata
             self.create_metadata_file();
@@ -897,37 +686,18 @@ classdef G4_conductor_controller < handle
                 end
             end
             
-            %Run required post processing script that converts the TDMS
+            %Always run the post processing script that converts the TDMS
             %files into mat files.
-            fly_results_folder = fullfile(experiment_folder,'Results',self.model.fly_name);
 
-            %Always run this script
             G4_TDMS_folder2struct(fly_results_folder);
-
             
-            %Set up trial options matrix
+            %Get array indicating the presence of pretrial, intertrial, and
+            %posttrial
+            trial_options = self.get_trial_options();
             
-            if ~isempty(pretrial{1})
-                is_pretrial = 1;
-            else
-                is_pretrial = 0;
-            end
-            if ~isempty(intertrial{1})
-                is_intertrial = 1;
-            else
-                is_intertrial = 0;
-            end
-            if ~isempty(posttrial{1})
-                is_posttrial = 1;
-            else
-                is_posttrial = 0;
-            end
-            trial_options = [is_pretrial, is_intertrial, is_posttrial];
-            
-            
-            
-            %Run post processing and plotting scripts if selected
+            %Run post processing and data analysis if selected
             if self.model.do_processing == 1 && (strcmp(self.model.processing_file,'') || ~isfile(self.model.processing_file))
+                %the processing file provided is empty or doesn't exist.
                 if ~isempty(self.view)
                     self.create_error_box("Processing script was not run because the processing file could not be found. Please run manually.");
                 else
@@ -940,98 +710,107 @@ classdef G4_conductor_controller < handle
                 processing_command = "processed_filename = " + proc_name + "(fly_results_folder, trial_options)";
 
                 eval(processing_command);
-            
+                
+                if self.model.do_plotting == 1 && (strcmp(self.model.plotting_file,'') || ~isfile(self.model.plotting_file))
+                    %The settings file for data analysis is empty or
+                    %doesn't exist.
+                    if ~isempty(self.view)
+                        self.create_error_box("data analysis was not run because the settings file could not be found. Please run manually.");
+                    else
+                        disp('data analysis settings file could not be found. Please run manually.');
+                    end
+                elseif self.model.do_plotting == 1 && isfile(self.model.plotting_file)
+
+                    self.run_single_fly_DA(self.model.plotting_file, fly_results_folder, trial_options, processed_filename, experiment_folder);
+                
+                end
+
             end
             
-            if self.model.do_plotting == 1 && (strcmp(self.model.plotting_file,'') || ~isfile(self.model.plotting_file))
-                if ~isempty(self.view)
-                    self.create_error_box("Plotting script was not run because the plotting file could not be found. Please run manually.");
-                else
-                    disp('Plotting file could not be found. Please run manually.');
-                end
-            elseif self.model.do_plotting == 1 && isfile(self.model.plotting_file)
-                [plot_path, plot_name, plot_ext] = fileparts(self.model.plotting_file);
-                plotting_command = plot_name + "(metadata.fly_results_folder, metadata.trial_options)";
-                plot_file = strcat(plot_name, plot_ext);
-                %Put all metadata in a struct to be passed to the
-                %function which creates the pdf.
-
-                metadata = struct;
-                metadata.experimenter = self.model.experimenter;
-                metadata.experiment_name = self.doc.experiment_name;
-                metadata.run_protocol_file = self.model.run_protocol_file;
-                
-                %Turn experiment type (1,2, or 3) to matching word
-                %("Flight", etc)
-                if self.model.experiment_type == 1
-                    metadata.experiment_type = "Flight";
-                elseif self.model.experiment_type == 2
-                    metadata.experiment_type = "Camera Walk";
-                elseif self.model.experiment_type == 3
-                    metadata.experiment_type = "Chip Walk";
-                end
-                metadata.fly_name = self.model.fly_name;
-                metadata.fly_genotype = self.model.fly_genotype;
-                if ~isempty(self.view)
-                    metadata.timestamp = self.view.date_and_time_box.String;
-                else
-                    metadata.timestamp = datestr(now, 'mm-dd-yyyy HH:MM:SS');
-                end
-                metadata.fly_age = self.model.fly_age;
-                metadata.fly_sex = self.model.fly_sex;
-                metadata.experiment_temp = self.model.experiment_temp;
-                metadata.rearing_protocol = self.model.rearing_protocol;
-                
-                metadata.plotting_file = self.model.plotting_file;
-                metadata.processing_file = self.model.processing_file;
-                if self.model.do_plotting == 1
-                    metadata.do_plotting = "Yes";
-                elseif self.model.do_plotting == 0
-                    metadata.do_plotting = "No";
-                end
-                if self.model.do_processing == 1
-                    metadata.do_processing = "Yes";
-                elseif self.model.do_processing == 0
-                    metadata.do_processing = "No";
-                end
-
-                metadata.plotting_command = plotting_command;
-                metadata.fly_results_folder = fly_results_folder;
-                metadata.trial_options = trial_options;
-                metadata.comments = self.model.metadata_comments;
-                metadata.light_cycle = self.model.light_cycle;
-            
-                %assigns the metadata struct to metadata in the base
-                %workspace so publish can use it.
-                assignin('base','metadata',metadata);
-                assignin('base','fly_results_folder',fly_results_folder);
-                assignin('base','trial_options',trial_options);
-                assignin('base','processed_filename', processed_filename);
-
-                %publishes the output (but not code) "create_pdf_script" to
-                %a pdf file.
-                options.codeToEvaluate = sprintf('%s(%s,%s,%s,%s)',plot_name,'fly_results_folder','trial_options','metadata','processed_filename');
-                options.format = 'pdf';
-                options.outputDir = sprintf('%s',fly_results_folder);
-                options.showCode = false;
-                publish(plot_file,options);
-                
-                plot_filename = strcat(plot_name,'.pdf');
-                new_plot_filename = strcat(self.model.fly_name,'.pdf');
-                pdf_path = fullfile(fly_results_folder,plot_filename);
-                new_pdf_path = fullfile(fly_results_folder,new_plot_filename);
-                movefile(pdf_path, new_pdf_path);
-
-                
-            end
             if ~isempty(self.view)
                 self.view.set_progress_title('Finished.');
                 drawnow;
             end
             
+            
+            
 
         end
-        
+                
+               
+%                 [plot_path, plot_name, plot_ext] = fileparts(self.model.plotting_file);
+%                 plotting_command = plot_name + "(metadata.fly_results_folder, metadata.trial_options)";
+%                 plot_file = strcat(plot_name, plot_ext);
+%                 %Put all metadata in a struct to be passed to the
+%                 %function which creates the pdf.
+% 
+%                 metadata = struct;
+%                 metadata.experimenter = self.model.experimenter;
+%                 metadata.experiment_name = self.doc.experiment_name;
+%                 metadata.run_protocol_file = self.model.run_protocol_file;
+%                 
+%                 %Turn experiment type (1,2, or 3) to matching word
+%                 %("Flight", etc)
+%                 if self.model.experiment_type == 1
+%                     metadata.experiment_type = "Flight";
+%                 elseif self.model.experiment_type == 2
+%                     metadata.experiment_type = "Camera Walk";
+%                 elseif self.model.experiment_type == 3
+%                     metadata.experiment_type = "Chip Walk";
+%                 end
+%                 metadata.fly_name = self.model.fly_name;
+%                 metadata.fly_genotype = self.model.fly_genotype;
+%                 if ~isempty(self.view)
+%                     metadata.timestamp = self.view.date_and_time_box.String;
+%                 else
+%                     metadata.timestamp = datestr(now, 'mm-dd-yyyy HH:MM:SS');
+%                 end
+%                 metadata.fly_age = self.model.fly_age;
+%                 metadata.fly_sex = self.model.fly_sex;
+%                 metadata.experiment_temp = self.model.experiment_temp;
+%                 metadata.rearing_protocol = self.model.rearing_protocol;
+%                 
+%                 metadata.plotting_file = self.model.plotting_file;
+%                 metadata.processing_file = self.model.processing_file;
+%                 if self.model.do_plotting == 1
+%                     metadata.do_plotting = "Yes";
+%                 elseif self.model.do_plotting == 0
+%                     metadata.do_plotting = "No";
+%                 end
+%                 if self.model.do_processing == 1
+%                     metadata.do_processing = "Yes";
+%                 elseif self.model.do_processing == 0
+%                     metadata.do_processing = "No";
+%                 end
+% 
+%                 metadata.plotting_command = plotting_command;
+%                 metadata.fly_results_folder = fly_results_folder;
+%                 metadata.trial_options = trial_options;
+%                 metadata.comments = self.model.metadata_comments;
+%                 metadata.light_cycle = self.model.light_cycle;
+%             
+%                 %assigns the metadata struct to metadata in the base
+%                 %workspace so publish can use it.
+%                 assignin('base','metadata',metadata);
+%                 assignin('base','fly_results_folder',fly_results_folder);
+%                 assignin('base','trial_options',trial_options);
+%                 assignin('base','processed_filename', processed_filename);
+% 
+%                 %publishes the output (but not code) "create_pdf_script" to
+%                 %a pdf file.
+%                 options.codeToEvaluate = sprintf('%s(%s,%s,%s,%s)',plot_name,'fly_results_folder','trial_options','metadata','processed_filename');
+%                 options.format = 'pdf';
+%                 options.outputDir = sprintf('%s',fly_results_folder);
+%                 options.showCode = false;
+%                 publish(plot_file,options);
+%                 
+%                 plot_filename = strcat(plot_name,'.pdf');
+%                 new_plot_filename = strcat(self.model.fly_name,'.pdf');
+%                 pdf_path = fullfile(fly_results_folder,plot_filename);
+%                 new_pdf_path = fullfile(fly_results_folder,new_plot_filename);
+%                 movefile(pdf_path, new_pdf_path);
+
+
         function update_flyName_reminder(self)
            if ~isempty(self.view)
                 self.create_error_box("If you are changing flies, please remember to update the fly name.");
@@ -1094,12 +873,13 @@ classdef G4_conductor_controller < handle
             [settings_data, line_path, index] = self.model.get_setting(line_to_match);
             path_to_experiment = strtrim(settings_data{line_path}(index:end));
             
+            
             % Open test g4p file
             self.open_g4p_file(path_to_experiment);
             
             %Set test specific values
             self.model.fly_name = ['trial',num2str(self.model.num_tests_conducted)];
-
+            
             if ~isempty(self.view)
                 self.update_view_if_exists();
             end
@@ -1108,11 +888,11 @@ classdef G4_conductor_controller < handle
             self.run();
 
             [test_exp_path, ~, ~] = fileparts(self.doc.save_filename);
-            if exist(fullfile(test_exp_path,'Results',self.model.fly_name))
-                movefile(fullfile(test_exp_path,'Results',self.model.fly_name,'*'),fullfile(real_file_path,'Results',real_fly_name,self.model.fly_name),'f');
+            if exist(fullfile(test_exp_path,self.model.date_folder, self.model.fly_save_name))
+                movefile(fullfile(test_exp_path,self.model.date_folder, self.model.fly_save_name,'*'),fullfile(real_file_path,self.model.date_folder, self.model.fly_save_name,self.model.fly_name),'f');
                 %rmdir(fullfile(test_exp_path,'Results', self.model.fly_name));
                 pause(.5);
-                rmdir(fullfile(test_exp_path,'Results'),'s');
+                rmdir(fullfile(test_exp_path,self.model.date_folder),'s');
 
             else
                 self.model.num_tests_conducted = self.model.num_tests_conducted - 1;
@@ -1216,13 +996,13 @@ classdef G4_conductor_controller < handle
                     + newline + newline + " Reminder: if you're changing flies for the next experiment, don't forget to update the fly name."));
                 self.model.set_metadata_comments(self.view.comments_box.String);
             end
-            
-            [experiment_path, g4p_filename, ext] = fileparts(self.doc.save_filename);
+           
+            [experiment_path, ~, ~] = fileparts(self.doc.save_filename);
             if self.is_aborted == 0
-                fly_folder = fullfile(experiment_path, 'Results', self.model.fly_name);
+                fly_folder = fullfile(experiment_path, self.model.date_folder, self.model.fly_save_name);
             else
                 aborted_filename = ['Aborted_exp_data',num2str(self.model.aborted_count)];
-                fly_folder = fullfile(experiment_path, 'Results', self.model.fly_name, aborted_filename);
+                fly_folder = fullfile(experiment_path, self.model.date_folder, self.model.fly_save_name, aborted_filename);
             end
             
             
@@ -1243,6 +1023,456 @@ classdef G4_conductor_controller < handle
             metadata_save_filename = fullfile(fly_folder, 'metadata.mat');
             save(metadata_save_filename, 'metadata');
             
+            
+        end
+        
+        function [saved] = check_if_saved(self)
+             saved = 1;
+             if strcmp(self.doc.save_filename,'') == 1
+                 saved = 0;
+                if ~isempty(self.view)
+                    self.create_error_box("You didn't save this experiment. Please go back and save then run the experiment again.", "Please save.");
+                else
+                    disp('Failed: Experiment has not been saved.');
+                end
+                
+            end
+            
+        end
+        
+        function [success] = create_folder(self, path, foldername)
+            
+            [success, msg] = mkdir(path, foldername);
+            if success == 0
+                disp(msg);
+            end
+            
+            
+        end
+        
+        function [hasFiles] = check_for_files(self, folderpath)
+            hasFiles = 0;
+            items = dir(folderpath);
+            for i = 1:length(items)
+                itemnames{i} = items(i).name;
+            end
+            for i = 1:length(items)
+                folders(i) = items(i).isdir;
+            end
+            folders(~folders) = [];
+
+            if length(itemnames) > length(folders)
+                hasFiles = 1;
+                if ~isempty(self.view)
+                    self.create_error_box('Results folder of that fly name already has data in it\n');
+                else
+                    disp('Failed: That fly already has data in the results folder.');
+                end
+                
+            end
+            
+        end
+        
+        function [active_ao_channels] = get_active_ao(self)
+            
+            pretrial = self.doc.pretrial;
+            block_trials = self.doc.block_trials;
+            intertrial = self.doc.intertrial;
+            posttrial = self.doc.posttrial;
+            
+           %make cell arrays for each ao channel listing all the
+                %functions called for that channel across all trials.
+            ao1_funcs = {};
+                ao1_funcs{1} = pretrial{4};
+
+                for c = 1:length(block_trials(:,1))
+                    ao1_funcs{c+1} = block_trials{c,4};
+                end
+                ao1_funcs{end + 1} =  intertrial{4};
+                ao1_funcs{end + 1} = posttrial{4};
+                ao1_isnt_empty = ~cellfun('isempty',ao1_funcs);
+            
+            ao2_funcs = {};
+                ao2_funcs{1} = pretrial{5};
+                for c = 1:length(block_trials(:,1))
+                    ao2_funcs{c+1} = block_trials{c,5};
+                end
+                ao2_funcs{end + 1} =  intertrial{5};
+                ao2_funcs{end + 1} = posttrial{5};
+                ao2_isnt_empty = ~cellfun('isempty',ao2_funcs);
+            
+            ao3_funcs = {};
+                ao3_funcs{1} = pretrial{6};
+                for c = 1:length(block_trials(:,1))
+                    ao3_funcs{c+1} = block_trials{c,6};
+                end
+                ao3_funcs{end + 1} =  intertrial{6};
+                ao3_funcs{end + 1} = posttrial{6};
+                ao3_isnt_empty = ~cellfun('isempty',ao3_funcs);
+            
+            
+            ao4_funcs = {};
+                ao4_funcs{1} = pretrial{7};
+                for c = 1:length(block_trials(:,1))
+                    ao4_funcs{c+1} = block_trials{c,7};
+                end
+                ao4_funcs{end + 1} =  intertrial{7};
+                ao4_funcs{end + 1} = posttrial{7};
+                ao4_isnt_empty = ~cellfun('isempty',ao4_funcs);
+                
+
+           
+            
+                %Determine which channels should be active by going through
+                %the arrays we just created and checking if they are empty
+                %or not
+            ao1_active = 0;
+     
+                if sum(ao1_isnt_empty) > 0
+                    ao1_active = 1;
+                end
+           
+            
+            ao2_active = 0;
+
+                if sum(ao2_isnt_empty) > 0
+                    ao2_active = 1;
+                end
+            
+            
+            ao3_active = 0;
+   
+                if sum(ao3_isnt_empty) > 0
+                    ao3_active = 1;
+                end
+          
+            
+            ao4_active = 0;
+ 
+                if sum(ao4_isnt_empty) > 0
+                    ao4_active = 1;
+                end
+
+            %channels is now an array of zeros and 1's, a 1 indicating that
+            %channel is active, a 0 indicating it is not. 
+            channels = [ao1_active, ao2_active, ao3_active, ao4_active];
+            channel_nums = [0,1,2,3];
+
+            
+            
+            %create an array of active ao channels which is formatted
+            %correctly to be passed to the panel_com function.
+            j = 1;
+            active_ao_channels = [];
+            for channel = 1:4
+                if channels(channel) == 1
+                    active_ao_channels(j) = channel_nums(channel);
+                    j = j + 1;
+                end
+            end 
+            
+        end
+        
+        function [parameters] = get_parameters_struct(self)
+            
+            pretrial = self.doc.pretrial;
+            intertrial = self.doc.intertrial;
+            posttrial = self.doc.posttrial;
+            block_trials = self.doc.block_trials;
+            
+            %This function returns an array, active_ao_channels, with the
+            %numbers of the active ao channels (ie [0 2 3] means ao
+            %channels 1, 3, and 4 are active. 
+            active_ao_channels = self.get_active_ao();
+      
+            %Create an array for each section with the indices of their
+            %aofunctions (no ao function returns an index of 0)
+            
+            [pretrial_ao_indices, intertrial_ao_indices, ao_indices, ...
+                posttrial_ao_indices] = self.get_active_ao_indices(active_ao_channels);
+            
+            parameters = struct; 
+            parameters.pretrial = pretrial;
+            
+            %get_pattern_index is a separate function which takes the
+            %string name of a pattern or function and returns its index
+            %number. If the string is empty (ie, there is no position
+            %function) it returns 0 as the index.
+
+            parameters.pretrial_pat_index = self.doc.get_pattern_index(pretrial{2});
+            parameters.pretrial_pos_index = self.doc.get_posfunc_index(pretrial{3});
+
+            
+            parameters.intertrial = intertrial;
+
+            parameters.intertrial_pat_index = self.doc.get_pattern_index(intertrial{2});
+            parameters.intertrial_pos_index = self.doc.get_posfunc_index(intertrial{3});
+
+            
+            parameters.block_trials = block_trials;
+
+            for i = 1:length(self.doc.block_trials(:,1))
+                parameters.block_pat_indices(i) = self.doc.get_pattern_index(block_trials{i,2}); 
+                parameters.block_pos_indices(i) = self.doc.get_posfunc_index(block_trials{i,3});
+            end
+            
+            parameters.posttrial = posttrial;
+
+            parameters.posttrial_pat_index = self.doc.get_pattern_index(posttrial{2});
+            parameters.posttrial_pos_index = self.doc.get_posfunc_index(posttrial{3});
+
+            
+            parameters.repetitions = self.doc.repetitions;
+            parameters.is_randomized = self.doc.is_randomized;
+            parameters.save_filename = self.doc.save_filename;
+            parameters.fly_name = self.model.fly_name;
+
+         
+            %-------------------------------------------------------------
+            parameters.pretrial_ao_indices = pretrial_ao_indices;
+            parameters.intertrial_ao_indices = intertrial_ao_indices;
+            parameters.posttrial_ao_indices = posttrial_ao_indices;
+            parameters.block_ao_indices = ao_indices;
+            parameters.active_ao_channels = active_ao_channels;
+            
+            %Need to know how many frames each pattern in each trial has
+            %in case the frame index on any of them needs to be randomized.
+            if ~isempty(pretrial{1})
+                prepat_field = self.doc.get_pattern_field_name(pretrial{2});
+                parameters.num_pretrial_frames = length(self.doc.Patterns.(prepat_field).pattern.Pats(1,1,:));
+            end
+            if ~isempty(intertrial{1})
+                interpat_field = self.doc.get_pattern_field_name(intertrial{2});
+                parameters.num_intertrial_frames = length(self.doc.Patterns.(interpat_field).pattern.Pats(1,1,:));
+            end
+            if ~isempty(posttrial{1})
+                postpat_field = self.doc.get_pattern_field_name(posttrial{2});
+                parameters.num_posttrial_frames = length(self.doc.Patterns.(postpat_field).pattern.Pats(1,1,:));
+            end
+            for i = 1:length(block_trials(:,1))
+                blockpat_field = self.doc.get_pattern_field_name(block_trials{i,2});
+                parameters.num_block_frames(i) = length(self.doc.Patterns.(blockpat_field).pattern.Pats(1,1,:));
+            end
+            
+            %Create experiment order .mat file and add the trial order to
+            %parameters
+            num_conditions = length(self.doc.block_trials(:,1));
+            if self.doc.is_randomized == 1
+                exp_order = NaN(self.doc.repetitions, num_conditions);
+                for rep_ind = 1:self.doc.repetitions
+                    exp_order(rep_ind,:) = randperm(num_conditions);
+                end
+            else
+                exp_order = repmat(1:num_conditions,self.doc.repetitions,1);
+
+            end
+            
+            parameters.exp_order = exp_order;
+            
+            
+            
+             
+            
+        end
+        
+        function [pre, inter, block, post] = get_active_ao_indices(self, active_ao_channels)
+           
+            pre = [];
+            inter = [];
+            block = [];
+            post = [];
+            
+            for i = 1:length(active_ao_channels)
+                channel_num = active_ao_channels(i);
+                pre(i) = self.doc.get_ao_index(self.doc.pretrial{channel_num + 4});
+                inter(i) = self.doc.get_ao_index(self.doc.intertrial{channel_num + 4});
+                post(i) = self.doc.get_ao_index(self.doc.posttrial{channel_num + 4});
+            end
+            
+            
+            for m = 1:length(active_ao_channels)
+                channel_num = active_ao_channels(m);
+                for k = 1:length(self.doc.block_trials(:,1))
+                    block(k,m) = self.doc.get_ao_index(self.doc.block_trials{k, channel_num + 4});
+                end
+            end
+            
+            %Fill in zeros for the ao indices for inactive channels
+            [pre, inter, block, post] = self.fill_inactive_ao_indices(active_ao_channels, pre, inter, block, post);
+
+            
+            
+        end
+        
+        function [pre, inter, block, post] = fill_inactive_ao_indices(self, active_ao_channels, pre, inter, block, post)
+           
+            if sum(ismember(active_ao_channels,0)) == 0
+                new_pre = [0 pre];
+                new_inter = [0 inter];
+                new_post = [0 post];
+                
+                for trial = 1:length(self.doc.block_trials(:,1))
+                    new_block(trial,:) = [0 block(trial,:)];
+                end
+                
+                pre = new_pre;
+                inter = new_inter;
+                post = new_post;
+                block = new_block;
+            end
+            
+            if sum(ismember(active_ao_channels,1)) == 0
+                new_pre = [];
+                new_inter = [];
+                new_post = [];
+                new_block = [];
+                if length(pre) >= 2
+                    new_pre = [pre(1) 0 pre(2:end)];
+                    new_inter = [inter(1) 0 inter(2:end)];
+                    new_post = [post(1) 0 post(2:end)];
+
+                    for trial = 1:length(self.doc.block_trials(:,1))
+                        new_block(trial,:) = [block(trial,1) 0  block(trial,2:end)];
+                    end
+                else
+                    new_pre = [pre(1) 0];
+                    new_inter = [inter(1) 0];
+                    new_post = [post(1) 0];
+
+                    for trial = 1:length(self.doc.block_trials(:,1))
+                        new_block(trial,:) = [block(trial,1) 0];
+                    end
+                end
+                
+                pre = new_pre;
+                inter = new_inter;
+                post = new_post;
+                block = new_block;
+            end
+            
+            if sum(ismember(active_ao_channels,2)) == 0
+                new_pre = [];
+                new_inter = [];
+                new_post = [];
+                new_block = [];
+                if length(pre) >= 3
+                    new_pre = [pre(1:2) 0 pre(end)];
+                    new_inter = [inter(1:2) 0 inter(end)];
+                    new_post = [post(1:2) 0 post(end)];
+
+                    for trial = 1:length(self.doc.block_trials(:,1))
+                        new_block(trial,:) = [block(trial,1:2) 0  block(trial,end)];
+                    end
+                else
+                    new_pre = [pre(1:2) 0];
+                    new_inter = [inter(1:2) 0];
+                    new_post = [post(1:2) 0];
+
+                    for trial = 1:length(self.doc.block_trials(:,1))
+                        new_block(trial,:) = [block(trial,1:2) 0];
+                    end
+                end
+                
+                pre = new_pre;
+                inter = new_inter;
+                post = new_post;
+                block = new_block;
+            end
+            
+            if sum(ismember(active_ao_channels,3)) == 0
+                new_pre = [];
+                new_inter = [];
+                new_post = [];
+                new_block = [];
+
+                new_pre = [pre(1:3) 0];
+                new_inter = [inter(1:3) 0];
+                new_post = [post(1:3) 0];
+
+                for trial = 1:length(self.doc.block_trials(:,1))
+                    new_block(trial,:) = [block(trial,1:3) 0];
+                end
+   
+                
+                pre = new_pre;
+                inter = new_inter;
+                post = new_post;
+                block = new_block;
+            end
+            
+            
+            
+        end
+        
+        function run_single_fly_DA(self, settings, save_path, trial_options, proc_file, exp_folder)
+            [~, settings_filename, settings_ext] = fileparts(settings);
+            [~, proc_name, ~] = fileparts(proc_file);
+            
+            %Load variables from the generic single-fly settings file. 
+            load(settings);
+            
+            %Check to make sure the variables were loaded correclty, return
+            %if not.            
+            if exist('exp_settings') ~= 1
+                if ~isempty(self.view)
+                    self.create_error_box("Unable to read all variables from the settings file. Please check it is formatted correctly.");
+                else
+                    disp("Data analysis not performed. Settings file incomplete.");
+                end
+                return;
+            end
+            if exist('save_settings') ~= 1
+                if ~isempty(self.view)
+                    self.create_error_box("Unable to read all variables from the settings file. Please check it is formatted correctly.");
+                else
+                    disp("Data analysis not performed. Settings file incomplete.");
+                end
+                return;
+            end
+            
+            %Update settings to reflect this particular fly.
+            exp_settings.trial_options = trial_options;
+            exp_settings.genotypes = [string(self.model.fly_genotype)];
+            exp_settings.exp_folder = {save_path};
+            exp_settings.processed_data_file = proc_name;
+            save_settings.path_to_protocol = exp_folder;
+            save_settings.save_path = save_path;
+         
+            new_settings_file = [settings_filename, settings_ext];
+            new_settings_path = fullfile(save_path, new_settings_file);
+            
+            %Save a new data analysis settings .mat file in this fly's
+            %results folder.
+            save(new_settings_path,'exp_settings', 'normalize_settings',...
+        'histogram_plot_settings', 'histogram_annotation_settings','CL_hist_plot_settings',...
+        'timeseries_plot_settings', 'TC_plot_settings', 'save_settings');
+
+            
+            da = create_data_analysis_tool(new_settings_path, '-single', '-hist', '-tsplot', '-tcplot');
+
+            da.run_analysis();
+            
+        end
+        
+        function trial_options = get_trial_options(self)
+            
+            if ~isempty(self.doc.pretrial{1})
+                is_pretrial = 1;
+            else
+                is_pretrial = 0;
+            end
+            if ~isempty(self.doc.intertrial{1})
+                is_intertrial = 1;
+            else
+                is_intertrial = 0;
+            end
+            if ~isempty(self.doc.posttrial{1})
+                is_posttrial = 1;
+            else
+                is_posttrial = 0;
+            end
+            
+            trial_options = [is_pretrial, is_intertrial, is_posttrial];
             
         end
 

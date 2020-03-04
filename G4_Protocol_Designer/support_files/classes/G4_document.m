@@ -1927,6 +1927,11 @@ classdef G4_document < handle
            % prog = waitbar(0, 'Importing...', 'WindowStyle', 'modal'); %start waiting bar
             self.top_folder_path = path;
             [file_names, folder_names] = self.get_file_folder_names(path);
+            for fold = length(folder_names):-1:1
+                if ~isempty(regexp(folder_names{fold}, '\d\d*_\d\d*_\d\d\d\d', 'once')) && regexp(folder_names{fold}, '\d\d*_\d\d*_\d\d\d\d')==1
+                    folder_names(fold) = [];
+                end
+            end
             
             no_more_subfolders = 0;
             imported_patterns = 0;

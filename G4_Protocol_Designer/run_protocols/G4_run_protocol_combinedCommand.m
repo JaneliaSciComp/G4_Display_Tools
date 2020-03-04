@@ -47,7 +47,7 @@
  %p.active_ao_channels lists the channels that are active - [0 2 3] for
  %example means channels 1, 3, and 4 are active.
 
-function [success] = G4_default_run_protocol(runcon, p)%input should always be 1 or 2 items
+function [success] = G4_run_protocol_combinedCommand(runcon, p)%input should always be 1 or 2 items
 
 %% Get access to the figure and progress bar in the run gui IF it was passed in.
 global ctrl;
@@ -83,6 +83,12 @@ end
          pre_gain = p.pretrial{10};
          pre_offset = p.pretrial{11};
          pre_dur = p.pretrial{12};
+         if pre_dur == 0
+             pre_dur = 2000;
+         end
+         if isempty(pre_frame_rate)
+             pre_frame_rate = 0;
+         end
      end
  
  %intertrial params---------------------------------------------------
@@ -108,6 +114,10 @@ end
          inter_gain = p.intertrial{10};
          inter_offset = p.intertrial{11};
          inter_dur = p.intertrial{12};
+         
+         if isempty(inter_frame_rate)
+             inter_frame_rate = 0;
+         end
      end
  
  %posttrial params------------------------------------------------------
@@ -132,6 +142,10 @@ end
          post_gain = p.posttrial{10};
          post_offset = p.posttrial{11};
          post_dur = p.posttrial{12};
+         
+         if isempty(post_frame_rate)
+             post_frame_rate = 0;
+         end
      end
  
  %define static block trial params (will define the ones that change every
@@ -241,50 +255,11 @@ end
                  %First update the progress bar to show pretrial is running----
                  runcon.update_progress('pre');
                  num_trial_of_total = num_trial_of_total + 1;
-
-                %Set the panel values appropriately----------------
-                 Panel_com('set_control_mode',pre_mode);
-                 if pre_mode == 3 %For some reason, mode 3 specifically screws up the run, making subsequent trials glitch. 
-                     pause(.1); %A pause is unnecessary with other modes but seems necessary with mode 3. Will investigate further.
-                 end
                  
-                 Panel_com('set_pattern_id', pre_pat);
-                 if pre_mode == 3
-                     pause(.1);
-                 end
-                    
-                 %randomize frame index if indicated
+                  %randomize frame index if indicated
                  if pre_frame_ind == 0
                      pre_frame_ind = randperm(p.num_pretrial_frames, 1);
                      
-                 end
-                 
-                 Panel_com('set_position_x',pre_frame_ind);
-                 if pre_mode == 3
-                     pause(.1);
-                 end
-                 
-
-                 if pre_pos ~= 0
-                     Panel_com('set_pattern_func_id', pre_pos);   
-                     
-                 end
-
-                 if ~isempty(pre_gain) %this assumes you'll never have gain without offset
-                     Panel_com('set_gain_bias', [pre_gain, pre_offset]);
-                     
-                 end
-
-                 if pre_mode == 2
-                     Panel_com('set_frame_rate', pre_frame_rate);
-                     
-                 end
-
-                 for i = 1:length(pre_ao_ind)
-                     if pre_ao_ind(i) ~= 0 %if it is zero, there was no ao function for this channel
-                         Panel_com('set_ao_function_id',[p.active_ao_channels(i), pre_ao_ind(i)]);%[channel number, index of ao func]
-                        
-                     end
                  end
                  
                  %Update status panel to show current parameters
@@ -293,20 +268,29 @@ end
 
                  pause(0.01);
                  
-                 %Run pretrial on screen
-                 if pre_dur ~= 0
-                    Panel_com('start_display', pre_dur);
-                    pause(pre_dur + .01);
-                 else
-                     Panel_com('start_display', 2000);
-                     w = waitforbuttonpress; %If pretrial duration is set to zero, this
-                     %causes it to loop until you press a button.
+                 Panel_com('set_position_x',pre_frame_ind);
+                 if pre_mode == 3
+                     pause(.1);
                  end
+                 
+                 if ~isempty(pre_gain) %this assumes you'll never have gain without offset
+                     Panel_com('set_gain_bias', [pre_gain, pre_offset]);
+                     
+                 end
+                 
+                 Panel_com('combined_command',[pre_mode, pre_pat, pre_pos, pre_ao_ind(1), pre_ao_ind(2), pre_ao_ind(3), pre_ao_ind(4),pre_frame_rate, pre_dur]);
+                 if pre_dur == 2000
+                     w = waitforbuttonpress; %If pretrial duration is set to zero, this
+                 else
+                     pause(pre_dur + .01);
+                 end
+                 
+
              end
              
              if runcon.check_if_aborted()
-                Panel_com('stop_display');
-                pause(.1);
+                 Panel_com('stop_display');
+                 pause(.1);
                 Panel_com('stop_log');
                 pause(1);
                 disconnectHost;
@@ -337,7 +321,7 @@ end
                     if length(block_ao_indices) >= cond
                         trial_ao_indices = block_ao_indices(cond,:);
                     else
-                        trial_ao_indices = [];
+                        trial_ao_indices = [0 0 0 0];
                     end
                     %Set frame index
                     if isempty(block_trials{cond,8})
@@ -352,34 +336,23 @@ end
                     gain = block_trials{cond, 10};
                     offset = block_trials{cond, 11};
                     dur = block_trials{cond, 12};
+                    if isempty(frame_rate)
+                        frame_rate = 0;
+                    end
                      
                     %Update panel_com-----------------------------
-                    Panel_com('set_control_mode', trial_mode)
-                    
-                    Panel_com('set_pattern_id', pat_id)
+
                     
                     if ~isempty(block_trials{cond,10})
                         Panel_com('set_gain_bias', [gain, offset]);
                     end
-                    if pos_id ~= 0
 
-                        Panel_com('set_pattern_func_id', pos_id)
-                        
-                    end
-                    if trial_mode == 2
-                        Panel_com('set_frame_rate',frame_rate);
-                    end
-                    
                     if frame_ind == 0
                         frame_ind = randperm(p.num_block_frames(c),1);
                     end
 
                     Panel_com('set_position_x', frame_ind);
-                    
-                    for i = 1:length(p.active_ao_channels)
-                        Panel_com('set_ao_function_id',[p.active_ao_channels(i), trial_ao_indices(i)]);
-                        
-                    end
+                   
                     
                     %Update status panel to show current parameters
                    runcon.update_current_trial_parameters(trial_mode, pat_id, pos_id, p.active_ao_channels, ...
@@ -389,8 +362,12 @@ end
                     pause(0.01)
                     
                     %Run block trial--------------------------------------
-                    Panel_com('start_display', dur); %duration expected in 100ms units
+                    Panel_com('combined_command',[trial_mode, pat_id, pos_id, trial_ao_indices(1), trial_ao_indices(2), trial_ao_indices(3), trial_ao_indices(4),frame_rate, dur]);
+
+                    
+%                     Panel_com('start_display', dur); %duration expected in 100ms units
                     pause(dur + .01)
+
                     isAborted = runcon.check_if_aborted();
                     if isAborted == 1
                         Panel_com('stop_display');
@@ -421,35 +398,15 @@ end
                         drawnow;
 
                         %Run intertrial-------------------------
-                        Panel_com('set_control_mode',inter_mode);
-                       
-                        Panel_com('set_pattern_id', inter_pat);
-                       
+
                         %randomize frame index if indicated
                         if inter_frame_ind == 0
                             inter_frame_ind = randperm(p.num_intertrial_frames, 1);
                         end
                         Panel_com('set_position_x',inter_frame_ind);
-                        
-
-                        if inter_pos ~= 0
-                            Panel_com('set_pattern_func_id', inter_pos);
-                            
-                        end
 
                          if ~isempty(inter_gain) %this assumes you'll never have gain without offset
                              Panel_com('set_gain_bias', [inter_gain, inter_offset]);
-                         end
-
-                         if inter_mode == 2
-                             Panel_com('set_frame_rate', inter_frame_rate);
-                         end
-
-                         for i = 1:length(inter_ao_ind)
-                             if inter_ao_ind(i) ~= 0 %if it is zero, there was no ao function for this channel
-                                 Panel_com('set_ao_function_id',[p.active_ao_channels(i), inter_ao_ind(i)]);%[channel number, index of ao func]
-                                 
-                             end
                          end
                          
                           %Update status panel to show current parameters
@@ -457,11 +414,15 @@ end
                             inter_ao_ind, inter_frame_ind, inter_frame_rate, inter_gain, inter_offset, inter_dur);
                         
                          pause(0.01);
-                         Panel_com('start_display', inter_dur);
+                         
+                         Panel_com('combined_command',[inter_mode, inter_pat, inter_pos, inter_ao_ind(1), inter_ao_ind(2), inter_ao_ind(3), inter_ao_ind(4),inter_frame_rate, inter_dur]);
+                    
+                         %Panel_com('start_display', inter_dur);
                          pause(inter_dur + .01);
+
                          if runcon.check_if_aborted() == 1
-                            Panel_com('stop_display');
-                            pause(.1);
+                             Panel_com('stop_display');
+                             pause(.1);
                             Panel_com('stop_log');
                             pause(1);
                             disconnectHost;
@@ -484,46 +445,28 @@ end
                 num_trial_of_total = num_trial_of_total + 1;
                 runcon.update_progress('post', num_trial_of_total);
 
-
-                 Panel_com('set_control_mode', post_mode);
-                 
-                 Panel_com('set_pattern_id', post_pat);
-                 
                  if ~isempty(post_gain)
                      Panel_com('set_gain_bias', [post_gain, post_offset]);
                  end
-                 if post_pos ~= 0
-                     Panel_com('set_pattern_func_id', post_pos);
-                     
-                 end
-                 if post_mode == 2
-                     Panel_com('set_frame_rate', post_frame_rate);
-                 end
+
                  if post_frame_ind == 0
                      post_frame_ind = randperm(p.num_posttrial_frames, 1);
                  end
                      
                  Panel_com('set_position_x',post_frame_ind);
                  
-                 for i = 1:length(post_ao_ind)
-                     if post_ao_ind(i) ~= 0 %if it is zero, there was no ao function for this channel
-                         Panel_com('set_ao_function_id',[p.active_ao_channels(i), post_ao_ind(i)]);%[channel number, index of ao func]
-                         
-                     end
-                 end
-                 
                   %Update status panel to show current parameters
                  runcon.update_current_trial_parameters(post_mode, post_pat, post_pos, p.active_ao_channels, ...
                      post_ao_ind, post_frame_ind, post_frame_rate, post_gain, post_offset, post_dur);
-                
+  
+                 Panel_com('combined_command',[post_mode, post_pat, post_pos, post_ao_ind(1), post_ao_ind(2), post_ao_ind(3), post_ao_ind(4),post_frame_rate, post_dur]);
 
-                 Panel_com('start_display',post_dur);
+                 pause(post_dur+.01);
 
-                 pause(post_dur);
                  
                  if runcon.check_if_aborted() == 1
-                    Panel_com('stop_display');
-                    pause(.1);
+                     Panel_com('stop_display');
+                     pause(.1);
                     Panel_com('stop_log');
                     pause(1);
                     disconnectHost;
@@ -535,17 +478,13 @@ end
                  
             end
 
-            Panel_com('stop_display');
-            
-            pause(1);
-
             %Panel_com('stop_log');
             stop_log_response = send_tcp( char([1 hex2dec('40')]), 1);
             if stop_log_response.success == 1
                 waitfor(errordlg("Stop Log command failed, please stop log manually then hit a key"));
                 waitforbuttonpress;
             end
-
+            Panel_com('stop_display');
             pause(1);          
 
             disconnectHost;

@@ -4,7 +4,7 @@
 %Variables needed for this: num_groups, num_exps, num_datatypes, num_conds,
 %num_datapoints, 
 
-function [baselines, maxs] = normalization_1(timeseries_data, base_start, ...
+function [baselines, maxs] = normalization_fly(timeseries_data, base_start, ...
     base_stop, max_start, max_stop, max_prctile, num_conds, num_datapoints, num_datatypes, num_groups, num_exps)
 
     
