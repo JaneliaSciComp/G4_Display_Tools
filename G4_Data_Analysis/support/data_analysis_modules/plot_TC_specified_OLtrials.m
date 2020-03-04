@@ -3,7 +3,7 @@
 %Variables needed for this function: TC_Conds, TC_inds,
 %num_groups, CombData, rep_Colors, rep_LineWidth, mean_Colors,
 %mean_LineWidth, timeseries_ylimits, subtitle_FontSize, 
-function plot_TC_specified_OLtrials(TC_plot_settings, TC_conds, TC_inds, genotype, control_genotype, ...
+function plot_TC_specified_OLtrials(TC_plot_settings, TC_conds, plot_names, TC_inds, genotype, control_genotype, ...
     num_groups, CombData, single, save_settings, fig_num)
 
     rep_Colors = TC_plot_settings.rep_colors;
@@ -102,7 +102,7 @@ function plot_TC_specified_OLtrials(TC_plot_settings, TC_conds, TC_inds, genotyp
                        % timeseries_ylimits(d,:) = ylim;
                     end
                    % titlestr = ['\fontsize{' num2str(subtitle_FontSize) '} Condition #{\color[rgb]{' num2str(mean_Colors(g,:)) '}' num2str(conds)];
-                    titlestr = "Datatype: " + CombData.channelNames.timeseries(d) + newline + " Condition # " + num2str(conds);
+                    %titlestr = "Datatype: " + CombData.channelNames.timeseries(d) + newline + " Condition # " + num2str(conds);
                     if row == num_plot_rows && col == 1
                         xlabel(axis_labels{TC_inds==d}(1), 'FontSize', axis_FontSize);
                         xticks(1:length(TC_conds{row}));
@@ -130,7 +130,7 @@ function plot_TC_specified_OLtrials(TC_plot_settings, TC_conds, TC_inds, genotyp
                     end 
                        
                     
-                    title(titlestr, 'FontSize', subtitle_FontSize)
+                    title(plot_names(row,col), 'FontSize', subtitle_FontSize)
                 end
             end
             if find(TC_inds==d) <= length(fig_names)

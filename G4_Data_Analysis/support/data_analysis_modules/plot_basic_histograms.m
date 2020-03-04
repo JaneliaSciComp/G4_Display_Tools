@@ -38,19 +38,36 @@ function plot_basic_histograms(timeseries_data, interhistogram_data, ...
         
         groups = num_groups;
     end
+    
+    
     g = 0;
     for k = 1:length(groups)
         num_plot_groups = groups(k);
         figure();
+
+        
         for plot_group = 1:num_plot_groups
             g = g + 1;
+            
+            %Get number flies for particular group
+            fly = 1;
+            while sum(sum(sum(~isnan(timeseries_data(g,fly,:,:,:))))) && fly <= num_exps-1
+                fly = fly+1;
+            end
+            if fly == 1
+                fly = 0;
+            end
+            
             for d = 1:num_TC_datatypes
                 data_vec = reshape(timeseries_data(g,:,TC_inds(d),:,:),[1 numel(timeseries_data(g,:,d,:,:))]);
                 datastr = TC_datatypes{d};
                 datastr(strfind(datastr,'_')) = '-'; %convert underscores to dashes to prevent subscripts
 
                 subplot(2+num_TC_datatypes,num_plot_groups,plot_group)
-                text(0.1, 1.25-0.3*d, ['Mean ' TC_datatypes{d} ' = ' num2str(nanmean(data_vec))], 'FontSize', 8);
+                if d ==1
+                    text(0.1, .95, ['Number of Flies: ' num2str(fly)],  'FontSize', 8);
+                end
+                text(0.1, 1.25-0.3*(d+1), ['Mean ' TC_datatypes{d} ' = ' num2str(nanmean(data_vec))], 'FontSize', 8);
                 axis off
                 hold on
         %         title(['Group ' num2str(g)],'FontSize',subtitle_FontSize);

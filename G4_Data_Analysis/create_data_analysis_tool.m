@@ -44,6 +44,7 @@ classdef create_data_analysis_tool < handle
         TC_datatypes
         TC_conds
         TC_plot_settings
+        TC_plot_titles
         
         datatype_indices
         
@@ -273,9 +274,14 @@ classdef create_data_analysis_tool < handle
                 %run module to set durations (x axis limits)
             end
             
+            %Get path to .g4p file
+            [g4ppath] = get_g4p_file(self.save_settings.path_to_protocol);
+
             if self.timeseries_plot_option == 1 && isempty(self.timeseries_plot_settings.cond_name) || ~isempty(self.timeseries_plot_settings.cond_name == 0)
-                self.timeseries_plot_settings.cond_name = create_default_timeseries_plot_titles(self.OL_conds, self.timeseries_plot_settings.cond_name, self.save_settings.path_to_protocol);
+                self.timeseries_plot_settings.cond_name = create_default_timeseries_plot_titles(self.OL_conds, self.timeseries_plot_settings.cond_name, g4ppath);
             end
+            
+            
                 
                 %Determine which graphs are in the leftmost column so we know
             %to keep their y-axes turned on.
@@ -332,6 +338,11 @@ classdef create_data_analysis_tool < handle
             if self.TC_plot_option == 1 && isempty(self.TC_conds)
                 self.TC_conds = create_default_TC_plot_layout(conditionModes, self.TC_conds);
             end
+            
+            if self.TC_plot_option == 1 && isempty(self.TC_plot_settings.cond_name) || ~isempty(self.TC_plot_settings.cond_name == 0)
+                self.TC_plot_titles = create_default_TC_titles(self.TC_conds, self.TC_plot_settings.cond_name, g4ppath);
+            end
+            
             if isempty(self.TC_plot_settings.figure_names)
                 self.TC_plot_settings.figure_names = string(self.TC_datatypes);
             end
@@ -559,14 +570,14 @@ classdef create_data_analysis_tool < handle
                         number_groups = size(subCombData.summaries,1);
                         genotypes = {self.genotype{1}, self.genotype{group}};
                         for k = 1:length(self.TC_conds)
-                            plot_TC_specified_OLtrials(self.TC_plot_settings, self.TC_conds{k}, self.datatype_indices.TC_inds, ...
+                            plot_TC_specified_OLtrials(self.TC_plot_settings, self.TC_conds{k}, self.TC_plot_titles{k}, self.datatype_indices.TC_inds, ...
                                genotypes, self.control_genotype, number_groups, subCombData, single, self.save_settings, k);
                         end
                     end
                 else
 
                     for k = 1:length(self.TC_conds)
-                        plot_TC_specified_OLtrials(self.TC_plot_settings, self.TC_conds{k}, self.datatype_indices.TC_inds, ...
+                        plot_TC_specified_OLtrials(self.TC_plot_settings, self.TC_conds{k}, self.TC_plot_titles{k}, self.datatype_indices.TC_inds, ...
                            self.genotype, self.control_genotype, self.num_groups, self.CombData, single, self.save_settings, k);
                     end
                 end

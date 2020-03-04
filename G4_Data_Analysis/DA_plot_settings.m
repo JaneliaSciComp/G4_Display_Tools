@@ -16,7 +16,7 @@ function [exp_settings, normalize_settings, histogram_plot_settings, histogram_a
      %empty and plot_all_genotypes is one, each genotype will be plotted by
      %itself. If there is a control, each genotype will be plotted by
      %control. The control must match exactly the metadata genotype value. 
-    exp_settings.control_genotype = '';
+    exp_settings.control_genotype = 'emptySplit_JFRC100_JFRC49';
     
     %[pretrial, intertrial, posttrial]
     exp_settings.trial_options = [1 1 1];
@@ -59,7 +59,7 @@ function [exp_settings, normalize_settings, histogram_plot_settings, histogram_a
       %field_values = ["OL0048B_UAS_Kir_JFRC49","emptySplit_UAS_Kir_JFRC49","OL0010B_UAS_Kir_JFRC49"];
 
     %This is the path to the protocol
-    save_settings.path_to_protocol = "/Users/taylorl/Desktop/Protocol004_OpticFlow_KirShibire_01-09-20_13-23-42";
+    save_settings.path_to_protocol = "/Users/taylorl/Desktop/Protocol004_OpticFlow_KirShibire_01-09-20_13-23-42/Results";
     
     %Optional array with the names  by which genotypes should be labeled -
     %simpler more human readable names for each genotype. Control should
@@ -82,7 +82,7 @@ function [exp_settings, normalize_settings, histogram_plot_settings, histogram_a
     
 % Save settings   
     %The path where you wish to save the results of the data analysis
-    save_settings.save_path = '/Users/taylorl/Desktop/single_fly_default';
+    save_settings.save_path = '/Users/taylorl/Desktop/default_DA';
     
 
     
@@ -185,6 +185,13 @@ function [exp_settings, normalize_settings, histogram_plot_settings, histogram_a
     %Create the layout of tuning curves in this array. It works differently
     %than OL_TS_conds - see documentation for details.
     TC_plot_settings.OL_TC_conds = [];
+    
+    %If you want your tuning curves to have their own plot titles, make an
+    %array of titles for each PLOT (not each condition). So this should be
+    %a cell array like with the timeseries. A cell element for each figure,
+    %and each cell having an array matching the layout of the figure. If you want no
+    %plot titles, set cond_name = 0
+    TC_plot_settings.cond_name = [];
     
     %The xaxis label for tuning curves
 %     TC_plot_settings.TC_axis_labels{1} = ["Frequency(Hz)","LmR"];
