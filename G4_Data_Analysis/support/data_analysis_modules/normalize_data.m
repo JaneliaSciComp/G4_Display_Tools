@@ -30,14 +30,18 @@ function [CombData] = normalize_data(current_analysis, num_conds, num_datapoints
         CombData.timeseries_avg_over_reps(:,:,d,:,:) = current_analysis.CombData.timeseries_avg_over_reps(:,:,d,:,:)./baselines(:,:,d,:,:);
         CombData.summaries(:,:,d,:,:) = current_analysis.CombData.summaries(:,:,d,:,:)./baselines(:,:,d,:,1);
         d = find(strcmpi(current_analysis.CombData.channelNames.histograms,datatype));
-        CombData.histograms(:,:,d,:,:,:) = current_analysis.CombData.histograms(:,:,d,:,:,:)./repmat(baselines(:,:,d,:,1),[1 1 1 1 1 num_positions]);
+        if isfield(CombData, 'histograms')
+            CombData.histograms(:,:,d,:,:,:) = current_analysis.CombData.histograms(:,:,d,:,:,:)./repmat(baselines(:,:,d,:,1),[1 1 1 1 1 num_positions]);
+        end
     end
     for datatype = normalize_to_max
         d = find(strcmpi(current_analysis.CombData.channelNames.timeseries,datatype));
          CombData.timeseries_avg_over_reps(:,:,d,:,:) = current_analysis.CombData.timeseries_avg_over_reps(:,:,d,:,:)./maxs(:,:,d,:,:);
         CombData.summaries(:,:,d,:,:) = current_analysis.CombData.summaries(:,:,d,:,:)./maxs(:,:,d,:,1);
         d = find(strcmpi(current_analysis.CombData.channelNames.histograms,datatype));
-        CombData.histograms(:,:,d,:,:,:) = current_analysis.CombData.histograms(:,:,d,:,:,:)./repmat(maxs(:,:,d,:,1),[1 1 1 1 1 num_positions]);
+        if isfield(CombData, 'histograms')
+            CombData.histograms(:,:,d,:,:,:) = current_analysis.CombData.histograms(:,:,d,:,:,:)./repmat(maxs(:,:,d,:,1),[1 1 1 1 1 num_positions]);
+        end
     end
 
 

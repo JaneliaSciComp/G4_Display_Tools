@@ -16,7 +16,7 @@ function [exp_settings, normalize_settings, histogram_plot_settings, histogram_a
      %empty and plot_all_genotypes is one, each genotype will be plotted by
      %itself. If there is a control, each genotype will be plotted by
      %control. The control must match exactly the metadata genotype value. 
-    exp_settings.control_genotype = 'emptySplit_JFRC100_JFRC49';
+    exp_settings.control_genotype = '';
     
     %[pretrial, intertrial, posttrial]
     exp_settings.trial_options = [1 1 1];
@@ -53,13 +53,13 @@ function [exp_settings, normalize_settings, histogram_plot_settings, histogram_a
     exp_settings.field_values = {};
 %    exp_settings.field_values{1} = ["emptySplit_JFRC100_JFRC49"];
 %     exp_settings.field_values{2} = ["SS01001_JFRC100_JFRC49"];
-     %exp_settings.field_values{3} = ["SS00324_JFRC100_JFRC49"];
+%     exp_settings.field_values{1} = ["SS00324_JFRC100_JFRC49"];
 %     field_values{3} = ["Kir 1"];
 %     field_values{2} = ["Kir 1", "01 17"];
       %field_values = ["OL0048B_UAS_Kir_JFRC49","emptySplit_UAS_Kir_JFRC49","OL0010B_UAS_Kir_JFRC49"];
 
     %This is the path to the protocol
-    save_settings.path_to_protocol = "/Users/taylorl/Desktop/Protocol004_OpticFlow_KirShibire_01-09-20_13-23-42/Results";
+    save_settings.path_to_protocol = "/Users/taylorl/Desktop/Protocol004_OpticFlow_KirShibire_01-09-20_13-23-42";
     
     %Optional array with the names  by which genotypes should be labeled -
     %simpler more human readable names for each genotype. Control should
@@ -70,7 +70,7 @@ function [exp_settings, normalize_settings, histogram_plot_settings, histogram_a
     %should list your genotype labels in that order with the exception that
     %the control should always be first. 
     
-    exp_settings.genotypes = ["EmptySplit JFRC",  "T4-T5", "TmY3", "CT1", "Lpc1"];
+    exp_settings.genotypes = ["Empty Split", "T4-T5", "TmY3", "CT1", "Lpc1"];
     %genotypes = ["empty-split", "LPLC-2", "LC-18", "T4_T5", "LC-15", "LC-25", "LC-11", "LC-17", "LC-4"];
     
     %% This will generate your exp_folder, do not edit. 
@@ -82,7 +82,7 @@ function [exp_settings, normalize_settings, histogram_plot_settings, histogram_a
     
 % Save settings   
     %The path where you wish to save the results of the data analysis
-    save_settings.save_path = '/Users/taylorl/Desktop';
+    save_settings.save_path = '/Users/taylorl/Desktop/single_fly_default';
     
 
     
@@ -108,7 +108,7 @@ function [exp_settings, normalize_settings, histogram_plot_settings, histogram_a
 %% Plot settings 
 
     %Date range displayed on histograms
-    histogram_annotation_settings.date_range = "01/21/20 to 01/30/20";
+    histogram_annotation_settings.annotation_text = "Annotation text here.";
     
     %OL_TS_conds indicates the layout of your timeseries figures. See
     %documentation for example. Leave empty ([]) for default layout.
