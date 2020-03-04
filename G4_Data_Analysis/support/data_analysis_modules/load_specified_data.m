@@ -4,7 +4,7 @@ function [num_positions, num_datatypes, num_conds, num_datapoints, CombData, fil
 %    CombData.conditionModes = CombData.conditionModes; 
 %    CombData.channelNames = CombData.channelNames;
 %     CombData.timestamps = CombData.timestamps;
-    CombData.histograms = [];
+    CombData.histograms_CL = [];
     CombData.interhistogram = [];
     CombData.timeseries = [];
     CombData.timeseries_avg_over_reps = nan([num_groups, num_exps]);
@@ -32,8 +32,16 @@ function [num_positions, num_datatypes, num_conds, num_datapoints, CombData, fil
     CombData.channelNames = fields.channelNames;
     CombData.conditionModes = fields.conditionModes;
     
-    if ~isempty(find(strcmp(fields_to_load,'histograms'),1)) > 0
-        CombData.histograms = nan([num_groups, num_exps, size(fields.histograms)]);
+    %changed fieldname histograms to histograms_CL in processed file.
+    if ~isempty(find(strcmp(fields_to_load,'histograms_CL'),1)) > 0
+        if isfield(fields, 'histograms_CL')
+            hist_label = 'histograms_CL';
+            
+        else
+            hist_label = 'histograms';
+
+        end
+        CombData.histograms_CL = nan([num_groups, num_exps, size(fields.(hist_label))]);
     end
     if ~isempty(find(strcmp(fields_to_load,'interhistogram'),1)) > 0
         CombData.interhistogram = nan([num_groups, num_exps, size(fields.interhistogram)]);
@@ -105,12 +113,12 @@ function [num_positions, num_datatypes, num_conds, num_datapoints, CombData, fil
                     end
                 end
                 
-                if ~isempty(find(strcmp(fields_to_load,'histograms'),1)) > 0
-                    num_positions = size(fields.histograms,4);
-                    if num_positions>size(CombData.histograms,6)
-                        CombData.histograms(:,:,:,:,:,size(CombData.histograms,6)+1:num_positions) = nan;
+                if ~isempty(find(strcmp(fields_to_load,'histograms_CL'),1)) > 0
+                    num_positions = size(fields.(hist_label),4);
+                    if num_positions>size(CombData.histograms_CL,6)
+                        CombData.histograms_CL(:,:,:,:,:,size(CombData.histograms_CL,6)+1:num_positions) = nan;
                     end
-                    CombData.histograms(g,e,:,:,:,1:num_positions) = fields.histograms;
+                    CombData.histograms_CL(g,e,:,:,:,1:num_positions) = fields.(hist_label);
                 end
                 
                 if ~isempty(find(strcmp(fields_to_load,'interhistogram'),1)) > 0
@@ -144,8 +152,8 @@ function [num_positions, num_datatypes, num_conds, num_datapoints, CombData, fil
                 end
                 
                 if ~isempty(find(strcmp(fields_to_load,'timeseries'),1)) > 0
-%                     if num_positions>size(CombData.histograms,6)
-%                         CombData.timeseries(:,:,:,:,size(CombData.histograms,6)+1:num_positions) = nan;
+%                     if num_positions>size(CombData.histograms_CL,6)
+%                         CombData.timeseries(:,:,:,:,size(CombData.histograms_CL,6)+1:num_positions) = nan;
 %                     end
                     num_datapoints = size(fields.timeseries,4);
                     if num_datapoints>size(CombData.timeseries,6)
@@ -181,16 +189,16 @@ function [num_positions, num_datatypes, num_conds, num_datapoints, CombData, fil
 
     
 
-    if ~isempty(CombData.histograms) && ~isempty(CombData.timeseries)
+    if ~isempty(CombData.histograms_CL) && ~isempty(CombData.timeseries)
 
-        if num_positions>size(CombData.histograms,6)
-            CombData.timeseries(:,:,:,:,:,size(CombData.histograms,6)+1:num_positions) = nan;
+        if num_positions>size(CombData.histograms_CL,6)
+            CombData.timeseries(:,:,:,:,:,size(CombData.histograms_CL,6)+1:num_positions) = nan;
         end
         [~, ~, num_datatypes, num_conds, num_reps, num_datapoints] = size(CombData.timeseries);
-        num_positions = size(CombData.histograms,6);
+        num_positions = size(CombData.histograms_CL,6);
         
-    elseif ~isempty(CombData.histograms)
-        num_positions = size(CombData.histograms,6);
+    elseif ~isempty(CombData.histograms_CL)
+        num_positions = size(CombData.histograms_CL,6);
         num_datatypes = [];
         num_conds = [];
         num_datapoints = [];
