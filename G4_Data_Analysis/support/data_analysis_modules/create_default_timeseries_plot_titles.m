@@ -5,7 +5,7 @@ function [OL_cond_name] = create_default_timeseries_plot_titles(OL_conds, cond_n
     
     OL_cond_name = cell(1,length(OL_conds));    
     %If the .g4p file wasn't found, give all graphs blank names. 
-    if isempty(g4path)
+    if isempty(g4ppath)
         
         for i = 1:length(OL_cond_name)
             for j = 1:size(OL_conds{i},1)
@@ -37,12 +37,25 @@ function [OL_cond_name] = create_default_timeseries_plot_titles(OL_conds, cond_n
                             funcname = '';
                         end
                         patparts = strsplit(patname,'_');
-                        funcparts = strsplit(funcname,'_');
-                        if ~isempty(funcparts)
-                            plot_name = [patparts{2},funcparts{2}, funcparts{3}];
+                        
+                        %remove any sections of the name that consist of
+                        %four numbers or 'G4'
+                        patparts = patparts(cellfun(@isempty, regexp(patparts, '\d\d\d\d')));
+                        patparts = patparts(cellfun(@isempty, regexp(patparts, 'G4')));
+                        if ~isempty(funcname)
+                            funcparts = strsplit(funcname,'_');
+
+                            %remove any sections of the name that consist of
+                            %four numbers or 'G4'
+                            funcparts = funcparts(cellfun(@isempty,regexp(funcparts, '\d\d\d\d')));
+                            funcparts = funcparts(cellfun(@isempty,regexp(funcparts, 'G4')));
+
+                            plot_name = [join(patparts,' '), ' ', join(funcparts, ' ')];
                         else
-                            plot_name = patparts{2};
+
+                            plot_name = join(patparts,' ');
                         end
+                      
                         OL_cond_name{i}(j,k) = string(plot_name);
                     else
                         OL_cond_name{i}(j,k) = ' ';

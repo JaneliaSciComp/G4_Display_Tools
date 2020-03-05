@@ -2,106 +2,50 @@
 function [exp_settings, normalize_settings, histogram_plot_settings, histogram_annotation_settings, ...
     CL_hist_plot_settings, timeseries_plot_settings, TC_plot_settings, save_settings] = DA_plot_settings()
 
-% Settings which need updating regularly (more static settings below)
+%% Settings which need updating regularly (more static settings below)
 
-%% Settings for exp_folder generation
-
-    %1 - each genotype will be plotted in its own figure against a control. 
-    %You must still provide the control genotype (as it is in the metadata.mat file) but
-    %0 - groups will be plotted as laid out below. 
-    exp_settings.plot_all_genotypes = 1; 
-  
-    
-     %If there is a control genotype, set it here. If control_genotype is
-     %empty and plot_all_genotypes is one, each genotype will be plotted by
-     %itself. If there is a control, each genotype will be plotted by
-     %control. The control must match exactly the metadata genotype value. 
-    exp_settings.control_genotype = 'emptySplit_JFRC100_JFRC49';
-    
-    %[pretrial, intertrial, posttrial]
+%[pretrial, intertrial, posttrial]
     exp_settings.trial_options = [1 1 1];
-
-    %if plot_all_genotypes = 1, this should be an array with string
-    %"fly_genotype". If it is zero, then this should contain the strings of
-    %metadata fields by which you want to group flies. 
-    
-    %Each cell element of field_to_sort_by represents a single group. So all
-%fields in one cell element will be used to narrow down that single group
-%of flies. 
-
-%For example, field_to_sort_by{1} = ["fly_genotype", "fly_age"];
-%             field_to_sort_by{2} = ["experimenter, "fly_age"];
-%             field_values{1} = ["emptySplit_JFRC100_JFRC49","3-6 days"];
-%             field_values{2} = ["kappagantular", "3-6 days"];
-              
-              %The above will produce two groups of flies, so an exp_folder
-              %of 2 by x. The first group will contain only flies that
-              %have the genotype emptySplit_JFRC100_JFRC49 AND are 3-6 days
-              %old. The second group will contain all flies run by
-              %kappagantular and are 3-6 days old. These groups may have
-              %some overlap.
+%% Settings for exp_folder generation
     
     exp_settings.field_to_sort_by{1} = ["fly_genotype"];
-  %    exp_settings.field_to_sort_by{2} = ["fly_genotype"];
-   %   exp_settings.field_to_sort_by{3} = ["fly_genotype"];
+%   exp_settings.field_to_sort_by{2} = ["fly_genotype"];
+%   exp_settings.field_to_sort_by{3} = ["fly_genotype"];
+   
+    %if plot_all_genotypes is 1, leave field_values empty.
+    exp_settings.field_values = {};
+%   exp_settings.field_values{1} = ["emptySplit_JFRC100_JFRC49"];
+%   exp_settings.field_values{2} = ["SS01001_JFRC100_JFRC49"];
+%   exp_settings.field_values{1} = ["SS00324_JFRC100_JFRC49"];
 
     exp_settings.single_group = 0;%1-all flies should be in one group, so exp_folder should be 1xX cell array
     exp_settings.single_fly = 0;%1- only a single fly is being analyzed, the exp_folder will simply be the path to the fly
-    
-    %if plot_all_genotypes is 1, leave field_values empty.
-    
-    exp_settings.field_values = {};
-%    exp_settings.field_values{1} = ["emptySplit_JFRC100_JFRC49"];
-%     exp_settings.field_values{2} = ["SS01001_JFRC100_JFRC49"];
-%     exp_settings.field_values{1} = ["SS00324_JFRC100_JFRC49"];
-%     field_values{3} = ["Kir 1"];
-%     field_values{2} = ["Kir 1", "01 17"];
-      %field_values = ["OL0048B_UAS_Kir_JFRC49","emptySplit_UAS_Kir_JFRC49","OL0010B_UAS_Kir_JFRC49"];
+
+    %1 - each genotype will be plotted in its own figure against a control. 
+    %0 - groups will be plotted as laid out below. 
+    exp_settings.plot_all_genotypes = 1; 
+   
+     %control must match exactly the metadata genotype value. 
+    exp_settings.control_genotype = 'emptySplit_JFRC100_JFRC49';
 
     %This is the path to the protocol
-    save_settings.path_to_protocol = "/Users/taylorl/Desktop/Protocol004_OpticFlow_KirShibire_01-09-20_13-23-42/Results";
-    
-    %Optional array with the names  by which genotypes should be labeled -
-    %simpler more human readable names for each genotype. Control should
-    %come first if there is one, and it should be in the same order as
-    %field_values if field_values is not empty. If field values are empty,
-    %it will be generated in the order of the group folders alphabetically.
-    %IE If your group folders are named Experiment001 - Experiment005, you
-    %should list your genotype labels in that order with the exception that
-    %the control should always be first. 
+    save_settings.path_to_protocol = "/Users/taylorl/Desktop/Protocol004_OpticFlow_KirShibire_01-09-20_13-23-42";
     
     exp_settings.genotypes = ["Empty Split", "T4-T5", "TmY3", "CT1", "Lpc1"];
     %genotypes = ["empty-split", "LPLC-2", "LC-18", "T4_T5", "LC-15", "LC-25", "LC-11", "LC-17", "LC-4"];
-    
-    %% This will generate your exp_folder, do not edit. 
-    
-   exp_settings.exp_folder = get_exp_folder(exp_settings.field_to_sort_by, exp_settings.field_values, exp_settings.single_group, ...
-        exp_settings.single_fly, save_settings.path_to_protocol, exp_settings.control_genotype);
-    
+
 %% Save settings
     
 % Save settings   
     %The path where you wish to save the results of the data analysis
-    save_settings.save_path = '/Users/taylorl/Desktop/default_DA';
-    
+    save_settings.save_path = '/Users/taylorl/Desktop';
 
-    
 %% Experiment settings
-  
-    %If you want both normalized and unnormalized data to be analyzed, set
-    %this equal to 1 and pass in the normalization type (normfly or
-    %normgroup) as a flag. If this is set to 0 and you pass in a
-    %normalization flag, you will get normalized results only - if you
-    %don't pass it in, you'll get unnormalized results only. 
-     exp_settings.plot_norm_and_unnorm = 1;
-   
 
-    %Name of the processed file it should pull data from (note processed
-    %files in all fly folders should be named the same way)
-    exp_settings.processed_data_file = 'KS_opticflow_G4_Processed_Data';
-    
+    exp_settings.plot_norm_and_unnorm = 1;%1 or 0. Must still pass in normalization flag.
 
-    
+    exp_settings.processed_data_file = 'G4_Processed_Data';
+
     %Log file will be named using this
     exp_settings.group_being_analyzed_name = 'OpticFlow_Kirshibire';
     
@@ -113,42 +57,19 @@ function [exp_settings, normalize_settings, histogram_plot_settings, histogram_a
     %OL_TS_conds indicates the layout of your timeseries figures. See
     %documentation for example. Leave empty ([]) for default layout.
     timeseries_plot_settings.OL_TS_conds = [];
-    
-%   timeseries_plot_settings.OL_TS_conds{1} = [1 3 5 7 9 11 13; 15 17 19 21 23 25 27; ...
-%       29 31 33 34 35 36 37; 38 39 40 41 43 1 3; 5 7 9 11 13 15 17;...
-%       19 21 23 25 27 29 31; 33 34 35 36 37 38 39]; %3x1, 3x3, 3x3 ON, 8x8 (4 x 2 plots)
-%   timeseries_plot_settings.OL_TS_conds{2} = [17 19; 21 23; 25 27; 29 31]; %16x16, 64x3, 64x3 ON, 64x16 (4 x 2 plots)
-%   timeseries_plot_settings.OL_TS_conds{3} = [33 34; 35 36; 37 38; 39 40]; %left and right Looms (4 x 2 plots)
-%   timeseries_plot_settings.OL_TS_conds{4} = [41; 43]; %yaw and sideslip (2 x 1 plots)
 
-    
     %Durations inform the x axis limits on timeseries plots. Leave empty
     %for the software to pull durations from the processed data, or create
-    %an array like OL_TS_conds with x limit values instead of condition #'s
+    %an array like OL_TS_conds with x limit values instead of condition
+    %#'s. See documentation for example.
     timeseries_plot_settings.OL_TS_durations = []; 
-    
-%   timeseries_plot_settings.OL_TS_durations{1} = [3.5 1.62 3.5 1.62 3.5 1.62 3.5; 1.62 3.5 1.62 3.5 1.62 3.5 1.62; ...
-%                  3.5 1.62 0.75 1.35 1.65 0.95 0.75; 1.35 1.65 0.95 2.35 2.35 3.5 1.62; 3.5 1.62 3.5 1.62 3.5 1.62 3.5; ...
-%                  1.62 3.5 1.62 3.5 1.62 3.5 1.62; 0.75 1.35 1.65 0.95 0.75 1.35 1.65];
-%   timeseries_plot_settings.OL_TS_durations{2} = [3.5 1.62; 3.5 1.62; 3.5 1.62; 3.5 1.62];
-%   timeseries_plot_settings.OL_TS_durations{3} = [0.75 1.35; 1.65 0.95; 0.75 1.35; 1.65 0.95];
-%   timeseries_plot_settings.OL_TS_durations{4} = [2.35; 2.35];
 
-    
     %Axis labels for the timeseries plots [x, y]. For multiple figures,
     %make it a cell array with each cell element corresponding to that
-    %figure in the OL_TS_conds array.
-%     timeseries_plot_settings.OL_TSconds_axis_labels{1} = ["Time(sec)", "LmR"];
-%     timeseries_plot_settings.OL_TSconds_axis_labels{2} = ["Time(sec)", "faLmR"];
-
+    %figure in the OL_TS_conds array. See documentation for example.
     timeseries_plot_settings.OL_TSconds_axis_labels = {};
 
-    
-    %An array of figure names for each figure of timeseries plots. This is
-    %per datatype. If you are using the default timseries layout, it will
-    %plot 30 timeseries subplots per figure, so divide your total number of
-    %plotted conditions by 30 to determine how many figures there will be. 
-    %Should correspond to datatypes.
+    %An array of figure names for each figure of timeseries plots. 
     timeseries_plot_settings.figure_names = ["LmR"];
     
 %datatype options for flying data: 'LmR_chan', 'L_chan', 'R_chan', 'F_chan', 'Frame Position', 'LmR', 'LpR', 'faLmR'
@@ -166,16 +87,12 @@ function [exp_settings, normalize_settings, histogram_plot_settings, histogram_a
     
     %plot both directions for each condition on the same axis. 
     timeseries_plot_settings.plot_both_directions = 1;
-    
 
-    
     %If you want the plots to have their own plot titles, make a cell array
-    %of titles corresponding to the OL_TS_conds array. IF left empty, a
-    %default array will be made by combining the pattern and function name of that condition. If you want no
-    %plot titles, set cond_name = 0
+    %of titles corresponding to the OL_TS_conds array. Else leave empty or
+    %set to 0 (no titles).
     timeseries_plot_settings.cond_name = [];
     
-
     %Create array to dictate layout of CL histograms or leave empty for def
     CL_hist_plot_settings.CL_hist_conds = [];
     
@@ -211,7 +128,7 @@ function [exp_settings, normalize_settings, histogram_plot_settings, histogram_a
 
     
 
-%Further settings that may not need adjusting often    
+%% Further settings that may not need adjusting often    
     %% Normalization Settings
 
     normalize_settings.normalize_to_baseline = {'LpR'};%datatypes to normalize by setting the baseline value to 1
@@ -301,5 +218,10 @@ function [exp_settings, normalize_settings, histogram_plot_settings, histogram_a
         %If there are any settings necessary for new module, add them to
         %one of the existing settings structs or create a new struct (more
         %work)
+        
+    %% This will generate your exp_folder, do not edit. 
+    
+   exp_settings.exp_folder = get_exp_folder(exp_settings.field_to_sort_by, exp_settings.field_values, exp_settings.single_group, ...
+        exp_settings.single_fly, save_settings.path_to_protocol, exp_settings.control_genotype);
 
 end
