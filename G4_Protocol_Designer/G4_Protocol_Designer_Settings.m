@@ -12,12 +12,12 @@ Rearing Protocol Sheet GID: 2007977020
 Light Cycle Sheet GID: 1154672887
 
 
-Default run protocol file: C:\matlabroot\G4_Display_Tools\G4_Protocol_Designer\run_protocols\G4_default_run_protocol.m
-Default processing file: C:\matlabroot\G4_Display_Tools\G4_Data_Analysis\data processing\G4_Process_Data_flyingdetector.m
+Default run protocol file: C:\matlabroot\G4_Display_Tools\G4_Protocol_Designer\run_protocols\G4_run_protocol_combinedCommand.m
+Default processing file: C:\matlabroot\G4_Display_Tools\G4_Data_Analysis\data processing\G4_Process_Data_flyingdetector_combinedComm.m
 Default plotting file: C:\matlabroot\G4_Display_Tools\G4_Protocol_Designer\plotting_files\G4_Plot_Data_flyingdetector_pdf.m
 
-Default test run protocol file: C:\matlabroot\G4_Display_Tools\G4_Protocol_Designer\run_protocols\G4_default_run_protocol.m
-Default test processing file: C:\matlabroot\G4_Display_Tools\G4_Data_Analysis\data processing\G4_Process_Data_flyingdetector.m
+Default test run protocol file: C:\matlabroot\G4_Display_Tools\G4_Protocol_Designer\run_protocols\G4_run_protocol_combinedCommand.m
+Default test processing file: C:\matlabroot\G4_Display_Tools\G4_Data_Analysis\data processing\G4_Process_Data_flyingdetector_combinedComm.m
 Default test plotting file: C:\matlabroot\G4_Display_Tools\G4_Protocol_Designer\plotting_files\G4_Plot_Data_flyingdetector_pdf.m
 
 Flight test protocol file: C:\matlabroot\G4_Display_Tools\G4_Protocol_Designer\test_protocols\test_protocol1\test_protocol1.g4p
