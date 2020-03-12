@@ -24,6 +24,7 @@ function plot_OL_timeseries(timeseries_data, timestampsIN, OL_conds, OL_duration
     y_fontsize = plot_settings.yLabel_fontSize;
     x_fontsize = plot_settings.xLabel_fontSize;
     fly_Colors = plot_settings.fly_colors;
+    axis_num_fontSize = plot_settings.axis_num_fontSize;
     
     
 
@@ -148,6 +149,7 @@ function plot_OL_timeseries(timeseries_data, timestampsIN, OL_conds, OL_duration
                             mm = [min(y), max(y)];
                             ydata = [ydata, mm];
                         end
+                        set(gca, 'FontSize', axis_num_fontSize);
                         
                        % timeseries_ylimits(d,:) = ylim;
  
