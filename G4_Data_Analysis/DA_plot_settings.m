@@ -29,7 +29,7 @@ function [exp_settings, normalize_settings, histogram_plot_settings, histogram_a
     exp_settings.control_genotype = 'emptySplit_JFRC100_JFRC49';
 
     %This is the path to the protocol
-    save_settings.path_to_protocol = "/Users/taylorl/Desktop/Protocol004_OpticFlow_KirShibire_01-09-20_13-23-42";
+    save_settings.path_to_protocol = "/Users/taylorl/Desktop/Protocol004_OpticFlow_KirShibire_01-09-20_13-23-42/Results";
     
     exp_settings.genotypes = ["Empty Split", "T4-T5", "TmY3", "CT1", "Lpc1"];
     %genotypes = ["empty-split", "LPLC-2", "LC-18", "T4_T5", "LC-15", "LC-25", "LC-11", "LC-17", "LC-4"];
@@ -38,13 +38,13 @@ function [exp_settings, normalize_settings, histogram_plot_settings, histogram_a
     
 % Save settings   
     %The path where you wish to save the results of the data analysis
-    save_settings.save_path = '/Users/taylorl/Desktop';
+    save_settings.save_path = '/Users/taylorl/Desktop/default_DA';
 
 %% Experiment settings
 
     exp_settings.plot_norm_and_unnorm = 1;%1 or 0. Must still pass in normalization flag.
 
-    exp_settings.processed_data_file = 'G4_Processed_Data';
+    exp_settings.processed_data_file = 'KS_opticflow_G4_Processed_Data';
 
     %Log file will be named using this
     exp_settings.group_being_analyzed_name = 'OpticFlow_Kirshibire';
@@ -177,8 +177,9 @@ function [exp_settings, normalize_settings, histogram_plot_settings, histogram_a
     timeseries_plot_settings.timeseries_xlimits = [0 4];
     timeseries_plot_settings.subtitle_fontSize = 8;
     timeseries_plot_settings.legend_fontSize = 6;
-    timeseries_plot_settings.yLabel_fontSize = 10;
-    timeseries_plot_settings.xLabel_fontSize = 10;
+    timeseries_plot_settings.yLabel_fontSize = 6;
+    timeseries_plot_settings.xLabel_fontSize = 6;
+    timeseries_plot_settings.axis_num_fontSize = 6;
     timeseries_plot_settings.overlap = 0; %not working
     timeseries_plot_settings.fly_colors = [.95 .95 .95; .9 .9 .9; .85 .85 .85; .8 .8 .8; .75 .75 .75; .7 .7 .7; .65 .65 .65; .6 .6 .6; .55 .55 .55; .5 .5 .5; .45 .45 .45;  .4 .4 .4; .35 .35 .35; .3 .3 .3; .25 .25 .25; .2 .2 .2; .15 .15 .15; .1 .1 .1]; %Colors assigned to individual fly lines
     timeseries_plot_settings.rep_colors = [0 0 0; 1 0 0; 0 0.5 0; 0 0 1; 1 0.5 0; .75 0 1; 0 1 0; 0 1 1; 1 0 1; 1 1 0]; %default 10 colors supports up to 10 groups (add more colors for more groups)

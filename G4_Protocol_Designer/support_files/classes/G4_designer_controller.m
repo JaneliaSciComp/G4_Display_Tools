@@ -184,6 +184,8 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
             columns_editable = true;
             column_format = {'numeric', 'char', 'char', 'char', 'char','char', ...
                 'char', 'char', 'numeric', 'numeric', 'numeric', 'numeric', 'logical'};
+            column_widths = {'auto', 'auto', 'auto', 'auto', 'auto', 'auto', ...
+                'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto',};
             font_size = 10;
             
             positions.pre = [.2, .92, .682, .06];
@@ -205,7 +207,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
 
             self.pretrial_table = uitable(self.f, 'data', self.doc.pretrial, 'columnname', column_names, ...
             'units', 'normalized', 'Position', positions.pre, 'ColumnEditable', columns_editable, 'ColumnFormat', column_format, ...
-           'CellEditCallback', @self.update_model_pretrial, 'CellSelectionCallback', {@self.preview_selection, positions});
+            'ColumnWidth', column_widths, 'CellEditCallback', @self.update_model_pretrial, 'CellSelectionCallback', {@self.preview_selection, positions});
 
             % intertrial_label
             uicontrol(self.f, 'Style', 'text', 'String', 'Inter-Trial', ...
@@ -214,7 +216,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
 
             self.intertrial_table = uitable(self.f, 'data', self.doc.intertrial, 'columnname', column_names, ...
             'units', 'normalized', 'Position', positions.inter, 'ColumnEditable', columns_editable, 'ColumnFormat', column_format, ...
-            'CellEditCallback', @self.update_model_intertrial, 'CellSelectionCallback', {@self.preview_selection, positions});
+            'ColumnWidth', column_widths, 'CellEditCallback', @self.update_model_intertrial, 'CellSelectionCallback', {@self.preview_selection, positions});
 
             %blocktrial_label
             uicontrol(self.f, 'Style', 'text', 'String', 'Block Trials', ...
@@ -223,7 +225,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
 
             self.block_table = uitable(self.f, 'data', self.doc.block_trials, 'columnname', column_names, ...
             'units', 'normalized', 'Position', positions.block, 'ColumnEditable', columns_editable, 'ColumnFormat', column_format, ...
-            'CellEditCallback', @self.update_model_block_trials, 'CellSelectionCallback', {@self.preview_selection, positions});
+            'ColumnWidth', column_widths, 'CellEditCallback', @self.update_model_block_trials, 'CellSelectionCallback', {@self.preview_selection, positions});
 
             %posttrial_label
             uicontrol(self.f, 'Style', 'text', 'String', 'Post-Trial', ...
@@ -232,7 +234,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
 
             self.posttrial_table = uitable(self.f, 'data', self.doc.posttrial, 'columnname', column_names, ...
             'units', 'normalized', 'Position', positions.post, 'ColumnEditable', columns_editable, 'ColumnFormat', column_format, ...
-            'CellEditCallback', @self.update_model_posttrial, 'CellSelectionCallback', {@self.preview_selection, positions});
+            'ColumnWidth', column_widths, 'CellEditCallback', @self.update_model_posttrial, 'CellSelectionCallback', {@self.preview_selection, positions});
 
             %add_trial_button
             uicontrol(self.f, 'Style', 'pushbutton','String','Add Trial','units', ...
@@ -3333,6 +3335,51 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
             end
 
         end
+        
+        function update_column_widths(self)
+            
+            %establish minimum width for each column
+           max_len = cell(4,13);
+           for i = 1:size(max_len,1)
+               for j = 1:size(max_len,2)
+                   if j == 2 || j == 3
+                        max_len{i,j} = 20;
+                   elseif j == 8 || j == 9 || j == 12
+                        max_len{i,j} = 15;
+                   else
+                       max_len{i,j} = 10;
+                   end
+               end
+           end
+           tables = {self.pretrial_table, self.intertrial_table, self.posttrial_table, self.block_table};
+           data = {self.doc.pretrial, self.doc.intertrial, self.doc.posttrial, self.doc.block_trials};
+           
+           %get max width for each column in pretrial
+           for table = 1:length(tables)
+                for col = 1:size(data{table},2)
+                    for row = 1:size(data{table},1)
+                        width = length(data{table}{row, col});
+                        if width > max_len{table,col}
+                           max_len{table,col} = width;
+                        end
+                    end
+                end
+           end
+            
+            %convert from length in characters to pixels
+            for i = 1:size(max_len,1)
+                for j = 1:size(max_len,2)
+                    max_len{i,j} = max_len{i,j}*5;
+                end
+            end
+            
+            self.pretrial_table.ColumnWidth = max_len(1,:);
+            self.intertrial_table.ColumnWidth = max_len(2,:);
+            self.posttrial_table.ColumnWidth = max_len(3,:);
+            self.block_table.ColumnWidth = max_len(4,:);
+
+            
+        end
 
 %% Additional Update functions
 
@@ -3370,6 +3417,9 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
             self.set_exp_name();
             self.set_recent_file_menu_items();
             self.set_exp_length_text();
+            self.doc.replace_greyed_cell_values();
+            self.update_column_widths();
+            self.insert_greyed_cells();
             
 
 

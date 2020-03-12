@@ -720,8 +720,17 @@ classdef G4_conductor_controller < handle
                         disp('data analysis settings file could not be found. Please run manually.');
                     end
                 elseif self.model.do_plotting == 1 && isfile(self.model.plotting_file)
+                    
+                    [plot_path, plot_comm, ext] = fileparts(self.model.plotting_file);
+                    if strcmp(ext,'.mat')
 
-                    self.run_single_fly_DA(self.model.plotting_file, fly_results_folder, trial_options, processed_filename, experiment_folder);
+                        self.run_single_fly_DA(self.model.plotting_file, fly_results_folder, trial_options, processed_filename, experiment_folder);
+                    else
+                        
+                        %Do old analysis.
+                        self.run_pdf_report(fly_results_folder, trial_options, processed_filename);
+                        
+                    end
                 
                 end
 
@@ -731,90 +740,16 @@ classdef G4_conductor_controller < handle
                 self.view.set_progress_title('Finished.');
                 drawnow;
             end
-            
-            
-            
 
         end
-                
-               
-%                 [plot_path, plot_name, plot_ext] = fileparts(self.model.plotting_file);
-%                 plotting_command = plot_name + "(metadata.fly_results_folder, metadata.trial_options)";
-%                 plot_file = strcat(plot_name, plot_ext);
-%                 %Put all metadata in a struct to be passed to the
-%                 %function which creates the pdf.
-% 
-%                 metadata = struct;
-%                 metadata.experimenter = self.model.experimenter;
-%                 metadata.experiment_name = self.doc.experiment_name;
-%                 metadata.run_protocol_file = self.model.run_protocol_file;
-%                 
-%                 %Turn experiment type (1,2, or 3) to matching word
-%                 %("Flight", etc)
-%                 if self.model.experiment_type == 1
-%                     metadata.experiment_type = "Flight";
-%                 elseif self.model.experiment_type == 2
-%                     metadata.experiment_type = "Camera Walk";
-%                 elseif self.model.experiment_type == 3
-%                     metadata.experiment_type = "Chip Walk";
-%                 end
-%                 metadata.fly_name = self.model.fly_name;
-%                 metadata.fly_genotype = self.model.fly_genotype;
-%                 if ~isempty(self.view)
-%                     metadata.timestamp = self.view.date_and_time_box.String;
-%                 else
-%                     metadata.timestamp = datestr(now, 'mm-dd-yyyy HH:MM:SS');
-%                 end
-%                 metadata.fly_age = self.model.fly_age;
-%                 metadata.fly_sex = self.model.fly_sex;
-%                 metadata.experiment_temp = self.model.experiment_temp;
-%                 metadata.rearing_protocol = self.model.rearing_protocol;
-%                 
-%                 metadata.plotting_file = self.model.plotting_file;
-%                 metadata.processing_file = self.model.processing_file;
-%                 if self.model.do_plotting == 1
-%                     metadata.do_plotting = "Yes";
-%                 elseif self.model.do_plotting == 0
-%                     metadata.do_plotting = "No";
-%                 end
-%                 if self.model.do_processing == 1
-%                     metadata.do_processing = "Yes";
-%                 elseif self.model.do_processing == 0
-%                     metadata.do_processing = "No";
-%                 end
-% 
-%                 metadata.plotting_command = plotting_command;
-%                 metadata.fly_results_folder = fly_results_folder;
-%                 metadata.trial_options = trial_options;
-%                 metadata.comments = self.model.metadata_comments;
-%                 metadata.light_cycle = self.model.light_cycle;
-%             
-%                 %assigns the metadata struct to metadata in the base
-%                 %workspace so publish can use it.
-%                 assignin('base','metadata',metadata);
-%                 assignin('base','fly_results_folder',fly_results_folder);
-%                 assignin('base','trial_options',trial_options);
-%                 assignin('base','processed_filename', processed_filename);
-% 
-%                 %publishes the output (but not code) "create_pdf_script" to
-%                 %a pdf file.
-%                 options.codeToEvaluate = sprintf('%s(%s,%s,%s,%s)',plot_name,'fly_results_folder','trial_options','metadata','processed_filename');
-%                 options.format = 'pdf';
-%                 options.outputDir = sprintf('%s',fly_results_folder);
-%                 options.showCode = false;
-%                 publish(plot_file,options);
-%                 
-%                 plot_filename = strcat(plot_name,'.pdf');
-%                 new_plot_filename = strcat(self.model.fly_name,'.pdf');
-%                 pdf_path = fullfile(fly_results_folder,plot_filename);
-%                 new_pdf_path = fullfile(fly_results_folder,new_plot_filename);
-%                 movefile(pdf_path, new_pdf_path);
 
 
         function update_flyName_reminder(self)
+            
            if ~isempty(self.view)
                 self.create_error_box("If you are changing flies, please remember to update the fly name.");
            end
+           
         end
         
         function prepare_test_exp(self)
@@ -1473,6 +1408,82 @@ classdef G4_conductor_controller < handle
             end
             
             trial_options = [is_pretrial, is_intertrial, is_posttrial];
+            
+        end
+        
+        function run_pdf_report(self, fly_results_folder, trial_options, processed_filename)
+            
+            [plot_path, plot_name, plot_ext] = fileparts(self.model.plotting_file);
+            plotting_command = plot_name + "(metadata.fly_results_folder, metadata.trial_options)";
+            plot_file = strcat(plot_name, plot_ext);
+            %Put all metadata in a struct to be passed to the
+            %function which creates the pdf.
+
+            metadata = struct;
+            metadata.experimenter = self.model.experimenter;
+            metadata.experiment_name = self.doc.experiment_name;
+            metadata.run_protocol_file = self.model.run_protocol_file;
+            
+            if self.model.experiment_type == 1
+                metadata.experiment_type = "Flight";
+            elseif self.model.experiment_type == 2
+                metadata.experiment_type = "Camera Walk";
+            elseif self.model.experiment_type == 3
+                metadata.experiment_type = "Chip Walk";
+            end
+            
+            metadata.fly_name = self.model.fly_name;
+            metadata.fly_genotype = self.model.fly_genotype;
+            if ~isempty(self.view)
+                metadata.timestamp = self.view.date_and_time_box.String;
+            else
+                metadata.timestamp = datestr(now, 'mm-dd-yyyy HH:MM:SS');
+            end
+            metadata.fly_age = self.model.fly_age;
+            metadata.fly_sex = self.model.fly_sex;
+            metadata.experiment_temp = self.model.experiment_temp;
+            metadata.rearing_protocol = self.model.rearing_protocol;
+            metadata.plotting_file = self.model.plotting_file;
+            metadata.processing_file = self.model.processing_file;
+            if self.model.do_plotting == 1
+                metadata.do_plotting = "Yes";
+            elseif self.model.do_plotting == 0
+                metadata.do_plotting = "No";
+            end
+            if self.model.do_processing == 1
+                metadata.do_processing = "Yes";
+            elseif self.model.do_processing == 0
+                metadata.do_processing = "No";
+            end
+            metadata.plotting_command = plotting_command;
+            
+            metadata.fly_results_folder = fly_results_folder;
+            metadata.trial_options = trial_options;
+            metadata.comments = self.model.metadata_comments;
+            metadata.light_cycle = self.model.light_cycle;
+
+            %assigns the metadata struct to metadata in the base
+            %workspace so publish can use it.
+            assignin('base','metadata',metadata);
+            assignin('base','fly_results_folder',fly_results_folder);
+            assignin('base','trial_options',trial_options);
+            assignin('base','processed_filename', processed_filename);
+
+            %publishes the output (but not code) "create_pdf_script" to
+            %a pdf file.
+            options.codeToEvaluate = sprintf('%s(%s,%s,%s,%s)',plot_name,'fly_results_folder','trial_options','metadata','processed_filename');
+            options.format = 'pdf';
+            options.outputDir = sprintf('%s',fly_results_folder);
+            options.showCode = false;
+            publish(plot_file,options);
+
+
+            plot_filename = strcat(plot_name,'.pdf');
+            new_plot_filename = strcat(self.model.fly_name,'.pdf');
+            pdf_path = fullfile(fly_results_folder,plot_filename);
+            new_pdf_path = fullfile(fly_results_folder,new_plot_filename);
+            movefile(pdf_path, new_pdf_path);
+
             
         end
 

@@ -112,9 +112,7 @@ classdef create_data_analysis_tool < handle
             self.save_settings = settings.save_settings;
             self.exp_folder = self.exp_settings.exp_folder;
             self.trial_options = self.exp_settings.trial_options;
-          
-   
-        
+
             self.normalize_option = 0; %0 = don't normalize, 1 = normalize every fly, 2 = normalize every group
             self.histogram_plot_option = 0;
             self.CL_histogram_plot_option = 0;
