@@ -1216,21 +1216,22 @@ classdef G4_conductor_controller < handle
             inter = [];
             block = [];
             post = [];
-            
+
             for i = 1:length(active_ao_channels)
                 channel_num = active_ao_channels(i);
                 pre(i) = self.doc.get_ao_index(self.doc.pretrial{channel_num + 4});
                 inter(i) = self.doc.get_ao_index(self.doc.intertrial{channel_num + 4});
                 post(i) = self.doc.get_ao_index(self.doc.posttrial{channel_num + 4});
             end
-            
-            
+
             for m = 1:length(active_ao_channels)
                 channel_num = active_ao_channels(m);
                 for k = 1:length(self.doc.block_trials(:,1))
                     block(k,m) = self.doc.get_ao_index(self.doc.block_trials{k, channel_num + 4});
                 end
             end
+
+                
             
             %Fill in zeros for the ao indices for inactive channels
             [pre, inter, block, post] = self.fill_inactive_ao_indices(active_ao_channels, pre, inter, block, post);
@@ -1240,99 +1241,111 @@ classdef G4_conductor_controller < handle
         end
         
         function [pre, inter, block, post] = fill_inactive_ao_indices(self, active_ao_channels, pre, inter, block, post)
-           
-            if sum(ismember(active_ao_channels,0)) == 0
-                new_pre = [0 pre];
-                new_inter = [0 inter];
-                new_post = [0 post];
+            
+            if ~isempty(active_ao_channels)
+                if sum(ismember(active_ao_channels,0)) == 0
+                    new_pre = [0 pre];
+                    new_inter = [0 inter];
+                    new_post = [0 post];
+
+                    for trial = 1:length(self.doc.block_trials(:,1))
+                        new_block(trial,:) = [0 block(trial,:)];
+                    end
+
+                    pre = new_pre;
+                    inter = new_inter;
+                    post = new_post;
+                    block = new_block;
+                end
+
+                if sum(ismember(active_ao_channels,1)) == 0
+                    new_pre = [];
+                    new_inter = [];
+                    new_post = [];
+                    new_block = [];
+                    if length(pre) >= 2
+                        new_pre = [pre(1) 0 pre(2:end)];
+                        new_inter = [inter(1) 0 inter(2:end)];
+                        new_post = [post(1) 0 post(2:end)];
+
+                        for trial = 1:length(self.doc.block_trials(:,1))
+                            new_block(trial,:) = [block(trial,1) 0  block(trial,2:end)];
+                        end
+                    else
+                        new_pre = [pre(1) 0];
+                        new_inter = [inter(1) 0];
+                        new_post = [post(1) 0];
+
+                        for trial = 1:length(self.doc.block_trials(:,1))
+                            new_block(trial,:) = [block(trial,1) 0];
+                        end
+                    end
+
+                    pre = new_pre;
+                    inter = new_inter;
+                    post = new_post;
+                    block = new_block;
+                end
+
+                if sum(ismember(active_ao_channels,2)) == 0
+                    new_pre = [];
+                    new_inter = [];
+                    new_post = [];
+                    new_block = [];
+                    if length(pre) >= 3
+                        new_pre = [pre(1:2) 0 pre(end)];
+                        new_inter = [inter(1:2) 0 inter(end)];
+                        new_post = [post(1:2) 0 post(end)];
+
+                        for trial = 1:length(self.doc.block_trials(:,1))
+                            new_block(trial,:) = [block(trial,1:2) 0  block(trial,end)];
+                        end
+                    else
+                        new_pre = [pre(1:2) 0];
+                        new_inter = [inter(1:2) 0];
+                        new_post = [post(1:2) 0];
+
+                        for trial = 1:length(self.doc.block_trials(:,1))
+                            new_block(trial,:) = [block(trial,1:2) 0];
+                        end
+                    end
+
+                    pre = new_pre;
+                    inter = new_inter;
+                    post = new_post;
+                    block = new_block;
+                end
+
+                if sum(ismember(active_ao_channels,3)) == 0
+                    new_pre = [];
+                    new_inter = [];
+                    new_post = [];
+                    new_block = [];
+
+                    new_pre = [pre(1:3) 0];
+                    new_inter = [inter(1:3) 0];
+                    new_post = [post(1:3) 0];
+
+                    for trial = 1:length(self.doc.block_trials(:,1))
+                        new_block(trial,:) = [block(trial,1:3) 0];
+                    end
+
+
+                    pre = new_pre;
+                    inter = new_inter;
+                    post = new_post;
+                    block = new_block;
+                end
                 
+            else
+                
+                pre = [0 0 0 0];
+                inter = [0 0 0 0];
+                post = [0 0 0 0];
                 for trial = 1:length(self.doc.block_trials(:,1))
-                    new_block(trial,:) = [0 block(trial,:)];
+                    block(trial,:) = [0 0 0 0];
                 end
                 
-                pre = new_pre;
-                inter = new_inter;
-                post = new_post;
-                block = new_block;
-            end
-            
-            if sum(ismember(active_ao_channels,1)) == 0
-                new_pre = [];
-                new_inter = [];
-                new_post = [];
-                new_block = [];
-                if length(pre) >= 2
-                    new_pre = [pre(1) 0 pre(2:end)];
-                    new_inter = [inter(1) 0 inter(2:end)];
-                    new_post = [post(1) 0 post(2:end)];
-
-                    for trial = 1:length(self.doc.block_trials(:,1))
-                        new_block(trial,:) = [block(trial,1) 0  block(trial,2:end)];
-                    end
-                else
-                    new_pre = [pre(1) 0];
-                    new_inter = [inter(1) 0];
-                    new_post = [post(1) 0];
-
-                    for trial = 1:length(self.doc.block_trials(:,1))
-                        new_block(trial,:) = [block(trial,1) 0];
-                    end
-                end
-                
-                pre = new_pre;
-                inter = new_inter;
-                post = new_post;
-                block = new_block;
-            end
-            
-            if sum(ismember(active_ao_channels,2)) == 0
-                new_pre = [];
-                new_inter = [];
-                new_post = [];
-                new_block = [];
-                if length(pre) >= 3
-                    new_pre = [pre(1:2) 0 pre(end)];
-                    new_inter = [inter(1:2) 0 inter(end)];
-                    new_post = [post(1:2) 0 post(end)];
-
-                    for trial = 1:length(self.doc.block_trials(:,1))
-                        new_block(trial,:) = [block(trial,1:2) 0  block(trial,end)];
-                    end
-                else
-                    new_pre = [pre(1:2) 0];
-                    new_inter = [inter(1:2) 0];
-                    new_post = [post(1:2) 0];
-
-                    for trial = 1:length(self.doc.block_trials(:,1))
-                        new_block(trial,:) = [block(trial,1:2) 0];
-                    end
-                end
-                
-                pre = new_pre;
-                inter = new_inter;
-                post = new_post;
-                block = new_block;
-            end
-            
-            if sum(ismember(active_ao_channels,3)) == 0
-                new_pre = [];
-                new_inter = [];
-                new_post = [];
-                new_block = [];
-
-                new_pre = [pre(1:3) 0];
-                new_inter = [inter(1:3) 0];
-                new_post = [post(1:3) 0];
-
-                for trial = 1:length(self.doc.block_trials(:,1))
-                    new_block(trial,:) = [block(trial,1:3) 0];
-                end
-   
-                
-                pre = new_pre;
-                inter = new_inter;
-                post = new_post;
-                block = new_block;
             end
             
             
