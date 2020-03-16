@@ -535,6 +535,7 @@ classdef G4_conductor_controller < handle
             %get path to experiment folder
             [experiment_path, ~, ~] = fileparts(self.doc.save_filename);
             experiment_folder = experiment_path;
+            self.model.update_fly_save_name();
   
             %Path to save all results for this fly
             fly_results_folder = fullfile(experiment_folder, self.model.date_folder, self.model.fly_save_name);
