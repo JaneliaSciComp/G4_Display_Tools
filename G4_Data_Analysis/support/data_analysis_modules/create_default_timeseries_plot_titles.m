@@ -50,10 +50,14 @@ function [OL_cond_name] = create_default_timeseries_plot_titles(OL_conds, cond_n
                             funcparts = funcparts(cellfun(@isempty,regexp(funcparts, '\d\d\d\d')));
                             funcparts = funcparts(cellfun(@isempty,regexp(funcparts, 'G4')));
 
-                            plot_name = [join(patparts,' '), ' ', join(funcparts, ' ')];
+                            part1 = join(patparts,' ');
+                            part2 = join(funcparts, ' ');
+
+                            plot_name = [part1{1}, ' ', part2{1}];
                         else
 
                             plot_name = join(patparts,' ');
+                            plot_name = plot_name{1};
                         end
                       
                         OL_cond_name{i}(j,k) = string(plot_name);
