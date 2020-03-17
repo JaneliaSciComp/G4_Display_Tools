@@ -11,10 +11,13 @@ function save_figure(save_settings, varargin)
     x_width = save_settings.x_width;
     y_width = save_settings.y_width;
     
-    set(gcf, 'PaperUnits', paperunits);
-    set(gcf, 'PaperPosition', [0.4 0.4 x_width y_width]);
-    orient(gcf, orientation);
-    print(save_path,'-dpdf');
-    close(gcf);
+    h =  findobj('type','figure');
+    fig_to_save = h(1);
+    
+    set(fig_to_save, 'PaperUnits', paperunits);
+    set(fig_to_save, 'PaperPosition', [0.4 0.4 x_width y_width]);
+    orient(fig_to_save, orientation);
+    print(fig_to_save, save_path,'-dpdf');
+    close(fig_to_save);
 
 end
