@@ -183,7 +183,7 @@ function plot_OL_timeseries(timeseries_data, timestampsIN, OL_conds, OL_duration
                     if place == bottom_left_place
                         xlabel(axis_labels{OL_inds==d}(1), 'FontSize', x_fontsize) %7th subplot - Bottom Left
                     end
-                    if ~isnan(OL_durations(place)) || OL_durations(place) ~= 0
+                    if ~isnan(OL_durations(place)) && OL_durations(place) ~= 0
                         xlim([0, OL_durations(place)]);
                     end
                     
