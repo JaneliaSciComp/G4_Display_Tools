@@ -154,18 +154,19 @@ function exp_folder = get_exp_folder(field_to_sort_by, field_values, single_grou
             end
             for l = 1:length(field_to_sort_by)
                 for j = 1:length(field_to_sort_by{l})
-                    for m = 1:length(field_values{l})
+                    
 
-                        if contains(metadata.metadata.(field_to_sort_by{l}(j)),field_values{l}(m))
-                            passed(m) = 1;
-                        else
-                            passed(m) = 0;
+                    if contains(metadata.metadata.(field_to_sort_by{l}(j)),field_values{l}(j))
+                        passed(j) = 1;
+                    else
+                        passed(j) = 0;
 
-                        end
                     end
-                    if sum(passed) == m
-                        exp_folder{l,end+1} = fly_file;
-                    end
+                    
+                    
+                end
+                if sum(passed) == j
+                    exp_folder{l,end+1} = fly_file;
                 end
             end
         end
