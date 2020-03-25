@@ -479,6 +479,12 @@ classdef create_data_analysis_tool < handle
                        self.TC_plot_settings.figure_names(tcname) = self.TC_plot_settings.figure_names(tcname) + " - Normalized";
                     end
                 end
+                for revert_name = 1:length(self.timeseries_plot_settings.figure_names)
+                    self.timeseries_plot_settings.figure_names(revert_name) = erase(self.timeseries_plot_settings.figure_names(revert_name), " - Normalized");
+                end
+                for revert_tcname = 1:length(self.TC_plot_settings.figure_names)
+                    self.TC_plot_settings.figure_names(revert_tcname) = erase(self.TC_plot_settings.figure_names(revert_tcname), " - Normalized");
+                end
             else
                 analyses_run = self.generate_plots(analyses_run, num_positions, num_datatypes, num_conds, num_datapoints, single);
             end

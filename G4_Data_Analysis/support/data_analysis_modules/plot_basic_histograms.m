@@ -28,7 +28,11 @@ function plot_basic_histograms(timeseries_data, interhistogram_data, ...
     if num_groups > 5
         for i = 1:ceil(num_groups/5)
             if i == ceil(num_groups/5)
-                groups(i) = rem(num_groups,5);
+                if rem(num_groups,5) == 0
+                    groups(i) = 5;
+                else
+                    groups(i) = rem(num_groups,5);
+                end
             else
                 groups(i) = 5;
             end
@@ -125,9 +129,9 @@ function plot_basic_histograms(timeseries_data, interhistogram_data, ...
                     x = xlim;
                     x = x(2);
                     tickgap = x/10;
-                    for k = 1:11
-                        tick_labels(k) = (-180 + (36*k) - 36);
-                        ticks(k) = k*tickgap - tickgap;
+                    for tick = 1:11
+                        tick_labels(tick) = (-180 + (36*tick) - 36);
+                        ticks(tick) = tick*tickgap - tickgap;
                     end
 
                     xticks(ticks);
@@ -172,10 +176,14 @@ function plot_basic_histograms(timeseries_data, interhistogram_data, ...
 
 
         end
-        
+        if k == 1
+            genotype_labels = 1:groups(k);
+        else
+            genotype_labels = sum(groups(1:k-1))+1:sum(groups(1:k));
+        end
 
 
-        save_figure(save_settings, genotype{1:end}, 'hist', num2str(k));
+        save_figure(save_settings, genotype{genotype_labels}, 'hist', num2str(k));
     end
     
 %     currgraph = gcf;
