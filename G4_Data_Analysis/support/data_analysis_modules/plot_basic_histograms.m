@@ -49,7 +49,7 @@ function plot_basic_histograms(timeseries_data, interhistogram_data, ...
         num_plot_groups = groups(k);
         figure();
         
-        for gr = 1:num_plot_groups*length(groups)
+        for gr = 1:num_plot_groups*(length(groups)-1)+groups(end)
             flies(gr) = 0;
             while sum(sum(sum(~isnan(timeseries_data(gr,flies(gr)+1,:,:,:))))) && flies(gr) <= num_exps-1
                 flies(gr) = flies(gr) + 1;

@@ -213,6 +213,7 @@ function [exp_settings, normalize_settings, histogram_plot_settings, histogram_a
     save_settings.x_width = 8; 
     save_settings.y_width = 10;
     save_settings.orientation = 'landscape';
+    save_settings.high_resolution = 0;
     
     
         %% TO ADD A NEW MODULE
