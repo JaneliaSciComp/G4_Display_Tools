@@ -43,6 +43,7 @@ function process_data(exp_folder, processing_settings_file)
     trial_options = settings.trial_options;
     faLmR = settings.enable_faLmR;
     enable_pos_series = settings.enable_pos_series;
+    pos_conditions = settings.pos_conditions;
     num_positions = settings.num_positions;
     data_pad = settings.data_pad;
     sm_delay = settings.sm_delay;
@@ -235,7 +236,7 @@ function process_data(exp_folder, processing_settings_file)
     if enable_pos_series
             
         [pos_series, mean_pos_series] = get_position_series(ts_data, ...
-            Frame_ind, num_positions, data_pad, LmR_ind, sm_delay);
+            Frame_ind, num_positions, data_pad, LmR_ind, sm_delay, pos_conditions);
 
     else
         pos_series = [];

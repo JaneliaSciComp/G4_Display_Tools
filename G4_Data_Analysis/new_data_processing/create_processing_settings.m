@@ -33,6 +33,9 @@ function create_processing_settings()
     
     %% Position series settings
     settings.enable_pos_series = 1; %If you want position series, set to 1. Only use on sweeps
+    settings.pos_conditions = [14 15 16 17 18 19 20 21 22 23 24 25 26]; %A 1xn array with numbers of conditions to be included in position series
+                                  %Leave empty if all conditions to be
+                                  %included.
     settings.sm_delay = 0; %add delay in ms to account for sensorimotor delay
     settings.num_positions = 192;
     settings.data_pad = 1050; %in ms

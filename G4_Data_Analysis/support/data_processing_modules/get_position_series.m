@@ -1,8 +1,14 @@
-function [pos_series, mean_pos_series] = get_position_series(ts_data, Frame_ind, num_positions, data_pad, LmR_ind, sm_delay)
-
-    [num_chans, num_conds, num_reps, max_pts] = size(ts_data);
+function [pos_series, mean_pos_series] = get_position_series(ts_data, Frame_ind, ...
+    num_positions, data_pad, LmR_ind, sm_delay, pos_conditions)
     
-    tmp = (squeeze(ts_data(Frame_ind,1,:,:)));
+    if ~isempty(pos_conditions)
+        ts_pos_data = ts_data(:,pos_conditions,:,:);
+    else
+        ts_pos_data = ts_data;
+    end
+    [num_chans, num_conds, num_reps, max_pts] = size(ts_pos_data);
+    
+    tmp = (squeeze(ts_pos_data(Frame_ind,1,:,:)));
     for rep = 1:size(tmp,1)
         for pt = 1:size(tmp,2)
             if ~isnan(tmp(rep, pt)) && floor(tmp(rep,pt)) ~= tmp(rep,pt)
@@ -18,7 +24,7 @@ function [pos_series, mean_pos_series] = get_position_series(ts_data, Frame_ind,
             % next few lines extract the indices of the data we wish to
             % analyze. Here we assume that the data structure may have nans at a few
             % positions in front and the more padded at the end. 
-            temp_pos_ts = squeeze(ts_data(Frame_ind,cond_ind,rep_ind, :));
+            temp_pos_ts = squeeze(ts_pos_data(Frame_ind,cond_ind,rep_ind, :));
             temp_analysis_inds = find(isfinite(temp_pos_ts)); 
             analysis_inds = temp_analysis_inds(data_pad:(end-data_pad));
             pos_ts = temp_pos_ts(analysis_inds);
@@ -43,7 +49,7 @@ function [pos_series, mean_pos_series] = get_position_series(ts_data, Frame_ind,
                     step_range_abs = analysis_inds(step_range_rel) + sm_delay ; % sm_delay is offset in time (response lags stim appearance)
 
                     if size(step_range_abs) > 0 
-                        pos_series(cond_ind, rep_ind, mean_step_val) = squeeze(nanmean(ts_data(LmR_ind,cond_ind,rep_ind, step_range_abs), 4)); 
+                        pos_series(cond_ind, rep_ind, mean_step_val) = squeeze(nanmean(ts_pos_data(LmR_ind,cond_ind,rep_ind, step_range_abs), 4)); 
                     else
                         warning('step length error')
                     end
