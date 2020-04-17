@@ -3,8 +3,8 @@ function create_processing_settings()
     settings = struct;
     
     %% Save settings
-    fly_folder = '/Users/taylorl/Desktop/control_CT1-12_42_25';
-    settings_file_name = 'processing_settings';
+    
+    settings_file_path = '/Users/taylorl/Desktop/processing_settings';
     
     
     %% General settings
@@ -18,7 +18,7 @@ function create_processing_settings()
     settings.da_start = .05; %seconds after start of trial to start data analysis
     settings.da_stop = .15; %seconds before end of trial to end data analysis
     settings.time_conv = 1000000; %converts seconds to microseconds (TDMS timestamps are in micros)
-    settings.common_cond_dur = 1; %sets whether all condition durations are the same (1) or not (0), for error-checking
+    settings.common_cond_dur = 0; %sets whether all condition durations are the same (1) or not (0), for error-checking
     settings.processed_file_name = 'testing_new_processing';
     settings.combined_command = 0; %Set to 1 if using the combined command
     
@@ -33,7 +33,7 @@ function create_processing_settings()
     
     %% Position series settings
     settings.enable_pos_series = 1; %If you want position series, set to 1. Only use on sweeps
-    settings.pos_conditions = [14 15 16 17 18 19 20 21 22 23 24 25 26]; %A 1xn array with numbers of conditions to be included in position series
+    settings.pos_conditions = []; %A 1xn array with numbers of conditions to be included in position series
                                   %Leave empty if all conditions to be
                                   %included.
     settings.sm_delay = 0; %add delay in ms to account for sensorimotor delay
@@ -41,7 +41,7 @@ function create_processing_settings()
     settings.data_pad = 1050; %in ms
     
     %% FaLmR settings
-    settings.enable_faLmR = 0; %If you want to do faLmR, set this to 1. 
+    settings.enable_faLmR = 1; %If you want to do faLmR, set this to 1. 
                             %Everything else will be updated automatically.
                             
                             
@@ -51,7 +51,7 @@ function create_processing_settings()
         settings.channel_order{end + 1} = 'faLmR';
     end
 
-    save(fullfile(fly_folder, settings_file_name), 'settings');
+    save(settings_file_path, 'settings');
 
 
 end

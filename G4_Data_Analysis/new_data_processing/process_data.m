@@ -1,7 +1,7 @@
 % Outline of new processing script
 
 function process_data(exp_folder, processing_settings_file)
-%% L%oad .mat file containing user defined settings. These include:
+%% Load .mat file containing user defined settings. These include:
     
     % channel_order = {'LmR_chan', 'L_chan', 'R_chan', 'F_chan', 'Frame Position', 'LmR', 'LpR'}; %add faLmR below if desired (line 214)
     %specify time ranges for parsing and data analysis
@@ -27,7 +27,7 @@ function process_data(exp_folder, processing_settings_file)
     if ~exist(processing_settings_file, 'var')
         processing_settings_file = 'processing_settings.mat';
     end
-    load(fullfile(exp_folder,processing_settings_file));
+    load(processing_settings_file);
     channel_order = settings.channel_order;
 
     %specify time ranges for parsing and data analysis
@@ -69,11 +69,10 @@ function process_data(exp_folder, processing_settings_file)
     % here)
 
     [start_idx, stop_idx, start_times, stop_times] = get_start_stop_times(Log, command_string, manual_first_start);
-
-    combined_data = Log.Commands.Data(start_idx);
+    
     
     %get order of pattern IDs (maybe use for error-checking?)
-    [modeID_order] = get_modeID_order(combined_data);
+    [modeID_order, patternID_order] = get_modeID_order(combined_command, Log, start_idx);
     
     %load the order in which conditions were run, as well as the number of
     %conditions and reps
@@ -259,12 +258,13 @@ function process_data(exp_folder, processing_settings_file)
     summaries = tc_data; %[datatype, condition, repition]
     summaries_normalized = tc_data_norm;
     conditionModes = cond_modes(:,1); %[condition]
+    LmR_normalization_max = maxs(LmR_ind,1,1);
     
     save(fullfile(exp_folder,processed_file_name), 'timeseries', 'timeseries_normalized', ...
         'ts_avg_reps', 'ts_avg_reps_norm', 'LmR_avg_over_reps', 'LmR_avg_reps_norm',...
         'LpR_avg_over_reps', 'LpR_avg_reps_norm','faLmR_avg_over_reps', 'faLmR_avg_reps_norm',...
     'channelNames', 'histograms_CL', 'summaries', 'summaries_normalized','conditionModes', ...
-    'interhistogram', 'timestamps', 'pos_series', 'mean_pos_series');
+    'interhistogram', 'timestamps', 'pos_series', 'mean_pos_series', 'pos_conditions', 'LmR_normalization_max');
 
 
 end
