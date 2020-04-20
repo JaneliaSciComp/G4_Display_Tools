@@ -4,7 +4,7 @@ function create_processing_settings()
     
     %% Save settings
     
-    settings_file_path = '/Users/taylorl/Desktop/processing_settings';
+    settings_file_path = '/Users/taylorl/Desktop/emptysplit_1/processing_settings';
     
     
     %% General settings
@@ -33,7 +33,7 @@ function create_processing_settings()
     
     %% Position series settings
     settings.enable_pos_series = 1; %If you want position series, set to 1. Only use on sweeps
-    settings.pos_conditions = []; %A 1xn array with numbers of conditions to be included in position series
+    settings.pos_conditions = [1:32]; %A 1xn array with numbers of conditions to be included in position series
                                   %Leave empty if all conditions to be
                                   %included.
     settings.sm_delay = 0; %add delay in ms to account for sensorimotor delay

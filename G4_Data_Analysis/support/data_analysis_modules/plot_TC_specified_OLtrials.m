@@ -4,7 +4,7 @@
 %num_groups, CombData, rep_Colors, rep_LineWidth, mean_Colors,
 %mean_LineWidth, timeseries_ylimits, subtitle_FontSize, 
 function plot_TC_specified_OLtrials(TC_plot_settings, TC_conds, plot_names, TC_inds, genotype, control_genotype, ...
-    num_groups, CombData, single, save_settings, fig_num)
+    num_groups, summaries, single, save_settings, fig_num)
 
     rep_Colors = TC_plot_settings.rep_colors;
     rep_LineWidth = TC_plot_settings.rep_lineWidth;
@@ -43,7 +43,7 @@ function plot_TC_specified_OLtrials(TC_plot_settings, TC_conds, plot_names, TC_i
                     better_subplot(num_plot_rows, num_plot_cols, placement)
                     hold on
                     for g = 1:num_groups
-                        tmpdata = squeeze(nanmean(CombData.summaries(g,:,d,conds,:),5));
+                        tmpdata = squeeze(nanmean(summaries(g,:,d,conds,:),5));
 
                         if single == 1 
                             plot(tmpdata','Color',mean_Colors(g,:),'LineWidth',rep_LineWidth, 'Marker', marker_type);
@@ -58,7 +58,7 @@ function plot_TC_specified_OLtrials(TC_plot_settings, TC_conds, plot_names, TC_i
                             for l = 1:length(conds)
                                 conds(l) = conds(l) + 1;
                             end
-                            tmpdata = squeeze(nanmean(CombData.summaries(g,:,d,conds,:),5));
+                            tmpdata = squeeze(nanmean(summaries(g,:,d,conds,:),5));
                             if single == 1
                                 plot(tmpdata','Color', mean_Colors(g+1,:), 'LineWidth', mean_LineWidth, 'Marker', marker_type);
                             elseif num_groups == 1

@@ -1,6 +1,7 @@
 
-function [exp_settings, normalize_settings, histogram_plot_settings, histogram_annotation_settings, ...
-    CL_hist_plot_settings, timeseries_plot_settings, TC_plot_settings, save_settings] = DA_plot_settings()
+function [exp_settings, histogram_plot_settings, histogram_annotation_settings, ...
+    CL_hist_plot_settings, timeseries_plot_settings, TC_plot_settings, ...
+    pos_plot_settings, save_settings] = DA_plot_settings()
 
 %% Settings which need updating regularly (more static settings below)
 
@@ -18,36 +19,36 @@ function [exp_settings, normalize_settings, histogram_plot_settings, histogram_a
 %   exp_settings.field_values{2} = ["SS01001_JFRC100_JFRC49"];
 %   exp_settings.field_values{1} = ["SS00324_JFRC100_JFRC49"];
 
-    exp_settings.single_group = 0;%1-all flies should be in one group, so exp_folder should be 1xX cell array
+    exp_settings.single_group = 1;%1-all flies should be in one group, so exp_folder should be 1xX cell array
     exp_settings.single_fly = 0;%1- only a single fly is being analyzed, the exp_folder will simply be the path to the fly
 
     %1 - each genotype will be plotted in its own figure against a control. 
     %0 - groups will be plotted as laid out below. 
-    exp_settings.plot_all_genotypes = 1; 
+    exp_settings.plot_all_genotypes = 0; 
    
      %control must match exactly the metadata genotype value. 
-    exp_settings.control_genotype = 'emptySplit_JFRC100_JFRC49';
+    exp_settings.control_genotype = '';
 
     %This is the path to the protocol
-    save_settings.path_to_protocol = "/Users/taylorl/Desktop/Protocol004_OpticFlow_KirShibire_01-09-20_13-23-42/Results";
+    save_settings.path_to_protocol = "/Users/taylorl/Desktop/test_protocol";
     
-    exp_settings.genotypes = ["Empty Split", "T4-T5", "TmY3", "CT1", "Lpc1"];
+    exp_settings.genotypes = ["Empty Split"];
     %genotypes = ["empty-split", "LPLC-2", "LC-18", "T4_T5", "LC-15", "LC-25", "LC-11", "LC-17", "LC-4"];
 
 %% Save settings
     
 % Save settings   
     %The path where you wish to save the results of the data analysis
-    save_settings.save_path = '/Users/taylorl/Desktop/default_DA';
+    save_settings.save_path = '/Users/taylorl/Desktop/test_protocol/Experiment001_emptysplit_BA';
 
 %% Experiment settings
 
-    exp_settings.plot_norm_and_unnorm = 1;%1 or 0. Must still pass in normalization flag.
+    exp_settings.plot_norm_and_unnorm = 1;%1 or 0.
 
-    exp_settings.processed_data_file = 'KS_opticflow_G4_Processed_Data';
+    exp_settings.processed_data_file = 'testing_new_processing';
 
     %Log file will be named using this
-    exp_settings.group_being_analyzed_name = 'OpticFlow_Kirshibire';
+    exp_settings.group_being_analyzed_name = 'Empty split test';
     
 %% Plot settings 
 
@@ -83,7 +84,7 @@ function [exp_settings, normalize_settings, histogram_plot_settings, histogram_a
     timeseries_plot_settings.show_individual_flies = 0;
     
     %plot the frame position under each timeseries plot
-    timeseries_plot_settings.frame_superimpose = 1;
+    timeseries_plot_settings.frame_superimpose = 0;
     
     %plot both directions for each condition on the same axis. 
     timeseries_plot_settings.plot_both_directions = 1;
@@ -128,14 +129,21 @@ function [exp_settings, normalize_settings, histogram_plot_settings, histogram_a
 
     
 
-%% Further settings that may not need adjusting often    
+%% Further settings that may not need adjusting often 
+
+%% Position series settings
+
+    pos_plot_settings.pos_conds = [];
+    pos_plot_settings.new_xaxis = [];
+    pos_plot_settings.figure_names =  ["Position Series"];
+    pos_plot_settings.plot_both_directions = 0;
     %% Normalization Settings
 
-    normalize_settings.normalize_to_baseline = {'LpR'};%datatypes to normalize by setting the baseline value to 1
-    normalize_settings.baseline_startstop = [0 1]; %start and stop times to use for baseline normalization
-    normalize_settings.normalize_to_max = {'LmR'}; %datatypes to normalize by setting the maximum (or minimum) values to +1 (or -1)
-    normalize_settings.max_startstop = [1 3]; %start and stop times to use for max normalization
-    normalize_settings.max_prctile = 98; %percentile to use as a more robust estimate of the maximum value
+%     normalize_settings.normalize_to_baseline = {'LpR'};%datatypes to normalize by setting the baseline value to 1
+%     normalize_settings.baseline_startstop = [0 1]; %start and stop times to use for baseline normalization
+%     normalize_settings.normalize_to_max = {'LmR'}; %datatypes to normalize by setting the maximum (or minimum) values to +1 (or -1)
+%     normalize_settings.max_startstop = [1 3]; %start and stop times to use for max normalization
+%     normalize_settings.max_prctile = 98; %percentile to use as a more robust estimate of the maximum value
 
     %% Plot Settings for basic Histograms
 
