@@ -4,11 +4,13 @@ function create_processing_settings()
     
     %% Save settings
     
-    settings_file_path = '/Users/taylorl/Desktop/emptysplit_1/processing_settings';
+    settings_file_path = '/Users/taylorl/Desktop/bad_flies/processing_settings';
+    
     
     
     %% General settings
     settings.trial_options = [1 1 1];
+    settings.path_to_protocol = '/Users/taylorl/Desktop/bad_flies/small_field_looms_V2_09-20-19_13-24-31.g4p';
     settings.channel_order = {'LmR_chan', 'L_chan', 'R_chan', 'F_chan', 'Frame Position', 'LmR', 'LpR'}; 
     settings.hist_datatypes = {'Frame Position', 'LmR', 'LpR'};
     settings.manual_first_start = 0;

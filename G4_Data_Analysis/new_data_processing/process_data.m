@@ -50,6 +50,7 @@ function process_data(exp_folder, processing_settings_file)
     manual_first_start = s.settings.manual_first_start;
     combined_command = s.settings.combined_command;
     max_prctile = s.settings.max_prctile;
+    path_to_protocol = s.settings.path_to_protocol;
 
 
     %Set which command we should be looking for in the log files
@@ -88,16 +89,30 @@ function process_data(exp_folder, processing_settings_file)
     %organize trial duration and control mode by condition/repetition
     [cond_dur, cond_modes] = organize_durations_modes(num_conds, num_reps, ...
     num_trials, exp_order, trial_stop_times, trial_start_times, trial_modes, time_conv);
+    
+    [bad_duration_conds, bad_duration_intertrials] = check_condition_durations(cond_dur, intertrial_durs, path_to_protocol);
+    [bad_slope_conds] = check_flat_conditions(trial_start_times, trial_stop_times, Log, num_reps, num_conds, exp_order);
+    [bad_crossCorr_conds] = check_correlation(trial_start_times, trial_stop_times, exp_order, Log);
 
     %check condition durations and control modes for experiment errors
     assert(all(all((cond_modes-repmat(cond_modes(:,1),[1 num_reps]))==0)),...
         'unexpected order of trial modes - check that pre-trial, post-trial, and intertrial options are correct')
+   
     
-    %Get any bad conditions or reps (defined as having a duration more than
-    %1% different from the median) and display them. 
-    [bad_conds, bad_reps, bad_intertrials] = get_bad_conditions(common_cond_dur, ...
-        cond_dur, num_reps, exp_folder, trial_options, intertrial_durs);
-    
+    bad_conditions = [bad_duration_conds; bad_slope_conds; bad_crossCorr_conds];
+    for i = size(bad_conditions):-1:1
+        for j = size(bad_conditions):-1:1
+            if i == j
+                continue;
+            elseif bad_conditions(i,:) == bad_conditions(j,:)
+                bad_conditions(i,:) = [];
+                break;
+            end
+        end
+    end
+    bad_conds = bad_conditions(:,2);
+    bad_reps = bad_conditions(:,1);
+    bad_intertrials = bad_duration_intertrials;
     
     %get indices for all datatypes - Any datatype not present in the
     %channel_order variable will return an empty index.
@@ -151,9 +166,11 @@ function process_data(exp_folder, processing_settings_file)
                 unaligned_time = double(Log.Frames.Time(1,start_ind:stop_ind)-intertrial_start_times(trial))/time_conv;
                 inter_ts_data(trial,:) = align_timeseries(inter_ts_time, unaligned_time, Log.Frames.Position(1,start_ind:stop_ind)+1, 'propagate', 'median');
             end
+            
         end
     end
     
+
     
     
     %% process data into meaningful datasets
@@ -237,6 +254,9 @@ function process_data(exp_folder, processing_settings_file)
         [pos_series, mean_pos_series] = get_position_series(ts_data, ...
             Frame_ind, num_positions, data_pad, LmR_ind, sm_delay, pos_conditions);
 
+%         [pos_series, mean_pos_series] = get_position_series_a(ts_data, ...
+%             Frame_ind, num_positions, data_pad, LmR_ind, sm_delay, pos_conditions);
+
     else
         pos_series = [];
         mean_pos_series = [];
@@ -266,7 +286,8 @@ function process_data(exp_folder, processing_settings_file)
         'LpR_avg_over_reps', 'LpR_avg_reps_norm','faLmR_avg_over_reps', 'faLmR_avg_reps_norm',...
     'channelNames', 'histograms_CL', 'summaries', 'summaries_normalized','conditionModes', ...
     'interhistogram', 'timestamps', 'pos_series', 'mean_pos_series', 'pos_conditions', ...
-    'LmR_normalization_max', 'normalization_maxes');
+    'LmR_normalization_max', 'normalization_maxes', 'bad_duration_conds', ...
+    'bad_duration_intertrials','bad_slope_conds', 'bad_crossCorr_conds');
 
 
 end
