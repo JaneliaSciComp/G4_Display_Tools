@@ -114,6 +114,8 @@ function process_data(exp_folder, processing_settings_file)
     bad_reps = bad_conditions(:,1);
     bad_intertrials = bad_duration_intertrials;
     
+   
+    
     %get indices for all datatypes - Any datatype not present in the
     %channel_order variable will return an empty index.
     Frame_ind = strcmpi(channel_order,'Frame Position');
@@ -170,7 +172,7 @@ function process_data(exp_folder, processing_settings_file)
         end
     end
     
-
+    ts_data = search_for_misaligned_data(ts_data, .015, num_conds, num_reps, Frame_ind);
     
     
     %% process data into meaningful datasets
@@ -179,6 +181,8 @@ function process_data(exp_folder, processing_settings_file)
     ts_data(LpR_ind,:,:,:) = ts_data(L_chan_idx,:,:,:) + ts_data(R_chan_idx,:,:,:); % + = increased amplitude, - = decreased
     
     %% Normalize LmR timeseries data
+    
+    
     
     %Get maxs (do not normalize to baselines by default)
     
@@ -219,6 +223,7 @@ function process_data(exp_folder, processing_settings_file)
     
     %duplicate ts_data and exclude all datapoints outside data analysis window (da_start:da_stop)
     da_data = ts_data;
+
     da_data_norm = ts_data_normalized;
     da_start_ind = find(ts_time>=da_start,1);
     da_data(:,:,:,1:da_start_ind) = nan; %omit data before trial start
@@ -228,6 +233,8 @@ function process_data(exp_folder, processing_settings_file)
         da_data(:,cond,:,da_stop_ind:end) = nan; %omit data after trial end
         da_data_norm(:,cond,:,da_stop_ind:end) = nan;
     end
+    
+    
 
 %calculate values for tuning curves
     tc_data = nanmean(da_data,4);

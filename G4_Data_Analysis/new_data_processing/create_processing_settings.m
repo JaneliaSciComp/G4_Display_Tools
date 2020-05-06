@@ -23,6 +23,7 @@ function create_processing_settings()
     settings.common_cond_dur = 0; %sets whether all condition durations are the same (1) or not (0), for error-checking
     settings.processed_file_name = 'testing_new_processing';
     settings.combined_command = 0; %Set to 1 if using the combined command
+    settings.percent_to_shift = .015;
     
     %% Normalization settings
     
@@ -40,7 +41,7 @@ function create_processing_settings()
                                   %included.
     settings.sm_delay = 0; %add delay in ms to account for sensorimotor delay
     settings.num_positions = 192;
-    settings.data_pad = 1050; %in ms
+    settings.data_pad = 10; %in ms
     
     %% FaLmR settings
     settings.enable_faLmR = 1; %If you want to do faLmR, set this to 1. 
