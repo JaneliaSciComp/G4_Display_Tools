@@ -51,6 +51,7 @@ function process_data(exp_folder, processing_settings_file)
     combined_command = s.settings.combined_command;
     max_prctile = s.settings.max_prctile;
     path_to_protocol = s.settings.path_to_protocol;
+    percent_to_shift = s.settings.percent_to_shift;
 
 
     %Set which command we should be looking for in the log files
@@ -172,7 +173,7 @@ function process_data(exp_folder, processing_settings_file)
         end
     end
     
-    ts_data = search_for_misaligned_data(ts_data, .015, num_conds, num_reps, Frame_ind);
+    ts_data = search_for_misaligned_data(ts_data, percent_to_shift, num_conds, num_reps, Frame_ind);
     
     
     %% process data into meaningful datasets

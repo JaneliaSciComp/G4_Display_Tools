@@ -45,8 +45,8 @@ function plot_basic_histograms(timeseries_data, interhistogram_data, ...
     
     
     g = 0;
-    for k = 1:length(groups)
-        num_plot_groups = groups(k);
+    for grp = 1:length(groups)
+        num_plot_groups = groups(grp);
         figure();
         
         for gr = 1:num_plot_groups*(length(groups)-1)+groups(end)
@@ -189,14 +189,14 @@ function plot_basic_histograms(timeseries_data, interhistogram_data, ...
 
 
         end
-        if k == 1
-            genotype_labels = 1:groups(k);
+        if grp == 1
+            genotype_labels = 1:groups(grp);
         else
-            genotype_labels = sum(groups(1:k-1))+1:sum(groups(1:k));
+            genotype_labels = sum(groups(1:grp-1))+1:sum(groups(1:grp));
         end
 
 
-        save_figure(save_settings, genotype{genotype_labels}, 'hist', num2str(k));
+        save_figure(save_settings, genotype{genotype_labels}, 'hist', num2str(grp));
     end
     
 %     currgraph = gcf;

@@ -48,6 +48,7 @@ classdef create_data_analysis_tool < handle
         
         pos_plot_option
         pos_plot_settings
+        MP_plot_settings
         
         datatype_indices
 %         
@@ -116,6 +117,7 @@ classdef create_data_analysis_tool < handle
             self.save_settings = settings.save_settings;
             self.exp_folder = self.exp_settings.exp_folder;
             self.trial_options = self.exp_settings.trial_options;
+            self.MP_plot_settings = settings.MP_plot_settings;
 
 %             self.normalize_option = 0; %0 = don't normalize, 1 = normalize every fly, 2 = normalize every group
             self.histogram_plot_option = 0;
@@ -321,30 +323,15 @@ classdef create_data_analysis_tool < handle
             %their y and x-axes. 
             
             self.timeseries_top_left_place = 1;
-            for i = 1:length(self.OL_conds)
-                a = ~isnan(self.OL_conds{i});
-                self.timeseries_bottom_left_places{i} = sum(a(:,1));
-                %self.timeseries_plot_settings.bottom_left_place{i} = size(self.OL_conds{i},1)*size(self.OL_conds{i},2)-(size(self.OL_conds{i},2) - 1);
-                %count = 1;
-                if size(self.OL_conds{i},1) ~= 1
-%                     for j = 1:size(self.OL_conds{i},1)*size(self.OL_conds{i},2)
-%                         if mod(j, size(self.OL_conds{i},1)) == 0
-%                             self.timeseries_bottom_row_places{i}(count) = j;
-%                             count = count + 1;
-%                         end
-% 
-%                     end
-                    for m = 1:size(self.OL_conds{i},1)
-                        self.timeseries_left_column_places{i}(m) = m;
-                    end
-
-
-                else
-%                     for k = 1:length(self.OL_conds{i})
-%                         self.timeseries_bottom_row_places{i}(k) = k;
-%                     end
-                    self.timeseries_left_column_places{i} = 1;
-                end
+            self.MP_plot_settings.top_left_place = 1;
+            if self.timeseries_plot_option == 1
+                [self.timeseries_bottom_left_places, self.timeseries_left_column_places] = ...
+                   get_plot_placements(self.OL_conds);
+            end
+            if self.pos_plot_option == 1
+            
+              [self.MP_plot_settings.bottom_left_place, self.MP_plot_settings.left_column_places] = ...
+                 get_plot_placements(self.MP_plot_settings.mp_conds);
             end
             
             
@@ -376,10 +363,10 @@ classdef create_data_analysis_tool < handle
                 % Get default layout of position series figure(s)
                 
             end
-            if length(self.pos_plot_settings.pos_conds) > length(self.pos_plot_settings.figure_names)
+            if length(self.MP_plot_settings.mp_conds) > length(self.MP_plot_settings.figure_names)
                 orig_fig_names = self.pos_plot_settings.figure_names;
-                while length(self.pos_plot_settings.pos_conds) > length(self.pos_plot_settings.figure_names)
-                    self.pos_plot_settings.figure_names = [self.pos_plot_settings.figure_names, orig_fig_names];
+                while length(self.MP_plot_settings.mp_conds) > length(self.MP_plot_settings.figure_names)
+                    self.MP_plot_settings.figure_names = [self.MP_plot_settings.figure_names, orig_fig_names];
                 end
             end
             
@@ -462,6 +449,20 @@ classdef create_data_analysis_tool < handle
                 analyses_run = self.generate_plots(analyses_run, norm, single);
             end
             
+            if self.pos_plot_option == 1
+                [P, M, P_flies, M_flies] = generate_M_and_P(self.CombData.mean_pos_series, ...
+                    self.MP_plot_settings.mp_conds, self.MP_plot_settings);
+                
+                plot_position_series(self.MP_plot_settings, ...
+                    self.pos_plot_settings, self.save_settings, self.CombData.mean_pos_series, ...
+                    P, M, P_flies, M_flies, self.genotype, self.control_genotype);
+
+                
+                analyses_run{end + 1} = 'Position Series';
+
+            end
+                
+            
             analyses_run = unique(analyses_run);
      
             update_individual_fly_log_files(self.exp_folder, self.save_settings.save_path, ...
@@ -519,6 +520,21 @@ classdef create_data_analysis_tool < handle
                 norm = 0;
                 analyses_run = self.generate_plots(analyses_run, norm, single);
             end
+            
+            if self.pos_plot_option == 1
+                [P, M, P_flies, M_flies] = generate_M_and_P(self.CombData.mean_pos_series, ...
+                    self.MP_plot_settings.mp_conds, self.MP_plot_settings);
+                
+                plot_position_series(self.MP_plot_settings, self.pos_plot_settings, ...
+                    self.save_settings, self.CombData.mean_pos_series, ...
+                    P, M, P_flies, M_flies, self.genotype, self.control_genotype);
+
+                
+                analyses_run{end + 1} = 'Position Series';
+
+            end
+            
+
             
             analyses_run = unique(analyses_run);
                 
@@ -630,6 +646,8 @@ classdef create_data_analysis_tool < handle
                 analyses_run{end+1} = 'Tuning Curves';
 
             end
+            
+
         end
 
                    

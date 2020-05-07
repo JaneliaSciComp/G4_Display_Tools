@@ -7,7 +7,7 @@ function [CombData, files_excluded] = load_specified_data(exp_folder, CombData, 
     CombData.histograms_CL = [];
     CombData.interhistogram = [];
     CombData.timeseries = [];
-    CombData.ts_avg_reps = nan([num_groups, num_exps]);
+    CombData.ts_avg_reps = [];
 
     CombData.summaries = [];
     CombData.LmR_avg_over_reps = [];
@@ -195,12 +195,12 @@ function [CombData, files_excluded] = load_specified_data(exp_folder, CombData, 
                             
                         case 'mean_pos_series'
                             
-                            num_datapointsPos = size(fields.(fi),3);
-                            if num_datapointsPos>size(CombData.(fi),5)
-                                CombData.(fi)(:,:,:,:,size(CombData.(fi),5)+1:num_datapointsPos) = nan;                       
+                            num_datapointsPos = size(fields.(fi),2);
+                            if num_datapointsPos>size(CombData.(fi),4)
+                                CombData.(fi)(:,:,:,size(CombData.(fi),4)+1:num_datapointsPos) = nan;                       
                             end
 
-                            CombData.(fi)(g,e,:,:,1:num_datapointsPos) = fields.(fi);
+                            CombData.(fi)(g,e,:,1:num_datapointsPos) = fields.(fi);
                             
                             
                         case 'LmR_avg_over_reps'

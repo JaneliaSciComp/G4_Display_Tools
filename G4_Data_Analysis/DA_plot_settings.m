@@ -1,7 +1,7 @@
 
 function [exp_settings, histogram_plot_settings, histogram_annotation_settings, ...
     CL_hist_plot_settings, timeseries_plot_settings, TC_plot_settings, ...
-    pos_plot_settings, save_settings] = DA_plot_settings()
+    MP_plot_settings, pos_plot_settings, save_settings] = DA_plot_settings()
 
 %% Settings which need updating regularly (more static settings below)
 
@@ -15,22 +15,22 @@ function [exp_settings, histogram_plot_settings, histogram_annotation_settings, 
    
     %if plot_all_genotypes is 1, leave field_values empty.
     exp_settings.field_values = {};
-%   exp_settings.field_values{1} = ["emptySplit_JFRC100_JFRC49"];
+%   exp_settings.field_values{1} = ["emptySplit_UAS_Kir_JFRC49"];
 %   exp_settings.field_values{2} = ["SS01001_JFRC100_JFRC49"];
 %   exp_settings.field_values{1} = ["SS00324_JFRC100_JFRC49"];
 
-    exp_settings.single_group = 1;%1-all flies should be in one group, so exp_folder should be 1xX cell array
+    exp_settings.single_group = 0;%1-all flies should be in one group, so exp_folder should be 1xX cell array
     exp_settings.single_fly = 0;%1- only a single fly is being analyzed, the exp_folder will simply be the path to the fly
 
     %1 - each genotype will be plotted in its own figure against a control. 
     %0 - groups will be plotted as laid out below. 
-    exp_settings.plot_all_genotypes = 0; 
+    exp_settings.plot_all_genotypes = 1; 
    
      %control must match exactly the metadata genotype value. 
-    exp_settings.control_genotype = '';
+    exp_settings.control_genotype = 'emptySplit_UAS_Kir_JFRC49';
 
     %This is the path to the protocol
-    save_settings.path_to_protocol = "/Users/taylorl/Desktop/test_protocol";
+    save_settings.path_to_protocol = "/Users/taylorl/Desktop/bad_flies";
     
     exp_settings.genotypes = ["Empty Split"];
     %genotypes = ["empty-split", "LPLC-2", "LC-18", "T4_T5", "LC-15", "LC-25", "LC-11", "LC-17", "LC-4"];
@@ -39,7 +39,7 @@ function [exp_settings, histogram_plot_settings, histogram_annotation_settings, 
     
 % Save settings   
     %The path where you wish to save the results of the data analysis
-    save_settings.save_path = '/Users/taylorl/Desktop/test_protocol/Experiment001_emptysplit_BA';
+    save_settings.save_path = '/Users/taylorl/Desktop/bad_flies';
 
 %% Experiment settings
 
@@ -50,11 +50,12 @@ function [exp_settings, histogram_plot_settings, histogram_annotation_settings, 
     %Log file will be named using this
     exp_settings.group_being_analyzed_name = 'Empty split test';
     
-%% Plot settings 
+%% Histogram settings 
 
     %Date range displayed on histograms
     histogram_annotation_settings.annotation_text = "Annotation text here.";
-    
+
+%% Timeseries plot settings
     %OL_TS_conds indicates the layout of your timeseries figures. See
     %documentation for example. Leave empty ([]) for default layout.
     timeseries_plot_settings.OL_TS_conds = [];
@@ -93,13 +94,15 @@ function [exp_settings, histogram_plot_settings, histogram_annotation_settings, 
     %of titles corresponding to the OL_TS_conds array. Else leave empty or
     %set to 0 (no titles).
     timeseries_plot_settings.cond_name = [];
-    
+
+%% Closed loop histogram settings
     %Create array to dictate layout of CL histograms or leave empty for def
     CL_hist_plot_settings.CL_hist_conds = [];
     
     %Datatypes for which to plot closed-loop histograms
     CL_hist_plot_settings.CL_datatypes = {'Frame Position'}; %datatypes to plot as histograms          
-    
+
+%% Tuning Curve plot settings
     %Create the layout of tuning curves in this array. It works differently
     %than OL_TS_conds - see documentation for details.
     TC_plot_settings.OL_TC_conds = [];
@@ -126,17 +129,34 @@ function [exp_settings, histogram_plot_settings, histogram_annotation_settings, 
     %Plots tuning curves for both directions on the same axis
     TC_plot_settings.plot_both_directions = 1; 
     
+%% Position-Series P and M Plot Settings
 
+    MP_plot_settings.mp_conds{1} = [1 3 5 7; 9 11 13 15];
+    MP_plot_settings.mp_conds{2} = [17 19 21 23; 25 27 29 31];   
+    MP_plot_settings.xaxis = [1:192];
+    MP_plot_settings.plot_MandP = 1;
+    MP_plot_settings.figure_names =  ["M", "P"]; 
+    MP_plot_settings.axis_labels{1} = ["M X Label", "M Y Label"]; %{xlabel, ylabel}
+    MP_plot_settings.axis_labels{2} = ["P X Label", "P Y Label"];
+    MP_plot_settings.cond_name{1} = ["Conds12" "Conds34" "Conds56" "Conds78"; ...
+        "Conds910" "Conds1112" "Conds1314" "Conds1516"]; %Titles of subplots - correspond to pos_conds
+    MP_plot_settings.cond_name{2} = ["Conds1718" "Conds1920" "Conds2122" "Conds2324"; ...
+        "Conds2526" "Conds2728" "Conds2930" "Conds3132"];
+    MP_plot_settings.show_ind_flies = 1;
+    MP_plot_settings.ylimits = [0 0; 0 0]; %[ylimits for M; ylimits for P];
     
-
+    
+%% Position-Series Averages Plot Settings
+    
+    pos_plot_settings.plot_pos_averaged = 0;
+    pos_plot_settings.pos_conds = [];
+    pos_plot_settings.new_xaxis = [];
+    
 %% Further settings that may not need adjusting often 
 
 %% Position series settings
 
-    pos_plot_settings.pos_conds = [];
-    pos_plot_settings.new_xaxis = [];
-    pos_plot_settings.figure_names =  ["Position Series"];
-    pos_plot_settings.plot_both_directions = 0;
+    
     %% Normalization Settings
 
 %     normalize_settings.normalize_to_baseline = {'LpR'};%datatypes to normalize by setting the baseline value to 1
@@ -213,7 +233,28 @@ function [exp_settings, histogram_plot_settings, histogram_annotation_settings, 
     TC_plot_settings.subtitle_fontSize = 8;
     TC_plot_settings.marker_type = 'o';
     TC_plot_settings.legend_FontSize = 6;
-       
+    
+%% Plot settings for position series
+
+    MP_plot_settings.rep_colors = [0 0 0; 1 0 0; 0 0.5 0; 0 0 1; 1 0.5 0; ...
+        .75 0 1; 0 1 0; 0 1 1; 1 0 1; 1 1 0]; %default 10 colors supports up to 10 groups (add more colors for more groups)
+    MP_plot_settings.mean_colors = [1 0 0; 0 0 1; 0 0.5 0; 1 0.5 0; .75 0 1; ...
+        0 1 0;  1 0.5 1; 0 1 1; 1 0 1; 1 1 0]; %default 10 colors supports up to 10 groups (add more colors for more groups)
+    MP_plot_settings.control_color = [0 0 0];
+    MP_plot_settings.mean_lineWidth = 1;
+    MP_plot_settings.edgeColor = 'none';
+    MP_plot_settings.patch_alpha = 0.3;
+    MP_plot_settings.subtitle_fontSize = 8;
+    MP_plot_settings.legend_fontSize = 6;
+    MP_plot_settings.ylimits = []; %[M ymin ymax; P ylmin ymax];
+    MP_plot_settings.xlimits = []; %[M xmin xmax; P xmin xmax];
+    MP_plot_settings.rep_lineWidth = 0.05;
+    MP_plot_settings.yLabel_fontSize = 6;
+    MP_plot_settings.xLabel_fontSize = 6;
+    MP_plot_settings.fly_colors = [.95 .95 .95; .9 .9 .9; .85 .85 .85; .8 .8 .8; ...
+        .75 .75 .75; .7 .7 .7; .65 .65 .65; .6 .6 .6; .55 .55 .55; .5 .5 .5; .45 .45 .45;  .4 .4 .4; .35 .35 .35; .3 .3 .3; .25 .25 .25; .2 .2 .2; .15 .15 .15; .1 .1 .1]; %Colors assigned to individual fly lines
+    MP_plot_settings.axis_num_fontSize = 6;
+
 
     %% Save settings
 

@@ -31,6 +31,8 @@ function ts_data = search_for_misaligned_data(ts_data, dev_limit, num_conds, num
         for i = 1:length(indices(cond,:))
             if ~isnan(indices(cond,i))
                 diffs(i) = abs(indices(cond,i) - mean_idx);
+            else
+                diffs(i) = NaN;
             end
         end
         
@@ -38,14 +40,23 @@ function ts_data = search_for_misaligned_data(ts_data, dev_limit, num_conds, num
         if last_ind == 0
             last_ind = 1;
         end
-        while ~isnan(ts_data(Frame_ind, cond, rep, last_ind))
+        r = 1;
+        while isnan(ts_data(Frame_ind, cond, r, :))
+            r = r + 1;
+        end
+        while ~isnan(ts_data(Frame_ind, cond, r, last_ind))
             last_ind = last_ind + 1;
         end
         trial_length = last_ind - mean_idx;
         
         max_diff_idx = find(diffs==max(diffs));
-        if diffs(max_diff_idx) > dev_limit*trial_length
-            rep_needs_aligned(cond) = max_diff_idx;
+        if length(max_diff_idx) == 1
+            
+            if diffs(max_diff_idx) > dev_limit*trial_length
+                rep_needs_aligned(cond) = max_diff_idx;
+            else
+                rep_needs_aligned(cond) = NaN;
+            end
         else
             rep_needs_aligned(cond) = NaN;
         end
