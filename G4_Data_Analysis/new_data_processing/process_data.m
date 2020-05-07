@@ -111,9 +111,18 @@ function process_data(exp_folder, processing_settings_file)
             end
         end
     end
-    bad_conds = bad_conditions(:,2);
-    bad_reps = bad_conditions(:,1);
-    bad_intertrials = bad_duration_intertrials;
+    if ~isempty(bad_conditions)
+        bad_conds = bad_conditions(:,2);
+        bad_reps = bad_conditions(:,1);
+    else
+        bad_conds = [];
+        bad_reps = [];
+    end
+    if ~isempty(bad_duration_intertrials)
+        bad_intertrials = bad_duration_intertrials;
+    else
+        bad_intertrials = [];
+    end
     
    
     

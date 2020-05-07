@@ -44,8 +44,9 @@ function ts_data = search_for_misaligned_data(ts_data, dev_limit, num_conds, num
         while isnan(ts_data(Frame_ind, cond, r, :))
             r = r + 1;
         end
-        while ~isnan(ts_data(Frame_ind, cond, r, last_ind))
+        while ~isnan(ts_data(Frame_ind, cond, r, last_ind)) && last_ind < size(ts_data,4)
             last_ind = last_ind + 1;
+            
         end
         trial_length = last_ind - mean_idx;
         

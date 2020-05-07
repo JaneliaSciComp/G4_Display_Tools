@@ -14,20 +14,20 @@ function [exp_settings, histogram_plot_settings, histogram_annotation_settings, 
 %   exp_settings.field_to_sort_by{3} = ["fly_genotype"];
    
     %if plot_all_genotypes is 1, leave field_values empty.
-    exp_settings.field_values = {};
-%   exp_settings.field_values{1} = ["emptySplit_UAS_Kir_JFRC49"];
+%    exp_settings.field_values = {};
+   exp_settings.field_values{1} = ["emptySplit_UAS_Kir_JFRC49"];
 %   exp_settings.field_values{2} = ["SS01001_JFRC100_JFRC49"];
 %   exp_settings.field_values{1} = ["SS00324_JFRC100_JFRC49"];
 
-    exp_settings.single_group = 0;%1-all flies should be in one group, so exp_folder should be 1xX cell array
+    exp_settings.single_group = 1;%1-all flies should be in one group, so exp_folder should be 1xX cell array
     exp_settings.single_fly = 0;%1- only a single fly is being analyzed, the exp_folder will simply be the path to the fly
 
     %1 - each genotype will be plotted in its own figure against a control. 
     %0 - groups will be plotted as laid out below. 
-    exp_settings.plot_all_genotypes = 1; 
+    exp_settings.plot_all_genotypes = 0; 
    
      %control must match exactly the metadata genotype value. 
-    exp_settings.control_genotype = 'emptySplit_UAS_Kir_JFRC49';
+    exp_settings.control_genotype = '';
 
     %This is the path to the protocol
     save_settings.path_to_protocol = "/Users/taylorl/Desktop/bad_flies";
@@ -143,7 +143,7 @@ function [exp_settings, histogram_plot_settings, histogram_annotation_settings, 
     MP_plot_settings.cond_name{2} = ["Conds1718" "Conds1920" "Conds2122" "Conds2324"; ...
         "Conds2526" "Conds2728" "Conds2930" "Conds3132"];
     MP_plot_settings.show_ind_flies = 1;
-    MP_plot_settings.ylimits = [0 0; 0 0]; %[ylimits for M; ylimits for P];
+
     
     
 %% Position-Series Averages Plot Settings
@@ -251,8 +251,9 @@ function [exp_settings, histogram_plot_settings, histogram_annotation_settings, 
     MP_plot_settings.rep_lineWidth = 0.05;
     MP_plot_settings.yLabel_fontSize = 6;
     MP_plot_settings.xLabel_fontSize = 6;
-    MP_plot_settings.fly_colors = [.95 .95 .95; .9 .9 .9; .85 .85 .85; .8 .8 .8; ...
-        .75 .75 .75; .7 .7 .7; .65 .65 .65; .6 .6 .6; .55 .55 .55; .5 .5 .5; .45 .45 .45;  .4 .4 .4; .35 .35 .35; .3 .3 .3; .25 .25 .25; .2 .2 .2; .15 .15 .15; .1 .1 .1]; %Colors assigned to individual fly lines
+    MP_plot_settings.fly_colors = [.1 .1 .1; .15 .15 .15; .2 .2 .2; .25 .25 .25; .3 .3 .3; .35 .35 .35; .4 .4 .4; .45 .45 .45; ...
+        .5 .5 .5; .55 .55 .55; .6 .6 .6; .65 .65 .65; .7 .7 .7; .75 .75 .75; .8 .8 .8; .85 .85 .85; .9 .9 .9; .95 .95 .95];
+          %Colors assigned to individual fly lines
     MP_plot_settings.axis_num_fontSize = 6;
 
 
