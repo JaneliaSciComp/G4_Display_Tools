@@ -15,8 +15,8 @@ function create_processing_settings()
     settings.hist_datatypes = {'Frame Position', 'LmR', 'LpR'};
     settings.manual_first_start = 0;
     settings.data_rate = 1000; % rate (in Hz) which all data will be aligned to
-    settings.pre_dur = 1; %seconds before start of trial to include
-    settings.post_dur = 1; %seconds after end of trial to include
+    settings.pre_dur = .05; %seconds before start of trial to include
+    settings.post_dur = .05; %seconds after end of trial to include
     settings.da_start = .05; %seconds after start of trial to start data analysis
     settings.da_stop = .15; %seconds before end of trial to end data analysis
     settings.time_conv = 1000000; %converts seconds to microseconds (TDMS timestamps are in micros)
@@ -24,6 +24,23 @@ function create_processing_settings()
     settings.processed_file_name = 'testing_new_processing';
     settings.combined_command = 0; %Set to 1 if using the combined command
     settings.percent_to_shift = .015;
+    
+    %% Wing Beat Frequency Settings
+    
+    settings.wbf_range = [160 260]; %Minimum and maximum acceptable wing beat frequencies
+    settings.wbf_cutoff = .2; %Maximum acceptable portion of a condition where the fly is not flying
+    settings.wbf_end_percent = .8; %If a fly is not flying for more than the above acceptable portion of a condition,
+                                    %You can choose to keep the trial
+                                    %anyway if this portion of the bad wbf
+                                    %measurements are clustered in the last
+                                    %ten percent of the condition. (Ie if
+                                    %80% of hte bad wbf readings are in the
+                                    %last ten percent of the condition, the
+                                    %first 90% of hte condition is probably
+                                    %fine and worth keeping). If you want
+                                    %to get rid of it as a bad trial no
+                                    %matter where the bad wbf readings are,
+                                    %set this to 1.
     
     %% Normalization settings
     

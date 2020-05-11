@@ -15,7 +15,8 @@ function plot_position_series(MP_settings, pos_settings, save_settings, mean_pos
      subtitle_FontSize = MP_settings.subtitle_fontSize;
      legend_FontSize = MP_settings.legend_fontSize;
     ylimits = MP_settings.ylimits;
-    xlimits = MP_settings.xlimits;
+    xaxis = MP_settings.xaxis;
+    new_xaxis = MP_settings.new_xaxis;
      rep_LineWidth = MP_settings.rep_lineWidth;
      control_color = MP_settings.control_color;
      show_ind_flies = MP_settings.show_ind_flies;
@@ -32,10 +33,11 @@ function plot_position_series(MP_settings, pos_settings, save_settings, mean_pos
     num_groups = size(mean_pos_series,1);
     num_exps = size(mean_pos_series,2);
     
-    
-    
-    
-    
+    if ~isempty(new_xaxis)
+        xaxis = new_xaxis(xaxis);
+    end
+    [xaxis, xaxis_inds] = sort(xaxis);
+
    
     if ~isempty(MP_conds)
         
@@ -70,19 +72,34 @@ function plot_position_series(MP_settings, pos_settings, save_settings, mean_pos
 
                         if num_groups == 1 && show_ind_flies == 1
                             for fly = 1:size(data_flies,2)
-                                plot(squeeze(data_flies(1, fly, ceil(MP_conds{fig}(row,col)/2), :)),'Color',fly_colors(fly,:),'LineWidth',rep_LineWidth);
+                                datatoplot = squeeze(data_flies(1, fly, ceil(MP_conds{fig}(row,col)/2), :));
+                                datatoplot = datatoplot(xaxis_inds);
+                                plot(xaxis, datatoplot,'Color',fly_colors(fly,:),'LineWidth',rep_LineWidth);
                                 hold on;
+
                             end
-                            plot(squeeze(data(1, ceil(MP_conds{fig}(row,col)/2), :)),'Color',mean_colors(1,:),'LineWidth',mean_LineWidth);
+                            datatoplot = squeeze(data(1, ceil(MP_conds{fig}(row,col)/2), :));
+                            datatoplot = datatoplot(xaxis_inds);
+                            plot(xaxis, datatoplot,'Color',mean_colors(1,:),'LineWidth',mean_LineWidth);
+
                         else
 
                             for g = 1:num_groups
-
+                        
                                 if g == control_genotype
-                                    plot(squeeze(data(g, ceil(MP_conds{fig}(row,col)/2), :)),'Color',control_color,'LineWidth',mean_LineWidth);
-                                    
+
+                                    datatoplot = squeeze(data(g, ceil(MP_conds{fig}(row,col)/2), :));
+                                    datatoplot = datatoplot(xaxis_inds);
+                                    plot(xaxis, datatoplot,'Color',control_color,'LineWidth',mean_LineWidth);
+
                                 else
-                                    plot(squeeze(data(g, ceil(MP_conds{fig}(row,col)/2), :)),'Color',mean_colors(g,:),'LineWidth',mean_LineWidth);
+
+
+                                   datatoplot = squeeze(data(g, ceil(MP_conds{fig}(row,col)/2), :));
+                                    datatoplot = datatoplot(xaxis_inds);
+                                    plot(xaxis, datatoplot,'Color',mean_colors(g,:),'LineWidth',mean_LineWidth);
+
+
                                 end
                             end
                         end
@@ -124,7 +141,7 @@ function plot_position_series(MP_settings, pos_settings, save_settings, mean_pos
                             set(gca,'YTick');
                         end
                         if place == bottom_left_place{MP}
-                            xlabel(axis_labels{fig}(1), 'FontSize', x_fontsize) %7th subplot - Bottom Left
+                            xlabel(axis_labels{MP}(1), 'FontSize', x_fontsize) %7th subplot - Bottom Left
                         end
 
 

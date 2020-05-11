@@ -52,6 +52,9 @@ function process_data(exp_folder, processing_settings_file)
     max_prctile = s.settings.max_prctile;
     path_to_protocol = s.settings.path_to_protocol;
     percent_to_shift = s.settings.percent_to_shift;
+    wbf_range = s.settings.wbf_range;
+    wbf_cutoff = s.settings.wbf_cutoff;
+    wbf_end_percent = s.settings.wbf_end_percent;
 
 
     %Set which command we should be looking for in the log files
@@ -65,6 +68,20 @@ function process_data(exp_folder, processing_settings_file)
     % Load TDMS file
 
     Log = load_tdms_log(exp_folder);
+    
+        %get indices for all datatypes - Any datatype not present in the
+    %channel_order variable will return an empty index.
+    Frame_ind = strcmpi(channel_order,'Frame Position');
+    LmR_ind = find(strcmpi(channel_order,'LmR'));
+    LpR_ind = find(strcmpi(channel_order,'LpR'));
+    LmR_chan_idx = find(strcmpi(channel_order,'LmR_chan'));
+    L_chan_idx = find(strcmpi(channel_order,'L_chan'));
+    R_chan_idx = find(strcmpi(channel_order,'R_chan'));
+    F_chan_idx = find(strcmpi(channel_order,'F_chan'));
+    faLmR_ind = find(strcmpi(channel_order,'faLmR'));
+    num_ts_datatypes = length(channel_order);
+    num_ADC_chans = length(Log.ADC.Channels);
+    
 
     % Determine the start and stop times of each trial (if we want to create a
     % different method of doing this, just write a new module and plug it in
@@ -90,17 +107,28 @@ function process_data(exp_folder, processing_settings_file)
     %organize trial duration and control mode by condition/repetition
     [cond_dur, cond_modes] = organize_durations_modes(num_conds, num_reps, ...
     num_trials, exp_order, trial_stop_times, trial_start_times, trial_modes, time_conv);
+
+
+ % pre-allocate arrays for aligning the timeseries data
+    [ts_time, ts_data, inter_ts_time, inter_ts_data] = create_ts_arrays(cond_dur, data_rate, pre_dur, post_dur, num_ts_datatypes, ...
+    num_conds, num_reps, trial_options, intertrial_durs, num_trials);
     
+%%%%%Maybe create wbf_data in a different function to include intertrials,
+%%%%%then pass it in to the function to find bad wbfs where I only look at
+%%%%%the indices for the actual condition???
     [bad_duration_conds, bad_duration_intertrials] = check_condition_durations(cond_dur, intertrial_durs, path_to_protocol);
     [bad_slope_conds] = check_flat_conditions(trial_start_times, trial_stop_times, Log, num_reps, num_conds, exp_order);
     [bad_crossCorr_conds] = check_correlation(trial_start_times, trial_stop_times, exp_order, Log);
+    [bad_WBF_conds, wbf_data] = find_bad_wbf_trials(Log, ts_data, wbf_range, wbf_cutoff, ...
+    wbf_end_percent, trial_start_times, trial_stop_times, num_conds, num_reps, exp_order);
+
 
     %check condition durations and control modes for experiment errors
     assert(all(all((cond_modes-repmat(cond_modes(:,1),[1 num_reps]))==0)),...
         'unexpected order of trial modes - check that pre-trial, post-trial, and intertrial options are correct')
    
     
-    bad_conditions = [bad_duration_conds; bad_slope_conds; bad_crossCorr_conds];
+    bad_conditions = [bad_duration_conds; bad_slope_conds; bad_crossCorr_conds; bad_WBF_conds];
     for i = size(bad_conditions):-1:1
         for j = size(bad_conditions):-1:1
             if i == j
@@ -126,23 +154,8 @@ function process_data(exp_folder, processing_settings_file)
     
    
     
-    %get indices for all datatypes - Any datatype not present in the
-    %channel_order variable will return an empty index.
-    Frame_ind = strcmpi(channel_order,'Frame Position');
-    LmR_ind = find(strcmpi(channel_order,'LmR'));
-    LpR_ind = find(strcmpi(channel_order,'LpR'));
-    LmR_chan_idx = find(strcmpi(channel_order,'LmR_chan'));
-    L_chan_idx = find(strcmpi(channel_order,'L_chan'));
-    R_chan_idx = find(strcmpi(channel_order,'R_chan'));
-    F_chan_idx = find(strcmpi(channel_order,'F_chan'));
-    faLmR_ind = find(strcmpi(channel_order,'faLmR'));
-    num_ts_datatypes = length(channel_order);
-    num_ADC_chans = length(Log.ADC.Channels);
-    
-    % pre-allocate arrays for aligning the timeseries data
-    [ts_time, ts_data, inter_ts_time, inter_ts_data] = create_ts_arrays(cond_dur, data_rate, pre_dur, post_dur, num_ts_datatypes, ...
-    num_conds, num_reps, trial_options, intertrial_durs, num_trials);
 
+  
         %loop for every trial
     for trial=1:num_trials
         cond = exp_order(trial);
@@ -304,7 +317,7 @@ function process_data(exp_folder, processing_settings_file)
     'channelNames', 'histograms_CL', 'summaries', 'summaries_normalized','conditionModes', ...
     'interhistogram', 'timestamps', 'pos_series', 'mean_pos_series', 'pos_conditions', ...
     'LmR_normalization_max', 'normalization_maxes', 'bad_duration_conds', ...
-    'bad_duration_intertrials','bad_slope_conds', 'bad_crossCorr_conds');
+    'bad_duration_intertrials','bad_slope_conds', 'bad_crossCorr_conds', 'bad_WBF_conds');
 
 
 end

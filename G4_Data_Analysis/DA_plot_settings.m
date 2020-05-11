@@ -10,16 +10,18 @@ function [exp_settings, histogram_plot_settings, histogram_annotation_settings, 
 %% Settings for exp_folder generation
     
     exp_settings.field_to_sort_by{1} = ["fly_genotype"];
+    exp_settings.field_to_sort_by{2} = ["fly_genotype"];
 %   exp_settings.field_to_sort_by{2} = ["fly_genotype"];
 %   exp_settings.field_to_sort_by{3} = ["fly_genotype"];
    
     %if plot_all_genotypes is 1, leave field_values empty.
 %    exp_settings.field_values = {};
-   exp_settings.field_values{1} = ["emptySplit_UAS_Kir_JFRC49"];
+    exp_settings.field_values{1} = ["emptySplit_UAS_Kir_JFRC49"];
+    exp_settings.field_values{2} = ["SS00324_UAS_Kir_JFRC49"];
 %   exp_settings.field_values{2} = ["SS01001_JFRC100_JFRC49"];
 %   exp_settings.field_values{1} = ["SS00324_JFRC100_JFRC49"];
 
-    exp_settings.single_group = 1;%1-all flies should be in one group, so exp_folder should be 1xX cell array
+    exp_settings.single_group = 0;%1-all flies should be in one group, so exp_folder should be 1xX cell array
     exp_settings.single_fly = 0;%1- only a single fly is being analyzed, the exp_folder will simply be the path to the fly
 
     %1 - each genotype will be plotted in its own figure against a control. 
@@ -27,19 +29,19 @@ function [exp_settings, histogram_plot_settings, histogram_annotation_settings, 
     exp_settings.plot_all_genotypes = 0; 
    
      %control must match exactly the metadata genotype value. 
-    exp_settings.control_genotype = '';
+    exp_settings.control_genotype = 'emptySplit_UAS_Kir_JFRC49';
 
     %This is the path to the protocol
     save_settings.path_to_protocol = "/Users/taylorl/Desktop/bad_flies";
     
-    exp_settings.genotypes = ["Empty Split"];
+    exp_settings.genotypes = ["EmptySplit-RA", "Kir"];
     %genotypes = ["empty-split", "LPLC-2", "LC-18", "T4_T5", "LC-15", "LC-25", "LC-11", "LC-17", "LC-4"];
 
 %% Save settings
     
 % Save settings   
     %The path where you wish to save the results of the data analysis
-    save_settings.save_path = '/Users/taylorl/Desktop/bad_flies';
+    save_settings.save_path = '/Users/taylorl/Desktop';
 
 %% Experiment settings
 
@@ -48,7 +50,7 @@ function [exp_settings, histogram_plot_settings, histogram_annotation_settings, 
     exp_settings.processed_data_file = 'testing_new_processing';
 
     %Log file will be named using this
-    exp_settings.group_being_analyzed_name = 'Empty split test';
+    exp_settings.group_being_analyzed_name = 'smallfield_Kir';
     
 %% Histogram settings 
 
@@ -82,10 +84,10 @@ function [exp_settings, histogram_plot_settings, histogram_annotation_settings, 
     
     %Set this to 1 if you are plotting only a single group and want lines
     %plotted for each fly as well as the average.
-    timeseries_plot_settings.show_individual_flies = 0;
+    timeseries_plot_settings.show_individual_flies = 1;
     
     %plot the frame position under each timeseries plot
-    timeseries_plot_settings.frame_superimpose = 0;
+    timeseries_plot_settings.frame_superimpose = 1;
     
     %plot both directions for each condition on the same axis. 
     timeseries_plot_settings.plot_both_directions = 1;
@@ -132,17 +134,28 @@ function [exp_settings, histogram_plot_settings, histogram_annotation_settings, 
 %% Position-Series P and M Plot Settings
 
     MP_plot_settings.mp_conds{1} = [1 3 5 7; 9 11 13 15];
-    MP_plot_settings.mp_conds{2} = [17 19 21 23; 25 27 29 31];   
-    MP_plot_settings.xaxis = [1:192];
-    MP_plot_settings.plot_MandP = 1;
+    MP_plot_settings.mp_conds{2} = [17 19 21 23; 25 27 29 31];
+    
+    MP_plot_settings.xaxis = [1:192]; %Standard x axis, only change if the number of frames has changed
+    
+    %MP_plot_settings.new_xaxis = [];
+%    MP_plot_settings.new_xaxis = (360/MP_plot_settings.xaxis(end))*[(MP_plot_settings.xaxis - 1) - 96]; %use this option to
+    %plot M and P against angular position, left being negative, right
+    %being positive
+    
+    MP_plot_settings.new_xaxis = circshift((360/MP_plot_settings.xaxis(end))*[(MP_plot_settings.xaxis - 1) - 96], 96); %use
+    %this option to plot M and P against angular position, centered so left
+    %is positive and right is negative. 
+    MP_plot_settings.plot_MandP = 0;
     MP_plot_settings.figure_names =  ["M", "P"]; 
-    MP_plot_settings.axis_labels{1} = ["M X Label", "M Y Label"]; %{xlabel, ylabel}
-    MP_plot_settings.axis_labels{2} = ["P X Label", "P Y Label"];
-    MP_plot_settings.cond_name{1} = ["Conds12" "Conds34" "Conds56" "Conds78"; ...
-        "Conds910" "Conds1112" "Conds1314" "Conds1516"]; %Titles of subplots - correspond to pos_conds
-    MP_plot_settings.cond_name{2} = ["Conds1718" "Conds1920" "Conds2122" "Conds2324"; ...
-        "Conds2526" "Conds2728" "Conds2930" "Conds3132"];
-    MP_plot_settings.show_ind_flies = 1;
+    MP_plot_settings.axis_labels{1} = ["Frame Position", "Motion-Dependent Response"]; %{xlabel, ylabel}
+    MP_plot_settings.axis_labels{2} = ["Frame Position", "Position-Dependent Response"];
+    MP_plot_settings.cond_name{1} = ["3x1 Sweep 0.35 Hz", "3x1 Sweep 1.07 Hz" ,"3x3 Sweep 0.35 Hz", "3x3 Sweep 1.07 Hz"; ...
+        "3x3 ON Sweep 0.35 Hz" ,"3x3 ON Sweep 1.07 Hz" ,"8x8 Sweep 0.35" ,"8x8 Sweep 1.07"]; %Titles of subplots - correspond to pos_conds
+    MP_plot_settings.cond_name{2} = ["16x16 Sweep 0.35 Hz", "16x16 Sweep 1.07 Hz", "64x3 Sweep 0.35Hz", "64x3 Sweep 1.07 Hz"; ...
+        "64x3 ON Sweep 0.35 Hz", "64x3 ON Sweep 1.07 Hz", "64x16 Sweep 0.35 Hz", "64x16 Sweep 1.07 Hz"];
+    MP_plot_settings.show_ind_flies = 0;
+
 
     
     
