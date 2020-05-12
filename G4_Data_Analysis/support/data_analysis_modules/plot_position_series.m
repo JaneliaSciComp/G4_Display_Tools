@@ -64,7 +64,7 @@ function plot_position_series(MP_settings, pos_settings, save_settings, mean_pos
                         if row*col > size(data,2)
                             continue;
                         end
-                        cond = MP_conds{MP}(1+(row-1),col);
+                        cond = MP_conds{fig}(1+(row-1),col);
                         place = row+num_rows*(col-1);
                         placement = col+num_cols*(row-1);
                         better_subplot(num_rows, num_cols, placement)
@@ -137,10 +137,10 @@ function plot_position_series(MP_settings, pos_settings, save_settings, mean_pos
                         xlabel('')
                         ylabel('')
                         if place == top_left_place
-                            ylabel(axis_labels{fig}(2), 'FontSize', y_fontsize) %1st subplot - Top Left
+                            ylabel(axis_labels{MP}(2), 'FontSize', y_fontsize) %1st subplot - Top Left
                             set(gca,'YTick');
                         end
-                        if place == bottom_left_place{MP}
+                        if place == bottom_left_place{fig}
                             xlabel(axis_labels{MP}(1), 'FontSize', x_fontsize) %7th subplot - Bottom Left
                         end
 
@@ -167,9 +167,9 @@ function plot_position_series(MP_settings, pos_settings, save_settings, mean_pos
                     end
                 end
                 h = findobj(gcf,'Type','line');
-                if control_genotype ~= 0 
-                    genotype{control_genotype} = genotype{control_genotype} + " (control)";
-                end
+%                 if control_genotype ~= 0 
+%                     genotype{control_genotype} = genotype{control_genotype} + " (control)";
+%                 end
                 if num_groups == 1
 
 
@@ -180,9 +180,9 @@ function plot_position_series(MP_settings, pos_settings, save_settings, mean_pos
                     legend1 = legend(h(end:-1:end-(num_groups-1)), genotype{1:end},'Orientation','horizontal');
 
                 end
-                if control_genotype ~= 0
-                    genotype{control_genotype} = erase(genotype{control_genotype}," (control)");
-                end
+%                 if control_genotype ~= 0
+%                     genotype{control_genotype} = erase(genotype{control_genotype}," (control)");
+%                 end
 
                 newPosition = [0.5 0.004 0.001 0.001]; %legend positioning
 

@@ -139,9 +139,9 @@ function plot_TC_specified_OLtrials(TC_plot_settings, TC_conds, plot_names, TC_i
                 end
             end
             h = findobj(gcf,'Type','line');
-            if control_genotype ~= 0 
-                genotype{control_genotype} = genotype{control_genotype} + " (control)";
-            end
+%             if control_genotype ~= 0 
+%                 genotype{control_genotype} = genotype{control_genotype} + " (control)";
+%             end
             if num_groups == 1
                 if plot_opposing_directions == 0
                     legend1 = legend(genotype);
@@ -155,9 +155,9 @@ function plot_TC_specified_OLtrials(TC_plot_settings, TC_conds, plot_names, TC_i
                     legend1 = legend(h(end:-2:end - (num_groups*2-1)),genotype{1:end},'Orientation','horizontal');
                 end
             end
-            if control_genotype ~= 0
-                genotype{control_genotype} = erase(genotype{control_genotype}," (control)");
-            end
+%             if control_genotype ~= 0
+%                 genotype{control_genotype} = erase(genotype{control_genotype}," (control)");
+%             end
             
             if timeseries_ylimits(d,:) == 0
                 allax = findall(gcf, 'Type', 'axes');

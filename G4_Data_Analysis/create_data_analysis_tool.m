@@ -259,10 +259,11 @@ classdef create_data_analysis_tool < handle
                 error('cannot find processed file in specified folder')
             end
 
-            load(fullfile(self.exp_folder{1,1},Data_name), 'channelNames', 'conditionModes', 'timestamps', 'ts_avg_reps');
+            load(fullfile(self.exp_folder{1,1},Data_name), 'channelNames', 'conditionModes', 'timestamps', 'ts_avg_reps', 'pos_conditions');
             self.CombData.timestamps = timestamps;
             self.CombData.channelNames = channelNames;
             self.CombData.conditionModes = conditionModes;
+            self.CombData.pos_conditions = pos_conditions;
             
             
             
@@ -294,11 +295,24 @@ classdef create_data_analysis_tool < handle
                 %run module to set durations (x axis limits)
             end
             
+            
             %Get path to .g4p file
             [g4ppath] = get_g4p_file(self.save_settings.path_to_protocol);
 
             if self.timeseries_plot_option == 1 && isempty(self.timeseries_plot_settings.cond_name) || ~isempty(self.timeseries_plot_settings.cond_name == 0)
                 self.timeseries_plot_settings.cond_name = create_default_timeseries_plot_titles(self.OL_conds, self.timeseries_plot_settings.cond_name, g4ppath);
+            end
+            
+            if self.pos_plot_option && isempty(self.MP_plot_settings.mp_conds)
+                self.MP_plot_settings.mp_conds = create_default_MP_layout(self.CombData.pos_conditions, self.MP_plot_settings.mp_conds);
+            end
+            
+            if self.pos_plot_option && isempty(self.MP_plot_settings.cond_name)
+                self.MP_plot_settings.cond_name = create_default_timeseries_plot_titles(self.MP_plot_settings.mp_conds, self.MP_plot_settings.cond_name, g4ppath);
+            end
+            
+            if self.pos_plot_option && isempty(self.MP_plot_settings.figure_names)
+                self.MP_plot_settings.figure_names = ["M","P"];
             end
             
             
