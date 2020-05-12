@@ -152,11 +152,7 @@ function process_data(exp_folder, processing_settings_file)
         bad_intertrials = [];
     end
     
-   
-    
-
-  
-        %loop for every trial
+    %loop for every trial
     for trial=1:num_trials
         cond = exp_order(trial);
         rep = floor((trial-1)/num_conds)+1;
@@ -197,13 +193,7 @@ function process_data(exp_folder, processing_settings_file)
     
     ts_data = search_for_misaligned_data(ts_data, percent_to_shift, num_conds, num_reps, Frame_ind);
     
-    
-    %% process data into meaningful datasets
-    %calculate LmR (Left - Right) and LpR (Left + Right)
-    ts_data(LmR_ind,:,:,:) = ts_data(L_chan_idx,:,:,:) - ts_data(R_chan_idx,:,:,:); % + = right turns, - = left turns
-    ts_data(LpR_ind,:,:,:) = ts_data(L_chan_idx,:,:,:) + ts_data(R_chan_idx,:,:,:); % + = increased amplitude, - = decreased
-    
-    %% Normalize LmR timeseries data
+     %% Normalize LmR timeseries data
     
     
     
@@ -217,20 +207,28 @@ function process_data(exp_folder, processing_settings_file)
 
     %Normalize all timeseries data  
     
-    ts_data_normalized = normalize_ts_data(s.settings.channel_order, ts_data, maxs);
+    [ts_data_normalized, normalization_max] = normalize_ts_data(L_chan_idx, R_chan_idx, ts_data, maxs);
 
 
     %Get timeseries avg over reps - normalized and
     %unnormalized. 
+    %% process data into meaningful datasets
+    %calculate LmR (Left - Right) and LpR (Left + Right)
     
-  
-   
+    %Unnormalized datasets
+    ts_data(LmR_ind,:,:,:) = ts_data(L_chan_idx,:,:,:) - ts_data(R_chan_idx,:,:,:); % + = right turns, - = left turns
+    ts_data(LpR_ind,:,:,:) = ts_data(L_chan_idx,:,:,:) + ts_data(R_chan_idx,:,:,:); % + = increased amplitude, - = decreased
     
     ts_avg_reps = squeeze(nanmean(ts_data, 3));
-    ts_avg_reps_norm = squeeze(nanmean(ts_data_normalized, 3));
     LmR_avg_over_reps = squeeze(ts_avg_reps(LmR_ind,:,:));
-    LmR_avg_reps_norm = squeeze(ts_avg_reps_norm(LmR_ind,:,:));
     LpR_avg_over_reps = squeeze(ts_avg_reps(LpR_ind,:,:));
+    
+    %Normalized datasets
+    ts_data_normalized(LmR_ind,:,:,:) = ts_data_normalized(L_chan_idx,:,:,:) - ts_data_normalized(R_chan_idx,:,:,:); % + = right turns, - = left turns   
+    ts_data_normalized(LpR_ind,:,:,:) = ts_data_normalized(L_chan_idx,:,:,:) + ts_data_normalized(R_chan_idx,:,:,:); % + = increased amplitude, - = decreased    
+    
+    ts_avg_reps_norm = squeeze(nanmean(ts_data_normalized, 3));
+    LmR_avg_reps_norm = squeeze(ts_avg_reps_norm(LmR_ind,:,:));   
     LpR_avg_reps_norm = squeeze(ts_avg_reps_norm(LpR_ind,:,:));
     
     if faLmR == 1
@@ -281,7 +279,7 @@ function process_data(exp_folder, processing_settings_file)
     %data - normalized and unnormalized.
     if enable_pos_series
             
-        [pos_series, mean_pos_series] = get_position_series(ts_data, ...
+        [pos_series, mean_pos_series] = get_position_series(ts_data_normalized, ...
             Frame_ind, num_positions, data_pad, LmR_ind, sm_delay, pos_conditions);
 
 %         [pos_series, mean_pos_series] = get_position_series_a(ts_data, ...
@@ -308,15 +306,15 @@ function process_data(exp_folder, processing_settings_file)
     summaries = tc_data; %[datatype, condition, repition]
     summaries_normalized = tc_data_norm;
     conditionModes = cond_modes(:,1); %[condition]
-    LmR_normalization_max = maxs(LmR_ind,1,1);
-    normalization_maxes = maxs(:,1,1);
+%    LmR_normalization_max = maxs(LmR_ind,1,1)
+
     
     save(fullfile(exp_folder,processed_file_name), 'timeseries', 'timeseries_normalized', ...
-        'ts_avg_reps', 'ts_avg_reps_norm', 'LmR_avg_over_reps', 'LmR_avg_reps_norm',...
-        'LpR_avg_over_reps', 'LpR_avg_reps_norm','faLmR_avg_over_reps', 'faLmR_avg_reps_norm',...
+        'ts_avg_reps', 'ts_avg_reps_norm',  'LmR_avg_over_reps', 'LmR_avg_reps_norm',...
+   'LpR_avg_over_reps', 'LpR_avg_reps_norm','faLmR_avg_over_reps', 'faLmR_avg_reps_norm',...
     'channelNames', 'histograms_CL', 'summaries', 'summaries_normalized','conditionModes', ...
     'interhistogram', 'timestamps', 'pos_series', 'mean_pos_series', 'pos_conditions', ...
-    'LmR_normalization_max', 'normalization_maxes', 'bad_duration_conds', ...
+    'normalization_max', 'bad_duration_conds', ...
     'bad_duration_intertrials','bad_slope_conds', 'bad_crossCorr_conds', 'bad_WBF_conds');
 
 

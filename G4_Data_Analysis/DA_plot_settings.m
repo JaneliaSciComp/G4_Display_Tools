@@ -139,11 +139,11 @@ function [exp_settings, histogram_plot_settings, histogram_annotation_settings, 
     MP_plot_settings.xaxis = [1:192]; %Standard x axis, only change if the number of frames has changed
     
     %MP_plot_settings.new_xaxis = [];
-%    MP_plot_settings.new_xaxis = (360/MP_plot_settings.xaxis(end))*[(MP_plot_settings.xaxis - 1) - 96]; %use this option to
+%    MP_plot_settings.new_xaxis = (360/MP_plot_settings.xaxis(end))*[(MP_plot_settings.xaxis) - 96]; %use this option to
     %plot M and P against angular position, left being negative, right
     %being positive
     
-    MP_plot_settings.new_xaxis = circshift((360/MP_plot_settings.xaxis(end))*[(MP_plot_settings.xaxis - 1) - 96], 96); %use
+    MP_plot_settings.new_xaxis = circshift((360/MP_plot_settings.xaxis(end))*[(MP_plot_settings.xaxis) - 96], 96); %use
     %this option to plot M and P against angular position, centered so left
     %is positive and right is negative. 
     MP_plot_settings.plot_MandP = 0;

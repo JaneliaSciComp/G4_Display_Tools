@@ -6,7 +6,8 @@ function [pos_series, mean_pos_series] = get_position_series(ts_data, Frame_ind,
     else
         ts_pos_data = ts_data;
     end
-    [num_chans, num_conds, num_reps, max_pts] = size(ts_pos_data);
+    [num_chans, num_conds, num_reps, max_pts] = size(ts_pos_data);  
+%    ts_pos_data = round(ts_pos_data*100);
     
     tmp = (squeeze(ts_pos_data(Frame_ind,1,:,:)));
     for rep = 1:size(tmp,1)
