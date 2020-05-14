@@ -29,10 +29,51 @@ function [pos_series, mean_pos_series] = get_position_series(ts_data, Frame_ind,
             temp_analysis_inds = find(isfinite(temp_pos_ts)); 
             analysis_inds = temp_analysis_inds(data_pad:(end-data_pad));
             pos_ts = temp_pos_ts(analysis_inds);
-
-            step_candidates = find(diff(pos_ts)); % find the indices where the position changes
-
+            
+            %Find steps that are larger than 1           
+            bigSteps = find(abs(diff(pos_ts))>1);
+            if ~isempty(bigSteps)
+                if length(bigSteps) == 1
+                    if bigSteps(1) < length(pos_ts)/4 %Large step toward the beginning of the trial
+                        start_step_cands = bigSteps(1);
+                        stop_step_cands = NaN;
+                    else %Large step toward the end of the trial
+                        start_step_cands = NaN;
+                        stop_step_cands = bigSteps(1);
+                    end
+                else
+                    switch_ind = [];
+                    for s = 1:length(bigSteps)-1
+                        if bigSteps(s + 1) > bigSteps(s)*4
+                            switch_ind = s;
+                        end
+                    end
+                    if ~isempty(switch_ind)
+                        start_step_cands = bigSteps(switch_ind);
+                        stop_step_cands = bigSteps(switch_ind + 1);
+                    else
+                        if bigSteps(1) < length(pos_ts)/4
+                            start_step_cands = bigSteps(end);
+                            stop_step_cands = NaN;
+                        else
+                            start_step_cands = NaN;
+                            stop_step_cands = bigSteps(1);
+                        end
+                    end
+                end
+                    
+            else
+                stop_step_cands = NaN;
+                start_step_cands = NaN;
+            end
+                
+            step_candidates = find(diff(pos_ts));% find the indices where the position changes
+            step_candidates(step_candidates<start_step_cands) = [];
+            step_candidates(step_candidates>stop_step_cands) = [];
+            
             med_step_size = median(diff(step_candidates)); % what's the avergae gap size
+
+            
 
             % currently missing from this code below:
             % 1) not backing off for first and last steps (the flat parts),
@@ -40,9 +81,11 @@ function [pos_series, mean_pos_series] = get_position_series(ts_data, Frame_ind,
             % to method a
             % 2) don't check that each mean_step_val is unique; if something goes wrong, could end up
             % coppying over same data multiple times if don't check
+
             for step_inds = 1:length(step_candidates)-1 
                 if abs(step_candidates(step_inds + 1) - step_candidates(step_inds) - med_step_size)/med_step_size < 0.5 % is step size is within 50% of the median
                     step_range_rel = step_candidates(step_inds):step_candidates(step_inds+1) + 1;
+                 
                     mean_step_val = mean(pos_ts(step_range_rel) );
                     if abs(mean_step_val - round(mean_step_val)) > 0.1 warning('error with step detection'); end
                     mean_step_val = round(mean_step_val); % force it to be an integer
@@ -50,7 +93,8 @@ function [pos_series, mean_pos_series] = get_position_series(ts_data, Frame_ind,
                     step_range_abs = analysis_inds(step_range_rel) + sm_delay ; % sm_delay is offset in time (response lags stim appearance)
 
                     if size(step_range_abs) > 0 
-                        pos_series(cond_ind, rep_ind, mean_step_val) = squeeze(nanmean(ts_pos_data(LmR_ind,cond_ind,rep_ind, step_range_abs), 4)); 
+                         pos_series(cond_ind, rep_ind, mean_step_val) = squeeze(nanmean(ts_pos_data(LmR_ind,cond_ind,rep_ind, step_range_abs), 4)); 
+
                     else
                         warning('step length error')
                     end
