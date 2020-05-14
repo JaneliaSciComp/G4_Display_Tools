@@ -248,11 +248,14 @@ function process_data(exp_folder, processing_settings_file)
     da_data_norm = ts_data_normalized;
     da_start_ind = find(ts_time>=da_start,1);
     da_data(:,:,:,1:da_start_ind) = nan; %omit data before trial start
-    for cond = 1:num_conds
-        da_stop_ind = find(ts_time<=(cond_dur(cond,1)-da_stop),1,'last');
+    for con = 1:num_conds
+        if ~isempty(find(con==bad_conds))
+            continue;
+        end
+        da_stop_ind = find(ts_time<=(cond_dur(con,1)-da_stop),1,'last');
         assert(~isempty(da_stop_ind),'data analysis window extends past trial end')
-        da_data(:,cond,:,da_stop_ind:end) = nan; %omit data after trial end
-        da_data_norm(:,cond,:,da_stop_ind:end) = nan;
+        da_data(:,con,:,da_stop_ind:end) = nan; %omit data after trial end
+        da_data_norm(:,con,:,da_stop_ind:end) = nan;
     end
     
     

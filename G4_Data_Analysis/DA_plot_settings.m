@@ -41,7 +41,7 @@ function [exp_settings, histogram_plot_settings, histogram_annotation_settings, 
     
 % Save settings   
     %The path where you wish to save the results of the data analysis
-    save_settings.save_path = '/Users/taylorl/Desktop';
+    save_settings.save_path = '/Users/taylorl/Desktop/bad_flies';
 
 %% Experiment settings
 

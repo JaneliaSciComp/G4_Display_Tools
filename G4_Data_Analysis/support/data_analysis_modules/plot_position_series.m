@@ -33,12 +33,13 @@ function plot_position_series(MP_settings, pos_settings, save_settings, mean_pos
     num_groups = size(mean_pos_series,1);
     num_exps = size(mean_pos_series,2);
     
+
     if ~isempty(new_xaxis)
         xaxis = new_xaxis(xaxis);
     end
     [xaxis, xaxis_inds] = sort(xaxis);
 
-   
+    
     if ~isempty(MP_conds)
         
         %Plot P and M 
@@ -73,13 +74,13 @@ function plot_position_series(MP_settings, pos_settings, save_settings, mean_pos
                         if num_groups == 1 && show_ind_flies == 1
                             for fly = 1:size(data_flies,2)
                                 datatoplot = squeeze(data_flies(1, fly, ceil(MP_conds{fig}(row,col)/2), :));
-                                datatoplot = datatoplot(xaxis_inds);
+                                %datatoplot = datatoplot(xaxis_inds);
                                 plot(xaxis, datatoplot,'Color',fly_colors(fly,:),'LineWidth',rep_LineWidth);
                                 hold on;
 
                             end
                             datatoplot = squeeze(data(1, ceil(MP_conds{fig}(row,col)/2), :));
-                            datatoplot = datatoplot(xaxis_inds);
+%                            datatoplot = datatoplot(xaxis_inds);
                             plot(xaxis, datatoplot,'Color',mean_colors(1,:),'LineWidth',mean_LineWidth);
 
                         else
@@ -89,14 +90,13 @@ function plot_position_series(MP_settings, pos_settings, save_settings, mean_pos
                                 if g == control_genotype
 
                                     datatoplot = squeeze(data(g, ceil(MP_conds{fig}(row,col)/2), :));
-                                    datatoplot = datatoplot(xaxis_inds);
+                                    %datatoplot = datatoplot(xaxis_inds);
                                     plot(xaxis, datatoplot,'Color',control_color,'LineWidth',mean_LineWidth);
 
                                 else
 
-
                                    datatoplot = squeeze(data(g, ceil(MP_conds{fig}(row,col)/2), :));
-                                    datatoplot = datatoplot(xaxis_inds);
+                                   % datatoplot = datatoplot(xaxis_inds);
                                     plot(xaxis, datatoplot,'Color',mean_colors(g,:),'LineWidth',mean_LineWidth);
 
 
