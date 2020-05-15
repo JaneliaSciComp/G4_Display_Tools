@@ -155,7 +155,8 @@ function [exp_settings, histogram_plot_settings, histogram_annotation_settings, 
     MP_plot_settings.cond_name{2} = ["16x16 Sweep 0.35 Hz", "16x16 Sweep 1.07 Hz", "64x3 Sweep 0.35Hz", "64x3 Sweep 1.07 Hz"; ...
         "64x3 ON Sweep 0.35 Hz", "64x3 ON Sweep 1.07 Hz", "64x16 Sweep 0.35 Hz", "64x16 Sweep 1.07 Hz"];
     MP_plot_settings.show_ind_flies = 0;
-
+    MP_plot_settings.ylimits = []; %[M ymin ymax; P ylmin ymax];
+    MP_plot_settings.xlimits = []; %[M xmin xmax; P xmin xmax];
 
     
     
@@ -259,8 +260,7 @@ function [exp_settings, histogram_plot_settings, histogram_annotation_settings, 
     MP_plot_settings.patch_alpha = 0.3;
     MP_plot_settings.subtitle_fontSize = 8;
     MP_plot_settings.legend_fontSize = 6;
-    MP_plot_settings.ylimits = []; %[M ymin ymax; P ylmin ymax];
-    MP_plot_settings.xlimits = []; %[M xmin xmax; P xmin xmax];
+    
     MP_plot_settings.rep_lineWidth = 0.05;
     MP_plot_settings.yLabel_fontSize = 6;
     MP_plot_settings.xLabel_fontSize = 6;

@@ -69,6 +69,7 @@ function plot_position_series(MP_settings, pos_settings, save_settings, mean_pos
                         place = row+num_rows*(col-1);
                         placement = col+num_cols*(row-1);
                         better_subplot(num_rows, num_cols, placement)
+                        yline(0, 'k--');
                         hold on
 
                         if num_groups == 1 && show_ind_flies == 1
@@ -93,6 +94,7 @@ function plot_position_series(MP_settings, pos_settings, save_settings, mean_pos
                                     %datatoplot = datatoplot(xaxis_inds);
                                     plot(xaxis, datatoplot,'Color',control_color,'LineWidth',mean_LineWidth);
 
+
                                 else
 
                                    datatoplot = squeeze(data(g, ceil(MP_conds{fig}(row,col)/2), :));
@@ -103,6 +105,8 @@ function plot_position_series(MP_settings, pos_settings, save_settings, mean_pos
                                 end
                             end
                         end
+                        
+                        
                
          %               titlestr = ['\fontsize{' num2str(subtitle_FontSize) '} Condition #{\color[rgb]{' num2str(mean_Colors(g,:)) '}' num2str(cond)]; 
                         if ~isempty(cond_name{fig}(row,col))
@@ -155,16 +159,16 @@ function plot_position_series(MP_settings, pos_settings, save_settings, mean_pos
                     end
                 end
                 
-                if ~isempty(ylimits)
-                    if ylimits(MP,:) == 0
-                        allax = findall(gcf, 'Type', 'axes');
-                        ymin = min(ydata);
-                        ymax = max(ydata);
-                        for ax = allax
+                if isempty(ylimits)
 
-                            ylim(ax, [ymin, ymax]);
-                        end
+                    allax = findall(gcf, 'Type', 'axes');
+                    ymin = min(ydata);
+                    ymax = max(ydata);
+                    for ax = allax
+
+                        ylim(ax, [ymin, ymax]);
                     end
+
                 end
                 h = findobj(gcf,'Type','line');
 %                 if control_genotype ~= 0 
