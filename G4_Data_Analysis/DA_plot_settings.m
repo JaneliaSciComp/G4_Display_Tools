@@ -10,15 +10,17 @@ function [exp_settings, histogram_plot_settings, histogram_annotation_settings, 
 %% Settings for exp_folder generation
     
     exp_settings.field_to_sort_by{1} = ["fly_genotype"];
-    exp_settings.field_to_sort_by{2} = ["fly_genotype"];
-%   exp_settings.field_to_sort_by{2} = ["fly_genotype"];
-%   exp_settings.field_to_sort_by{3} = ["fly_genotype"];
-   
+% 
+%    exp_settings.field_to_sort_by{2} = ["fly_genotype"];
+%    exp_settings.field_to_sort_by{3} = ["fly_genotype"];
+%        exp_settings.field_to_sort_by{2} = ["fly_genotype"];
+
     %if plot_all_genotypes is 1, leave field_values empty.
-%    exp_settings.field_values = {};
-    exp_settings.field_values{1} = ["emptySplit_UAS_Kir_JFRC49"];
-    exp_settings.field_values{2} = ["SS00324_UAS_Kir_JFRC49"];
-%   exp_settings.field_values{2} = ["SS01001_JFRC100_JFRC49"];
+    
+    exp_settings.field_values = {};
+%     exp_settings.field_values{1} = ["emptySplit_UAS_Kir_JFRC49"];
+%      exp_settings.field_values{2} = ["OL0010B_UAS_Kir_JFRC49"];
+%    exp_settings.field_values{3} = ["OL0042B_UAS_Kir_JFRC49"];
 %   exp_settings.field_values{1} = ["SS00324_JFRC100_JFRC49"];
 
     exp_settings.single_group = 0;%1-all flies should be in one group, so exp_folder should be 1xX cell array
@@ -26,7 +28,7 @@ function [exp_settings, histogram_plot_settings, histogram_annotation_settings, 
 
     %1 - each genotype will be plotted in its own figure against a control. 
     %0 - groups will be plotted as laid out below. 
-    exp_settings.plot_all_genotypes = 0; 
+    exp_settings.plot_all_genotypes = 1; 
    
      %control must match exactly the metadata genotype value. 
     exp_settings.control_genotype = 'emptySplit_UAS_Kir_JFRC49';
@@ -34,7 +36,7 @@ function [exp_settings, histogram_plot_settings, histogram_annotation_settings, 
     %This is the path to the protocol
     save_settings.path_to_protocol = "/Users/taylorl/Desktop/bad_flies";
     
-    exp_settings.genotypes = ["EmptySplit-RA", "Kir"];
+    exp_settings.genotypes = ["ES", "LC18", "LC15", "T4T5"];
     %genotypes = ["empty-split", "LPLC-2", "LC-18", "T4_T5", "LC-15", "LC-25", "LC-11", "LC-17", "LC-4"];
 
 %% Save settings
@@ -146,7 +148,7 @@ function [exp_settings, histogram_plot_settings, histogram_annotation_settings, 
     MP_plot_settings.new_xaxis = circshift((360/MP_plot_settings.xaxis(end))*[(MP_plot_settings.xaxis) - 96], 96); %use
     %this option to plot M and P against angular position, centered so left
     %is positive and right is negative. 
-    MP_plot_settings.plot_MandP = 0;
+    MP_plot_settings.plot_MandP = 1;
     MP_plot_settings.figure_names =  ["M", "P"]; 
     MP_plot_settings.axis_labels{1} = ["Frame Position", "Motion-Dependent Response"]; %{xlabel, ylabel}
     MP_plot_settings.axis_labels{2} = ["Frame Position", "Position-Dependent Response"];
@@ -162,10 +164,32 @@ function [exp_settings, histogram_plot_settings, histogram_annotation_settings, 
     
 %% Position-Series Averages Plot Settings
     
-    pos_plot_settings.plot_pos_averaged = 0;
-    pos_plot_settings.pos_conds = [];
-    pos_plot_settings.new_xaxis = [];
+    pos_plot_settings.plot_pos_averaged = 1;
+    pos_plot_settings.plot_opposing_directions = 1;
+    pos_plot_settings.pos_conds{1} = [1 3 5 7; 9 11 13 15];
+    pos_plot_settings.pos_conds{2} = [17 19 21 23; 25 27 29 31];
+    pos_plot_settings.figure_names = ["Mean Position Series"];
+
+    pos_plot_settings.axis_labels = ["X Label", "Y Label"];
+    pos_plot_settings.cond_name{1} = ["3x1 Sweep 0.35 Hz", "3x1 Sweep 1.07 Hz" ,"3x3 Sweep 0.35 Hz", "3x3 Sweep 1.07 Hz"; ...
+        "3x3 ON Sweep 0.35 Hz" ,"3x3 ON Sweep 1.07 Hz" ,"8x8 Sweep 0.35" ,"8x8 Sweep 1.07"];
+    pos_plot_settings.cond_name{2} = ["16x16 Sweep 0.35 Hz", "16x16 Sweep 1.07 Hz", "64x3 Sweep 0.35Hz", "64x3 Sweep 1.07 Hz"; ...
+        "64x3 ON Sweep 0.35 Hz", "64x3 ON Sweep 1.07 Hz", "64x16 Sweep 0.35 Hz", "64x16 Sweep 1.07 Hz"];
+    pos_plot_settings.show_ind_flies = 0;
+    pos_plot_settings.ylimits = [];
+    pos_plot_settings.xlimits = [];
+    pos_plot_settings.xaxis = [1:192];%Standard x axis, only change if the number of frames has changed
+    pos_plot_settings.new_xaxis = circshift((360/MP_plot_settings.xaxis(end))*[(MP_plot_settings.xaxis) - 96], 96); %use
+    %this option to plot M and P against angular position, centered so left;
+
+%    pos_plot_settings.new_xaxis = (360/MP_plot_settings.xaxis(end))*[(MP_plot_settings.xaxis) - 96]; %use this option to
+%    plot position series against angular position, left being negative, right
+%    being positive
     
+    %pos_plot_settings.new_xaxis = [];
+    
+    
+
 %% Further settings that may not need adjusting often 
 
 %% Position series settings
@@ -248,7 +272,7 @@ function [exp_settings, histogram_plot_settings, histogram_annotation_settings, 
     TC_plot_settings.marker_type = 'o';
     TC_plot_settings.legend_FontSize = 6;
     
-%% Plot settings for position series
+%% Plot settings for M and P
 
     MP_plot_settings.rep_colors = [0 0 0; 1 0 0; 0 0.5 0; 0 0 1; 1 0.5 0; ...
         .75 0 1; 0 1 0; 0 1 1; 1 0 1; 1 1 0]; %default 10 colors supports up to 10 groups (add more colors for more groups)
@@ -268,6 +292,23 @@ function [exp_settings, histogram_plot_settings, histogram_annotation_settings, 
         .5 .5 .5; .55 .55 .55; .6 .6 .6; .65 .65 .65; .7 .7 .7; .75 .75 .75; .8 .8 .8; .85 .85 .85; .9 .9 .9; .95 .95 .95];
           %Colors assigned to individual fly lines
     MP_plot_settings.axis_num_fontSize = 6;
+    
+%% Plot settings for position series
+
+    pos_plot_settings.subtitle_fontSize = 8;
+    pos_plot_settings.legend_fontSize = 6;
+    pos_plot_settings.yLabel_fontSize = 6;
+    pos_plot_settings.xLabel_fontSize = 6;
+    pos_plot_settings.axis_num_fontSize = 6;
+    pos_plot_settings.fly_colors = [.1 .1 .1; .15 .15 .15; .2 .2 .2; .25 .25 .25; .3 .3 .3; .35 .35 .35; .4 .4 .4; .45 .45 .45; ...
+        .5 .5 .5; .55 .55 .55; .6 .6 .6; .65 .65 .65; .7 .7 .7; .75 .75 .75; .8 .8 .8; .85 .85 .85; .9 .9 .9; .95 .95 .95];
+    pos_plot_settings.rep_colors = [0 0 0; 1 0 0; 0 0.5 0; 0 0 1; 1 0.5 0; .75 0 1; 0 1 0; 0 1 1; 1 0 1; 1 1 0]; %default 10 colors supports up to 10 groups (add more colors for more groups)
+    pos_plot_settings.rep_lineWidth = 0.05;
+    pos_plot_settings.mean_colors = [1 0 0; 0 0 1; 0 0.5 0; 1 0.5 0; .75 0 1; 0 1 0;  1 0.5 1; 0 1 1; 1 0 1; 1 1 0]; %default 10 colors supports up to 10 groups (add more colors for more groups)
+    pos_plot_settings.control_color = [0 0 0];
+    pos_plot_settings.mean_lineWidth = 1;
+    pos_plot_settings.edgeColor = 'none';
+    pos_plot_settings.patch_alpha = 0.3;
 
 
     %% Save settings

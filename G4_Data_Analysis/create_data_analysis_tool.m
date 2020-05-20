@@ -338,6 +338,8 @@ classdef create_data_analysis_tool < handle
             
             self.timeseries_top_left_place = 1;
             self.MP_plot_settings.top_left_place = 1;
+            self.pos_plot_settings.top_left_place = 1;
+            
             if self.timeseries_plot_option == 1
                 [self.timeseries_bottom_left_places, self.timeseries_left_column_places] = ...
                    get_plot_placements(self.OL_conds);
@@ -346,6 +348,11 @@ classdef create_data_analysis_tool < handle
             
               [self.MP_plot_settings.bottom_left_place, self.MP_plot_settings.left_column_places] = ...
                  get_plot_placements(self.MP_plot_settings.mp_conds);
+            end
+            
+            if self.pos_plot_option == 1 && self.pos_plot_settings.plot_pos_averaged == 1
+                [self.pos_plot_settings.bottom_left_place, self.pos_plot_settings.left_column_places] = ...
+                    get_plot_placements(self.pos_plot_settings.pos_conds);
             end
             
             

@@ -2,11 +2,8 @@ function plot_position_series(MP_settings, pos_settings, save_settings, mean_pos
     P, M, P_flies, M_flies, genotype, control_genotype)
 
 
-    pos_conds = pos_settings.pos_conds;
+    
     MP_conds = MP_settings.mp_conds;
-    show_ind_flies = MP_settings.show_ind_flies;
-    rep_colors = MP_settings.rep_colors;
-    control_color = MP_settings.control_color;
     cond_name = MP_settings.cond_name;
      mean_colors = MP_settings.mean_colors;
      mean_LineWidth = MP_settings.mean_lineWidth;
@@ -208,7 +205,7 @@ function plot_position_series(MP_settings, pos_settings, save_settings, mean_pos
     
     if pos_settings.plot_pos_averaged == 1
         
-        % Plot the regular position series (not M and P)
+        plot_unedited_position_series(pos_settings, mean_pos_series, save_settings, genotype, control_genotype)
         
     end
 
