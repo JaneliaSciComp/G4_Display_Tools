@@ -124,11 +124,11 @@ function plot_unedited_position_series(settings, mean_pos_series, save_settings,
                                          if mean_colors(g,rgb) > .75
                                              color_adjust(rgb) = 0;
                                          elseif mean_colors(g,rgb) > .5
-                                             color_adjust(rgb) = .25;
+                                             color_adjust(rgb) = .15;
                                          elseif mean_colors(g, rgb) > .25
-                                             color_adjust(rgb) = .5;
+                                             color_adjust(rgb) = .35;
                                          elseif mean_colors(g,rgb) >= 0
-                                             color_adjust(rgb) = .75;
+                                             color_adjust(rgb) = .55;
                                          end
                                       end
 
