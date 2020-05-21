@@ -315,6 +315,22 @@ classdef create_data_analysis_tool < handle
                 self.MP_plot_settings.figure_names = ["M","P"];
             end
             
+            if self.pos_plot_option && self.pos_plot_settings.plot_pos_averaged && ...
+                    isempty(self.pos_plot_settings.pos_conds)
+                self.pos_plot_settings.pos_conds = create_default_posSeries_layout(pos_conditions, ...
+                    self.pos_plot_settings.pos_conds, self.pos_plot_settings.plot_opposing_directions);
+            end
+            
+            if self.pos_plot_option && isempty(self.pos_plot_settings.cond_name) && ...
+                    self.pos_plot_settings.plot_pos_averaged
+                self.pos_plot_settings.cond_name = create_default_timeseries_plot_titles(self.pos_plot_settings.pos_conds, ...
+                    self.pos_plot_settings.cond_name, g4ppath);
+            end
+            
+            if self.pos_plot_option && isempty(self.pos_plot_settings.figure_names) && ...
+                    self.pos_plot_settings.plot_pos_averaged
+                self.pos_plot_settings.figure_names = ["Mean Position Series"];
+            end
             
                 
                 %Determine which graphs are in the leftmost column so we know
@@ -350,7 +366,7 @@ classdef create_data_analysis_tool < handle
                  get_plot_placements(self.MP_plot_settings.mp_conds);
             end
             
-            if self.pos_plot_option == 1 && self.pos_plot_settings.plot_pos_averaged == 1
+            if self.pos_plot_option && self.pos_plot_settings.plot_pos_averaged
                 [self.pos_plot_settings.bottom_left_place, self.pos_plot_settings.left_column_places] = ...
                     get_plot_placements(self.pos_plot_settings.pos_conds);
             end
