@@ -50,7 +50,7 @@ function [bad_trials, wbf_data] = find_bad_wbf_trials(Log, ts_data, wbf_range, w
                 if end_count/count <= wbf_end_percent
 
                     bad_trial_count = bad_trial_count + 1;
-                    bad_trials(bad_trial_count,:) = [cond, rep];
+                    bad_trials(bad_trial_count,:) = [rep, cond];
                 end
                 
                 %If enough of the bad wbf readings are clustered at the

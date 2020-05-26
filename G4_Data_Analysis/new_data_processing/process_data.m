@@ -55,6 +55,13 @@ function process_data(exp_folder, processing_settings_file)
     wbf_range = s.settings.wbf_range;
     wbf_cutoff = s.settings.wbf_cutoff;
     wbf_end_percent = s.settings.wbf_end_percent;
+    
+    if isempty(s.settings.summary_save_path)
+        summary_save_path = exp_folder;
+    else
+        summary_save_path = s.settings.summary_save_path;
+    end
+    summary_filename = strcat(s.settings.summary_filename, '.txt');
 
 
     %Set which command we should be looking for in the log files
@@ -126,31 +133,12 @@ function process_data(exp_folder, processing_settings_file)
     %check condition durations and control modes for experiment errors
     assert(all(all((cond_modes-repmat(cond_modes(:,1),[1 num_reps]))==0)),...
         'unexpected order of trial modes - check that pre-trial, post-trial, and intertrial options are correct')
-   
+     %Generate report of bad conditions  
+    [bad_conds, bad_reps, bad_intertrials, bad_conds_summary] = ...
+        consolidate_bad_conds(bad_duration_conds, bad_duration_intertrials, bad_slope_conds,...
+        bad_crossCorr_conds, bad_WBF_conds, num_trials, num_conds, num_reps, trial_options);
     
-    bad_conditions = [bad_duration_conds; bad_slope_conds; bad_crossCorr_conds; bad_WBF_conds];
-    for i = size(bad_conditions):-1:1
-        for j = size(bad_conditions):-1:1
-            if i == j
-                continue;
-            elseif bad_conditions(i,:) == bad_conditions(j,:)
-                bad_conditions(i,:) = [];
-                break;
-            end
-        end
-    end
-    if ~isempty(bad_conditions)
-        bad_conds = bad_conditions(:,2);
-        bad_reps = bad_conditions(:,1);
-    else
-        bad_conds = [];
-        bad_reps = [];
-    end
-    if ~isempty(bad_duration_intertrials)
-        bad_intertrials = bad_duration_intertrials;
-    else
-        bad_intertrials = [];
-    end
+    
     
     %loop for every trial
     for trial=1:num_trials
@@ -298,6 +286,12 @@ function process_data(exp_folder, processing_settings_file)
     
     
     %% save data
+    fileId = fopen(fullfile(summary_save_path,summary_filename), 'wt');
+    for line = 1:length(bad_conds_summary)
+        fprintf(fileId, '\n%s\n',bad_conds_summary{line});
+    end
+    fclose(fileId);
+    
 
     channelNames.timeseries = channel_order; %cell array of channel names for timeseries data
     channelNames.histograms = hist_datatypes; %cell array of channel names for histograms

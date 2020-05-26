@@ -64,6 +64,10 @@ function create_processing_settings()
     settings.enable_faLmR = 1; %If you want to do faLmR, set this to 1. 
                             %Everything else will be updated automatically.
                             
+    %% Summary settings
+    settings.summary_filename = 'Summary_of_bad_trials'; %Filename of the summary of which trials weren't run and why
+    settings.summary_save_path = []; %Leave empty if you want the summary saved in the fly folder.
+                            
                             
     %% Do adjustments and save .mat file
     
