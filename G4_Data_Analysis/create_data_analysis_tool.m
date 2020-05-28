@@ -50,6 +50,9 @@ classdef create_data_analysis_tool < handle
         pos_plot_settings
         MP_plot_settings
         
+        comp_plot_option
+        comp_plot_settings
+        
         datatype_indices
 %         
     %    normalize_option
@@ -118,6 +121,7 @@ classdef create_data_analysis_tool < handle
             self.exp_folder = self.exp_settings.exp_folder;
             self.trial_options = self.exp_settings.trial_options;
             self.MP_plot_settings = settings.MP_plot_settings;
+            self.comp_plot_settings = settings.comp_settings;
 
 %             self.normalize_option = 0; %0 = don't normalize, 1 = normalize every fly, 2 = normalize every group
             self.histogram_plot_option = 0;
@@ -216,6 +220,13 @@ classdef create_data_analysis_tool < handle
                         self.pos_plot_option = 1;
                         self.data_needed{end+1} = 'mean_pos_series';
                         self.data_needed{end+1} = 'pos_conditions';
+                        
+                    case '-compplot'
+                        
+                        self.comp_plot_option = 1;
+                        self.data_needed{end+1} = 'mean_pos_series';
+                        self.data_needed{end+1} = 'ts_avg_reps';
+                        self.data_needed{end+1} = 'ts_avg_reps_norm';
                         
 %                     case '-norm'
 %                         
@@ -571,8 +582,16 @@ classdef create_data_analysis_tool < handle
 
             end
             
+            if self.comp_plot_option == 1
+                [P, M, P_flies, M_flies] = generate_M_and_P(self.CombData.mean_pos_series, ...
+                    self.MP_plot_settings.mp_conds, self.MP_plot_settings);
+                
+                create_comparison_figure(self.CombData, ...
+                    self.comp_plot_settings, self.timeseries_plot_settings, ...
+                    self.pos_plot_settings, self.MP_plot_settings, P, M, ...
+                    P_flies, M_flies, single, self.save_settings, self.genotype, self.control_genotype);
+            end
 
-            
             analyses_run = unique(analyses_run);
                 
         

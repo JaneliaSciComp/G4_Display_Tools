@@ -40,7 +40,7 @@ function plot_TC_specified_OLtrials(TC_plot_settings, TC_conds, plot_names, TC_i
                         continue;
                     end
                     placement = col+num_plot_cols*(row-1);
-                    better_subplot(num_plot_rows, num_plot_cols, placement)
+                    better_subplot(num_plot_rows, num_plot_cols, placement, 20, 35)
                     hold on
                     for g = 1:num_groups
                         tmpdata = squeeze(nanmean(summaries(g,:,d,conds,:),5));

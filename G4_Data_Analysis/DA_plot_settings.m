@@ -1,7 +1,7 @@
 
 function [exp_settings, histogram_plot_settings, histogram_annotation_settings, ...
     CL_hist_plot_settings, timeseries_plot_settings, TC_plot_settings, ...
-    MP_plot_settings, pos_plot_settings, save_settings] = DA_plot_settings()
+    MP_plot_settings, pos_plot_settings, save_settings, comp_settings] = DA_plot_settings()
 
 %% Settings which need updating regularly (more static settings below)
 
@@ -10,17 +10,16 @@ function [exp_settings, histogram_plot_settings, histogram_annotation_settings, 
 %% Settings for exp_folder generation
     
     exp_settings.field_to_sort_by{1} = ["fly_genotype"];
-% 
-%    exp_settings.field_to_sort_by{2} = ["fly_genotype"];
+    exp_settings.field_to_sort_by{2} = ["fly_genotype"];
 %    exp_settings.field_to_sort_by{3} = ["fly_genotype"];
 %        exp_settings.field_to_sort_by{2} = ["fly_genotype"];
 
     %if plot_all_genotypes is 1, leave field_values empty.
     
-    exp_settings.field_values = {};
-%     exp_settings.field_values{1} = ["emptySplit_UAS_Kir_JFRC49"];
-%      exp_settings.field_values{2} = ["OL0010B_UAS_Kir_JFRC49"];
-%    exp_settings.field_values{3} = ["OL0042B_UAS_Kir_JFRC49"];
+%    exp_settings.field_values = {};
+     exp_settings.field_values{1} = ["emptySplit_UAS_Kir_JFRC49"];      
+     exp_settings.field_values{2} = ["OL0010B_UAS_Kir_JFRC49"];
+%    exp_settings.field_values{2} = ["OL0042B_UAS_Kir_JFRC49"];
 %   exp_settings.field_values{1} = ["SS00324_JFRC100_JFRC49"];
 
     exp_settings.single_group = 0;%1-all flies should be in one group, so exp_folder should be 1xX cell array
@@ -28,7 +27,7 @@ function [exp_settings, histogram_plot_settings, histogram_annotation_settings, 
 
     %1 - each genotype will be plotted in its own figure against a control. 
     %0 - groups will be plotted as laid out below. 
-    exp_settings.plot_all_genotypes = 1; 
+    exp_settings.plot_all_genotypes = 0; 
    
      %control must match exactly the metadata genotype value. 
     exp_settings.control_genotype = 'emptySplit_UAS_Kir_JFRC49';
@@ -36,7 +35,7 @@ function [exp_settings, histogram_plot_settings, histogram_annotation_settings, 
     %This is the path to the protocol
     save_settings.path_to_protocol = "/Users/taylorl/Desktop/bad_flies";
     
-    exp_settings.genotypes = ["ES", "LC18", "LC15", "T4T5"];
+    exp_settings.genotypes = ["ES", "T4-T5"];
     %genotypes = ["empty-split", "LPLC-2", "LC-18", "T4_T5", "LC-15", "LC-25", "LC-11", "LC-17", "LC-4"];
 
 %% Save settings
@@ -86,10 +85,10 @@ function [exp_settings, histogram_plot_settings, histogram_annotation_settings, 
     
     %Set this to 1 if you are plotting only a single group and want lines
     %plotted for each fly as well as the average.
-    timeseries_plot_settings.show_individual_flies = 1;
+    timeseries_plot_settings.show_individual_flies = 0;
     
     %plot the frame position under each timeseries plot
-    timeseries_plot_settings.frame_superimpose = 1;
+    timeseries_plot_settings.frame_superimpose = 0;
     
     %plot both directions for each condition on the same axis. 
     timeseries_plot_settings.plot_both_directions = 1;
@@ -165,16 +164,18 @@ function [exp_settings, histogram_plot_settings, histogram_annotation_settings, 
 %% Position-Series Averages Plot Settings
     
     pos_plot_settings.plot_pos_averaged = 1;
-    pos_plot_settings.plot_opposing_directions = 1;
-    pos_plot_settings.pos_conds{1} = [1 3 5 7; 9 11 13 15];
-    pos_plot_settings.pos_conds{2} = [17 19 21 23; 25 27 29 31];
-    pos_plot_settings.figure_names = ["Mean Position Series"];
+    pos_plot_settings.plot_opposing_directions = 0;
+    pos_plot_settings.pos_conds = [];
+%     pos_plot_settings.pos_conds{1} = [1 3 5 7; 9 11 13 15];
+%     pos_plot_settings.pos_conds{2} = [17 19 21 23; 25 27 29 31];
+    pos_plot_settings.figure_names = [];
 
     pos_plot_settings.axis_labels = ["X Label", "Y Label"];
-    pos_plot_settings.cond_name{1} = ["3x1 Sweep 0.35 Hz", "3x1 Sweep 1.07 Hz" ,"3x3 Sweep 0.35 Hz", "3x3 Sweep 1.07 Hz"; ...
-        "3x3 ON Sweep 0.35 Hz" ,"3x3 ON Sweep 1.07 Hz" ,"8x8 Sweep 0.35" ,"8x8 Sweep 1.07"];
-    pos_plot_settings.cond_name{2} = ["16x16 Sweep 0.35 Hz", "16x16 Sweep 1.07 Hz", "64x3 Sweep 0.35Hz", "64x3 Sweep 1.07 Hz"; ...
-        "64x3 ON Sweep 0.35 Hz", "64x3 ON Sweep 1.07 Hz", "64x16 Sweep 0.35 Hz", "64x16 Sweep 1.07 Hz"];
+%     pos_plot_settings.cond_name{1} = ["3x1 Sweep 0.35 Hz", "3x1 Sweep 1.07 Hz" ,"3x3 Sweep 0.35 Hz", "3x3 Sweep 1.07 Hz"; ...
+%         "3x3 ON Sweep 0.35 Hz" ,"3x3 ON Sweep 1.07 Hz" ,"8x8 Sweep 0.35" ,"8x8 Sweep 1.07"];
+%     pos_plot_settings.cond_name{2} = ["16x16 Sweep 0.35 Hz", "16x16 Sweep 1.07 Hz", "64x3 Sweep 0.35Hz", "64x3 Sweep 1.07 Hz"; ...
+%         "64x3 ON Sweep 0.35 Hz", "64x3 ON Sweep 1.07 Hz", "64x16 Sweep 0.35 Hz", "64x16 Sweep 1.07 Hz"];
+    pos_plot_settings.cond_name = [];
     pos_plot_settings.show_ind_flies = 0;
     pos_plot_settings.ylimits = [];
     pos_plot_settings.xlimits = [];
@@ -187,6 +188,27 @@ function [exp_settings, histogram_plot_settings, histogram_annotation_settings, 
 %    being positive
     
     %pos_plot_settings.new_xaxis = [];
+    
+    
+%% Comparison figure settings
+
+    comp_settings.plot_order = {'LmR','pos','M','P'};
+    comp_settings.conditions = [1,3,5,7,9,11,13,15,17,19,21,23,25,27,29,31];
+    comp_settings.rows_per_fig = 6;
+    comp_settings.figure_names = {'Comparison1-11', ...
+        'Comparison13-23', 'Comparison25-31'};
+    comp_settings.cond_name{1} = ["Cond1 LmR", "Cond1 Pos Series", "Cond1 M", "Cond1 P";...
+        "Cond2 LmR", "Cond2 Pos Series", "Cond2 M", "Cond2 P"; "Cond3 LmR", "Cond3 Pos Series", "Cond3 M", "Cond3 P";...
+        "Cond4 LmR", "Cond4 Pos Series", "Cond4 M", "Cond4 P"; "Cond3 LmR", "Cond3 Pos Series", "Cond3 M", "Cond3 P";...
+        "Cond3 LmR", "Cond3 Pos Series", "Cond3 M", "Cond3 P"];
+     comp_settings.cond_name{2} = ["Cond1 LmR", "Cond1 Pos Series", "Cond1 M", "Cond1 P";...
+        "Cond2 LmR", "Cond2 Pos Series", "Cond2 M", "Cond2 P"; "Cond3 LmR", "Cond3 Pos Series", "Cond3 M", "Cond3 P";...
+        "Cond4 LmR", "Cond4 Pos Series", "Cond4 M", "Cond4 P"; "Cond3 LmR", "Cond3 Pos Series", "Cond3 M", "Cond3 P";...
+        "Cond3 LmR", "Cond3 Pos Series", "Cond3 M", "Cond3 P"];
+     comp_settings.cond_name{3} = ["Cond1 LmR", "Cond1 Pos Series", "Cond1 M", "Cond1 P";...
+        "Cond2 LmR", "Cond2 Pos Series", "Cond2 M", "Cond2 P"; "Cond3 LmR", "Cond3 Pos Series", "Cond3 M", "Cond3 P";...
+        "Cond4 LmR", "Cond4 Pos Series", "Cond4 M", "Cond4 P"];
+    comp_settings.norm = 1;
     
     
 
@@ -304,7 +326,7 @@ function [exp_settings, histogram_plot_settings, histogram_annotation_settings, 
         .5 .5 .5; .55 .55 .55; .6 .6 .6; .65 .65 .65; .7 .7 .7; .75 .75 .75; .8 .8 .8; .85 .85 .85; .9 .9 .9; .95 .95 .95];
     pos_plot_settings.rep_colors = [0 0 0; 1 0 0; 0 0.5 0; 0 0 1; 1 0.5 0; .75 0 1; 0 1 0; 0 1 1; 1 0 1; 1 1 0]; %default 10 colors supports up to 10 groups (add more colors for more groups)
     pos_plot_settings.rep_lineWidth = 0.05;
-    pos_plot_settings.mean_colors = [1 0 0; 0 0 1; 0 0.5 0; 1 0.5 0; .75 0 1; 0 1 0;  1 0.5 1; 0 1 1; 1 0 1; 1 1 0]; %default 10 colors supports up to 10 groups (add more colors for more groups)
+    pos_plot_settings.mean_colors = [1 0 0; 0 0 1; 1 1 0; 0 0.5 0; 1 0.5 0; .75 0 1; 0 1 0;  1 0.5 1; 0 1 1; 1 0 1]; %default 10 colors supports up to 10 groups (add more colors for more groups)
     pos_plot_settings.control_color = [0 0 0];
     pos_plot_settings.mean_lineWidth = 1;
     pos_plot_settings.edgeColor = 'none';

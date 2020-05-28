@@ -60,7 +60,7 @@ function plot_unedited_position_series(settings, mean_pos_series, save_settings,
                     placement = col+num_cols*(row-1);
                     if cond > 0
 
-                        better_subplot(num_rows, num_cols, placement)
+                        better_subplot(num_rows, num_cols, placement,20,35)
                         hold on
 
                         for g = 1:num_groups

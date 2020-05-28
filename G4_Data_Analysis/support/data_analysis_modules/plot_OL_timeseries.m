@@ -68,10 +68,10 @@ function plot_OL_timeseries(timeseries_data, timestampsIN, OL_conds, OL_duration
                             else
                                 if g == control_genotype
                                     plot(timestamps,meandata,'Color',control_color,'LineWidth',mean_LineWidth);
-                                    patch([timestamps fliplr(timestamps)],[meandata+semdata fliplr(meandata-semdata)],'k','FaceColor',control_color,'EdgeColor','none','FaceAlpha',patch_alpha)
+                                    patch([timestamps fliplr(timestamps)],[meandata+semdata fliplr(meandata-semdata)],'k','FaceColor',control_color,'EdgeColor',EdgeColor,'FaceAlpha',patch_alpha)
                                 else
                                     plot(timestamps,meandata,'Color',mean_Colors(g,:),'LineWidth',mean_LineWidth);
-                                    patch([timestamps fliplr(timestamps)],[meandata+semdata fliplr(meandata-semdata)],'k','FaceColor',mean_Colors(g,:),'EdgeColor','none','FaceAlpha',patch_alpha)
+                                    patch([timestamps fliplr(timestamps)],[meandata+semdata fliplr(meandata-semdata)],'k','FaceColor',mean_Colors(g,:),'EdgeColor',EdgeColor,'FaceAlpha',patch_alpha)
                                 end
                             end
                             
@@ -92,11 +92,11 @@ function plot_OL_timeseries(timeseries_data, timestampsIN, OL_conds, OL_duration
                                     plot(repmat(timestampsIN',[1 num_exps]),tmpdata','Color',mean_Colors(g+1,:),'LineWidth',rep_LineWidth);
                                 elseif num_groups == 1
                                     plot(timestamps,meandata,'Color',mean_Colors(g+1,:),'LineWidth',mean_LineWidth);
-                                    patch([timestamps fliplr(timestamps)],[meandata+semdata fliplr(meandata-semdata)],'k','FaceColor',mean_Colors(g+1,:),'EdgeColor','none','FaceAlpha',patch_alpha)
+                                    patch([timestamps fliplr(timestamps)],[meandata+semdata fliplr(meandata-semdata)],'k','FaceColor',mean_Colors(g+1,:),'EdgeColor',EdgeColor,'FaceAlpha',patch_alpha)
                                 else
                                     if g == control_genotype
                                         plot(timestamps,meandata,'Color',control_color + .75,'LineWidth',mean_LineWidth);
-                                        patch([timestamps fliplr(timestamps)],[meandata+semdata fliplr(meandata-semdata)],'k','FaceColor',control_color,'EdgeColor','none','FaceAlpha',patch_alpha)
+                                        patch([timestamps fliplr(timestamps)],[meandata+semdata fliplr(meandata-semdata)],'k','FaceColor',control_color,'EdgeColor',EdgeColor,'FaceAlpha',patch_alpha)
 
                                     else
                                         
@@ -114,7 +114,7 @@ function plot_OL_timeseries(timeseries_data, timestampsIN, OL_conds, OL_duration
                                         end
                                         
                                         plot(timestamps,meandata,'Color',mean_Colors(g,:) + color_adjust,'LineWidth',mean_LineWidth);
-                                        patch([timestamps fliplr(timestamps)],[meandata+semdata fliplr(meandata-semdata)],'k','FaceColor',mean_Colors(g,:),'EdgeColor','none','FaceAlpha',patch_alpha)
+                                        patch([timestamps fliplr(timestamps)],[meandata+semdata fliplr(meandata-semdata)],'k','FaceColor',mean_Colors(g,:),'EdgeColor',EdgeColor,'FaceAlpha',patch_alpha)
                                 
                                     
                                     end

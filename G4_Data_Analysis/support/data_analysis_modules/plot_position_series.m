@@ -65,7 +65,7 @@ function plot_position_series(MP_settings, pos_settings, save_settings, mean_pos
                         cond = MP_conds{fig}(1+(row-1),col);
                         place = row+num_rows*(col-1);
                         placement = col+num_cols*(row-1);
-                        better_subplot(num_rows, num_cols, placement)
+                        better_subplot(num_rows, num_cols, placement,20,35)
                         yline(0, 'k--');
                         hold on
 
