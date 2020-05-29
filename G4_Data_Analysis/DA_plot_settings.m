@@ -195,6 +195,7 @@ function [exp_settings, histogram_plot_settings, histogram_annotation_settings, 
     comp_settings.plot_order = {'LmR','pos','M','P'};
     comp_settings.conditions = [1,3,5,7,9,11,13,15,17,19,21,23,25,27,29,31];
     comp_settings.rows_per_fig = 6;
+    comp_settings.ylimits = [0 0];
     comp_settings.figure_names = {'Comparison1-11', ...
         'Comparison13-23', 'Comparison25-31'};
     comp_settings.cond_name{1} = ["Cond1 LmR", "Cond1 Pos Series", "Cond1 M", "Cond1 P";...

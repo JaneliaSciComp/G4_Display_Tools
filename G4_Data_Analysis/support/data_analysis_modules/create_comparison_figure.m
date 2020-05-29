@@ -48,7 +48,7 @@
     legend_FontSize = ts_settings.legend_fontSize;
     axis_num_fontSize = ts_settings.axis_num_fontSize;
     subtitle_FontSize = ts_settings.subtitle_fontSize;
-    timeseries_ylimits = ts_settings.timeseries_ylimits;
+    ylimits = comp_settings.ylimits;
     norm = comp_settings.norm;
     
     figure_names = comp_settings.figure_names;
@@ -89,6 +89,7 @@
             fig_name = figure_names{fig};
             cond_name = cond_names{fig};
             ydata = [];
+            ydata_pos = [];
             for row = 1:num_rows
                 if (fig-1)*num_rows + row > length(conditions)
                     continue;
@@ -193,9 +194,9 @@
                              else
                                  axis_labels = ts_settings.OL_TSconds_axis_labels;
                              end
-                             
-                             if timeseries_ylimits(d,:) ~= 0
-                                ylim(timeseries_ylimits(d,:));
+
+                             if ylimits ~= 0
+                                ylim(ylimits);
                             else
                                 lines = findobj(gca, 'Type', 'line');
                                 for l = 1:length(lines)
@@ -287,6 +288,26 @@
                             else
                                 axis_labels = pos_settings.axis_labels;
                             end
+                            
+                            if ylimits ~= 0
+                                ylim(ylimits);
+                            else
+                                lines = findobj(gca, 'Type', 'line');
+                                for l = 1:length(lines)
+                                    curr_ydata = lines(l).YData;
+                                    mm = [min(curr_ydata), max(curr_ydata)];
+                                    ydata = [ydata, mm];
+
+                                end
+                            end
+                            
+%                             lines_pos = findobj(gca, 'Type', 'line');
+%                             for l = 1:length(lines_pos)
+%                                 curr_ydata_pos = lines_pos(l).YData;
+%                                 mm_pos = [min(curr_ydata_pos), max(curr_ydata_pos)];
+%                                 ydata_pos = [ydata_pos, mm_pos];
+% 
+%                             end
 
                              
                          elseif strcmp(plot_type, 'M')
@@ -334,6 +355,18 @@
                                 axis_labels = ["Frame Position", "Motion-Dependent Response"];
                             else
                                 axis_labels = mp_settings.axis_labels{1};
+                            end
+                            
+                            if ylimits ~= 0
+                                ylim(ylimits);
+                            else
+                                lines = findobj(gca, 'Type', 'line');
+                                for l = 1:length(lines)
+                                    curr_ydata = lines(l).YData;
+                                    mm = [min(curr_ydata), max(curr_ydata)];
+                                    ydata = [ydata, mm];
+
+                                end
                             end
                                 
                              
@@ -387,6 +420,18 @@
                             else
                                 axis_labels = mp_settings.axis_labels{2};
                             end
+                            
+                            if ylimits ~= 0
+                                ylim(ylimits);
+                            else
+                                lines = findobj(gca, 'Type', 'line');
+                                for l = 1:length(lines)
+                                    curr_ydata = lines(l).YData;
+                                    mm = [min(curr_ydata), max(curr_ydata)];
+                                    ydata = [ydata, mm];
+
+                                end
+                            end
                                 
                              
                          else
@@ -428,23 +473,17 @@
                     %Add x and y axis labels if int he correct position
                 end
             end
-            if timeseries_ylimits(d,:) == 0
+            if ylimits == 0
                 allax = findall(gcf, 'Type', 'axes');
-                if fig ~= num_figs
-                    for r = 1:num_rows
-                        ts_axes(r) = allax(num_cols*r);
-                    end
-                else
-                    for r = 1:(length(conditions) - (num_figs-1)*num_rows)
-                        ts_axes(r) = allax(num_cols*r);
-                    end
-                end
                 ymin = min(ydata);
                 ymax = max(ydata);
-                for ax = ts_axes
+                for ax = allax
                     ylim(ax, [ymin, ymax]);
                 end
+
             end
+            
+           
             
             h = findobj(gcf,'Type','line');
             if num_groups == 1
@@ -485,7 +524,10 @@
                 save_figure(save_settings, fig_title, num2str(conditions((fig-1)*num_rows+1:fig*num_rows)));
             end
             
-            clear('ts_axes');
+            clear('allax');
+            clear('lines');
+            clear('curr_ydata');
+
                 
                 % Save figure here
         end
