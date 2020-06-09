@@ -35,14 +35,34 @@ function [figNames] = get_figure_names(plot_type, figNames, varargin)
             if isempty(figNames)
                 figNames = ["M", "P"];
             end
+            
+        case 'comp'
+            
+            conditions = varargin{1};
+            conds_per_fig = varargin{2};
+            num_figs = ceil(length(conditions)/conds_per_fig);
+            if isempty(figNames)
+                for f = 1:num_figs
+                    start_ind = conds_per_fig*f - (conds_per_fig-1);
+                    if f ~= num_figs
+                        figNames{f} = ['Comparison_',num2str(conditions(start_ind)),'-',num2str(conditions(start_ind + 3))];
+                    else
+                        figNames{f} = ['Comparison_',num2str(conditions(start_ind)),'-', num2str(conditions(end))];
+                    end
+                end
+            end
+            
 
     end
+    
+    if ~strcmp(plot_type,'comp')
         
    
-    orig_figNames = figNames;
+       orig_figNames = figNames;
 
-    while length(conds) > length(figNames)
-        figNames = [figNames, orig_figNames];
+        while length(conds) > length(figNames)
+            figNames = [figNames, orig_figNames];
+        end
     end
     
 

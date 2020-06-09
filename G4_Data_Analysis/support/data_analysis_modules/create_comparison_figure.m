@@ -529,10 +529,10 @@ function create_comparison_figure(CombData, gen_settings, comp_settings, ts_sett
              figH = gcf;
             fig_title = figH.Name(~isspace(figH.Name));
             if fig == num_figs
-                save_figure(save_settings, fig_title, num2str(conditions((fig-1)*num_rows+1)),  num2str(conditions(end)));
+                save_figure(save_settings, fig_title);
             else
 
-                save_figure(save_settings, fig_title, num2str(conditions((fig-1)*num_rows+1)), num2str(conditions(fig*num_rows)));
+                save_figure(save_settings, fig_title);
             end
             
             clear('allax');

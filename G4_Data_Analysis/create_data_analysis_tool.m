@@ -346,6 +346,15 @@
                 
             end
             
+            %for comparison plot if applicable
+            
+            if self.comp_plot_option && isempty(self.comp_plot_settings.figure_names)
+                self.comp_plot_settings.figure_names = get_figure_names('comp', ...
+                    self.comp_plot_settings.figure_names, self.comp_plot_settings.conditions,...
+                    self.comp_plot_settings.rows_per_fig);
+            end
+            
+            
             %% Get default x limits for timeseries plots if not provided
             if isempty(self.OL_conds_durations) && self.timeseries_plot_option
                     
