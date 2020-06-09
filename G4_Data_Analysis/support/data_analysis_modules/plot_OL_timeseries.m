@@ -2,29 +2,31 @@
 
 function plot_OL_timeseries(timeseries_data, timestampsIN, OL_conds, OL_durations, cond_name, OL_inds, ...
     axis_labels, Frame_ind, num_groups, genotype, control_genotype, plot_settings, top_left_place, bottom_left_place, ...
-    left_col_places, figure_titles, single, save_settings, fig_num)
+    left_col_places, figure_titles, single, save_settings, fig_num, gen_settings)
 
     
-    rep_Colors = plot_settings.rep_colors;
-    mean_Colors = plot_settings.mean_colors;
-    mean_LineWidth = plot_settings.mean_lineWidth;
-    EdgeColor = plot_settings.edgeColor;
-    patch_alpha = plot_settings.patch_alpha;
-    subtitle_FontSize = plot_settings.subtitle_fontSize;
-    legend_FontSize = plot_settings.legend_fontSize;
+    rep_Colors = gen_settings.rep_colors;
+    mean_Colors = gen_settings.mean_colors;
+    mean_LineWidth = gen_settings.mean_lineWidth;
+    EdgeColor = gen_settings.edgeColor;
+    patch_alpha = gen_settings.patch_alpha;
+    subtitle_FontSize = gen_settings.subtitle_fontSize;
+    legend_FontSize = gen_settings.legend_fontSize;
     frame_scale = plot_settings.frame_scale;
     frame_color = plot_settings.frame_color;
     frame_superimpose = plot_settings.frame_superimpose;
     timeseries_ylimits = plot_settings.timeseries_ylimits;
     timeseries_xlimits = plot_settings.timeseries_xlimits;
-    rep_LineWidth = plot_settings.rep_lineWidth;
+    rep_LineWidth = gen_settings.rep_lineWidth;
     plot_opposing_directions = plot_settings.plot_both_directions;
-    control_color = plot_settings.control_color;
+    control_color = gen_settings.control_color;
     show_ind_flies = plot_settings.show_individual_flies;
-    y_fontsize = plot_settings.yLabel_fontSize;
-    x_fontsize = plot_settings.xLabel_fontSize;
-    fly_Colors = plot_settings.fly_colors;
-    axis_num_fontSize = plot_settings.axis_num_fontSize;
+    y_fontsize = gen_settings.yLabel_fontSize;
+    x_fontsize = gen_settings.xLabel_fontSize;
+    fly_Colors = gen_settings.fly_colors;
+    axis_num_fontSize = gen_settings.axis_num_fontSize;
+    figTitle_fontSize = gen_settings.figTitle_fontSize;
+    subplot_figure_titles = plot_settings.subplot_figure_names{fig_num};
     
     
 
@@ -185,6 +187,10 @@ function plot_OL_timeseries(timeseries_data, timestampsIN, OL_conds, OL_duration
                     end
                     if ~isnan(OL_durations(place)) && OL_durations(place) ~= 0
                         xlim([0, OL_durations(place)]);
+                    end
+                    
+                    if ~isempty(subplot_figure_titles)
+                        sgtitle(subplot_figure_titles(OL_inds==d), 'FontSize', figTitle_fontSize);
                     end
                     
                     

@@ -1,7 +1,7 @@
 
 function [exp_settings, histogram_plot_settings, histogram_annotation_settings, ...
     CL_hist_plot_settings, timeseries_plot_settings, TC_plot_settings, ...
-    MP_plot_settings, pos_plot_settings, save_settings, comp_settings] = DA_plot_settings()
+    MP_plot_settings, pos_plot_settings, save_settings, comp_settings, gen_settings] = DA_plot_settings()
 
 %% Settings which need updating regularly (more static settings below)
 
@@ -61,9 +61,10 @@ function [exp_settings, histogram_plot_settings, histogram_annotation_settings, 
 %% Timeseries plot settings
     %OL_TS_conds indicates the layout of your timeseries figures. See
     %documentation for example. Leave empty ([]) for default layout.
-    timeseries_plot_settings.OL_TS_conds = [];
+    timeseries_plot_settings.OL_TS_conds{1} = [1 2 3 4; 5 6 7 8; 9 10 11 12];
+    timeseries_plot_settings.OL_TS_conds{2} = [13 14 15 16; 17 18 19 20; 21 22 23 24];
 
-    %Durations inform the x axis limits on timeseries plots. Leave empty
+    % Durations inform the x axis limits on timeseries plots. Leave empty
     %for the software to pull durations from the processed data, or create
     %an array like OL_TS_conds with x limit values instead of condition
     %#'s. See documentation for example.
@@ -72,16 +73,20 @@ function [exp_settings, histogram_plot_settings, histogram_annotation_settings, 
     %Axis labels for the timeseries plots [x, y]. For multiple figures,
     %make it a cell array with each cell element corresponding to that
     %figure in the OL_TS_conds array. See documentation for example.
-    timeseries_plot_settings.OL_TSconds_axis_labels = {};
+    timeseries_plot_settings.axis_labels = {};
 
     %An array of figure names for each figure of timeseries plots. 
-    timeseries_plot_settings.figure_names = ["LmR"];
+    timeseries_plot_settings.figure_names = ["LmR", "LpR"];
+    
+    timeseries_plot_settings.subplot_figure_names{1} = ["LmR Conds 1-12"; "LpR Conds 1-12"]; %Cell array with same num cell elements as OL_TS_conds. 
+    %Each cell should have one name for each datatype
+    timeseries_plot_settings.subplot_figure_names{2} = ["LmR Conds 13-24"; "LpR Conds 13-24"];
     
 %datatype options for flying data: 'LmR_chan', 'L_chan', 'R_chan', 'F_chan', 'Frame Position', 'LmR', 'LpR', 'faLmR'
 %datatype options for walking data: 'Vx0_chan', 'Vx1_chan', 'Vy0_chan', 'Vy1_chan', 'Frame Position', 'Turning', 'Forward', 'Sideslip'
     
     %The datatype to plot as timeseries
-    timeseries_plot_settings.OL_datatypes = {'LmR'};
+    timeseries_plot_settings.OL_datatypes = {'LmR', 'LpR'};
     
     %Set this to 1 if you are plotting only a single group and want lines
     %plotted for each fly as well as the average.
@@ -101,6 +106,7 @@ function [exp_settings, histogram_plot_settings, histogram_annotation_settings, 
 %% Closed loop histogram settings
     %Create array to dictate layout of CL histograms or leave empty for def
     CL_hist_plot_settings.CL_hist_conds = [];
+    CL_hist_plot_settings.axis_labels = {};
     
     %Datatypes for which to plot closed-loop histograms
     CL_hist_plot_settings.CL_datatypes = {'Frame Position'}; %datatypes to plot as histograms          
@@ -108,7 +114,10 @@ function [exp_settings, histogram_plot_settings, histogram_annotation_settings, 
 %% Tuning Curve plot settings
     %Create the layout of tuning curves in this array. It works differently
     %than OL_TS_conds - see documentation for details.
-    TC_plot_settings.OL_TC_conds = [];
+    TC_plot_settings.OL_TC_conds{1}{1} = [1 3 5 7];
+    TC_plot_settings.OL_TC_conds{1}{2} = [9 11 13 15];
+    TC_plot_settings.OL_TC_conds{2}{1} = [17 19 21 23];
+    TC_plot_settings.OL_TC_conds{2}{2} = [25 27 29 31];
     
     %If you want your tuning curves to have their own plot titles, make an
     %array of titles for each PLOT (not each condition). So this should be
@@ -120,8 +129,10 @@ function [exp_settings, histogram_plot_settings, histogram_annotation_settings, 
     %The xaxis label for tuning curves
 %     TC_plot_settings.TC_axis_labels{1} = ["Frequency(Hz)","LmR"];
 %     TC_plot_settings.TC_axis_labels{2} = ["Frequency(Hz)", "LpR"];
-    TC_plot_settings.TC_axis_labels = {};
+    TC_plot_settings.axis_labels = {};
     TC_plot_settings.figure_names = [];
+    TC_plot_settings.subplot_figure_names{1} = ["LmR Conds 1-15"; "LpR Conds 1-15"];
+    TC_plot_settings.subplot_figure_names{2} = ["LmR Conds 17-31"; "LpR Conds 17-31"];
     
     %The x-axis values for tuning curves
     TC_plot_settings.xaxis_values = [0.625 1.25 2.5 5 10 20 40];
@@ -149,13 +160,15 @@ function [exp_settings, histogram_plot_settings, histogram_annotation_settings, 
     %is positive and right is negative. 
     MP_plot_settings.plot_MandP = 1;
     MP_plot_settings.figure_names =  ["M", "P"]; 
+    MP_plot_settings.subplot_figure_names{1} = ["M conds 1-15"; "M conds 16-31"];
+    MP_plot_settings.subplot_figure_names{2} = ["P conds 1-15"; "P conds 16-31"];
     MP_plot_settings.axis_labels{1} = ["Frame Position", "Motion-Dependent Response"]; %{xlabel, ylabel}
     MP_plot_settings.axis_labels{2} = ["Frame Position", "Position-Dependent Response"];
     MP_plot_settings.cond_name{1} = ["3x1 Sweep 0.35 Hz", "3x1 Sweep 1.07 Hz" ,"3x3 Sweep 0.35 Hz", "3x3 Sweep 1.07 Hz"; ...
         "3x3 ON Sweep 0.35 Hz" ,"3x3 ON Sweep 1.07 Hz" ,"8x8 Sweep 0.35" ,"8x8 Sweep 1.07"]; %Titles of subplots - correspond to pos_conds
     MP_plot_settings.cond_name{2} = ["16x16 Sweep 0.35 Hz", "16x16 Sweep 1.07 Hz", "64x3 Sweep 0.35Hz", "64x3 Sweep 1.07 Hz"; ...
         "64x3 ON Sweep 0.35 Hz", "64x3 ON Sweep 1.07 Hz", "64x16 Sweep 0.35 Hz", "64x16 Sweep 1.07 Hz"];
-    MP_plot_settings.show_ind_flies = 0;
+    MP_plot_settings.show_individual_flies = 0;
     MP_plot_settings.ylimits = []; %[M ymin ymax; P ylmin ymax];
     MP_plot_settings.xlimits = []; %[M xmin xmax; P xmin xmax];
 
@@ -165,10 +178,12 @@ function [exp_settings, histogram_plot_settings, histogram_annotation_settings, 
     
     pos_plot_settings.plot_pos_averaged = 1;
     pos_plot_settings.plot_opposing_directions = 0;
-    pos_plot_settings.pos_conds = [];
-%     pos_plot_settings.pos_conds{1} = [1 3 5 7; 9 11 13 15];
-%     pos_plot_settings.pos_conds{2} = [17 19 21 23; 25 27 29 31];
+%    pos_plot_settings.pos_conds = [];
+    pos_plot_settings.pos_conds{1} = [1 3 5 7; 9 11 13 15];
+    pos_plot_settings.pos_conds{2} = [17 19 21 23; 25 27 29 31];
     pos_plot_settings.figure_names = [];
+    
+    pos_plot_settings.subplot_figure_names = ["Pos Series 1-15"; "Pos Series 17-31"];
 
     pos_plot_settings.axis_labels = ["X Label", "Y Label"];
 %     pos_plot_settings.cond_name{1} = ["3x1 Sweep 0.35 Hz", "3x1 Sweep 1.07 Hz" ,"3x3 Sweep 0.35 Hz", "3x3 Sweep 1.07 Hz"; ...
@@ -176,7 +191,7 @@ function [exp_settings, histogram_plot_settings, histogram_annotation_settings, 
 %     pos_plot_settings.cond_name{2} = ["16x16 Sweep 0.35 Hz", "16x16 Sweep 1.07 Hz", "64x3 Sweep 0.35Hz", "64x3 Sweep 1.07 Hz"; ...
 %         "64x3 ON Sweep 0.35 Hz", "64x3 ON Sweep 1.07 Hz", "64x16 Sweep 0.35 Hz", "64x16 Sweep 1.07 Hz"];
     pos_plot_settings.cond_name = [];
-    pos_plot_settings.show_ind_flies = 0;
+    pos_plot_settings.show_individual_flies = 0;
     pos_plot_settings.ylimits = [];
     pos_plot_settings.xlimits = [];
     pos_plot_settings.xaxis = [1:192];%Standard x axis, only change if the number of frames has changed
@@ -194,21 +209,24 @@ function [exp_settings, histogram_plot_settings, histogram_annotation_settings, 
 
     comp_settings.plot_order = {'LmR','pos','M','P'};
     comp_settings.conditions = [1,3,5,7,9,11,13,15,17,19,21,23,25,27,29,31];
-    comp_settings.rows_per_fig = 6;
+    comp_settings.rows_per_fig = 4;
     comp_settings.ylimits = [0 0];
-    comp_settings.figure_names = {'Comparison1-11', ...
-        'Comparison13-23', 'Comparison25-31'};
+    comp_settings.figure_names = {'Comparison1-7', ...
+        'Comparison9-15', 'Comparison17-23', 'Comparison25-31'};
+    comp_settings.subplot_figure_names = {'LmR, Pos, M, P 1-7', 'LmR, Pos, M, P 9-15', ...
+        'LmR, Pos, M, P 17-23', 'LmR, Pos, M, P 25-31'};
     comp_settings.cond_name{1} = ["Cond1 LmR", "Cond1 Pos Series", "Cond1 M", "Cond1 P";...
-        "Cond2 LmR", "Cond2 Pos Series", "Cond2 M", "Cond2 P"; "Cond3 LmR", "Cond3 Pos Series", "Cond3 M", "Cond3 P";...
-        "Cond4 LmR", "Cond4 Pos Series", "Cond4 M", "Cond4 P"; "Cond3 LmR", "Cond3 Pos Series", "Cond3 M", "Cond3 P";...
-        "Cond3 LmR", "Cond3 Pos Series", "Cond3 M", "Cond3 P"];
-     comp_settings.cond_name{2} = ["Cond1 LmR", "Cond1 Pos Series", "Cond1 M", "Cond1 P";...
-        "Cond2 LmR", "Cond2 Pos Series", "Cond2 M", "Cond2 P"; "Cond3 LmR", "Cond3 Pos Series", "Cond3 M", "Cond3 P";...
-        "Cond4 LmR", "Cond4 Pos Series", "Cond4 M", "Cond4 P"; "Cond3 LmR", "Cond3 Pos Series", "Cond3 M", "Cond3 P";...
-        "Cond3 LmR", "Cond3 Pos Series", "Cond3 M", "Cond3 P"];
-     comp_settings.cond_name{3} = ["Cond1 LmR", "Cond1 Pos Series", "Cond1 M", "Cond1 P";...
-        "Cond2 LmR", "Cond2 Pos Series", "Cond2 M", "Cond2 P"; "Cond3 LmR", "Cond3 Pos Series", "Cond3 M", "Cond3 P";...
-        "Cond4 LmR", "Cond4 Pos Series", "Cond4 M", "Cond4 P"];
+        "Cond3 LmR", "Cond3 Pos Series", "Cond3 M", "Cond3 P"; "Cond5 LmR", "Cond5 Pos Series", "Cond5 M", "Cond5 P";...
+        "Cond7 LmR", "Cond7 Pos Series", "Cond7 M", "Cond7 P"];
+     comp_settings.cond_name{2} = ["Cond9 LmR", "Cond9 Pos Series", "Cond9 M", "Cond9 P";...
+        "Cond11 LmR", "Cond11 Pos Series", "Cond11 M", "Cond11 P"; "Cond13 LmR", "Cond13 Pos Series", "Cond13 M", "Cond13 P";...
+        "Cond15 LmR", "Cond15 Pos Series", "Cond15 M", "Cond15 P"];
+     comp_settings.cond_name{3} = ["Cond17 LmR", "Cond17 Pos Series", "Cond17 M", "Cond17 P";...
+        "Cond19 LmR", "Cond19 Pos Series", "Cond19 M", "Cond19 P"; "Cond21 LmR", "Cond21 Pos Series", "Cond21 M", "Cond21 P";...
+        "Cond23 LmR", "Cond23 Pos Series", "Cond23 M", "Cond23 P"];
+    comp_settings.cond_name{4} = ["Cond25 LmR", "Cond25 Pos Series", "Cond25 M", "Cond25 P"; ...
+        "Cond27 LmR", "Cond27 Pos Series", "Cond27 M", "Cond27 P"; "Cond29 LmR", "Cond29 Pos Series", "Cond29 M", "Cond29 P"; ...
+        "Cond31 LmR", "Cond31 Pos Series", "Cond31 M", "Cond31 P"];
     comp_settings.norm = 1;
     
     
@@ -226,14 +244,27 @@ function [exp_settings, histogram_plot_settings, histogram_annotation_settings, 
 %     normalize_settings.max_startstop = [1 3]; %start and stop times to use for max normalization
 %     normalize_settings.max_prctile = 98; %percentile to use as a more robust estimate of the maximum value
 
-    %% Plot Settings for basic Histograms
+%% GENERAL PLOT SETTINGS
+    gen_settings.figTitle_fontSize = 12;
+    gen_settings.subtitle_fontSize = 8;
+    gen_settings.legend_fontSize = 6;
+    gen_settings.yLabel_fontSize = 6;
+    gen_settings.xLabel_fontSize = 6;
+    gen_settings.axis_num_fontSize = 6;
+    gen_settings.axis_label_fontSize = 6;
+    gen_settings.fly_colors = [.95 .95 .95; .9 .9 .9; .85 .85 .85; .8 .8 .8; .75 .75 .75; .7 .7 .7; .65 .65 .65; .6 .6 .6; .55 .55 .55; .5 .5 .5; .45 .45 .45;  .4 .4 .4; .35 .35 .35; .3 .3 .3; .25 .25 .25; .2 .2 .2; .15 .15 .15; .1 .1 .1]; %Colors assigned to individual fly lines
+    gen_settings.rep_colors = [0 0 0; 1 0 0; 0 0.5 0; 0 0 1; 1 0.5 0; .75 0 1; 0 1 0; 0 1 1; 1 0 1; 1 1 0]; %default 10 colors supports up to 10 groups (add more colors for more groups)
+    gen_settings.rep_lineWidth = 0.05;
+    gen_settings.mean_colors = [1 0 0; 0 0 1; 0 0.5 0; 1 0.5 0; .75 0 1; 0 1 0;  1 0.5 1; 0 1 1; 1 0 1; 1 1 0]; %default 10 colors supports up to 10 groups (add more colors for more groups)
+    gen_settings.control_color = [0 0 0];
+    gen_settings.mean_lineWidth = 1;
+    gen_settings.edgeColor = 'none';
+    gen_settings.patch_alpha = 0.3; %sets the level of transparency for patch region around timeseries data
+
+
+%% Plot Settings for basic Histograms
 
     histogram_plot_settings.histogram_ylimits = [0 100; -6 6; 2 10];
-    histogram_plot_settings.subtitle_FontSize = 8;
-    histogram_plot_settings.rep_colors = [0.5 0.5 0.5; 1 0.5 0.5; 0.25 0.75 0.25; 0.5 0.5 1; 1 0.75 0.25; 0.75 0.5 1; 0.5 1 0.5; 0.5 1 1; 1 0.5 1; 1 1 0.5]; %default 10 colors supports up to 10 groups (add more colors for more groups)
-    histogram_plot_settings.mean_colors = [0 0 0; 1 0 0; 0 0.5 0; 0 0 1; 1 0.5 0; .75 0 1; 0 1 0; 0 1 1; 1 0 1; 1 1 0]; %default 10 colors supports up to 10 groups (add more colors for more groups)
-    histogram_plot_settings.rep_LineWidth = 0.05;
-    histogram_plot_settings.mean_LineWidth = 1;
     histogram_plot_settings.inter_in_degrees = 1;
 
     %% Annotation settings for basic Histograms
@@ -250,12 +281,7 @@ function [exp_settings, histogram_plot_settings, histogram_annotation_settings, 
 
     %% Plot settings for Closed-Loop histograms
 
-    CL_hist_plot_settings.rep_colors = [0.5 0.5 0.5; 1 0.5 0.5; 0.5 0.5 1];
-    CL_hist_plot_settings.rep_lineWidth = 0.05;
-    CL_hist_plot_settings.mean_colors = [0 0 0;1 0 0; 0 0 1];
-    CL_hist_plot_settings.mean_lineWidth = 1;
     CL_hist_plot_settings.histogram_ylimits = [0 100; -6 6; 2 10];
-    CL_hist_plot_settings.subtitle_fontSize = 8;
 
     %% Plot settings for Open-Loop timeseries plots
     
@@ -264,74 +290,20 @@ function [exp_settings, histogram_plot_settings, histogram_annotation_settings, 
 
     timeseries_plot_settings.timeseries_ylimits = [-1.1 1.1; -1 6; -1 6; -1 6; 1 192; 0 0; 0 0; 0 0]; %[min max] y limits for each datatype (including 1 additional for 'faLmR' option)
     timeseries_plot_settings.timeseries_xlimits = [0 4];
-    timeseries_plot_settings.subtitle_fontSize = 8;
-    timeseries_plot_settings.legend_fontSize = 6;
-    timeseries_plot_settings.yLabel_fontSize = 6;
-    timeseries_plot_settings.xLabel_fontSize = 6;
-    timeseries_plot_settings.axis_num_fontSize = 6;
-    timeseries_plot_settings.overlap = 0; %not working
-    timeseries_plot_settings.fly_colors = [.95 .95 .95; .9 .9 .9; .85 .85 .85; .8 .8 .8; .75 .75 .75; .7 .7 .7; .65 .65 .65; .6 .6 .6; .55 .55 .55; .5 .5 .5; .45 .45 .45;  .4 .4 .4; .35 .35 .35; .3 .3 .3; .25 .25 .25; .2 .2 .2; .15 .15 .15; .1 .1 .1]; %Colors assigned to individual fly lines
-    timeseries_plot_settings.rep_colors = [0 0 0; 1 0 0; 0 0.5 0; 0 0 1; 1 0.5 0; .75 0 1; 0 1 0; 0 1 1; 1 0 1; 1 1 0]; %default 10 colors supports up to 10 groups (add more colors for more groups)
-    timeseries_plot_settings.rep_lineWidth = 0.05;
-    timeseries_plot_settings.mean_colors = [1 0 0; 0 0 1; 0 0.5 0; 1 0.5 0; .75 0 1; 0 1 0;  1 0.5 1; 0 1 1; 1 0 1; 1 1 0]; %default 10 colors supports up to 10 groups (add more colors for more groups)
-    timeseries_plot_settings.control_color = [0 0 0];
-    timeseries_plot_settings.mean_lineWidth = 1;
-    timeseries_plot_settings.edgeColor = 'none';
-    timeseries_plot_settings.patch_alpha = 0.3; %sets the level of transparency for patch region around timeseries data
     timeseries_plot_settings.frame_scale = .5;
     timeseries_plot_settings.frame_color = [0.7 0.7 0.7];
     
     %% Plot settings for tuning curves
 
-    TC_plot_settings.rep_lineWidth = 0.05;
-    TC_plot_settings.mean_lineWidth = 1;
-    TC_plot_settings.timeseries_ylimits = [-1.1 1.1; -1 6; -1 6; -1 6; 1 192; 0 0; 0 0; 0 0];
-    TC_plot_settings.axis_label_fontSize = 6; 
-    TC_plot_settings.xtick_label_fontSize = 6;
-    TC_plot_settings.rep_colors = [0 0 0; 0.75 0 0; 0 0.25 0; 0 0 0.75; 0.75 0.25 0; .5 0 0.75; 0 0.75 0; 0 0.75 0.75; 0.75 0 0.75; 0.75 0.75 0]; %default 10 colors supports up to 10 groups (add more colors for more groups)
-    TC_plot_settings.mean_colors = [1 0 0; 0 0 1; 0 0.5 0; 1 0.5 0; .75 0 1; 0 1 0;  1 0.5 1; 0 1 1; 1 0 1; 1 1 0]; %default 10 colors supports up to 10 groups (add more colors for more groups)
-    TC_plot_settings.control_color = [0 0 0];
-    TC_plot_settings.subtitle_fontSize = 8;
+    TC_plot_settings.timeseries_ylimits = [-1.1 1.1; -1 6; -1 6; -1 6; 1 192; 0 0; 0 0; 0 0];   
     TC_plot_settings.marker_type = 'o';
-    TC_plot_settings.legend_FontSize = 6;
+    TC_plot_settings.default_conds_per_curve = 7; %If the conditions are not provided in a layout, it will by default include 7 conditions in each curve
+
     
 %% Plot settings for M and P
 
-    MP_plot_settings.rep_colors = [0 0 0; 1 0 0; 0 0.5 0; 0 0 1; 1 0.5 0; ...
-        .75 0 1; 0 1 0; 0 1 1; 1 0 1; 1 1 0]; %default 10 colors supports up to 10 groups (add more colors for more groups)
-    MP_plot_settings.mean_colors = [1 0 0; 0 0 1; 0 0.5 0; 1 0.5 0; .75 0 1; ...
-        0 1 0;  1 0.5 1; 0 1 1; 1 0 1; 1 1 0]; %default 10 colors supports up to 10 groups (add more colors for more groups)
-    MP_plot_settings.control_color = [0 0 0];
-    MP_plot_settings.mean_lineWidth = 1;
-    MP_plot_settings.edgeColor = 'none';
-    MP_plot_settings.patch_alpha = 0.3;
-    MP_plot_settings.subtitle_fontSize = 8;
-    MP_plot_settings.legend_fontSize = 6;
-    
-    MP_plot_settings.rep_lineWidth = 0.05;
-    MP_plot_settings.yLabel_fontSize = 6;
-    MP_plot_settings.xLabel_fontSize = 6;
-    MP_plot_settings.fly_colors = [.1 .1 .1; .15 .15 .15; .2 .2 .2; .25 .25 .25; .3 .3 .3; .35 .35 .35; .4 .4 .4; .45 .45 .45; ...
-        .5 .5 .5; .55 .55 .55; .6 .6 .6; .65 .65 .65; .7 .7 .7; .75 .75 .75; .8 .8 .8; .85 .85 .85; .9 .9 .9; .95 .95 .95];
-          %Colors assigned to individual fly lines
-    MP_plot_settings.axis_num_fontSize = 6;
-    
+   
 %% Plot settings for position series
-
-    pos_plot_settings.subtitle_fontSize = 8;
-    pos_plot_settings.legend_fontSize = 6;
-    pos_plot_settings.yLabel_fontSize = 6;
-    pos_plot_settings.xLabel_fontSize = 6;
-    pos_plot_settings.axis_num_fontSize = 6;
-    pos_plot_settings.fly_colors = [.1 .1 .1; .15 .15 .15; .2 .2 .2; .25 .25 .25; .3 .3 .3; .35 .35 .35; .4 .4 .4; .45 .45 .45; ...
-        .5 .5 .5; .55 .55 .55; .6 .6 .6; .65 .65 .65; .7 .7 .7; .75 .75 .75; .8 .8 .8; .85 .85 .85; .9 .9 .9; .95 .95 .95];
-    pos_plot_settings.rep_colors = [0 0 0; 1 0 0; 0 0.5 0; 0 0 1; 1 0.5 0; .75 0 1; 0 1 0; 0 1 1; 1 0 1; 1 1 0]; %default 10 colors supports up to 10 groups (add more colors for more groups)
-    pos_plot_settings.rep_lineWidth = 0.05;
-    pos_plot_settings.mean_colors = [1 0 0; 0 0 1; 1 1 0; 0 0.5 0; 1 0.5 0; .75 0 1; 0 1 0;  1 0.5 1; 0 1 1; 1 0 1]; %default 10 colors supports up to 10 groups (add more colors for more groups)
-    pos_plot_settings.control_color = [0 0 0];
-    pos_plot_settings.mean_lineWidth = 1;
-    pos_plot_settings.edgeColor = 'none';
-    pos_plot_settings.patch_alpha = 0.3;
 
 
     %% Save settings

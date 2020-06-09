@@ -1,4 +1,4 @@
-     function create_comparison_figure(CombData, comp_settings, ts_settings, ...
+function create_comparison_figure(CombData, gen_settings, comp_settings, ts_settings, ...
     pos_settings, mp_settings,P, M, P_flies, M_flies, single, save_settings,...
     genotype, control_genotype)
     
@@ -17,6 +17,7 @@
     plot_order = comp_settings.plot_order;
     num_rows = comp_settings.rows_per_fig;
     num_groups = size(M,1);
+    
    
     
     if ~isempty(plot_order)
@@ -31,28 +32,30 @@
     end
     num_figs = ceil(num_conds/num_rows);
     show_ind_flies_ts = ts_settings.show_individual_flies;
-    show_ind_flies_pos = pos_settings.show_ind_flies;
-    show_ind_flies_mp = mp_settings.show_ind_flies;
+    show_ind_flies_pos = pos_settings.show_individual_flies;
+    show_ind_flies_mp = mp_settings.show_individual_flies;
     
     new_xaxis = mp_settings.new_xaxis;
     pos_xaxis = mp_settings.xaxis;
     
-    fly_colors = ts_settings.fly_colors;
-    mean_colors = ts_settings.mean_colors;
-    rep_LineWidth = ts_settings.rep_lineWidth;
-    mean_LineWidth = ts_settings.mean_lineWidth;
-    control_color = ts_settings.control_color;
-    EdgeColor = ts_settings.edgeColor;
-    patch_alpha = ts_settings.patch_alpha;
-    y_fontsize = ts_settings.yLabel_fontSize;
-    legend_FontSize = ts_settings.legend_fontSize;
-    axis_num_fontSize = ts_settings.axis_num_fontSize;
-    subtitle_FontSize = ts_settings.subtitle_fontSize;
+    fly_colors = gen_settings.fly_colors;
+    mean_colors = gen_settings.mean_colors;
+    rep_LineWidth = gen_settings.rep_lineWidth;
+    mean_LineWidth = gen_settings.mean_lineWidth;
+    control_color = gen_settings.control_color;
+    EdgeColor = gen_settings.edgeColor;
+    patch_alpha = gen_settings.patch_alpha;
+    y_fontsize = gen_settings.yLabel_fontSize;
+    legend_FontSize = gen_settings.legend_fontSize;
+    axis_num_fontSize = gen_settings.axis_num_fontSize;
+    subtitle_FontSize = gen_settings.subtitle_fontSize;
+    figTitle_fontSize = gen_settings.figTitle_fontSize;
     ylimits = comp_settings.ylimits;
     norm = comp_settings.norm;
     
     figure_names = comp_settings.figure_names;
     cond_names = comp_settings.cond_name;
+    subplot_figure_titles = comp_settings.subplot_figure_names;
     
     if ~isempty(new_xaxis)
         pos_xaxis = new_xaxis(pos_xaxis);
@@ -102,7 +105,8 @@
                     if cond ~= 0
                         
                          %subplot
-                         better_subplot(num_rows, num_cols, placement, 40, 60)
+                         
+                         better_subplot(num_rows, num_cols, placement, 40, 120)
                          hold on
                          yline(0, 'k--');
                          hold on
@@ -189,10 +193,15 @@
                                 end
                              end
                              
-                             if isempty(ts_settings.OL_TSconds_axis_labels)
+                             if isempty(ts_settings.axis_labels)
                                  axis_labels = ["Time(sec", plot_type];
                              else
-                                 axis_labels = ts_settings.OL_TSconds_axis_labels;
+                                 if length(plot_order) <= 4
+                                     axis_labels = ts_settings.axis_labels{1};
+                                 else
+                                     num_ts_plot = strcmp(plot_order, plot_type);
+                                     axis_labels = ts_settings.axis_labels{num_ts_plot};
+                                 end
                              end
 
                              if ylimits ~= 0
@@ -483,7 +492,9 @@
 
             end
             
-           
+           if ~isempty(subplot_figure_titles)
+               sgtitle(subplot_figure_titles{1,fig}, 'FontSize', figTitle_fontSize);
+           end
             
             h = findobj(gcf,'Type','line');
             if num_groups == 1
@@ -518,10 +529,10 @@
              figH = gcf;
             fig_title = figH.Name(~isspace(figH.Name));
             if fig == num_figs
-                save_figure(save_settings, fig_title, num2str(conditions((fig-1)*num_rows+1:end)));
+                save_figure(save_settings, fig_title, num2str(conditions((fig-1)*num_rows+1)),  num2str(conditions(end)));
             else
 
-                save_figure(save_settings, fig_title, num2str(conditions((fig-1)*num_rows+1:fig*num_rows)));
+                save_figure(save_settings, fig_title, num2str(conditions((fig-1)*num_rows+1)), num2str(conditions(fig*num_rows)));
             end
             
             clear('allax');

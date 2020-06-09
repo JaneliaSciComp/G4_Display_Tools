@@ -3,25 +3,27 @@
 %Variables needed for this function: TC_Conds, TC_inds,
 %num_groups, CombData, rep_Colors, rep_LineWidth, mean_Colors,
 %mean_LineWidth, timeseries_ylimits, subtitle_FontSize, 
-function plot_TC_specified_OLtrials(TC_plot_settings, TC_conds, plot_names, TC_inds, genotype, control_genotype, ...
+function plot_TC_specified_OLtrials(TC_plot_settings, gen_settings, TC_conds, plot_names, TC_inds, genotype, control_genotype, ...
     num_groups, summaries, single, save_settings, fig_num)
 
-    rep_Colors = TC_plot_settings.rep_colors;
-    rep_LineWidth = TC_plot_settings.rep_lineWidth;
-    mean_Colors = TC_plot_settings.mean_colors;
-    mean_LineWidth = TC_plot_settings.mean_lineWidth;
+    rep_Colors = gen_settings.rep_colors;
+    rep_LineWidth = gen_settings.rep_lineWidth;
+    mean_Colors = gen_settings.mean_colors;
+    mean_LineWidth = gen_settings.mean_lineWidth;
     timeseries_ylimits = TC_plot_settings.timeseries_ylimits;
-    subtitle_FontSize = TC_plot_settings.subtitle_fontSize;
+    subtitle_FontSize = gen_settings.subtitle_fontSize;
     marker_type = TC_plot_settings.marker_type;
     plot_opposing_directions = TC_plot_settings.plot_both_directions;
-    control_color = TC_plot_settings.control_color;
-    legend_FontSize = TC_plot_settings.legend_FontSize;
-    axis_FontSize = TC_plot_settings.axis_label_fontSize;
-    axis_labels = TC_plot_settings.TC_axis_labels;
+    control_color = gen_settings.control_color;
+    legend_FontSize = gen_settings.legend_fontSize;
+    axis_FontSize = gen_settings.axis_label_fontSize;
+    axis_labels = TC_plot_settings.axis_labels;
     datatypes = TC_plot_settings.TC_datatypes;
     xaxis_values = TC_plot_settings.xaxis_values;
     fig_names = TC_plot_settings.figure_names;
-    xtick_fontSize = TC_plot_settings.xtick_label_fontSize;
+    xtick_fontSize = gen_settings.axis_num_fontSize;
+    subplot_figure_titles = TC_plot_settings.subplot_figure_names{fig_num};
+    figTitle_fontSize = gen_settings.figTitle_fontSize;
     
     
     if ~isempty(TC_conds)
@@ -40,7 +42,7 @@ function plot_TC_specified_OLtrials(TC_plot_settings, TC_conds, plot_names, TC_i
                         continue;
                     end
                     placement = col+num_plot_cols*(row-1);
-                    better_subplot(num_plot_rows, num_plot_cols, placement, 20, 35)
+                    better_subplot(num_plot_rows, num_plot_cols, placement, 20, 95)
                     hold on
                     for g = 1:num_groups
                         tmpdata = squeeze(nanmean(summaries(g,:,d,conds,:),5));
@@ -158,7 +160,9 @@ function plot_TC_specified_OLtrials(TC_plot_settings, TC_conds, plot_names, TC_i
 %             if control_genotype ~= 0
 %                 genotype{control_genotype} = erase(genotype{control_genotype}," (control)");
 %             end
-            
+            if ~isempty(subplot_figure_titles)
+                sgtitle(subplot_figure_titles(TC_inds==d), 'FontSize', figTitle_fontSize);
+            end
             if timeseries_ylimits(d,:) == 0
                 allax = findall(gcf, 'Type', 'axes');
                 ymin = min(ydata);

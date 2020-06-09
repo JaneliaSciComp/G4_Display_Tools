@@ -1,15 +1,15 @@
 %% plot data
 %calculate overall measurements and plot basic histograms
 function plot_basic_histograms(timeseries_data, interhistogram_data, ...
-    TC_datatypes, plot_settings, num_groups, num_exps, genotype, TC_inds, trial_options, ...
+    TC_datatypes, gen_settings, plot_settings, num_groups, num_exps, genotype, TC_inds, trial_options, ...
     annotation_settings, single, save_settings)
 
     %Set up needed variables
-    rep_Colors = plot_settings.rep_colors;
-    mean_Colors = plot_settings.mean_colors;
-    rep_LineWidth = plot_settings.rep_LineWidth;
-    mean_LineWidth = plot_settings.mean_LineWidth;
-    subtitle_FontSize = plot_settings.subtitle_FontSize/1.25;
+    rep_Colors = gen_settings.rep_colors;
+    mean_Colors = gen_settings.mean_colors;
+    rep_LineWidth = gen_settings.rep_lineWidth;
+    mean_LineWidth = gen_settings.mean_lineWidth;
+    subtitle_FontSize = gen_settings.subtitle_fontSize/1.25;
     ann_textbox = annotation_settings.textbox;
     ann_text = annotation_settings.annotation_text;
     ann_fontSize = annotation_settings.font_size/1.25;

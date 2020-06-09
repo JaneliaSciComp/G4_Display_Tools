@@ -1,29 +1,32 @@
-function plot_unedited_position_series(settings, mean_pos_series, save_settings, genotype, control_genotype)
-
+function plot_unedited_position_series(settings, gen_settings, mean_pos_series, save_settings, genotype, control_genotype)
+    
+    mean_colors = gen_settings.mean_colors;
+     mean_LineWidth = gen_settings.mean_lineWidth;
+    EdgeColor = gen_settings.edgeColor;
+    patch_alpha = gen_settings.patch_alpha;
+     subtitle_FontSize = gen_settings.subtitle_fontSize;
+     legend_FontSize = gen_settings.legend_fontSize;
+     rep_LineWidth = gen_settings.rep_lineWidth;
+     control_color = gen_settings.control_color;
+     y_fontsize = gen_settings.yLabel_fontSize;
+     x_fontsize = gen_settings.xLabel_fontSize;
+     fly_colors = gen_settings.fly_colors;
+    axis_num_fontSize = gen_settings.axis_num_fontSize;
+    figTitle_fontSize = gen_settings.figTitle_fontSize;
+    
     conds = settings.pos_conds;
     cond_name = settings.cond_name;
-    mean_colors = settings.mean_colors;
-    mean_LineWidth = settings.mean_lineWidth;
-    EdgeColor = settings.edgeColor;
-    patch_alpha = settings.patch_alpha;
-    subtitle_FontSize = settings.subtitle_fontSize;
-    legend_FontSize = settings.legend_fontSize;
     ylimits = settings.ylimits;
     xaxis = settings.xaxis;
     new_xaxis = settings.new_xaxis;
-    rep_LineWidth = settings.rep_lineWidth;
-    control_color = settings.control_color;
-    show_ind_flies = settings.show_ind_flies;
-    y_fontsize = settings.yLabel_fontSize;
-    x_fontsize = settings.xLabel_fontSize;
-    fly_colors = settings.fly_colors;
-    axis_num_fontSize = settings.axis_num_fontSize;
+    show_ind_flies = settings.show_individual_flies;
     left_col_places = settings.left_column_places;
     top_left_place = settings.top_left_place;
     bottom_left_place = settings.bottom_left_place;
     axis_labels = settings.axis_labels;
     figure_titles = settings.figure_names;
     plot_opposing_directions = settings.plot_opposing_directions;
+    subplot_figure_titles = settings.subplot_figure_names;
     % Plot the regular position series (not M and P)
     
     num_groups = size(mean_pos_series,1);
@@ -178,7 +181,10 @@ function plot_unedited_position_series(settings, mean_pos_series, save_settings,
 
 
             if ~isempty(figure_titles)
-                set(gcf, 'Name', figure_titles);
+                set(gcf, 'Name', figure_titles{fig});
+            end
+            if ~isempty(subplot_figure_titles)
+                sgtitle(subplot_figure_titles(fig), 'FontSize', figTitle_fontSize);
             end
 
             if ylimits == 0

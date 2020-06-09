@@ -22,7 +22,8 @@ plot_height = (1 - gap_y*(H+1))/H;
 
 
 plot_x = col*gap_x + (col-1)*plot_width + .015;
-plot_y = row*gap_y + (row-1)*plot_height; %This equation was giving a huge number (200 and something) for a normalized y position. changed equation to match above - LT 8/15
+plot_y = row*gap_y + (row-1)*plot_height + .05; %This equation was giving a huge number (200 and something) for a normalized y position. changed equation to match above - LT 8/15
+
 
 % if rem(N-1,W) == 0
 %     %Then the plot is on the left column. Add 15 pixels to its plot_width

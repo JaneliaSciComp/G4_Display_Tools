@@ -1,31 +1,33 @@
-function plot_position_series(MP_settings, pos_settings, save_settings, mean_pos_series, ...
+function plot_position_series(gen_settings, MP_settings, pos_settings, save_settings, mean_pos_series, ...
     P, M, P_flies, M_flies, genotype, control_genotype)
 
 
     
     MP_conds = MP_settings.mp_conds;
     cond_name = MP_settings.cond_name;
-     mean_colors = MP_settings.mean_colors;
-     mean_LineWidth = MP_settings.mean_lineWidth;
-    EdgeColor = MP_settings.edgeColor;
-    patch_alpha = MP_settings.patch_alpha;
-     subtitle_FontSize = MP_settings.subtitle_fontSize;
-     legend_FontSize = MP_settings.legend_fontSize;
+     mean_colors = gen_settings.mean_colors;
+     mean_LineWidth = gen_settings.mean_lineWidth;
+    EdgeColor = gen_settings.edgeColor;
+    patch_alpha = gen_settings.patch_alpha;
+     subtitle_FontSize = gen_settings.subtitle_fontSize;
+     legend_FontSize = gen_settings.legend_fontSize;
     ylimits = MP_settings.ylimits;
     xaxis = MP_settings.xaxis;
     new_xaxis = MP_settings.new_xaxis;
-     rep_LineWidth = MP_settings.rep_lineWidth;
-     control_color = MP_settings.control_color;
-     show_ind_flies = MP_settings.show_ind_flies;
-     y_fontsize = MP_settings.yLabel_fontSize;
-     x_fontsize = MP_settings.xLabel_fontSize;
-     fly_colors = MP_settings.fly_colors;
-    axis_num_fontSize = MP_settings.axis_num_fontSize;
+     rep_LineWidth = gen_settings.rep_lineWidth;
+     control_color = gen_settings.control_color;
+     show_ind_flies = MP_settings.show_individual_flies;
+     y_fontsize = gen_settings.yLabel_fontSize;
+     x_fontsize = gen_settings.xLabel_fontSize;
+     fly_colors = gen_settings.fly_colors;
+    axis_num_fontSize = gen_settings.axis_num_fontSize;
     left_col_places = MP_settings.left_column_places;
     top_left_place = MP_settings.top_left_place;
     bottom_left_place = MP_settings.bottom_left_place;
     axis_labels = MP_settings.axis_labels;
     figure_titles = MP_settings.figure_names;
+    subplot_figure_titles = MP_settings.subplot_figure_names;
+    figTitle_fontSize = gen_settings.figTitle_fontSize;
     
     num_groups = size(mean_pos_series,1);
     num_exps = size(mean_pos_series,2);
@@ -156,6 +158,12 @@ function plot_position_series(MP_settings, pos_settings, save_settings, mean_pos
                     end
                 end
                 
+                if MP <= length(subplot_figure_titles)
+                    if ~isempty(subplot_figure_titles{MP})
+                        sgtitle(subplot_figure_titles{MP}(fig), 'FontSize', figTitle_fontSize);
+                    end
+                end
+                
                 if isempty(ylimits)
 
                     allax = findall(gcf, 'Type', 'axes');
@@ -205,7 +213,7 @@ function plot_position_series(MP_settings, pos_settings, save_settings, mean_pos
     
     if pos_settings.plot_pos_averaged == 1
         
-        plot_unedited_position_series(pos_settings, mean_pos_series, save_settings, genotype, control_genotype)
+        plot_unedited_position_series(pos_settings, gen_settings, mean_pos_series, save_settings, genotype, control_genotype)
         
     end
 

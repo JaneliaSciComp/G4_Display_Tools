@@ -41,7 +41,7 @@ function [P, M, P_flies, M_flies] = generate_M_and_P(mean_pos_series, MP_conds, 
         end
     end
     
-    if MP_settings.show_ind_flies == 1
+    if MP_settings.show_individual_flies == 1
         count = 1;
         for fig = 1:num_figs
             for row = 1:num_rows
