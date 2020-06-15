@@ -107,6 +107,7 @@
             self.timeseries_plot_option = 0;
             self.TC_plot_option = 0;
             self.pos_plot_option = 0;
+            self.comp_plot_option = 0;
             
             self.single_analysis = 0;
             self.group_analysis = 0;
