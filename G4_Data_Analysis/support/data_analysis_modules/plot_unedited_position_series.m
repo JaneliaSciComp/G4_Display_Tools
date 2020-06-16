@@ -62,8 +62,9 @@ function plot_unedited_position_series(settings, gen_settings, mean_pos_series, 
                     place = row+num_rows*(col-1);
                     placement = col+num_cols*(row-1);
                     if cond > 0
-
-                        better_subplot(num_rows, num_cols, placement,20,35)
+                        
+                        [gap_x, gap_y] = get_plot_spacing(num_rows, num_cols);
+                        better_subplot(num_rows, num_cols, placement,gap_x, gap_y)
                         hold on
 
                         for g = 1:num_groups

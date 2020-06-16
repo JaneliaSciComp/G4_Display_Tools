@@ -42,7 +42,9 @@ function plot_TC_specified_OLtrials(TC_plot_settings, gen_settings, TC_conds, pl
                         continue;
                     end
                     placement = col+num_plot_cols*(row-1);
-                    better_subplot(num_plot_rows, num_plot_cols, placement, 20, 95)
+                    
+                    [gap_x, gap_y] = get_plot_spacing(num_plot_rows, num_plot_cols);
+                    better_subplot(num_plot_rows, num_plot_cols, placement, gap_x, gap_y)
                     hold on
                     for g = 1:num_groups
                         tmpdata = squeeze(nanmean(summaries(g,:,d,conds,:),5));

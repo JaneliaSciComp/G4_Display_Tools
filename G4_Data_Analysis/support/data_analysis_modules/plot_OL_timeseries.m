@@ -47,8 +47,16 @@ function plot_OL_timeseries(timeseries_data, timestampsIN, OL_conds, OL_duration
                     cond = OL_conds(1+(row-1),col);
                     placement = col+num_plot_cols*(row-1);
                     place = row+num_plot_rows*(col-1);
+                    
+                    %The larger the number of rows is compared to columns,
+                    %the more data gets cut off the bottom. Have to
+                    %increment the spacing between plots depending on num
+                    %rows. 
+                    
+                    [gap_x, gap_y] = get_plot_spacing(num_plot_rows, num_plot_cols);
+                    
                     if cond>0
-                        better_subplot(num_plot_rows, num_plot_cols, placement)
+                        better_subplot(num_plot_rows, num_plot_cols, placement, gap_x, gap_y)
                         hold on
                         for g = 1:num_groups
                             tmpdata = squeeze(timeseries_data(g,:,d,cond,:));

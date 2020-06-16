@@ -28,7 +28,8 @@ function plot_CL_histograms(CL_conds, CL_inds, histogram_data, num_groups, ...
                     for col = 1:num_plot_cols
                         cond = CL_conds(1+(row-1)*(1+overlap),col,fig);
                         if cond>0
-                            better_subplot(num_plot_rows, num_plot_cols, col+num_plot_cols*(row-1), 20, 35)
+                            [gap_x, gap_y] = get_plot_spacing(num_plot_rows, num_plot_cols);
+                            better_subplot(num_plot_rows, num_plot_cols, col+num_plot_cols*(row-1), gap_x, gap_y)
                             hold on
                             [~, num_exps, ~, ~, ~, num_positions] = size(histogram_data);
                             x = circshift(1:num_positions,[1 floor(num_positions/2)]);

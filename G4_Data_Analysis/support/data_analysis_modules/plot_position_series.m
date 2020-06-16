@@ -67,7 +67,9 @@ function plot_position_series(gen_settings, MP_settings, pos_settings, save_sett
                         cond = MP_conds{fig}(1+(row-1),col);
                         place = row+num_rows*(col-1);
                         placement = col+num_cols*(row-1);
-                        better_subplot(num_rows, num_cols, placement,20,35)
+                        
+                        [gap_x, gap_y] = get_plot_spacing(num_rows, num_cols);
+                        better_subplot(num_rows, num_cols, placement,gap_x, gap_y)
                         yline(0, 'k--');
                         hold on
 
