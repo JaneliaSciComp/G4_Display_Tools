@@ -26,7 +26,7 @@ function plot_OL_timeseries(timeseries_data, timestampsIN, OL_conds, OL_duration
     fly_Colors = gen_settings.fly_colors;
     axis_num_fontSize = gen_settings.axis_num_fontSize;
     figTitle_fontSize = gen_settings.figTitle_fontSize;
-    subplot_figure_titles = plot_settings.subplot_figure_names{fig_num};
+    subplot_figure_titles = plot_settings.subplot_figure_title{fig_num};
     
     
 

@@ -26,7 +26,7 @@ function plot_position_series(gen_settings, MP_settings, pos_settings, save_sett
     bottom_left_place = MP_settings.bottom_left_place;
     axis_labels = MP_settings.axis_labels;
     figure_titles = MP_settings.figure_names;
-    subplot_figure_titles = MP_settings.subplot_figure_names;
+    subplot_figure_titles = MP_settings.subplot_figure_title;
     figTitle_fontSize = gen_settings.figTitle_fontSize;
     
     num_groups = size(mean_pos_series,1);

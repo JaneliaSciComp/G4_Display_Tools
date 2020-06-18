@@ -7,118 +7,130 @@ function [exp_settings, histogram_plot_settings, histogram_annotation_settings, 
 
 %[pretrial, intertrial, posttrial]
     exp_settings.trial_options = [1 1 1];
-%% Settings for exp_folder generation
-    
-    exp_settings.field_to_sort_by{1} = ["fly_genotype"];
-    exp_settings.field_to_sort_by{2} = ["fly_genotype"];
-%    exp_settings.field_to_sort_by{3} = ["fly_genotype"];
-%        exp_settings.field_to_sort_by{2} = ["fly_genotype"];
+%% Settings for exp_folder generation and saving results
 
-    %if plot_all_genotypes is 1, leave field_values empty.
+    %This is the path to the protocol
+    save_settings.path_to_protocol = "C:\Users\kappagantular\Desktop\smallfield_V2_comparison\Results";
     
+    %The path where you wish to save the results of the data analysis
+    save_settings.save_path = 'C:\Users\kappagantular\Desktop\smallfield_V2_comparison\Plots';
+    
+    %Field names are metadata field names
+    exp_settings.field_to_sort_by{1} = ["fly_genotype", "experimenter"];
+    exp_settings.field_to_sort_by{2} = ["fly_genotype", "experimenter"];
+    exp_settings.field_to_sort_by{3} = ["fly_genotype", "experimenter"];
+    exp_settings.field_to_sort_by{4} = ["fly_genotype", "experimenter"];
+
+    %If plot_all_genotypes is 1, leave field_values empty.   
 %    exp_settings.field_values = {};
-     exp_settings.field_values{1} = ["emptySplit_UAS_Kir_JFRC49"];      
-     exp_settings.field_values{2} = ["OL0010B_UAS_Kir_JFRC49"];
-%    exp_settings.field_values{2} = ["OL0042B_UAS_Kir_JFRC49"];
-%   exp_settings.field_values{1} = ["SS00324_JFRC100_JFRC49"];
+    exp_settings.field_values{1} = ["emptySplit_UAS_Kir_JFRC49", "arrudar"];
+    exp_settings.field_values{2} = ["emptySplit_UAS_Kir_JFRC49", "kappagantular"];
+    exp_settings.field_values{3} = ["OL0042B_UAS_Kir_JFRC49", "arrudar"];
+    exp_settings.field_values{4} = ["OL0042B_UAS_Kir_JFRC49", "kappagantular"];
 
+    %For a single group or multiple groups, the flag is '-group'
     exp_settings.single_group = 0;%1-all flies should be in one group, so exp_folder should be 1xX cell array
+    %The flag for a single fly is '-single'
     exp_settings.single_fly = 0;%1- only a single fly is being analyzed, the exp_folder will simply be the path to the fly
 
     %1 - each genotype will be plotted in its own figure against a control. 
     %0 - groups will be plotted as laid out below. 
     exp_settings.plot_all_genotypes = 0; 
    
-     %control must match exactly the metadata genotype value. 
+    %Control must match exactly the metadata genotype value. 
     exp_settings.control_genotype = 'emptySplit_UAS_Kir_JFRC49';
-
-    %This is the path to the protocol
-    save_settings.path_to_protocol = "/Users/taylorl/Desktop/bad_flies";
+      
+    %Array of genotype names
+    exp_settings.genotypes = ["EmptySplit-RA", "EmptySplit-RK",  "LC 15-RA", "LC 15-RK"];
     
-    exp_settings.genotypes = ["ES", "T4-T5"];
-    %genotypes = ["empty-split", "LPLC-2", "LC-18", "T4_T5", "LC-15", "LC-25", "LC-11", "LC-17", "LC-4"];
-
-%% Save settings
-    
-% Save settings   
-    %The path where you wish to save the results of the data analysis
-    save_settings.save_path = '/Users/taylorl/Desktop/bad_flies';
 
 %% Experiment settings
-
-    exp_settings.plot_norm_and_unnorm = 1;%1 or 0.
-
-    exp_settings.processed_data_file = 'testing_new_processing';
+    
+    %Plot normalized and unnormalized data
+    %1 for both or 0 for normalized data)
+    exp_settings.plot_norm_and_unnorm = 1;  
+    
+    %Processed mat file name
+    exp_settings.processed_data_file = 'Modular_G4_Processed_Data';
 
     %Log file will be named using this
     exp_settings.group_being_analyzed_name = 'smallfield_Kir';
     
-%% Histogram settings 
+%% Histogram settings ('-hist')
 
     %Date range displayed on histograms
-    histogram_annotation_settings.annotation_text = "Annotation text here.";
+    histogram_annotation_settings.annotation_text = "RA vs RK data for small-field and loom patterns.";
 
-%% Timeseries plot settings
+%% Timeseries plot settings ('-TSplot')
+
+    %The datatype to plot as timeseries
+    %datatype options for flying data: 'LmR_chan', 'L_chan', 'R_chan', 'F_chan', 'Frame Position', 'LmR', 'LpR', 'faLmR'
+    %datatype options for walking data: 'Vx0_chan', 'Vx1_chan', 'Vy0_chan', 'Vy1_chan', 'Frame Position', 'Turning', 'Forward', 'Sideslip'
+    timeseries_plot_settings.OL_datatypes = {'LmR', 'LpR'};
+    
     %OL_TS_conds indicates the layout of your timeseries figures. See
     %documentation for example. Leave empty ([]) for default layout.
-    timeseries_plot_settings.OL_TS_conds{1} = [1 2 3 4; 5 6 7 8; 9 10 11 12];
-    timeseries_plot_settings.OL_TS_conds{2} = [13 14 15 16; 17 18 19 20; 21 22 23 24];
+    timeseries_plot_settings.OL_TS_conds{1} = [1 3 ; 5 7 ; 9 11];
+    timeseries_plot_settings.OL_TS_conds{2} = [13 15; 17 19; 21 23];
 
     % Durations inform the x axis limits on timeseries plots. Leave empty
     %for the software to pull durations from the processed data, or create
     %an array like OL_TS_conds with x limit values instead of condition
     %#'s. See documentation for example.
     timeseries_plot_settings.OL_TS_durations = []; 
-
-    %Axis labels for the timeseries plots [x, y]. For multiple figures,
-    %make it a cell array with each cell element corresponding to that
-    %figure in the OL_TS_conds array. See documentation for example.
-    timeseries_plot_settings.axis_labels = {};
-
-    %An array of figure names for each figure of timeseries plots. 
-    timeseries_plot_settings.figure_names = ["LmR", "LpR"];
     
-    timeseries_plot_settings.subplot_figure_names{1} = ["LmR Conds 1-12"; "LpR Conds 1-12"]; %Cell array with same num cell elements as OL_TS_conds. 
-    %Each cell should have one name for each datatype
-    timeseries_plot_settings.subplot_figure_names{2} = ["LmR Conds 13-24"; "LpR Conds 13-24"];
-    
-%datatype options for flying data: 'LmR_chan', 'L_chan', 'R_chan', 'F_chan', 'Frame Position', 'LmR', 'LpR', 'faLmR'
-%datatype options for walking data: 'Vx0_chan', 'Vx1_chan', 'Vy0_chan', 'Vy1_chan', 'Frame Position', 'Turning', 'Forward', 'Sideslip'
-    
-    %The datatype to plot as timeseries
-    timeseries_plot_settings.OL_datatypes = {'LmR', 'LpR'};
-    
-    %Set this to 1 if you are plotting only a single group and want lines
-    %plotted for each fly as well as the average.
-    timeseries_plot_settings.show_individual_flies = 0;
-    
-    %plot the frame position under each timeseries plot
-    timeseries_plot_settings.frame_superimpose = 0;
-    
-    %plot both directions for each condition on the same axis. 
-    timeseries_plot_settings.plot_both_directions = 1;
-
     %If you want the plots to have their own plot titles, make a cell array
     %of titles corresponding to the OL_TS_conds array. Else leave empty or
     %set to 0 (no titles).
     timeseries_plot_settings.cond_name = [];
 
-%% Closed loop histogram settings
-    %Create array to dictate layout of CL histograms or leave empty for def
+    %Axis labels for the timeseries plots [x, y]. For multiple figures,
+    %make it a cell array with each cell element corresponding to that
+    %figure in the OL_TS_conds array. See documentation for example.
+    timeseries_plot_settings.axis_labels = {};
+    
+    %Title for subplot/figure
+    timeseries_plot_settings.subplot_figure_title{1} = ["LmR Conds 1-12"; "LpR Conds 1-12"]; %Cell array with same num cell elements as OL_TS_conds. 
+    %Each cell should have one name for each datatype
+    timeseries_plot_settings.subplot_figure_title{2} = ["LmR Conds 13-24"; "LpR Conds 13-24"];
+    
+    %An array of figure names for each figure of timeseries plots.(not 
+    %printed on actual figure)
+    timeseries_plot_settings.figure_names = ["LmR", "LpR"];
+    
+    %Set this to 1 if you are plotting only a single group and want lines
+    %plotted for each fly as well as the average.
+    timeseries_plot_settings.show_individual_flies = 0;
+    
+    %Plot the frame position under each timeseries plot
+    timeseries_plot_settings.frame_superimpose = 0;
+    
+    %Plot both directions for each condition on the same axis. 
+    timeseries_plot_settings.plot_both_directions = 1;
+
+
+%% Closed loop histogram settings ('-CLhist')
+    %Datatypes for which to plot closed-loop histograms
+    CL_hist_plot_settings.CL_datatypes = {'Frame Position'}; %datatypes to plot as histograms     
+
+    %Array layout of conditions 
     CL_hist_plot_settings.CL_hist_conds = [];
+    
+    %Axis labels for the timeseries plots [x, y].
     CL_hist_plot_settings.axis_labels = {};
     
-    %Datatypes for which to plot closed-loop histograms
-    CL_hist_plot_settings.CL_datatypes = {'Frame Position'}; %datatypes to plot as histograms          
 
-%% Tuning Curve plot settings
+%% Tuning Curve plot settings ('TCplot')
+    
+    %Datatypes for which to plot tuning curves
+    TC_plot_settings.TC_datatypes = {'LmR','LpR'};     
+
     %Create the layout of tuning curves in this array. It works differently
     %than OL_TS_conds - see documentation for details.
-    TC_plot_settings.OL_TC_conds{1}{1} = [1 3 5 7];
-    TC_plot_settings.OL_TC_conds{1}{2} = [9 11 13 15];
-    TC_plot_settings.OL_TC_conds{2}{1} = [17 19 21 23];
-    TC_plot_settings.OL_TC_conds{2}{2} = [25 27 29 31];
-    
+    TC_plot_settings.OL_TC_conds{1}{1} = [1 3 5 7 9 11];
+    TC_plot_settings.OL_TC_conds{1}{2} = [13 15 17 19 21];
+    TC_plot_settings.OL_TC_conds{1}{3} = [23 25 27 29 31];
+
     %If you want your tuning curves to have their own plot titles, make an
     %array of titles for each PLOT (not each condition). So this should be
     %a cell array like with the timeseries. A cell element for each figure,
@@ -126,95 +138,123 @@ function [exp_settings, histogram_plot_settings, histogram_annotation_settings, 
     %plot titles, set cond_name = 0
     TC_plot_settings.cond_name = [];
     
+    %The x-axis values for tuning curves
+    TC_plot_settings.xaxis_values = [0.625 1.25 2.5 5 10 20 40];
+    
     %The xaxis label for tuning curves
 %     TC_plot_settings.TC_axis_labels{1} = ["Frequency(Hz)","LmR"];
 %     TC_plot_settings.TC_axis_labels{2} = ["Frequency(Hz)", "LpR"];
     TC_plot_settings.axis_labels = {};
+    
+    %Title for subplot/figure
+    TC_plot_settings.subplot_figure_title{1} = ["LmR Conds 1-31"; "LpR Conds 1-31"];
+    
+    %An array of figure names for each figure(not printed on actual figure)
     TC_plot_settings.figure_names = [];
-    TC_plot_settings.subplot_figure_names{1} = ["LmR Conds 1-15"; "LpR Conds 1-15"];
-    TC_plot_settings.subplot_figure_names{2} = ["LmR Conds 17-31"; "LpR Conds 17-31"];
-    
-    %The x-axis values for tuning curves
-    TC_plot_settings.xaxis_values = [0.625 1.25 2.5 5 10 20 40];
-    
-    %Datatypes for which to plot tuning curves
-    TC_plot_settings.TC_datatypes = {'LmR','LpR'}; 
     
     %Plots tuning curves for both directions on the same axis
     TC_plot_settings.plot_both_directions = 1; 
     
-%% Position-Series P and M Plot Settings
+%% Position-Series M and P Plot Settings ('-posplot)
 
+    %Plot M and P plots
+    MP_plot_settings.plot_MandP = 1;    
+
+    %Array layout of conditions
     MP_plot_settings.mp_conds{1} = [1 3 5 7; 9 11 13 15];
     MP_plot_settings.mp_conds{2} = [17 19 21 23; 25 27 29 31];
     
-    MP_plot_settings.xaxis = [1:192]; %Standard x axis, only change if the number of frames has changed
+    %Titles corresponding to the conditions array - correspond to pos_conds
+    MP_plot_settings.cond_name{1} = ["3x1 Sweep 0.35 Hz", "3x1 Sweep 1.07 Hz" ,"3x3 Sweep 0.35 Hz", "3x3 Sweep 1.07 Hz"; ...
+        "3x3 ON Sweep 0.35 Hz" ,"3x3 ON Sweep 1.07 Hz" ,"8x8 Sweep 0.35" ,"8x8 Sweep 1.07"]; 
+    MP_plot_settings.cond_name{2} = ["16x16 Sweep 0.35 Hz", "16x16 Sweep 1.07 Hz", "64x3 Sweep 0.35Hz", "64x3 Sweep 1.07 Hz"; ...
+        "64x3 ON Sweep 0.35 Hz", "64x3 ON Sweep 1.07 Hz", "64x16 Sweep 0.35 Hz", "64x16 Sweep 1.07 Hz"];
+    
+    %Standard x axis, only change if the number of frames has change
+    MP_plot_settings.xaxis = [1:192]; 
     
     %MP_plot_settings.new_xaxis = [];
 %    MP_plot_settings.new_xaxis = (360/MP_plot_settings.xaxis(end))*[(MP_plot_settings.xaxis) - 96]; %use this option to
     %plot M and P against angular position, left being negative, right
     %being positive
-    
     MP_plot_settings.new_xaxis = circshift((360/MP_plot_settings.xaxis(end))*[(MP_plot_settings.xaxis) - 96], 96); %use
     %this option to plot M and P against angular position, centered so left
     %is positive and right is negative. 
-    MP_plot_settings.plot_MandP = 1;
-    MP_plot_settings.figure_names =  ["M", "P"]; 
-    MP_plot_settings.subplot_figure_names{1} = ["M conds 1-15"; "M conds 16-31"];
-    MP_plot_settings.subplot_figure_names{2} = ["P conds 1-15"; "P conds 16-31"];
+        
+    %Axis labels for the timeseries plots [x, y].
     MP_plot_settings.axis_labels{1} = ["Frame Position", "Motion-Dependent Response"]; %{xlabel, ylabel}
     MP_plot_settings.axis_labels{2} = ["Frame Position", "Position-Dependent Response"];
-    MP_plot_settings.cond_name{1} = ["3x1 Sweep 0.35 Hz", "3x1 Sweep 1.07 Hz" ,"3x3 Sweep 0.35 Hz", "3x3 Sweep 1.07 Hz"; ...
-        "3x3 ON Sweep 0.35 Hz" ,"3x3 ON Sweep 1.07 Hz" ,"8x8 Sweep 0.35" ,"8x8 Sweep 1.07"]; %Titles of subplots - correspond to pos_conds
-    MP_plot_settings.cond_name{2} = ["16x16 Sweep 0.35 Hz", "16x16 Sweep 1.07 Hz", "64x3 Sweep 0.35Hz", "64x3 Sweep 1.07 Hz"; ...
-        "64x3 ON Sweep 0.35 Hz", "64x3 ON Sweep 1.07 Hz", "64x16 Sweep 0.35 Hz", "64x16 Sweep 1.07 Hz"];
-    MP_plot_settings.show_individual_flies = 0;
+    
+    %Limits for x- and y-axis
     MP_plot_settings.ylimits = []; %[M ymin ymax; P ylmin ymax];
     MP_plot_settings.xlimits = []; %[M xmin xmax; P xmin xmax];
-
     
+    %Title for subplot/figure
+    MP_plot_settings.subplot_figure_title{1} = ["M conds 1-15"; "M conds 16-31"];
+    MP_plot_settings.subplot_figure_title{2} = ["P conds 1-15"; "P conds 16-31"];
     
-%% Position-Series Averages Plot Settings
+    %An array of figure names for each figure(not printed on actual figure)
+    MP_plot_settings.figure_names =  ["M", "P"]; 
     
+    %Display individual flies in a single group
+    MP_plot_settings.show_individual_flies = 0;
+        
+%% Position-Series Averages Plot Settings ('-posplot)
+    
+    %Plot average position series
     pos_plot_settings.plot_pos_averaged = 1;
-    pos_plot_settings.plot_opposing_directions = 0;
-%    pos_plot_settings.pos_conds = [];
+    
+    %Array layout of conditions
+    %pos_plot_settings.pos_conds = [];
     pos_plot_settings.pos_conds{1} = [1 3 5 7; 9 11 13 15];
     pos_plot_settings.pos_conds{2} = [17 19 21 23; 25 27 29 31];
-    pos_plot_settings.figure_names = [];
     
-    pos_plot_settings.subplot_figure_names = ["Pos Series 1-15"; "Pos Series 17-31"];
-
-    pos_plot_settings.axis_labels = ["X Label", "Y Label"];
+    %Titles corresponding to the conditions array
+    pos_plot_settings.cond_name = [];
 %     pos_plot_settings.cond_name{1} = ["3x1 Sweep 0.35 Hz", "3x1 Sweep 1.07 Hz" ,"3x3 Sweep 0.35 Hz", "3x3 Sweep 1.07 Hz"; ...
 %         "3x3 ON Sweep 0.35 Hz" ,"3x3 ON Sweep 1.07 Hz" ,"8x8 Sweep 0.35" ,"8x8 Sweep 1.07"];
 %     pos_plot_settings.cond_name{2} = ["16x16 Sweep 0.35 Hz", "16x16 Sweep 1.07 Hz", "64x3 Sweep 0.35Hz", "64x3 Sweep 1.07 Hz"; ...
 %         "64x3 ON Sweep 0.35 Hz", "64x3 ON Sweep 1.07 Hz", "64x16 Sweep 0.35 Hz", "64x16 Sweep 1.07 Hz"];
-    pos_plot_settings.cond_name = [];
-    pos_plot_settings.show_individual_flies = 0;
-    pos_plot_settings.ylimits = [];
-    pos_plot_settings.xlimits = [];
-    pos_plot_settings.xaxis = [1:192];%Standard x axis, only change if the number of frames has changed
+    
+    %Standard x axis, only change if the number of frames has changed
+    pos_plot_settings.xaxis = [1:192];
+    
+    %pos_plot_settings.new_xaxis = [];
     pos_plot_settings.new_xaxis = circshift((360/MP_plot_settings.xaxis(end))*[(MP_plot_settings.xaxis) - 96], 96); %use
     %this option to plot M and P against angular position, centered so left;
-
 %    pos_plot_settings.new_xaxis = (360/MP_plot_settings.xaxis(end))*[(MP_plot_settings.xaxis) - 96]; %use this option to
 %    plot position series against angular position, left being negative, right
 %    being positive
-    
-    %pos_plot_settings.new_xaxis = [];
-    
-    
-%% Comparison figure settings
 
+    %Axis labels for the timeseries plots [x, y].    
+    pos_plot_settings.axis_labels = ["X Label", "Y Label"];  %{xlabel, ylabel}  
+
+    %Limits for x- and y-axis
+    pos_plot_settings.ylimits = [];
+    pos_plot_settings.xlimits = [];
+    
+    %An array of figure names for each figure(not printed on actual figure)
+    pos_plot_settings.figure_names = [];
+    
+    %Title for subplot/figure
+    pos_plot_settings.subplot_figure_title = ["Pos Series 1-15"; "Pos Series 17-31"];
+
+    %Display individual flies in a single group
+    pos_plot_settings.show_individual_flies = 0;
+    
+    %Plot opposite direction
+    pos_plot_settings.plot_opposing_directions = 0;
+
+
+%% Comparison figure settings
+    
+    %Ordering type of plots
     comp_settings.plot_order = {'LmR','pos','M','P'};
+    
+    %Layout of conditions
     comp_settings.conditions = [1,3,5,7,9,11,13,15,17,19,21,23,25,27,29,31];
-    comp_settings.rows_per_fig = 4;
-    comp_settings.ylimits = [0 0];
-    comp_settings.figure_names = {'Comparison1-7', ...
-        'Comparison9-15', 'Comparison17-23', 'Comparison25-31'};
-    comp_settings.subplot_figure_names = {'LmR, Pos, M, P 1-7', 'LmR, Pos, M, P 9-15', ...
-        'LmR, Pos, M, P 17-23', 'LmR, Pos, M, P 25-31'};
+    
+    %Titles corresponding to the conditions array
     comp_settings.cond_name{1} = ["Cond1 LmR", "Cond1 Pos Series", "Cond1 M", "Cond1 P";...
         "Cond3 LmR", "Cond3 Pos Series", "Cond3 M", "Cond3 P"; "Cond5 LmR", "Cond5 Pos Series", "Cond5 M", "Cond5 P";...
         "Cond7 LmR", "Cond7 Pos Series", "Cond7 M", "Cond7 P"];
@@ -227,8 +267,23 @@ function [exp_settings, histogram_plot_settings, histogram_annotation_settings, 
     comp_settings.cond_name{4} = ["Cond25 LmR", "Cond25 Pos Series", "Cond25 M", "Cond25 P"; ...
         "Cond27 LmR", "Cond27 Pos Series", "Cond27 M", "Cond27 P"; "Cond29 LmR", "Cond29 Pos Series", "Cond29 M", "Cond29 P"; ...
         "Cond31 LmR", "Cond31 Pos Series", "Cond31 M", "Cond31 P"];
-    comp_settings.norm = 1;
     
+    %Maximum number of rows plotted per figure
+    comp_settings.rows_per_fig = 4;
+    
+    %Limits for y-axis
+    comp_settings.ylimits = [0 0];
+    
+    %Title for subplot/figure
+    comp_settings.subplot_figure_title = {'LmR, Pos, M, P 1-7', 'LmR, Pos, M, P 9-15', ...
+        'LmR, Pos, M, P 17-23', 'LmR, Pos, M, P 25-31'};
+    
+    %An array of figure names for each figure(not printed on actual figure)
+    comp_settings.figure_names = {'Comparison1-7', ...
+        'Comparison9-15', 'Comparison17-23', 'Comparison25-31'};
+     
+    %All plots on the comparison plot are normalized when set to 1
+    comp_settings.norm = 1;
     
 
 %% Further settings that may not need adjusting often 
@@ -245,6 +300,10 @@ function [exp_settings, histogram_plot_settings, histogram_annotation_settings, 
 %     normalize_settings.max_prctile = 98; %percentile to use as a more robust estimate of the maximum value
 
 %% GENERAL PLOT SETTINGS
+    
+%Arrangement of datatype options for flying data: 'LmR_chan', 'L_chan', 'R_chan', 'F_chan', 'Frame Position', 'LmR', 'LpR', 'faLmR'
+%Arrangement of datatype options for walking data: 'Vx0_chan', 'Vx1_chan', 'Vy0_chan', 'Vy1_chan', 'Frame Position', 'Turning', 'Forward', 'Sideslip'
+    
     gen_settings.figTitle_fontSize = 12;
     gen_settings.subtitle_fontSize = 8;
     gen_settings.legend_fontSize = 6;
@@ -252,15 +311,14 @@ function [exp_settings, histogram_plot_settings, histogram_annotation_settings, 
     gen_settings.xLabel_fontSize = 6;
     gen_settings.axis_num_fontSize = 6;
     gen_settings.axis_label_fontSize = 6;
-    gen_settings.fly_colors = [.95 .95 .95; .9 .9 .9; .85 .85 .85; .8 .8 .8; .75 .75 .75; .7 .7 .7; .65 .65 .65; .6 .6 .6; .55 .55 .55; .5 .5 .5; .45 .45 .45;  .4 .4 .4; .35 .35 .35; .3 .3 .3; .25 .25 .25; .2 .2 .2; .15 .15 .15; .1 .1 .1]; %Colors assigned to individual fly lines
-    gen_settings.rep_colors = [0 0 0; 1 0 0; 0 0.5 0; 0 0 1; 1 0.5 0; .75 0 1; 0 1 0; 0 1 1; 1 0 1; 1 1 0]; %default 10 colors supports up to 10 groups (add more colors for more groups)
+    gen_settings.fly_colors = [.95 .95 .95; .9 .9 .9; .85 .85 .85; .8 .8 .8; .75 .75 .75; .7 .7 .7; .65 .65 .65; .6 .6 .6; .55 .55 .55; .5 .5 .5; .45 .45 .45;  .4 .4 .4; .35 .35 .35; .3 .3 .3; .25 .25 .25; .2 .2 .2; .15 .15 .15; .1 .1 .1;.95 .95 .95; .9 .9 .9; .85 .85 .85; .8 .8 .8; .75 .75 .75; .7 .7 .7; .65 .65 .65; .6 .6 .6; .55 .55 .55; .5 .5 .5; .45 .45 .45;  .4 .4 .4; .35 .35 .35; .3 .3 .3; .25 .25 .25; .2 .2 .2; .15 .15 .15; .1 .1 .1]; %Colors assigned to individual fly lines
+    gen_settings.rep_colors = [0.5 0.5 0.5; 1 0.5 0.5; 0.25 0.75 0.25; 0.5 0.5 1; 1 0.75 0.25; 0.75 0.5 1; 0.5 1 0.5; 0.5 1 1; 1 0.5 1; 1 1 0.5]; %default 10 colors supports up to 10 groups (add more colors for more groups)
     gen_settings.rep_lineWidth = 0.05;
-    gen_settings.mean_colors = [1 0 0; 0 0 1; 0 0.5 0; 1 0.5 0; .75 0 1; 0 1 0;  1 0.5 1; 0 1 1; 1 0 1; 1 1 0]; %default 10 colors supports up to 10 groups (add more colors for more groups)
+    gen_settings.mean_colors = [0 0 0; 1 0 0; 0 0.5 0; 0 0 1; 1 0.5 0; .75 0 1; 0 1 0; 0 1 1; 1 0 1; 1 1 0]; %default 10 colors supports up to 10 groups (add more colors for more groups)
     gen_settings.control_color = [0 0 0];
     gen_settings.mean_lineWidth = 1;
     gen_settings.edgeColor = 'none';
     gen_settings.patch_alpha = 0.3; %sets the level of transparency for patch region around timeseries data
-
 
 %% Plot Settings for basic Histograms
 
@@ -285,9 +343,6 @@ function [exp_settings, histogram_plot_settings, histogram_annotation_settings, 
 
     %% Plot settings for Open-Loop timeseries plots
     
-%datatype options for flying data: 'LmR_chan', 'L_chan', 'R_chan', 'F_chan', 'Frame Position', 'LmR', 'LpR', 'faLmR'
-%datatype options for walking data: 'Vx0_chan', 'Vx1_chan', 'Vy0_chan', 'Vy1_chan', 'Frame Position', 'Turning', 'Forward', 'Sideslip'
-
     timeseries_plot_settings.timeseries_ylimits = [-1.1 1.1; -1 6; -1 6; -1 6; 1 192; 0 0; 0 0; 0 0]; %[min max] y limits for each datatype (including 1 additional for 'faLmR' option)
     timeseries_plot_settings.timeseries_xlimits = [0 4];
     timeseries_plot_settings.frame_scale = .5;

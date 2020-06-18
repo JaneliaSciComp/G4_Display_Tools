@@ -55,7 +55,7 @@ function create_comparison_figure(CombData, gen_settings, comp_settings, ts_sett
     
     figure_names = comp_settings.figure_names;
     cond_names = comp_settings.cond_name;
-    subplot_figure_titles = comp_settings.subplot_figure_names;
+    subplot_figure_titles = comp_settings.subplot_figure_title;
     
     if ~isempty(new_xaxis)
         pos_xaxis = new_xaxis(pos_xaxis);

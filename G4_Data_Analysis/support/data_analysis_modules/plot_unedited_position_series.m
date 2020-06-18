@@ -26,7 +26,7 @@ function plot_unedited_position_series(settings, gen_settings, mean_pos_series, 
     axis_labels = settings.axis_labels;
     figure_titles = settings.figure_names;
     plot_opposing_directions = settings.plot_opposing_directions;
-    subplot_figure_titles = settings.subplot_figure_names;
+    subplot_figure_titles = settings.subplot_figure_title;
     % Plot the regular position series (not M and P)
     
     num_groups = size(mean_pos_series,1);
