@@ -182,11 +182,8 @@ function process_data(exp_folder, processing_settings_file)
     ts_data = search_for_misaligned_data(ts_data, percent_to_shift, num_conds, num_reps, Frame_ind);
     
      %% Normalize LmR timeseries data
-    
-    
-    
-    %Get maxs (do not normalize to baselines by default)
-    
+
+    %Get maxs (do not normalize to baselines by default)    
 
     num_datapoints = size(ts_data, 4);
     
@@ -203,21 +200,19 @@ function process_data(exp_folder, processing_settings_file)
     %% process data into meaningful datasets
     %calculate LmR (Left - Right) and LpR (Left + Right)
     
+     
+    
     %Unnormalized datasets
     ts_data(LmR_ind,:,:,:) = ts_data(L_chan_idx,:,:,:) - ts_data(R_chan_idx,:,:,:); % + = right turns, - = left turns
     ts_data(LpR_ind,:,:,:) = ts_data(L_chan_idx,:,:,:) + ts_data(R_chan_idx,:,:,:); % + = increased amplitude, - = decreased
     
-    ts_avg_reps = squeeze(nanmean(ts_data, 3));
-    LmR_avg_over_reps = squeeze(ts_avg_reps(LmR_ind,:,:));
-    LpR_avg_over_reps = squeeze(ts_avg_reps(LpR_ind,:,:));
+    
     
     %Normalized datasets
     ts_data_normalized(LmR_ind,:,:,:) = ts_data_normalized(L_chan_idx,:,:,:) - ts_data_normalized(R_chan_idx,:,:,:); % + = right turns, - = left turns   
     ts_data_normalized(LpR_ind,:,:,:) = ts_data_normalized(L_chan_idx,:,:,:) + ts_data_normalized(R_chan_idx,:,:,:); % + = increased amplitude, - = decreased    
     
-    ts_avg_reps_norm = squeeze(nanmean(ts_data_normalized, 3));
-    LmR_avg_reps_norm = squeeze(ts_avg_reps_norm(LmR_ind,:,:));   
-    LpR_avg_reps_norm = squeeze(ts_avg_reps_norm(LpR_ind,:,:));
+    
     
     if faLmR == 1
         [ts_data, ts_data_normalized] = get_faLmR(ts_data, ts_data_normalized, LmR_ind, faLmR_ind);
@@ -227,6 +222,14 @@ function process_data(exp_folder, processing_settings_file)
         faLmR_avg_over_reps = [];
         faLmR_avg_reps_norm = [];
     end
+    
+    ts_avg_reps = squeeze(nanmean(ts_data, 3));
+    LmR_avg_over_reps = squeeze(ts_avg_reps(LmR_ind,:,:));
+    LpR_avg_over_reps = squeeze(ts_avg_reps(LpR_ind,:,:));
+    
+    ts_avg_reps_norm = squeeze(nanmean(ts_data_normalized, 3));
+    LmR_avg_reps_norm = squeeze(ts_avg_reps_norm(LmR_ind,:,:));   
+    LpR_avg_reps_norm = squeeze(ts_avg_reps_norm(LpR_ind,:,:));
 
     %calculate values for tuning curves - normalized and unnormalized
     

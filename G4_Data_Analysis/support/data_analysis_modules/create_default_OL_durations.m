@@ -4,7 +4,7 @@ function [OL_durs] = create_default_OL_durations(OL_conds, timeseries_data, time
         for j = 1:length(OL_conds{i}(:,1))
             for k = 1:length(OL_conds{i}(1,:))
                 
-                if isnan(OL_conds{i}(j,k))
+                if isnan(OL_conds{i}(j,k)) || OL_conds{i}(j,k) == 0
                     OL_durs{i}(j,k) = nan;
                     continue;
                 end

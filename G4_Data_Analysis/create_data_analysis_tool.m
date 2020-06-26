@@ -165,6 +165,7 @@
                         self.timeseries_plot_option = 1;
                         self.data_needed{end+1} = 'ts_avg_reps_norm';
                         
+                        
                     case '-tcplot' %Do tuning curve plots
                         
                         self.TC_plot_option = 1;
@@ -602,7 +603,7 @@
                 end
                 
                 
-        end
+            end
             
             if self.pos_plot_option == 1
                 [P, M, P_flies, M_flies] = generate_M_and_P(self.CombData.mean_pos_series, ...
