@@ -61,7 +61,7 @@ function plot_position_series(gen_settings, MP_settings, pos_settings, save_sett
 
                 for row = 1:num_rows
                     for col = 1:num_cols
-                        if row*col > size(data,2)
+                        if row*col > size(data,2) || isnan(MP_conds{fig}(row,col)) || MP_conds{fig}(row,col)==0
                             continue;
                         end
                         cond = MP_conds{fig}(1+(row-1),col);

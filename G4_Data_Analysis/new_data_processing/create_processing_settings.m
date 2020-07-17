@@ -4,13 +4,13 @@ function create_processing_settings()
     
     %% Save settings
     
-    settings_file_path = '/Users/taylorl/Desktop/bad_flies/processing_settings';
+    settings_file_path = '/Users/taylorl/Desktop/CT1_Ablation_03-16-20_12-39-26/processing_settings';
     
     
     
     %% General settings
     settings.trial_options = [1 1 1];
-    settings.path_to_protocol = '/Users/taylorl/Desktop/bad_flies/small_field_looms_V2_09-20-19_13-24-31.g4p';
+    settings.path_to_protocol = '/Users/taylorl/Desktop/CT1_Ablation_03-16-20_12-39-26/CT1_Ablation_03-16-20_12-39-26.g4p';
     settings.channel_order = {'LmR_chan', 'L_chan', 'R_chan', 'F_chan', 'Frame Position', 'LmR', 'LpR'}; 
     settings.hist_datatypes = {'Frame Position', 'LmR', 'LpR'};
     settings.manual_first_start = 0;
@@ -53,7 +53,7 @@ function create_processing_settings()
     
     %% Position series settings
     settings.enable_pos_series = 1; %If you want position series, set to 1. Only use on sweeps
-    settings.pos_conditions = [1:32]; %A 1xn array with numbers of conditions to be included in position series
+    settings.pos_conditions = [1:28]; %A 1xn array with numbers of conditions to be included in position series
                                   %Leave empty if all conditions to be
                                   %included.
     settings.sm_delay = 0; %add delay in ms to account for sensorimotor delay

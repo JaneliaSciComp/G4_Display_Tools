@@ -491,6 +491,9 @@
      
             update_individual_fly_log_files(self.exp_folder, self.save_settings.save_path, ...
             analyses_run, files_excluded);
+        
+            create_pdf_report(self.save_settings.report_path, self.save_settings.save_path, ...
+                self.save_settings.report_plotType_order, self.save_settings.norm_order);
          end
 
         
@@ -644,6 +647,9 @@
             
             update_individual_fly_log_files(self.exp_folder, self.save_settings.save_path, ...
                 analyses_run, files_excluded);
+            
+            create_pdf_report(self.save_settings.report_path, self.save_settings.save_path, ...
+                self.save_settings.report_plotType_order, self.save_settings.norm_order);
             
         end
         
