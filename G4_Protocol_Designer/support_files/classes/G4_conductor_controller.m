@@ -1386,6 +1386,7 @@ classdef G4_conductor_controller < handle
             exp_settings.processed_data_file = proc_name;
             save_settings.path_to_protocol = exp_folder;
             save_settings.save_path = save_path;
+            save_settings.report_path = fullfile(save_path, 'DA_report.pdf');
          
             new_settings_file = [settings_filename, settings_ext];
             new_settings_path = fullfile(save_path, new_settings_file);
