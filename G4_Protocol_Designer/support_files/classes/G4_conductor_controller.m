@@ -708,7 +708,7 @@ classdef G4_conductor_controller < handle
             elseif self.model.do_processing == 1 && isfile(self.model.processing_file)
                 [proc_path, proc_name, proc_ext] = fileparts(self.model.processing_file);
                 
-                processing_command = "processed_filename = " + proc_name + "(fly_results_folder, trial_options)";
+                processing_command = "process_data(fly_results_folder, self.model.processing_file)";
 
                 eval(processing_command);
                 
@@ -1393,9 +1393,10 @@ classdef G4_conductor_controller < handle
             
             %Save a new data analysis settings .mat file in this fly's
             %results folder.
-            save(new_settings_path,'exp_settings', 'normalize_settings',...
-        'histogram_plot_settings', 'histogram_annotation_settings','CL_hist_plot_settings',...
-        'timeseries_plot_settings', 'TC_plot_settings', 'save_settings');
+            save(new_settings_path,'exp_settings', 'histogram_plot_settings', ...
+        'histogram_annotation_settings','CL_hist_plot_settings',...
+        'timeseries_plot_settings', 'TC_plot_settings', 'MP_plot_settings', ...
+        'pos_plot_settings', 'save_settings','comp_settings', 'gen_settings');
 
             
             da = create_data_analysis_tool(new_settings_path, '-single', '-hist', '-tsplot', '-tcplot');
