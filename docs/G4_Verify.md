@@ -5,7 +5,7 @@ grand_parent: Generation 4
 nav_order: 4
 ---
 
-After the hardware and software setup is complete, open MATLAB and run PControl_G4. Make sure that you “allow network access” to the g4host.exe. 
+After the hardware and software setup is complete, try to start "Panel_Host". If that works, open MATLAB and run PControl_G4. Make sure that you “allow network access” to the `g4host.exe`. 
 
 Two windows will open: a LabVIEW window followed by a MATLAB GUI. Once the PControl_G4 MATLAB GUI has opened, click on the “arena” tab and click “all on”. If all pixels turn on, then the system has been set up successfully and you can continue into the next section for an overview of the software tools to begin more advanced operation of the display system.
 

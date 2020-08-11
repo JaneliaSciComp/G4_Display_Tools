@@ -2,7 +2,7 @@
 title:  G4 Protocol Designer
 parent: Display Tools
 grand_parent: Generation 4
-nav_order: 15
+nav_order: 12
 ---
 
 1. TOC
@@ -28,7 +28,7 @@ If you already have a .g4p file saved and ready to run, you can open The Experim
 
 ## Start the protocol designer.  
 
-In MATLAB open the file `G4_Experiment_Designer.m`, located in `G4_Display_Tools\G4_Protocol_Designer` and hit run. This should open the “Fly Experiment Designer” in a Window that looks like this:
+In MATLAB open the file `G4_Experiment_Designer.m`, located in `G4_Display_Tools\G4_Protocol_Designer` and hit run. This should open the "Fly Experiment Designer" in a Window that looks like this:
 
 ![Fly Experiment Designer main window](../docs/assets/screenshot-1.png)
 
@@ -36,7 +36,7 @@ In MATLAB open the file `G4_Experiment_Designer.m`, located in `G4_Display_Tools
 
 LED screen arenas come in three row screens and four row screens. Which patterns you can use are determined by the screen size you are using, so be sure to check what type of arena you’re using. 
 
-Notice the radio button at the center left of the application indicating “3 Row Screen” or “4 Row Screen.” Set this to the correct screen size before doing anything else. This setting will become disabled as soon as you import a folder, so if it is incorrect when you import, you will need to restart the application.
+Notice the radio button at the center left of the application indicating *3 Row Screen*{:.gui-btn} or *4 Row Screen*{:.gui-btn}. Set this to the correct screen size that corresponds with your [hardware setup](../docs/G4_Hardware_Setup.md) before doing anything else. This setting will become disabled as soon as you import a folder, so if it is incorrect when you import, you will need to restart the application.
 
 ## Verify your settings are correct. 
 
@@ -45,11 +45,13 @@ The next step after verifying your screen size is to verify your settings are co
 ![Fly Experiment Settings window](../docs/assets/screenshot-2.png)
 
 
-The first field in the settings panel reads “Configuration file location:” If the path to the configuration file is incorrect, please update it by using the associated browse button or by typing the correct path into the field.
+The first field in the settings panel reads *Configuration file location:*{:.gui-txt} If the path to the configuration file is incorrect, please update it by using the associated browse button or by typing the correct path into the field.
 
 ## Run, Plotting, and Processing
 
-The next three fields are paths to your default run protocol file, processing file, and plotting file. Make sure these paths are correctly set. If you would like to use your own default files, enter the paths to those files here instead. The defaults are `G4_Display_Tools\G4_Protocol_Designer\run_protocols` for the run protocol, `G4_Display_Tools\G4_Data_Analysis\data processing` for the processing file, and `G4_Display_Tools\G4_Protocol_Designer\plotting_files` for the plotting file. The default plotting file `G4_Plot_Data_flyingdetector_pdf.m` will produce a pdf report. If you prefer another type of plotting, have a look at other options in `G4_Display_Tools\G4_Data_Analysis\data plotting`.
+The next three fields are paths to your default run protocol file, processing file, and plotting file. These files are provided with the Protocol Designer and and are used to run different stages of the experiment. While there is usually no need to edit these files, they allow customization beyond the parameters provided by the Protocol Designer to advanced users.
+
+In either case, if you want to use the default files or use your own, make sure these paths are set correctly. The defaults are `G4_Display_Tools\G4_Protocol_Designer\run_protocols` for the run protocol, `G4_Display_Tools\G4_Data_Analysis\data processing` for the processing file, and `G4_Display_Tools\G4_Protocol_Designer\plotting_files` for the plotting file. The default plotting file `G4_Plot_Data_flyingdetector_pdf.m` will produce a pdf report. If you prefer another type of plotting, have a look at other options in `G4_Display_Tools\G4_Data_Analysis\data plotting`.
 
 ## Test Protocols
 
@@ -57,7 +59,7 @@ The next three lines in the settings file provide paths to test protocols for ea
 
 ## Overlapping graphs
 
-“Overlapping graphs” refers to the pdf report generated at the end of the experiment. The default is `0`, but if you would like your final graphs to plot on top of one another on a single axis, change this value to `1`.
+"Overlapping graphs" refers to the pdf report generated at the end of the experiment. The default is `0`, but if you would like your final graphs to plot on top of one another on a single axis, change this value to `1`.
 
 ## Disabled cells
 
@@ -65,7 +67,7 @@ When using the protocol designer, cells for unavailable parameters will fill wit
 
 ## Metadata GoogleSheet Properties. 
 
-Notice the separate panel at the bottom of the Settings window called Metadata GoogleSheet Properties. These keys link to an online spreadsheet from which the Conductor dynamically pulls the metadata fields. The different fields labeled with “GID” define tabs in the metadata GoogleSheet. Should the GoogleSheet be reorganized (specifically current ones deleted or new ones created) the new key will need to be obtained for that tab and replaced here. Usually, there should be no reason to change these values.
+Notice the separate panel at the bottom of the Settings window called Metadata GoogleSheet Properties. These keys link to an online spreadsheet from which the Conductor dynamically pulls the metadata fields. The different fields labeled with "GID" define tabs in the metadata GoogleSheet. Should the GoogleSheet be reorganized (specifically current ones deleted or new ones created) the new key will need to be obtained for that tab and replaced here. Usually, there should be no reason to change these values.
 
 # The Designer: Import files
 
@@ -97,52 +99,61 @@ If you select a trial in the block, then go to *File*{:.gui-btn} > *Copy To*{:.g
 
 ## Pre, Inter, and Post trials are not required.
 
-If you do not wish to have a pre-trial in your experiment, simply erase the mode and hit enter. Leaving the mode blank will disable this section. The same can be done for inter-trial and post-trial, but the block trials must have at least one trial. 
+If you do not wish to have a pre-trial in your experiment, simply erase the mode and hit enter. Leaving the mode blank will disable this section. The same can be done for inter-trial and post-trial, but the block trials must have at least one trial.
 
-## Frame Index. 
+## Frame Index.
 
-The frame index can be set in any mode, and will dictate where in the pattern library the animation will start. You may also enter “r” instead of a number as the frame index. This tells the screens to start at a random frame within the frame library. 
+The frame index can be set in any mode, and will dictate where in the pattern library the animation will start. You may also enter *r*{:.gui-txt} instead of a number as the frame index. This tells the screens to start at a random frame within the frame library.
 
-## Infinite loop pre-trial. 
+## Infinite loop pre-trial.
 
-If you want the pre-trial to run indefinitely until you are ready to move on with the experiment, enter a duration of 0. This will cause the pre-trial to continue running until you hit a key or click the mouse to indicate the experiment should continue. This can give you time to make sure your fly is fixated correctly. 
+If you want the pre-trial to run indefinitely until you are ready to move on with the experiment, enter a duration of 0. This will cause the pre-trial to continue running until you hit a key or click the mouse to indicate the experiment should continue. This can give you time to make sure your fly is fixated correctly.
 
 Here is an example of a completed experiment. Be sure to change the name of your experiment at the bottom!
 
 ![Example of a completed experiment](../docs/assets/screenshot-4.png)
 
-## Other parameters outside the tables. 
+## Other parameters outside the tables.
 
-There are a number of parameters outside the trials themselves that need to be set. 
-- You may choose whether your block trials run in sequential order or random order. 
-- You may choose how many times your experiment is repeated. For example, if “repetitions” is set to two, the pre-trial will run once, the block will run twice, with an inter-trial between each block trial, and the post-trial will run once. Note that-he inter-trial does NOT run before the first block trial OR after the last block trial. 
+There are a number of parameters outside the trials themselves that need to be set.
+
+- You may choose whether your block trials run in sequential order or random order.
+- You may choose how many times your experiment is repeated. For example, if *repetitions*{:.gui-txt} is set to two, the pre-trial will run once, the block will run twice, with an inter-trial between each block trial, and the post-trial will run once. Note that-he inter-trial does NOT run before the first block trial OR after the last block trial.
 - You need to set the sample rates for your Analog Input Channels. If you’d like to disable a channel, set the sample rate to 0.
-- You must set your screen size BEFORE importing. 
-- You must also give your experimental protocol a name at the bottom. 
+- You must set your screen size BEFORE importing.
+- You must also give your experimental protocol a name at the bottom.
 
 # Saving and opening experiments
 
 ## Saving an experiment. 
 
-You’ll notice that under the *File*{:.gui-btn} menu, there is no “Save” option, only *Save As*{:.gui-btn}. This is a safety precaution to prevent you from overwriting an older experimental protocol. When you hit *Save As*{:.gui-btn}, the application will immediately append a timestamp to the end of your experiment name and save everything in a folder of this name in whatever location you browse to. Once the save dialog has opened, you can change this name if you wish, but be careful of over-writing something important. You will not be able to get it back. 
+You’ll notice that under the *File*{:.gui-btn} menu, there is no "Save" option, only *Save As*{:.gui-btn}. This is a safety precaution to prevent you from overwriting an older experimental protocol. When you hit *Save As*{:.gui-btn}, the application will immediately append a timestamp to the end of your experiment name and save the experiment structure in a folder of this name in whatever location you browse to. Note that the experiment does not contain any data at this point, here you save the definition on how an experiment is going to be run. Once the save dialog has opened, you can change this name if you wish, but be careful of over-writing something important. You will not be able to get it back.
 
-When you save an experiment, the application will automatically export all the files you need to run said experiment. It will create an experiment folder, inside of which will be a `Patterns` Folder, `Functions` folder, and `Analog Output` folder, in addition to the `currentExp.mat` file and `.g4p` file. 
+When you save an experiment, the application will automatically export all the files you need to run said experiment. It will create an experiment folder, inside of which will be a `Patterns` Folder, `Functions` folder, and `Analog Output` folder, in addition to the `currentExp.mat` file and `.g4p` file:
 
-Once you have saved an experiment, if you want to design a new one, there is no need to close the application. Simply click the Clear All button at the top right corner, and it will clear out the currently loaded experiment. Be careful though, if you click Clear All before saving the experiment, you will lose your data!
+```
+├── Patterns
+├── Functions
+├── Analog Output
+├─ currentExp.mat
+└─ experiment.g4p
+```
 
-## Opening an experiment. 
+Once you have saved an experiment, if you want to design another one, there is no need to close the application. Simply click the *Clear All*{:.gui-btn} button at the top right corner, and it will clear out the currently loaded experiment. Be careful though, if you click *Clear All*{:.gui-btn} before saving the experiment, you will lose that setup!
 
-When you go to *File*{:.gui-btn} – *Open*{:.gui-btn}, you’ll see one or more options. *.g4p file*{:.gui-btn} is the first. Click this if you want to open an experiment file not listed. When you open an experiment, you should browse to the .g4p file inside the experiment folder and open that. Everything in the folder will automatically be imported. 
+## Opening an experiment.
 
-Below the *.g4p file*{:.gui-btn} option may be listed up to four experiment names. These are the four most recently opened .g4p files, and if you want to open one of them again, just click the name it will open automatically. When you first start using this software, there will be no recently opened files to list here, but they will appear as you use the software. 
+When you go to *File*{:.gui-btn} – *Open*{:.gui-btn}, you’ll see one or more options. *.g4p file*{:.gui-btn} is the first. Click this if you want to open an experiment file not listed. When you open an experiment, you should browse to the .g4p file inside the experiment folder and open that. Everything in the folder will automatically be imported.
 
-Keep in mind if you open an experiment, change it, and then resave it, it will not update the original experiment. It will save as a new folder because there will be a new timestamp added to the experiment name. 
+Below the *.g4p file*{:.gui-btn} option may be listed up to four experiment names. These are the four most recently opened .g4p files, and if you want to open one of them again, just click the name it will open automatically. When you first start using this software, there will be no recently opened files to list here, but they will appear as you use the software.
+
+Keep in mind if you open an experiment, change it, and then resave it, it will not update the original experiment. It will save as a new folder because there will be a new timestamp added to the experiment name.
 
 When you open an experiment, the designer will automatically populate with the appropriate trials and parameters.
 
 # Previewing an Experiment
 
-## Previewing a full trial. 
+## Previewing a full trial.
 
 The in-screen preview panel shows you a preview of the pattern or function you are working with, but you can also get a holistic preview of a selected trial. Select the box at the end of the trial you want to see and hit the *Preview*{:.gui-btn} button to the right of the preview pane. You will see a separate window pop up that looks something like this, depending on the trial:
 
@@ -150,7 +161,7 @@ The in-screen preview panel shows you a preview of the pattern or function you a
 
 You have some options to set once this window is open. Notice the *Real-time Speed*{:.gui-txt} checkbox below the position function, and the *Frame Increment*{:.gui-txt} field below that. If you hit *Play*{:.gui-btn} immediately after the preview window opens, when the *Frame Increment*{:.gui-txt} is set to `1`, the preview will play VERY slowly. This is because these patterns play on the screens at 500 or 1000 frames per second, and a frame increment of 1 means you are showing every single frame on a screen that only refreshes at approximately 20 frames per second.
 
-If you’d like to see the preview in real-time, check the *Real-time Speed*{:.gui-txt} box by the *Pause*{:.gui-btn} button. This will automatically calculate what frame increment is needed to play the trial at its set duration. Notice that while the *Real-time Speed*{:.gui-txt} box is checked, you cannot change the *Frame Increment*{:.gui-txt}. 
+If you’d like to see the preview in real-time, check the *Real-time Speed*{:.gui-txt} box by the *Pause*{:.gui-btn} button. This will automatically calculate what frame increment is needed to play the trial at its set duration. Notice that while the *Real-time Speed*{:.gui-txt} box is checked, you cannot change the *Frame Increment*{:.gui-txt}.
 
 If you would like to see the preview at some speed in the middle (fast enough that you don’t grow old waiting for it, but slow enough to get a good idea of what is happening), uncheck the *Real-time Speed*{:.gui-txt} box and set the *Frame increment*{:.gui-txt} to any number. It determines how many frames are skipped between each frame shown, so the higher the number, the faster the playback.
 
@@ -160,13 +171,13 @@ Notice on the right side there is a check box labeled *Pattern Only Video*{:.gui
 
 # Dry Run
 
-## To do a dry run of a single trial. 
+## To do a dry run of a single trial.
 
 A dry run is the running of a single trial on the LED screen arena. This trial does not activate any analog input channels and does not include any pre- or post- trials. It will run the trial selected on the screens in isolation, so you can verify it appears on the screen as you expect. To do this, select the trial you want to view and hit the *Dry Run*{:.gui-btn} button below the *Preview*{:.gui-btn} button. Please note that this will take a few seconds, as it will need to open and connect to the G4 Host. A dialog box will pop up when the screens are ready, asking you to click *Start*{:.gui-btn} or *Cancel*{:.gui-btn}. The trial will not begin running on the screens until you click *Start*{:.gui-btn}.
 
 # The Experiment Conductor
 
-## Click “Run Trials”. 
+## Click "Run Trials".
 
 If you are in the experiment designer and you are ready to run your experiment, click the *Run Trials*{:.gui-btn} button at the left of the window. This will produce a separate window, known as the experiment conductor. Note the different parts: at the top left is the experiment settings, the metadata on the right, the progress bar in the center, and the trial data at the bottom.
 
@@ -182,11 +193,11 @@ If you click Open Metadata Google Sheet and nothing happens or you get an error 
 
 Select the correct experiment type. The *Run Test Protocol*{:.gui-btn} button will run the protocol listed in the settings file as the test protocol for that type. This will allow you to see a test run on the screens and make sure it looks right. If you need to adjust these settings, you cannot presently do it from the conductor. Close the conductor, adjust the settings through *File*{:.gui-btn} -> *Settings*{:.gui-btn} on the Designer, then return the conductor when finished.
 
-## Processing and Plotting. 
+## Processing and Plotting.
 
 Select whether you would like the application to perform automatic data processing and/or plotting when the experiment is done. (Note that the software cannot do plotting without first processing the data).
 
-## Processing, Plotting, and Run Protocol paths. 
+## Processing, Plotting, and Run Protocol paths.
 
 You must set the paths to three files – the processing and plotting files (if you’ve selected to use them) and the run protocol file. The default paths in the settings file will be placed here automatically, so if you don’t wish to change from the defaults, you don’t have to do anything. However, you can change these without altering the defaults. Hit the *browse*{:.gui-btn} button at the end of each text box to change the file being used in this particular experiment.
 
@@ -207,15 +218,15 @@ Also beneath this will be the total time the experiment is expected to take.
 
 When you are ready to go, hit the *Run Experiment*{:.gui-btn} button. It will take a few seconds to connect to the G4 Host, but when everything is ready, a dialog box will pop up asking you to *Start*{:.gui-btn} or *Cancel*{:.gui-btn}. If you entered a duration of zero for your pre-trial, don’t forget you will need to hit a button to make the experiment go past the pre-trial.
 
-## Abort an experiment. 
+## Abort an experiment.
 
 If something goes wrong and you need to abort an experiment in the middle, hit the *Abort Experiment*{:.gui-btn} button. This will finish the currently running trial, then stop the experiment. It will automatically clear out any lingering log files, so once you get the dialog box saying the experiment was aborted successfully, you can hit *Run*{:.gui-btn} to restart the experiment. 
 
-## Open a subsequent experiment. 
+## Open a subsequent experiment.
 
 If you are done with the experiment currently loaded in the conductor and wish to run another, no need to close the application. Just go to *File*{:.gui-btn} – *open*{:.gui-btn} and open the new experiment. It will automatically replace the old one.
 
-## Using the conductor without the designer. 
+## Using the conductor without the designer.
 
 The conductor can also be opened on its own, without going through the experiment designer. To open the conductor directly, run the `G4_Experiment_Conductor.m` file in `G4_Display_Tools\G4_Protocol_Designer`. If you open the conductor this way, then you will need to go to *File*{:.gui-btn} – *Open*{:.gui-btn} to open the .g4p file you want to run. Other than that, it operates exactly the same as described above.
 
@@ -225,7 +236,7 @@ The conductor can also be opened on its own, without going through the experimen
 
 If you elected to run them, data analysis scripts will run when the experiment is complete. This will create a `Results` folder in your experiment folder. The Results folder will contain a folder for each fly that has been run through that particular experimental protocol, which is why giving your flies unique names is important! In each fly folder will be TDMS log files, a processed data file, and a PDF report containing the metadata and basic data analysis/plotting. The only plotting files which produce PDF reports are in `G4_Display_Tools\G4_Protocol_Designer\plotting_files`.  If you develop other data analysis files, simply replace the path for the processing or plotting files in the conductor, and those will run after the experiment instead. However, you cannot currently run more than one for each step.
 
-# How to change the run protocol for experiments. 
+# How to change the run protocol for experiments.
 
 ## The run protocol.
 
@@ -237,15 +248,15 @@ The default run protocol file is heavily commented to help you understand what e
 
 # Trouble-shooting
 
-## Common errors and how to fix them. 
+## Common errors and how to fix them.
 
 Many common errors will create a dialog box telling you there is a problem, but some of them may be vague if you are new to MATLAB or to this software. Here are some of the most error messages and what to do about them:
 
-### “You must select a trial” or “Only one trial may be selected.” 
+### "You must select a trial" or "Only one trial may be selected." 
 
 Some of the functionality in the designer can only be performed on one trial at a time. If you get this error, scroll through all your trials and make sure a second one isn’t selected somewhere. 
 
-### “You cannot edit that field in this mode.”
+### "You cannot edit that field in this mode."
 
 Most modes only allow certain parameters to be changed in that mode. You are trying to edit a parameter not available for the mode. Check the mode value for your trial and make sure it is correct for what you’re trying to do. 
 
@@ -253,17 +264,17 @@ Most modes only allow certain parameters to be changed in that mode. You are try
 
 This is not actually an error, and will not prevent you from doing anything. However, the Analog Input sample rates usually should be multiples of 1000, so this warning is there in case you miss a zero or otherwise typo a sample rate. 
 
-### "None of the patterns imported match the screen size selected.” 
+### "None of the patterns imported match the screen size selected." 
 
 Check the screen size at the center left of the designer. The patterns you’ve tried to import were made for a different size screen than you have selected. 
 
 ### "If you have imported from multiple locations, you must save your experiment before you can test it on the screens." 
 
-This is also not an error, but a warning. If you have not saved your experiment yet, then the folder this application thinks of as the “experiment folder” is the last folder you imported from. If you have imported from multiple locations and try to test a trial on the screens, it may not work if it cannot find the pattern or function it needs in the last location you imported from. You can avoid this issue by saving the experiment before you dry run a trial. 
+This is also not an error, but a warning. If you have not saved your experiment yet, then the folder this application thinks of as the "experiment folder" is the last folder you imported from. If you have imported from multiple locations and try to test a trial on the screens, it may not work if it cannot find the pattern or function it needs in the last location you imported from. You can avoid this issue by saving the experiment before you dry run a trial. 
 
 **There are also errors that you might get in MATLAB that don’t produce a dialog box. Some common ones include: **
 
-### “Error using fileread. Could not open file HHMI Panels Configuration.ini.” 
+### "Error using fileread. Could not open file HHMI Panels Configuration.ini." 
 
 If you get this error message regarding the configuration file or any other important file, check that the path to this file is correct in your settings file, and make sure the file is on your MATLAB path. If you get this file regarding the `G4_Protocol_Designer_Settings.m` file, make sure it is located in `G4_Display_Tools\G4_Protocol_Designer`. Do not move it from this location. If you get this error regarding the `recently_opened_g4p_files.m` file, please make sure it is located in `G4_Display_Tools\G4_Protocol_Designer\support_files`. DO NOT edit this file. 
 
