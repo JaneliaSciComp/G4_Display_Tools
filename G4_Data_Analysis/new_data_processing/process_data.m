@@ -257,8 +257,12 @@ function process_data(exp_folder, processing_settings_file)
     
     %calculate histograms of/by pattern position - normalized and
     %unnormalized
-    hist_data = calculate_histograms(da_data, hist_datatypes, Frame_ind, num_conds, num_reps,...
-    LmR_ind, LpR_ind);
+    if ~isempty(hist_datatypes)
+        hist_data = calculate_histograms(da_data, hist_datatypes, Frame_ind, num_conds, num_reps,...
+        LmR_ind, LpR_ind);
+    else
+        hist_data = [];
+    end
     
     %get histogram of intertrial pattern position
     %get histogram of intertrial pattern position
