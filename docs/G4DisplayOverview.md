@@ -1,7 +1,7 @@
 ---
 title: Setting up an experiment - an overview
 parent: Getting Started
-nav_order: 1
+nav_order: 3
 ---
 
 # Setting up an experiment
