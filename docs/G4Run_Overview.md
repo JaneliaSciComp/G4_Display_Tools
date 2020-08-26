@@ -34,7 +34,7 @@ There is a detailed tutorial taking you through the set up of these google sheet
 
 Log in to a google drive account and create a new google sheet. That google sheet should have a tab for each metadata field. Here is an example taken from our google sheet.
 
-![google sheet example](assets/googleShet_scrShot.png)
+![google sheet example](assets/googleSheet_scrShot.png)
 
 In this example, the drop down field in the conductor will have two options for light cycle: 01 17 and 21 13. For the user's convenience, there is a button on the conductor linked to this google sheet, so if a user couldn't remember what these codes meant, they could simply click "Open googlesheet" and check in the notes. In addition, if a user needs to add a new metadata value which does not exist in the drop down lists, they can click "Open googlesheet" and add the new value directly to the sheet, so from then on it will be an option in the associated dropdown list. 
 
