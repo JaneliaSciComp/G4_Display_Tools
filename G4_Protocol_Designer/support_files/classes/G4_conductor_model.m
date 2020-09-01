@@ -207,7 +207,7 @@ classdef G4_conductor_model < handle
         
         function set_fly_genotype(self, new_val)
             self.fly_genotype = self.metadata_options.fly_geno{new_val};
-            self.update_fly_save_name(self);
+            self.update_fly_save_name();
         end
         
         function set_do_plotting(self, new_val)
