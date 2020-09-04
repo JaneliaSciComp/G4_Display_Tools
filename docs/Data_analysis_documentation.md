@@ -2,7 +2,8 @@
 title:  G4 Data Analysis
 parent: Display Tools
 grand_parent: Generation 4
-nav_order: 13
+nav_order: 14
+has_children: true
 ---
 
 1. TOC

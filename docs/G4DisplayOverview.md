@@ -29,7 +29,7 @@ The first thing you need to do is create any patterns:
 and/or functions:
 ![function](assets/function.png)
 
-that will be necessary for the experiment. You don't want to create a pattern and add it to the experiment one at a time - create all your patterns and functions up front. You can do this using the ![G4 Motion Maker](../Motion_Maker_G4/About Motion Maker.md) for patterns and ![G4 Function Maker](../Function_Maker_G4/About Function Maker.md) for functions. 
+that will be necessary for the experiment. You don't want to create a pattern and add it to the experiment one at a time - create all your patterns and functions up front. You can do this using the [G4 Motion Maker](../Motion_Maker_G4/About Motion Maker.md) for patterns and [G4 Function Maker](../Function_Maker_G4/About Function Maker.md) for functions. 
 
 Once your patterns and functions, if you need them, have been created, you want to open the [G4 Protocol Designer](../G4_Protocol_Designer/User-Instructions.md). This software will allow you to import the patterns and functions you've created and organize them into trials. It will also allow you to set many other parameters, like the size of your screen, whether you want trials randomized, how many times the protocol should be repeated, and much  more. 
 

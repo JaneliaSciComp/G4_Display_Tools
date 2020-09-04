@@ -56,7 +56,7 @@ Once your settings file is as you want it, you will run the function create_sett
 
 It's important to note that your experiment folder must follow a certain structure for this to work. The data analysis settings allows you to provide information which will let the software automatically pull data for flies you are interested in. For example, you can tell it that you want all flies of genotype1 and run by one experimenter in one group, and all flies of that same genotype but run by a different experimenter in a second group. Then your data analysis would be comparing flies of the same genotype run by two different experimenters. However, this sorting behavior requires that your experiment structure be set up in this general structure: 
 
-![File organization](assets/fileOrg.png)
+![File organization](assets/folderOrg.png)
 
 The protocol folder refers to the folder which contains your .g4p file as well as an pattern or function folders. Inside the protocol folder should be some subfolders which organize your flies in some way. In our case, we create a folder for each date. That folder then contains the results of all flies run on that date. But these could be by genotype or any other organizational scheme. The important thing is that each individual fly folder, which contains that fly's results, are two levels below the protocol folder, as shown here. 
 
