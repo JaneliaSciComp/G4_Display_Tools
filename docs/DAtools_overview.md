@@ -26,7 +26,7 @@ It takes a little bit of work to parse these raw vectors into meaningful dataset
 
 ## How to set up automatic data processing
 
-Please see the [Display Tools Section](../README.md) for an introduction to the data processing tools and detailed tutorials on how to use it. Here I will give you a general idea of what's required. 
+Please see the [G4 Data Analysis section](Data_analysis_documentation.md) for an introduction to the data processing tools and detailed tutorials on how to use it. Here I will give you a general idea of what's required. 
 
 You will access a file we provided called create_processing_settings.m. This file contains many different parameters, which is covered in detail in the tutorials. Essentially, you will provide information such as file name and save locations, information pertaining to the structure of your experiment, information pertaining to channels you used and datatypes you'd like to analyze, and provide parameters for normalization and error checking. When you have your settings the way you want them, you can run the file and it will create a .mat file wherever you specified. This .mat file contains your processing settings. 
 
@@ -46,7 +46,7 @@ The analyses included in this tools are:
 - Position series plots (Similar to timeseries but adjusted so the data is plotted against the position of the pattern instead of time. Only relevant for certain types of stimulus)
 - A comparison plot which creates numerous of the above plots side by side for each trial for easy comparison. 
 
-If you'd like to set this up to run automatically, please see the detailed tutorials in [Display Tools](../README.md). Here's a general run  down. 
+If you'd like to set this up to run automatically, please see the detailed tutorials in [G4 Data Analysis](Data_analysis_documentation.md). Here's a general run  down. 
 
 The first thing you will do, much like the data processing set, is open the file DA_plot_settings.m.  You will notice that this settings file is far longer than the processing settings file. It will take a while to get used to the plethora of options here, so I highly recommend following our tutorial the first time you set this up. There is currently an application with a user interface in development to replace this file, to make it easier for you to configure your data analysis settings, and it will be included with future releases. 
 

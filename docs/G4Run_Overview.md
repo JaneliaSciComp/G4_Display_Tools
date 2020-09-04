@@ -8,7 +8,7 @@ nav_order: 4
 
 At this point, you should understand, in broad strokes at least, what it entails to create an experiment. To learn to create an experiment in detail and access tutorials regarding the Motion Maker, Function Maker, and G4 Protocol Designer, see the [Display Tools](../README.md) page. 
 
-Once you've created and saved an experiment, you will use the [G4 Conductor](../G4_Protocol_Designer/User-Instructions.md) to run it. 
+Once you've created and saved an experiment, you will use the [G4 Conductor](G4_Conductor_Manual.md) to run it. 
 
 ![G4 Conductor](assets/conductor_scrShot.png)
 
@@ -46,7 +46,7 @@ Once the metadata is configured, using the Conductor is a breeze. If you have no
 
 There is also a field for your "run protocol." This is a file that determines how exactly trials on run on the screens. There is a default run protocol provided and that will be the default path here. If you wanted to create your own custom run protocol, you will first need to learn how to use the G4_Control tool discussed under [Display Tools](../README.md).
 
-The last thing you should be aware of is the "Run Test Protocol" button. If you click this, the conductor will load a preset, short protocol that is designed to quickly test the fly and see if they are fixating correctly. It could also be used to make sure the screens are displaying correctly. A default test protocol has been provided, but you can always create your own and make it the default in the Designer settings. You can find more details in [Display Tools](../README.md). 
+The last thing you should be aware of is the "Run Test Protocol" button. If you click this, the conductor will load a preset, short protocol that is designed to quickly test the fly and see if they are fixating correctly. It could also be used to make sure the screens are displaying correctly. A default test protocol has been provided, but you can always create your own and make it the default in the Designer settings. You can find more details in the [G4 Protocol Designer](G4_Designer_Manual.md). 
 
 Assuming the conductor is configured and your defaults are set, all you need to do is select your experiment type, fill in your metadata, and hit Run. A progress bar will appear, keeping you updated on which condition is running and what patterns or functions it is using (if any). After the progress bar fills, the text directly above it will read "post-processing" and eventually "Experiment Finished," at which point you can start your next experiment. If, at any point during the experiment, something goes wrong, you can click "Abort." This will save any data you have collected and stop the experiment. You can hit "Run" again to start over or get out of the program if you don't want to continue. 
 

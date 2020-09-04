@@ -23,6 +23,10 @@ Before you begin, please note that the Pattern, Position function, and AO functi
 - Position Functions, at a minimum, must be a struct named pfnparam with fields `pfnparam.gs_val`, `pfnparam.func`, and `pfnparam.size`
 - Ao Functions must be a struct named afnparam with fields `afnparam.func`, `afnparam.size`, and `afnparam.ID`
 
+# Tutorials
+
+This page constitutes the main user manual for the G4 Protocol Designer, but there are a number of additional tutorials to help you get set up. If you need more guidance, please scroll to the bottom of this page for a list of available tutorials.
+
 # The Designer: Start-up
 
 If you already have a .g4p file saved and ready to run, you can open The Experiment Conductor directly instead of using the designer.
@@ -287,5 +291,7 @@ In this document visual aids transport specific meanings. Hopefully this is intu
 # Contact
 
 If you need assistance or would like to talk about the G4 Designer software further, you can contact Lisa (Taylor) Ferguson, Scientific Computing Associate, at <taylorl@janelia.hhmi.org>.
+
+# Tutorials
 
 {::comment}this was copied from the original file `User_Instructions.docx`{:/comment}

@@ -3,6 +3,7 @@ title:  G4 Experiment Conductor
 parent: Display Tools
 grand_parent: Generation 4
 nav_order: 13
+has_children: true
 ---
 
 1. TOC
@@ -22,7 +23,9 @@ The window that opens should look something like this:
 
 The top left section contains settings for your experiment. The top right section is where you can fill in some basic experiment metadata. The center displays a progress bar, or will once an experiment begins running. Once you begin running an experiment, data relating to the current trial will display along the bottom. 
 
-*Note: You must have set up a metadata google sheet and connected it to the G4 software through the G4 Designer Settings. If you have not done this, the Conductor will not open properly. Please see the [tutorial on how to set this up](../docs/googlesheet_tutorial.md).*
+*Note: You must have set up a metadata google sheet and connected it to the G4 software through the G4 Designer Settings. If you have not done this, the Conductor will not open properly.* 
+
+{::comment}Please see the [tutorial on how to set this up](googlesheet_tutorial.md).{:/comment}
 
 # Fill out the metadata
 
@@ -103,3 +106,5 @@ The run protocol does not refer to the .g4p file, but refers to the way in which
 If you create your own run protocol, please do not forget that you must change the path in the conductor to your new file. 
 
 The default run protocol file is heavily commented to help you understand what each piece of code goes, but if you are confused about something, you can always contact Lisa Taylor at her contact information at the bottom of this document. 
+
+# Tutorials
