@@ -233,14 +233,14 @@ For an overview on how this works, please see the [Data analysis overview](../do
 
 This pretty much covers the G4 Designer's features and how to use them. However, if you still have any questions or issues, you may refer to one of the additional resources below: 
 
-- [This additional information about the experiment modes](../docs/experiment_modes.md)
-- [This tutorial on how to set up your Designer settings](../docs/settings_tutorial.md)
+{::comment}- [This additional information about the experiment modes](../docs/experiment_modes.md)
+- [This tutorial on how to set up your Designer settings](../docs/settings_tutorial.md){:/comment}
 - [This tutorial on how to set up your metadata googlesheet](../docs/googlesheet_tutorial.md)
-- [This tutorial on how to create a single condition](../docs/condition_tutorial.md)
+{::comment}- [This tutorial on how to create a single condition](../docs/condition_tutorial.md)
 - [This tutorial on how to create a full experiment](../docs/experiment_tutorial.md)
 - [This tutorial on how to use the arena without the Designer](../docs/screenTCP_tutorial.md)
 - [This tutorial on how to set up automatic data processing](../docs/processing_tutorial.md)
-- [This tutorial on how to set up automatic data analysis](../docs/analysis_tutorial.md)
+- [This tutorial on how to set up automatic data analysis](../docs/analysis_tutorial.md){:/comment}
 
 ## Trouble-shooting
 

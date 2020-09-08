@@ -52,7 +52,7 @@ Look at the bottom of your google sheet and you will see a section that looks li
 
 ![Initial tabs](assets/addTab.png)
 
-You can rename Sheet1 by simply double-clicking on the text. Alternatively, click the black down-pointing arrow to the right of "Sheet1" and select "rename" from the menu that is provided. Rename this tab to "Users" or something similar. 
+You can rename Sheet1 by simply double-clicking on the text. Alternatively, click the down-pointing arrow to the right of "Sheet1" and select "rename" from the menu that is provided. Rename this tab to "Users" or something similar. 
 
 To add a second tab, click on the small black plus sign to the left of your first tab. When you hover your mouse over it, text will pop up that says "Add Sheet." This terminology might be a little confusing, but "tab" and "sheet" are interchangeable here. 
 
@@ -78,7 +78,7 @@ With all of this in mind, go through each tab and enter a starting set of values
 
 So the google sheet is done. Great! But how does the Conductor access these values? 
 
-To give it access, we must open the [G4 Protocol Designer](G4_Designer_Manual.md). If you've never opened the designer before, follow that link for details on how to open it. Simply put, you can browse to G4_Display_Tools/G4_Protocol_Designer/G4_Protocol_Designer.m, open this file in matlab, and run it. Assuming your path is set up correctly and you have your configuration file in place, it should open the main Designer window. 
+To give it access, we must open the [G4 Protocol Designer](G4_Designer_Manual.md). If you've never opened the designer before, [click here](G4_Designer_Manual.md) for details on how to open it. Simply put, you can browse to G4_Display_Tools/G4_Protocol_Designer/G4_Protocol_Designer.m, open this file in matlab, and run it. Assuming your path is set up correctly and you have your configuration file in place, it should open the main Designer window. 
 
 Once it's open, go to *File*{:.gui-btn} -> *Settings*{:.gui-btn} at the top left corner. This window should appear:
 
@@ -104,11 +104,11 @@ Your settings window should now look more similar to the photo above, with all t
 
 You should now be able to open the [G4 Experiment Conductor](G4_Conductor_Manual.md) without error. When you do, check the drop down lists in your metadata panel. They should contain all the values you have provided in your googlesheet, and look something like this:
 
-[metadata panel](assets/metadataPanel.png)
+![metadata panel](assets/metadataPanel.png)
 
-[metadata list opened](assets/metadataPanel_open.png)
+![metadata list opened](assets/metadataPanel_open.png)
 
-To be sure everything has worked correctly, click the *Open Metadata Google Sheet*{:.gui-btn} button. Assuming you are connected to the internet, this should open the google sheet you just created in your browser. If you get an error, see the [G4 Conductor Manual](G4_Conductor_Manual.md) for some common errors and their solutions.
+To be sure everything has worked correctly, click the *Open Metadata Google Sheet*{:.gui-btn} button. Assuming you are connected to the internet, this should open the google sheet you just created in your browser. If you get an error, see the [Final Details](G4_Designer_Manual.md) in the G4 Designer Manual for some common errors and their solutions.
 
 
 
