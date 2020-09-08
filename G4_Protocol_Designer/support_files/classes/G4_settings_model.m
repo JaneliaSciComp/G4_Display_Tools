@@ -13,9 +13,12 @@ classdef G4_settings_model < handle
         flight_test_protocol_
         cam_walk_test_protocol_
         chip_walk_test_protocol_
+        test_run_protocol_
+        test_process_file_
+        test_plot_file_
         uneditable_cell_color_
         uneditable_cell_text_
-        overlapping_graphs_
+
         
         list_of_setting_strings_
         list_of_settings_needed_
@@ -39,9 +42,11 @@ classdef G4_settings_model < handle
         flight_test_protocol
         cam_walk_test_protocol
         chip_walk_test_protocol
+        test_run_protocol
+        test_process_file
+        test_plot_file
         uneditable_cell_color
         uneditable_cell_text
-        overlapping_graphs
         
         list_of_setting_strings
         list_of_settings_needed
@@ -66,12 +71,13 @@ classdef G4_settings_model < handle
             %These two cell arrays will constitute the fields and values of
             %hte lines_to_match struct. They must be in matching order. 
             fields = {'config', 'key', 'run', 'proc', 'plot', 'flight', ...
-                'cam', 'chip', 'overlap', 'color', 'text', 'usersGID', 'ageGID', ...
+                'cam', 'chip', 'testrun', 'testproc', 'testplot', 'color', 'text', 'usersGID', 'ageGID', ...
                 'sexGID', 'genoGID', 'tempGID', 'rearingGID', 'lightGID', };
             lines = {'Configuration File Path: ', 'Metadata Google Sheet key: ',  ...
                 'Default run protocol file: ', 'Default processing file: ', 'Default plotting file: ', ...
                 'Flight test protocol file: ', 'Camera walk test protocol file: ', ...
-                'Chip walk test protocol file: ', 'Overlapping graphs: ', 'Color to fill uneditable cells: ', ...
+                'Chip walk test protocol file: ', 'Default test run protocol file: ', ...
+                'Default test processing file: ', 'Default test plotting file: ', 'Color to fill uneditable cells: ', ...
                 'Text to fill uneditable cells: ','Users Sheet GID: ', ...
                 'Fly Age Sheet GID: ', 'Fly Sex Sheet GID: ', 'Fly Geno Sheet GID: ', ...
                 'Experiment Temp Sheet GID: ', 'Rearing Protocol Sheet GID: ', 'Light Cycle Sheet GID: ',};
@@ -79,15 +85,16 @@ classdef G4_settings_model < handle
             %These strings must match the string
             %preceding the corresponding value in the settings file -
             %including the space after the :
-            self.list_of_setting_strings = lines(1:11);
-            self.list_of_gid_strings = lines(12:end);
+            self.list_of_setting_strings = lines(1:13);
+            self.list_of_gid_strings = lines(14:end);
             
             %These strings must match the class property names they
             %correspond to.
             self.list_of_settings_needed = {'config_filepath', 'metadata_sheet_key', ...
                 'default_run_protocol', 'default_proc_protocol', 'default_plot_protocol', ...
                  'flight_test_protocol', 'cam_walk_test_protocol', 'chip_walk_test_protocol', ...
-                 'overlapping_graphs', 'uneditable_cell_color', 'uneditable_cell_text'};
+                 'test_run_protocol', 'test_process_file', 'test_plot_file', ...
+                 'uneditable_cell_color', 'uneditable_cell_text'};
              
              %These names used as struct fields to store all the GID values
              %- if metadata fields are added or subtracted, change this to
@@ -197,9 +204,6 @@ classdef G4_settings_model < handle
         function set.uneditable_cell_text(self, value)
             self.uneditable_cell_text_ = value;
         end
-        function set.overlapping_graphs(self, value)
-            self.overlapping_graphs_ = value;
-        end
         function set.list_of_setting_strings(self, value)
             self.list_of_setting_strings_ = value;
         end
@@ -214,6 +218,15 @@ classdef G4_settings_model < handle
         end
         function set.lines_to_match(self, value)
             self.lines_to_match_ = value;
+        end
+        function set.test_run_protocol(self, value)
+            self.test_run_protocol_ = value;
+        end
+        function set.test_process_file(self, value)
+            self.test_process_file_ = value;
+        end
+        function set.test_plot_file(self, value)
+            self.test_plot_file_ = value;
         end
 
         %% Getters
@@ -257,9 +270,6 @@ classdef G4_settings_model < handle
         function value = get.uneditable_cell_text(self)
             value = self.uneditable_cell_text_;
         end
-        function value = get.overlapping_graphs(self)
-            value = self.overlapping_graphs_;
-        end
         function value = get.list_of_setting_strings(self)
             value = self.list_of_setting_strings_;
         end
@@ -274,6 +284,15 @@ classdef G4_settings_model < handle
         end
         function value = get.lines_to_match(self)
             value = self.lines_to_match_;
+        end
+        function value = get.test_run_protocol(self)
+            value = self.test_run_protocol_;
+        end
+        function value = get.test_process_file(self)
+            value = self.test_process_file_;
+        end
+        function value = get.test_plot_file(self)
+            value = self.test_plot_file_;
         end
        
 

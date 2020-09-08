@@ -20,9 +20,12 @@ classdef G4_settings_view < handle
         flight_test_textbox_
         walkCam_test_textbox_
         walkChip_test_textbox_
+        test_run_textbox_
+        test_process_textbox_
+        test_plot_textbox_
         disabled_color_textbox_
         disabled_text_textbox_
-        overlapping_graphs_textbox_
+
 
     end
     
@@ -45,9 +48,11 @@ classdef G4_settings_view < handle
         flight_test_textbox
         walkCam_test_textbox
         walkChip_test_textbox
+        test_run_textbox
+        test_process_textbox
+        test_plot_textbox
         disabled_color_textbox
         disabled_text_textbox
-        overlapping_graphs_textbox
 
     end
     
@@ -58,9 +63,9 @@ classdef G4_settings_view < handle
             %% User adjusted values to control appearance and object
             %positions
             self.con = controller;
-            figure_position = [.2 .2 .6 .6];
+            figure_position = [.1 .1 .8 .8];
             top_left_label = [.01,.95, .24, .04]; %position of the first label
-            gap_between_edges = .012; %size gap between objects
+            gap_between_edges = .0052; %size gap between objects
             textbox_label_ratio = 2.5; %ratio of the textbox size to the label size
             button_textbox_ratio = .15; %ratio of the button size to the textbox size
             panel_height = .4;
@@ -169,21 +174,58 @@ classdef G4_settings_view < handle
             browse7_pos = self.calc_new_browse_position(chip_box_pos, gap_between_edges, button_textbox_ratio);
             chip_browse_button = self.create_button(self.fig, 'Browse', browse7_pos);
             
-            %% Whether you want overlapping graphs in data plotting
-            %Overlapping Graphs - label
+            %% Default run protocol for the TEST
+            %Def run protocol for test - label
             
-            graphs_label_pos = self.calc_new_label_position(chip_label_pos, gap_between_edges);
-            graphs_label = self.create_label(self.fig, 'Overlapping graphs (0 or 1): ', graphs_label_pos);
+            testRun_label_pos = self.calc_new_label_position(chip_label_pos, gap_between_edges);
+            testRun_label = self.create_label(self.fig, 'Default Run Protocol for Test: ', testRun_label_pos);
             
-            %overlapping graphs - textbox
+            %Def run protocol for test - textbox
             
-            graphs_box_pos = self.calc_new_textbox_position(graphs_label_pos, gap_between_edges, textbox_label_ratio);
-            self.overlapping_graphs_textbox = self.create_text_box(self.fig, self.con.model.overlapping_graphs, graphs_box_pos);
+            testRun_box_pos = self.calc_new_textbox_position(testRun_label_pos, gap_between_edges, textbox_label_ratio);
+            self.test_run_textbox = self.create_text_box(self.fig, self.con.model.test_run_protocol, testRun_box_pos);
             
+            %Def run protocol for test - browse button
+            browse8_pos = self.calc_new_browse_position(testRun_box_pos, gap_between_edges, button_textbox_ratio);
+            testRun_browse_button = self.create_button(self.fig, 'Browse', browse8_pos);
+            %% Default processing file for the TEST 
+            
+            %Def process file for test - label
+            
+            test_process_label_pos = self.calc_new_label_position(testRun_label_pos, gap_between_edges);
+            test_process_label = self.create_label(self.fig, 'Default Processing file for Test: ', test_process_label_pos);
+            
+            %Def process file for test - textbox
+            
+            test_process_box_pos = self.calc_new_textbox_position(test_process_label_pos, gap_between_edges, textbox_label_ratio);
+            self.test_process_textbox = self.create_text_box(self.fig, self.con.model.test_process_file, test_process_box_pos);
+            
+            %Def process file for test - browse button
+            browse9_pos = self.calc_new_browse_position(test_process_box_pos, gap_between_edges, button_textbox_ratio);
+            test_process_browse_button = self.create_button(self.fig, 'Browse', browse9_pos);
+            
+            %% Default plotting file for the TEST
+            
+            %Def plot file for test - label
+            
+            test_plot_label_pos = self.calc_new_label_position(test_process_label_pos, gap_between_edges);
+            test_plot_label = self.create_label(self.fig, 'Default Plotting file for Test: ', test_plot_label_pos);
+            
+            %Def plot file for test - textbox
+            
+            test_plot_box_pos = self.calc_new_textbox_position(test_plot_label_pos, gap_between_edges, textbox_label_ratio);
+            self.test_plot_textbox = self.create_text_box(self.fig, self.con.model.test_plot_file, test_plot_box_pos);
+            
+            %Def plot file for test - browse button
+            
+            browse10_pos = self.calc_new_browse_position(test_plot_box_pos, gap_between_edges, button_textbox_ratio);
+            test_plot_browse_button = self.create_button(self.fig, 'Browse', browse10_pos);
+            
+           
             %% The fill color of disabled cells
             %Disabled cell color - label
             
-            color_label_pos = self.calc_new_label_position(graphs_label_pos, gap_between_edges);
+            color_label_pos = self.calc_new_label_position(test_plot_label_pos, gap_between_edges);
             color_label = self.create_label(self.fig, 'Color of disabled cells: ', color_label_pos);
             
             %Disabled cell color - textbox
@@ -288,6 +330,9 @@ classdef G4_settings_view < handle
             set(flight_browse_button, 'Callback', @self.browse_for_flight);
             set(cam_browse_button, 'Callback', @self.browse_for_walkCam);
             set(chip_browse_button, 'Callback', @self.browse_for_walkChip);
+            set(testRun_browse_button, 'Callback', @self.browse_for_testRun);
+            set(test_process_browse_button, 'Callback', @self.browse_for_testProc);
+            set(test_plot_browse_button, 'Callback', @self.browse_for_testPlot);
 
             
         end
@@ -312,7 +357,9 @@ classdef G4_settings_view < handle
            self.con.check_valid_flight_file(self.flight_test_textbox.String);
            self.con.check_valid_camWalk_file(self.walkCam_test_textbox.String);
            self.con.check_valid_chipWalk_file(self.walkChip_test_textbox.String);
-           self.con.check_valid_overlap(str2double(self.overlapping_graphs_textbox.String));
+           self.con.check_valid_test_run(self.test_run_textbox.String);
+           self.con.check_valid_test_process(self.test_process_textbox.String);
+           self.con.check_valid_test_plot(self.test_plot_textbox.String);
            self.con.check_valid_color(self.disabled_color_textbox.String);
            
            %Currently no validity testing for the following
@@ -398,6 +445,28 @@ classdef G4_settings_view < handle
             if new_file ~= 0
                 self.walkChip_test_textbox.String = new_file;
                 
+            end
+        end
+        
+        function browse_for_testRun(self, ~, ~)
+            
+            new_file = self.con.browse('*.m');
+            if new_file ~= 0
+                self.test_run_textbox.String = new_file;
+            end
+        end
+        function browse_for_testProc(self, ~, ~)
+            
+            new_file = self.con.browse('*.mat');
+            if new_file ~= 0
+                self.test_process_textbox.String = new_file;
+            end
+        end
+        function browse_for_testPlot(self, ~, ~)
+            
+            new_file = self.con.browse('*.mat');
+            if new_file ~= 0
+                self.test_plot_textbox.String = new_file;
             end
         end
         
@@ -501,10 +570,15 @@ classdef G4_settings_view < handle
         function value = get.disabled_text_textbox(self)
             value = self.disabled_text_textbox_;
         end
-        function value = get.overlapping_graphs_textbox(self)
-            value = self.overlapping_graphs_textbox_;
+        function value = get.test_run_textbox(self)
+            value = self.test_run_textbox_;
         end
-        
+        function value = get.test_process_textbox(self)
+            value = self.test_process_textbox_;
+        end
+        function value = get.test_plot_textbox(self)
+            value = self.test_plot_textbox_;
+        end
         %% Setters
 
         function set.fig(self, value)
@@ -564,9 +638,17 @@ classdef G4_settings_view < handle
         function set.disabled_text_textbox(self, value)
             self.disabled_text_textbox_ = value;
         end
-        function set.overlapping_graphs_textbox(self, value)
-            self.overlapping_graphs_textbox_ = value;
+        function set.test_run_textbox(self, value)
+            self.test_run_textbox_ = value;
         end
+        function set.test_process_textbox(self, value)
+            self.test_process_textbox_ = value;
+        end
+        function set.test_plot_textbox(self, value)
+            self.test_plot_textbox_ = value;
+        end
+
+
 
         
     end

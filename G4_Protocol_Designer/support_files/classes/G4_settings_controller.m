@@ -61,10 +61,12 @@ classdef G4_settings_controller < handle
             self.view.flight_test_textbox.String = self.model.flight_test_protocol;
             self.view.walkCam_test_textbox.String = self.model.cam_walk_test_protocol;
             self.view.walkChip_test_textbox.String = self.model.chip_walk_test_protocol;
+            self.view.test_run_textbox.String = self.model.test_run_protocol;
+            self.view.test_process_textbox.String = self.model.test_process_file;
+            self.view.test_plot_textbox.String = self.model.test_plot_file;
             self.view.disabled_color_textbox.String = self.model.uneditable_cell_color;
             self.view.disabled_text_textbox.String = self.model.uneditable_cell_text;
-            self.view.overlapping_graphs_textbox.String = self.model.overlapping_graphs;
-        
+
         end
         
         %% Functions to check input values are correct. If valid, these 
@@ -146,16 +148,39 @@ classdef G4_settings_controller < handle
             
         end
         
-        function check_valid_overlap(self, value)
+        function check_valid_test_run(self, filepath)
             
-            if value == 0 || value == 1
-                self.model.overlapping_graphs = num2str(value);
-                self.model.set_new_setting(self.model.lines_to_match.overlap, num2str(value));
+            if isfile(filepath)
+                self.model.test_run_protocol = filepath;
+                self.model.set_new_setting(self.model.lines_to_match.testrun, filepath);
             else
-                disp("Your overlapping graphs value must be 0 or 1");
+                self.create_error_box("This run protocol filepath does not exist.");
             end
             
         end
+        
+        function check_valid_test_process(self, filepath)
+            
+            if isfile(filepath)
+                self.model.test_process_file = filepath;
+                self.model.set_new_setting(self.model.lines_to_match.testproc, filepath);
+            else
+                self.create_error_box("This processing file does not exist.");
+            end
+            
+        end
+        
+        function check_valid_test_plot(self, filepath)
+            
+            if isfile(filepath)
+                self.model.test_plot_file = filepath;
+                self.model.set_new_setting(self.model.lines_to_match.testplot, filepath);
+            else
+                disp("This plotting file does not exist.");
+            end
+            
+        end
+        
         
         function check_valid_color(self, string)
             
