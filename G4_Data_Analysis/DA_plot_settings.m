@@ -16,7 +16,7 @@ function [exp_settings, histogram_plot_settings, histogram_annotation_settings, 
     save_settings.save_path = '/Users/taylorl/Desktop/CT1_Ablation_03-16-20_12-39-26/Plots';
     
     save_settings.report_path = '/Users/taylorl/Desktop/CT1_Ablation_03-16-20_12-39-26/Plots/DA_report.pdf';
-    save_settings.report_plotType_order = {'hist','timeseries', 'TC', 'M_', 'P_', 'MeanPositionSeries', 'Comparison'};
+    save_settings.report_plotType_order = {'_hist_','timeseries', 'TC', 'M_', 'P_', 'MeanPositionSeries', 'Comparison'};
     save_settings.norm_order = {'unnormalized', 'normalized'};
     
     %Field names are metadata field names
