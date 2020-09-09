@@ -90,7 +90,7 @@ function plot_basic_histograms(timeseries_data, interhistogram_data, ...
         %         title(['Group ' num2str(g)],'FontSize',subtitle_FontSize);
                 genotypeStr = convertCharsToStrings(genotype{g});
                 num_expsStr = convertCharsToStrings(num_exps);        
-                title(genotypeStr,'FontSize',subtitle_FontSize);
+                title(genotypeStr,'FontSize',subtitle_FontSize,'interpreter','none');
                 %text
     %             annotation('textbox',[0.3 0.0001 0.7 0.027],'String',"empty split: " + e + " flies run from 08/08/19 to 08/13/19", ...
     %                 'FontSize' ,10,'FontName','Arial','LineStyle','-','EdgeColor',[1 1 1],'LineWidth',1,'BackgroundColor',[1 1 1],'Color',[0 0 0],'Interpreter', 'none'); %e is number of experiments
@@ -107,7 +107,7 @@ function plot_basic_histograms(timeseries_data, interhistogram_data, ...
                 hold on
                 xl = xlim;
                 plot(xl,[avg avg],'--','Color',rep_Colors(g,:)','LineWidth',mean_LineWidth)
-                title(datastr,'FontSize',subtitle_FontSize);
+                title(datastr,'FontSize',subtitle_FontSize,'interpreter','none');
                 currPlot = gca;
                 set(currPlot, 'FontSize', 8);
             end
@@ -169,6 +169,7 @@ function plot_basic_histograms(timeseries_data, interhistogram_data, ...
                 
                 subplot(2+num_TC_datatypes,num_plot_groups,(1+num_TC_datatypes)*num_plot_groups+plot_group)
                 plot(fly_line','Color',rep_Colors(g,:),'LineWidth',rep_LineWidth)
+                hold on;
                 
                 if plot_in_degrees == 1
                      x = xlim;
@@ -182,7 +183,12 @@ function plot_basic_histograms(timeseries_data, interhistogram_data, ...
 
                     xticklabels(string(tick_labels));
                     xlabel('Degrees');
-               end
+                end
+               
+                avg_val = mean(fly_line);
+                xl_fly = xlim;
+                plot(xl_fly,[avg_val avg_val],'--','Color',rep_Colors(g,:)','LineWidth',rep_LineWidth)
+                
                 
             
             end

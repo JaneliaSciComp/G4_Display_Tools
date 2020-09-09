@@ -21,6 +21,7 @@ function plot_OL_timeseries(timeseries_data, timestampsIN, OL_conds, OL_duration
     plot_opposing_directions = plot_settings.plot_both_directions;
     control_color = gen_settings.control_color;
     show_ind_flies = plot_settings.show_individual_flies;
+    show_ind_reps = plot_settings.show_individual_reps;
     y_fontsize = gen_settings.yLabel_fontSize;
     x_fontsize = gen_settings.xLabel_fontSize;
     fly_Colors = gen_settings.fly_colors;
@@ -57,18 +58,34 @@ function plot_OL_timeseries(timeseries_data, timestampsIN, OL_conds, OL_duration
                     
                     if cond>0
                         better_subplot(num_plot_rows, num_plot_cols, placement, gap_x, gap_y)
+                        yline(0, 'k--');
                         hold on
                         for g = 1:num_groups
-                            tmpdata = squeeze(timeseries_data(g,:,d,cond,:));
+                            if single && show_ind_reps
+                                num_reps = size(timeseries_data,5);
+                                tmpdata = squeeze(timeseries_data(g,:,d,cond,:,:));
+                                 
+                            else
+                                num_reps = 0;
+                                tmpdata = squeeze(timeseries_data(g,:,d,cond,:));
+                                
+                            end
                             meandata = nanmean(tmpdata);
                             nanidx = isnan(meandata);
                             stddata = nanstd(tmpdata);
                             semdata = stddata./sqrt(sum(max(~isnan(tmpdata),[],2)));
                             timestamps = timestampsIN(~nanidx);
                             meandata(nanidx) = []; 
-                            semdata(nanidx) = []; 
-                            if single == 1
-                                plot(repmat(timestampsIN',[1 num_exps]),tmpdata','Color',mean_Colors(g,:),'LineWidth',rep_LineWidth);
+                            semdata(nanidx) = [];
+                            if single 
+                                if show_ind_reps
+                                    for rep = 1:num_reps
+                                        plot(repmat(timestampsIN',[1 rep]),tmpdata(rep,:)','Color',fly_Colors(rep*2,:),'LineWidth', rep_LineWidth);
+                                    end
+                                    plot(timestamps, meandata, 'Color', .75*mean_Colors(g,:),'LineWidth', mean_LineWidth);
+                                else
+                                    plot(repmat(timestampsIN',[1 num_exps]),tmpdata','Color',mean_Colors(g,:),'LineWidth',rep_LineWidth);
+                                end
                             elseif num_groups==1  && show_ind_flies == 1
                                 for exp = 1:num_exps
                                     plot(repmat(timestampsIN',[1 exp]),tmpdata(exp,:)','Color',fly_Colors(exp,:),'LineWidth',rep_LineWidth);
@@ -86,8 +103,11 @@ function plot_OL_timeseries(timeseries_data, timestampsIN, OL_conds, OL_duration
                             end
                             
                             if plot_opposing_directions == 1
-                            
-                                tmpdata = squeeze(timeseries_data(g,:,d,cond+1,:));
+                                if single && show_ind_reps
+                                    tmpdata = squeeze(timeseries_data(g,:,d,cond+1,:,:));
+                                else
+                                    tmpdata = squeeze(timeseries_data(g,:,d,cond+1,:));
+                                end
                                 meandata = nanmean(tmpdata);
                                 nanidx = isnan(meandata);
                                 stddata = nanstd(tmpdata);
@@ -99,7 +119,14 @@ function plot_OL_timeseries(timeseries_data, timestampsIN, OL_conds, OL_duration
                                 %lighter
   
                                 if single == 1
-                                    plot(repmat(timestampsIN',[1 num_exps]),tmpdata','Color',mean_Colors(g+1,:),'LineWidth',rep_LineWidth);
+                                    if show_ind_reps
+                                        for rep2 = 1:num_reps
+                                            plot(repmat(timestampsIN',[1 rep2]), tmpdata(rep2,:)', 'Color', fly_Colors(rep2*2,:),'LineWidth', rep_LineWidth);
+                                        end
+                                        plot(timestamps, meandata, 'Color', .75*mean_Colors(g+1,:), 'LineWidth', mean_LineWidth);
+                                    else
+                                        plot(repmat(timestampsIN',[1 num_exps]),tmpdata','Color',mean_Colors(g+1,:),'LineWidth',rep_LineWidth);
+                                    end
                                 elseif num_groups == 1
                                     plot(timestamps,meandata,'Color',mean_Colors(g+1,:),'LineWidth',mean_LineWidth);
                                     patch([timestamps fliplr(timestamps)],[meandata+semdata fliplr(meandata-semdata)],'k','FaceColor',mean_Colors(g+1,:),'EdgeColor',EdgeColor,'FaceAlpha',patch_alpha)

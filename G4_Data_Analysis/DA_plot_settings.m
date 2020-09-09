@@ -106,11 +106,15 @@ function [exp_settings, histogram_plot_settings, histogram_annotation_settings, 
     %plotted for each fly as well as the average.
     timeseries_plot_settings.show_individual_flies = 1;
     
+    %Set this to 1 if you are plotting only a single fly and want lines
+    %plotted for each repetition as well as the fly's average.
+    timeseries_plot_settings.show_individual_reps = 1;
+    
     %Plot the frame position under each timeseries plot
     timeseries_plot_settings.frame_superimpose = 0;
     
     %Plot both directions for each condition on the same axis. 
-    timeseries_plot_settings.plot_both_directions = 0;
+    timeseries_plot_settings.plot_both_directions = 1;
 
 
 %% Closed loop histogram settings ('-CLhist')
