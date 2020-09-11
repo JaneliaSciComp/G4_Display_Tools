@@ -1,10 +1,3 @@
----
-title: Display Tools
-parent: Generation 4
-nav_order: 2
-has_children: true
----
-
 # Overview of G4 Display Tools
 
 This document briefly describes the various software tools developed for this system. They require the [Hardware](docs/G4_Hardware_Setup.md) and [Software](docs/G4_Software_Setup.md) to be [working correctly](docs/G4_Verify.md). 
@@ -25,7 +18,7 @@ Developed by Jinyang Liu, PControl_G4 allows for communication between the G4 di
 
 # G4_Protocol_Designer
 
-Developed by Lisa Taylor, these scripts and GUIs allow for designing, visualizing, and running experimental protocols using patterns and functions that have already been created. An experimental structure can be created and visualized using the G4_Experiment_Designer GUI, where pre-made pattern and function files can be selected and organized. Experimental protocols can be validated within the GUI and saved as .g4p files. The G4_Experiment_Conductor GUI can run experimental protocols and display information on the current experiment progress in real-time. See G4_Display_Tools\G4_Protocol_Designer\User Instructions.docx for more details on how to use these scripts.
+Developed by [Lisa (Taylor) Ferguson](mailto:taylorl@janelia.hhmi.org), these scripts and GUIs allow for designing, visualizing, and running experimental protocols using patterns and functions that have already been created. An experimental structure can be created and visualized using the G4_Experiment_Designer GUI, where pre-made pattern and function files can be selected and organized. Experimental protocols can be validated within the GUI and saved as .g4p files. The G4_Experiment_Conductor GUI can run experimental protocols and display information on the current experiment progress in real-time. See G4_Display_Tools\G4_Protocol_Designer\User Instructions.docx for more details on how to use these scripts.
 
 # G4_Example_Experiment_Scripts
 
