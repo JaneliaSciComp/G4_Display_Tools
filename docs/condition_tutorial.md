@@ -1,7 +1,7 @@
 ---
 title:  Tutorial - create one condition
 parent: G4 Protocol Designer
-grand_parent: Display Tools
+grand_parent: Generation 4
 nav_order: 5
 ---
 
@@ -25,49 +25,49 @@ In the G4 Designer, a condition is a single row in a table. The pre-trial (optio
 
 This is an example of a (tiny) experiment. In this case, the experiment will play as follows:
 
-pre-trial
-Condition 1
-inter-trial
-condition 2
-inter-trial
-condition 3
-inter-trial 
-condition 4
-post-trial
+1. pre-trial
+1. Condition 1
+1. inter-trial
+1. condition 2
+1. inter-trial
+1. condition 3
+1. inter-trial 
+1. condition 4
+1. post-trial
 
 Note that only the block conditions are referred to by their numbers. The others are referred to by their position, pre-, inter-, or post-. Also notice that the inter-trial does not play before the first block condition or after the last block condition.
 
 If, at the left side of the image, we had selected "Randomize Trials" instead of sequential, then the four conditions would play in random order. So it might be something like this:
 
-pre-trial
-Condition 2
-inter-trial
-Condition 1
-inter-trial
-Condition 4
-inter-trial
-Condition 3
-Post-trial
+1. pre-trial
+1. Condition 2
+1. inter-trial
+1. Condition 1
+1. inter-trial
+1. Condition 4
+1. inter-trial
+1. Condition 3
+1. Post-trial
 
 Only block conditions are affected by the "Randomize trials" feature. We also could have changed "Repetitions" on the left to be more than one. If there are 2 repetitions, that means the block conditions will be repeated a second time. With trials playing randomly, it might look something like this: 
 
-pre-trial
-Condition 2
-inter-trial
-Condition 1
-inter-trial
-Condition 4
-inter-trial 
-Condition 3
-inter-trial
-Condition 4
-inter-trial
-Condition 2
-inter-trial 
-Condition 1
-inter-trial
-Condition 3
-post-trial
+1. pre-trial
+1. Condition 2
+1. inter-trial
+1. Condition 1
+1. inter-trial
+1. Condition 4
+1. inter-trial 
+1. Condition 3
+1. inter-trial
+1. Condition 4
+1. inter-trial
+1. Condition 2
+1. inter-trial 
+1. Condition 1
+1. inter-trial
+1. Condition 3
+1. post-trial
 
 The set of block trials is played twice, but in random order each time. 
 

@@ -1,7 +1,6 @@
 ---
 title:  G4 Experiment Conductor
-parent: Display Tools
-grand_parent: Generation 4
+parent: Generation 4
 nav_order: 13
 has_children: true
 ---
@@ -105,6 +104,4 @@ The run protocol does not refer to the .g4p file, but refers to the way in which
 
 If you create your own run protocol, please do not forget that you must change the path in the conductor to your new file. 
 
-The default run protocol file is heavily commented to help you understand what each piece of code goes, but if you are confused about something, you can always contact Lisa Taylor at her contact information at the bottom of this document. 
-
-# Tutorials
+The default run protocol file is heavily commented to help you understand what each piece of code goes, but if you are confused about something, you can always contact [Lisa (Taylor) Ferguson](mailto:taylorl@janelia.hhmi.org).
