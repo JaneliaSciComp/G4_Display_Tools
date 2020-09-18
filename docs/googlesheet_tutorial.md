@@ -1,7 +1,7 @@
 ---
 title:  Tutorial - Metadata Googlesheet
 parent: G4 Protocol Designer
-grand_parent: Display Tools
+grand_parent: Generation 4
 nav_order: 3
 ---
 
