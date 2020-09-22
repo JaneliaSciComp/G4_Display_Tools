@@ -1,7 +1,6 @@
 ---
 title: Motion Maker G4
-parent: Display Tools
-grand_parent: Generation 4
+parent: Generation 4
 nav_order: 10
 ---
 

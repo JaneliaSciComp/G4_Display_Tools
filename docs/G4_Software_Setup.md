@@ -2,7 +2,7 @@
 title: Software
 parent: Setup
 grand_parent: Generation 4
-nav_order: 3
+nav_order: 20
 ---
 
 # G4 Software Setup

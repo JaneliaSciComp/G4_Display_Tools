@@ -1,17 +1,15 @@
 ---
-title:  G4 Panel Programmer
+title:  Panel Programmer
 parent: Setup
 grand_parent: Generation 4
-nav_order: 14
+nav_order: 12
 ---
 
-**Note**, you will need a custom version of the Arduino IDE with the PanelsG4
-board added as a target.
+**Note**, you will need a custom version of the Arduino IDE with the PanelsG4 board added as a target.
 
 # Preparation
 
-Program the Arduino Uno to be a AVR programmer. If required ­ I included
-pre­programmed Arduino.
+Program the Arduino Uno to be a AVR programmer. If required ­ I included pre­programmed Arduino.
 
 1. Connect Arduino (Make sure programmer shield is off it will prevent programming)
 1. Open Arduino IDE.

@@ -1,9 +1,7 @@
 ---
 title:  G4 Data Analysis
-parent: Display Tools
-grand_parent: Generation 4
+parent: Generation 4
 nav_order: 14
-has_children: true
 ---
 
 1. TOC
@@ -349,7 +347,5 @@ Coming soon
 # Appendix: Full list of settings:
 
 Coming soon
-
-# Tutorials
 
 {::comment}this was copied from the original file Data_analysis_documentation.docx{:/comment}

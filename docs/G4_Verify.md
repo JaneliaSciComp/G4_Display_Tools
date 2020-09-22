@@ -2,7 +2,7 @@
 title: Verify G4 Setup
 parent: Setup
 grand_parent: Generation 4
-nav_order: 4
+nav_order: 30
 ---
 
 After the hardware and software setup is complete, try to start "Panel_Host". If that works, open MATLAB and run PControl_G4. Make sure that you “allow network access” to the `g4host.exe`. 
