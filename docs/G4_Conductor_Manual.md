@@ -2,6 +2,7 @@
 title:  G4 Experiment Conductor
 parent: Generation 4
 nav_order: 13
+has_children: true
 ---
 
 1. TOC
