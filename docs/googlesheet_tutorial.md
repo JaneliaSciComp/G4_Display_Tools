@@ -2,7 +2,7 @@
 title:  Tutorial - Metadata Googlesheet
 parent: G4 Protocol Designer
 grand_parent: Generation 4
-nav_order: 3
+nav_order: 2
 ---
 
 1. TOC

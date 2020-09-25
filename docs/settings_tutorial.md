@@ -1,8 +1,8 @@
 ---
 title:  Tutorial - Configure Settings
 parent: G4 Protocol Designer
-grand_parent: Display Tools
-nav_order: 4
+grand_parent: Generation 4
+nav_order: 1
 ---
 
 # Prerequisites

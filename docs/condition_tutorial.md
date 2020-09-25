@@ -2,7 +2,7 @@
 title:  Tutorial - create one condition
 parent: G4 Protocol Designer
 grand_parent: Generation 4
-nav_order: 5
+nav_order: 3
 ---
 
 # Requirements
