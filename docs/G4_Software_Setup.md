@@ -1,8 +1,8 @@
 ---
 title: Software
-parent: Setup
+parent: Assembly
 grand_parent: Generation 4
-nav_order: 20
+nav_order: 2
 ---
 
 # G4 Software Setup
@@ -24,5 +24,3 @@ Download (or clone) the [G4_Display_Tools GitHub repository](https://github.com/
 **Configure the arena size for the Motion Maker software.** In MATLAB, run `configure_arena` (located in `G4_Display_Tools\Motion_Maker_G4\support\configure_arena.m`). Make sure the # of rows/columns of panels is correct. If you are using G4 panels consisting of 16x16 LEDs, set the panel size to be 16. If you are using a G4 arena consisting of 12 LED columns that would fully enclose the cylindrical arena (e.g. the 12" arena), set the arena circumference to 12. If you are using a differently-sized arena, such as the open-form 12/18 cylindrical arena (where 18 panel columns would be needed to fully enclose the cylinder), set the circumference to 18. If the center of the arena (located between columns 6 and 7) is not oriented directly “forward” from the center of the cylinder, use the `arena rotations` to account for that, otherwise some motion types will not be oriented correctly.
 
 [^1]: In July 2020, the NI R RIO Driver and most other software packages are available in version 20.0.
-
-{::comment}this was copied from the original file G4_Getting_Started.docx{:/comment}
