@@ -2,7 +2,7 @@
 title:  Tutorial - Design your own run protocol
 parent: G4 Experiment Conductor
 grand_parent: Generation 4
-nav_order: 1
+nav_order: 4
 ---
 
 # Prerequisites
@@ -50,15 +50,19 @@ This command tells the screens where it should be looking for whatever files you
 
 - `Panel_com('start_log')`
 
-You'll notice on the Panel Host there is a virtual LED labeled "Log running" which is green when a condition or experiment is running and which is dark when it is not. You should always start the log running before running an experiment and only stop the log running when the entire experiment is over. In the data analysis section, you'll see that your raw data is contained in the Log. If the log is not running, you will miss data from that time. It's good habit to always run the log, even if you are just testing something. 
+You may have noticed on the Panel Host there is a virtual LED labeled "Log running" which is green when a condition or experiment is running and which is dark when it is not. You should always start the log running before running an experiment and only stop the log running when the entire experiment is over. In the data analysis section, you'll see that your raw data is contained in the Log. If the log is not running, you will miss data from that time. It's good habit to always run the log, even if you are just testing something. 
 
 - `Panel_com('set_control_mode',1)`
 
-This command sets your experiment mode. Remember the screens are capable of running 7 different modes. We are running the first mode in this tutorial as it is simple and often used. It simply runs through the pattern library based on the position function provided it. (Ie, when the y-value of the position function is 10, the screen is displaying the 10th frame in the pattern).
+This command sets your experiment mode. Remember the screens are capable of running 7 different modes. We are running the first mode in this tutorial as it is simple and often used. It simply runs through the pattern library based on the position function provided it. (i.e., when the y-value of the position function is 10, the screen is displaying the 10th frame in the pattern).
 
 - `Panel_com('set_pattern_id',1)`
 
-This command tells the screens which pattern you want to use. Notice that you do not pass it a filepath, but a number. This is why your experiment folder must be set up the way it is. The software knows automatically to look in the 'Patterns' folder inside your experiment folder. It then checks the ID field of each .mat file to find the pattern with an ID of 1. It is good practice to name your patterns with their ID number in the name so that they will be ordered correctly in the folder. For example, when we make a set of patterns for an experiment, they each have a unique ID of 1 through the number of patterns we are making. Their filenames, then, are 'Pattern_0001', 'Pattern_0002', etc with the number in the filename matching the ID number. This way, it is easy to remember which ID number you should be sending to the screen in order to get the pattern that you want. 
+This command tells the screens which pattern you want to use. Notice that you do not pass it a filepath, but a number. This is why your experiment folder must be set up the way it is. The software knows automatically to look in the 'Patterns' folder inside your experiment folder. It then find the pattern with an ID of (in this case) 1. You set the pattern's ID in the [Motion Maker](../Motion_Maker_G4/About Motion Maker.md) when you designed the pattern. 
+
+It is good practice to name your patterns with their ID number in the name so that they will be ordered correctly in the folder and you don't have to remember the ID for every pattern. For example, when we make a set of patterns for an experiment, they each have a unique ID of 1 through the number of patterns we are making. Their filenames, then, are 'Pattern_0001', 'Pattern_0002', etc with the number in the filename matching the ID number. This way, it is easy to remember which ID number you should be sending to the screen in order to get the pattern that you want. 
+
+The arena uses the .pat file, which is not human-readable, but if you do not know the ID of your pattern, you can open the .mat file associated with that pattern in matlab. The structure it contains has an ID field with the ID number. 
 
 - `Panel_com('set_pattern_func_id',1)`
 
