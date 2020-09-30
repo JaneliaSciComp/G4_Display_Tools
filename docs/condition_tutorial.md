@@ -12,12 +12,12 @@ Before going through this tutorial, you should have done the following:
 - created one or more patterns using the [Motion Maker](../Motion_Maker_G4/About Motion Maker.md)
 - created one or more functions using the [Function Maker](../Function_Maker_G4/About Function Maker.md
 - Reviewed the different experiment modes
-- [Set up your arena](G4_Hardware_Setup.md) and [G4 software](G4_Software_Setup.md). 
+- [Set up your system](../../../docs/G4-Assembly.html).
 
 
 # Experiment structure
 
-An experimental protocol is really just a set of what we call "conditions." A condition, viewed on the arena screens, is a single pattern being displayed to a fly for some number of seconds. The pattern can be moving, to simulate motion, or still. It can be played in a closed-loop or open-loop way. But the key is that it only involves a single pattern file. 
+An experimental protocol is really just a set of what we call "conditions." A condition, viewed on the arena screens, is a single pattern being displayed to a fly for some number of seconds. The pattern can be moving, to simulate motion, or still. It can be played in a closed-loop or open-loop way. But the key is that it only involves a single pattern file.
 
 In the G4 Designer, a condition is a single row in a table. The pre-trial (optional) is a single condition that will play at the beginning of the experiment and then will not play again. The inter-trial (optional) is a single condition that will play in between each condition in the main experiment. It can be used to re-set the fly in between the main conditions of the experiment. The post-trial (optional) is a single condition that plays at the very end of the experiment. The block trials, contained in the large central table of the G4 Designer, are a set of conditions. There can be as many conditions in this block as you want. These conditions make up the main experiment and can be played in sequential or random order. 
 
@@ -111,7 +111,7 @@ In row 1 of the block trials table, click on the empty box under Pattern Name, c
 
 Click on the name of your pattern in that tall box. When you click on it, a preview of the pattern should appear in the preview pane. 
 
-![In screen preview](inScreenPreview.png)
+![In screen preview](assets/inScreenPreview.png)
 
 When creating an experiment you would have an entire list of patterns here, and you could click through them, looking at the preview of each one until you find the one you want. It works exactly the same way for functions, when you click the empty cell under "Position Function." 
 

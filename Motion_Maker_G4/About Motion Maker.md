@@ -32,10 +32,10 @@ After patterns have been created, they can be displayed on the G4 arena by incor
 2. using the Protocol Designer located in `G4_Display_Tools\G4_Protocol_Designer`, or 
 3. by using `PControl_G4` located in `G4_Display_Tools\PControl_Matlab`.
 
-## Using patterns for 2-color LED panels (or any panel with a checkerboard circuit layout). 
+## Using patterns for 2-color LED panels or any driver-v2
+{:#checkerboard}
 
-A newer version of LED panels was created with LED pixels arranged in a checkerboard circuit, so that 2 colors of LEDs could be placed on a single panel (e.g. for UV/Green LED panels). Displaying a pattern on LED panels of this type requires a rearrangement of the pattern matrix so that it conforms to the new layout. When saving a pattern for use on LED panels with a checkerboard layout, setting the pattern parameter `checker_layout` to `1` will use the `checkerboard_pattern` function to rearrange pattern matrices to fit this checkerboard layout. This function takes 2 pattern matrices (`Pats`) as inputs, where the 1st pattern matrix is rearranged to be displayed on one half of the checkerboard (e.g. on the green LEDs) and the 2nd is displayed on the other half (e.g. on the UV LEDs). To display a single pattern on both halves of the checkerboard, either leave the 2nd input blank or duplicate the 1st pattern for both inputs, which is the default setting in the `Motion_Maker_G4_gui`. To display a single pattern on only one half of the checkerboard, leave the other input as `0`.
-
+Two different versions of the [panel driver board](../../Panel/docs/driver.md) currently exist, the [driver-v1.x](../../Panel/docs/driver.md#driver-v1) for single-colored displays and [driver-v2.x](../../Panel/docs/driver.md#driver-v2) with pixels arranged in a "checkerboard circuit"  (e.g. for UV/Green LED panels). Displaying a pattern on LED panels of this type requires a rearrangement of the pattern matrix so that it conforms to this layout. When saving a pattern for use on LED panels with a checkerboard layout, setting the pattern parameter `checker_layout` to `1` will use the `checkerboard_pattern` function to rearrange pattern matrices to fit this checkerboard layout. This function takes 2 pattern matrices (`Pats`) as inputs, where the 1st pattern matrix is rearranged to be displayed on one half of the checkerboard (e.g. on the green LEDs) and the 2nd is displayed on the other half (e.g. on the UV LEDs). To display a single pattern on both halves of the checkerboard, either leave the 2nd input blank or duplicate the 1st pattern for both inputs, which is the default setting in the `Motion_Maker_G4_gui`. To display a single pattern on only one half of the checkerboard, leave the other input as `0`.
 
 # Description of Parameters
 
