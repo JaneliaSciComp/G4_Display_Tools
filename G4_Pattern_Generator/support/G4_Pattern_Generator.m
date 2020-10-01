@@ -1,8 +1,8 @@
-function [Pats, true_step_size, rot180] = Motion_Maker_G4(param)
-% FUNCTION [Pats, arena_phi, arena_theta, true_step_size, rot180] = Motion_Maker_G4(param)
+function [Pats, true_step_size, rot180] = G4_Pattern_Generator(param)
+% FUNCTION [Pats, arena_phi, arena_theta, true_step_size, rot180] = G4_Pattern_Generator(param)
 %
 % inputs:
-% see Motion_Maker_G4_script for list of inputs needed
+% see G4_Pattern_Generator_script for list of inputs needed
 %
 % outputs:
 % Pats: array of brightness values for each pixel in arena (multiple frames

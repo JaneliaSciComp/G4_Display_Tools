@@ -1,8 +1,8 @@
-function FMgui2script_G4(param)
-% FUNCTION FMgui2script_G4(param)
+function FGgui2script_G4(param)
+% FUNCTION FGgui2script_G4(param)
 %
 % creates a matlab script file that will create and save the function
-% specified by the current parameters in the Function_Maker_G4_gui
+% specified by the current parameters in the G4_Function_Generator_gui
 % 
 % Script saved in the directory 'C:\matlabroot\G4\Scripts\'
 %
@@ -31,7 +31,7 @@ end
 FID = fopen([script_dir tempname],'a');
 
 %print descriptive comments of script
-fprintf(FID,'%s\n','% Script version of Function_Maker_G4 with current GUI parameters');
+fprintf(FID,'%s\n','% Script version of G4_Function_Generator with current GUI parameters');
 fprintf(FID,'%s\n',['% (script saved in ' script_dir ')']);
 fprintf(FID,'%s\n','%');
 fprintf(FID,'%s\n','% Save this script with a new filename to keep it from being overwritten');

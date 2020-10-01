@@ -1,5 +1,5 @@
-function func = Function_Maker_G4(param)
-% FUNCTION func = Function_Maker_G4(param)
+function func = G4_Function_Generator(param)
+% FUNCTION func = G4_Function_Generator(param)
 % 
 % Creates a position function (used to control which pattern frame is 
 % displayed at every refresh of the LED arena) or an analog output function 

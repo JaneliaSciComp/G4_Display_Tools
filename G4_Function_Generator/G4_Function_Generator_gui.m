@@ -1,26 +1,26 @@
-function varargout = Function_Maker_G4_gui(varargin)
-% FUNCTION_MAKER_G4_GUI MATLAB code for Function_Maker_G4_gui.fig
-%      FUNCTION_MAKER_G4_GUI, by itself, creates a new FUNCTION_MAKER_G4_GUI or raises the existing
+function varargout = G4_Function_Generator_gui(varargin)
+% G4_FUNCTION_GENERATOR_GUI MATLAB code for G4_Function_Generator_gui.fig
+%      G4_FUNCTION_GENERATOR_GUI, by itself, creates a new G4_FUNCTION_GENERATOR_GUI or raises the existing
 %      singleton*.
 %
-%      H = FUNCTION_MAKER_G4_GUI returns the handle to a new FUNCTION_MAKER_G4_GUI or the handle to
+%      H = G4_FUNCTION_GENERATOR_GUI returns the handle to a new G4_FUNCTION_GENERATOR_GUI or the handle to
 %      the existing singleton*.
 %
-%      FUNCTION_MAKER_G4_GUI('CALLBACK',hObject,eventData,handles,...) calls the local
-%      function named CALLBACK in FUNCTION_MAKER_G4_GUI.M with the given input arguments.
+%      G4_FUNCTION_GENERATOR_GUI('CALLBACK',hObject,eventData,handles,...) calls the local
+%      function named CALLBACK in G4_FUNCTION_GENERATOR_GUI.M with the given input arguments.
 %
-%      FUNCTION_MAKER_G4_GUI('Property','Value',...) creates a new FUNCTION_MAKER_G4_GUI or raises the
+%      G4_FUNCTION_GENERATOR_GUI('Property','Value',...) creates a new G4_FUNCTION_GENERATOR_GUI or raises the
 %      existing singleton*.  Starting from the left, property value pairs are
-%      applied to the GUI before Function_Maker_G4_gui_OpeningFcn gets called.  An
+%      applied to the GUI before G4_Function_Generator_gui_OpeningFcn gets called.  An
 %      unrecognized property name or invalid value makes property application
-%      stop.  All inputs are passed to Function_Maker_G4_gui_OpeningFcn via varargin.
+%      stop.  All inputs are passed to G4_Function_Generator_gui_OpeningFcn via varargin.
 %
 %      *See GUI Options on GUIDE's Tools menu.  Choose "GUI allows only one
 %      instance to run (singleton)".
 %
 % See also: GUIDE, GUIDATA, GUIHANDLES
 
-% Edit the above text to modify the response to help Function_Maker_G4_gui
+% Edit the above text to modify the response to help G4_Function_Generator_gui
 
 % Last Modified by GUIDE v2.5 17-Aug-2017 13:44:10
 
@@ -28,8 +28,8 @@ function varargout = Function_Maker_G4_gui(varargin)
 gui_Singleton = 1;
 gui_State = struct('gui_Name',       mfilename, ...
                    'gui_Singleton',  gui_Singleton, ...
-                   'gui_OpeningFcn', @Function_Maker_G4_gui_OpeningFcn, ...
-                   'gui_OutputFcn',  @Function_Maker_G4_gui_OutputFcn, ...
+                   'gui_OpeningFcn', @G4_Function_Generator_gui_OpeningFcn, ...
+                   'gui_OutputFcn',  @G4_Function_Generator_gui_OutputFcn, ...
                    'gui_LayoutFcn',  [] , ...
                    'gui_Callback',   []);
 if nargin && ischar(varargin{1})
@@ -44,15 +44,15 @@ end
 % End initialization code - DO NOT EDIT
 
 
-% --- Executes just before Function_Maker_G4_gui is made visible.
-function Function_Maker_G4_gui_OpeningFcn(hObject, eventdata, handles, varargin)
+% --- Executes just before G4_Function_Generator_gui is made visible.
+function G4_Function_Generator_gui_OpeningFcn(hObject, eventdata, handles, varargin)
 % This function has no output args, see OutputFcn.
 % hObject    handle to figure
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-% varargin   command line arguments to Function_Maker_G4_gui (see VARARGIN)
+% varargin   command line arguments to G4_Function_Generator_gui (see VARARGIN)
 
-% Choose default command line output for Function_Maker_G4_gui
+% Choose default command line output for G4_Function_Generator_gui
 handles.output = hObject;
 
 %calculate default function
@@ -61,12 +61,12 @@ handles = pushbutton2_Callback(hObject, eventdata, handles);
 % Update handles structure
 guidata(hObject, handles);
 
-% UIWAIT makes Function_Maker_G4_gui wait for user response (see UIRESUME)
+% UIWAIT makes G4_Function_Generator_gui wait for user response (see UIRESUME)
 % uiwait(handles.figure1);
 
 
 % --- Outputs from this function are returned to the command line.
-function varargout = Function_Maker_G4_gui_OutputFcn(hObject, eventdata, handles) 
+function varargout = G4_Function_Generator_gui_OutputFcn(hObject, eventdata, handles) 
 % varargout  cell array for returning output args (see VARARGOUT);
 % hObject    handle to figure
 % eventdata  reserved - to be defined in a future version of MATLAB
@@ -244,7 +244,7 @@ function pushbutton1_Callback(hObject, eventdata, handles)
 % hObject    handle to pushbutton1 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-FMgui2script_G4(handles.param);
+FGgui2script_G4(handles.param);
 
 
 % --- Executes on button press in checkbox3.
@@ -1296,7 +1296,7 @@ else
 end
 
 %calculate function
-func = Function_Maker_G4(handles.param);
+func = G4_Function_Generator(handles.param);
 handles.func = func;
 time = (1:length(func))/fps;
 

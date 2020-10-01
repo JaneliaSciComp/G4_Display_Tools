@@ -1,5 +1,5 @@
 function arena_projection(Pats, gs_val, color, plot_type, frame, checker)
-% FUNCTION arena_checker_projection(Pats, gs_val, color, plot_type frame)
+% FUNCTION arena_projection(Pats, gs_val, color, plot_type frame)
 % 
 % Plots a single frame of the input pattern as a scatter plot of dots.
 %

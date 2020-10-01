@@ -56,7 +56,7 @@ function more_options_OpeningFcn(hObject, eventdata, handles, varargin)
 handles.output = hObject;
 
 %set current settings
-handles.gui1tag = findobj('Tag','Motion_Maker_G4_gui');
+handles.gui1tag = findobj('Tag','G4_Pattern_Generator_gui');
 sdata = getappdata(handles.gui1tag,'sdata');
 
 set(handles.popupmenu2, 'Value', ceil(sdata.aa_samples/8));

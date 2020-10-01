@@ -1,12 +1,12 @@
-function MMgui2script_G4(param)
-% function gui2script_G4(param)
+function PGgui2script_G4(param)
+% function PGgui2script_G4(param)
 %
 % creates a matlab script file that will create and save the pattern
 % specified by the current pattern parameters in the 
-% Motion_Pattern_Maker_gui
+% G4_Pattern_Generator_gui
 %
 % Script given the temporary name 'temp_script_G4.m' and saved in the 
-% directory 'C:\matlabroot\Motion_Maker_G4_scripts\'
+% directory 'C:\matlabroot\G4\scripts\'
 %
 % inputs:
 % param: all pattern parameters
@@ -22,7 +22,7 @@ if exist([script_dir 'temp_pattern_script_G4.m'],'file')
 end
 FID = fopen([script_dir 'temp_pattern_script_G4.m'],'a');
 
-fprintf(FID,'%s\n','% Script version of Motion_Maker_G4 with current GUI parameters');
+fprintf(FID,'%s\n','% Script version of G4_Pattern_Generator with current GUI parameters');
 fprintf(FID,'%s\n','% (script saved in C:\matlabroot\G4\Scripts\)');
 fprintf(FID,'%s\n','%');
 fprintf(FID,'%s\n','% Save this script with a new filename to keep it from being overwritten');
@@ -59,7 +59,7 @@ fprintf(FID,'%s\n',['param.checker_layout = ' num2str(param.checker_layout) '; %
 fprintf(FID,'%s\n','');
 fprintf(FID,'%s\n','');
 fprintf(FID,'%s\n','%% generate pattern');
-fprintf(FID,'%s\n','[Pats, param.true_step_size, param.rot180] = Motion_Maker_G4(param);');
+fprintf(FID,'%s\n','[Pats, param.true_step_size, param.rot180] = G4_Pattern_Generator(param);');
 fprintf(FID,'%s\n','param.stretch = zeros(size(Pats,3),1); %stretch increases (within limits) the per-frame brightness -- zeros add no brightness');
 fprintf(FID,'%s\n','');
 fprintf(FID,'%s\n','');
