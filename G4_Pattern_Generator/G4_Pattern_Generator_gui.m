@@ -1,26 +1,26 @@
-function varargout = Motion_Maker_G4_gui(varargin)
-% Motion_Maker_G4_gui MATLAB code for Motion_Maker_G4_gui.fig
-%      Motion_Maker_G4_gui, by itself, creates a new Motion_Maker_G4_gui or raises the existing
+function varargout = G4_Pattern_Generator_gui(varargin)
+% G4_Pattern_Generator_gui MATLAB code for G4_Pattern_Generator_gui.fig
+%      G4_Pattern_Generator_gui, by itself, creates a new G4_Pattern_Generator_gui or raises the existing
 %      singleton*.
 %
-%      H = Motion_Maker_G4_gui returns the handle to a new Motion_Maker_G4_gui or the handle to
+%      H = G4_Pattern_Generator_gui returns the handle to a new G4_Pattern_Generator_gui or the handle to
 %      the existing singleton*.
 %
-%      Motion_Maker_G4_gui('CALLBACK',hObject,eventData,handles,...) calls the local
-%      function named CALLBACK in Motiont_Maker_G4_gui.M with the given input arguments.
+%      G4_Pattern_Generator_gui('CALLBACK',hObject,eventData,handles,...) calls the local
+%      function named CALLBACK in G4_Pattern_Generator_gui.M with the given input arguments.
 %
-%      Motion_Maker_G4_gui('Property','Value',...) creates a new Motion_Maker_G4_gui or raises the
+%      G4_Pattern_Generator_gui('Property','Value',...) creates a new G4_Pattern_Generator_gui or raises the
 %      existing singleton*.  Starting from the left, property value pairs are
-%      applied to the GUI before Motion_Maker_G4_gui_OpeningFcn gets called.  An
+%      applied to the GUI before G4_Pattern_Generator_gui_OpeningFcn gets called.  An
 %      unrecognized property name or invalid value makes property application
-%      stop.  All inputs are passed to Motion_Maker_G4_gui_OpeningFcn via varargin.
+%      stop.  All inputs are passed to G4_Pattern_Generator_gui_OpeningFcn via varargin.
 %
 %      *See GUI Options on GUIDE's Tools menu.  Choose "GUI allows only one
 %      instance to run (singleton)".
 %
 % See also: GUIDE, GUIDATA, GUIHANDLES
 
-% Edit the above text to modify the response to help Motion_Maker_G4_gui
+% Edit the above text to modify the response to help G4_Pattern_Generator_gui
 
 % Last Modified by GUIDE v2.5 31-Mar-2017 09:13:30
 
@@ -29,8 +29,8 @@ function varargout = Motion_Maker_G4_gui(varargin)
 gui_Singleton = 1;
 gui_State = struct('gui_Name',       mfilename, ...
                    'gui_Singleton',  gui_Singleton, ...
-                   'gui_OpeningFcn', @Motion_Maker_G4_gui_OpeningFcn, ...
-                   'gui_OutputFcn',  @Motion_Maker_G4_gui_OutputFcn, ...
+                   'gui_OpeningFcn', @G4_Pattern_Generator_gui_OpeningFcn, ...
+                   'gui_OutputFcn',  @G4_Pattern_Generator_gui_OutputFcn, ...
                    'gui_LayoutFcn',  [] , ...
                    'gui_Callback',   []);
 if nargin && ischar(varargin{1})
@@ -45,13 +45,13 @@ end
 % End initialization code - DO NOT EDIT
 
 
-% --- Executes just before Motion_Maker_G4_gui is made visible.
-function Motion_Maker_G4_gui_OpeningFcn(hObject, eventdata, handles, varargin)
+% --- Executes just before G4_Pattern_Generator_gui is made visible.
+function G4_Pattern_Generator_gui_OpeningFcn(hObject, eventdata, handles, varargin)
 % This function has no output args, see OutputFcn.
 % hObject    handle to figure
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-% varargin   command line arguments to Motion_Maker_G4_gui (see VARARGIN)
+% varargin   command line arguments to G4_Pattern_Generator_gui (see VARARGIN)
 
 %set default additional options
 sdata.aa_samples = 15;
@@ -74,30 +74,30 @@ else
     s3data.arena_pitch = 0;
     s3data.updated = 0;
 end
-handles.tag = findobj('Tag','Motion_Maker_G4_gui');
+handles.tag = findobj('Tag','G4_Pattern_Generator_gui');
 setappdata(handles.tag,'sdata',sdata);
 setappdata(handles.tag,'s2data',s2data);
 setappdata(handles.tag,'s3data',s3data);
 handles.loaded_pattern = 0;
 
 % This sets up the initial plot - only do when we are invisible
-% so window can get raised using Motion_Maker_G4_gui.
+% so window can get raised using G4_Pattern_Generator_gui.
 if strcmp(get(hObject,'Visible'),'off')
     handles = pushbutton1_Callback(hObject, eventdata, handles);
 end
 
-% Choose default command line output for Motion_Maker_G4_gui
+% Choose default command line output for G4_Pattern_Generator_gui
 handles.output = hObject;
 
 % Update handles structure
 guidata(hObject, handles);
 
-% UIWAIT makes Motion_Maker_G4_gui wait for user response (see UIRESUME)
-% uiwait(handles.Motion_Maker_G4_gui);
+% UIWAIT makes G4_Pattern_Generator_gui wait for user response (see UIRESUME)
+% uiwait(handles.G4_Pattern_Generator_gui);
 
 
 % --- Outputs from this function are returned to the command line.
-function varargout = Motion_Maker_G4_gui_OutputFcn(hObject, eventdata, handles)
+function varargout = G4_Pattern_Generator_gui_OutputFcn(hObject, eventdata, handles)
 % varargout  cell array for returning output args (see VARARGOUT);
 % hObject    handle to figure
 % eventdata  reserved - to be defined in a future version of MATLAB
@@ -192,7 +192,7 @@ else
 end
 
 %generate pattern
-[handles.Pats, handles.param.true_step_size, handles.param.rot180] = Motion_Maker_G4(handles.param);
+[handles.Pats, handles.param.true_step_size, handles.param.rot180] = G4_Pattern_Generator(handles.param);
 handles.num_frames = size(handles.Pats,3);
 handles.param.stretch = ones(handles.num_frames,1);
 if handles.param.checker_layout==1
@@ -256,21 +256,21 @@ function PrintMenuItem_Callback(hObject, eventdata, handles)
 % hObject    handle to PrintMenuItem (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-printdlg(handles.Motion_Maker_G4_gui)
+printdlg(handles.G4_Pattern_Generator_gui)
 
 % --------------------------------------------------------------------
 function CloseMenuItem_Callback(hObject, eventdata, handles)
 % hObject    handle to CloseMenuItem (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-selection = questdlg(['Close ' get(handles.Motion_Maker_G4_gui,'Name') '?'],...
-                     ['Close ' get(handles.Motion_Maker_G4_gui,'Name') '...'],...
+selection = questdlg(['Close ' get(handles.G4_Pattern_Generator_gui,'Name') '?'],...
+                     ['Close ' get(handles.G4_Pattern_Generator_gui,'Name') '...'],...
                      'Yes','No','Yes');
 if strcmp(selection,'No')
     return;
 end
 
-delete(handles.Motion_Maker_G4_gui)
+delete(handles.G4_Pattern_Generator_gui)
 
 
 % --- Executes on selection change in popupmenu1.
@@ -1180,7 +1180,7 @@ try
     if abs(diff(s2data.long_lat_mask(1:2)))<2*pi || abs(diff(s2data.long_lat_mask(3:4)))<pi
         s2data.enable(2) = 1;
     end
-    handles.tag = findobj('Tag','Motion_Maker_G4_gui');
+    handles.tag = findobj('Tag','G4_Pattern_Generator_gui');
     setappdata(handles.tag,'sdata',sdata);
     setappdata(handles.tag,'s2data',s2data);
     handles.loaded_pattern = 1;
@@ -1248,8 +1248,8 @@ set(hObject, 'String', {'set as 1st level', 'random, spread (0 to 1st level)', '
 
 
 % --- Executes during object creation, after setting all properties.
-function Motion_Maker_G4_gui_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to Motion_Maker_G4_gui (see GCBO)
+function G4_Pattern_Generator_gui_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to G4_Pattern_Generator_gui (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
@@ -1260,7 +1260,7 @@ function pushbutton11_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-MMgui2script_G4(handles.param);
+PGgui2script_G4(handles.param);
 
 
 % --- Executes on button press in pushbutton11.
