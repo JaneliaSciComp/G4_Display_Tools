@@ -36,7 +36,7 @@ This is an example of a (tiny) experiment. In this case, the experiment will pla
 
 Note that only the block conditions are referred to by their numbers. The others are referred to by their position, pre-, inter-, or post-. Also notice that the inter-trial does not play before the first block condition or after the last block condition.
 
-If, at the left side of the image, we had selected "Randomize Trials" instead of sequential, then the four conditions would play in random order. So it might be something like this:
+If, at the left side of the image, we had selected *Randomize Trials*{:.gui-txt} instead of sequential, then the four conditions would play in random order. So it might be something like this:
 
 1. pre-trial
 1. Condition 2
@@ -48,7 +48,7 @@ If, at the left side of the image, we had selected "Randomize Trials" instead of
 1. Condition 3
 1. Post-trial
 
-Only block conditions are affected by the "Randomize trials" feature. We also could have changed "Repetitions" on the left to be more than one. If there are 2 repetitions, that means the block conditions will be repeated a second time. With trials playing randomly, it might look something like this: 
+Only block conditions are affected by the *Randomize trials*{:.gui-txt} feature. We also could have changed *Repetitions*{:.gui-txt} on the left to be more than one. If there are 2 repetitions, that means the block conditions will be repeated a second time. With trials playing randomly, it might look something like this: 
 
 1. pre-trial
 1. Condition 2
@@ -72,17 +72,17 @@ The set of block trials is played twice, but in random order each time.
 
 So you can see that being able to create a single condition is almost all you need to know in order to create an experiment. Once you can create one condition, all you have to do is make a bunch and put them together. 
 
-So what follows is a step by step instructions on how to create a single condition in the G4 Desginer. Please note that you should already have created any patterns and functions you might need for this. If you have not, please see documentation on the [Pattern Generator](../G4_Pattern_Generator/About Pattern Generator.md) and [Function Generator](../G4_Function_Generator/About Function Generator.md) for more details.
+So what follows is a step by step instructions on how to create a single condition in the [G4 Designer](G4_Designer_Manual.md). Please note that you should already have created any patterns and functions you might need for this. If you have not, please see documentation on the [Pattern Generator](../G4_Pattern_Generator/About Pattern Generator.md) and [Function Generator](../G4_Function_Generator/About Function Generator.md) for more details.
 
 # Open the designer and import
 
-First you have to open the Designer. There are two ways to do this. Assuming the G4 Display Tools are on your matlab path, you can simply type `G4_Experiment_Designer` into your matlab commandline. Alternatively, you can browse to the file `G4_Display_Tools/G4_Protocol_Designer/G4_Experiment_Designer.m`, open the file in matlab, and hit "Run" at the top of the matlab window. 
+First you have to open the Designer. There are two ways to do this. Assuming the [G4 Display Tools are on your matlab path](G4_Software_Setup.html#add-to-path), you can simply type `G4_Experiment_Designer` into your matlab command line. Alternatively, you can browse to the file `G4_Display_Tools/G4_Protocol_Designer/G4_Experiment_Designer.m`, open the file in matlab, and hit *Run*{:.gui-btn} at the top of the matlab window.
 
 You should get a screen that looks like this: 
 
 ![Empty Designer](assets/screenshot-1.png)
 
-If you get an error, first check that you have the configuration file referenced in [Setup](G4_Software_Setup.md) in place. Then open the file `G4_Display_Tools/G4_Protocol_Designer/G4_Protocol_Designer_Settings.m`. The first line of this file should read: Configuration File Path: [path to your configuration file]. If the path here is incorrect, replace it with the path to your Configuration file.
+If you get an error, first check that you have the configuration file referenced in [Setup](G4_Software_Setup.md) in place. Then open the file `G4_Display_Tools/G4_Protocol_Designer/G4_Protocol_Designer_Settings.m`. The first line of this file should read: `Configuration File Path: [path to your configuration file]`. If the path here is incorrect, replace it with the path to your Configuration file.
 
 **Please note that there should be exactly one space between the ':' and the first character of your path, and there should be no spaces after the last character of your path.** Once this first path has been set, you should never open this file again, and instead maintain your settings through the settings window in the Designer. 
 
@@ -93,7 +93,6 @@ Once the designer is open, you need to import the patterns you intend to use in 
 ![Import Window](assets/importWindow.png){:.ifr}
 
 You have three choices - *Folder*{:.gui-txt}, *File*{:.gui-txt}, or *Filtered File*{:.gui-txt}. If you have saved all of your patterns and/or functions in a folder, then choosing *Folder*{:.gui-txt} might be the most convenient option for you.
-
 
 ![Import Successful](assets/successfulImport.png){:.ifr}
 If you select folder, the Designer will attempt to import all files found in the folder. Don't worry if the folder has irrelevant files in it. The Designer will skip any files it doesn't recognize and provide a summary after the import is complete that looks like this:
@@ -111,7 +110,7 @@ The pattern has been imported but not much has changed about the Designer window
 
 # Add a pattern to your condition
 
-In row 1 of the block trials table, click on the empty box under Pattern Name, column 2. Not much happens at first glance - a cursor appears in the box. But look to the bottom right hand side of the window and you will see the tall narrow box labeled *Imported files for selected cell:*{:.gui-txt}, which was empty before, now has an item in it. The item should match the name of the pattern you imported. 
+In row 1 of the block trials table, click on the empty box under *Pattern Name*{:.gui-txt}, column 2. Not much happens at first glance - a cursor appears in the box. But look to the bottom right hand side of the window and you will see the tall narrow box labeled *Imported files for selected cell:*{:.gui-txt}, which was empty before, now has an item in it. The item should match the name of the pattern you imported. 
 
 ![empty cell selected](assets/clickEmptyCell.png)
 
@@ -119,7 +118,7 @@ Click on the name of your pattern in that tall box. When you click on it, a prev
 
 ![In screen preview](assets/inScreenPreview.png)
 
-When creating an experiment you would have an entire list of patterns here, and you could click through them, looking at the preview of each one until you find the one you want. It works exactly the same way for functions, when you click the empty cell under "Position Function." 
+When creating an experiment you would have an entire list of patterns here, and you could click through them, looking at the preview of each one until you find the one you want. It works exactly the same way for functions, when you click the empty cell under *Position Function*{:.gui-txt}.
 
 Once you've verified the pattern looks as you expect, click *Select*{:.gui-btn} under the box. This will populate the table cell with the pattern name.
 
@@ -167,7 +166,7 @@ From this preview panel you can also generate a video of what your condition wil
 
 ![Video panel](assets/videoGen.png)
 
-Enter a frame rate of 60 or less and click Generate Video. A window will pop up asking you to name the video and browse to the location where you want to save it. Do this and click "Save." 
+Enter a frame rate of 60 or less and click Generate Video. A window will pop up asking you to name the video and browse to the location where you want to save it. Do this and click *Save*{:.gui-btn}.
 
 A progress bar will appear that looks like this: ![Progress bar](assets/videoGenProgress.png)
 
@@ -176,7 +175,6 @@ Wait for the progress bar to finish and close on its own. This may take several 
 Once the video is done generating, go back to the preview window and select *Pattern Only Video*{:.gui-txt}. Now gnerate the video again, ensuring *Real-time speed*{:.gui-txt} is still selected. 
 
 The same thing will happen, but this video, instead of showing the entire preview window, will show only the pattern. This gives a better idea of what the fly will actually see in the arena. 
-
 
 ## Method 2 - requires the arena
 
@@ -194,9 +192,9 @@ We will cover saving a protocol and how it works in the experiment design tutori
 
 Now that the experiment is saved, select your condition using the checkbox on its right end (if it is not already selected) and then click *Dry Run*{:.gui-btn} just below the *Preview*{:.gui-btn}. 
 
-You will get a warning saying you must save the experiment before doing a dry run - this is not an error, but just a reminder. We have saved it, and you can just click OK. 
+You will get a warning saying you must save the experiment before doing a dry run - this is not an error, but just a reminder. We have saved it, and you can just click *OK*{:.gui-btn}. 
 
-Give the system a minute. At this point, the software will be running connectHost to open up the arena software and connect to the screens. This may take several seconds or even up to a minute. When everything is connected and the system is ready to play your condition on the screens, you will be prompted with a box saying it is ready. You may hit *Start*{:.gui-btn} to start the condition playing on the screen, or *Cancel*{:.gui-btn} to cancel. 
+Give the system a minute. At this point, the software will be running `connectHost` to open up the arena software and connect to the screens. This may take several seconds or even up to a minute. When everything is connected and the system is ready to play your condition on the screens, you will be prompted with a box saying it is ready. You may hit *Start*{:.gui-btn} to start the condition playing on the screen, or *Cancel*{:.gui-btn} to cancel.
 
 The dry run feature allows you to see exactly how your condition will look on the arena. If something is amiss, you can go back and edit your experiment until you get things the way you want. Just don't forget that if you want to do another Dry Run after making changes, you will have to save the experiment again, especially if your imported files come from multiple locations. 
 

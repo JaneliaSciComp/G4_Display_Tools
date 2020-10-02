@@ -9,15 +9,15 @@ nav_order: 14
 
 # Data Analysis Tools Documentation
 
-The github repository at https://github.com/JaneliaSciComp/G4_Display_Tools has a suite of data analysis tools. 
+The github repository at <https://github.com/JaneliaSciComp/G4_Display_Tools> has a suite of data analysis tools. Have a look at the [software installation guide](G4_Software_Setup.md) on how to set it up.
 
-In the typical use case of these tools, there are two files you need to worry about: `DA_plot_settings.m` at G4_Display_Tools/G4_Data_Analysis and `get_exp_folder.m` at G4_Display_Tools/G4_Data_Analysis/Support.
+In the typical use case of these tools, there are two files you need to worry about: `DA_plot_settings.m` at `G4_Display_Tools/G4_Data_Analysis` and `get_exp_folder.m` at `G4_Display_Tools/G4_Data_Analysis/Support`.
 
 # Data processing:
-	
+
 Before you can use the data analysis tools described below, you must process your data using either `G4_Process_data_flyingdetector` or `G4_Process_data_flyingdetector_combinedComm` (both located in `G4_Data_Analysis/data processing`). The first file processes data which was collected using the separate Panel_com commands, while the second processes data that was obtained using the new combined command. This step is done automatically after the experiment ends if you are using the G4 Conductor. It will produce a .mat file named `G4_Processed_Data`.
 
-When running an experiment using the G4 conductor, there are two run protocols that you can use – the older, `G4_default_run_protocol.m` and the newer `G4_run_protocol_combinedCommand.m`.  If you used the older run protocol, you must use the older processing file as well. Same with the new ones. If you mix and match these, your data processing will fail. 
+When running an experiment using the G4 conductor, there are two run protocols that you can use – the older, `G4_default_run_protocol.m` and the newer `G4_run_protocol_combinedCommand.m`. If you used the older run protocol, you must use the older processing file as well. Same with the new ones. If you mix and match these, your data processing will fail. 
 
 Note that there is an even older version of `G4_Process_data_flyingdetector`. It saves all data in a single struct called Data rather than saving the data in multiple variables. If you have data that was processed using this old version, you will need to convert it to the new format before analyzing the data in it. For your convenience, there is a script called `convert_processed_file.m` in `DA_Data_Analysis/support` which will convert older processed files to this new format.  Be sure to open this file and update the `processed_file_name` variable. If this does not match the filename of the processed file you want to convert (excluding the extension), it will not work.
 
@@ -177,6 +177,7 @@ The x-axis limits of timeseries plots generally will be the duration of that con
 timeseries_plot_settings.OL_TS_durations{1} = [1.5 3.12 1.5 3.12; 1.5 3.12 1.5 3.12]
 timeseries_plot_settings.OL_TS_durations{2} = [1 3; 1 3; 1 3; 1 3];
 ```
+
 …indicating that conditions 1, 5, 9 and 13 have durations of 1.5 seconds, 3, 7, 11, and 15 have durations of 3.12 seconds, 17, 21, 25, 29 have durations of 1 second, etc.
 
 If you left `OL_TS_conds` empty, leave this array empty as well. The program will deduce the condition durations from the processed data and create a default durations array.
@@ -240,11 +241,14 @@ Like OL_datatypes, this is a cell array of all datatypes you wish to create clos
 While this array is the same in purpose as OL_TS_conds and CL_hist_conds, it works a bit differently. This is because tuning curves plot multiple conditions on one axis.
 
 This is a two dimensional cell array. The first cell dimension is the number of figures. The second is the number of rows in that figure. Each cell element then contains a two dimensional array indicating which conditions should be included on the tuning curve and the tuning curve's placement. It follows the format:
+
 ```matlab
-OL_TC_conds{fig #}{row #} = [condition #'s on first tuning curve; condition #'s on second tuning curve; …];
+OL_TC_conds{fig #}{row #} = [condition #'s on first tuning curve; ...
+                             condition #'s on second tuning curve; …];
 ```
 
 **EXAMPLE:**
+
 ```matlab
 OL_TC_conds{1}{1} = [1 3 5 7; 9 11 13 15; 17 19 21 23]
 OL_TC_conds{1}{2} = [ 25 27 29 31; 33 35 37 39; 41 43 45 47];
@@ -328,7 +332,8 @@ Once you know there are no adjustments to be made, simply type in the command da
 
 ```matlab
 Create_settings_file(filename, filepath) % If you were creating a new settings file
-da = create_data_analysis_tool(path_to_settings, '-group', '-hist', '-TSplot', '-tcplot', '-normgroup');
+da = create_data_analysis_tool(path_to_settings, ...
+            '-group', '-hist', '-TSplot', '-tcplot', '-normgroup');
 da.run_analysis
 ```
 
