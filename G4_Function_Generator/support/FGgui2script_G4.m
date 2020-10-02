@@ -79,7 +79,7 @@ fprintf(FID,'%s\n','');
 
 %print script to generate function
 fprintf(FID,'%s\n','%% generate function');
-fprintf(FID,'%s\n',['func = Function_Maker_G4(' param.type 'param);']);
+fprintf(FID,'%s\n',['func = G4_Function_Generator(' param.type 'param);']);
 fprintf(FID,'%s\n','');
 fprintf(FID,'%s\n','');
 

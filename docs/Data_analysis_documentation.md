@@ -46,7 +46,7 @@ The settings are split into eight different structures.
 8. `save_settings`
    - These settings affect how the results are saved.
 
-The first section includes settings that will likely change with each type of analysis. The second section contains settings that will change less frequently, and mostly have to do with the details of plot appearance. Let’s go over the settings and what they mean.  
+The first section includes settings that will likely change with each type of analysis. The second section contains settings that will change less frequently, and mostly have to do with the details of plot appearance. Let's go over the settings and what they mean.  
 
 ## Settings in more detail
 
@@ -106,11 +106,11 @@ Set this to 1 if you only want to analyze a single fly, 0 if multiple flies.
 
 ### Plot all genotypes: 
 
-This should be either `0` or `1`. If it is set to `1`, then each fly of a particular value of `field to sort by` will be placed in a group together. All values will be grouped. In addition, each group will be plotted individually against the control. If you haveresults for five genotypes and you set group1 as the control, you’ll end up with four sets of graphs – group1 v group2, group1 v group3, etc.  Set this to 0 if you want to only include flies with a subset of values for your field to sort by, or if you want toput them on all one plot together rather than comparing to the control one by one. 
+This should be either `0` or `1`. If it is set to `1`, then each fly of a particular value of `field to sort by` will be placed in a group together. All values will be grouped. In addition, each group will be plotted individually against the control. If you haveresults for five genotypes and you set group1 as the control, you'll end up with four sets of graphs – group1 v group2, group1 v group3, etc.  Set this to 0 if you want to only include flies with a subset of values for your field to sort by, or if you want toput them on all one plot together rather than comparing to the control one by one. 
 
 ### Control genotype: 
 
-This should be a character vector with the value of your control. It should match exactly the value in the metadata.mat file. Ie if you’re grouping by genotype and your control is the empty split, your control genotype might be `'emptySplit_JFRC100_JFRC49'`
+This should be a character vector with the value of your control. It should match exactly the value in the metadata.mat file. Ie if you're grouping by genotype and your control is the empty split, your control genotype might be `'emptySplit_JFRC100_JFRC49'`
 
 **Note:** This should be enclosed in SINGLE quotes.
 
@@ -124,14 +124,13 @@ This is an array of names by which the groups should be labeled. These are inten
 
 **Note:** These strings should be encased in DOUBLE quotes. 
 
-### Save path: 
+### Save path:
 
-A string indicating the path where you’d like your results saved.
-
+A string indicating the path where you'd like your results saved.
 
 ### Plot norm and unnorm:
 
-Equals 0 or 1. If 1, whatever analysis you’re doing will be done twice, once with unnormalized data and once again with normalized data. You still must pass in a normalization flag to tell the software which normalization you would like done, or you willonly get the unnormalized analysis. If it is set to zero, you will only get normalized results if you pass in a normalization flag. If you do not pass in a flag, you will only get unnormalized results. 
+Equals 0 or 1. If 1, whatever analysis you're doing will be done twice, once with unnormalized data and once again with normalized data. You still must pass in a normalization flag to tell the software which normalization you would like done, or you will only get the unnormalized analysis. If it is set to zero, you will only get normalized results if you pass in a normalization flag. If you do not pass in a flag, you will only get unnormalized results. 
 
 ### Processed data file: 
 
@@ -166,7 +165,7 @@ The above code will create two figures of timeseries plots, containing two rows 
 
 The second figure, on the other hand, will contain four rows of two figures each. The first row will contain plots of condition 17 and 19, etc. 
 
-In this way, you can plot any condition in any position on the figure. Note that if you’re plotting more than one datatype, a figure is created for each datatype, so the above code, when run on two datatypes, would create four figures. Two for one datatype and two for the other. 
+In this way, you can plot any condition in any position on the figure. Note that if you're plotting more than one datatype, a figure is created for each datatype, so the above code, when run on two datatypes, would create four figures. Two for one datatype and two for the other. 
 
 ### OL_TS_durations:
 
@@ -195,16 +194,15 @@ OL_TSconds_axis_labels{2} = ["Time(sec)", "LmR"];
 
 An optional array of strings (enclosed in double quotes) providing a figure name for each figure of timeseries plots. Each datatype gets is own figure. If you are using the default layout of timeseries plots, each figure will have a maximum of 30 subplots. 
 
-If you’re plotting two datatypes for example, and each has sixty subplots, your figure names should be `["datatype1", "datatype1", "datatype2", "datatype2"]`. 
-    
+If you're plotting two datatypes for example, and each has sixty subplots, your figure names should be `["datatype1", "datatype1", "datatype2", "datatype2"]`.
+
 ### OL_datatypes:
 
 This should be a cell array of the datatypes you which to plot timeseries data for. You may plot timeseries for as many or few datatypes as you like. 
 
-The datatype options for flying data are: ‘LmR_chan’, ‘L_chan’, ‘R_chan’, ‘F_chan’, ‘Frame Position’, ‘LmR’, ‘LpR’, and ‘faLmR’.
+The datatype options for flying data are: 'LmR_chan', 'L_chan', 'R_chan', 'F_chan', 'Frame Position', 'LmR', 'LpR', and 'faLmR'.
 
-The datatype options for walking data are: ‘Vx0_chan’, ‘Vx1_chan’, ‘Vy0_chan’, ‘Vy1_chan’, ‘Frame Position’, ‘Turning’, ‘Forward’, and ‘Sideslip’
-
+The datatype options for walking data are: 'Vx0_chan', 'Vx1_chan', 'Vy0_chan', 'Vy1_chan', 'Frame Position', 'Turning', 'Forward', and 'Sideslip'.
 
 ### Show_individual_flies:
 
@@ -225,14 +223,13 @@ This should be set to 0 or 1, a 1 indicating that each timeseries subplot should
 
 If you would like your timeseries subplots to all have their own titles, this should be an array, matching OL_TS_conds in shape and size, with each element being the plot title for that condition. 
 
-If left empty, the analysis will create default subplot titles combining the condition’s pattern and function (if it exists) names. 
+If left empty, the analysis will create default subplot titles combining the condition's pattern and function (if it exists) names. 
 
 If you want your subplots to have no titles, set `cond_name = 0`
 
 ### CL_hist_conds:
 
-
-This array is exactly the same as OL_TS_conds, except it will determine the layout of your closed loop histograms if you’re creating any. Leave empty if you are not plotting histograms or would prefer the default layout.
+This array is exactly the same as OL_TS_conds, except it will determine the layout of your closed loop histograms if you're creating any. Leave empty if you are not plotting histograms or would prefer the default layout.
 
 ### CL_datatypes:
 
@@ -242,9 +239,9 @@ Like OL_datatypes, this is a cell array of all datatypes you wish to create clos
 
 While this array is the same in purpose as OL_TS_conds and CL_hist_conds, it works a bit differently. This is because tuning curves plot multiple conditions on one axis.
 
-This is a two dimensional cell array. The first cell dimension is the number of figures. The second is the number of rows in that figure. Each cell element then contains a two dimensional array indicating which conditions should be included on the tuning curve and the tuning curve’s placement. It follows the format: 
+This is a two dimensional cell array. The first cell dimension is the number of figures. The second is the number of rows in that figure. Each cell element then contains a two dimensional array indicating which conditions should be included on the tuning curve and the tuning curve's placement. It follows the format:
 ```matlab
-OL_TC_conds{fig #}{row #} = [condition #’s on first tuning curve; condition #’s on second tuning curve; …];
+OL_TC_conds{fig #}{row #} = [condition #'s on first tuning curve; condition #'s on second tuning curve; …];
 ```
 
 **EXAMPLE:**
@@ -294,7 +291,7 @@ This covers the settings that should be regularly updated. Below this section in
 
 Now that you have your settings as you want them, you need to create a .mat file which contains all your settings preferences. This will be used to actually run the data analysis. We do it this way because it is likely you will have only a few configurations of settings that you will use over and over again, in which case it is easier to create them once and be done. 
 
-In G4_data_analysis/support there is a function called ‘create_settings_file.’ This function takes in two parameters, the name of your settings file and the path where you would like to save it. 
+In G4_data_analysis/support there is a function called `create_settings_file`. This function takes in two parameters, the name of your settings file and the path where you would like to save it.
 
 Run this function to create a .mat file at the location you specific. This file will be passed in to run the data analysis. Note that if a .mat file already exists with the name and filepath you specify, it will be replaced.
 
@@ -302,16 +299,16 @@ Now you are ready to create your data analysis object and run an analysis!
 
 ## Running a typical analysis:
 
-There are two steps to running data analysis – the first is to run the file `create_data_analysis_tool.m.` This is not a regular script or function, so opening the file and hitting run in the MATLAB environment will not work. It is a class and when you run it, it creates an object. You should run it from the matlab command line. Here’s an example: 
+There are two steps to running data analysis – the first is to run the file `create_data_analysis_tool.m.` This is not a regular script or function, so opening the file and hitting run in the MATLAB environment will not work. It is a class and when you run it, it creates an object. You should run it from the matlab command line. Here's an example:
 
 ```matlab
-da = create_data_analysis_tool(path_to_settings_file, ‘-group’, ‘-tsplot’);
+da = create_data_analysis_tool(path_to_settings_file, '-group', '-tsplot');
 ```
 
 The first input is the path to the settings file which you just created. This will tell the class what specifications to use in the analysis. After this are multiple optional inputs, or flags, which tell the `create_data_analysis_tool` function what analysis to do. The currently accepted flags are as follows:
 
-- `'-group'` – Include this if you’re analyzing many flies
-- `'-single'` – include this if you’re analyzing a single fly. **NOTE:** You must include either single or group flag!
+- `'-group'` – Include this if you're analyzing many flies
+- `'-single'` – include this if you're analyzing a single fly. **NOTE:** You must include either single or group flag!
 - `'-normfly'` – normalize the data over each fly
 - `'-normgroup'` – normalize the data over groups
 - `'-hist'` – plot basic histograms
@@ -331,11 +328,11 @@ Once you know there are no adjustments to be made, simply type in the command da
 
 ```matlab
 Create_settings_file(filename, filepath) % If you were creating a new settings file
-da = create_data_analysis_tool(path_to_settings, ‘-group’, ‘-hist’, ‘-TSplot’, ‘-tcplot’, ‘-normgroup’);
+da = create_data_analysis_tool(path_to_settings, '-group', '-hist', '-TSplot', '-tcplot', '-normgroup');
 da.run_analysis
 ```
 
-This will produce a number of graphs, automatically saving them at the save path you entered, then closing so you don’t end up with a large number of windows to x out of. They will be automatically saved in the following way: 
+This will produce a number of graphs, automatically saving them at the save path you entered, then closing so you don't end up with a large number of windows to x out of. They will be automatically saved in the following way:
 
 `Datatype_groupNames_plotType_#.pdf`
 

@@ -14,7 +14,7 @@ Author:  [Lisa (Taylor) Ferguson](mailto:taylorl@janelia.hhmi.org)
 
 To Install, clone or download the [G4 Display Tools github repository](https://github.com/JaneliaSciComp/G4_Display_Tools). For full functionality, you must add this folder to the MATLAB path with all its subfolders and files. To do this, click *set path*{:.gui-btn} in the MATLAB home tab, and *add with subfolders*{:.gui-btn}. Next, browse to the location where you saved G4_Display_Tools, save and close the *Set Path*{:.gui-txt} window. Alternatively, in the Current Folder pane in MATLAB, browse to the location where you saved G4_Display_Tools, right click this folder, and select *Add to Path: Selected folders and subfolders*{:.gui-btn}. 
 
-You must also add your configuration file to your MATLAB path. It should be saved at `C:\Program Files (x86)\HHMI G4\Support Files\HHMI Panels Configuration.ini`.  If you don’t have this, please see the [Software Setup documentation](../docs/G4_Software_Setup.html).
+You must also add your configuration file to your MATLAB path. It should be saved at `C:\Program Files (x86)\HHMI G4\Support Files\HHMI Panels Configuration.ini`. If you don't have this, please see the [Software Setup documentation](../docs/G4_Software_Setup.md).
 
 Lastly, please ensure that `C:\matlabroot\PControl_G4_V01\TDMSReaderv2p5` is NOT on your MATLAB path. This folder contains files from previous versions of this software that may conflict with the current files. You can check this via the MATLAB command `contains(path, "TDMSReaderv2p5")` – a return value of `1` means the folder needs to be removed from your path.
 
@@ -40,7 +40,7 @@ In MATLAB open the file `G4_Experiment_Designer.m`, located in `G4_Display_Tools
 
 ## Check the size of the LED arena you are using. 
 
-LED screen arenas come in three row screens and four row screens. Which patterns you can use are determined by the screen size, so be sure to check what type of arena you’re using. 
+LED screen arenas come in three row screens and four row screens. Which patterns you can use are determined by the screen size, so be sure to check what type of arena you're using. 
 
 Notice the radio button at the center left of the application indicating *3 Row Screen*{:.gui-btn} or *4 Row Screen*{:.gui-btn}. Set this to the correct screen size that corresponds with your [hardware setup](../../../docs/G4-Assembly.md) before doing anything else. This setting will become disabled as soon as you import a folder, so if it is incorrect when you import, you will need to restart the application.
 
@@ -78,13 +78,13 @@ Once you have completed the tutorial and filled in these GID values, you should 
 
 # The Designer: Import files
 
-To design an experiment, you must first import the files that you will use for the experiment. These files may include patterns, position functions, analog output functions, or the `currentExp.mat` file produced with every experiment. Patterns describe the visual output on the arena at any point in time. You can use the position functions to change this output over time. Analog output functions are used to generate a corresponding output on the BNC. You should have already created these using the [G4 Motion Maker](../Motion_Maker_G4/About Motion Maker.md) and G4 Function Maker](../Function_Maker_G4/About Function Maker.md). The file `currentExp.mat` is a description of the experiment itself.
+To design an experiment, you must first import the files that you will use for the experiment. These files may include patterns, position functions, analog output functions, or the `currentExp.mat` file produced with every experiment. Patterns describe the visual output on the arena at any point in time. You can use the position functions to change this output over time. Analog output functions are used to generate a corresponding output on the BNC. You should have already created these using the [G4 Pattern Generator](../G4_Pattern_Generator/About Pattern Generator.md) and [G4 Function Generator](../G4_Function_Generator/About Function Generator.md). The file `currentExp.mat` is a description of the experiment itself.
 
 *Note that the `currentExp.mat` file will only exist if you are importing an experiment that has already been designed and saved with the designer. If you are creating a new experiment from scratch, you won't have it. The Designer will create it for you.*
 
 Go to *File*{:.gui-btn} -> *Import*{:.gui-btn} at the top left of the application. A box will appear giving you three options – Folder, File, or Filtered File. Select *Folder*{:.gui-btn} if you want to import all files from a particular folder. Alternatively, you can also import patterns or functions individually, one file at a time. The option *File*{:.gui-btn} allows you to choose a single file. The text you enter after selecting *Filtered File*{:.gui-btn} acts as an additional filter for the file selection dialog. For example, entering 'horizontal' or '0001' in the Filter Import Results will result in a `*horizontal*.mat` or `*0001*.mat` filter respectively. It is therefore like a permanent alternative to typing `*horizontal*.mat` as a filename in the file selector dialog.
 
-After selecting the file or folder you wish to import and depending on the size of your import, a progress bar informs you about the import progress. Once all files have been imported, you will see a summary of imported and skipped files. Files that are not recognized as necessary for an experiment or duplicate files, for example, will be skipped when importing. It will also tell you if there were any unrecognized files and how many. Once you confirm with *OK*{:.gui-btn} the import is complete. At this point you might notice the change in the *Experiment Name*{:.gui-txt} at the bottom of the screen. If you have imported an existing experiment folder, this box will contain the experiment folder’s name. Nothing else will look much different.
+After selecting the file or folder you wish to import and depending on the size of your import, a progress bar informs you about the import progress. Once all files have been imported, you will see a summary of imported and skipped files. Files that are not recognized as necessary for an experiment or duplicate files, for example, will be skipped when importing. It will also tell you if there were any unrecognized files and how many. Once you confirm with *OK*{:.gui-btn} the import is complete. At this point you might notice the change in the *Experiment Name*{:.gui-txt} at the bottom of the screen. If you have imported an existing experiment folder, this box will contain the experiment folder's name. Nothing else will look much different.
 
 # Designing an experimental protocol
 
@@ -128,7 +128,7 @@ If the small checkbox labeled "Arena preview" at the bottom right corner of the 
 
 *Note: Please make sure this check box is not checked if your computer is not actually connected to the arena screens or if the screens are not completely set up as this could cause an error.*
 
-The second thing that will happen is that the embedded list to the right of the preview will fill with all the imported files of that type (patterns if you’ve selected a pattern cell, position functions if you’ve selected a position function cell, and an analog output function for the AO cells). The filename of the selected cell is highlighted, but you may choose other items in this list. If you do, a preview of the item you clicked in the list will appear in the preview frame (and on the arena if enabled). You may go through this list, previewing items, until you find the one you want. Confirm a change in your currently selected cell with the *Select*{:.gui-btn} button. Clicking an empty cell will also provide this list, and you can choose the item you want and hit select to populate the empty cell.
+The second thing that will happen is that the embedded list to the right of the preview will fill with all the imported files of that type (patterns if you've selected a pattern cell, position functions if you've selected a position function cell, and an analog output function for the AO cells). The filename of the selected cell is highlighted, but you may choose other items in this list. If you do, a preview of the item you clicked in the list will appear in the preview frame (and on the arena if enabled). You may go through this list, previewing items, until you find the one you want. Confirm a change in your currently selected cell with the *Select*{:.gui-btn} button. Clicking an empty cell will also provide this list, and you can choose the item you want and hit select to populate the empty cell.
 
 ## Other methods of arranging parameters and trials. 
 
@@ -166,7 +166,7 @@ There are a number of parameters outside the conditions themselves that need to 
 
 ## Saving an experiment. 
 
-You’ll notice that under the *File*{:.gui-btn} menu, there is no "Save" option, only *Save As*{:.gui-btn}. This is a safety precaution to prevent you from overwriting an older experimental protocol. When you hit *Save As*{:.gui-btn}, the application will immediately append a timestamp to the end of your experiment name and save the experiment in a folder of this name in whatever location you browse to. If the experiment name already has a timestamp at the end of it (if, for example, you opened an existing experiment and edited it without changing its name), that timestamp will be removed and replaced with a current one, so your old folder will not be overwritten. 
+You'll notice that under the *File*{:.gui-btn} menu, there is no "Save" option, only *Save As*{:.gui-btn}. This is a safety precaution to prevent you from overwriting an older experimental protocol. When you hit *Save As*{:.gui-btn}, the application will immediately append a timestamp to the end of your experiment name and save the experiment in a folder of this name in whatever location you browse to. If the experiment name already has a timestamp at the end of it (if, for example, you opened an existing experiment and edited it without changing its name), that timestamp will be removed and replaced with a current one, so your old folder will not be overwritten. 
 
 *Note that the experiment does not contain any data at this point, only a protocol defining the experiment.*
 
@@ -186,7 +186,7 @@ Once you have saved an experiment, if you want to design another one, there is n
 
 ## Opening an experiment.
 
-When you go to *File*{:.gui-btn} – *Open*{:.gui-btn}, you’ll see one or more options. *.g4p file*{:.gui-btn} is the first and will always be there. Click this if you want to open an experiment file not listed. When you open an experiment, you should browse to the .g4p file inside the experiment folder and open that. Everything in the folder will automatically be imported.
+When you go to *File*{:.gui-btn} – *Open*{:.gui-btn}, you'll see one or more options. *.g4p file*{:.gui-btn} is the first and will always be there. Click this if you want to open an experiment file not listed. When you open an experiment, you should browse to the .g4p file inside the experiment folder and open that. Everything in the folder will automatically be imported.
 
 Below the *.g4p file*{:.gui-btn} option may be listed up to four experiment names. These are the four most recently opened .g4p files, and if you want to open one of them again, just click the name it will open automatically. When you first start using this software, there will be no recently opened files to list here, but they will appear as you use the software.
 
@@ -204,11 +204,11 @@ The in-screen preview panel shows you a preview of any pattern or function you s
 
 You have some options to set once this window is open. Notice the *Real-time Speed*{:.gui-txt} checkbox below the position function, and the *Frame Increment*{:.gui-txt} field below that. If you hit *Play*{:.gui-btn} immediately after the preview window opens, when the *Frame Increment*{:.gui-txt} is set to `1`, the preview will play VERY slowly. This is because these patterns play on the arena screens at 500 or 1000 frames per second, and a frame increment of 1 means you are showing every single frame on a screen that only refreshes at approximately 20 frames per second.
 
-If you’d like to see the preview in real-time, check the *Real-time Speed*{:.gui-txt} box by the *Pause*{:.gui-btn} button. This will automatically calculate what frame increment is needed to play the trial at its set duration. Notice that while the *Real-time Speed*{:.gui-txt} box is checked, you cannot change the *Frame Increment*{:.gui-txt}.
+If you'd like to see the preview in real-time, check the *Real-time Speed*{:.gui-txt} box by the *Pause*{:.gui-btn} button. This will automatically calculate what frame increment is needed to play the trial at its set duration. Notice that while the *Real-time Speed*{:.gui-txt} box is checked, you cannot change the *Frame Increment*{:.gui-txt}.
 
-If you would like to see the preview at some speed in the middle (fast enough that you don’t grow old waiting for it, but slow enough to get a good idea of what is happening), uncheck the *Real-time Speed*{:.gui-txt} box and set the *Frame increment*{:.gui-txt} to any number. It determines how many frames are skipped between each frame shown, so the higher the number, the faster the playback.
+If you would like to see the preview at some speed in the middle (fast enough that you don't grow old waiting for it, but slow enough to get a good idea of what is happening), uncheck the *Real-time Speed*{:.gui-txt} box and set the *Frame increment*{:.gui-txt} to any number. It determines how many frames are skipped between each frame shown, so the higher the number, the faster the playback.
 
-A vertical bar traces the current position in the position function preview and AO function previews as the pattern plays. A red vertical bar denotes the duration set in the designer. For example, in the picture above, the position function being used has a maximum x value of 7s, but my duration for this trial is set to 5s. Therefore, the red bar marks the place on the function where play will stop. Ideally, you will look for the red vertical bar to fall at the end of your graph, indicating that the duration set in your designer matches the duration of the functions you’re using.
+A vertical bar traces the current position in the position function preview and AO function previews as the pattern plays. A red vertical bar denotes the duration set in the designer. For example, in the picture above, the position function being used has a maximum x value of 7s, but my duration for this trial is set to 5s. Therefore, the red bar marks the place on the function where play will stop. Ideally, you will look for the red vertical bar to fall at the end of your graph, indicating that the duration set in your designer matches the duration of the functions you're using.
 
 ## Generate a video of the preview
 
@@ -253,7 +253,7 @@ Some of the functionality in the designer can only be performed on one condition
 
 ### "You cannot edit that field in this mode."
 
-Most modes only allow certain parameters to be changed. You are trying to edit a parameter not available for the mode. Check the mode value for that condition and make sure it is correct for what you’re trying to do. 
+Most modes only allow certain parameters to be changed. You are trying to edit a parameter not available for the mode. Check the mode value for that condition and make sure it is correct for what you're trying to do. 
 
 ### "The value you've entered is not a multiple of 1000. Please double check your entry." 
 
@@ -261,7 +261,7 @@ This is not actually an error, and will not prevent you from doing anything. How
 
 ### "None of the patterns imported match the screen size selected." 
 
-Check the screen size at the center left of the designer. The patterns you’ve tried to import were made for a different size screen than you have selected. 
+Check the screen size at the center left of the designer. The patterns you've tried to import were made for a different size screen than you have selected. 
 
 ### "If you have imported from multiple locations, you must save your experiment before you can test it on the screens." 
 
@@ -269,7 +269,7 @@ This is also not an error, but a warning. If you have not saved your experiment 
 
 *Note: There are plans in the works to remove this limitation and allow the software to track where each imported file comes from. Look for this in future releases.*
 
-**There are also errors that you might get in MATLAB that don’t produce a dialog box. Some common ones include: **
+**There are also errors that you might get in MATLAB that don't produce a dialog box. Some common ones include:**
 
 ### "Error using fileread. Could not open file HHMI Panels Configuration.ini." 
 

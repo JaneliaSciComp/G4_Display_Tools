@@ -9,11 +9,10 @@ nav_order: 3
 
 Before going through this tutorial, you should have done the following:
 
-- created one or more patterns using the [Motion Maker](../Motion_Maker_G4/About Motion Maker.md)
-- created one or more functions using the [Function Maker](../Function_Maker_G4/About Function Maker.md
+- created one or more patterns using the [Pattern Generator](../G4_Pattern_Generator/About Pattern Generator.md)
+- created one or more functions using the [Function Generator](../G4_Function_Generator/About Function Generator.md
 - Reviewed the different experiment modes
 - [Set up your system](../../../docs/G4-Assembly.html).
-
 
 # Experiment structure
 
@@ -73,7 +72,7 @@ The set of block trials is played twice, but in random order each time.
 
 So you can see that being able to create a single condition is almost all you need to know in order to create an experiment. Once you can create one condition, all you have to do is make a bunch and put them together. 
 
-So what follows is a step by step instructions on how to create a single condition in the G4 Desginer. Please note that you should already have created any patterns and functions you might need for this. If you have not, please see documentation on the [Motion Maker](../Motion_Maker_G4/About Motion Maker.md) and [Function Maker](../Function_Maker_G4/About Function Maker.md) for more details.
+So what follows is a step by step instructions on how to create a single condition in the G4 Desginer. Please note that you should already have created any patterns and functions you might need for this. If you have not, please see documentation on the [Pattern Generator](../G4_Pattern_Generator/About Pattern Generator.md) and [Function Generator](../G4_Function_Generator/About Function Generator.md) for more details.
 
 # Open the designer and import
 
@@ -83,23 +82,30 @@ You should get a screen that looks like this:
 
 ![Empty Designer](assets/screenshot-1.png)
 
-If you get an error, first check that you have the configuration file referenced in [Setup](G4_Software_Setup.md) in place. Then open the file `G4_Display_Tools/G4_Protocol_Designer/G4_Protocol_Designer_Settings.m`. The first line of this file should read: Configuration File Path: [path to your configuration file]. If the path here is incorrect, replace it with the path to your Configuration file. 
+If you get an error, first check that you have the configuration file referenced in [Setup](G4_Software_Setup.md) in place. Then open the file `G4_Display_Tools/G4_Protocol_Designer/G4_Protocol_Designer_Settings.m`. The first line of this file should read: Configuration File Path: [path to your configuration file]. If the path here is incorrect, replace it with the path to your Configuration file.
 
 **Please note that there should be exactly one space between the ':' and the first character of your path, and there should be no spaces after the last character of your path.** Once this first path has been set, you should never open this file again, and instead maintain your settings through the settings window in the Designer. 
 
-If this does not solve your error, see the [G4 Designer documentation](G4_Designer_Manual.md) for more common troubleshooting. 
+If this does not solve your error, see the [G4 Designer documentation](G4_Designer_Manual.md) for more common troubleshooting.
 
 Once the designer is open, you need to import the patterns you intend to use in the experiment, as well as any functions. To do this, click *File*{:.gui-btn} -> *Import*{:.gui-btn}. A small box should pop up:
 
-![Import Window](assets/importWindow.png)
+![Import Window](assets/importWindow.png){:.ifr}
 
-You have three choices - *Folder*{:.gui-txt}, *File*{:.gui-txt}, or *Filtered File*{:.gui-txt}. If you have saved all of your patterns and/or functions in a folder, then choosing *Folder*{:.gui-txt} might be the most convenient option for you. If you select folder, the Designer will attempt to import all files found in the folder. Don't worry if the folder has irrelevant files in it. The Designer will skip any files it doesn't recognize and provide a summary after the import is complete that looks like this:  ![Import Successful](assets/successfulImport.png)
+You have three choices - *Folder*{:.gui-txt}, *File*{:.gui-txt}, or *Filtered File*{:.gui-txt}. If you have saved all of your patterns and/or functions in a folder, then choosing *Folder*{:.gui-txt} might be the most convenient option for you.
+
+
+![Import Successful](assets/successfulImport.png){:.ifr}
+If you select folder, the Designer will attempt to import all files found in the folder. Don't worry if the folder has irrelevant files in it. The Designer will skip any files it doesn't recognize and provide a summary after the import is complete that looks like this:
+{:.clear}
 
 If you would rather import a single file at a time, simply click *File*{:.gui-txt} and browse to the file you want to import. That file could be a pattern .mat file, a function .mat file, or a currentExp.mat file (which you will only have if you have already designed and saved an experiment and you are trying to import that experiment).
 
-The *Filtered File*{:.gui-txt} option is there for your convenience. If you have some kind of naming convention for your files, you can provide a string that the file system can use to narrow down your options and only show you files which match the string. For example, if my patterns are all named Pattern_001.mat, Pattern_002.mat, Pattern_003.mat, etc, I can select *Filtered File*{:.gui-txt}. When this box appears ![filtered file box](assets/filteredFile.png) I could type Pattern into the box and hit okay. Now in my browse window, only files with "Pattern" in the name will be available. This is not case-sensitive. 
+![filtered file box](assets/filteredFile.png){:.ifr}
 
-In this case we are only creating a single condition, so select *File*{:.gui-txt} and browse to the .mat file that was produced when you used the Motion Maker to create a pattern. You should get a litte box saying that one file was successfully imported. 
+The *Filtered File*{:.gui-txt} option is there for your convenience. If you have some kind of naming convention for your files, you can provide a string that the file system can use to narrow down your options and only show you files which match the string. For example, if my patterns are all named `Pattern_001.mat`, `Pattern_002.mat`, `Pattern_003.mat`, etc, I can select *Filtered File*{:.gui-txt}. When this box appears. I could type Pattern into the box and hit okay. Now in my browse window, only files with "Pattern" in the name will be available. This is not case-sensitive. 
+
+In this case we are only creating a single condition, so select *File*{:.gui-txt} and browse to the .mat file that was produced when you used the Pattern Generator to create a pattern. You should get a little box saying that one file was successfully imported. 
 
 The pattern has been imported but not much has changed about the Designer window. Now we can start creating our condition. 
 
@@ -121,7 +127,7 @@ Once you've verified the pattern looks as you expect, click *Select*{:.gui-btn} 
 
 Conditions default to mode 1 but there are 7 modes in all. Mode 6 is currently not functional, but the rest are available to you. When you change the mode, the disabled cells may change. This is because different modes allow different parameters.
 
-For now let's leave it in mode 1. This is the mode that uses a position function to determine which frame of the pattern is displaying at any given time. For mode 1, we need to import a position function. Repeat the import steps above, but this time import a position function that you created with the [Function Maker](../Function_Maker_G4/About Function Maker.md).
+For now let's leave it in mode 1. This is the mode that uses a position function to determine which frame of the pattern is displaying at any given time. For mode 1, we need to import a position function. Repeat the import steps above, but this time import a position function that you created with the [Function Generator](../G4_Function_Generator/About Function Generator.md).
 
 # Add a position function
 
