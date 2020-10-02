@@ -50,7 +50,7 @@ Select whether you would like the application to perform automatic data processi
 
 For this to work, you should have created a data processing settings file and a data analysis settings file earlier in the experiment design process. If processing is checked, the associated filepath should be to your processing settings file, and the same for your plotting (analysis).
 
-If you want your data processed and analyzed automatically but have not set up these settings files, please see [Data analysis](../G4_Data_Analysis/Data_analysis_documentation.md). If you do not wish to use this feature right now, simply uncheck the processing and plotting boxes. 
+If you want your data processed and analyzed automatically but have not set up these settings files, please see [Data analysis](Data_analysis_documentation.md). If you do not wish to use this feature right now, simply uncheck the processing and plotting boxes. 
 
 ## Processing, Plotting, and Run Protocol paths.
 
