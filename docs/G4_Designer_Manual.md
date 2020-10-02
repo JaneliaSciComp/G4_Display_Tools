@@ -12,13 +12,7 @@ has_children: true
 
 Author:  [Lisa (Taylor) Ferguson](mailto:taylorl@janelia.hhmi.org)
 
-To Install, clone or download the [G4 Display Tools github repository](https://github.com/JaneliaSciComp/G4_Display_Tools). For full functionality, you must add this folder to the MATLAB path with all its subfolders and files. To do this, click *set path*{:.gui-btn} in the MATLAB home tab, and *add with subfolders*{:.gui-btn}. Next, browse to the location where you saved G4_Display_Tools, save and close the *Set Path*{:.gui-txt} window. Alternatively, in the Current Folder pane in MATLAB, browse to the location where you saved G4_Display_Tools, right click this folder, and select *Add to Path: Selected folders and subfolders*{:.gui-btn}. 
-
-You must also add your configuration file to your MATLAB path. It should be saved at `C:\Program Files (x86)\HHMI G4\Support Files\HHMI Panels Configuration.ini`. If you don't have this, please see the [Software Setup documentation](../docs/G4_Software_Setup.md).
-
-Lastly, please ensure that `C:\matlabroot\PControl_G4_V01\TDMSReaderv2p5` is NOT on your MATLAB path. This folder contains files from previous versions of this software that may conflict with the current files. You can check this via the MATLAB command `contains(path, "TDMSReaderv2p5")` – a return value of `1` means the folder needs to be removed from your path.
-
-Before you begin, please note that the Pattern, Position function, and AO function .mat files used by this program must be structured correctly for the program to read them. 
+Before you begin, make sure that you have [installed the Display tools](G4_Software_Setup.md). Also note that the Pattern, Position function, and AO function .mat files used by this program must be structured correctly for the program to read them.
 
 - Patterns, at a minimum, must be a struct named pattern with fields `pattern.Pats` and `pattern.gs_val`.
 - Position Functions, at a minimum, must be a struct named pfnparam with fields `pfnparam.gs_val`, `pfnparam.func`, and `pfnparam.size`
@@ -26,7 +20,7 @@ Before you begin, please note that the Pattern, Position function, and AO functi
 
 # Tutorials
 
-This page constitutes the main user manual for the G4 Protocol Designer, but there are a number of additional tutorials to help you get set up. If you need more guidance, please scroll to the bottom of this page for a list of available tutorials.
+This page constitutes the main user manual for the G4 Protocol Designer, but there are a number of [additional tutorials](#additional-resources) to help you get set up.
 
 # The Designer: Start-up
 
@@ -68,7 +62,7 @@ The next three lines in the settings window provide paths to test protocols for 
 
 ## Disabled cells
 
-When using the protocol designer, cells for unavailable parameters will by default fill with ‘---------‘ on a grey background, to indicate that you cannot edit these cells. The next two fields in the settings file allow you to customize the color and text which fill disabled cells. 
+When using the protocol designer, cells for unavailable parameters will by default fill with `---------` on a grey background, to indicate that you cannot edit these cells. The next two fields in the settings file allow you to customize the color and text which fill disabled cells. 
 
 ## Metadata GoogleSheet Properties. 
 
@@ -234,18 +228,24 @@ For an overview on how this works, please see the [Data analysis overview](../do
 
 This pretty much covers the G4 Designer's features and how to use them. However, if you still have any questions or issues, you may refer to one of the additional resources below: 
 
-{::comment}- [This additional information about the experiment modes](../docs/experiment_modes.md)
-- [This tutorial on how to set up your Designer settings](../docs/settings_tutorial.md){:/comment}
+{::comment}
+- [This additional information about the experiment modes](../docs/experiment_modes.md)
+{:/comment}
+
+- [This tutorial on how to set up your Designer settings](../docs/settings_tutorial.md)
 - [This tutorial on how to set up your metadata googlesheet](../docs/googlesheet_tutorial.md)
-{::comment}- [This tutorial on how to create a single condition](../docs/condition_tutorial.md)
+- [This tutorial on how to create a single condition](../docs/condition_tutorial.md)
+
+{::comment}
 - [This tutorial on how to create a full experiment](../docs/experiment_tutorial.md)
 - [This tutorial on how to use the arena without the Designer](../docs/screenTCP_tutorial.md)
 - [This tutorial on how to set up automatic data processing](../docs/processing_tutorial.md)
-- [This tutorial on how to set up automatic data analysis](../docs/analysis_tutorial.md){:/comment}
+- [This tutorial on how to set up automatic data analysis](../docs/analysis_tutorial.md)
+{:/comment}
 
 ## Trouble-shooting
 
-Many common errors will create a dialog box telling you there is a problem, but some of them may be vague if you are new to MATLAB or to this software. Here are some of the most error messages and what to do about them:                                                                                           
+Many common errors will create a dialog box telling you there is a problem, but some of them may be vague if you are new to MATLAB or to this software. Here are some of the most error messages and what to do about them:
 
 ### "You must select a trial" or "Only one trial may be selected." 
 

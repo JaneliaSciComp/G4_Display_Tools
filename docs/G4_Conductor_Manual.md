@@ -12,9 +12,9 @@ has_children: true
 
 The G4 Conductor is the application you will use to run an experimental protocol on the LED screen arena. 
 
-To open this application directly from the G4 Designer, click the *Run Trials*{:.gui-btn} on the left side of the Desiger window. The experimental protocol that was open in the Designer will automatically be opened in the Conductor, assuming you have saved the experimental protocol. 
+To open this application directly from the [G4 Designer](G4_Designer_Manual.md), click the *Run Trials*{:.gui-btn} on the left side of the Designer window. The experimental protocol that was open in the Designer will automatically be opened in the Conductor, assuming you have saved the experimental protocol.
 
-If the Designer is not open, there is no need to open it. You can open the file `G4_Display_Tools/G4_Protocol_Designer/G4_Experiment_Conductor.m` in matlab and hit Run to open the Conductor directly.
+If the Designer is not open, there is no need to open it. You can open the file `G4_Display_Tools/G4_Protocol_Designer/G4_Experiment_Conductor.m` in matlab and hit *Run*{:.gui-btn} to open the Conductor directly.
 
 The window that opens should look something like this:
 
@@ -24,7 +24,7 @@ The top left section contains settings for your experiment. The top right sectio
 
 *Note: You must have set up a metadata google sheet and connected it to the G4 software through the G4 Designer Settings. If you have not done this, the Conductor will not open properly.* 
 
-{::comment}Please see the [tutorial on how to set this up](googlesheet_tutorial.md).{:/comment}
+Please see the [tutorial on how to set this up](googlesheet_tutorial.md).
 
 # Fill out the metadata
 
