@@ -6,7 +6,7 @@ nav_order: 4
 
 # How to run an experiment - an overview
 
-At this point, you should understand, in broad strokes at least, what it entails to create an experiment. To learn to create an experiment in detail and access tutorials regarding the Motion Maker, Function Maker, and G4 Protocol Designer, open the item 'Generation 4' on the left hand menu. 
+At this point, you should understand, in broad strokes at least, what it entails to create an experiment. To learn to create an experiment in detail and access tutorials regarding the Pattern Generator, Function Generator, and G4 Protocol Designer, open the item 'Generation 4' on the left hand menu. 
 
 Once you've created and saved an experiment, you will use the [G4 Conductor](G4_Conductor_Manual.md) to run it. 
 

@@ -54,29 +54,28 @@ If you want your data processed and analyzed automatically but have not set up t
 
 ## Processing, Plotting, and Run Protocol paths.
 
-You must set the paths to three files – the processing and plotting files (if you’ve selected to use them) and the run protocol file. The default paths in the settings file will be placed here automatically, so if you don’t wish to change from the defaults, you don’t have to do anything. However, you can change these without altering the defaults. Hit the *browse*{:.gui-btn} button at the end of each text box to change the file being used in this particular experiment.
+You must set the paths to three files – the processing and plotting files (if you've selected to use them) and the run protocol file. The default paths in the settings file will be placed here automatically, so if you don't wish to change from the defaults, you don't have to do anything. However, you can change these without altering the defaults. Hit the *browse*{:.gui-btn} button at the end of each text box to change the file being used in this particular experiment.
 
-- Please note that the run protocol file is set up to be edited by users if they wish. There is now only one default run protocol, but you can change it and save others if you’d like. You should always save these in `G4_Display_Tools\G4_Protocol_Designer\run_protocols` with the default. Whatever .m file is in this text box is the one that will be run. Please only do this if you are comfortable writing scripts in MATLAB.
+- Please note that the run protocol file is set up to be edited by users if they wish. There is now only one default run protocol, but you can change it and save others if you'd like. You should always save these in `G4_Display_Tools\G4_Protocol_Designer\run_protocols` with the default. Whatever .m file is in this text box is the one that will be run. Please only do this if you are comfortable writing scripts in MATLAB.
 - Please note that you cannot change the experiment name in the conductor. The designer, if it is open, and the conductor share the same underlying experiment. If you change the experiment in the designer, it will change in the conductor, but if you have opened the conductor independently, it will not. For this reason, changing the experiment name in the conductor could lead to confusion as to which is experiment is actually loaded. If you must make any changes, close the conductor and go back to the designer.
 
 # Run a test protocol (optional)
 
 The *Run Test Protocol*{:.gui-btn} button will run the protocol listed in the settings file as the test protocol for that type. This will allow you to see a test run on the screens and make sure it looks right. If you need to adjust these settings, you cannot presently do it from the conductor. Close the conductor, adjust the settings through *File*{:.gui-btn} -> *Settings*{:.gui-btn} on the Designer, then return the conductor when finished.
 
-
 ## The progress bar.
 
-You’ll notice in the image above, the progress bar is split into two halves. A vertical bar will denote the end of each repetition. The more repetitions your experiment has, the more bars there will be. When you start running an experiment, text will appear above the progress bar, telling which trial in which repetition is running at any given time. 
+You'll notice in the image above, the progress bar is split into two halves. A vertical bar will denote the end of each repetition. The more repetitions your experiment has, the more bars there will be. When you start running an experiment, text will appear above the progress bar, telling which trial in which repetition is running at any given time. 
 
 ## Trial Data.
 
-Below the progress bar will be the parameters for the trial currently running on the screen. You’ll notice that the *Pattern*{:.gui-txt}, *position function*{:.gui-txt}, and *AO functions*{:.gui-txt} give numbers, not file names. This is the value being sent to the screens. If `Pattern_0008` is the fourth pattern in the patterns field of `currentExp.mat`, then the number provided under *Pattern*{:.gui-txt} will be 4. The `currentExp.mat` file stores all the experiment parameters and sends them to the screen in a way the screens can understand.
+Below the progress bar will be the parameters for the trial currently running on the screen. You'll notice that the *Pattern*{:.gui-txt}, *position function*{:.gui-txt}, and *AO functions*{:.gui-txt} give numbers, not file names. This is the value being sent to the screens. If `Pattern_0008` is the fourth pattern in the patterns field of `currentExp.mat`, then the number provided under *Pattern*{:.gui-txt} will be 4. The `currentExp.mat` file stores all the experiment parameters and sends them to the screen in a way the screens can understand.
 
 Also beneath this will be the total time the experiment is expected to take.
 
 ## Run the experiment.
 
-When you are ready to go, hit the *Run Experiment*{:.gui-btn} button. It will take a few seconds to connect to the G4 Host, but when everything is ready, a dialog box will pop up asking you to *Start*{:.gui-btn} or *Cancel*{:.gui-btn}. If you entered a duration of zero for your pre-trial, don’t forget you will need to hit a button to make the experiment go past the pre-trial.
+When you are ready to go, hit the *Run Experiment*{:.gui-btn} button. It will take a few seconds to connect to the G4 Host, but when everything is ready, a dialog box will pop up asking you to *Start*{:.gui-btn} or *Cancel*{:.gui-btn}. If you entered a duration of zero for your pre-trial, don't forget you will need to hit a button to make the experiment go past the pre-trial.
 
 ## Abort an experiment.
 

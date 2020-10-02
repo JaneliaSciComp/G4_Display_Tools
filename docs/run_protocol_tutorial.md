@@ -8,8 +8,8 @@ nav_order: 4
 # Prerequisites
 
 - [G4 Setup](G4_Software_Setup.md)
-- have designed at least one pattern using the [Motion Maker](../Motion_Maker_G4/About Motion Maker.md)
-- have designed at least one position function using the [Function Maker](../Function_Maker_G4/About Function Maker.md)
+- have designed at least one pattern using the [Pattern Maker](../G4_Pattern_Generator/About Pattern Generator.md)
+- have designed at least one position function using the [Function Generator](../G4_Function_Generator/About Function Generator.md)
 - Have some basic knowledge of programming in matlab
 
 # Introduction
@@ -36,7 +36,7 @@ As you can see, you send commands to the screen generally by typing `Panel_com(c
 
 Now that you know you can send commands to the screens via matlab commandline, it becomes clear that you could run an entire condition this way if you knew which commands to use. I'll take you through the steps to do this now. Once you have run a condition via command line, it will be much easier to understand the function of the run protocol. 
 
-To do this, you will need an experiment folder, or at least a mock experiment folder, containing a pattern and function. If you've already done the tutorial on how to [design a condition](condition_tutorial.md), you should have one, wherever you saved the file in that tutorial. If you've not done this yet, that's okay. Create a test folder on your desktop or somewhere else easily accessible (you can delete it later). Inside this folder should be two folders - one called Patterns and one called Functions. And each of these folders should contain at least one pattern and one function, created using the [Motion Maker](../Motion_Maker_G4/About Motion Maker.md) and the [Function Maker](../Function_Maker_G4/About Function Maker.md). Both files associated with the pattern or function, .mat and .pat files, should be present. This next section will not work if you don't have a pattern and a function to send to the screens. 
+To do this, you will need an experiment folder, or at least a mock experiment folder, containing a pattern and function. If you've already done the tutorial on how to [design a condition](condition_tutorial.md), you should have one, wherever you saved the file in that tutorial. If you've not done this yet, that's okay. Create a test folder on your desktop or somewhere else easily accessible (you can delete it later). Inside this folder should be two folders - one called Patterns and one called Functions. And each of these folders should contain at least one pattern and one function, created using the [Pattern Generator](../G4_Pattern_Generator/About Pattern Generator.md) and the [Function Generator](../G4_Function_Generator/About Function Generator.md). Both files associated with the pattern or function, .mat and .pat files, should be present. This next section will not work if you don't have a pattern and a function to send to the screens.
 
 If you did not send the connectHost command to the screens earlier, do it now. Panel Host must be connected before sending any other commands via Panel_com. 
 
@@ -58,7 +58,7 @@ This command sets your experiment mode. Remember the screens are capable of runn
 
 - `Panel_com('set_pattern_id',1)`
 
-This command tells the screens which pattern you want to use. Notice that you do not pass it a filepath, but a number. This is why your experiment folder must be set up the way it is. The software knows automatically to look in the 'Patterns' folder inside your experiment folder. It then find the pattern with an ID of (in this case) 1. You set the pattern's ID in the [Motion Maker](../Motion_Maker_G4/About Motion Maker.md) when you designed the pattern. 
+This command tells the screens which pattern you want to use. Notice that you do not pass it a filepath, but a number. This is why your experiment folder must be set up the way it is. The software knows automatically to look in the 'Patterns' folder inside your experiment folder. It then find the pattern with an ID of (in this case) 1. You set the pattern's ID in the [Pattern Generator](../G4_Pattern_Generator/About Pattern Generator.md) when you designed the pattern. 
 
 It is good practice to name your patterns with their ID number in the name so that they will be ordered correctly in the folder and you don't have to remember the ID for every pattern. For example, when we make a set of patterns for an experiment, they each have a unique ID of 1 through the number of patterns we are making. Their filenames, then, are 'Pattern_0001', 'Pattern_0002', etc with the number in the filename matching the ID number. This way, it is easy to remember which ID number you should be sending to the screen in order to get the pattern that you want. 
 

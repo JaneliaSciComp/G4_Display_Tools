@@ -101,14 +101,14 @@ for mtype = 1:2
     
         param.ID = param.ID + 1;
         %generate and save pattern for this condition ID
-        [Pats, param.true_step_size, param.rot180] = Motion_Maker_G4(param);
+        [Pats, param.true_step_size, param.rot180] = G4_Pattern_Generator(param);
         param.stretch = zeros(size(Pats,3),1);
         save_pattern_G4(Pats, param, [exp_folder '\Patterns'], ['Pattern_' num2str(param.ID, '%04d') '_G4.mat']);
         %generate and save position function for this condition ID
-        func = Function_Maker_G4(afnparam); afnparam.ID = param.ID;
+        func = G4_Function_Generator(afnparam); afnparam.ID = param.ID;
         save_function_G4(func, afnparam, [exp_folder '\Analog Output Functions'], ['FunctionAO_' num2str(param.ID, '%04d') '_G4.mat']);
         %generate and save analog output function for this condition ID
-        func = Function_Maker_G4(pfnparam); pfnparam.ID = param.ID;
+        func = G4_Function_Generator(pfnparam); pfnparam.ID = param.ID;
         save_function_G4(func, pfnparam, [exp_folder '\Functions'], ['Function_' num2str(param.ID, '%04d') '_G4.mat']);
     end
 end
