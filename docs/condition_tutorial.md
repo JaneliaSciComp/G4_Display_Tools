@@ -74,7 +74,7 @@ So you can see that being able to create a single condition is almost all you ne
 
 So what follows is a step by step instructions on how to create a single condition in the [G4 Designer](G4_Designer_Manual.md). Please note that you should already have created any patterns and functions you might need for this. If you have not, please see documentation on the [Pattern Generator](../G4_Pattern_Generator/About Pattern Generator.md) and [Function Generator](../G4_Function_Generator/About Function Generator.md) for more details.
 
-# Open the designer and import
+# Open the designer
 
 First you have to open the Designer. There are two ways to do this. Assuming the [G4 Display Tools are on your matlab path](G4_Software_Setup.html#add-to-path), you can simply type `G4_Experiment_Designer` into your matlab command line. Alternatively, you can browse to the file `G4_Display_Tools/G4_Protocol_Designer/G4_Experiment_Designer.m`, open the file in matlab, and hit *Run*{:.gui-btn} at the top of the matlab window.
 
@@ -87,6 +87,18 @@ If you get an error, first check that you have the configuration file referenced
 **Please note that there should be exactly one space between the ':' and the first character of your path, and there should be no spaces after the last character of your path.** Once this first path has been set, you should never open this file again, and instead maintain your settings through the settings window in the Designer. 
 
 If this does not solve your error, see the [G4 Designer documentation](G4_Designer_Manual.md) for more common troubleshooting.
+
+## Screen size
+
+When you first open the designer, the first thing you should always do is set your screen type. On the left hand side of the designer you should see a pair of radio buttons that look like this:
+
+!(Screen size button)[assets/ScreenSizeBtn.png]
+
+Some arenas have three rows of panels, and some arenas have four rows of panels. When you create patterns with the Pattern Maker, they are created for one size screen or the other. An experiment cannot contain a mix of 3 row and 4 row patterns. Once you import the patterns you want to use in this experiment, this radio button will grey out and you will no longer be able to change it. This is a safety feature to prevent you from accidentally mixing different size patterns in your experiment. 
+
+As such, before doing anything else, you need to select which type of screen this experiment is meant for. 
+
+# Import
 
 Once the designer is open, you need to import the patterns you intend to use in the experiment, as well as any functions. To do this, click *File*{:.gui-btn} -> *Import*{:.gui-btn}. A small box should pop up:
 
