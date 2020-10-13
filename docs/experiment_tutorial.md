@@ -30,7 +30,7 @@ When you click *Auto-Fill*{:.gui-btn}, the software does several things.
 
 Make sure you have imported at least two patterns and one function, and then click *Auto-Fill*{:.gui-btn} to test this feature out yourself. In my example, I have imported five patterns and one function, and *Auto-Fill*{:.gui-btn} produces this:
 
-!(Auto-Fill Results)[assets/autofill.png]
+![Auto-Fill Results](assets/autofill.png)
 
 It's unlikely that you will want your experiment organized in exactly this order. Auto-Fill is not meant to create your experiment but simply to give you a starting point. However, when you're creating your patterns and functions, it might be helpful to keep the Auto-Fill function in mind. If you know what order you want your patterns to run in the experiment, giving them ID values ascending in that order will make organizing the experiment much easier in the Designer. 
 
@@ -42,7 +42,7 @@ As in the previous tutorial, you can click on any cell in the table. If it is a 
 
 If you wish to use a different mode, just erase the current mode and type in a number 1-7. This will automatically change which cells are disabled. Here is an example of what various modes look like: 
 
-!(Different modes in the Designer)[assets/modesInDesigner.png]
+![Different modes in the Designer](assets/modesInDesigner.png)
 
 Notice the buttons to the right side of the Block Trials table. These include the *Shift Up*{:.gui-btn}, *Shift Down*{:.gui-btn}, *Add Trial*{:.gui-btn}, *Delete Trial*{:.gui-btn}, and *Invert Selection*{:.gui-btn}. These can help you re-organize your conditions. 
 
@@ -60,17 +60,18 @@ Last is the *Invert Selection*{:.gui-btn} button. Select a couple, but not all, 
 
 # Pre, Inter, and Post-trial conditions
 
+![Copy To Box](assets/CopyToBox.png){:.ifr}
+
 Notice that these buttons do not have any effect on the Pre, Inter, and Post-trials. These trials are usually just created manually, by the method shown in the previous tutorial on how to create a condition. However, there are a couple other tools you can use to speed this up. 
 
 Select one of your conditions in the block trials. Then go to *File*{:.gui-btn} -> *Copy To*{:.gui-btn}. A box like this will pop up: 
 
-!(Copy To Box)[assets/CopyToBox.png]
-
 Select one or more of the options and click *OK*{:.gui-btn}. You can select them one by one, or you can click the *Select All*{:.gui-btn} button at the bottom to select all three. The condition from your block trials which you have selected will be copied into all the tables that you chose in the pop up box - the Pre, Inter, or Post-trial areas. If you have a single trial you want to serve as pre, inter, and post-trial, or two of the three, this is a slightly quicker way to create them. 
 
-Now select several conditions in your block trials. Then go to *File*{:.gui-btn} -> *Set Selected...*{:.gui-btn}. This feature will likely not be used much, but I just want to make you aware of it. In this case, a pop up window will appear giving you a field for every cell in the condition, like this: 
+Now select several conditions in your block trials. Then go to *File*{:.gui-btn} -> *Set Selected...*{:.gui-btn}. This feature will likely not be used much, but I just want to make you aware of it. In this case, a pop up window will appear giving you a field for every cell in the condition, like this:
+{:.clear}
 
-!(Set Selected Window)[assets/SetSelectedBox.png]
+![Set Selected Window](assets/SetSelectedBox.png){:.ifr}
 
 Here you can type in the value for each field. Be aware that there is no error-checking here. It is up to you to make sure you type in the pattern and function names correctly. Otherwise when you try to run the condition, you will get an error because the screens will not be able to find the correct pattern or function file. You should also put in a frame index of 1, assuming you are not using a mode in which you might make the frame index something else. Frame index is, by default, 1. Type in mode 1, a pattern name, a function name, a frame index of 1, and a duration (any number). The rest you can leave blank, and click *OK*{:.gui-btn}. Every condition you have selected will be filled in with this information. This is another easy way to create many copies of the same condition. 
 
@@ -79,8 +80,9 @@ Here you can type in the value for each field. Be aware that there is no error-c
 In the condition tutorial, you went through how to preview a condition, using the Preview and Dry Run buttons on the bottom left. But we pretty much ignored in the in-screen preview. Let's go through that now. 
 
 Click on the pattern name in one of your conditions. When you click on it, the Preview pane should populate as shown below:
+{:.clear}
 
-!(In Screen Preview)[assets/inScrnPrv.png]
+![In Screen Preview](assets/inScrnPrv.png)
 
 Below the in screen preview are a number of buttons. Click *Forward Frame*{:.gui-btn}. Your pattern preview should change slightly. This button allows you to move through each frame in the pattern. Patterns are 3 dimensional arrays. The first two dimensions indicate the width and height of the pattern. The third dimension determines the number of frames in the pattern, so *Frame Forward*{:.gui-btn} and *Back Frame*{:.gui-btn} move you forward and backward through this third dimension. If you don't want to look at each frame individually, click *Play*{:.gui-btn}. This will cause the pattern to play through each frame at a relatively slow frame rate. You may hit *Pause*{:.gui-btn} to stop this play back where it is. Hit *Stop*{:.gui-btn} to stop the playing and return the preview back to the first frame. This allows you to explore any imported pattern and make sure it is as you expect. 
 
@@ -90,7 +92,7 @@ Now click on a function in one of your conditions. The pattern display should be
 
 You may see a red vertical bar somewhere on your function. This indicates the duration set for the condition the pattern is in. For example, in this preview, the condition's duration is set to 3 seconds. Notice that the upper x-axis of the shown function represents time, and ends at 3 seconds.
 
-!(Function Preview)[assets/redBarFunc.png]
+![Function Preview](assets/redBarFunc.png)
 
 This is why the red vertical bar lines up with the end of the function. The red bar does not have to line up with the end, but normally this is what you would want, and condition that plays long enough to get through your position function exactly once. Of course, this is only relevant in modes that use a position function. 
 
@@ -112,13 +114,14 @@ NOTE: If you have not saved your experiment, this feature may not work. The reas
 
 Now that you're familiar with the tables and previewing options, lets look to the left side of the Designer. 
 
+![Experiment Length Button](assets/expLength.png){:.ifr}
+
 Click the *Calculate Experiment Length*{:.gui-btn} button. As you might expect, it provides you with an estimate of how long your experiment will take as it is arranged at that moment. 
 
-!(Experiment Length Button)[assets/expLength.png]
+Below this button is a panel containing two radio buttons. You must choose one option or the other.
+{:.clear}
 
-Below this button is a panel containing two radio buttons. You must choose one option or the other. 
-
-!(Random or Sequential Radio Buttons)[assets/randomRadios.png]
+![Random or Sequential Radio Buttons](assets/randomRadios.png){:.ifr}
 
 If you select *Randomize Trials*{:.gui-txt}, then every time your main block of trials runs, the conditions will be run in a random order. If you select *Sequential Trials*{:.gui-txt}, then every time the main block plays, the conditions will play in the order that they appear in the Block Trials table. For an example of the difference, refer back to the beginning of the (condition tutorial)[condition_tutorial.md].
 
@@ -130,7 +133,7 @@ Next is the *Run Trials*{:.gui-btn}. You can always open the G4 Conductor direct
 
 The next panel allows you to set the sample rates of any Analog Input Channels you might be using.
 
-!(Analog Input Channels)[assets/AIC.png]
+![Analog Input Channels](assets/AIC.png){:.ifr}
 
 If you do not want to use an input channel, simply set its sample rate to 0. It's common in our lab not to use any of them. Otherwise, this should be the sample rate (in Hz) that you want your input channel to use. 
 
@@ -146,13 +149,13 @@ You've now been introduced to everything you need to create an entire experiment
 
 Now that you've created an experiment, let's save it! Go to *File*{:.gui-btn} -> *Save As*{:.gui-btn}. This window will appear: 
 
-!(Save As Window)[assets/saveAs.png]
+![Save As Window](assets/saveAs.png)
 
 Notice the program added a timestamp to the end of your experiment name automatically, and gave it the extension '.g4p.' This is the extension we assign to the .mat file which contains all the parameters and conditions for your experiment. It stands for G4 Protocol. 
 
 Browse to the location you want to save and click save. Notice that it does not just save the .g4p file. There should now be a folder in the location you chose with the same name as the .g4p file. The inside of the folder should be structured something like this: 
 
-!(Experiment Folder example)[assets/exportedFolder.png]
+![Experiment Folder example](assets/exportedFolder.png)
 
 In this scenario, tutorial10-08-20_10-35-14 is what is referred to in the documentation as my Experiment Folder. It contains everything needed to run this experiment. Inside is the .g4p file as well as the currentExp.mat file. This .mat file contains data regarding the patterns and function in your experiment, but you don't need to do anything with it. It should then contain three folders: 'Patterns', 'Functions', and "Analog Output Functions.' Inside each are both the binary files (.pat, .pfn, .afn) and .mat files associated with each pattern or function. Do not alter or move any of these files. Leave the folder arranged how it is.
 
