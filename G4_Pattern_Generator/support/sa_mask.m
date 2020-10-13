@@ -7,7 +7,7 @@ function mask = sa_mask(x, y, z, sa_mask_params, aa_samples)
 % 
 % inputs:
 % x/y/z: cartesian coordinates for every pixel in arena
-% sa_mask_params: [center-longitude, center-lattitude, solid-angle, out/in]
+% sa_mask_params: [center-longitude, center-latitude, solid-angle, out/in]
 %               4th vector (out/in) is optional; setting to 1 masks the 
 %               inside of the solid angle specified rather than the outside
 % aa_samples: %# of samples taken to calculate the brightness of each pixel
@@ -18,7 +18,7 @@ function mask = sa_mask(x, y, z, sa_mask_params, aa_samples)
 
 
 coord = sa_mask_params(1:2);
-coord(2) = coord(2)+pi/2; %convert from lattitude to spherical
+coord(2) = coord(2)+pi/2; %convert from latitude to spherical
 solid_angle = sa_mask_params(3);
 
 %rotate mask center to south pole
