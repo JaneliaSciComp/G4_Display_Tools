@@ -90,13 +90,13 @@ If this does not solve your error, see the [G4 Designer documentation](G4_Design
 
 ## Screen size
 
-When you first open the designer, the first thing you should always do is set your screen type. On the left hand side of the designer you should see a pair of radio buttons that look like this:
+![Screen size button](assets/ScreenSizeBtn.png){:.ifr}
 
-!(Screen size button)[assets/ScreenSizeBtn.png]
+When you first open the designer, the first thing you should always do is set your screen type. On the left hand side of the designer you should see a pair of radio buttons that look like this:
 
 Some arenas have three rows of panels, and some arenas have four rows of panels. When you create patterns with the Pattern Maker, they are created for one size screen or the other. An experiment cannot contain a mix of 3 row and 4 row patterns. Once you import the patterns you want to use in this experiment, this radio button will grey out and you will no longer be able to change it. This is a safety feature to prevent you from accidentally mixing different size patterns in your experiment. 
 
-As such, before doing anything else, you need to select which type of screen this experiment is meant for. 
+As such, before doing anything else, you need to select which type of screen this experiment is meant for.
 
 # Import
 
