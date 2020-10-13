@@ -36,7 +36,7 @@ fprintf(FID,'%s\n',['param.pattern_fov = ''' param.pattern_fov '''; %full-field 
 fprintf(FID,'%s\n',['param.arena_pitch = ' num2str(param.arena_pitch, '%.4g') '; %angle of arena pitch (0 = straight ahead, positive values = pitched up)']);
 fprintf(FID,'%s\n',['param.gs_val = ' num2str(param.gs_val) '; %bits of intensity value (1 or 4)']);
 fprintf(FID,'%s\n',['param.levels = [' num2str(param.levels, '%d') ']; %brightness level of [1st bar (in grating) or advancing edge, 2nd bar or receding edge, background (mask)]']);
-fprintf(FID,'%s\n',['param.pole_coord = [' num2str(param.pole_coord, ' %.4g') ']; %location of pattern pole [longitude, lattitude] {for pattern_fov=full-field}']);
+fprintf(FID,'%s\n',['param.pole_coord = [' num2str(param.pole_coord, ' %.4g') ']; %location of pattern pole [longitude, latitude] {for pattern_fov=full-field}']);
 fprintf(FID,'%s\n',['param.motion_angle = ' num2str(param.motion_angle, '%.4g') '; %angle of rotation (0=rightward motion, positive values rotate the direction clockwise) {fov=local}']);
 fprintf(FID,'%s\n',['param.spat_freq = ' num2str(param.spat_freq, '%.4g') '; %spatial angle (in radians) before pattern repeats {for gratings and edge}']);
 fprintf(FID,'%s\n',['param.step_size = ' num2str(param.step_size, '%.4g') '; %amount of motion per frame (in radians) {for type~=off/on}']);
@@ -48,8 +48,8 @@ fprintf(FID,'%s\n',['param.dot_occ = ''' param.dot_occ '''; %how occluding dots 
 fprintf(FID,'%s\n',['param.dot_re_random = ' num2str(1) '; %whether to re-randomize dot starting locations (1=randomize, 0=reuse previous) {for startfield}']);
 fprintf(FID,'%s\n',['param.dot_level = ' num2str(param.dot_level) '; %0 = dot brightness set to 1st level; 1 and 2 = random brightness (0-1st; 0 or 1st) {for starfield}']);
 fprintf(FID,'%s\n',['param.snap_dots = ' num2str(param.snap_dots) '; %1 if apparent dot locations should be rounded to the nearest pixel {for starfield}']);
-fprintf(FID,'%s\n',['param.sa_mask = [' num2str(param.sa_mask, ' %.3g') ']; %location, size, and direction of solid angle mask [longitude, lattitude, solid_angle, out/in]']);
-fprintf(FID,'%s\n',['param.long_lat_mask = [' num2str(param.long_lat_mask, ' %.3g') ']; %coordinates of lattitude/longitude mask [min-long, max-long, min-lat, max-lattitude, out/in]']);
+fprintf(FID,'%s\n',['param.sa_mask = [' num2str(param.sa_mask, ' %.3g') ']; %location, size, and direction of solid angle mask [longitude, latitude, solid_angle, out/in]']);
+fprintf(FID,'%s\n',['param.long_lat_mask = [' num2str(param.long_lat_mask, ' %.3g') ']; %coordinates of latitude/longitude mask [min-long, max-long, min-lat, max-latitude, out/in]']);
 fprintf(FID,'%s\n',['param.aa_samples = ' num2str(param.aa_samples) '; %# of samples taken to calculate the brightness of each pixel (1 or 15 suggested)']);
 fprintf(FID,'%s\n',['param.aa_poles = ' num2str(param.aa_poles) '; %1=anti-aliases the poles of rotation/translation grating/edge stimuli by matching them to the duty cycle']);
 fprintf(FID,'%s\n',['param.back_frame = ' num2str(param.back_frame) '; %1=adds a frame (frame 1) uniformly at background (mask) level']);

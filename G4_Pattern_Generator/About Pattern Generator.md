@@ -2,6 +2,7 @@
 title: G4 Pattern Generator
 parent: Generation 4
 nav_order: 10
+has_children: true
 ---
 
 1. TOC
@@ -9,7 +10,7 @@ nav_order: 10
 
 # Overview of G4_Pattern_Generator
 
-This set of MATLAB scripts and GUIs can be used to design patterns (primarily for displaying motion, rather than pictures of objects) on a G4 display. Patterns are generated using the `G4_Pattern_Generator.m` script based on input parameters that describe the desired motion. These scripts output two types of pattern files: The first type is a .mat file which contains the created pattern matrix (named `Pats`) and all the pattern parameters so that it can be easily read back into MATLAB. The second type is a .pat file containing a binary vector of the pattern that can be quickly accessed by the Display Controller. Only the .pat file is necessary to be displayed on a G4 arena, though the .mat file is needed to be easily loaded back into MATLAB for viewing, debugging, or for creating experiments with the G4_Protocol_Designer.
+This set of MATLAB scripts and GUIs can be used to design patterns (primarily for displaying motion, rather than pictures of objects) on a G4 display. Patterns are generated using the `G4_Pattern_Generator.m` script based on input parameters that describe the desired motion. These scripts output two types of pattern files: The first type is a .mat file which contains the created pattern matrix (named `Pats`) and all the pattern parameters so that it can be easily read back into MATLAB. The second type is a .pat file containing a binary vector of the pattern that can be quickly accessed by the Display Controller. Only the .pat file is necessary to be displayed on a G4 arena, though the .mat file is needed to be easily loaded back into MATLAB for viewing, debugging, or for creating experiments with the [G4_Protocol_Designer](../docs/G4_Designer_Manual.md).
 
 ## Mapping the display pixel coordinates in 3D. 
 

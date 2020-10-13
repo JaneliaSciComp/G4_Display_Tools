@@ -83,7 +83,7 @@ if param.sa_mask(3)<pi
     mask = repmat(mask,[1, 1, num_frames]);
     Pats = Pats.*mask + param.levels(3)*ones(size(Pats)).*(1-mask);
 end
-%lattitude-longitude mask
+%latitude-longitude mask
 if abs(diff(param.long_lat_mask(1:2)))<2*pi || abs(diff(param.long_lat_mask(3:4)))<pi
     [arena_phi, arena_theta, ~] = cart2sphere(arena_x, arena_y, arena_z);
     mask = long_lat_mask(arena_phi, arena_theta, param.long_lat_mask, param.aa_samples);

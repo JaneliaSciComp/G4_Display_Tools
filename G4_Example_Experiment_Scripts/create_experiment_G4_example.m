@@ -10,7 +10,7 @@ param.pattern_fov = 'full-field'; %full-field or local
 param.arena_pitch = 0; %angle of arena pitch (0 = straight ahead, positive values = pitched up)
 param.gs_val = 4; %bits of intensity value (1 or 4)
 param.levels = [15 0 7]; %brightness level of [1st bar (in grating) or advancing edge, 2nd bar or receding edge, background (mask)]
-param.pole_coord = deg2rad([0 -90]); %location of pattern pole [longitude, lattitude] {for pattern_fov=full-field}
+param.pole_coord = deg2rad([0 -90]); %location of pattern pole [longitude, latitude] {for pattern_fov=full-field}
 param.motion_angle = deg2rad(0); %angle of rotation (0=rightward motion, positive values rotate the direction clockwise) {fov=local}
 param.spat_freq = deg2rad(60); %spatial angle (in radians) before pattern repeats {for gratings and edge}
 param.step_size = deg2rad(1.875); %amount of motion per frame (in radians) {for type~=off/on}
@@ -22,8 +22,8 @@ param.dot_occ = 'closest'; %how occluding dots are drawn (closest, sum, or mean)
 param.dot_re_random = 1; %whether to re-randomize dot starting locations (1=randomize, 0=reuse previous) {for starfield}
 param.dot_level = 0; %0 = dot brightness set to 1st level; 1 and 2 = random brightness (0-1st; 0 or 1st) {for starfield}
 param.snap_dots = 0; %1 if apparent dot locations should be rounded to the nearest pixel {for starfield}
-param.sa_mask = deg2rad([0 0 180 0]); %location, size, and direction of solid angle mask [longitude, lattitude, solid_angle, out/in]
-param.long_lat_mask = deg2rad([-180 180 -90 90 0]); %coordinates of lattitude/longitude mask [min-long, max-long, min-lat, max-lattitude, out/in]
+param.sa_mask = deg2rad([0 0 180 0]); %location, size, and direction of solid angle mask [longitude, latitude, solid_angle, out/in]
+param.long_lat_mask = deg2rad([-180 180 -90 90 0]); %coordinates of latitude/longitude mask [min-long, max-long, min-lat, max-latitude, out/in]
 param.aa_samples = 15; %# of samples taken to calculate the brightness of each pixel (1 or 15 suggested)
 param.aa_poles = 1; %1=anti-aliases the poles of rotation/translation grating/edge stimuli by matching them to the duty cycle
 param.back_frame = 1; %1=adds a frame (frame 1) uniformly at background (mask) level
@@ -95,9 +95,9 @@ for mtype = 1:2
         param.motion_type = 'translation';
     end
     pole_longitudes = [0 0 0 180 -90 90];
-    pole_lattitudes = [-90 90 0 0 0 0];
+    pole_latitudes = [-90 90 0 0 0 0];
     for p = 1:6
-        param.pole_coord = deg2rad([pole_longitudes(p) pole_lattitudes(p)]);
+        param.pole_coord = deg2rad([pole_longitudes(p) pole_latitudes(p)]);
     
         param.ID = param.ID + 1;
         %generate and save pattern for this condition ID

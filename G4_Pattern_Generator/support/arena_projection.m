@@ -28,7 +28,7 @@ center_w = 0.5;
 switch plot_type
     case 1 %mercator projection
         x = rad2deg(arena_phi);
-        y = rad2deg(arena_theta)-90; %convert to lattitude
+        y = rad2deg(arena_theta)-90; %convert to latitude
         dot_size = 140*p_rad;
         axes = [-180 180 -90 90];
     case 2 %grid projection
