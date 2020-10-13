@@ -14,10 +14,10 @@ function [Pats, num_frames, true_step_size] = make_grating_edge(param, arena_x, 
 % param.step_size: amount of motion per frame
 % param.spat_freq: angle before the pattern repeats
 % param.duty_cycle: percent of square wave at the high value/ also sets the value of translation poles
-% param.pole_coord: location of pattern pole [longitude, lattitude]
-% param.sa_mask: [mask-center-longitude, mask-center-lattitude]
+% param.pole_coord: location of pattern pole [longitude, latitude]
+% param.sa_mask: [mask-center-longitude, mask-center-latitude]
 % param.motion_angle: direction of motion (0=left->right; positive values rotate the direction clockwise)
-% param.sa_mask: [mask-center-longitude, mask-center-lattitude]
+% param.sa_mask: [mask-center-longitude, mask-center-latitude]
 % param.aa_samples: # of samples taken to calculate a single pixel's brightness
 % param.aa_poles: anti-aliases the poles of rotation/translation grating/edge stimuli by matching them to the duty cycle
 % param.phase_shift: amount to shift the starting phase of the grating/edge pattern
