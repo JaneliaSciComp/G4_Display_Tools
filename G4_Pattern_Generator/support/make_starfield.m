@@ -12,8 +12,8 @@ function [Pats, num_frames, true_step_size] = make_starfield(param, arena_x, are
 % param.dot_level: 0 = dot brightness set to 1st level; 1 and 2 = random brightness (0-1st; 0 or 1st)
 % param.arena_pitch: pitch of arena 
 % param.step_size: distance dot travels per frame
-% param.pole_coord: location of pattern pole [longitude, lattitude]
-% param.sa_mask: [mask-center-longitude, mask-center-lattitude]
+% param.pole_coord: location of pattern pole [longitude, latitude]
+% param.sa_mask: [mask-center-longitude, mask-center-latitude]
 % param.motion_angle: direction of motion (0=left->right, positive values rotate clockwise)
 % param.num_dots: number of random dots generated in arena space
 % param.dot_radius: radius of each dot

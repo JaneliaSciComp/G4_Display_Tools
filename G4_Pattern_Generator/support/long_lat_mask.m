@@ -3,15 +3,15 @@ function mask = long_lat_mask(phi, theta, long_lat_params, aa_samples)
 %
 % Given a 2-D matrix of points in spherical coordinates (phi, theta), this 
 % function generates a mask for all points that lie either outside or 
-% inside the lattitude/longitude lines specified
+% inside the latitude/longitude lines specified
 % 
 % inputs:
 % phi: 2-D array of angles of rotation around the z-axis (longitude)
-% theta: 2-D array of angles around the x-axis (lattitude)
-% long_lat_params: [min-longitude, max-longitude, min-lattitude, 
-%                   max-lattitude, out/in]
+% theta: 2-D array of angles around the x-axis (latitude)
+% long_lat_params: [min-longitude, max-longitude, min-latitude, 
+%                   max-latitude, out/in]
 %                   5th vector (out/in) is optional; setting to 1 masks
-%                   the inside of the lattitude/longitude lines specified
+%                   the inside of the latitude/longitude lines specified
 %                   rather than the outside
 % aa_samples: %# of samples taken to calculate the brightness of each pixel
 %
@@ -20,11 +20,11 @@ function mask = long_lat_mask(phi, theta, long_lat_params, aa_samples)
 %               create smooth mask edges if aa_samples>1)
 
 longs = long_lat_params(1:2);
-lats = long_lat_params(3:4) + pi/2; %convert from lattitude to spherical
+lats = long_lat_params(3:4) + pi/2; %convert from latitude to spherical
 mask_lo = ones(size(phi));
 mask_la = ones(size(phi));
 
-%create lattitude mask
+%create latitude mask
 if abs(diff(lats))<pi
     samples = samples_by_diff(theta, aa_samples);
     mask_la = samples>min(lats) & samples<max(lats);
@@ -41,7 +41,7 @@ end
 %combine masks
 mask = mask_la.*mask_lo;
 
-%mask inside of lattitude/longitude lines rather than outside (if desired)
+%mask inside of latitude/longitude lines rather than outside (if desired)
 if length(long_lat_params)==5 && long_lat_params(5)
     mask = 1-mask;
 end
