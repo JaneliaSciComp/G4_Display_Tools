@@ -8,13 +8,13 @@ nav_order: 4
 
 # Prerequistes
 
-- (G4 Software Setup)[G4_Software_Setup.md]
-- You must have created and saved all patterns needed for the experiment using the (G4 Pattern Generator)[../G4_Pattern_Generator/About Pattern Generator.md]
-- You must have created all the functions you need for the experiment (assuming you need any) using the (G4 Function Generator)[../G4_Function_Generator/About Function Generator.md]
+- [G4 Software Setup](G4_Software_Setup.md)
+- You must have created and saved all patterns needed for the experiment using the [G4 Pattern Generator](../G4_Pattern_Generator/About Pattern Generator.md)
+- You must have created all the functions you need for the experiment (assuming you need any) using the [G4 Function Generator](../G4_Function_Generator/About Function Generator.md)
 
 # Creating a single condition
 
-Before starting this tutorial, please complete the (tutorial to create a condition)[condition_tutorial.md]. It will take you through step by step how to get your experiment started. This tutorial will pick up where that one left off, so please leave the designer with your condition open and return here when you are finished to continue creating a full experiment. 
+Before starting this tutorial, please complete the [tutorial to create a condition](condition_tutorial.md). It will take you through step by step how to get your experiment started. This tutorial will pick up where that one left off, so please leave the designer with your condition open and return here when you are finished to continue creating a full experiment. 
 
 # Autofill
 
@@ -123,7 +123,7 @@ Below this button is a panel containing two radio buttons. You must choose one o
 
 ![Random or Sequential Radio Buttons](assets/randomRadios.png){:.ifr}
 
-If you select *Randomize Trials*{:.gui-txt}, then every time your main block of trials runs, the conditions will be run in a random order. If you select *Sequential Trials*{:.gui-txt}, then every time the main block plays, the conditions will play in the order that they appear in the Block Trials table. For an example of the difference, refer back to the beginning of the (condition tutorial)[condition_tutorial.md].
+If you select *Randomize Trials*{:.gui-txt}, then every time your main block of trials runs, the conditions will be run in a random order. If you select *Sequential Trials*{:.gui-txt}, then every time the main block plays, the conditions will play in the order that they appear in the Block Trials table. For an example of the difference, refer back to the beginning of the [condition tutorial](condition_tutorial.md).
 
 Beneath the panel you'll see a text box labeled *Repetitions*{:.gui-txt}. This refers to the number of times the *Block Trials* as a whole will be repeated. The pre-trial and post-trial are not included in these repetitions. The default value here is 1. Change it to 3, and then click *Calculate Experiment Length*{:.gui-btn} again. You'll see that the experiment length will be updated to take into account how many times the block is repeated. 
 
@@ -167,4 +167,4 @@ Now that you have saved your experiment, go back to the designer and make a chan
 
 After you have saved your experiment, click the *Clear All*{:.gui-btn} button in the top right hand corner. You'll get a pop up window reminding you to save your experiment if you haven't. Hit continue. This will clear everything out of the designer. Your imported files will be gone, your parameters will re-set to default values.  This is handy if you would like to sit down and design multiple experiments in a row. Just remember that clicking this button will get rid of all the data in the Designer, so if you click it before you save the experiment, you will lose your work!
 
-Congratulations! You've designed an experiment! See the (G4 Conductor documentation)[G4_Conductor_Manual.md] and associated tutorials to learn how to play the experiment you just designed on the screens. 
+Congratulations! You've designed an experiment! See the [G4 Conductor documentation](G4_Conductor_Manual.md) and associated tutorials to learn how to play the experiment you just designed on the screens. 
