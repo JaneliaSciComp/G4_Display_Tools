@@ -50,7 +50,7 @@ The first field in the settings panel reads *Configuration file location:*{:.gui
 
 The next three fields are paths to your default run protocol file, processing file, and plotting file. A default run protocol is provided with the G4 software, but if you'd like to learn exactly what the run protocol does and how to create your own, please see the tutorial [Create a Run Protocol](../docs/run_protocol_tutorial.md). 
 
-Plotting and Processing refers to settings files dictating how you want your experimental data to be handled after the experiment. If you have not created these settings files, please see the tutorials [Set up Processing](../docs/processing_tutorial.md) and [Set up Data Analysis](../docs/analysis_tutorial.md).
+Plotting and Processing refers to settings files dictating how you want your experimental data to be handled after the experiment. If you have not created these settings files, please see [Data Analysis](Data_analysis.documentation.md).
 
 Assuming you want to use the default run protocol, this field should read `G4_Display_Tools\G4_Protocol_Designer\run_protocols\G4_default_run_protocol.m`.  The other two should contain paths to your processing and data analysis settings files, or should be empty if you haven't created them. 
 
@@ -220,7 +220,7 @@ To do this, select the condition you want to view and hit the *Dry Run*{:.gui-bt
 
 If you would like your data to be processed or have any our offered preliminary analyses done on it automatically at the end of your experiment, I would recommend you set that up when designing your experiment, so your experimental protocol is fresh in your mind. However, this process does not involve the G4 Designer and can be done at any time. 
 
-For an overview on how this works, please see the [Data analysis overview](../docs/DAtools_overview.md) or for more specific instructions, see the [Data processing tutorial](../docs/processing_tutorial.md) and [Data analysis tutorial](../docs/analysis_tutorial.md).
+For an overview on how this works, please see the [Data analysis overview](../docs/DAtools_overview.md) or for more specific instructions, see the [Data Analysis doc](Data_analysis_documentation.md).
 
 # Final Details
 
@@ -235,13 +235,9 @@ This pretty much covers the G4 Designer's features and how to use them. However,
 - [This tutorial on how to set up your Designer settings](../docs/settings_tutorial.md)
 - [This tutorial on how to set up your metadata googlesheet](../docs/googlesheet_tutorial.md)
 - [This tutorial on how to create a single condition](../docs/condition_tutorial.md)
-
-{::comment}
 - [This tutorial on how to create a full experiment](../docs/experiment_tutorial.md)
-- [This tutorial on how to use the arena without the Designer](../docs/screenTCP_tutorial.md)
-- [This tutorial on how to set up automatic data processing](../docs/processing_tutorial.md)
-- [This tutorial on how to set up automatic data analysis](../docs/analysis_tutorial.md)
-{:/comment}
+- [This tutorial on how to use the arena without the Designer](../docs/run_protocol_tutorial.md)
+
 
 ## Trouble-shooting
 
