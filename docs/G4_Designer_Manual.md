@@ -50,7 +50,7 @@ The first field in the settings panel reads *Configuration file location:*{:.gui
 
 The next three fields are paths to your default run protocol file, processing file, and plotting file. A default run protocol is provided with the G4 software, but if you'd like to learn exactly what the run protocol does and how to create your own, please see the tutorial [Create a Run Protocol](../docs/run_protocol_tutorial.md). 
 
-Plotting and Processing refers to settings files dictating how you want your experimental data to be handled after the experiment. If you have not created these settings files, please see [Data Analysis](Data_analysis.documentation.md).
+Plotting and Processing refers to settings files dictating how you want your experimental data to be handled after the experiment. If you have not created these settings files, please see [Data Analysis](Data_analysis_documentation.md).
 
 Assuming you want to use the default run protocol, this field should read `G4_Display_Tools\G4_Protocol_Designer\run_protocols\G4_default_run_protocol.m`.  The other two should contain paths to your processing and data analysis settings files, or should be empty if you haven't created them. 
 
