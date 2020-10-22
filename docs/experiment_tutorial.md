@@ -60,7 +60,7 @@ Last is the *Invert Selection*{:.gui-btn} button. Select a couple, but not all, 
 
 # Pre, Inter, and Post-trial conditions
 
-![Copy To Box](assets/CopyToBox.png){:.ifr}
+![Copy To Box](assets/CopyToBox.png){:.ifr .pop}
 
 Notice that these buttons do not have any effect on the Pre, Inter, and Post-trials. These trials are usually just created manually, by the method shown in the previous tutorial on how to create a condition. However, there are a couple other tools you can use to speed this up. 
 
@@ -71,7 +71,7 @@ Select one or more of the options and click *OK*{:.gui-btn}. You can select them
 Now select several conditions in your block trials. Then go to *File*{:.gui-btn} -> *Set Selected...*{:.gui-btn}. This feature will likely not be used much, but I just want to make you aware of it. In this case, a pop up window will appear giving you a field for every cell in the condition, like this:
 {:.clear}
 
-![Set Selected Window](assets/SetSelectedBox.png){:.ifr}
+![Set Selected Window](assets/SetSelectedBox.png){:.ifr .pop}
 
 Here you can type in the value for each field. Be aware that there is no error-checking here. It is up to you to make sure you type in the pattern and function names correctly. Otherwise when you try to run the condition, you will get an error because the screens will not be able to find the correct pattern or function file. You should also put in a frame index of 1, assuming you are not using a mode in which you might make the frame index something else. Frame index is, by default, 1. Type in mode 1, a pattern name, a function name, a frame index of 1, and a duration (any number). The rest you can leave blank, and click *OK*{:.gui-btn}. Every condition you have selected will be filled in with this information. This is another easy way to create many copies of the same condition. 
 
@@ -114,14 +114,14 @@ NOTE: If you have not saved your experiment, this feature may not work. The reas
 
 Now that you're familiar with the tables and previewing options, lets look to the left side of the Designer. 
 
-![Experiment Length Button](assets/expLength.png){:.ifr}
+![Experiment Length Button](assets/expLength.png){:.ifr .pop}
 
 Click the *Calculate Experiment Length*{:.gui-btn} button. As you might expect, it provides you with an estimate of how long your experiment will take as it is arranged at that moment. 
 
 Below this button is a panel containing two radio buttons. You must choose one option or the other.
 {:.clear}
 
-![Random or Sequential Radio Buttons](assets/randomRadios.png){:.ifr}
+![Random or Sequential Radio Buttons](assets/randomRadios.png){:.ifr .pop}
 
 If you select *Randomize Trials*{:.gui-txt}, then every time your main block of trials runs, the conditions will be run in a random order. If you select *Sequential Trials*{:.gui-txt}, then every time the main block plays, the conditions will play in the order that they appear in the Block Trials table. For an example of the difference, refer back to the beginning of the [condition tutorial](condition_tutorial.md).
 
@@ -133,7 +133,7 @@ Next is the *Run Trials*{:.gui-btn}. You can always open the G4 Conductor direct
 
 The next panel allows you to set the sample rates of any Analog Input Channels you might be using.
 
-![Analog Input Channels](assets/AIC.png){:.ifr}
+![Analog Input Channels](assets/AIC.png){:.ifr .pop}
 
 If you do not want to use an input channel, simply set its sample rate to 0. It's common in our lab not to use any of them. Otherwise, this should be the sample rate (in Hz) that you want your input channel to use. 
 

@@ -48,9 +48,9 @@ Now that your googlesheet is created, the first thing you should do is create al
 
 Future releases will come with the ability to customize these fields, but for now they are all required.
 
-Look at the bottom of your google sheet and you will see a section that looks like this:
+![Initial tabs](assets/addTab.png){:.ifr}
 
-![Initial tabs](assets/addTab.png)
+Look at the bottom of your google sheet and you will see a section that looks like this:
 
 You can rename Sheet1 by simply double-clicking on the text. Alternatively, click the down-pointing arrow to the right of "Sheet1" and select "rename" from the menu that is provided. Rename this tab to "Users" or something similar. 
 

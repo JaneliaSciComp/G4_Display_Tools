@@ -2,7 +2,7 @@
 title:  Tutorial - Generate functions for an experiment
 parent: G4 Function Generator
 grand_parent: Generation 4
-nav_order: 13
+nav_order: 1
 ---
 
 # Introduction
@@ -62,8 +62,3 @@ The primary elements to using the tool in script form is setting all of the func
 # Next Steps
 
 Once patterns and functions have been generated, you are ready to progress to creating and running an actual experiment. This can be achieved using the [provided example scripts](https://github.com/JaneliaSciComp/G4_Display_Tools/tree/master/G4_Example_Experiment_Scripts) or by using the [Protocol Designer GUI](G4_Designer_Manual.md).
-
-
-
-
-
