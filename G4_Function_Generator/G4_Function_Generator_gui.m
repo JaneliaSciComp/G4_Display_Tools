@@ -1087,7 +1087,7 @@ set(handles.checkbox10,'visible',vis)
 
 
 if get(handles.popupmenu1, 'Value') == 1
-    vis = {'on', 'off', 'off', 'off', 'off', 'off'};
+    vis = {'on', 'off', 'off', 'off', 'off', 'on'};
 elseif get(handles.popupmenu1, 'Value') == 7
     vis = {'off', 'on', 'on', 'off', 'on', 'on'};
 else
@@ -1101,7 +1101,7 @@ set(handles.edit28,'enable',vis{5})
 set(handles.checkbox2,'enable',vis{6})
 
 if get(handles.popupmenu2, 'Value') == 1
-    vis = {'on', 'off', 'off', 'off', 'off', 'off'};
+    vis = {'on', 'off', 'off', 'off', 'off', 'on'};
 elseif get(handles.popupmenu2, 'Value') == 7
     vis = {'off', 'on', 'on', 'off', 'on', 'on'};
 else
@@ -1115,7 +1115,7 @@ set(handles.edit29,'enable',vis{5})
 set(handles.checkbox4,'enable',vis{6})
 
 if get(handles.popupmenu3, 'Value') == 1
-    vis = {'on', 'off', 'off', 'off', 'off', 'off'};
+    vis = {'on', 'off', 'off', 'off', 'off', 'on'};
 elseif get(handles.popupmenu3, 'Value') == 7
     vis = {'off', 'on', 'on', 'off', 'on', 'on'};
 else
@@ -1129,7 +1129,7 @@ set(handles.edit30,'enable',vis{5})
 set(handles.checkbox6,'enable',vis{6})
 
 if get(handles.popupmenu4, 'Value') == 1
-    vis = {'on', 'off', 'off', 'off', 'off', 'off'};
+    vis = {'on', 'off', 'off', 'off', 'off', 'on'};
 elseif get(handles.popupmenu4, 'Value') == 7
     vis = {'off', 'on', 'on', 'off', 'on', 'on'};
 else
@@ -1143,7 +1143,7 @@ set(handles.edit31,'enable',vis{5})
 set(handles.checkbox8,'enable',vis{6})
 
 if get(handles.popupmenu5, 'Value') == 1
-    vis = {'on', 'off', 'off', 'off', 'off', 'off'};
+    vis = {'on', 'off', 'off', 'off', 'off', 'on'};
 elseif get(handles.popupmenu5, 'Value') == 7
     vis = {'off', 'on', 'on', 'off', 'on', 'on'};
 else
@@ -1177,6 +1177,25 @@ if isfield(handles, 'param')
     handles = rmfield(handles, 'param');
 end
 handles.dont_load = 0;
+
+%check that no frames exceed number of pattern frames
+if get(handles.popupmenu6, 'Value')==1
+set(handles.edit1,'String',num2str(min([str2double(get(handles.edit1, 'String')), str2double(get(handles.edit27, 'String'))])));
+set(handles.edit2,'String',num2str(min([str2double(get(handles.edit2, 'String')), str2double(get(handles.edit27, 'String'))])));
+set(handles.edit3,'String',num2str(min([str2double(get(handles.edit3, 'String')), str2double(get(handles.edit27, 'String'))])));
+set(handles.edit6,'String',num2str(min([str2double(get(handles.edit6, 'String')), str2double(get(handles.edit27, 'String'))])));
+set(handles.edit7,'String',num2str(min([str2double(get(handles.edit7, 'String')), str2double(get(handles.edit27, 'String'))])));
+set(handles.edit8,'String',num2str(min([str2double(get(handles.edit8, 'String')), str2double(get(handles.edit27, 'String'))])));
+set(handles.edit11,'String',num2str(min([str2double(get(handles.edit11, 'String')), str2double(get(handles.edit27, 'String'))])));
+set(handles.edit12,'String',num2str(min([str2double(get(handles.edit12, 'String')), str2double(get(handles.edit27, 'String'))])));
+set(handles.edit13,'String',num2str(min([str2double(get(handles.edit13, 'String')), str2double(get(handles.edit27, 'String'))])));
+set(handles.edit16,'String',num2str(min([str2double(get(handles.edit16, 'String')), str2double(get(handles.edit27, 'String'))])));
+set(handles.edit17,'String',num2str(min([str2double(get(handles.edit17, 'String')), str2double(get(handles.edit27, 'String'))])));
+set(handles.edit18,'String',num2str(min([str2double(get(handles.edit18, 'String')), str2double(get(handles.edit27, 'String'))])));
+set(handles.edit21,'String',num2str(min([str2double(get(handles.edit21, 'String')), str2double(get(handles.edit27, 'String'))])));
+set(handles.edit22,'String',num2str(min([str2double(get(handles.edit22, 'String')), str2double(get(handles.edit27, 'String'))])));
+set(handles.edit23,'String',num2str(min([str2double(get(handles.edit23, 'String')), str2double(get(handles.edit27, 'String'))])));
+end
 
 %get function parameters
 type_strings = {'pfn', 'afn'};
