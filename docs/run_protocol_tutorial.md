@@ -2,7 +2,7 @@
 title:  Tutorial - Design your own run protocol
 parent: G4 Experiment Conductor
 grand_parent: Generation 4
-nav_order: 4
+nav_order: 1
 ---
 
 # Prerequisites
@@ -32,7 +32,7 @@ In your matlab command window, type `connectHost` and hit enter. Assuming your s
 
 As you can see, you send commands to the screen generally by typing `Panel_com(command name, arguments)` into the matlab command line. If you look in Panel_com.m at line 28, you will see that when you submit the 'all_on' command, a particular hexidecimal string is sent to the screens via TCP. The benefit of this wrapper is that you do not have to write this hecidecimal string - the wrapper does it for you. The downside is that you cannot create new commands for the screens on the fly. You can only use the pre-defined commands that are listed in Panel_com. 
 
-# Running a condition via command line
+## Running a condition via command line
 
 Now that you know you can send commands to the screens via matlab commandline, it becomes clear that you could run an entire condition this way if you knew which commands to use. I'll take you through the steps to do this now. Once you have run a condition via command line, it will be much easier to understand the function of the run protocol. 
 
@@ -42,21 +42,21 @@ If you did not send the connectHost command to the screens earlier, do it now. P
 
 Type the following commands into your matlab command line. It is better to send them one at a time rather than to send them all at once. This is because if one of the commands takes an extra 50 ms to run, it can cause the following commands to get backed up. In the run protocol, you will see that we place strategic pauses and checking to avoid the screen commands getting backed up, as this can cause the screens to glitch. 
 
-- `Panel_com('change_root_directory', path to your experiment folder here as a string)`
+### `Panel_com('change_root_directory', path to your experiment folder here as a string)`
 
 This command tells the screens where it should be looking for whatever files you send it from now on. This is why your functions and patterns must be contained in the same experiment folder. You should pass in the absolute path to your experiment folder as a string. An example from my computer would be: 
 
 `Panel_com('change_root_directory', '/Users/taylorl/Desktop/test_protocol')`
 
-- `Panel_com('start_log')`
+### `Panel_com('start_log')`
 
-You may have noticed on the Panel Host there is a virtual LED labeled "Log running" which is green when a condition or experiment is running and which is dark when it is not. You should always start the log running before running an experiment and only stop the log running when the entire experiment is over. In the data analysis section, you'll see that your raw data is contained in the Log. If the log is not running, you will miss data from that time. It's good habit to always run the log, even if you are just testing something. 
+You may have noticed on the Panel Host there is a virtual LED labeled "Log running" which is green when a condition or experiment is running and which is dark when it is not. You should always start the log running before running an experiment and only stop the log running when the entire experiment is over. In the data analysis section, you'll see that your raw data is contained in the Log. If the log is not running, you will miss data from that time. It's good habit to always run the log, even if you are just testing something.
 
-- `Panel_com('set_control_mode',1)`
+### `Panel_com('set_control_mode',1)`
 
 This command sets your experiment mode. Remember the screens are capable of running 7 different modes. We are running the first mode in this tutorial as it is simple and often used. It simply runs through the pattern library based on the position function provided it. (i.e., when the y-value of the position function is 10, the screen is displaying the 10th frame in the pattern).
 
-- `Panel_com('set_pattern_id',1)`
+### `Panel_com('set_pattern_id',1)`
 
 This command tells the screens which pattern you want to use. Notice that you do not pass it a filepath, but a number. This is why your experiment folder must be set up the way it is. The software knows automatically to look in the 'Patterns' folder inside your experiment folder. It then find the pattern with an ID of (in this case) 1. You set the pattern's ID in the [Pattern Generator](../G4_Pattern_Generator/About Pattern Generator.md) when you designed the pattern. 
 
@@ -64,17 +64,17 @@ It is good practice to name your patterns with their ID number in the name so th
 
 The arena uses the .pat file, which is not human-readable, but if you do not know the ID of your pattern, you can open the .mat file associated with that pattern in matlab. The structure it contains has an ID field with the ID number. 
 
-- `Panel_com('set_pattern_func_id',1)`
+### `Panel_com('set_pattern_func_id',1)`
 
 This command works exactly the same as the previous command, but with regard to the position functions instead of patterns. The same naming convention is suggested. This command is not necessary in some modes, but it is necessary for mode 1. 
 
-- `Panel_com('start_display', 3)`
+### `Panel_com('start_display', 3)`
 
 You can probably guess that this command tells the screens to start displaying the information you have previously send it. Before you send this command, you must at least set the mode and the pattern id. Other commands are required, or not, depending on which mode you are using. The 3, in this command, is a duration. This tells the screen to display this pattern and function combination for 3 seconds. after that amount of time, it will automatically stop displaying the pattern. 
 
 Once your pattern has run and the screen has gone dark again, submit the final command:
 
-- `Panel_com('stop_log')`
+### `Panel_com('stop_log')`
 
 It's very important to remember the stop_log command. Were you to run a real condition this way and forget to stop the log, it would continue running and could disrupt other functions of the Panel Host, not to mention giving you lots of useless extra data.
 
@@ -101,27 +101,16 @@ For example, lines 53-60 are necessary code to give the run protocol access to t
 Around line 170 is where the code starts that you're more likely to be interested in. Start at line 170 and scroll down with me as I explain the code's various steps. 
 
 - First the code prompts the user to confirm they want to run the experiment and gives them an option to cancel it. (169-182)
-
 - Then the run protocol looks at the experiment and determines how many trials will be run in total. Note that, in our case, we assume no inter-trial is played before the first block trial or after the last block trial. It assumes the pre-trial and post-trial are only played once. Details like this could change the experiment slightly, so if you wanted to do this differently, you would need to change this code. (187-200)
-
-- Then it calculates how long the experiment will take and updates the progress bar's text. (205-231) 
-
+- Then it calculates how long the experiment will take and updates the progress bar's text. (205-231)\\
 At line 234 we start using Panel_com commands. This is why you must be familiar with them if you want to write your own run protocol. As the protocol exists now, this is the order of operations: 
-
 - Start the log (lines 235-236)
-
 - If there is a pre-trial, set the mode, pattern, x position, function, gain and bias, frame rate, and ao functions. Note that not all of these are used for every pre-trial. Each mode requires a subset of these, but your run protocol needs to always define them so it will work with any mode. You can see in the top half of this file how these values are taken from the experiment structure passed in, which is why you likely want to leave the first 160 lines or so as they are. (24-288)
-  
 - Once the parameters are all set, line 291 runs a function that belongs to the G4 conductor. This function updates the data being displayed on the Conductor screen regarding which trial is being displayed. You can use this function in your own run protocols, but you must call it exactly as it is called here and pass in the correct variables. In our case, 'runcon' is the handle to the G4 Conductor which was passed in at the beginning of the file, but you could name this anything you want in your own run protocol.
-
 - An if statement at line 297 checks to see if the duration for the pre-trial is set to 0. This is another feature we have in our run protocol that you may or may not care about. If you set the duration of the pre-trial to 0, this means the pre-trial will run indefinitely until you hit a button to tell it to move on. This is often useful if you don't want to move on with the experiment until your fly has fixated correctly and you don't know exactly how long that will take. Notice, that it will not actually run indefinitely. If the pretrial duration is 0, we pass 2000 seconds to the panel_com as the duration. The length duration you can pass to the screens with your 'Start_display' command is actually limited. (297-304)
-
 - Notice that after a 'start_display' command is sent to Panel_come, we then put a "pause" directly after it which lasts for the duration of the trial plus one hundredth of a second. If you do not do this, your run protocol code will continue running while the trial you just displayed is still displaying on the screens. This is bad because it will start trying to set the parameters for the next trial while the previous one is still running, which will cause the screens to back up and get glitchy. If you write your own protocol, you must remember to include these pauses. 
-
 - Another two functions from our G4 Conductor are called at lines 307 and 318. The first, called check_if_aborted, must be included in any of your run protocols if you want the "Abort" button the Conductor to work. In our run protocol, it checks if the "Abort" button has been clicked at the end of every trial. At line 318, the elapsed time displayed on the Conductor is updated. This also is done at the end of every trial. 
-
 - Lines 323-478 contain the main loop which runs your set of block trials. "Conditions" refer to each condition in the block as created in the Designer. Repetitions refers to the number of times the entire block is repeated. Each instance of the loop runs one condition and one inter-trial, except the last iteration which does not run an inter-trial. 
-
 - Lines 481-536 run the post-trial if there is one. Notice at line 543, instead of using the 'stop_log' command, our run protocol uses 'send_tcp' directly. This is because a common problem has been that the 'stop_log' command does not go through due to some back-up with the screens, and then the Conductor can not do its job of moving the data files to where they need to go, because the log is still running. We've done this so that if the stop log command fails, we can allow the user to stop the log manually before moving on. 
 
 # Run Protocol Requirements
@@ -134,8 +123,5 @@ So now that you've seen how our run protocol is structured, you can probably tel
   - update_elapsed_time - updates the elapsed time shown on the Conductor. Takes in one argument, a number.
   - update_progress - updates text above the progress bar. Takes in several variables, see line 417 for an example. Note the lines following this function (lines 417-421) must all be run to display this update on the Conductor. 
   - update_current_trial_parameters - The conductor shows the parameters (pattern id, function id, mode, etc) of any given trial as it runs. This updates the conductor to show the current trial. You must pass in all the parameters for that condtion. (See line 456 for an example)
-  - check_if_aborted - checks if the "Abort" button has been clicked, returns 0 for no, 1 for yes. 
-- You must remember to stop_display, stop_log, and disconnectHost at the end of the file. 
-
-
-
+  - check_if_aborted - checks if the "Abort" button has been clicked, returns 0 for no, 1 for yes.
+- You must remember to stop_display, stop_log, and disconnectHost at the end of the file.

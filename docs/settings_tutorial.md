@@ -30,11 +30,11 @@ Make sure that G4_Display_Tools and all its subfolders and files are on your mat
 
 A window like the one below will open. If it does not, or if you get a matlab error, see the [G4 Designer Manual](G4_Designer_Manual.md) for more help on errors and debugging. 
 
-![Empty Designer Window](assets/screenshot-1.png)
+![Empty Designer Window](assets/screenshot-1.png){:.pop}
 
 Click *File*{:.gui-txt}->*Settings*{:.gui-txt} in the upper left hand corner of the window. A second window should pop up that looks like this:
 
-![Designer Settings](assets/screenshot-2.png)
+![Designer Settings](assets/screenshot-2.png){:.pop}
 
 # The settings
 

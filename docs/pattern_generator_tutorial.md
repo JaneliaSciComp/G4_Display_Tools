@@ -2,7 +2,7 @@
 title:  Tutorial - Generate patterns for an experiment
 parent: G4 Pattern Generator
 grand_parent: Generation 4
-nav_order: 11
+nav_order: 1
 ---
 
 # Introduction
@@ -63,9 +63,5 @@ The primary elements to using this tool in script form are:
 
 # Next steps
 
-With patterns now generated, the next logical step is to generate position functions -- these are simple data files that can be associated with a pattern file to tell the arena how that pattern should be displayed (i.e. how fast to cycle through the pattern's frames and in what order). To learn how to create position functions using the G4 Function Generator (as well as analog output functions using the same tool), read the [About Function Generator](../G4_Function_Generator/About Function Generator.md) document and complete the associated [tutorial](../docs/Function_Generator_tutorial.md).
-
-
-
-
+With patterns now generated, the next logical step is to generate position functions -- these are simple data files that can be associated with a pattern file to tell the arena how that pattern should be displayed (i.e. how fast to cycle through the pattern's frames and in what order). To learn how to create position functions using the G4 Function Generator (as well as analog output functions using the same tool), read the [About Function Generator](../G4_Function_Generator/About Function Generator.md) document and complete the associated [tutorial](../docs/function_generator_tutorial.md).
 
