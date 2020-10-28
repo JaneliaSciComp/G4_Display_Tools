@@ -3,6 +3,7 @@ title: G4 Function Generator
 parent: Generation 4
 nav_order: 11
 has_children: true
+has_toc: false
 ---
 
 # Overview of G4_Function_Generator
