@@ -10,7 +10,7 @@ nav_order: 3
 Before going through this tutorial, you should have done the following:
 
 - created one or more patterns using the [Pattern Generator](../G4_Pattern_Generator/About Pattern Generator.md)
-- created one or more functions using the [Function Generator](../G4_Function_Generator/About Function Generator.md
+- created one or more functions using the [Function Generator](../G4_Function_Generator/About Function Generator.md)
 - Reviewed the different experiment modes
 - [Set up your system](../../../docs/G4-Assembly.html).
 
