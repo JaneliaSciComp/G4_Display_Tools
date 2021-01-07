@@ -3,6 +3,9 @@ function [Frame_ind, OL_inds, CL_inds, TC_inds] = get_datatype_indices(channelNa
 
     Frame_ind = find(strcmpi(channelNames.timeseries,'Frame Position'));
     for i = 1:length(OL_datatypes)
+        if strcmp(OL_datatypes{i}, 'faLmR')
+            continue;
+        end
         ind = find(strcmpi(channelNames.timeseries,OL_datatypes{i}));
         assert(~isempty(ind),['could not find ' OL_datatypes{i} ' datatype'])
         OL_inds(i) = ind;

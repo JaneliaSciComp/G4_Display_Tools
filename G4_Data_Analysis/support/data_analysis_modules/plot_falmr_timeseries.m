@@ -1,10 +1,9 @@
-%plot timeseries data for open-loop trials
-
-function plot_OL_timeseries(timeseries_data, timestampsIN, OL_conds, OL_durations, cond_name, OL_inds, ...
-    axis_labels, Frame_ind, num_groups, genotype, control_genotype, plot_settings, top_left_place, bottom_left_place, ...
-    left_col_places, figure_titles, single, save_settings, fig_num, gen_settings, pat_move_time)
-
+function plot_falmr_timeseries(falmr_data, timestampsIN, axis_labels,num_groups, ...
+genotype, control_genotype, plot_settings, top_left_place, bottom_left_place, ...
+    left_col_places, figure_titles, single, save_settings, gen_settings, pat_move_time)
     
+    falmr_conds = plot_settings.faLmR_conds;
+    cond_name = plot_settings.faLmR_cond_name;
     rep_Colors = gen_settings.rep_colors;
     mean_Colors = gen_settings.mean_colors;
     mean_LineWidth = gen_settings.mean_lineWidth;
@@ -27,52 +26,51 @@ function plot_OL_timeseries(timeseries_data, timestampsIN, OL_conds, OL_duration
     fly_Colors = gen_settings.fly_colors;
     axis_num_fontSize = gen_settings.axis_num_fontSize;
     figTitle_fontSize = gen_settings.figTitle_fontSize;
-    subplot_figure_titles = plot_settings.subplot_figure_title{fig_num};
+    
     cutoff_time = plot_settings.cutoff_time;
     other_indicators = plot_settings.other_indicators;
     pattern_motion_indicator = plot_settings.pattern_motion_indicator;
-    condition_pairs = plot_settings.opposing_condition_pairs;
-    
-    
+    condition_pairs = plot_settings.faLmR_pairs;
 
+     if ~isempty(falmr_conds)
 
-    
-    if ~isempty(OL_conds)
-    
-        num_exps = size(timeseries_data,2);
-    %loop for different data types
-        for d = OL_inds
+        num_exps = size(falmr_data,2);
+        
+        for fig = 1:length(falmr_conds)
+            subplot_figure_titles = plot_settings.subplot_figure_title{fig};
+        
             ydata = [];
-            %num_plot_rows = (1-overlap/2)*max(nansum(OL_conds(:,:,fig)>0));
-            %num_plot_cols = max(nansum(OL_conds(:,:,fig)>0,2));
-            num_plot_rows = size(OL_conds,1);
-            num_plot_cols = size(OL_conds,2);
+            %num_plot_rows = (1-overlap/2)*max(nansum(falmr_conds(:,:,fig)>0));
+            %num_plot_cols = max(nansum(falmr_conds(:,:,fig)>0,2));
+            num_plot_rows = size(falmr_conds{fig},1);
+            num_plot_cols = size(falmr_conds{fig},2);
             figure('Position',[100 100 540 540*(num_plot_rows/num_plot_cols)])
             for row = 1:num_plot_rows
                 for col = 1:num_plot_cols
-                    cond = OL_conds(1+(row-1),col);
+                    cond = falmr_conds{fig}(1+(row-1),col);
                     placement = col+num_plot_cols*(row-1);
                     place = row+num_plot_rows*(col-1);
-                    
+
                     %The larger the number of rows is compared to columns,
                     %the more data gets cut off the bottom. Have to
                     %increment the spacing between plots depending on num
                     %rows. 
-                    
+
                     [gap_x, gap_y] = get_plot_spacing(num_plot_rows, num_plot_cols);
-                    
+
+
                     if cond>0
                         better_subplot(num_plot_rows, num_plot_cols, placement, gap_x, gap_y)
                         yline(0);
                         hold on
                         for g = 1:num_groups
                             if single && show_ind_reps
-                                num_reps = size(timeseries_data,5);
-                                tmpdata = squeeze(timeseries_data(g,:,d,cond,:,:));
+                                num_reps = size(falmr_data,4);
+                                tmpdata = squeeze(falmr_data(g,:,cond,:,:));
                                  
                             else
                                 num_reps = 0;
-                                tmpdata = squeeze(timeseries_data(g,:,d,cond,:));
+                                tmpdata = squeeze(falmr_data(g,:,cond,:));
                                 
                             end
                             meandata = nanmean(tmpdata);
@@ -120,13 +118,13 @@ function plot_OL_timeseries(timeseries_data, timestampsIN, OL_conds, OL_duration
 
                                 
                             end
-                            
+
                             if plot_opposing_directions == 1
                                 opp_cond = get_opposing_condition(cond, condition_pairs);
                                 if single && show_ind_reps
-                                    tmpdata = squeeze(timeseries_data(g,:,d,opp_cond,:,:));
+                                    tmpdata = squeeze(falmr_data(g,:,opp_cond,:,:));
                                 else
-                                    tmpdata = squeeze(timeseries_data(g,:,d,opp_cond,:));
+                                    tmpdata = squeeze(falmr_data(g,:,opp_cond,:));
                                 end
                                 meandata = nanmean(tmpdata);
                                 nanidx = isnan(meandata);
@@ -144,9 +142,8 @@ function plot_OL_timeseries(timeseries_data, timestampsIN, OL_conds, OL_duration
                                        semdata(length(meandata)+1:end) = [];
                                     end
                                 end
-                                
-                               
-                                %adjust color to make opposing direction
+
+ %adjust color to make opposing direction
                                 %lighter
   
                                 if single == 1
@@ -193,11 +190,13 @@ function plot_OL_timeseries(timeseries_data, timestampsIN, OL_conds, OL_duration
                                
                             end
                         end
-%                         titlestr = ['\fontsize{' num2str(subtitle_FontSize) '} Condition #{\color[rgb]{' num2str(mean_Colors(g,:)) '}' num2str(cond)]; 
-                        if ~isempty(cond_name(1+(row-1),col))
-                            title(cond_name(1+(row-1),col),'FontSize',subtitle_FontSize)
+
+                        if ~isempty(cond_name)
+                            if ~isempty(cond_name{fig}(1+(row-1),col))
+                                title(cond_name{fig}(1+(row-1),col),'FontSize',subtitle_FontSize)
+                            end
                         end
-                        if timeseries_ylimits(d,:) ~= 0
+                        if timeseries_ylimits(7,:) ~= 0
                             ylim(timeseries_ylimits(d,:));
                         else
                             lines = findobj(gca, 'Type', 'line');
@@ -218,40 +217,26 @@ function plot_OL_timeseries(timeseries_data, timestampsIN, OL_conds, OL_duration
                             xline(disp_move_line);
                         end
                         
-                        if frame_superimpose==1
-                            curr_ylim = ylim(gca);
-                            yrange = diff(curr_ylim);
-                            framepos = squeeze(nanmedian(nanmedian(timeseries_data(:,:,Frame_ind,cond,:),2),1))';
-                            framepos = (frame_scale*framepos/max(framepos))+curr_ylim(1)-frame_scale*yrange;
-                            ylim([curr_ylim(1)-frame_scale*yrange curr_ylim(2)])
-                            plot(timestampsIN,framepos,'Color',frame_color,'LineWidth',mean_LineWidth);
-                            y = ylim;
-                            mm = [min(y), max(y)];
-                            ydata = [ydata, mm];
-                        end
+%                         if frame_superimpose==1
+%                             curr_ylim = ylim(gca);
+%                             yrange = diff(curr_ylim);
+%                             framepos = squeeze(nanmedian(nanmedian(timeseries_data(:,:,Frame_ind,cond,:),2),1))';
+%                             framepos = (frame_scale*framepos/max(framepos))+curr_ylim(1)-frame_scale*yrange;
+%                             ylim([curr_ylim(1)-frame_scale*yrange curr_ylim(2)])
+%                             plot(timestampsIN,framepos,'Color',frame_color,'LineWidth',mean_LineWidth);
+%                             y = ylim;
+%                             mm = [min(y), max(y)];
+%                             ydata = [ydata, mm];
+%                         end
                         set(gca, 'FontSize', axis_num_fontSize);
-                        
-                        
-                        
-                       % timeseries_ylimits(d,:) = ylim;
- 
-                        %xlim(timeseries_xlimits)
-                        
-                        
-                        
-%                         title([titlestr '}'])
-                        % title
-                        %title(cond_name{cond},'FontSize',subtitle_FontSize)
-                        % legend
 
-
-                    end
+                     end
 
 
 
                     % setting axes and labels
 
-                    if ~ismember(place,left_col_places) %far-most left axis (clear all the right subplots)
+                    if ~ismember(place,left_col_places{fig}) %far-most left axis (clear all the right subplots)
                           currGraph = gca; 
                           currGraph.YAxis.Visible = 'off';
                     end 
@@ -259,18 +244,18 @@ function plot_OL_timeseries(timeseries_data, timestampsIN, OL_conds, OL_duration
                     xlabel('')
                     ylabel('')
                     if place == top_left_place
-                        ylabel(axis_labels{OL_inds==d}(2), 'FontSize', y_fontsize) %1st subplot - Top Left
+                        ylabel(axis_labels{end}(2), 'FontSize', y_fontsize) %1st subplot - Top Left
                         set(gca,'YTick');
                     end
-                    if place == bottom_left_place
-                        xlabel(axis_labels{OL_inds==d}(1), 'FontSize', x_fontsize) %7th subplot - Bottom Left
+                    if place == bottom_left_place{fig}
+                        xlabel(axis_labels{end}(1), 'FontSize', x_fontsize) %7th subplot - Bottom Left
                     end
-                    if ~isnan(OL_durations(place)) && OL_durations(place) ~= 0
-                        xlim([-.2, OL_durations(place)]);
-                    end
-                    
+%                     if ~isnan(OL_durations(place)) && OL_durations(place) ~= 0
+%                         xlim([-.2, OL_durations(place)]);
+%                     end
+%                     
                     if ~isempty(subplot_figure_titles)
-                        sgtitle(subplot_figure_titles(OL_inds==d), 'FontSize', figTitle_fontSize);
+                        sgtitle(subplot_figure_titles(fig), 'FontSize', figTitle_fontSize);
                     end
                     
                     
@@ -281,13 +266,13 @@ function plot_OL_timeseries(timeseries_data, timestampsIN, OL_conds, OL_duration
 %                         end
                 end
             end
-            if find(OL_inds==d) <= length(figure_titles)
-                if ~isempty(figure_titles(OL_inds==d))
-                    set(gcf, 'Name', figure_titles(OL_inds==d));
+            if fig <= length(figure_titles)
+                if ~isempty(figure_titles{fig})
+                    set(gcf, 'Name', figure_titles{fig});
                 end
             end
             
-            if timeseries_ylimits(d,:) == 0
+            if timeseries_ylimits(7,:) == 0
                 allax = findall(gcf, 'Type', 'axes');
                 ymin = min(ydata);
                 ymax = max(ydata);
@@ -301,7 +286,7 @@ function plot_OL_timeseries(timeseries_data, timestampsIN, OL_conds, OL_duration
 %                 genotype{control_genotype} = genotype{control_genotype} + " (control)";
 %             end
             if num_groups == 1
-                if frame_superimpose == 0 && plot_opposing_directions == 0
+                if  plot_opposing_directions == 0
 
                     legend1 = legend(genotype, 'FontSize', legend_FontSize);
                 else
@@ -320,7 +305,8 @@ function plot_OL_timeseries(timeseries_data, timestampsIN, OL_conds, OL_duration
                     
                 end
             end
-%             if control_genotype ~= 0
+
+%            if control_genotype ~= 0
 %                 genotype{control_genotype} = erase(genotype{control_genotype}," (control)");
 %             end
 
@@ -334,10 +320,12 @@ function plot_OL_timeseries(timeseries_data, timestampsIN, OL_conds, OL_duration
             figH = gcf;
             fig_title = figH.Name(~isspace(figH.Name));
 
-            save_figure(save_settings, fig_title, genotype{1:end}, 'timeseries', num2str(fig_num));
+            save_figure(save_settings, fig_title, genotype{1:end}, 'faLmR_timeseries', num2str(fig));
 
+
+
+        
 
         end
-    end
-    
-end
+        
+     end

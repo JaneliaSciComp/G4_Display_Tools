@@ -3,7 +3,7 @@ function create_pdf_report(output, folderpath, plot_type_order, norm_order)
 
     ordered_files = order_pdfs(plot_type_order, norm_order, folderpath);
     
-    for file = 1:length(ordered_files)
+    for file = length(ordered_files):-1:1
         if ~strcmp(ordered_files{file}(end-3:end),'.pdf')
             ordered_files(file) = [];
             disp("File number " + num2str(file) + "removed because it was not a .pdf");

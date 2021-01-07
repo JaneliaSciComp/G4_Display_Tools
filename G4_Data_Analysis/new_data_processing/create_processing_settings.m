@@ -4,13 +4,13 @@ function create_processing_settings()
     
     %% Save settings
     
-    settings_file_path = '/Users/taylorl/Desktop/CT1_Ablation_03-16-20_12-39-26/processing_settings';
+    settings_file_path = '/Users/taylorl/Desktop/protocol_folder/new_processing_settings';
     
     
     
     %% General settings
     settings.trial_options = [1 1 1];
-    settings.path_to_protocol = '/Users/taylorl/Desktop/CT1_Ablation_03-16-20_12-39-26/CT1_Ablation_03-16-20_12-39-26.g4p';
+    settings.path_to_protocol = '/Users/taylorl/Desktop/protocol_folder/CT1_Ablation_Final_04-07-20_10-39-32.g4p';
     settings.channel_order = {'LmR_chan', 'L_chan', 'R_chan', 'F_chan', 'Frame Position', 'LmR', 'LpR'}; 
     settings.hist_datatypes = {'Frame Position', 'LmR', 'LpR'};
     settings.manual_first_start = 0;
@@ -52,7 +52,7 @@ function create_processing_settings()
     
     
     %% Position series settings
-    settings.enable_pos_series = 1; %If you want position series, set to 1. Only use on sweeps
+    settings.enable_pos_series = 0; %If you want position series, set to 1. Only use on sweeps
     settings.pos_conditions = [1:28]; %A 1xn array with numbers of conditions to be included in position series
                                   %Leave empty if all conditions to be
                                   %included.
@@ -60,9 +60,41 @@ function create_processing_settings()
     settings.num_positions = 192;
     settings.data_pad = 10; %in ms
     
-    %% FaLmR settings
+    %% FaLmR settings - flipping and averaging only implemented for LmR data
+    
     settings.enable_faLmR = 1; %If you want to do faLmR, set this to 1. 
-                            %Everything else will be updated automatically.
+                            %If not, set it to 0
+    
+    % If you leave condition_pairs empty, flipped and averaged pairs will default to 
+    % 1-2, 3-4, 5-6, etc, with even conditions being flipped. If you want conditions paired differently,
+    % uncomment the settings.condition_pairs cell array below. The number
+    % of cell array elements (numbers in the {}) should be half the total
+    % number of conditions (unless you are pairing some conditions multiple times). 
+    % When the pairs are flipped and averaged, the
+    % second number will be the one that is flipped (made negative).
+    
+    % This will result in a flipped and averaged data set which is similar
+    % to the timeseries data set, but will be only approximately half the
+    % size. element 1, in this dataset, would be the data from the first
+    % pair flipped and averaged, element 2, the second pair, etc. 
+    
+%    settings.condition_pairs = {};                        
+    settings.condition_pairs{1} = [1 6];
+    settings.condition_pairs{2} = [2 5];
+    settings.condition_pairs{3} = [3 8];
+    settings.condition_pairs{4} = [4 7];
+    settings.condition_pairs{5} = [9 10];
+    settings.condition_pairs{6} = [10 9];
+    settings.condition_pairs{7} = [11 12];
+    settings.condition_pairs{8} = [12 11];
+    settings.condition_pairs{9} = [13 18];
+    settings.condition_pairs{10} = [14 17];
+    settings.condition_pairs{11} = [15 20];
+    settings.condition_pairs{12} = [16 19];
+    settings.condition_pairs{13} = [21 26];
+    settings.condition_pairs{14} = [22 25];
+    settings.condition_pairs{15} = [23 28];
+    settings.condition_pairs{16} = [24 27];
                             
     %% Summary settings
     settings.summary_filename = 'Summary_of_bad_trials'; %Filename of the summary of which trials weren't run and why
@@ -71,9 +103,9 @@ function create_processing_settings()
                             
     %% Do adjustments and save .mat file
     
-    if settings.enable_faLmR
-        settings.channel_order{end + 1} = 'faLmR';
-    end
+%     if settings.enable_faLmR
+%         settings.channel_order{end + 1} = 'faLmR';
+%     end
 
     save(settings_file_path, 'settings');
 

@@ -102,8 +102,8 @@ function plot_basic_histograms(timeseries_data, interhistogram_data, ...
                     'Color', ann_color, 'Interpreter', ann_interpreter);
 
                 subplot(2+num_TC_datatypes,num_plot_groups,d*num_plot_groups+plot_group)
-                avg = length(data_vec)/100;
-                histogram(data_vec,100)
+                avg = 1/100;
+                histogram(data_vec, 100, 'Normalization', 'probability')
                 hold on
                 xl = xlim;
                 plot(xl,[avg avg],'--','Color',rep_Colors(g,:)','LineWidth',mean_LineWidth)
@@ -116,6 +116,10 @@ function plot_basic_histograms(timeseries_data, interhistogram_data, ...
                 
                 ind_lines = squeeze(nanmean(interhistogram_data(g,:,:,:),3));
                 avg_line = squeeze(nanmean(nanmean(interhistogram_data(g,:,:,:),3),2));
+                total_points = nansum(interhistogram_data(1,1,1,:),4);
+                ind_lines = ind_lines/total_points;
+                avg_line = avg_line/total_points;
+                
                 if plot_in_degrees == 1
                     if size(ind_lines,2) > size(ind_lines,1)
                         half = size(ind_lines,2)/2;
@@ -136,6 +140,10 @@ function plot_basic_histograms(timeseries_data, interhistogram_data, ...
                 plot(ind_lines','Color',rep_Colors(g,:),'LineWidth',rep_LineWidth)
                 hold on   
                 plot(avg_line,'Color',mean_Colors(g,:),'LineWidth',mean_LineWidth)
+                hold on
+                avg_dist_line = (100/192)*(1/100);
+                xli = xlim;
+                plot(xli, [avg_dist_line avg_dist_line], '--', 'Color', rep_Colors(g,:)', 'LineWidth', mean_LineWidth)
                 
                 %convert x axis to degrees
                if plot_in_degrees == 1
@@ -153,7 +161,7 @@ function plot_basic_histograms(timeseries_data, interhistogram_data, ...
                     xlabel('Degrees');
                end
 
-                title('Intertrial Pattern Frame','FontSize',subtitle_FontSize)
+                title('Closed Loop Stripe Position','FontSize',subtitle_FontSize)
                 currPlot = gca;
                 set(currPlot, 'FontSize', 8);
             

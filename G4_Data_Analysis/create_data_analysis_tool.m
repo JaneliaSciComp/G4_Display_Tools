@@ -37,7 +37,9 @@
         timeseries_top_left_place
         timeseries_bottom_left_places
         timeseries_left_column_places
-        %timeseries_bottom_row_places
+        falmr_top_left_place
+        falmr_bottom_left_places
+        falmr_left_column_places
         
         TC_plot_option
         TC_datatypes
@@ -65,6 +67,8 @@
         data_needed
         
         group_being_analyzed_name
+
+        faLmR
     
         %% TO ADD A NEW MODULE
 %         new_module_option
@@ -125,6 +129,14 @@
             self.TC_conds = self.TC_plot_settings.OL_TC_conds;
             
             self.CL_datatypes = self.CL_hist_plot_settings.CL_datatypes;
+            if ~isempty(find(strcmp(self.timeseries_plot_settings.OL_datatypes, 'faLmR')))
+                self.faLmR = 1;
+                self.OL_datatypes = self.timeseries_plot_settings.OL_datatypes;
+                self.OL_datatypes(strcmp(self.OL_datatypes,'faLmR')==1) = [];
+            else
+                self.faLmR = 0;
+                self.OL_datatypes = self.timeseries_plot_settings.OL_datatypes;
+            end
             self.OL_datatypes = self.timeseries_plot_settings.OL_datatypes;
             self.TC_datatypes = self.TC_plot_settings.TC_datatypes;
             
@@ -144,7 +156,7 @@
         %use flags to determine which variables from the processed data
         %file are needed.
             self.flags = varargin;
-            self.data_needed = {'conditionModes', 'channelNames', 'summaries', 'summaries_normalized'};
+            self.data_needed = {'conditionModes', 'channelNames', 'summaries', 'summaries_normalized', 'timestamps'};
             for i = 1:length(self.flags)
                 
                 switch lower(self.flags{i})
@@ -167,7 +179,16 @@
                         self.data_needed{end+1} = 'ts_avg_reps';
                         self.data_needed{end+1} = 'timeseries';
                         self.data_needed{end+1} = 'timeseries_normalized';
+                        self.data_needed{end+1} = 'pattern_movement_time_avg';
                         
+                        if self.faLmR == 1
+
+                            
+                            self.data_needed{end+1} = 'faLmR_avg_reps_norm';
+
+                        
+                        end
+
                         
                     case '-tcplot' %Do tuning curve plots
                         
@@ -211,10 +232,12 @@
             
             if self.exp_settings.plot_norm_and_unnorm
                 self.data_needed{end+1} = 'ts_avg_reps';
+                if self.faLmR == 1
+                    self.data_needed{end+1} = 'faLmR_avg_over_reps';
+                end
 
             end
-            
-            self.data_needed{end+1} = 'timestamps';
+
             self.data_needed = unique(self.data_needed);
             
             %% Always load channelNames, conditionModes, and timestamps
@@ -225,7 +248,7 @@
                 error('cannot find processed file in specified folder')
             end
 
-            load(fullfile(self.exp_folder{1,1},Data_name), 'channelNames', 'conditionModes', 'timestamps', 'ts_avg_reps', 'pos_conditions');
+            load(fullfile(self.exp_folder{1,1},Data_name), 'channelNames', 'conditionModes', 'timestamps', 'ts_avg_reps', 'pos_conditions', 'faLmR_avg_over_reps');
             self.CombData.timestamps = timestamps;
             self.CombData.channelNames = channelNames;
             self.CombData.conditionModes = conditionModes;
@@ -254,8 +277,15 @@
                 
                 %Create default layout for given condition vector
                 self.OL_conds = create_default_plot_layout(conds_vec_ts);
+
+                if self.faLmR==1 && isempty(self.timeseries_plot_settings.faLmR_conds)
+                    self.timeseries_plot_settings.faLmR_conds = create_default_faLmR_layout(faLmR_avg_over_reps, self.timeseries_plot_settings.plot_both_directions);
+                end
+                    
                 
             end
+
+            
             
             if self.CL_histogram_plot_option && isempty(self.CL_conds)
                 
@@ -291,7 +321,7 @@
             
            %% Create default subplot titles that are called for and were not provided
 
-            if self.timeseries_plot_option && isempty(self.timeseries_plot_settings.cond_name) || ~isempty(self.timeseries_plot_settings.cond_name == 0)
+            if self.timeseries_plot_option && isempty(self.timeseries_plot_settings.cond_name)
                 self.timeseries_plot_settings.cond_name = create_default_plot_titles(self.OL_conds, self.timeseries_plot_settings.cond_name, g4ppath);
             end
 
@@ -389,12 +419,17 @@
             %their y and x-axes. 
             
             self.timeseries_top_left_place = 1;
+            self.falmr_top_left_place = 1;
             self.MP_plot_settings.top_left_place = 1;
             self.pos_plot_settings.top_left_place = 1;
             
             if self.timeseries_plot_option == 1
                 [self.timeseries_bottom_left_places, self.timeseries_left_column_places] = ...
                    get_plot_placements(self.OL_conds);
+            end
+            if self.faLmR == 1
+                [self.falmr_bottom_left_places, self.falmr_left_column_places] = ...
+                    get_plot_placements(self.timeseries_plot_settings.faLmR_conds);
             end
             if self.pos_plot_option == 1
             
@@ -535,6 +570,7 @@
                     norm = 1;
                     for name = 1:length(self.timeseries_plot_settings.figure_names)
                        self.timeseries_plot_settings.figure_names(name) = self.timeseries_plot_settings.figure_names(name) + " - Normalized";
+                       self.timeseries_plot_settings.faLmR_figure_names(name) = self.timeseries_plot_settings.faLmR_figure_names(name) + " - Normalized";
                     end
                     for subname = 1:length(self.timeseries_plot_settings.subplot_figure_title)
                         for datasubname = 1:length(self.timeseries_plot_settings.subplot_figure_title{subname})
@@ -553,6 +589,7 @@
                 end
                 for revert_name = 1:length(self.timeseries_plot_settings.figure_names)
                     self.timeseries_plot_settings.figure_names(revert_name) = erase(self.timeseries_plot_settings.figure_names(revert_name), " - Normalized");
+                    self.timeseries_plot_settings.faLmR_figure_names(revert_name) = erase(self.timeseries_plot_settings.faLmR_figure_names(revert_name), " - Normalized");
                 end
                 for revert_subname = 1:length(self.timeseries_plot_settings.subplot_figure_title)
                     for revert_datasubname = 1:length(self.timeseries_plot_settings.subplot_figure_title{revert_subname})
@@ -675,11 +712,15 @@
                     for group = 2:size(self.exp_folder,1)
                         if norm == 0
                             timeseries_data = [self.CombData.ts_avg_reps(1,:,:,:,:);self.CombData.ts_avg_reps(group,:,:,:,:)];
+                            falmr_data = [self.CombData.faLmR_avg_over_reps(1,:,:,:);self.CombData.faLmR_avg_over_reps(group,:,:,:)];
                         else
                             timeseries_data = [self.CombData.ts_avg_reps_norm(1,:,:,:,:);self.CombData.ts_avg_reps_norm(group,:,:,:,:)];
+                            falmr_data = [self.CombData.faLmR_avg_reps_norm(1,:,:,:);self.CombData.faLmR_avg_reps_norm(group,:,:,:)];
                         end
                         number_groups = size(timeseries_data,1);
                         genotypes = {self.genotype{1}, self.genotype{group}};
+                        
+                        pattern_movement_time = [self.CombData.pattern_movement_time_avg(1,:,:,:);self.CombData.pattern_movement_time_avg(group,:,:,:)];
                         for k = 1:numel(self.OL_conds)
                             plot_OL_timeseries(timeseries_data, self.CombData.timestamps, ...
                                 self.OL_conds{k}, self.OL_conds_durations{k}, self.timeseries_plot_settings.cond_name{k}, ...
@@ -687,48 +728,84 @@
                                 self.datatype_indices.Frame_ind, number_groups, genotypes, self.control_genotype, self.timeseries_plot_settings,...
                                 self.timeseries_top_left_place, self.timeseries_bottom_left_places{k}, ...
                                 self.timeseries_left_column_places{k},self.timeseries_plot_settings.figure_names, ...
-                                single, self.save_settings, k, self.gen_settings);
+                                single, self.save_settings, k, self.gen_settings, pattern_movement_time);
+                        end
+                        if self.faLmR == 1
+                            plot_falmr_timeseries(falmr_data, self.CombData.timestamps, ...
+                             self.OL_conds_axis_labels,number_groups, genotypes, self.control_genotype,...
+                             self.timeseries_plot_settings, self.falmr_top_left_place, ...
+                             self.falmr_bottom_left_places, self.falmr_left_column_places, ...
+                             self.timeseries_plot_settings.faLmR_figure_names, single, ...
+                             self.save_settings, self.gen_settings, pattern_movement_time);
                         end
                     end
                 else
 
-                    for k = 1:numel(self.OL_conds)
-                        if ~single || ~self.timeseries_plot_settings.show_individual_reps
+                    
+                    if ~single || ~self.timeseries_plot_settings.show_individual_reps
                        
-                            if norm == 0
-                                timeseries_data = self.CombData.ts_avg_reps;
-                            else
-                                timeseries_data = self.CombData.ts_avg_reps_norm;
-                            end
+                        if norm == 0
+                            timeseries_data = self.CombData.ts_avg_reps;
+                            falmr_data = self.CombData.faLmR_avg_over_reps;
+
+                        else
+                            timeseries_data = self.CombData.ts_avg_reps_norm;
+                            falmr_data = self.CombData.faLmR_avg_reps_norm;
+                        end
+                        
+
+                        
+                        % Pattern movement time is ordered by condition - may need to make a second
+% one ordered by how conditions are paired during flipping and averaging? 
+
+                        pattern_movement_time = self.CombData.pattern_movement_time_avg;
+                        for k = 1:numel(self.OL_conds)
                             plot_OL_timeseries(timeseries_data, ...
                                 self.CombData.timestamps, self.OL_conds{k}, self.OL_conds_durations{k}, self.timeseries_plot_settings.cond_name{k}, ...
                                 self.datatype_indices.OL_inds, self.OL_conds_axis_labels, ...
                                 self.datatype_indices.Frame_ind, self.num_groups, self.genotype, self.control_genotype, self.timeseries_plot_settings,...
                                 self.timeseries_top_left_place, self.timeseries_bottom_left_places{k}, ...
                                 self.timeseries_left_column_places{k},self.timeseries_plot_settings.figure_names, ...
-                                single, self.save_settings, k, self.gen_settings);
-                        else
+                                single, self.save_settings, k, self.gen_settings, pattern_movement_time);
+                            
+                        end
+                        if self.faLmR == 1
+                            plot_falmr_timeseries(falmr_data, self.CombData.timestamps, ...
+                             self.OL_conds_axis_labels,self.num_groups, self.genotype, self.control_genotype,...
+                             self.timeseries_plot_settings, self.falmr_top_left_place, ...
+                             self.falmr_bottom_left_places, self.falmr_left_column_places, ...
+                             self.timeseries_plot_settings.faLmR_figure_names, single, ...
+                             self.save_settings, self.gen_settings, pattern_movement_time);
+                        end
+                    else
+                        % Don't offer falmr plotting which shows each
+                    % repetition - it would be hard to make it readable. 
+
                             if norm == 0
                                 timeseries_data = self.CombData.timeseries;
                             else
                                 timeseries_data = self.CombData.timeseries_normalized;
                             end
                             
+                            pattern_movement_time = self.CombData.pattern_movement_time_avg;
+                            
                             plot_OL_timeseries(timeseries_data, ...
                                 self.CombData.timestamps, self.OL_conds{k}, self.OL_conds_durations{k}, self.timeseries_plot_settings.cond_name{k}, ...
                                 self.datatype_indices.OL_inds, self.OL_conds_axis_labels, ...
                                 self.datatype_indices.Frame_ind, self.num_groups, self.genotype, self.control_genotype, self.timeseries_plot_settings,...
                                 self.timeseries_top_left_place, self.timeseries_bottom_left_places{k}, ...
                                 self.timeseries_left_column_places{k},self.timeseries_plot_settings.figure_names, ...
-                                single, self.save_settings, k, self.gen_settings);
+                                single, self.save_settings, k, self.gen_settings, pattern_movement_time);
                             
-                        end
+                     end
 
 
-                    end
                 end
 
                 analyses_run{end+1} = 'Timeseries Plots';
+                if self.faLmR == 1
+                    analyses_run{end+1} = 'faLmR';
+                end
 
             end
 

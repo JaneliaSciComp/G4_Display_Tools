@@ -6,7 +6,7 @@ function add_ablated_field(flyPath, ablated)
         return;
     end
     
-    if ~strcmp(ablated, commentOptions{1}) && ~strcmp(ablated, commentOptions{2} && ~strcmp(ablated, commentOptions{3}) && ~strcmp(ablated, commentOptions{4}))
+    if ~strcmp(ablated, commentOptions{1}) && ~strcmp(ablated, commentOptions{2}) && ~strcmp(ablated, commentOptions{3}) && ~strcmp(ablated, commentOptions{4})
         prompt = "Your new ablated value does not match the options 'n', 'b', 'l', or 'r'. Do you wish to continue? (y or n)";
         cont = input(prompt,'s');
     else

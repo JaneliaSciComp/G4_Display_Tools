@@ -21,6 +21,7 @@ function process_data(exp_folder, processing_settings_file)
 
     if nargin==0
         exp_folder = uigetdir('C:/','Select a folder containing a G4_TDMS_Logs file');
+        processing_settings_file = uigetfile('C:/','Select your processing settings file');
     end
     
     % Normalization settings - take from DA_plot_settings
@@ -42,6 +43,7 @@ function process_data(exp_folder, processing_settings_file)
     hist_datatypes = s.settings.hist_datatypes; %{'Frame Position', 'LmR', 'LpR'};
     trial_options = s.settings.trial_options;
     faLmR = s.settings.enable_faLmR;
+    condition_pairs = s.settings.condition_pairs;
     enable_pos_series = s.settings.enable_pos_series;
     pos_conditions = s.settings.pos_conditions;
     num_positions = s.settings.num_positions;
@@ -85,7 +87,7 @@ function process_data(exp_folder, processing_settings_file)
     L_chan_idx = find(strcmpi(channel_order,'L_chan'));
     R_chan_idx = find(strcmpi(channel_order,'R_chan'));
     F_chan_idx = find(strcmpi(channel_order,'F_chan'));
-    faLmR_ind = find(strcmpi(channel_order,'faLmR'));
+%    faLmR_ind = find(strcmpi(channel_order,'faLmR'));
     num_ts_datatypes = length(channel_order);
     num_ADC_chans = length(Log.ADC.Channels);
     
@@ -95,7 +97,7 @@ function process_data(exp_folder, processing_settings_file)
     % here)
 
     [start_idx, stop_idx, start_times, stop_times] = get_start_stop_times(Log, command_string, manual_first_start);
-    
+    [frame_movement_start_times] = get_pattern_movement_times(start_times, Log);
     
     %get order of pattern IDs (maybe use for error-checking?)
     [modeID_order, patternID_order] = get_modeID_order(combined_command, Log, start_idx);
@@ -107,13 +109,15 @@ function process_data(exp_folder, processing_settings_file)
     %Determine start and stop times for different trial types (pre, inter,
     %regular)
 
-    [num_trials, trial_start_times, trial_stop_times, trial_modes, ...
-    intertrial_start_times, intertrial_stop_times, intertrial_durs] = ...
-    get_trial_startStop(exp_order, trial_options, start_times, stop_times, modeID_order, time_conv);
+    [num_trials, trial_start_times, trial_stop_times, ...
+    trial_move_start_times,trial_modes, intertrial_start_times, intertrial_stop_times, ...
+    intertrial_durs] = get_trial_startStop(exp_order, trial_options, start_times, ...
+    stop_times, frame_movement_start_times, modeID_order, time_conv);
 
     %organize trial duration and control mode by condition/repetition
-    [cond_dur, cond_modes] = organize_durations_modes(num_conds, num_reps, ...
-    num_trials, exp_order, trial_stop_times, trial_start_times, trial_modes, time_conv);
+    [cond_dur, cond_modes,  cond_frame_move_time] = organize_durations_modes(num_conds, num_reps, ...
+    num_trials, exp_order, trial_stop_times, trial_start_times,  ...
+    trial_move_start_times, trial_modes, time_conv);
 
 
  % pre-allocate arrays for aligning the timeseries data
@@ -138,7 +142,13 @@ function process_data(exp_folder, processing_settings_file)
         consolidate_bad_conds(bad_duration_conds, bad_duration_intertrials, bad_slope_conds,...
         bad_crossCorr_conds, bad_WBF_conds, num_trials, num_conds, num_reps, trial_options);
     
-    
+    if ~isempty(bad_conds)
+        for c = 1:length(bad_conds)
+            for r = 1:length(bad_reps)
+                cond_frame_move_time(bad_conds(c), bad_reps(r)) = NaN;
+            end
+        end
+    end
     
     %loop for every trial
     for trial=1:num_trials
@@ -212,28 +222,9 @@ function process_data(exp_folder, processing_settings_file)
     ts_data_normalized(LmR_ind,:,:,:) = ts_data_normalized(L_chan_idx,:,:,:) - ts_data_normalized(R_chan_idx,:,:,:); % + = right turns, - = left turns   
     ts_data_normalized(LpR_ind,:,:,:) = ts_data_normalized(L_chan_idx,:,:,:) + ts_data_normalized(R_chan_idx,:,:,:); % + = increased amplitude, - = decreased    
     
-    
-    
-    if faLmR == 1
-        [ts_data, ts_data_normalized] = get_faLmR(ts_data, ts_data_normalized, LmR_ind, faLmR_ind);
-        faLmR_avg_over_reps = squeeze(nanmean(ts_data(faLmR_ind,:,:,:),3));
-        faLmR_avg_reps_norm = squeeze(nanmean(ts_data_normalized(faLmR_ind,:,:,:),3));
-    else
-        faLmR_avg_over_reps = [];
-        faLmR_avg_reps_norm = [];
-    end
-    
-    ts_avg_reps = squeeze(nanmean(ts_data, 3));
-    LmR_avg_over_reps = squeeze(ts_avg_reps(LmR_ind,:,:));
-    LpR_avg_over_reps = squeeze(ts_avg_reps(LpR_ind,:,:));
-    
-    ts_avg_reps_norm = squeeze(nanmean(ts_data_normalized, 3));
-    LmR_avg_reps_norm = squeeze(ts_avg_reps_norm(LmR_ind,:,:));   
-    LpR_avg_reps_norm = squeeze(ts_avg_reps_norm(LpR_ind,:,:));
 
-    %calculate values for tuning curves - normalized and unnormalized
-    
-    %duplicate ts_data and exclude all datapoints outside data analysis window (da_start:da_stop)
+     %duplicate ts_data and exclude all datapoints outside data analysis
+     %window. Shorten condition data to actual analysis window set. 
     da_data = ts_data;
 
     da_data_norm = ts_data_normalized;
@@ -248,8 +239,28 @@ function process_data(exp_folder, processing_settings_file)
         da_data(:,con,:,da_stop_ind:end) = nan; %omit data after trial end
         da_data_norm(:,con,:,da_stop_ind:end) = nan;
     end
+
+
+    ts_avg_reps = squeeze(nanmean(da_data, 3));
+    LmR_avg_over_reps = squeeze(ts_avg_reps(LmR_ind,:,:));
+    LpR_avg_over_reps = squeeze(ts_avg_reps(LpR_ind,:,:));
     
-    
+    ts_avg_reps_norm = squeeze(nanmean(da_data_norm, 3));
+    LmR_avg_reps_norm = squeeze(ts_avg_reps_norm(LmR_ind,:,:));   
+    LpR_avg_reps_norm = squeeze(ts_avg_reps_norm(LpR_ind,:,:));
+
+    %Generate flipped and averaged datasets if requested
+       
+    if faLmR == 1
+        [faLmR_data, faLmR_data_norm] = get_faLmR(da_data, da_data_norm, LmR_ind, condition_pairs);
+        faLmR_avg_over_reps = squeeze(nanmean(faLmR_data(:,:,:),2));
+        faLmR_avg_reps_norm = squeeze(nanmean(faLmR_data_norm(:,:,:),2));
+    else
+        faLmR_data = [];
+        faLmR_data_norm = [];
+        faLmR_avg_over_reps = [];
+        faLmR_avg_reps_norm = [];
+    end
 
 %calculate values for tuning curves
     tc_data = nanmean(da_data,4);
@@ -277,7 +288,7 @@ function process_data(exp_folder, processing_settings_file)
     %data - normalized and unnormalized.
     if enable_pos_series
             
-        [pos_series, mean_pos_series] = get_position_series(ts_data_normalized, ...
+        [pos_series, mean_pos_series] = get_position_series(da_data_norm, ...
             Frame_ind, num_positions, data_pad, LmR_ind, sm_delay, pos_conditions);
 
 %         [pos_series, mean_pos_series] = get_position_series_a(ts_data, ...
@@ -305,21 +316,25 @@ function process_data(exp_folder, processing_settings_file)
     histograms_CL = hist_data; %[datatype, condition, repetition, pattern-position]
     interhistogram = inter_hist_data; %[repetition, pattern-position]
     timestamps = ts_time; %[1 timestamp]
-    timeseries = ts_data; %[datatype, condition, repition, datapoint]
-    timeseries_normalized = ts_data_normalized;
+    timeseries = da_data; %[datatype, condition, repition, datapoint]
+    timeseries_normalized = da_data_norm;
+    faLmR_timeseries = faLmR_data;
+    faLmR_timeseries_normalized = faLmR_data_norm;
     summaries = tc_data; %[datatype, condition, repition]
     summaries_normalized = tc_data_norm;
     conditionModes = cond_modes(:,1); %[condition]
+    pattern_movement_time_avg = squeeze(nanmean(cond_frame_move_time,2));
 %    LmR_normalization_max = maxs(LmR_ind,1,1)
 
     
     save(fullfile(exp_folder,processed_file_name), 'timeseries', 'timeseries_normalized', ...
-        'ts_avg_reps', 'ts_avg_reps_norm',  'LmR_avg_over_reps', 'LmR_avg_reps_norm',...
-   'LpR_avg_over_reps', 'LpR_avg_reps_norm','faLmR_avg_over_reps', 'faLmR_avg_reps_norm',...
-    'channelNames', 'histograms_CL', 'summaries', 'summaries_normalized','conditionModes', ...
-    'interhistogram', 'timestamps', 'pos_series', 'mean_pos_series', 'pos_conditions', ...
-    'normalization_max', 'bad_duration_conds', ...
-    'bad_duration_intertrials','bad_slope_conds', 'bad_crossCorr_conds', 'bad_WBF_conds');
+        'faLmR_timeseries', 'faLmR_timeseries_normalized', 'ts_avg_reps', 'ts_avg_reps_norm', ...
+    'LmR_avg_over_reps', 'LmR_avg_reps_norm','LpR_avg_over_reps', 'LpR_avg_reps_norm',...
+    'faLmR_avg_over_reps', 'faLmR_avg_reps_norm','channelNames', 'histograms_CL', ...
+    'summaries', 'summaries_normalized','conditionModes', 'interhistogram', 'timestamps', ...
+    'pos_series', 'mean_pos_series', 'pos_conditions', 'normalization_max', ...
+    'bad_duration_conds', 'bad_duration_intertrials','bad_slope_conds', 'bad_crossCorr_conds',...
+    'bad_WBF_conds','cond_frame_move_time', 'pattern_movement_time_avg');
 
 
 end
