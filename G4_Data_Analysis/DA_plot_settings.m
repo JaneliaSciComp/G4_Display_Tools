@@ -51,7 +51,7 @@ function [exp_settings, histogram_plot_settings, histogram_annotation_settings, 
     
     %Plot normalized and unnormalized data
     %1 for both or 0 for normalized data)
-    exp_settings.plot_norm_and_unnorm = 0;  
+    exp_settings.plot_norm_and_unnorm = 1;  
     
     %Processed mat file name
     exp_settings.processed_data_file = 'testing_new_processing';
@@ -438,7 +438,7 @@ function [exp_settings, histogram_plot_settings, histogram_annotation_settings, 
     %% Plot settings for Open-Loop timeseries plots
     
     timeseries_plot_settings.timeseries_ylimits = [-1.1 1.1; -1 6; -1 6; -1 6; 1 192; -.5 .5; 0 0; 0 0]; %[min max] y limits for each datatype (including 1 additional for 'faLmR' option)
-    timeseries_plot_settings.timeseries_xlimits = [0 4];
+    timeseries_plot_settings.timeseries_xlimits = [0 4]; I had 
     timeseries_plot_settings.frame_scale = .5;
     timeseries_plot_settings.frame_color = [0.7 0.7 0.7];
     
