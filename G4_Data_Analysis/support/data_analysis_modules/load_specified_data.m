@@ -38,6 +38,11 @@ function [CombData, files_excluded] = load_specified_data(exp_folder, CombData, 
     CombData.timestamps = fields.timestamps;
     CombData.channelNames = fields.channelNames;
     CombData.conditionModes = fields.conditionModes;
+    CombData.bad_crossCorr_conds = fields.bad_crossCorr_conds;
+    CombData.bad_duration_conds = fields.bad_duration_conds;
+    CombData.bad_duration_intertrials = fields.bad_duration_intertrials;
+    CombData.bad_slope_conds = fields.bad_slope_conds;
+    CombData.bad_WBF_conds = fields.bad_WBF_conds;
         
     if ~isempty(find(strcmp(fields_to_load,'LmR_normalization_max'),1)) > 0
         CombData.LmR_normalization_max = fields.LmR_normalization_max;

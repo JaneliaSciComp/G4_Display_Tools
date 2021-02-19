@@ -74,10 +74,10 @@
     %those should have the fly folders for all flies run on that date. 
 
 %% This is the function for the new file system arrangement. Find old system below.
-function exp_folder = get_exp_folder(field_to_sort_by, field_values, single_group, single_fly,  path_to_protocol, control)
+function exp_folder = get_exp_folder(field_to_sort_by, field_values, single_group, single_fly, single_fly_path,  path_to_protocol, control)
 
      if single_fly == 1
-        exp_folder = {path_to_protocol};
+        exp_folder = {single_fly_path};
         return;
      end
      [protocol_subFiles, protocol_subFolders] = get_files_and_subdirectories(path_to_protocol);
@@ -88,11 +88,11 @@ function exp_folder = get_exp_folder(field_to_sort_by, field_values, single_grou
         field_values = {};
         total_fly = 1;
         for date = 1:num_dates
-            folder_path = fullfile(path_to_protocol, protocol_subFolders(date));
+            folder_path = fullfile(path_to_protocol, protocol_subFolders{date});
             [fly_files, fly_folders] = get_files_and_subdirectories(folder_path);
             num_flies = length(fly_folders);
             for fly = 1:num_flies
-                fly_file = fullfile(folder_path, fly_folders(fly));
+                fly_file = fullfile(folder_path, fly_folders{fly});
                 if isfile(fullfile(fly_file, 'metadata.mat'))
                     metadata = load(fullfile(fly_file, 'metadata.mat'));
                 else
@@ -146,7 +146,7 @@ function exp_folder = get_exp_folder(field_to_sort_by, field_values, single_grou
         [fly_files, fly_folders] = get_files_and_subdirectories(folder_path);
         num_flies = length(fly_folders);
         for k = 1:num_flies
-            fly_file = fullfile(folder_path, fly_folders(k));
+            fly_file = fullfile(folder_path, fly_folders{k});
             if isfile(fullfile(fly_file, 'metadata.mat'))
                 metadata = load(fullfile(fly_file, 'metadata.mat'));
             else

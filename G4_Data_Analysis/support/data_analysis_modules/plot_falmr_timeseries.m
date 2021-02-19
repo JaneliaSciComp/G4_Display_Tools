@@ -1,43 +1,58 @@
-function plot_falmr_timeseries(falmr_data, timestampsIN, axis_labels,num_groups, ...
-genotype, control_genotype, plot_settings, top_left_place, bottom_left_place, ...
-    left_col_places, figure_titles, single, save_settings, gen_settings, pat_move_time)
-    
+function plot_falmr_timeseries(falmr_data, timestampsIN, plot_settings, exp_settings, ...
+    model, save_settings, gen_settings, num_groups, genotype,  single, pat_move_time)
+
+% Get items needed out of settings structures
+
+% Timeseries plot settings
     falmr_conds = plot_settings.faLmR_conds;
     cond_name = plot_settings.faLmR_cond_name;
+    axis_labels = plot_settings.OL_TS_conds_axis_labels;
+    figure_titles = plot_settings.faLmR_figure_names;
+     frame_scale = plot_settings.frame_scale;
+    frame_color = plot_settings.frame_color;
+    frame_superimpose = plot_settings.frame_superimpose;
+    timeseries_ylimits = plot_settings.timeseries_ylimits;
+    timeseries_xlimits = plot_settings.timeseries_xlimits;
+    plot_opposing_directions = plot_settings.faLmR_plot_both_directions;
+    show_ind_flies = plot_settings.show_individual_flies;
+    show_ind_reps = plot_settings.show_individual_reps;
+    cutoff_time = plot_settings.cutoff_time;
+    other_indicators = plot_settings.other_indicators;
+    pattern_motion_indicator = plot_settings.pattern_motion_indicator;
+    condition_pairs = plot_settings.faLmR_pairs;
+    
+    % general plot settings
     rep_Colors = gen_settings.rep_colors;
     mean_Colors = gen_settings.mean_colors;
     mean_LineWidth = gen_settings.mean_lineWidth;
     EdgeColor = gen_settings.edgeColor;
     patch_alpha = gen_settings.patch_alpha;
     subtitle_FontSize = gen_settings.subtitle_fontSize;
-    legend_FontSize = gen_settings.legend_fontSize;
-    frame_scale = plot_settings.frame_scale;
-    frame_color = plot_settings.frame_color;
-    frame_superimpose = plot_settings.frame_superimpose;
-    timeseries_ylimits = plot_settings.timeseries_ylimits;
-    timeseries_xlimits = plot_settings.timeseries_xlimits;
-    rep_LineWidth = gen_settings.rep_lineWidth;
-    plot_opposing_directions = plot_settings.plot_both_directions;
-    control_color = gen_settings.control_color;
-    show_ind_flies = plot_settings.show_individual_flies;
-    show_ind_reps = plot_settings.show_individual_reps;
+    legend_FontSize = gen_settings.legend_fontSize; 
+    rep_LineWidth = gen_settings.rep_lineWidth;   
+    control_color = gen_settings.control_color;   
     y_fontsize = gen_settings.yLabel_fontSize;
     x_fontsize = gen_settings.xLabel_fontSize;
     fly_Colors = gen_settings.fly_colors;
     axis_num_fontSize = gen_settings.axis_num_fontSize;
-    figTitle_fontSize = gen_settings.figTitle_fontSize;
+    figTitle_fontSize = gen_settings.figTitle_fontSize; 
     
-    cutoff_time = plot_settings.cutoff_time;
-    other_indicators = plot_settings.other_indicators;
-    pattern_motion_indicator = plot_settings.pattern_motion_indicator;
-    condition_pairs = plot_settings.faLmR_pairs;
+    % Model
+        
+    bottom_left_place = model.falmr_bottom_left_places;
+    left_col_places = model.falmr_left_column_places;
+    top_left_place = model.top_left_place; 
+    
+    % Experiment settings
+    control_genotype = exp_settings.control_genotype;
+    
 
      if ~isempty(falmr_conds)
 
         num_exps = size(falmr_data,2);
         
         for fig = 1:length(falmr_conds)
-            subplot_figure_titles = plot_settings.subplot_figure_title{fig};
+            subplot_figure_titles = plot_settings.faLmR_subplot_figure_titles{fig};
         
             ydata = [];
             %num_plot_rows = (1-overlap/2)*max(nansum(falmr_conds(:,:,fig)>0));

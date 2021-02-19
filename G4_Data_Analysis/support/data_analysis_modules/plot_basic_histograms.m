@@ -1,10 +1,21 @@
 %% plot data
 %calculate overall measurements and plot basic histograms
-function plot_basic_histograms(timeseries_data, interhistogram_data, ...
-    TC_datatypes, gen_settings, plot_settings, num_groups, num_exps, genotype, TC_inds, trial_options, ...
-    annotation_settings, single, save_settings)
+function plot_basic_histograms(model, timeseries_data, interhistogram_data, ...
+    TC_plot_settings, gen_settings, plot_settings, exp_settings, proc_settings, ...
+    annotation_settings, single, save_settings, num_groups, genotype)
 
     %Set up needed variables
+    num_exps = model.num_exps;
+
+    trial_options = proc_settings.trial_options;
+    TC_inds = model.datatype_indices.TC_inds; % uses 
+    bad_trials = model.bad_trials;
+    bad_inter = model.bad_intertrials;
+    
+
+    TC_datatypes = TC_plot_settings.TC_datatypes;
+    protocol = exp_settings.group_being_analyzed_name;
+     
     rep_Colors = gen_settings.rep_colors;
     mean_Colors = gen_settings.mean_colors;
     rep_LineWidth = gen_settings.rep_lineWidth;
@@ -21,8 +32,8 @@ function plot_basic_histograms(timeseries_data, interhistogram_data, ...
     ann_color = annotation_settings.color;
     ann_interpreter = annotation_settings.interpreter;
     plot_in_degrees = plot_settings.inter_in_degrees;
+    xlimits = plot_settings.xlimits;
     
-
     num_TC_datatypes = length(TC_datatypes);
     
     if num_groups > 5
@@ -65,32 +76,33 @@ function plot_basic_histograms(timeseries_data, interhistogram_data, ...
         
         for plot_group = 1:num_plot_groups
             g = g + 1;
-%             
-%             %Get number flies for particular group
-%             fly = 1;
-%             while sum(sum(sum(~isnan(timeseries_data(g,fly,:,:,:))))) && fly <= num_exps-1
-%                 fly = fly+1;
-%             end
-%             if fly == 1
-%                 fly = 0;
-%             end
             
             for d = 1:num_TC_datatypes
                 data_vec = reshape(timeseries_data(g,:,TC_inds(d),:,:),[1 numel(timeseries_data(g,:,d,:,:))]);
-                datastr = TC_datatypes{d};
+                datastr = ['Open Loop ' TC_datatypes{d}];
                 datastr(strfind(datastr,'_')) = '-'; %convert underscores to dashes to prevent subscripts
 
                 subplot(2+num_TC_datatypes,num_plot_groups,plot_group)
                 if d ==1
-                    text(0.1, .95, ['Number of Flies: ' num2str(flies(g))],  'FontSize', 8);
+                    if single == 0
+                        text(0.1, .95, ['Number of Flies: ' num2str(flies(g))],  'FontSize', 8);
+                        text(0.1, 1.25-0.3*(d+1), ['Mean ' TC_datatypes{d} ' = ' num2str(nanmean(data_vec))], 'FontSize', 8);
+                    else
+                        text(0.1, .95, ['Trials thrown out: ' num2str(size(bad_trials,1))],  'FontSize', 8);
+                    end
                 end
-                text(0.1, 1.25-0.3*(d+1), ['Mean ' TC_datatypes{d} ' = ' num2str(nanmean(data_vec))], 'FontSize', 8);
+                
                 axis off
                 hold on
         %         title(['Group ' num2str(g)],'FontSize',subtitle_FontSize);
-                genotypeStr = convertCharsToStrings(genotype{g});
-                num_expsStr = convertCharsToStrings(num_exps);        
-                title(genotypeStr,'FontSize',subtitle_FontSize,'interpreter','none');
+                genotypeStr = convertCharsToStrings(genotype(g));
+                protocolStr = convertCharsToStrings(protocol);
+                num_expsStr = convertCharsToStrings(num_exps);  
+                if single
+                    title("Single Fly Report - " + protocolStr + ", " + genotypeStr,'FontSize',subtitle_FontSize,'interpreter','none');
+                else
+                    title(protocolStr + ", " + genotypeStr,'FontSize',subtitle_FontSize,'interpreter','none');
+                end
                 %text
     %             annotation('textbox',[0.3 0.0001 0.7 0.027],'String',"empty split: " + e + " flies run from 08/08/19 to 08/13/19", ...
     %                 'FontSize' ,10,'FontName','Arial','LineStyle','-','EdgeColor',[1 1 1],'LineWidth',1,'BackgroundColor',[1 1 1],'Color',[0 0 0],'Interpreter', 'none'); %e is number of experiments
@@ -105,8 +117,14 @@ function plot_basic_histograms(timeseries_data, interhistogram_data, ...
                 avg = 1/100;
                 histogram(data_vec, 100, 'Normalization', 'probability')
                 hold on
-                xl = xlim;
-                plot(xl,[avg avg],'--','Color',rep_Colors(g,:)','LineWidth',mean_LineWidth)
+                xlim(xlimits(d,:))
+                xlabel('Volts', 'FontSize', ann_fontSize);
+                ylabel('Percentage', 'FontSize', ann_fontSize);
+                plot(xlimits(d,:),[avg avg],'--','Color',rep_Colors(g,:)','LineWidth',mean_LineWidth)
+                ylimit = ylim; 
+                set(gca, 'YTick', ylimit(1):.01:ylimit(2))
+                yticklabels(yticks*100);
+                
                 title(datastr,'FontSize',subtitle_FontSize,'interpreter','none');
                 currPlot = gca;
                 set(currPlot, 'FontSize', 8);
@@ -160,6 +178,10 @@ function plot_basic_histograms(timeseries_data, interhistogram_data, ...
                     xticklabels(string(tick_labels));
                     xlabel('Degrees');
                end
+               
+               ylimit = ylim; 
+               set(gca, 'YTick', ylimit(1):.01:ylimit(2))
+               yticklabels(yticks*100);
 
                 title('Closed Loop Stripe Position','FontSize',subtitle_FontSize)
                 currPlot = gca;
@@ -197,7 +219,9 @@ function plot_basic_histograms(timeseries_data, interhistogram_data, ...
                 xl_fly = xlim;
                 plot(xl_fly,[avg_val avg_val],'--','Color',rep_Colors(g,:)','LineWidth',rep_LineWidth)
                 
-                
+                title('Closed Loop Stripe Position','FontSize',subtitle_FontSize)
+                currPlot = gca;
+                set(currPlot, 'FontSize', 8);
             
             end
 
