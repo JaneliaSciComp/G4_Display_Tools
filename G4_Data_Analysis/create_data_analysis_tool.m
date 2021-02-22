@@ -505,9 +505,9 @@
                         end
                     end
                     for fasubname = 1:length(self.timeseries_plot_settings.faLmR_subplot_figure_titles)
-                        for fadatasubname = 1:length(self.timeseries_plot_settings.faLmR_subplot_figure_titles{fasubname})
-                            self.timeseries_plot_settings.faLmR_subplot_figure_titles{fasubname}(fadatasubname) = self.timeseries_plot_settings.faLmR_subplot_figure_titles{fasubname}(fadatasubname) + " - Normalized";
-                        end
+                      
+                        self.timeseries_plot_settings.faLmR_subplot_figure_titles(fasubname) = self.timeseries_plot_settings.faLmR_subplot_figure_titles(fasubname) + " - Normalized";
+                        
                     end
 
                     for tcname = 1:length(self.TC_plot_settings.figure_names)
@@ -527,6 +527,9 @@
                     for revert_datasubname = 1:length(self.timeseries_plot_settings.subplot_figure_title{revert_subname})
                         self.timeseries_plot_settings.subplot_figure_title{revert_subname}(revert_datasubname) = erase(self.timeseries_plot_settings.subplot_figure_title{revert_subname}(revert_datasubname), " - Normalized");
                     end
+                end
+                for revert_faname = 1:length(self.timeseries_plot_settings.faLmR_subplot_figure_titles)
+                    self.timeseries_plot_settings.faLmR_subplot_figure_titles(revert_faname) = erase(self.timeseries_plot_settings.faLmR_subplot_figure_titles(revert_faname), " - Normalized");
                 end
                 for revert_tcname = 1:length(self.TC_plot_settings.figure_names)
                     self.TC_plot_settings.figure_names(revert_tcname) = erase(self.TC_plot_settings.figure_names(revert_tcname), " - Normalized");
@@ -548,6 +551,9 @@
                         self.timeseries_plot_settings.subplot_figure_title{subname}(datasubname) = self.timeseries_plot_settings.subplot_figure_title{subname}(datasubname) + " - Normalized";
                     end
                 end
+                for fasubname = 1:length(self.timeseries_plot_settings.faLmR_subplot_figure_titles)
+                    self.timeseries_plot_settings.faLmR_subplot_figure_titles(fasubname) = self.timeseries_plot_settings.faLmR_subplot_figure_titles(fasubname) + " - Normalized";
+                end
 
                 for tcname = 1:length(self.TC_plot_settings.figure_names)
                    self.TC_plot_settings.figure_names(tcname) = self.TC_plot_settings.figure_names(tcname) + " - Normalized";
@@ -567,6 +573,9 @@
                     for revert_datasubname = 1:length(self.timeseries_plot_settings.subplot_figure_title{revert_subname})
                         self.timeseries_plot_settings.subplot_figure_title{revert_subname}(revert_datasubname) = erase(self.timeseries_plot_settings.subplot_figure_title{revert_subname}(revert_datasubname), " - Normalized");
                     end
+                end
+                for revert_faname = 1:length(self.timeseries_plot_settings.faLmR_subplot_figure_titles)
+                    self.timeseries_plot_settings.faLmR_subplot_figure_titles(revert_faname) = erase(self.timeseries_plot_settings.faLmR_subplot_figure_titles(revert_faname), " - Normalized");
                 end
                 for revert_tcname = 1:length(self.TC_plot_settings.figure_names)
                     self.TC_plot_settings.figure_names(revert_tcname) = erase(self.TC_plot_settings.figure_names(revert_tcname), " - Normalized");

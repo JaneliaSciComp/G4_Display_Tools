@@ -180,7 +180,7 @@ function [exp_settings, histogram_plot_settings, histogram_annotation_settings, 
     % processing settings. 
     timeseries_plot_settings.faLmR_conds = [];
     timeseries_plot_settings.faLmR_figure_names = ["faLmR"];
-    timeseries_plot_settings.faLmR_subplot_figure_titles{1} = ["CT1 faLmR Not Ablated"];
+    timeseries_plot_settings.faLmR_subplot_figure_titles = ["CT1 faLmR Not Ablated"];
 %     This example would work when you are not planning to plot two pairs
 %     per axis.
 

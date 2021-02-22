@@ -52,7 +52,7 @@ function plot_falmr_timeseries(falmr_data, timestampsIN, plot_settings, exp_sett
         num_exps = size(falmr_data,2);
         
         for fig = 1:length(falmr_conds)
-            subplot_figure_titles = plot_settings.faLmR_subplot_figure_titles{fig};
+            subplot_figure_titles = plot_settings.faLmR_subplot_figure_titles;
         
             ydata = [];
             %num_plot_rows = (1-overlap/2)*max(nansum(falmr_conds(:,:,fig)>0));
