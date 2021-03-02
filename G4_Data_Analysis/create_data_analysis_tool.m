@@ -416,24 +416,27 @@
                 analyses_run{end+1} = 'Basic histograms';
             end
             
+            % Always plot normalized plots
+            norm = 1;
+            
+            % Add - Normalized to the end of all timeseries and
+                % tuning curve figure titles. 
+            [self.timeseries_plot_settings, self.TC_plot_settings] = add_titles_text(" - Normalized",...
+                 self.timeseries_plot_settings, self.TC_plot_settings);
+            
+            %generate normalized timeseries and tuning curve plots
+            analyses_run = self.generate_plots(analyses_run, norm, single);
+            
+            %Remove -Normalized from all ts/tc titles
+            [self.timeseries_plot_settings, self.TC_plot_settings] = revert_titles_text(" - Normalized", ...
+                self.timeseries_plot_settings, self.TC_plot_settings);
+                
             if self.exp_settings.plot_norm_and_unnorm == 1
                 norm = 0;
-                for it = 1:2
 
-                    %run generate plots
-                    analyses_run = self.generate_plots(analyses_run, norm, single);
-
-                    for name = 1:length(self.timeseries_plot_settings.figure_names)
-                       self.timeseries_plot_settings.figure_names(name) = self.timeseries_plot_settings.figure_names(name) + " - Normalized";
-                    end
-                    for tcname = 1:length(self.TC_plot_settings.figure_names)
-                       self.TC_plot_settings.figure_names(tcname) = self.TC_plot_settings.figure_names(tcname) + " - Normalized";
-                    end
-                    norm = 1;
-                end
-            else
-                norm = 1;
+                % If settings dictate, create unnormalized plots
                 analyses_run = self.generate_plots(analyses_run, norm, single);
+ 
             end
             
             if self.pos_plot_option == 1
@@ -488,105 +491,27 @@
                 analyses_run{end+1} = 'Basic histograms';
             end
             
+            % Always plot normalized plots
+            norm = 1;
+            
+            % Add - Normalized to the end of all timeseries and
+                % tuning curve figure titles. 
+            [self.timeseries_plot_settings, self.TC_plot_settings] = add_titles_text(" - Normalized",...
+                 self.timeseries_plot_settings, self.TC_plot_settings);
+            
+            %generate normalized timeseries and tuning curve plots
+            analyses_run = self.generate_plots(analyses_run, norm, single);
+            
+            %Remove -Normalized from all ts/tc titles
+            [self.timeseries_plot_settings, self.TC_plot_settings] = revert_titles_text(" - Normalized", ...
+                self.timeseries_plot_settings, self.TC_plot_settings);
+                
             if self.exp_settings.plot_norm_and_unnorm == 1
                 norm = 0;
-                for it = 1:2
-                    analyses_run = self.generate_plots(analyses_run, norm, single);
-                    norm = 1;
-                    for name = 1:length(self.timeseries_plot_settings.figure_names)
-                       self.timeseries_plot_settings.figure_names(name) = self.timeseries_plot_settings.figure_names(name) + " - Normalized";
-                    end
-                    for faName = 1:length(self.timeseries_plot_settings.faLmR_figure_names)
-                       self.timeseries_plot_settings.faLmR_figure_names(name) = self.timeseries_plot_settings.faLmR_figure_names(faName) + " - Normalized";
-                    end
-                    for subname = 1:length(self.timeseries_plot_settings.subplot_figure_title)
-                        for datasubname = 1:length(self.timeseries_plot_settings.subplot_figure_title{subname})
-                            self.timeseries_plot_settings.subplot_figure_title{subname}(datasubname) = self.timeseries_plot_settings.subplot_figure_title{subname}(datasubname) + " - Normalized";
-                        end
-                    end
-                    for fasubname = 1:length(self.timeseries_plot_settings.faLmR_subplot_figure_titles)
-                      
-                        self.timeseries_plot_settings.faLmR_subplot_figure_titles(fasubname) = self.timeseries_plot_settings.faLmR_subplot_figure_titles(fasubname) + " - Normalized";
-                        
-                    end
 
-                    for tcname = 1:length(self.TC_plot_settings.figure_names)
-                       self.TC_plot_settings.figure_names(tcname) = self.TC_plot_settings.figure_names(tcname) + " - Normalized";
-                    end
-                    for subtcname = 1:length(self.TC_plot_settings.subplot_figure_title)
-                        for datatcsubname = 1:length(self.TC_plot_settings.subplot_figure_title{subtcname})
-                            self.TC_plot_settings.subplot_figure_title{subtcname}(datatcsubname) = self.TC_plot_settings.subplot_figure_title{subtcname}(datatcsubname) + " - Normalized";
-                        end
-                    end
-                end
-                for revert_name = 1:length(self.timeseries_plot_settings.figure_names)
-                    self.timeseries_plot_settings.figure_names(revert_name) = erase(self.timeseries_plot_settings.figure_names(revert_name), " - Normalized");
-                    self.timeseries_plot_settings.faLmR_figure_names(revert_name) = erase(self.timeseries_plot_settings.faLmR_figure_names(revert_name), " - Normalized");
-                end
-                for revert_subname = 1:length(self.timeseries_plot_settings.subplot_figure_title)
-                    for revert_datasubname = 1:length(self.timeseries_plot_settings.subplot_figure_title{revert_subname})
-                        self.timeseries_plot_settings.subplot_figure_title{revert_subname}(revert_datasubname) = erase(self.timeseries_plot_settings.subplot_figure_title{revert_subname}(revert_datasubname), " - Normalized");
-                    end
-                end
-                for revert_faname = 1:length(self.timeseries_plot_settings.faLmR_subplot_figure_titles)
-                    self.timeseries_plot_settings.faLmR_subplot_figure_titles(revert_faname) = erase(self.timeseries_plot_settings.faLmR_subplot_figure_titles(revert_faname), " - Normalized");
-                end
-                for revert_tcname = 1:length(self.TC_plot_settings.figure_names)
-                    self.TC_plot_settings.figure_names(revert_tcname) = erase(self.TC_plot_settings.figure_names(revert_tcname), " - Normalized");
-                end
-                for revert_tcsubname = 1:length(self.TC_plot_settings.subplot_figure_title)
-                    for revert_tcdatasubname = 1:length(self.TC_plot_settings.subplot_figure_title{revert_tcsubname})
-                        self.TC_plot_settings.subplot_figure_title{revert_tcsubname}(revert_tcdatasubname) = erase(self.TC_plot_settings.subplot_figure_title{revert_tcsubname}(revert_tcdatasubname), " - Normalized");
-                    end
-                end
-            else
-                norm = 1;
-                
-                
-                for name = 1:length(self.timeseries_plot_settings.figure_names)
-                   self.timeseries_plot_settings.figure_names(name) = self.timeseries_plot_settings.figure_names(name) + " - Normalized";
-                end
-                for subname = 1:length(self.timeseries_plot_settings.subplot_figure_title)
-                    for datasubname = 1:length(self.timeseries_plot_settings.subplot_figure_title{subname})
-                        self.timeseries_plot_settings.subplot_figure_title{subname}(datasubname) = self.timeseries_plot_settings.subplot_figure_title{subname}(datasubname) + " - Normalized";
-                    end
-                end
-                for fasubname = 1:length(self.timeseries_plot_settings.faLmR_subplot_figure_titles)
-                    self.timeseries_plot_settings.faLmR_subplot_figure_titles(fasubname) = self.timeseries_plot_settings.faLmR_subplot_figure_titles(fasubname) + " - Normalized";
-                end
-
-                for tcname = 1:length(self.TC_plot_settings.figure_names)
-                   self.TC_plot_settings.figure_names(tcname) = self.TC_plot_settings.figure_names(tcname) + " - Normalized";
-                end
-                for subtcname = 1:length(self.TC_plot_settings.subplot_figure_title)
-                    for datatcsubname = 1:length(self.TC_plot_settings.subplot_figure_title{subtcname})
-                        self.TC_plot_settings.subplot_figure_title{subtcname}(datatcsubname) = self.TC_plot_settings.subplot_figure_title{subtcname}(datatcsubname) + " - Normalized";
-                    end
-                end
-                
+                % If settings dictate, create unnormalized plots
                 analyses_run = self.generate_plots(analyses_run, norm, single);
-                
-                for revert_name = 1:length(self.timeseries_plot_settings.figure_names)
-                    self.timeseries_plot_settings.figure_names(revert_name) = erase(self.timeseries_plot_settings.figure_names(revert_name), " - Normalized");
-                end
-                for revert_subname = 1:length(self.timeseries_plot_settings.subplot_figure_title)
-                    for revert_datasubname = 1:length(self.timeseries_plot_settings.subplot_figure_title{revert_subname})
-                        self.timeseries_plot_settings.subplot_figure_title{revert_subname}(revert_datasubname) = erase(self.timeseries_plot_settings.subplot_figure_title{revert_subname}(revert_datasubname), " - Normalized");
-                    end
-                end
-                for revert_faname = 1:length(self.timeseries_plot_settings.faLmR_subplot_figure_titles)
-                    self.timeseries_plot_settings.faLmR_subplot_figure_titles(revert_faname) = erase(self.timeseries_plot_settings.faLmR_subplot_figure_titles(revert_faname), " - Normalized");
-                end
-                for revert_tcname = 1:length(self.TC_plot_settings.figure_names)
-                    self.TC_plot_settings.figure_names(revert_tcname) = erase(self.TC_plot_settings.figure_names(revert_tcname), " - Normalized");
-                end
-                for revert_tcsubname = 1:length(self.TC_plot_settings.subplot_figure_title)
-                    for revert_tcdatasubname = 1:length(self.TC_plot_settings.subplot_figure_title{revert_tcsubname})
-                        self.TC_plot_settings.subplot_figure_title{revert_tcsubname}(revert_tcdatasubname) = erase(self.TC_plot_settings.subplot_figure_title{revert_tcsubname}(revert_tcdatasubname), " - Normalized");
-                    end
-                end
-                
-                
+ 
             end
             
             if self.pos_plot_option == 1
@@ -691,11 +616,15 @@
                        
                         if norm == 0
                             timeseries_data = self.CombData.ts_avg_reps;
-                            falmr_data = self.CombData.faLmR_avg_over_reps;
+                            if self.faLmR
+                                falmr_data = self.CombData.faLmR_avg_over_reps;
+                            end
 
                         else
                             timeseries_data = self.CombData.ts_avg_reps_norm;
-                            falmr_data = self.CombData.faLmR_avg_reps_norm;
+                            if self.faLmR
+                                falmr_data = self.CombData.faLmR_avg_reps_norm;
+                            end
                         end
                         
 

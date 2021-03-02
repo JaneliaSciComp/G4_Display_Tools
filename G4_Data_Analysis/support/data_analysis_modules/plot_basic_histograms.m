@@ -85,12 +85,21 @@ function plot_basic_histograms(model, timeseries_data, interhistogram_data, ...
                 subplot(2+num_TC_datatypes,num_plot_groups,plot_group)
                 if d ==1
                     if single == 0
-                        text(0.1, .95, ['Number of Flies: ' num2str(flies(g))],  'FontSize', 8);
-                        text(0.1, 1.25-0.3*(d+1), ['Mean ' TC_datatypes{d} ' = ' num2str(nanmean(data_vec))], 'FontSize', 8);
+                        text(0.1, .65, ['Number of Flies: ' num2str(flies(g))],  'FontSize', 8);
+                        
                     else
-                        text(0.1, .95, ['Trials thrown out: ' num2str(size(bad_trials,1))],  'FontSize', 8);
+                        md = load(fullfile(exp_settings.fly_path, 'metadata.mat'));
+                        fly_name = md.metadata.fly_name;
+                        timestamp = md.metadata.timestamp;
+                        fly_name(strfind(fly_name,'_')) = '-';
+                        text(0.1, .7, ['Fly Name: ' fly_name], 'FontSize', 8);
+                        text(0.1, .5, ['Timestamp: ' timestamp], 'FontSize', 8);
+                        text(0.1, .3, ['Trials thrown out: ' num2str(size(bad_trials,1))],  'FontSize', 8);
+                        
+                        
                     end
                 end
+                text(0.6, 1.25-0.3*(d+1), ['Mean ' TC_datatypes{d} ' = ' num2str(nanmean(data_vec))], 'FontSize', 8);
                 
                 axis off
                 hold on
@@ -119,11 +128,12 @@ function plot_basic_histograms(model, timeseries_data, interhistogram_data, ...
                 hold on
                 xlim(xlimits(d,:))
                 xlabel('Volts', 'FontSize', ann_fontSize);
-                ylabel('Percentage', 'FontSize', ann_fontSize);
+                ylabel('%', 'FontSize', ann_fontSize);
                 plot(xlimits(d,:),[avg avg],'--','Color',rep_Colors(g,:)','LineWidth',mean_LineWidth)
                 ylimit = ylim; 
                 set(gca, 'YTick', ylimit(1):.01:ylimit(2))
                 yticklabels(yticks*100);
+                xline(0, 'LineWidth',.75);
                 
                 title(datastr,'FontSize',subtitle_FontSize,'interpreter','none');
                 currPlot = gca;
@@ -182,6 +192,7 @@ function plot_basic_histograms(model, timeseries_data, interhistogram_data, ...
                ylimit = ylim; 
                set(gca, 'YTick', ylimit(1):.01:ylimit(2))
                yticklabels(yticks*100);
+               ylabel('%', 'FontSize', ann_fontSize);
 
                 title('Closed Loop Stripe Position','FontSize',subtitle_FontSize)
                 currPlot = gca;
@@ -190,6 +201,8 @@ function plot_basic_histograms(model, timeseries_data, interhistogram_data, ...
             elseif trial_options(2) == 1 && single == 1
                 
                 fly_line = squeeze(nanmean(interhistogram_data(g,:,:,:),3));
+                total_points = nansum(interhistogram_data(1,1,1,:),4);
+                fly_line = fly_line/total_points;
                 if plot_in_degrees == 1
                     
                     half = length(fly_line)/2;
@@ -218,6 +231,11 @@ function plot_basic_histograms(model, timeseries_data, interhistogram_data, ...
                 avg_val = mean(fly_line);
                 xl_fly = xlim;
                 plot(xl_fly,[avg_val avg_val],'--','Color',rep_Colors(g,:)','LineWidth',rep_LineWidth)
+                
+                 ylimit = ylim; 
+               set(gca, 'YTick', ylimit(1):.01:ylimit(2))
+               yticklabels(yticks*100);
+               ylabel('%', 'FontSize', ann_fontSize);
                 
                 title('Closed Loop Stripe Position','FontSize',subtitle_FontSize)
                 currPlot = gca;
