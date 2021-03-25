@@ -2,70 +2,41 @@
     
        
     properties
-        exp_folder
-        genotype
-        control_genotype
-        trial_options
-        CombData
-        processed_data_file
-        flags
+        
+        % Properties obtained from the settings file 
         exp_settings
         gen_settings
-        
-        group_analysis
-        single_analysis
-        
-        histogram_plot_option
         histogram_plot_settings
         histogram_annotation_settings
-        
-        CL_histogram_plot_option
-        CL_datatypes
-        CL_conds
         CL_hist_plot_settings
-        
-        timeseries_plot_option
-        OL_datatypes        
-        OL_conds
-        OL_conds_durations
-        OL_conds_axis_labels
         timeseries_plot_settings
-        patterns
-        looms
-        wf
-        cond_name
-        timeseries_top_left_place
-        timeseries_bottom_left_places
-        timeseries_left_column_places
-        %timeseries_bottom_row_places
-        
-        TC_plot_option
-        TC_datatypes
-        TC_conds
         TC_plot_settings
-        TC_plot_titles
-        
-        pos_plot_option
         pos_plot_settings
         MP_plot_settings
-        
-        comp_plot_option
         comp_plot_settings
-        
-        datatype_indices
-%         
-    %    normalize_option
-%         normalize_settings
-        
         save_settings
+        proc_settings
         
-        num_groups
-        num_exps
         
-        data_needed
+        % Properties passed in through the initial command
+        flags
         
-        group_being_analyzed_name
-    
+        
+        % Properties created during initialization
+        CombData
+        histogram_plot_option
+        CL_histogram_plot_option
+        timeseries_plot_option
+        TC_plot_option
+        pos_plot_option
+        comp_plot_option
+        group_analysis
+        single_analysis
+        faLmR
+        model %class that holds variables and datasets to be saved at the end of analysis
+
+        % Need to move elsewhere
+
         %% TO ADD A NEW MODULE
 %         new_module_option
         %new_module_settings (if necessary)
@@ -83,10 +54,10 @@
                 return;
             end
             
-            %Load settings file
+            %% Load settings file
             settings = load(settings_file);
             
-            %Set all necessary variables to properties of the class
+            %% Set all necessary variables to properties of the class
             self.exp_settings = settings.exp_settings;
             self.gen_settings = settings.gen_settings;
             self.histogram_plot_settings = settings.histogram_plot_settings;
@@ -98,9 +69,10 @@
             self.save_settings = settings.save_settings;
             self.MP_plot_settings = settings.MP_plot_settings;
             self.comp_plot_settings = settings.comp_settings;
+            self.proc_settings = settings.proc_settings;
             
-            self.exp_folder = self.exp_settings.exp_folder;
-            self.trial_options = self.exp_settings.trial_options;
+%             self.exp_settings.exp_folder = self.exp_settings.exp_folder;
+%             self.proc_settings.trial_options = self.proc_settings.trial_options;
             
             self.histogram_plot_option = 0;
             self.CL_histogram_plot_option = 0;
@@ -112,39 +84,28 @@
             self.single_analysis = 0;
             self.group_analysis = 0;
             
-            self.processed_data_file = self.exp_settings.processed_data_file;
-            self.group_being_analyzed_name = self.exp_settings.group_being_analyzed_name;
+            if ~iscell(self.exp_settings.genotypes)
+                self.exp_settings.genotypes = num2cell(self.exp_settings.genotypes);
+            end
             
-            for i = 1:length(self.exp_settings.genotypes)
-                self.genotype{i} = self.exp_settings.genotypes(i);
+
+            %% Determine if flipped and averaged data is being plotted
+            if ~isempty(find(strcmp(self.timeseries_plot_settings.OL_datatypes, 'faLmR')))
+                self.faLmR = 1;
+                self.timeseries_plot_settings.OL_datatypes(strcmp(self.timeseries_plot_settings.OL_datatypes,'faLmR')==1) = [];
+            else
+                self.faLmR = 0;
             end
 
-            self.OL_conds = self.timeseries_plot_settings.OL_TS_conds;
-            self.OL_conds_durations = self.timeseries_plot_settings.OL_TS_durations;
-            self.CL_conds = self.CL_hist_plot_settings.CL_hist_conds;
-            self.TC_conds = self.TC_plot_settings.OL_TC_conds;
-            
-            self.CL_datatypes = self.CL_hist_plot_settings.CL_datatypes;
-            self.OL_datatypes = self.timeseries_plot_settings.OL_datatypes;
-            self.TC_datatypes = self.TC_plot_settings.TC_datatypes;
-            
-            %Get number of groups and experiments per group
-            [self.num_groups, self.num_exps] = size(self.exp_folder);
-            
-            %Check if there is a control group
-            if ~isempty(self.exp_settings.control_genotype)
-                self.control_genotype = 1;
-            else
-                self.control_genotype = 0;  
-            end
-           
 
         %% Update settings based on flags
         
         %use flags to determine which variables from the processed data
         %file are needed.
             self.flags = varargin;
-            self.data_needed = {'conditionModes', 'channelNames', 'summaries', 'summaries_normalized'};
+            data_needed = {'conditionModes', 'channelNames', 'summaries', ...
+                'summaries_normalized', 'timestamps', 'bad_crossCorr_conds',...
+                'bad_duration_conds', 'bad_duration_intertrials', 'bad_slope_conds', 'bad_WBF_conds'};
             for i = 1:length(self.flags)
                 
                 switch lower(self.flags{i})
@@ -152,23 +113,29 @@
                     case '-hist' %Do basic histogram plots
                         
                         self.histogram_plot_option = 1;
-                        self.data_needed{end+1} = 'ts_avg_reps';
-                        self.data_needed{end+1} = 'interhistogram';
+                        data_needed{end+1} = 'ts_avg_reps';
+                        data_needed{end+1} = 'interhistogram';
                         
                     case '-clhist' %Do closed loop histogram plots
                         
                         self.CL_histogram_plot_option = 1;
-                        self.data_needed{end+1} = 'histograms_CL';
+                        data_needed{end+1} = 'histograms_CL';
                         
                     case '-tsplot' %Do timeseries plots
                         
                         self.timeseries_plot_option = 1;
-                        self.data_needed{end+1} = 'ts_avg_reps_norm';
-                        self.data_needed{end+1} = 'ts_avg_reps';
-                        self.data_needed{end+1} = 'timeseries';
-                        self.data_needed{end+1} = 'timeseries_normalized';
+                        data_needed{end+1} = 'ts_avg_reps_norm';
+                        data_needed{end+1} = 'ts_avg_reps';
+                        data_needed{end+1} = 'timeseries';
+                        data_needed{end+1} = 'timeseries_normalized';
+                        data_needed{end+1} = 'pattern_movement_time_avg';
                         
-                        
+                        if self.faLmR == 1
+
+                            data_needed{end+1} = 'faLmR_avg_reps_norm';
+
+                        end
+
                     case '-tcplot' %Do tuning curve plots
                         
                         self.TC_plot_option = 1;
@@ -176,15 +143,15 @@
                     case '-posplot' %Do M, P, and maybe position series plots
                         
                         self.pos_plot_option = 1;
-                        self.data_needed{end+1} = 'mean_pos_series';
-                        self.data_needed{end+1} = 'pos_conditions';
+                        data_needed{end+1} = 'mean_pos_series';
+                        data_needed{end+1} = 'pos_conditions';
                         
                     case '-compplot' %Do comparison plot
                         
                         self.comp_plot_option = 1;
-                        self.data_needed{end+1} = 'mean_pos_series';
-                        self.data_needed{end+1} = 'ts_avg_reps';
-                        self.data_needed{end+1} = 'ts_avg_reps_norm';
+                        data_needed{end+1} = 'mean_pos_series';
+                        data_needed{end+1} = 'ts_avg_reps';
+                        data_needed{end+1} = 'ts_avg_reps_norm';
                         
                     case '-single'
                         
@@ -209,63 +176,78 @@
                 
             end
             
+            %% Add unnormalized data if necessary
             if self.exp_settings.plot_norm_and_unnorm
-                self.data_needed{end+1} = 'ts_avg_reps';
+                data_needed{end+1} = 'ts_avg_reps';
+                if self.faLmR == 1
+                    data_needed{end+1} = 'faLmR_avg_over_reps';
+                end
 
             end
-            
-            self.data_needed{end+1} = 'timestamps';
-            self.data_needed = unique(self.data_needed);
+
+            data_needed = unique(data_needed);
             
             %% Always load channelNames, conditionModes, and timestamps
-            files = dir(self.exp_folder{1,1});
+            files = dir(self.exp_settings.exp_folder{1,1});
             try
-                Data_name = files(contains({files.name},{self.processed_data_file})).name;
+                Data_name = files(contains({files.name},{self.proc_settings.processed_file_name})).name;
             catch
                 error('cannot find processed file in specified folder')
             end
 
-            load(fullfile(self.exp_folder{1,1},Data_name), 'channelNames', 'conditionModes', 'timestamps', 'ts_avg_reps', 'pos_conditions');
+            load(fullfile(self.exp_settings.exp_folder{1,1},Data_name), 'channelNames', 'conditionModes', 'timestamps', 'ts_avg_reps', 'pos_conditions', 'faLmR_avg_over_reps');
             self.CombData.timestamps = timestamps;
             self.CombData.channelNames = channelNames;
             self.CombData.conditionModes = conditionModes;
             self.CombData.pos_conditions = pos_conditions;
             
-             %Get path to .g4p file
-            [g4ppath] = get_g4p_file(self.save_settings.path_to_protocol);
+             %% Establish model which will track dataset changes, indices, 
+            %other things that need tracking throughout analysis
+            
+            self.model = da_model(self);
+
 
             %% Create default plot axis labels for any that were not
             %provided.
-            [self.OL_conds_axis_labels, self.TC_plot_settings.axis_labels, ...
+            [self.timeseries_plot_settings.OL_TS_conds_axis_labels, self.TC_plot_settings.axis_labels, ...
                 self.pos_plot_settings.axis_labels, self.MP_plot_settings.axis_labels] = ...
             generate_default_axis_labels(self.timeseries_plot_settings.axis_labels,...
                 self.TC_plot_settings.axis_labels, self.pos_plot_settings.axis_labels, ...
-                self.MP_plot_settings.axis_labels, self.OL_datatypes, self.TC_datatypes);
+                self.MP_plot_settings.axis_labels, self.timeseries_plot_settings.OL_datatypes, ...
+                self.TC_plot_settings.TC_datatypes);
 
             %Create default plot layout for any plots flagged but not
             %supplied
             
             %% Create any default layouts that are called for and were not provided
             
-            if self.timeseries_plot_option == 1 && isempty(self.OL_conds) %timeseries are being plotted but a plot layout was not provided
+            %timeseries
+            if self.timeseries_plot_option == 1 && isempty(self.timeseries_plot_settings.OL_TS_conds) %timeseries are being plotted but a plot layout was not provided
                 
                 %Figure out which conditions need to be plotted.
                 [conds_vec_ts] = get_conds_to_plot('ts_plot', self.timeseries_plot_settings, conditionModes);
                 
                 %Create default layout for given condition vector
-                self.OL_conds = create_default_plot_layout(conds_vec_ts);
+                self.timeseries_plot_settings.OL_TS_conds = create_default_plot_layout(conds_vec_ts);
+
+                if self.faLmR==1 && isempty(self.timeseries_plot_settings.faLmR_conds)
+                    self.timeseries_plot_settings.faLmR_conds = create_default_faLmR_layout(faLmR_avg_over_reps, self.timeseries_plot_settings.faLmR_plot_both_directions);
+                end
+                    
                 
             end
             
-            if self.CL_histogram_plot_option && isempty(self.CL_conds)
+            % Closed loop histograms
+            if self.CL_histogram_plot_option && isempty(self.CL_hist_plot_settings.CL_conds)
                 
                 %Figure out which conditions need to be plotted.
                 [conds_vec_cl] = get_conds_to_plot('cl_hist', conditionModes);
                 
                  %Create default layout for given condition vector
-                self.CL_conds = create_default_plot_layout(conds_vec_cl);
+                self.CL_hist_plot_settings.CL_conds = create_default_plot_layout(conds_vec_cl);
             end
             
+            % Position series plots
             if self.pos_plot_option && isempty(self.pos_plot_settings.pos_conds) && ...
                     self.pos_plot_settings.plot_pos_averaged
                 %Figure out which conditions need to be plotted.
@@ -275,6 +257,7 @@
                 self.pos_plot_settings.pos_conds = create_default_plot_layout(conds_vec_pos);
             end
             
+            %M and P plots
             if self.pos_plot_option && isempty(self.MP_plot_settings.mp_conds)
                 %Figure out which conditions need to be plotted.
                 [conds_vec_mp] = get_conds_to_plot('mp_plot', pos_conditions);
@@ -282,38 +265,39 @@
                 self.MP_plot_settings.mp_conds = create_default_plot_layout(conds_vec_mp);
             end
             
-            if self.TC_plot_option == 1 && isempty(self.TC_conds)
+            %Tuning curves
+            if self.TC_plot_option == 1 && isempty(self.TC_plot_settings.OL_TC_conds)
                 
                 %Tuning curves are weird so have their own function to get
                 %default layout.
-                self.TC_conds = create_default_TC_plot_layout(conditionModes, self.TC_conds);
+                self.TC_plot_settings.OL_TC_conds = create_default_TC_plot_layout(conditionModes, self.TC_plot_settings.OL_TC_conds);
             end
             
            %% Create default subplot titles that are called for and were not provided
-
-            if self.timeseries_plot_option && isempty(self.timeseries_plot_settings.cond_name) || ~isempty(self.timeseries_plot_settings.cond_name == 0)
-                self.timeseries_plot_settings.cond_name = create_default_plot_titles(self.OL_conds, self.timeseries_plot_settings.cond_name, g4ppath);
+            %timeseries
+            if self.timeseries_plot_option && isempty(self.timeseries_plot_settings.cond_name)
+                self.timeseries_plot_settings.cond_name = create_default_plot_titles(self.timeseries_plot_settings.OL_TS_conds, self.timeseries_plot_settings.cond_name, self.model.g4p_path);
             end
 
-            
+            %M and P plots
             if self.pos_plot_option && isempty(self.MP_plot_settings.cond_name)
-                self.MP_plot_settings.cond_name = create_default_plot_titles(self.MP_plot_settings.mp_conds, self.MP_plot_settings.cond_name, g4ppath);
+                self.MP_plot_settings.cond_name = create_default_plot_titles(self.MP_plot_settings.mp_conds, self.MP_plot_settings.cond_name, self.model.g4p_path);
             end
-            
+            %closed loop histograms
             if self.CL_histogram_plot_option && isempty(self.CL_hist_plot_settings.cond_name)
-                self.CL_hist_plot_settings.cond_name = create_default_plot_titles(self.CL_conds, self.CL_hist_plot_settings.cond_name, g4ppath);
+                self.CL_hist_plot_settings.cond_name = create_default_plot_titles(self.CL_hist_plot_settings.CL_conds, self.CL_hist_plot_settings.cond_name, self.model.g4p_path);
             end
-            
+            %position series
             if self.pos_plot_option && isempty(self.pos_plot_settings.cond_name) && ...
                     self.pos_plot_settings.plot_pos_averaged
                 self.pos_plot_settings.cond_name = create_default_plot_titles(self.pos_plot_settings.pos_conds, ...
-                    self.pos_plot_settings.cond_name, g4ppath);
+                    self.pos_plot_settings.cond_name, self.model.g4p_path);
             end
             
             %Tuning curves are weird and need their own function to create
             %default plot titles
              if self.TC_plot_option == 1 && isempty(self.TC_plot_settings.cond_name) || ~isempty(self.TC_plot_settings.cond_name == 0)
-                self.TC_plot_titles = create_default_TC_titles(self.TC_conds, self.TC_plot_settings.cond_name, g4ppath);
+                self.TC_plot_settings.TC_plot_titles = create_default_TC_titles(self.TC_plot_settings.OL_TC_conds, self.TC_plot_settings.cond_name, self.model.g4p_path);
             end
           
             %% Create default figure names that are called for and were not provided
@@ -324,20 +308,20 @@
             %for timeseries plots
             if self.timeseries_plot_option
                 self.timeseries_plot_settings.figure_names = get_figure_names('ts',...
-                    self.timeseries_plot_settings.figure_names, self.OL_datatypes, self.OL_conds);
+                    self.timeseries_plot_settings.figure_names, self.timeseries_plot_settings.OL_datatypes, self.timeseries_plot_settings.OL_TS_conds);
             end
             
             %for closed loop histograms (not implemented yet in plotting
             %function)
             if self.CL_histogram_plot_option 
                 self.CL_hist_plot_settings.figure_names = get_figure_names('cl_hist',...
-                    self.CL_hist_plot_settings.figure_names, self.CL_datatypes, self.CL_conds);
+                    self.CL_hist_plot_settings.figure_names, self.CL_hist_plot_settings.CL_datatypes, self.CL_hist_plot_settings.CL_conds);
             end
             
             %for tuning curves
             if self.TC_plot_option
                 self.TC_plot_settings.figure_names = get_figure_names('tc', ...
-                    self.TC_plot_settings.figure_names, self.TC_datatypes, self.TC_conds);
+                    self.TC_plot_settings.figure_names, self.TC_plot_settings.TC_datatypes, self.TC_plot_settings.OL_TC_conds);
             end
             
             %for M and P plots, and position series if applicable.
@@ -361,62 +345,40 @@
             
             
             %% Get default x limits for timeseries plots if not provided
-            if isempty(self.OL_conds_durations) && self.timeseries_plot_option
+            if isempty(self.timeseries_plot_settings.OL_TS_durations) && self.timeseries_plot_option
                     
-                 self.OL_conds_durations = create_default_OL_durations(self.OL_conds, ts_avg_reps, self.CombData.timestamps);
+                 self.timeseries_plot_settings.OL_TS_durations = create_default_OL_durations(self.timeseries_plot_settings.OL_TS_conds, ts_avg_reps, self.CombData.timestamps);
                 %run module to set durations (x axis limits)
             end
             
+            %% Get faLmR pairings if they were left empty in the settings and are needed.
             
-            %% Get placements of subplots, so we know which ones should have enabled axes    
-                %Determine which graphs are in the leftmost column so we know
-            %to keep their y-axes turned on.
+            if self.timeseries_plot_option && self.timeseries_plot_settings.plot_both_directions ...
+                    && isempty(self.timeseries_plot_settings.opposing_condition_pairs)
             
-            %place refers to the count of the graph in order from top left
-            %to bottom right. So for example, an OL_conds of [1 3 5; 7 8 9;
-            %11 13 15;] shows a three by three grid of plots of those
-            %condition numbers. The places would be [ 1 4 7; 2 5 8; 3 6 9;]
-            %so conditions 1 7, and 11 would be in places 1, 2, and 3 and
-            %would be marked as being the leftmost plots. The bottom row,
-            %conditions 11, 13, and 15, would be in places 3, 6, and 9.
-            %It's done this way because of the indexing in matlab. In this
-            %example OL_conds, OL_conds(4) would be 3, because it goes down
-            %columns, not across rows, and index increases. 
-
-            %Top left place and bottom left place (1 and 3 in the above
-            %example, or conditions 1 and 11), are calculated separately
-            %because these two positions will additionally have a label on
-            %their y and x-axes. 
-            
-            self.timeseries_top_left_place = 1;
-            self.MP_plot_settings.top_left_place = 1;
-            self.pos_plot_settings.top_left_place = 1;
-            
-            if self.timeseries_plot_option == 1
-                [self.timeseries_bottom_left_places, self.timeseries_left_column_places] = ...
-                   get_plot_placements(self.OL_conds);
-            end
-            if self.pos_plot_option == 1
-            
-              [self.MP_plot_settings.bottom_left_place, self.MP_plot_settings.left_column_places] = ...
-                 get_plot_placements(self.MP_plot_settings.mp_conds);
-            end
-            
-            if self.pos_plot_option && self.pos_plot_settings.plot_pos_averaged
-                [self.pos_plot_settings.bottom_left_place, self.pos_plot_settings.left_column_places] = ...
-                    get_plot_placements(self.pos_plot_settings.pos_conds);
+                self.timeseries_plot_settings.opposing_condition_pairs = get_default_timeseries_pairings(self.exp_settings);
             end
 
-            [self.datatype_indices.Frame_ind, self.datatype_indices.OL_inds, self.datatype_indices.CL_inds, ...
-                self.datatype_indices.TC_inds] = get_datatype_indices(channelNames, self.OL_datatypes, ...
-                self.CL_datatypes, self.TC_datatypes);
+            
+            %% Perform checks to make sure nothing is missing or incorrect
             
             self.run_safety_checks();
             
+            %% Update model
             
-            %% Run Data analysis based on settings
+            self.model.update_model(self);
             
+            %% Load all data needed for the analysis
             
+            [self.CombData, self.model.files_excluded] = load_specified_data(self.exp_settings.exp_folder, ...
+                self.CombData, data_needed, self.proc_settings.processed_file_name);
+            
+            self.model.get_removed_trials(self.CombData)
+            
+            %% Do any necessary processing of the datasets
+            
+            self.update_datasets()
+
             
         end
         
@@ -443,37 +405,38 @@
             analyses_run = {'Single'};
             single = 1;
             %in this case, exp_folder should be a cell array with one
-            %element, the path to the processed data file. 
+            %element, the path to the processed data file.
             
-            [self.CombData, files_excluded] = load_specified_data(self.exp_folder, ...
-                self.CombData, self.data_needed, self.processed_data_file);
-           
             if self.histogram_plot_option
-                plot_basic_histograms(self.CombData.ts_avg_reps, self.CombData.interhistogram, ...
-                    self.TC_datatypes, self.gen_settings, self.histogram_plot_settings, self.num_groups, self.num_exps,...
-                    self.genotype, self.datatype_indices.TC_inds, self.trial_options, self.histogram_annotation_settings, single, self.save_settings);
+                plot_basic_histograms(self.model, self.CombData.ts_avg_reps, self.CombData.interhistogram, ...
+                    self.TC_plot_settings, self.gen_settings, self.histogram_plot_settings,self.exp_settings,...
+                    self.proc_settings, self.histogram_annotation_settings, single, self.save_settings, ...
+                    self.model.num_groups, self.exp_settings.genotypes);
                 
                 analyses_run{end+1} = 'Basic histograms';
             end
             
+            % Always plot normalized plots
+            norm = 1;
+            
+            % Add - Normalized to the end of all timeseries and
+                % tuning curve figure titles. 
+            [self.timeseries_plot_settings, self.TC_plot_settings] = add_titles_text(" - Normalized",...
+                 self.timeseries_plot_settings, self.TC_plot_settings);
+            
+            %generate normalized timeseries and tuning curve plots
+            analyses_run = self.generate_plots(analyses_run, norm, single);
+            
+            %Remove -Normalized from all ts/tc titles
+            [self.timeseries_plot_settings, self.TC_plot_settings] = revert_titles_text(" - Normalized", ...
+                self.timeseries_plot_settings, self.TC_plot_settings);
+                
             if self.exp_settings.plot_norm_and_unnorm == 1
                 norm = 0;
-                for it = 1:2
 
-                    %run generate plots
-                    analyses_run = self.generate_plots(analyses_run, norm, single);
-
-                    for name = 1:length(self.timeseries_plot_settings.figure_names)
-                       self.timeseries_plot_settings.figure_names(name) = self.timeseries_plot_settings.figure_names(name) + " - Normalized";
-                    end
-                    for tcname = 1:length(self.TC_plot_settings.figure_names)
-                       self.TC_plot_settings.figure_names(tcname) = self.TC_plot_settings.figure_names(tcname) + " - Normalized";
-                    end
-                    norm = 1;
-                end
-            else
-                norm = 1;
+                % If settings dictate, create unnormalized plots
                 analyses_run = self.generate_plots(analyses_run, norm, single);
+ 
             end
             
             if self.pos_plot_option == 1
@@ -482,7 +445,7 @@
                 
                 plot_position_series(self.gen_settings, self.MP_plot_settings, ...
                     self.pos_plot_settings, self.save_settings, self.CombData.mean_pos_series, ...
-                    P, M, P_flies, M_flies, self.genotype, self.control_genotype);
+                    P, M, P_flies, M_flies, self.exp_settings.genotypes, self.exp_settings.control_genotype);
 
                 
                 analyses_run{end + 1} = 'Position Series';
@@ -492,8 +455,8 @@
             
             analyses_run = unique(analyses_run);
      
-            update_individual_fly_log_files(self.exp_folder, self.save_settings.save_path, ...
-            analyses_run, files_excluded);
+            update_individual_fly_log_files(self.exp_settings.exp_folder, self.save_settings.save_path, ...
+            analyses_run, self.model.files_excluded);
         
             create_pdf_report(self.save_settings.report_path, self.save_settings.save_path, ...
                 self.save_settings.report_plotType_order, self.save_settings.norm_order);
@@ -504,111 +467,51 @@
             
             analyses_run = {'Group'};
             single = 0;
-            
-            [self.CombData, files_excluded] = load_specified_data(self.exp_folder, ...
-                self.CombData, self.data_needed, self.processed_data_file);
-           
+
             if self.histogram_plot_option == 1
                 if self.exp_settings.plot_all_genotypes == 1
-                    for group = 2:size(self.exp_folder,1)
+                    for group = 2:size(self.exp_settings.exp_folder,1)
                         timeseries_data = [self.CombData.ts_avg_reps(1,:,:,:,:);self.CombData.ts_avg_reps(group,:,:,:,:)];
                         interhistogram = [self.CombData.interhistogram(1,:,:,:); self.CombData.interhistogram(group,:,:,:)];
                         number_groups = size(timeseries_data,1);
-                        genotypes = {self.genotype{1}, self.genotype{group}};
-                        plot_basic_histograms(timeseries_data, interhistogram, self.TC_datatypes, ...
-                            self.gen_settings, self.histogram_plot_settings, number_groups, self.num_exps, genotypes, ...
-                            self.datatype_indices.TC_inds, self.trial_options, self.histogram_annotation_settings, single, self.save_settings);
+                        genotypes = {self.exp_settings.genotypes{1}, self.exp_settings.genotypes{group}};
+                        
+                        plot_basic_histograms(self.model, timseries_data, interhistogram, ...
+                    self.TC_plot_settings, self.gen_settings, self.histogram_plot_settings,self.exp_settings,...
+                    self.proc_settings, self.histogram_annotation_settings, single, self.save_settings, ...
+                    number_groups, genotypes);
                     end
                 else
-                    plot_basic_histograms(self.CombData.ts_avg_reps, self.CombData.interhistogram, ...
-                        self.TC_datatypes, self.gen_settings, self.histogram_plot_settings, self.num_groups, self.num_exps,...
-                        self.genotype, self.datatype_indices.TC_inds, self.trial_options, self.histogram_annotation_settings, single, self.save_settings);
+                     plot_basic_histograms(self.model, self.CombData.ts_avg_reps, self.CombData.interhistogram, ...
+                    self.TC_plot_settings, self.gen_settings, self.histogram_plot_settings,self.exp_settings,...
+                    self.proc_settings, self.histogram_annotation_settings, single, self.save_settings, ...
+                    self.model.num_groups, self.exp_settings.genotypes);
                 end
 
                 analyses_run{end+1} = 'Basic histograms';
             end
             
+            % Always plot normalized plots
+            norm = 1;
+            
+            % Add - Normalized to the end of all timeseries and
+                % tuning curve figure titles. 
+            [self.timeseries_plot_settings, self.TC_plot_settings] = add_titles_text(" - Normalized",...
+                 self.timeseries_plot_settings, self.TC_plot_settings);
+            
+            %generate normalized timeseries and tuning curve plots
+            analyses_run = self.generate_plots(analyses_run, norm, single);
+            
+            %Remove -Normalized from all ts/tc titles
+            [self.timeseries_plot_settings, self.TC_plot_settings] = revert_titles_text(" - Normalized", ...
+                self.timeseries_plot_settings, self.TC_plot_settings);
+                
             if self.exp_settings.plot_norm_and_unnorm == 1
                 norm = 0;
-                for it = 1:2
-                    analyses_run = self.generate_plots(analyses_run, norm, single);
-                    norm = 1;
-                    for name = 1:length(self.timeseries_plot_settings.figure_names)
-                       self.timeseries_plot_settings.figure_names(name) = self.timeseries_plot_settings.figure_names(name) + " - Normalized";
-                    end
-                    for subname = 1:length(self.timeseries_plot_settings.subplot_figure_title)
-                        for datasubname = 1:length(self.timeseries_plot_settings.subplot_figure_title{subname})
-                            self.timeseries_plot_settings.subplot_figure_title{subname}(datasubname) = self.timeseries_plot_settings.subplot_figure_title{subname}(datasubname) + " - Normalized";
-                        end
-                    end
 
-                    for tcname = 1:length(self.TC_plot_settings.figure_names)
-                       self.TC_plot_settings.figure_names(tcname) = self.TC_plot_settings.figure_names(tcname) + " - Normalized";
-                    end
-                    for subtcname = 1:length(self.TC_plot_settings.subplot_figure_title)
-                        for datatcsubname = 1:length(self.TC_plot_settings.subplot_figure_title{subtcname})
-                            self.TC_plot_settings.subplot_figure_title{subtcname}(datatcsubname) = self.TC_plot_settings.subplot_figure_title{subtcname}(datatcsubname) + " - Normalized";
-                        end
-                    end
-                end
-                for revert_name = 1:length(self.timeseries_plot_settings.figure_names)
-                    self.timeseries_plot_settings.figure_names(revert_name) = erase(self.timeseries_plot_settings.figure_names(revert_name), " - Normalized");
-                end
-                for revert_subname = 1:length(self.timeseries_plot_settings.subplot_figure_title)
-                    for revert_datasubname = 1:length(self.timeseries_plot_settings.subplot_figure_title{revert_subname})
-                        self.timeseries_plot_settings.subplot_figure_title{revert_subname}(revert_datasubname) = erase(self.timeseries_plot_settings.subplot_figure_title{revert_subname}(revert_datasubname), " - Normalized");
-                    end
-                end
-                for revert_tcname = 1:length(self.TC_plot_settings.figure_names)
-                    self.TC_plot_settings.figure_names(revert_tcname) = erase(self.TC_plot_settings.figure_names(revert_tcname), " - Normalized");
-                end
-                for revert_tcsubname = 1:length(self.TC_plot_settings.subplot_figure_title)
-                    for revert_tcdatasubname = 1:length(self.TC_plot_settings.subplot_figure_title{revert_tcsubname})
-                        self.TC_plot_settings.subplot_figure_title{revert_tcsubname}(revert_tcdatasubname) = erase(self.TC_plot_settings.subplot_figure_title{revert_tcsubname}(revert_tcdatasubname), " - Normalized");
-                    end
-                end
-            else
-                norm = 1;
-                
-                
-                for name = 1:length(self.timeseries_plot_settings.figure_names)
-                   self.timeseries_plot_settings.figure_names(name) = self.timeseries_plot_settings.figure_names(name) + " - Normalized";
-                end
-                for subname = 1:length(self.timeseries_plot_settings.subplot_figure_title)
-                    for datasubname = 1:length(self.timeseries_plot_settings.subplot_figure_title{subname})
-                        self.timeseries_plot_settings.subplot_figure_title{subname}(datasubname) = self.timeseries_plot_settings.subplot_figure_title{subname}(datasubname) + " - Normalized";
-                    end
-                end
-
-                for tcname = 1:length(self.TC_plot_settings.figure_names)
-                   self.TC_plot_settings.figure_names(tcname) = self.TC_plot_settings.figure_names(tcname) + " - Normalized";
-                end
-                for subtcname = 1:length(self.TC_plot_settings.subplot_figure_title)
-                    for datatcsubname = 1:length(self.TC_plot_settings.subplot_figure_title{subtcname})
-                        self.TC_plot_settings.subplot_figure_title{subtcname}(datatcsubname) = self.TC_plot_settings.subplot_figure_title{subtcname}(datatcsubname) + " - Normalized";
-                    end
-                end
-                
+                % If settings dictate, create unnormalized plots
                 analyses_run = self.generate_plots(analyses_run, norm, single);
-                
-                for revert_name = 1:length(self.timeseries_plot_settings.figure_names)
-                    self.timeseries_plot_settings.figure_names(revert_name) = erase(self.timeseries_plot_settings.figure_names(revert_name), " - Normalized");
-                end
-                for revert_subname = 1:length(self.timeseries_plot_settings.subplot_figure_title)
-                    for revert_datasubname = 1:length(self.timeseries_plot_settings.subplot_figure_title{revert_subname})
-                        self.timeseries_plot_settings.subplot_figure_title{revert_subname}(revert_datasubname) = erase(self.timeseries_plot_settings.subplot_figure_title{revert_subname}(revert_datasubname), " - Normalized");
-                    end
-                end
-                for revert_tcname = 1:length(self.TC_plot_settings.figure_names)
-                    self.TC_plot_settings.figure_names(revert_tcname) = erase(self.TC_plot_settings.figure_names(revert_tcname), " - Normalized");
-                end
-                for revert_tcsubname = 1:length(self.TC_plot_settings.subplot_figure_title)
-                    for revert_tcdatasubname = 1:length(self.TC_plot_settings.subplot_figure_title{revert_tcsubname})
-                        self.TC_plot_settings.subplot_figure_title{revert_tcsubname}(revert_tcdatasubname) = erase(self.TC_plot_settings.subplot_figure_title{revert_tcsubname}(revert_tcdatasubname), " - Normalized");
-                    end
-                end
-                
-                
+ 
             end
             
             if self.pos_plot_option == 1
@@ -617,7 +520,7 @@
                 
                 plot_position_series(self.gen_settings, self.MP_plot_settings, self.pos_plot_settings, ...
                     self.save_settings, self.CombData.mean_pos_series, ...
-                    P, M, P_flies, M_flies, self.genotype, self.control_genotype);
+                    P, M, P_flies, M_flies, self.exp_settings.genotypes, self.exp_settings.control_genotype);
 
                 
                 analyses_run{end + 1} = 'Position Series';
@@ -631,7 +534,7 @@
                 create_comparison_figure(self.CombData, self.gen_settings,...
                     self.comp_plot_settings, self.timeseries_plot_settings, ...
                     self.pos_plot_settings, self.MP_plot_settings, P, M, ...
-                    P_flies, M_flies, single, self.save_settings, self.genotype, self.control_genotype);
+                    P_flies, M_flies, single, self.save_settings, self.exp_settings.genotypes, self.exp_settings.control_genotype);
             end
 
             analyses_run = unique(analyses_run);
@@ -644,12 +547,12 @@
 %                 new_mod_test();
 %             end
 
-            update_analysis_file_group(self.group_being_analyzed_name, self.save_settings.path_to_protocol, ...
-                self.save_settings.save_path, analyses_run, files_excluded, ...
-                self.OL_datatypes, self.CL_datatypes, self.TC_datatypes, self.genotype);
+            update_analysis_file_group(self.exp_settings.group_being_analyzed_name, self.proc_settings.protocol_folder, ...
+                self.save_settings.save_path, analyses_run, self.model.files_excluded, ...
+                self.timeseries_plot_settings.OL_datatypes, self.CL_hist_plot_settings.CL_datatypes, self.TC_plot_settings.TC_datatypes, self.exp_settings.genotypes);
             
-            update_individual_fly_log_files(self.exp_folder, self.save_settings.save_path, ...
-                analyses_run, files_excluded);
+            update_individual_fly_log_files(self.exp_settings.exp_folder, self.save_settings.save_path, ...
+                analyses_run, self.model.files_excluded);
             
             create_pdf_report(self.save_settings.report_path, self.save_settings.save_path, ...
                 self.save_settings.report_plotType_order, self.save_settings.norm_order);
@@ -661,9 +564,9 @@
 
             if self.CL_histogram_plot_option == 1
 
-                for k = 1:numel(self.CL_conds)
-                    plot_CL_histograms(self.CL_conds{k}, self.datatype_indices.CL_inds, ...
-                        self.CombData.histograms, self.num_groups, self.CL_hist_plot_settings);
+                for k = 1:numel(self.CL_hist_plot_settings.CL_conds)
+                    plot_CL_histograms(self.CL_hist_plot_settings.CL_conds{k}, self.model.datatype_indices.CL_inds, ...
+                        self.CombData.histograms, self.model.num_groups, self.CL_hist_plot_settings);
                 end
 
                 analyses_run{end+1} = 'CL histograms';
@@ -671,71 +574,111 @@
             end
 
             if self.timeseries_plot_option == 1
-                if self.exp_settings.plot_all_genotypes == 1 && self.num_groups > 1
-                    for group = 2:size(self.exp_folder,1)
+                if self.exp_settings.plot_all_genotypes == 1 && self.model.num_groups > 1
+                    for group = 2:size(self.exp_settings.exp_folder,1)
+                        
+                        %Pull all correct data for that group
                         if norm == 0
                             timeseries_data = [self.CombData.ts_avg_reps(1,:,:,:,:);self.CombData.ts_avg_reps(group,:,:,:,:)];
+                            falmr_data = [self.CombData.faLmR_avg_over_reps(1,:,:,:);self.CombData.faLmR_avg_over_reps(group,:,:,:)];
                         else
                             timeseries_data = [self.CombData.ts_avg_reps_norm(1,:,:,:,:);self.CombData.ts_avg_reps_norm(group,:,:,:,:)];
+                            falmr_data = [self.CombData.faLmR_avg_reps_norm(1,:,:,:);self.CombData.faLmR_avg_reps_norm(group,:,:,:)];
                         end
                         number_groups = size(timeseries_data,1);
-                        genotypes = {self.genotype{1}, self.genotype{group}};
-                        for k = 1:numel(self.OL_conds)
+                        genotypes = {self.exp_settings.genotypes{1}, self.exp_settings.genotypes{group}};
+                        
+                        pattern_movement_time = [self.CombData.pattern_movement_time_avg(1,:,:,:);self.CombData.pattern_movement_time_avg(group,:,:,:)];
+                        
+                        %Plot timeseries groups in a loop, once per group
+                        for k = 1:numel(self.timeseries_plot_settings.OL_TS_conds)
                             plot_OL_timeseries(timeseries_data, self.CombData.timestamps, ...
-                                self.OL_conds{k}, self.OL_conds_durations{k}, self.timeseries_plot_settings.cond_name{k}, ...
-                                self.datatype_indices.OL_inds, self.OL_conds_axis_labels, ...
-                                self.datatype_indices.Frame_ind, number_groups, genotypes, self.control_genotype, self.timeseries_plot_settings,...
-                                self.timeseries_top_left_place, self.timeseries_bottom_left_places{k}, ...
-                                self.timeseries_left_column_places{k},self.timeseries_plot_settings.figure_names, ...
-                                single, self.save_settings, k, self.gen_settings);
+                                self.model, self.timeseries_plot_settings, self.exp_settings,...
+                                self.save_settings, self.gen_settings, number_groups, ...
+                                genotypes, single, k,  pattern_movement_time);
+                            
+                          
+                        end
+                        if self.faLmR == 1
+                            
+                            plot_falmr_timeseries(falmr_data, self.CombData.timestamps, ...
+                                self.timeseries_plot_settings, self.exp_settings, self.model, ...
+                                self.save_settings, self.gen_settings, number_groups, genotypes, ...
+                                single, pattern_movement_time);
+                            
+
                         end
                     end
                 else
 
-                    for k = 1:numel(self.OL_conds)
-                        if ~single || ~self.timeseries_plot_settings.show_individual_reps
+                    
+                    if ~single || ~self.timeseries_plot_settings.show_individual_reps
                        
-                            if norm == 0
-                                timeseries_data = self.CombData.ts_avg_reps;
-                            else
-                                timeseries_data = self.CombData.ts_avg_reps_norm;
+                        if norm == 0
+                            timeseries_data = self.CombData.ts_avg_reps;
+                            if self.faLmR
+                                falmr_data = self.CombData.faLmR_avg_over_reps;
                             end
-                            plot_OL_timeseries(timeseries_data, ...
-                                self.CombData.timestamps, self.OL_conds{k}, self.OL_conds_durations{k}, self.timeseries_plot_settings.cond_name{k}, ...
-                                self.datatype_indices.OL_inds, self.OL_conds_axis_labels, ...
-                                self.datatype_indices.Frame_ind, self.num_groups, self.genotype, self.control_genotype, self.timeseries_plot_settings,...
-                                self.timeseries_top_left_place, self.timeseries_bottom_left_places{k}, ...
-                                self.timeseries_left_column_places{k},self.timeseries_plot_settings.figure_names, ...
-                                single, self.save_settings, k, self.gen_settings);
+
                         else
+                            timeseries_data = self.CombData.ts_avg_reps_norm;
+                            if self.faLmR
+                                falmr_data = self.CombData.faLmR_avg_reps_norm;
+                            end
+                        end
+                        
+
+                        
+                        % Pattern movement time is ordered by condition - may need to make a second
+% one ordered by how conditions are paired during flipping and averaging? 
+
+                        pattern_movement_time = self.CombData.pattern_movement_time_avg;
+                        for k = 1:numel(self.timeseries_plot_settings.OL_TS_conds)
+                            plot_OL_timeseries(timeseries_data, self.CombData.timestamps, ...
+                                self.model, self.timeseries_plot_settings, self.exp_settings,...
+                                self.save_settings, self.gen_settings, self.model.num_groups, ...
+                                self.exp_settings.genotypes, single, k,  pattern_movement_time);
+                            
+                        end
+                        if self.faLmR == 1
+                           plot_falmr_timeseries(falmr_data, self.CombData.timestamps, ...
+                                self.timeseries_plot_settings, self.exp_settings, self.model, ...
+                                self.save_settings, self.gen_settings, self.model.num_groups, ...
+                                self.exp_settings.genotypes, single, pattern_movement_time);
+                        end
+                    else
+                        % Don't offer falmr plotting which shows each
+                    % repetition - it would be hard to make it readable. 
+
                             if norm == 0
                                 timeseries_data = self.CombData.timeseries;
                             else
                                 timeseries_data = self.CombData.timeseries_normalized;
                             end
                             
-                            plot_OL_timeseries(timeseries_data, ...
-                                self.CombData.timestamps, self.OL_conds{k}, self.OL_conds_durations{k}, self.timeseries_plot_settings.cond_name{k}, ...
-                                self.datatype_indices.OL_inds, self.OL_conds_axis_labels, ...
-                                self.datatype_indices.Frame_ind, self.num_groups, self.genotype, self.control_genotype, self.timeseries_plot_settings,...
-                                self.timeseries_top_left_place, self.timeseries_bottom_left_places{k}, ...
-                                self.timeseries_left_column_places{k},self.timeseries_plot_settings.figure_names, ...
-                                single, self.save_settings, k, self.gen_settings);
+                            pattern_movement_time = self.CombData.pattern_movement_time_avg;
                             
-                        end
+                             plot_OL_timeseries(timeseries_data, self.CombData.timestamps, ...
+                                self.model, self.timeseries_plot_settings, self.exp_settings,...
+                                self.save_settings, self.gen_settings, self.model.num_groups, ...
+                                self.exp_settings.genotypes, single, k,  pattern_movement_time);
+                            
+                     end
 
 
-                    end
                 end
 
                 analyses_run{end+1} = 'Timeseries Plots';
+                if self.faLmR == 1
+                    analyses_run{end+1} = 'faLmR';
+                end
 
             end
 
             if self.TC_plot_option == 1
                 
                 if self.exp_settings.plot_all_genotypes == 1
-                    for group = 2:size(self.exp_folder,1)
+                    for group = 2:size(self.exp_settings.exp_folder,1)
                         if norm == 0
                             
                             summaries = [self.CombData.summaries(1,:,:,:,:);self.CombData.summaries(group,:,:,:,:)];
@@ -745,10 +688,10 @@
                             
                         end
                         number_groups = size(summaries,1);
-                        genotypes = {self.genotype{1}, self.genotype{group}};
-                        for k = 1:length(self.TC_conds)
-                            plot_TC_specified_OLtrials(self.TC_plot_settings, self.gen_settings, self.TC_conds{k}, self.TC_plot_titles{k}, self.datatype_indices.TC_inds, ...
-                               genotypes, self.control_genotype, number_groups, summaries, single, self.save_settings, k);
+                        genotypes = {self.exp_settings.genotypes{1}, self.exp_settings.genotypes{group}};
+                        for k = 1:length(self.TC_plot_settings.OL_TC_conds)
+                            plot_TC_specified_OLtrials(self.TC_plot_settings, self.gen_settings, self.TC_plot_settings.OL_TC_conds{k}, self.TC_plot_titles{k}, self.model.datatype_indices.TC_inds, ...
+                               genotypes, self.exp_settings.control_genotype, number_groups, summaries, single, self.save_settings, k);
                         end
                     end
                 else
@@ -758,9 +701,9 @@
                         summaries = self.CombData.summaries_normalized;
                     end
 
-                    for k = 1:length(self.TC_conds)
-                        plot_TC_specified_OLtrials(self.TC_plot_settings, self.gen_settings, self.TC_conds{k}, self.TC_plot_titles{k}, self.datatype_indices.TC_inds, ...
-                           self.genotype, self.control_genotype, self.num_groups, summaries, single, self.save_settings, k);
+                    for k = 1:length(self.TC_plot_settings.OL_TC_conds)
+                        plot_TC_specified_OLtrials(self.TC_plot_settings, self.gen_settings, self.TC_plot_settings.OL_TC_conds{k}, self.TC_plot_titles{k}, self.model.datatype_indices.TC_inds, ...
+                           self.exp_settings.genotypes, self.exp_settings.control_genotype, self.model.num_groups, summaries, single, self.save_settings, k);
                     end
                 end
 
@@ -771,24 +714,35 @@
 
         end
 
-                   
+        function update_datasets(self)
+            [num_groups, num_exps] = size(self.exp_settings.exp_folder);
+            if num_groups == 1 && num_exps == 1
+                single = 1;
+            else
+                single = 0;
+            end
+            
+            
+                
+            
+        end
      
         
         function run_safety_checks(self)
            
-            if ~isempty(self.OL_conds) && ~isempty(self.OL_conds_durations)
+            if ~isempty(self.timeseries_plot_settings.OL_TS_conds) && ~isempty(self.timeseries_plot_settings.OL_TS_durations)
                 
-                %OL_conds and OL_conds_durations must be exactly the same
+                %OL_conds and OL_TS_durations must be exactly the same
                 %dimensions
                 
-                if size(self.OL_conds) ~= size(self.OL_conds_durations)
-                    errordlg("Your OL_conds and OL_conds_durations arrays must be exaclty the same size.")
+                if size(self.timeseries_plot_settings.OL_TS_conds) ~= size(self.timeseries_plot_settings.OL_TS_durations)
+                    errordlg("Your OL_conds and OL_TS_durations arrays must be exaclty the same size.")
                     return;
                 end
                 
-                for i = 1:length(self.OL_conds)
-                    if size(self.OL_conds{i}) ~= size(self.OL_conds_durations{i})
-                        errordlg("Your OL_conds and OL_conds_durations arrays must be exaclty the same size.");
+                for i = 1:length(self.timeseries_plot_settings.OL_TS_conds)
+                    if size(self.timeseries_plot_settings.OL_TS_conds{i}) ~= size(self.timeseries_plot_settings.OL_TS_durations{i})
+                        errordlg("Your OL_conds and OL_TS_durations arrays must be exaclty the same size.");
                         return;
                     end
                 end

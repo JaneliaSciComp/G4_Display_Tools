@@ -1,51 +1,52 @@
 
 function [exp_settings, histogram_plot_settings, histogram_annotation_settings, ...
-    CL_hist_plot_settings, timeseries_plot_settings, TC_plot_settings, ...
+    CL_hist_plot_settings, timeseries_plot_settings, TC_plot_settings, proc_settings,...
     MP_plot_settings, pos_plot_settings, save_settings, comp_settings, gen_settings] = DA_plot_settings()
 
 %% Settings which need updating regularly (more static settings below)
 
-%[pretrial, intertrial, posttrial]
-    exp_settings.trial_options = [1 1 1];
-%% Settings for exp_folder generation and saving results
+    % The path to your processing settings for this protocol
+    exp_settings.path_to_processing_settings = '/Users/taylorl/Desktop/protocol_folder/new_processing_settings.mat';
 
-    %This is the path to the protocol
-    save_settings.path_to_protocol = "/Users/taylorl/Desktop/CT1_Ablation_03-16-20_12-39-26";
+%% Settings for exp_folder generation and saving results
     
     %The path where you wish to save the results of the data analysis
-    save_settings.save_path = '/Users/taylorl/Desktop/CT1_Ablation_03-16-20_12-39-26/Plots';
+    save_settings.save_path = '/Users/taylorl/Desktop/protocol_folder/new_analysis/group_two';
     
-    save_settings.report_path = '/Users/taylorl/Desktop/CT1_Ablation_03-16-20_12-39-26/Plots/DA_report.pdf';
-    save_settings.report_plotType_order = {'_hist_','timeseries', 'TC', 'M_', 'P_', 'MeanPositionSeries', 'Comparison'};
-    save_settings.norm_order = {'unnormalized', 'normalized'};
+    save_settings.report_path = '/Users/taylorl/Desktop/protocol_folder/new_analysis/group_two/DA_report.pdf';    
     
     %Field names are metadata field names
-    exp_settings.field_to_sort_by{1} = ["fly_genotype"];
-%     exp_settings.field_to_sort_by{2} = ["fly_genotype", "experimenter"];
+    exp_settings.field_to_sort_by{1} = ["ablated"];
+    exp_settings.field_to_sort_by{2} = ["ablated"];
 %     exp_settings.field_to_sort_by{3} = ["fly_genotype", "experimenter"];
 %     exp_settings.field_to_sort_by{4} = ["fly_genotype", "experimenter"];
 
     %If plot_all_genotypes is 1, leave field_values empty.   
 %    exp_settings.field_values = {};
-    exp_settings.field_values{1} = ["control_CT1"];
-%     exp_settings.field_values{2} = ["emptySplit_UAS_Kir_JFRC49", "kappagantular"];
+    exp_settings.field_values{1} = ["n"];
+    exp_settings.field_values{2} = ["b"];
 %     exp_settings.field_values{3} = ["OL0042B_UAS_Kir_JFRC49", "arrudar"];
 %     exp_settings.field_values{4} = ["OL0042B_UAS_Kir_JFRC49", "kappagantular"];
 
     %For a single group or multiple groups, the flag is '-group'
-    exp_settings.single_group = 1;%1-all flies should be in one group, so exp_folder should be 1xX cell array
+    exp_settings.single_group = 0;%1-all flies should be in one group, so exp_folder should be 1xX cell array
+    
     %The flag for a single fly is '-single'
     exp_settings.single_fly = 0;%1- only a single fly is being analyzed, the exp_folder will simply be the path to the fly
-
+    
+    %If you're running a single fly, you need to provide the path to that
+    %fly folder
+    exp_settings.fly_path = '/Users/taylorl/Desktop/protocol_folder/N/SS01001_UASFRTStopFRTRicinA_JFRC12-09_33_58';
+    
     %1 - each genotype will be plotted in its own figure against a control. 
     %0 - groups will be plotted as laid out below. 
     exp_settings.plot_all_genotypes = 0; 
    
     %Control must match exactly the metadata genotype value. 
-    exp_settings.control_genotype = 'control_CT1';
+    exp_settings.control_genotype = 'n';
       
     %Array of genotype names
-    exp_settings.genotypes = ["CT 1 Control"];
+    exp_settings.genotypes = ["Not Ablated", "All Ablated"];
     
 
 %% Experiment settings
@@ -53,29 +54,29 @@ function [exp_settings, histogram_plot_settings, histogram_annotation_settings, 
     %Plot normalized and unnormalized data
     %1 for both or 0 for normalized data)
     exp_settings.plot_norm_and_unnorm = 1;  
-    
-    %Processed mat file name
-    exp_settings.processed_data_file = 'testing_new_processing';
 
     %Log file will be named using this
-    exp_settings.group_being_analyzed_name = 'CT1_ablation';
+    exp_settings.group_being_analyzed_name = 'CT1 Ablation Protocol';
     
 %% Histogram settings ('-hist')
 
     %Date range displayed on histograms
-    histogram_annotation_settings.annotation_text = "Flies tested 03/16/2020.";
+    histogram_annotation_settings.annotation_text = "";
 
 %% Timeseries plot settings ('-TSplot')
 
     %The datatype to plot as timeseries
-    %datatype options for flying data: 'LmR_chan', 'L_chan', 'R_chan', 'F_chan', 'Frame Position', 'LmR', 'LpR', 'faLmR'
+    %datatype options for flying data: 'LmR_chan', 'L_chan', 'R_chan',
+    %'F_chan', 'Frame Position', 'LmR', 'LpR', 'faLmRda
     %datatype options for walking data: 'Vx0_chan', 'Vx1_chan', 'Vy0_chan', 'Vy1_chan', 'Frame Position', 'Turning', 'Forward', 'Sideslip'
-    timeseries_plot_settings.OL_datatypes = {'faLmR'};
+    timeseries_plot_settings.OL_datatypes = {'LmR', 'faLmR'};
     
     %OL_TS_conds indicates the layout of your timeseries figures. See
     %documentation for example. Leave empty ([]) for default layout.
-    timeseries_plot_settings.OL_TS_conds{1} = [1 3 5 7 9 11; 13 15 17 19 0 0 ; 21 23 25 27 0 0];
-%     timeseries_plot_settings.OL_TS_conds{2} = [13 15; 17 19; 21 23];
+    timeseries_plot_settings.OL_TS_conds = [];
+%    timeseries_plot_settings.OL_TS_conds{1} = [1 3 5 7; 9 11 13 15; 17 19 21 23];
+%     timeseries_plot_settings.OL_TS_conds{2} = [13 14 15 16; 17 18 19 20; 21 22 23 24];
+%     timeseries_plot_settings.OL_TS_conds{3} = [25 26; 27 28];
 
     % Durations inform the x axis limits on timeseries plots. Leave empty
     %for the software to pull durations from the processed data, or create
@@ -87,6 +88,8 @@ function [exp_settings, histogram_plot_settings, histogram_annotation_settings, 
     %of titles corresponding to the OL_TS_conds array. Else leave empty or
     %set to 0 (no titles).
     timeseries_plot_settings.cond_name = [];
+ %   timeseries_plot_settings.cond_name{1} = ["grating 3Hz", "grating 12Hz", "rightleft90 grating 3Hz"; ...
+ %       "rightleft90 grating 12Hz", "On Plus 3Hz", "On Plus 12Hz"; "Off Plus 3 Hz", "Off Plus 12Hz", ""];
 
     %Axis labels for the timeseries plots [x, y]. For multiple figures,
     %make it a cell array with each cell element corresponding to that
@@ -94,27 +97,106 @@ function [exp_settings, histogram_plot_settings, histogram_annotation_settings, 
     timeseries_plot_settings.axis_labels = {};
     
     %Title for subplot/figure
-    timeseries_plot_settings.subplot_figure_title{1} = ["CT 1 Ablation Control Data"]; %Cell array with same num cell elements as OL_TS_conds. 
+    timeseries_plot_settings.subplot_figure_title{1} = ["CT1 Ablation LmR"];
+%     timeseries_plot_settings.subplot_figure_title{2} = ["CT1 LmR both ablated Conds: 13-24"];
+%     timeseries_plot_settings.subplot_figure_title{3} = ["CT1 LmR both ablated Conds: 24-28"];%Cell array with same num cell elements as OL_TS_conds. 
     %Each cell should have one name for each datatype
 %     timeseries_plot_settings.subplot_figure_title{2} = ["LmR Conds 13-24"; "LpR Conds 13-24"];
     
     %An array of figure names for each figure of timeseries plots.(not 
     %printed on actual figure)
-    timeseries_plot_settings.figure_names = ["faLmR"];
+    timeseries_plot_settings.figure_names = ["LmR"];
+    
+    %Set this to 1 if you want a vertical line on your plot indicating the
+    %point at which the pattern actually started moving on the screen
+    
+    timeseries_plot_settings.pattern_motion_indicator = 1;
+    
+    % Should match the OL_TC_conds array as you may want different
+    % indicators for each condition. For any condition that does not need a
+    % condition, put in a 0
+    timeseries_plot_settings.other_indicators = [];
+    
+    %Set to 0 for no cut-off
+    timeseries_plot_settings.cutoff_time = 2;
     
     %Set this to 1 if you are plotting only a single group and want lines
     %plotted for each fly as well as the average.
-    timeseries_plot_settings.show_individual_flies = 1;
+    timeseries_plot_settings.show_individual_flies = 0;
     
     %Set this to 1 if you are plotting only a single fly and want lines
     %plotted for each repetition as well as the fly's average.
-    timeseries_plot_settings.show_individual_reps = 1;
+    timeseries_plot_settings.show_individual_reps = 0;
     
     %Plot the frame position under each timeseries plot
     timeseries_plot_settings.frame_superimpose = 0;
     
     %Plot both directions for each condition on the same axis. 
     timeseries_plot_settings.plot_both_directions = 1;
+    
+    %If your protocol is set up so that paired conditions are consecutive
+    %(ie, you want to pair your conditions 1-2, 3-4, 5-6, etc), leave this
+    %array empty. If you want to pair your conditions in some other way,
+    %provide the pairs as shown in the commented out example.
+    timeseries_plot_settings.opposing_condition_pairs = [];
+%     timeseries_plot_settings.opposing_condition_pairs{1} = [1 6];
+%     timeseries_plot_settings.opposing_condition_pairs{2} = [2 5];
+%     timeseries_plot_settings.opposing_condition_pairs{3} = [3 8];
+%     timeseries_plot_settings.opposing_condition_pairs{4} = [4 7];
+%     timeseries_plot_settings.opposing_condition_pairs{5} = [9 10];
+%     timeseries_plot_settings.opposing_condition_pairs{6} = [10 9];
+%     timeseries_plot_settings.opposing_condition_pairs{7} = [11 12];
+%     timeseries_plot_settings.opposing_condition_pairs{8} = [12 11];
+%     timeseries_plot_settings.opposing_condition_pairs{9} = [13 18];
+%     timeseries_plot_settings.opposing_condition_pairs{10} = [14 17];
+%     timeseries_plot_settings.opposing_condition_pairs{11} = [15 20];
+%     timeseries_plot_settings.opposing_condition_pairs{12} = [16 19];
+%     timeseries_plot_settings.opposing_condition_pairs{13} = [21 26];
+%     timeseries_plot_settings.opposing_condition_pairs{14} = [22 25];
+%     timeseries_plot_settings.opposing_condition_pairs{15} = [23 28];
+%     timeseries_plot_settings.opposing_condition_pairs{16} = [24 27];
+%     
+
+    % faLmR data has already combined condition pairs from the processing settings by flipping and
+    % averaging them into one dataset. If you'd like to plot these pairs on
+    % the same axis - ie, if in the processing step conditions 1 and 6 were
+    % flipped and averaged together and conditions 2 and 5 were flipped and
+    % averaged together and now you'd like to plot both these averages on
+    % the same axis - that's what faLmR_pairs is for. It will look just
+    % like the opposing_condition_pairs above, but will reference the
+    % pairing in your processing settings. So for example, a 1 here refers
+    % to your first pair in the processing settings intstead of the first condition. 2 refers to the second
+    % pair, etc. 
+
+    % If this is empty and plot_both_directions = 1, it will by default plot the first two pairs
+    % together, the second two pairs together, etc. I would recommend
+    % setting your pairing in processing settings up that way so that you
+    % don't have to dictate pairs here as well.
+    timeseries_plot_settings.faLmR_pairs = [];
+    timeseries_plot_settings.faLmR_plot_both_directions = 0;
+    
+    % A layout option for faLmR plots just like for the regular timeseries
+    % plots above, but in this one, 1 refers to "pair 1" from the
+    % processing settings. 
+    timeseries_plot_settings.faLmR_conds = [];
+    timeseries_plot_settings.faLmR_figure_names = ["faLmR"];
+    timeseries_plot_settings.faLmR_subplot_figure_titles = ["CT1 faLmR Not Ablated"];
+%     This example would work when you are not planning to plot two pairs
+%     per axis.
+
+%     timeseries_plot_settings.faLmR_conds{1} = [1 2 3 4; 5 6 7 8];
+%     timeseries_plot_settings.faLmR_conds{2} = [9 10 11 12; 13 14 15 16];
+
+%     This example would work when you are planning to plot two pairs
+%     per axis.
+
+%     timeseries_plot_settings.faLmR_conds{1} = [1 3 5 7; 9 11 13 15];
+
+    timeseries_plot_settings.faLmR_cond_name = [];
+%    timeseries_plot_settings.faLmR_cond_name{1} = ["grating 3Hz", ...
+%    "grating 12Hz", "rightleft90 grating 3Hz", "rightleft90 grating 12Hz";...
+ %   "On Plus 3Hz", "On Plus 12Hz" "Off Plus 3 Hz", "Off Plus 12Hz"];
+
 
 
 %% Closed loop histogram settings ('-CLhist')
@@ -131,7 +213,8 @@ function [exp_settings, histogram_plot_settings, histogram_annotation_settings, 
 %% Tuning Curve plot settings ('TCplot')
     
     %Datatypes for which to plot tuning curves
-    TC_plot_settings.TC_datatypes = {'LmR','LpR'};     
+    TC_plot_settings.TC_datatypes = {'LmR','LpR'};
+
 
     %Create the layout of tuning curves in this array. It works differently
     %than OL_TS_conds - see documentation for details.
@@ -336,6 +419,7 @@ function [exp_settings, histogram_plot_settings, histogram_annotation_settings, 
 %% Plot Settings for basic Histograms
 
     histogram_plot_settings.histogram_ylimits = [0 100; -6 6; 2 10];
+    histogram_plot_settings.xlimits = [-8, 6; 0 18]; % [LmR limits, LpR limits]
     histogram_plot_settings.inter_in_degrees = 1;
 
     %% Annotation settings for basic Histograms
@@ -357,14 +441,14 @@ function [exp_settings, histogram_plot_settings, histogram_annotation_settings, 
     %% Plot settings for Open-Loop timeseries plots
     
     timeseries_plot_settings.timeseries_ylimits = [-1.1 1.1; -1 6; -1 6; -1 6; 1 192; 0 0; 0 0; 0 0]; %[min max] y limits for each datatype (including 1 additional for 'faLmR' option)
-    timeseries_plot_settings.timeseries_xlimits = [0 4];
+    timeseries_plot_settings.timeseries_xlimits = [0 4];  
     timeseries_plot_settings.frame_scale = .5;
     timeseries_plot_settings.frame_color = [0.7 0.7 0.7];
     
     %% Plot settings for tuning curves
 
     TC_plot_settings.timeseries_ylimits = [-1.1 1.1; -1 6; -1 6; -1 6; 1 192; 0 0; 0 0; 0 0];   
-    TC_plot_settings.marker_type = 'o';
+%     TC_plot_settings.marker_type = 'o';
     TC_plot_settings.default_conds_per_curve = 7; %If the conditions are not provided in a layout, it will by default include 7 conditions in each curve
 
     
@@ -375,7 +459,8 @@ function [exp_settings, histogram_plot_settings, histogram_annotation_settings, 
 
 
     %% Save settings
-
+    save_settings.report_plotType_order = {'_hist_','timeseries', 'TC', 'M_', 'P_', 'MeanPositionSeries', 'Comparison'};
+    save_settings.norm_order = {'unnormalized', 'normalized'};
     save_settings.paperunits = 'inches';
     save_settings.x_width = 8; 
     save_settings.y_width = 10;
@@ -387,10 +472,13 @@ function [exp_settings, histogram_plot_settings, histogram_annotation_settings, 
         %If there are any settings necessary for new module, add them to
         %one of the existing settings structs or create a new struct (more
         %work)
-        
+    %% Get necessary information stored in processing settings
+    process_settings = load(exp_settings.path_to_processing_settings);
+    proc_settings = process_settings.settings;
+    [proc_settings.protocol_folder, ~, ~] = fileparts(proc_settings.path_to_protocol);
     %% This will generate your exp_folder, do not edit. 
     
    exp_settings.exp_folder = get_exp_folder(exp_settings.field_to_sort_by, exp_settings.field_values, exp_settings.single_group, ...
-        exp_settings.single_fly, save_settings.path_to_protocol, exp_settings.control_genotype);
+        exp_settings.single_fly, exp_settings.fly_path, proc_settings.protocol_folder, exp_settings.control_genotype);
 
 end

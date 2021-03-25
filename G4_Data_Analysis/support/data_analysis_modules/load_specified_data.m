@@ -38,6 +38,11 @@ function [CombData, files_excluded] = load_specified_data(exp_folder, CombData, 
     CombData.timestamps = fields.timestamps;
     CombData.channelNames = fields.channelNames;
     CombData.conditionModes = fields.conditionModes;
+    CombData.bad_crossCorr_conds = fields.bad_crossCorr_conds;
+    CombData.bad_duration_conds = fields.bad_duration_conds;
+    CombData.bad_duration_intertrials = fields.bad_duration_intertrials;
+    CombData.bad_slope_conds = fields.bad_slope_conds;
+    CombData.bad_WBF_conds = fields.bad_WBF_conds;
         
     if ~isempty(find(strcmp(fields_to_load,'LmR_normalization_max'),1)) > 0
         CombData.LmR_normalization_max = fields.LmR_normalization_max;
@@ -74,12 +79,12 @@ function [CombData, files_excluded] = load_specified_data(exp_folder, CombData, 
                 %checks
                 
                 if ~isempty(CombData.ts_avg_reps) && ~isempty(CombData.timeseries)
-                    if ~all(size(squeeze(CombData.ts_avg_reps(1,1,:,:,1)))==size(squeeze(CombData.timeseries(1,1,:,:,1,1))))
-                        
-                        disp(['Data in ' exp_folder{g,e} 'appears to be the incorrect size']);
-                        files_excluded{end+1} = [exp_folder{g,e}, "timeseries data and avg timeseries data different sizes"];
-                        continue;
-                    end
+%                     if ~all(size(squeeze(CombData.ts_avg_reps(1,1,:,:,1)))==size(squeeze(CombData.timeseries(1,1,:,:,1,1))))
+%                         
+%                         disp(['Data in ' exp_folder{g,e} 'appears to be the incorrect size']);
+%                         files_excluded{end+1} = [exp_folder{g,e}, "timeseries data and avg timeseries data different sizes"];
+%                         continue;
+%                     end
                     
 
                 end
@@ -241,19 +246,19 @@ function [CombData, files_excluded] = load_specified_data(exp_folder, CombData, 
                             
                         case 'faLmR_avg_over_reps'
                             
-                            num_datapointsLpR = size(fields.(fi),3);
-                            if num_datapointsLpR>size(CombData.(fi),5)
-                                CombData.(fi)(:,:,:,:,size(CombData.(fi),5)+1:num_datapointsLpR) = nan;
+                            num_datapointsFa = size(fields.(fi),2);
+                            if num_datapointsFa>size(CombData.(fi),4)
+                                CombData.(fi)(:,:,:,size(CombData.(fi),4)+1:num_datapointsFa) = nan;
                             end
-                            CombData.(fi)(g,e,:,:,1:num_datapointsLpR) = fields.(fi);
+                            CombData.(fi)(g,e,:,1:num_datapointsFa) = fields.(fi);
                             
                         case 'faLmR_avg_reps_norm'
                             
-                             num_datapointsLpR = size(fields.(fi),3);
-                            if num_datapointsLpR>size(CombData.(fi),5)
-                                CombData.(fi)(:,:,:,:,size(CombData.(fi),5)+1:num_datapointsLpR) = nan;
+                            num_datapointsFa = size(fields.(fi),2);
+                            if num_datapointsFa>size(CombData.(fi),4)
+                                CombData.(fi)(:,:,:,size(CombData.(fi),4)+1:num_datapointsFa) = nan;
                             end
-                            CombData.(fi)(g,e,:,:,1:num_datapointsLpR) = fields.(fi);
+                            CombData.(fi)(g,e,:,1:num_datapointsFa) = fields.(fi);
                             
                         case 'histograms_CL'
                             num_positions = size(fields.(fi),4);
@@ -265,6 +270,11 @@ function [CombData, files_excluded] = load_specified_data(exp_folder, CombData, 
                         case 'interhistogram'
                             
                             CombData.(fi)(g,e,:,:) = fields.(fi);
+                            
+                        case 'pattern_movement_time_avg'
+                            
+                            CombData.(fi)(g,e,:,:) = fields.(fi);
+
                             
                     end
                     

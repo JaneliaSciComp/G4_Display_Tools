@@ -3,6 +3,7 @@ title:  G4 Protocol Designer
 parent: Generation 4
 nav_order: 12
 has_children: true
+has_toc: false
 ---
 
 1. TOC

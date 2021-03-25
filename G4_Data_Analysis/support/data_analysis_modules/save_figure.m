@@ -23,6 +23,7 @@ function save_figure(save_settings, varargin)
     else
         print(fig_to_save, save_path, '-dpdf');
     end
+    savefig(save_path)
     close(fig_to_save);
 
 

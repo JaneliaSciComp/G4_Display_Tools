@@ -1,10 +1,21 @@
 %% plot data
 %calculate overall measurements and plot basic histograms
-function plot_basic_histograms(timeseries_data, interhistogram_data, ...
-    TC_datatypes, gen_settings, plot_settings, num_groups, num_exps, genotype, TC_inds, trial_options, ...
-    annotation_settings, single, save_settings)
+function plot_basic_histograms(model, timeseries_data, interhistogram_data, ...
+    TC_plot_settings, gen_settings, plot_settings, exp_settings, proc_settings, ...
+    annotation_settings, single, save_settings, num_groups, genotype)
 
     %Set up needed variables
+    num_exps = model.num_exps;
+
+    trial_options = proc_settings.trial_options;
+    TC_inds = model.datatype_indices.TC_inds; % uses 
+    bad_trials = model.bad_trials;
+    bad_inter = model.bad_intertrials;
+    
+
+    TC_datatypes = TC_plot_settings.TC_datatypes;
+    protocol = exp_settings.group_being_analyzed_name;
+     
     rep_Colors = gen_settings.rep_colors;
     mean_Colors = gen_settings.mean_colors;
     rep_LineWidth = gen_settings.rep_lineWidth;
@@ -21,8 +32,8 @@ function plot_basic_histograms(timeseries_data, interhistogram_data, ...
     ann_color = annotation_settings.color;
     ann_interpreter = annotation_settings.interpreter;
     plot_in_degrees = plot_settings.inter_in_degrees;
+    xlimits = plot_settings.xlimits;
     
-
     num_TC_datatypes = length(TC_datatypes);
     
     if num_groups > 5
@@ -65,32 +76,42 @@ function plot_basic_histograms(timeseries_data, interhistogram_data, ...
         
         for plot_group = 1:num_plot_groups
             g = g + 1;
-%             
-%             %Get number flies for particular group
-%             fly = 1;
-%             while sum(sum(sum(~isnan(timeseries_data(g,fly,:,:,:))))) && fly <= num_exps-1
-%                 fly = fly+1;
-%             end
-%             if fly == 1
-%                 fly = 0;
-%             end
             
             for d = 1:num_TC_datatypes
                 data_vec = reshape(timeseries_data(g,:,TC_inds(d),:,:),[1 numel(timeseries_data(g,:,d,:,:))]);
-                datastr = TC_datatypes{d};
+                datastr = ['Open Loop ' TC_datatypes{d}];
                 datastr(strfind(datastr,'_')) = '-'; %convert underscores to dashes to prevent subscripts
 
                 subplot(2+num_TC_datatypes,num_plot_groups,plot_group)
                 if d ==1
-                    text(0.1, .95, ['Number of Flies: ' num2str(flies(g))],  'FontSize', 8);
+                    if single == 0
+                        text(0.1, .65, ['Number of Flies: ' num2str(flies(g))],  'FontSize', 8);
+                        
+                    else
+                        md = load(fullfile(exp_settings.fly_path, 'metadata.mat'));
+                        fly_name = md.metadata.fly_name;
+                        timestamp = md.metadata.timestamp;
+                        fly_name(strfind(fly_name,'_')) = '-';
+                        text(0.1, .7, ['Fly Name: ' fly_name], 'FontSize', 8);
+                        text(0.1, .5, ['Timestamp: ' timestamp], 'FontSize', 8);
+                        text(0.1, .3, ['Trials thrown out: ' num2str(size(bad_trials,1))],  'FontSize', 8);
+                        
+                        
+                    end
                 end
-                text(0.1, 1.25-0.3*(d+1), ['Mean ' TC_datatypes{d} ' = ' num2str(nanmean(data_vec))], 'FontSize', 8);
+                text(0.6, 1.25-0.3*(d+1), ['Mean ' TC_datatypes{d} ' = ' num2str(nanmean(data_vec))], 'FontSize', 8);
+                
                 axis off
                 hold on
         %         title(['Group ' num2str(g)],'FontSize',subtitle_FontSize);
-                genotypeStr = convertCharsToStrings(genotype{g});
-                num_expsStr = convertCharsToStrings(num_exps);        
-                title(genotypeStr,'FontSize',subtitle_FontSize,'interpreter','none');
+                genotypeStr = convertCharsToStrings(genotype(g));
+                protocolStr = convertCharsToStrings(protocol);
+                num_expsStr = convertCharsToStrings(num_exps);  
+                if single
+                    title("Single Fly Report - " + protocolStr + ", " + genotypeStr,'FontSize',subtitle_FontSize,'interpreter','none');
+                else
+                    title(protocolStr + ", " + genotypeStr,'FontSize',subtitle_FontSize,'interpreter','none');
+                end
                 %text
     %             annotation('textbox',[0.3 0.0001 0.7 0.027],'String',"empty split: " + e + " flies run from 08/08/19 to 08/13/19", ...
     %                 'FontSize' ,10,'FontName','Arial','LineStyle','-','EdgeColor',[1 1 1],'LineWidth',1,'BackgroundColor',[1 1 1],'Color',[0 0 0],'Interpreter', 'none'); %e is number of experiments
@@ -102,11 +123,18 @@ function plot_basic_histograms(timeseries_data, interhistogram_data, ...
                     'Color', ann_color, 'Interpreter', ann_interpreter);
 
                 subplot(2+num_TC_datatypes,num_plot_groups,d*num_plot_groups+plot_group)
-                avg = length(data_vec)/100;
-                histogram(data_vec,100)
+                avg = 1/100;
+                histogram(data_vec, 100, 'Normalization', 'probability')
                 hold on
-                xl = xlim;
-                plot(xl,[avg avg],'--','Color',rep_Colors(g,:)','LineWidth',mean_LineWidth)
+                xlim(xlimits(d,:))
+                xlabel('Volts', 'FontSize', ann_fontSize);
+                ylabel('%', 'FontSize', ann_fontSize);
+                plot(xlimits(d,:),[avg avg],'--','Color',rep_Colors(g,:)','LineWidth',mean_LineWidth)
+                ylimit = ylim; 
+                set(gca, 'YTick', ylimit(1):.01:ylimit(2))
+                yticklabels(yticks*100);
+                xline(0, 'LineWidth',.75);
+                
                 title(datastr,'FontSize',subtitle_FontSize,'interpreter','none');
                 currPlot = gca;
                 set(currPlot, 'FontSize', 8);
@@ -116,6 +144,10 @@ function plot_basic_histograms(timeseries_data, interhistogram_data, ...
                 
                 ind_lines = squeeze(nanmean(interhistogram_data(g,:,:,:),3));
                 avg_line = squeeze(nanmean(nanmean(interhistogram_data(g,:,:,:),3),2));
+                total_points = nansum(interhistogram_data(1,1,1,:),4);
+                ind_lines = ind_lines/total_points;
+                avg_line = avg_line/total_points;
+                
                 if plot_in_degrees == 1
                     if size(ind_lines,2) > size(ind_lines,1)
                         half = size(ind_lines,2)/2;
@@ -136,6 +168,10 @@ function plot_basic_histograms(timeseries_data, interhistogram_data, ...
                 plot(ind_lines','Color',rep_Colors(g,:),'LineWidth',rep_LineWidth)
                 hold on   
                 plot(avg_line,'Color',mean_Colors(g,:),'LineWidth',mean_LineWidth)
+                hold on
+                avg_dist_line = (100/192)*(1/100);
+                xli = xlim;
+                plot(xli, [avg_dist_line avg_dist_line], '--', 'Color', rep_Colors(g,:)', 'LineWidth', mean_LineWidth)
                 
                 %convert x axis to degrees
                if plot_in_degrees == 1
@@ -152,14 +188,21 @@ function plot_basic_histograms(timeseries_data, interhistogram_data, ...
                     xticklabels(string(tick_labels));
                     xlabel('Degrees');
                end
+               
+               ylimit = ylim; 
+               set(gca, 'YTick', ylimit(1):.01:ylimit(2))
+               yticklabels(yticks*100);
+               ylabel('%', 'FontSize', ann_fontSize);
 
-                title('Intertrial Pattern Frame','FontSize',subtitle_FontSize)
+                title('Closed Loop Stripe Position','FontSize',subtitle_FontSize)
                 currPlot = gca;
                 set(currPlot, 'FontSize', 8);
             
             elseif trial_options(2) == 1 && single == 1
                 
                 fly_line = squeeze(nanmean(interhistogram_data(g,:,:,:),3));
+                total_points = nansum(interhistogram_data(1,1,1,:),4);
+                fly_line = fly_line/total_points;
                 if plot_in_degrees == 1
                     
                     half = length(fly_line)/2;
@@ -189,7 +232,14 @@ function plot_basic_histograms(timeseries_data, interhistogram_data, ...
                 xl_fly = xlim;
                 plot(xl_fly,[avg_val avg_val],'--','Color',rep_Colors(g,:)','LineWidth',rep_LineWidth)
                 
+                 ylimit = ylim; 
+               set(gca, 'YTick', ylimit(1):.01:ylimit(2))
+               yticklabels(yticks*100);
+               ylabel('%', 'FontSize', ann_fontSize);
                 
+                title('Closed Loop Stripe Position','FontSize',subtitle_FontSize)
+                currPlot = gca;
+                set(currPlot, 'FontSize', 8);
             
             end
 

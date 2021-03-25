@@ -3,6 +3,7 @@ title: G4 Pattern Generator
 parent: Generation 4
 nav_order: 10
 has_children: true
+has_toc: false
 ---
 
 1. TOC

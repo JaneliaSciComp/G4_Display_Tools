@@ -1,35 +1,57 @@
 %plot timeseries data for open-loop trials
 
-function plot_OL_timeseries(timeseries_data, timestampsIN, OL_conds, OL_durations, cond_name, OL_inds, ...
-    axis_labels, Frame_ind, num_groups, genotype, control_genotype, plot_settings, top_left_place, bottom_left_place, ...
-    left_col_places, figure_titles, single, save_settings, fig_num, gen_settings)
+function plot_OL_timeseries(timeseries_data, timestampsIN, model, plot_settings,...
+    exp_settings, save_settings, gen_settings, num_groups, genotype, single, ...
+    fig_num, pat_move_time)
 
+
+    % Get needed items from the settings structures
     
+    %timeseries plot settings
+    OL_conds = plot_settings.OL_TS_conds{fig_num};
+    OL_durations = plot_settings.OL_TS_durations{fig_num};
+    cond_name = plot_settings.cond_name{fig_num};
+    axis_labels = plot_settings.OL_TS_conds_axis_labels;
+    figure_titles = plot_settings.figure_names;
+    frame_scale = plot_settings.frame_scale;
+    frame_color = plot_settings.frame_color;
+    frame_superimpose = plot_settings.frame_superimpose;
+    timeseries_ylimits = plot_settings.timeseries_ylimits;
+    timeseries_xlimits = plot_settings.timeseries_xlimits;
+    plot_opposing_directions = plot_settings.plot_both_directions;
+    show_ind_flies = plot_settings.show_individual_flies;
+    show_ind_reps = plot_settings.show_individual_reps;
+    subplot_figure_titles = plot_settings.subplot_figure_title;
+    cutoff_time = plot_settings.cutoff_time;
+    other_indicators = plot_settings.other_indicators;
+    pattern_motion_indicator = plot_settings.pattern_motion_indicator;
+    condition_pairs = plot_settings.opposing_condition_pairs;
+    
+    %General plot settings
     rep_Colors = gen_settings.rep_colors;
     mean_Colors = gen_settings.mean_colors;
     mean_LineWidth = gen_settings.mean_lineWidth;
     EdgeColor = gen_settings.edgeColor;
     patch_alpha = gen_settings.patch_alpha;
     subtitle_FontSize = gen_settings.subtitle_fontSize;
-    legend_FontSize = gen_settings.legend_fontSize;
-    frame_scale = plot_settings.frame_scale;
-    frame_color = plot_settings.frame_color;
-    frame_superimpose = plot_settings.frame_superimpose;
-    timeseries_ylimits = plot_settings.timeseries_ylimits;
-    timeseries_xlimits = plot_settings.timeseries_xlimits;
-    rep_LineWidth = gen_settings.rep_lineWidth;
-    plot_opposing_directions = plot_settings.plot_both_directions;
-    control_color = gen_settings.control_color;
-    show_ind_flies = plot_settings.show_individual_flies;
-    show_ind_reps = plot_settings.show_individual_reps;
+    legend_FontSize = gen_settings.legend_fontSize;   
+    rep_LineWidth = gen_settings.rep_lineWidth;   
+    control_color = gen_settings.control_color;    
     y_fontsize = gen_settings.yLabel_fontSize;
     x_fontsize = gen_settings.xLabel_fontSize;
     fly_Colors = gen_settings.fly_colors;
     axis_num_fontSize = gen_settings.axis_num_fontSize;
     figTitle_fontSize = gen_settings.figTitle_fontSize;
-    subplot_figure_titles = plot_settings.subplot_figure_title{fig_num};
     
+    %Model (index tracking, layout)
+    OL_inds = model.datatype_indices.OL_inds;
+    Frame_ind = model.datatype_indices.Frame_ind;
+    top_left_place = model.top_left_place;
+    bottom_left_place = model.timeseries_bottom_left_places{fig_num};
+    left_col_places = model.timeseries_left_column_places{fig_num};
     
+    %experiment settings
+    control_genotype = exp_settings.control_genotype;
 
     
     if ~isempty(OL_conds)
@@ -58,7 +80,7 @@ function plot_OL_timeseries(timeseries_data, timestampsIN, OL_conds, OL_duration
                     
                     if cond>0
                         better_subplot(num_plot_rows, num_plot_cols, placement, gap_x, gap_y)
-                        yline(0, 'k--');
+                        yline(0);
                         hold on
                         for g = 1:num_groups
                             if single && show_ind_reps
@@ -77,6 +99,17 @@ function plot_OL_timeseries(timeseries_data, timestampsIN, OL_conds, OL_duration
                             timestamps = timestampsIN(~nanidx);
                             meandata(nanidx) = []; 
                             semdata(nanidx) = [];
+                            ms_to_move = nanmean(squeeze(pat_move_time(g,:,cond,:)))/1000;
+                            move_line(g) = timestamps(1) + ms_to_move;
+                            if cutoff_time > 0
+                                cutoff_ind = find(timestamps>cutoff_time);
+                                if ~isempty(cutoff_ind)
+                                    meandata(cutoff_ind(1)+1:end) = [];
+                                    timestamps(cutoff_ind(1)+1:end)= [];
+                                    semdata(length(meandata)+1:end) = [];
+                                end
+                            end
+
                             if single 
                                 if show_ind_reps
                                     for rep = 1:num_reps
@@ -99,14 +132,18 @@ function plot_OL_timeseries(timeseries_data, timestampsIN, OL_conds, OL_duration
                                 else
                                     plot(timestamps,meandata,'Color',mean_Colors(g,:),'LineWidth',mean_LineWidth);
                                     patch([timestamps fliplr(timestamps)],[meandata+semdata fliplr(meandata-semdata)],'k','FaceColor',mean_Colors(g,:),'EdgeColor',EdgeColor,'FaceAlpha',patch_alpha)
+                                    
                                 end
+
+                                
                             end
                             
                             if plot_opposing_directions == 1
+                                opp_cond = get_opposing_condition(cond, condition_pairs);
                                 if single && show_ind_reps
-                                    tmpdata = squeeze(timeseries_data(g,:,d,cond+1,:,:));
+                                    tmpdata = squeeze(timeseries_data(g,:,d,opp_cond,:,:));
                                 else
-                                    tmpdata = squeeze(timeseries_data(g,:,d,cond+1,:));
+                                    tmpdata = squeeze(timeseries_data(g,:,d,opp_cond,:));
                                 end
                                 meandata = nanmean(tmpdata);
                                 nanidx = isnan(meandata);
@@ -115,6 +152,17 @@ function plot_OL_timeseries(timeseries_data, timestampsIN, OL_conds, OL_duration
                                 timestamps = timestampsIN(~nanidx);
                                 meandata(nanidx) = []; 
                                 semdata(nanidx) = [];
+                                
+                                if cutoff_time > 0
+                                    cutoff_ind = find(timestamps>cutoff_time);
+                                    if ~isempty(cutoff_ind)
+                                       meandata(cutoff_ind(1)+1:end) = [];
+                                       timestamps(cutoff_ind(1)+1:end) = [];
+                                       semdata(length(meandata)+1:end) = [];
+                                    end
+                                end
+                                
+                               
                                 %adjust color to make opposing direction
                                 %lighter
   
@@ -130,6 +178,7 @@ function plot_OL_timeseries(timeseries_data, timestampsIN, OL_conds, OL_duration
                                 elseif num_groups == 1
                                     plot(timestamps,meandata,'Color',mean_Colors(g+1,:),'LineWidth',mean_LineWidth);
                                     patch([timestamps fliplr(timestamps)],[meandata+semdata fliplr(meandata-semdata)],'k','FaceColor',mean_Colors(g+1,:),'EdgeColor',EdgeColor,'FaceAlpha',patch_alpha)
+
                                 else
                                     if g == control_genotype
                                         plot(timestamps,meandata,'Color',control_color + .75,'LineWidth',mean_LineWidth);
@@ -156,6 +205,8 @@ function plot_OL_timeseries(timeseries_data, timestampsIN, OL_conds, OL_duration
                                     
                                     end
                                 end
+                                
+                                
                                
                             end
                         end
@@ -175,6 +226,15 @@ function plot_OL_timeseries(timeseries_data, timestampsIN, OL_conds, OL_duration
                             end
                         end
                         
+                        if pattern_motion_indicator == 1
+                            if max(move_line)-min(move_line) > 50
+                                msg = "variation in start times of " + string(max(move_line)-min(move_line)) + " for cond " + string(cond);
+                                disp(msg);
+                            end
+                            disp_move_line = median(move_line);
+                            xline(disp_move_line);
+                        end
+                        
                         if frame_superimpose==1
                             curr_ylim = ylim(gca);
                             yrange = diff(curr_ylim);
@@ -187,6 +247,8 @@ function plot_OL_timeseries(timeseries_data, timestampsIN, OL_conds, OL_duration
                             ydata = [ydata, mm];
                         end
                         set(gca, 'FontSize', axis_num_fontSize);
+                        
+                        
                         
                        % timeseries_ylimits(d,:) = ylim;
  
@@ -221,11 +283,11 @@ function plot_OL_timeseries(timeseries_data, timestampsIN, OL_conds, OL_duration
                         xlabel(axis_labels{OL_inds==d}(1), 'FontSize', x_fontsize) %7th subplot - Bottom Left
                     end
                     if ~isnan(OL_durations(place)) && OL_durations(place) ~= 0
-                        xlim([0, OL_durations(place)]);
+                        xlim([-.2, OL_durations(place)]);
                     end
                     
                     if ~isempty(subplot_figure_titles)
-                        sgtitle(subplot_figure_titles(OL_inds==d), 'FontSize', figTitle_fontSize);
+                        sgtitle(subplot_figure_titles{OL_inds==d}(fig_num), 'FontSize', figTitle_fontSize);
                     end
                     
                     
@@ -260,7 +322,7 @@ function plot_OL_timeseries(timeseries_data, timestampsIN, OL_conds, OL_duration
 
                     legend1 = legend(genotype, 'FontSize', legend_FontSize);
                 else
-                    legend1 = legend(h(end), genotype);
+                    legend1 = legend(h(end), 'Positive');
                     
                 end
             else
@@ -270,8 +332,9 @@ function plot_OL_timeseries(timeseries_data, timestampsIN, OL_conds, OL_duration
                     legend1 = legend(h(end:-1:end-(num_groups-1)), genotype{1:end},'Orientation','horizontal');
                     
                 else
-
+                    
                     legend1 = legend(h(end:-2:end - (num_groups*2-1)),genotype{1:end},'Orientation','horizontal');%prints warnings in orange but ignore
+                    
                     
                 end
             end

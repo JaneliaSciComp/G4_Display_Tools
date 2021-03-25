@@ -11,6 +11,7 @@ function [conds_vec] = get_conds_to_plot(plot_type, varargin)
         case 'ts_plot'
             plot_settings = varargin{1};
             conditionModes = varargin{2};
+
             
             conds_vec = find(conditionModes~=4); 
             
@@ -19,9 +20,17 @@ function [conds_vec] = get_conds_to_plot(plot_type, varargin)
             %based on different options.
             if ~isempty(conds_vec)
                 if plot_settings.plot_both_directions
-                    for i = length(conds_vec):-1:1
-                        if rem(conds_vec(i),2) == 0
-                            conds_vec(i) = [];
+                    if isempty(plot_settings.opposing_condition_pairs)
+                        for i = length(conds_vec):-1:1
+                            if rem(conds_vec(i),2) == 0
+                                conds_vec(i) = [];
+                            end
+                        end
+                    else
+                        conds_vec = [];
+                        for pair = 1:length(plot_settings.opposing_condition_pairs)
+                            
+                            conds_vec(pair) = plot_settings.opposing_condition_pairs{pair}(1);
                         end
                     end
                 end

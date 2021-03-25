@@ -46,11 +46,6 @@ Log
     └── Data
 ```
 
-{::comment}
-TODO: maybe remove, if above representation is OK? Advantage of text instead of image: easier to copy&paste (eg to find out if this is A0 or AO), easier to edit.
-![Log Structure](assets/LogStructure.png)
-{:/comment}
-
 The ADC field holds a time vector for each channel which simply acts as a clock, with the time recorded every 10 milliseconds. It also holds a Volts vector for each channel which gives the actual fly position data, and then a channels array which gives you the names of each recorded channel. This is your raw fly data that you're likely interested in. 
 
 The AO field holds the same data as the ADC field, but for analog output channels. Often, these may not be in use and the data may be empty. 
@@ -106,11 +101,6 @@ It's important to note that your experiment folder must follow a certain structu
     ├── [fly2 folder]
     └── [fly3 folder
 ```
-
-{::comment}
-TODO: maybe remove, if above representation is OK? Advantage of text instead of image: easier to copy&paste, easier to edit.
-![File organization](assets/folderOrg.png)
-{:/comment}
 
 The protocol folder refers to the folder which contains your .g4p file as well as an pattern or function folders. Inside the protocol folder should be some subfolders which organize your flies in some way. In our case, we create a folder for each date. That folder then contains the results of all flies run on that date. But these could be by genotype or any other organizational scheme. The important thing is that each individual fly folder, which contains that fly's results, are two levels below the protocol folder, as shown here. 
 

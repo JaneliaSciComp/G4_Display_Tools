@@ -20,7 +20,7 @@ This tutorial, by its nature, will also show you how to send individual commands
 
 # The Panel_com Wrapper
 
-In the folder `G4_Display_Tools/PControl_Matlab/controller` you'll find a set of .m files. You might recognize the names of some of these functions from the setup section of this documentation. **You should not edit any of these file.** Changes to any of these files could prevent the G4 system from working properly so plealsle look carefully. 
+In the folder `G4_Display_Tools/PControl_Matlab/controller` you'll find a set of .m files. You might recognize the names of some of these functions from the setup section of this documentation. **You should not edit any of these file.** Changes to any of these files could prevent the G4 system from working properly so please look carefully.
 
 Open the file called `Panel_com.m` in matlab. This function, you will see, contains a large switch statement with many cases. Each case is a command that you can send to the screens. This file is a wrapper - what that means is that it lets you pass in a human readable command, and then turns that command into the correct code and sends it along to the screens. This way, you never have to get into the other files in this folder, and you never have to worry about creating hexidecimal strings or other code that the screens will recognize. 
 
