@@ -1,4 +1,4 @@
-function parts = split(string)
+function parts = Z_split(string)
 
     inds = strfind(string,' ');
     num_inds = length(inds);
