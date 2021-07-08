@@ -16,7 +16,9 @@ nav_order: 2
 
 The github repository at <https://github.com/JaneliaSciComp/G4_Display_Tools> has a suite of data analysis tools. Have a look at the [software installation guide](G4_Software_Setup.md) on how to set it up.
 
-In the typical use case of these tools, there are two files you need to worry about: `DA_plot_settings.m` at `G4_Display_Tools/G4_Data_Analysis` and `get_exp_folder.m` at `G4_Display_Tools/G4_Data_Analysis/Support`.
+In the typical use case of these tools, there is one file you need to worry about: `DA_plot_settings.m` at `G4_Display_Tools/G4_Data_Analysis`. This file contains many matlab variables which will dictate the settings of how your data is visualized. You will need to go through this file and update the settings according to your needs. This is the biggest task of setting up data analysis. Once your settings are correct and saved, the analysis itself will take less than a minute to run. 
+
+It is intended that, ideally, the user will create their data analysis settings at the same time that they create an experiment using the Designer and set up their data processing settings. You may want to set up two or three data analysis settings files, each of which will contain the settings for one type of analysis. Most commonly, this would be a settings file for plotting the data of a single fly, a settings file for plotting the data of a single group of flies (like a single genotype), and a settings file for plotting and comparing the data for many groups of flies. Each of these requires its own settings file, so it will be easiest if you create them at the same time as you create the experiment, so you don't have to go back and do it later. Once they've been created and saved, you can use them anytime to plot data. Data analysis settings can also be created and run anytime after an experiment has already been completed, so don't worry if you want to go back and do analysis on a previous experiment. This documentation will cover both scenarios. 
 
 
 # Plot Appearance Settings:

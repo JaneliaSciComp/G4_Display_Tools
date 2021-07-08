@@ -7,9 +7,9 @@ nav_order: 1
 
 # Overview
 
-To set up your automatic data processing (which will actually take place after an experiment is finished running via the [Condcutor](G4_Conductor_Manual.md)), you will need to edit one file, called `create_processing_settings.m`. You can find it in `G4_Display_Tools/G4_Data_Analysis/new_processing_settings`. Note that there are two folders in `G4_Data_Analysis` called `data_processing` and `data_plotting`. These are older files, compatible with older versions of the Display Tools, but they will not work with the current version on github.
+To set up your automatic data processing (which will actually take place after an experiment is finished running via the [Conductor](G4_Conductor_Manual.md)), you will need to edit one file, called `create_processing_settings.m`. You can find it in `G4_Display_Tools/G4_Data_Analysis/new_processing_settings`. Note that there are two folders in `G4_Data_Analysis` called `data_processing` and `data_plotting`. These are older files, compatible with older versions of the Display Tools, but they will not work with the current version on github.
 
-After opening `create_processing_settings.m` you will go through the file and change the settings to match your needs. Notice that the settings are simply matlab variables. You can change the value of any given variable, but do not create or delete any. Once the settings are how you want them, you will save the file, and then run it in matlab. It should only take a second to run. When it is finished, you should find a new .mat file in your Experiment folder containing your processing settings. Note, you must create your experiment before doing this, or you will have no Experiment folder to save the file in. This is all you need. When you use the Conductor to run the experiment, you'll see a textbox that wants a processing file. You will provide the path to this file you just created, and the Conductor will implement those settings when it runs its processing. See more details about this in the [Conductor documentation](G4_Conductor_Manual.md).
+After opening `create_processing_settings.m` you will go through the file and change the settings to match your needs. Notice that the settings are simply matlab variables. You can change the value of any given variable, but do not create or delete any. Once the settings are how you want them, you will save the file, and then run it in matlab. It should only take a second to run. When it is finished, you should find a new .mat file in your Experiment folder (or wherever you chose to save the file) containing your processing settings. When you use the Conductor to run the experiment, you'll see a textbox that wants a processing file. You will provide the path to this file you just created, and the Conductor will process the data accordingly when the experiment is done running. See more details about this in the [Conductor documentation](G4_Conductor_Manual.md).
 
 # The Settings in Detail
 
@@ -209,10 +209,92 @@ However, if you want to save this file elsewhere, you should set this variable e
 
 # Okay I've adjusted all the settings. Now what? 
 
-Once all your processing settings are correct. Save the file and then click `Run`. You'll find it at the top of your matlab editor with a green triangle on it. After the file runs, be sure you check that the file was saved. A .mat file should appear at the settings filepath you provided way at the beginning of the file, under the name you provided. Don't forget where this file is - you'll need it when it comes time to run the experiment on the Conductor. Unless you change your mind about how you want your data processed, you should not have to go through this file again - the same processing will be done for every fly put through this protocol.
+Once all your processing settings are correct. Save the file and then click `Run`. You'll find it at the top of your matlab editor with a green triangle on it. After the file runs, be sure you check that the file was saved. A .mat file should appear at the settings filepath you provided way at the beginning of the file, under the name you provided. Don't forget where this file is - you'll need it when it comes time to run the experiment on the Conductor. Unless you change your mind about how you want your data processed, you should not have to go through this file again - the same processing should be done for every fly put through this protocol.
 
-If you are interested in the code which actually runs the data processing, it is located at `G4_Display_Tools/G4_Data_Analysis/new_data_processing/process_data.m`.  This file calls many different functions that used throughout processing. These functions can all be found in `G4_Display_Tools/G4_Data_Analysis/support/data_processing_modules`.
+# What if I've already run my experiment and I want to process the data later? 
+
+You can do that! After you run a fly through a protocol, that fly gets its own folder inside the experiment folder where that fly's data is saved. If you have not run any data processing, then when you open the fly folder, you should see a subfolder containing a set of .TDMS files as well as a .mat file called `G4_TDMS_Logs_[numbers and stuff]`. If you were to open this .mat file, you'd see it contains a single matlab struct called Log that contains all your raw data. This data is not broken up or labeled in any way - it's just the stream of data that was collected over the course of the whole experiment.  
+
+First if you haven't done it, you should go through the processing settings exactly as described above, and when they are the way you want them, run `create_processing_settings.m` so you have a saved .mat file with your settings. This part has not changed, but there is another step that would normally be done by the Conductor. 
+
+Making sure all the files in `G4_Display_Tools` is on your matlab path, type the following into your matlab command window: 
+
+`process_data('path to fly folder', 'path to processing settings file');`
+
+Replace the text inside the single quotes with the path to your fly's folder (not to the TDMS files or .mat file) and the path to the settings file you just saved, respectively. This command will start the data processing, and it may take a minute or two to run. When it is finished running, a new .mat file should have appeared in your fly folder containing your data. 
+
+# What does the processed data look like? 
+
+Once processing has been done, you will end up with a new .mat file in your fly folder with the name you provided in your settings. If you open it in matlab, you'll see many different variables are saved in this .mat file. Let's go through them. 
+
+The first five variables you will see are: 
+
+`bad_crossCorr_conds`
+`bad_duration_conds`
+`bad_duration_intertrials`
+`bad_slope_conds`
+`bad_WBF_conds`
+
+As you might guess, these variables hold the condition and repetition numbers of any trials that were marked as bad for a particular reason. Any conditions in the first one were tossed because they were unable to be aligned. In the second array, it was due to the data being significantly longer or shorter than the expected duration. The third is the same but contains any intertrials that were tossed (this will simply be empty if your experiment did not have an intertrial). The fourth because the data was completely flate, and the fith because the fly stopped flying too much during the trial.  These arrays have two columns and a variable number of rows. The first column indicates repetition number, the second column indicates condition number. 
+
+`channelNames` is a struct with two cell arrays, indicating the channel order for both timeseries data and histogram data. These are simply copies of what you put in the processing settings, saved for your information.
+
+`cond_frame_move_time` is an array of times given in milliseconds. It has a number of columns matching the number of repetitions in the experiment, and a number of rows matching the number of conditions in the experiment. Each number is an estimate of exactly how much time passed between the moment the screens received the 'start-display' command and the moment the pattern on the screen actually moved for the first time. 
+
+`conditionModes` is simply a list showing the experiment mode of each condition.
+
+Next you have four variables relating to flipped and averaged data, assuming faLmR was enabled in your settings. If it was not, then you will not have these variables, or they will be empty. They are: 
+
+`faLmR_avg_over_reps`
+`faLmR_avg_reps_norm`
+`faLmR_timeseries`
+`faLmR_timeseries_normalized`
+
+These are arrays of data with a number of rows matching half of the number of conditions in an experiment, and many columns. See the faLmR settings explanation above for a refresher on how we calculate this data. These four arrays use the same data, but have had some basic things done to it for your convencience. `faLmR_timeseries` is the full, original data, and it has a third dimension, the size of which matches the number of repetitons in the experiment. This contains the flipped and averaged data for every condition and every repetition. `faLmR_timeseries_normalized` is the same, but the data has been normalized to the max/min values in the dataset. `faLmR_avg_over_reps`, you'll notice, does not have the third dimension. Here, the different repetitions of a single condition have all been averaged together. So each condition only has one datapoint - the average of each time that condition was repeated. `faLmR_avg_reps_norm` is the same, but the data has also been normalized. 
+
+Note that we tried to keep this naming scheme the same for different datatypes (LmR, LpR, etc). Knowing this may help you understand what the other arrays are without having to look them up in the documentation. 
+
+`histograms_CL` will only be relevant if you ran closed-loop conditions. This data has already been adjusted to be plotted directly as a histogram. 
+
+`interhistogram` contains your intertrial data, adjusted to plot as a histogram. Its dimension are the number of intertrials run by the number of positions the pattern can have across the screen.
+
+Next are four variables, similar to faLmR but containing LmR and LpR data: 
+
+`LmR_avg_over_reps`
+`LmR_avg_reps_norm`
+`LpR_avg_over_reps`
+`LpR_avg_reps_norm`
+
+These variables are the same as `faLmR_avg_over_reps` and `faLmR_avg_reps_norm`, but for LmR and Lpr data instead. 
+
+`mean_pos_series` will be empty if position series was not enabled. Otherwise it will contain your position series data, averaged over reptetitions. 
+
+`normalization_max` is the maximum value from the data that was used for normalization. 
+
+`pattern_movement_time_avg` is the same as `cond_frame_move_time` but averaged over the repeitions, so there is just one average "command to movement" time for each condition, in milliseconds. 
+
+`pos_conditions` is simply a copy of the conditions you included in your position series. It is irrelevant if position series was not enabled.
+
+`pos_series` is the position series data with no averaging. 
+
+`summaries` is data intended for creating tuning curves. Its dimensions should be number of datatypes by number of condition by number of repetitions. It averages all the data collected during each trial, resulting in one data point per datatype per condition per repetition. 
+
+`summaries_normalized` is a normalized version of `summaries`. 
+
+`timeseries` is the most basic variable containing most of the data unaltered. Its size is number of datatypes x number of conditions x number of repetitions x data length. It contains the collected data for each datatype for every condition and repetition. The datatypes follow the order in channelNames. So looking at the first dimension of `timeseries`, the 1 is the first datatype listed in channelNames, 2 is the second datatype in channelNames, etc. So `timeseries(6,1,3,:)` would represent the unaltered LmR data (assuming you kept LmR as your sixth channel in channelNames) for the first condition, third repeetion. `LmR_avg_over_reps`, then, is simply `timeseries(6,:,:,:) averaged over the third dimensionn (repetitions). We have just done this averaging for you and saved it under a new name for your convenience because it is very commonly needed. 
+
+`timeseries_normalized` is just the same as `timeseries` but has been normalized to the maximum value saved in `normalization_max`. 
+
+`timestamps` is simply an iterative list starting at a certain number and increaseing by one millisecond at a time. It used in alignment. 
+
+`ts_avg_reps` is the `timeseries` array, but averaged over repetitions
+
+`ts_avg_reps_norm` is the `timeseries` array, both averaged over repetitions and normalized. 
+
+# Final Notes
+
+If you are interested in the code which actually runs the data processing, it is located at `G4_Display_Tools/G4_Data_Analysis/new_data_processing/process_data.m`.  This file calls many different functions that are used throughout processing. These functions can all be found in `G4_Display_Tools/G4_Data_Analysis/support/data_processing_modules`.
 
 *Please do not edit or alter this code in any way unless you are very confident in your changes. Alterations to one function can have impacts on any other code that uses that function!*
 
-Now that your data processing is set up, you can move on to [data analysis](Data_analysis_documentation.md). There, you will create settings dictating what types of plots you want to be automatically generated, using the processed datasets, after an experiment runs. You can also set up analysis settings to quickly generate plots for groups of flies later. 
+Now that your data processing is set up and you know what to expect out of it, you can move on to [data analysis](Data_analysis_documentation.md). There, you will create settings dictating what types of plots you want to be automatically generated, using the processed datasets, after an experiment runs. You can also set up analysis settings to quickly generate plots for groups of flies later. 
