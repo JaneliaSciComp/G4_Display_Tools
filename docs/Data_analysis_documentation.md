@@ -1,11 +1,16 @@
 ---
 title:  G4 Data Analysis
-parent: Generation 4
-nav_order: 14
+parent: G4 Automated Data Handling
+grand_parent: Generation 4
+nav_order: 2
 ---
 
 1. TOC
 {:toc}
+
+# Prerequisites
+
+[Data Processing](data_processing_documentation.md). Automated data handling is split into two sections - data processing and data analysis. You cannot analyze the data until it has been processed, so please see the data processing documentation first if you have not been through it. 
 
 # Data Analysis Tools Documentation
 
@@ -13,15 +18,6 @@ The github repository at <https://github.com/JaneliaSciComp/G4_Display_Tools> ha
 
 In the typical use case of these tools, there are two files you need to worry about: `DA_plot_settings.m` at `G4_Display_Tools/G4_Data_Analysis` and `get_exp_folder.m` at `G4_Display_Tools/G4_Data_Analysis/Support`.
 
-# Data processing:
-
-Before you can use the data analysis tools described below, you must process your data using either `G4_Process_data_flyingdetector` or `G4_Process_data_flyingdetector_combinedComm` (both located in `G4_Data_Analysis/data processing`). The first file processes data which was collected using the separate Panel_com commands, while the second processes data that was obtained using the new combined command. This step is done automatically after the experiment ends if you are using the G4 Conductor. It will produce a .mat file named `G4_Processed_Data`.
-
-When running an experiment using the G4 conductor, there are two run protocols that you can use – the older, `G4_default_run_protocol.m` and the newer `G4_run_protocol_combinedCommand.m`. If you used the older run protocol, you must use the older processing file as well. Same with the new ones. If you mix and match these, your data processing will fail. 
-
-Note that there is an even older version of `G4_Process_data_flyingdetector`. It saves all data in a single struct called Data rather than saving the data in multiple variables. If you have data that was processed using this old version, you will need to convert it to the new format before analyzing the data in it. For your convenience, there is a script called `convert_processed_file.m` in `DA_Data_Analysis/support` which will convert older processed files to this new format.  Be sure to open this file and update the `processed_file_name` variable. If this does not match the filename of the processed file you want to convert (excluding the extension), it will not work.
-
-Alternatively, you may run the current `G4_Process_data_flyingdetector` file on old data to produce a new processed file.
 
 # Plot Appearance Settings:
 
