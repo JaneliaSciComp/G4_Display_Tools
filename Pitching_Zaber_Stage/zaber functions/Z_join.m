@@ -1,4 +1,4 @@
-function string = join(parts,spacer)
+function string = Z_join(parts,spacer)
 
 num_parts = length(parts);
 
