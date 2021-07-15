@@ -295,7 +295,7 @@ end
                  
                  %Run pretrial on screen
                  if pre_dur ~= 0
-                    Panel_com('start_display', pre_dur);
+                    Panel_com('start_display', pre_dur+2);
                     pause(pre_dur + .01);
                  else
                      Panel_com('start_display', 2000);
@@ -389,7 +389,7 @@ end
                     pause(0.01)
                     
                     %Run block trial--------------------------------------
-                    Panel_com('start_display', dur); %duration expected in 100ms units
+                    Panel_com('start_display', dur+2); %duration expected in 100ms units
                     pause(dur + .01)
                     isAborted = runcon.check_if_aborted();
                     if isAborted == 1
@@ -457,7 +457,7 @@ end
                             inter_ao_ind, inter_frame_ind, inter_frame_rate, inter_gain, inter_offset, inter_dur);
                         
                          pause(0.01);
-                         Panel_com('start_display', inter_dur);
+                         Panel_com('start_display', inter_dur+2);
                          pause(inter_dur + .01);
                          if runcon.check_if_aborted() == 1
                             Panel_com('stop_display');
@@ -517,7 +517,7 @@ end
                      post_ao_ind, post_frame_ind, post_frame_rate, post_gain, post_offset, post_dur);
                 
 
-                 Panel_com('start_display',post_dur);
+                 Panel_com('start_display',post_dur+2);
 
                  pause(post_dur);
                  
