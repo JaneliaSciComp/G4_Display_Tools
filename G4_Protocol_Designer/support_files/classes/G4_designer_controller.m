@@ -178,7 +178,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
             %LAYOUT PARAMETERS TO BE EDITED
 
             column_names = {'Mode', 'Pattern Name' 'Position Function', ...
-                'AO 1', 'AO 2', 'AO 3', 'AO 4', ...
+                'AO 2', 'AO 3', 'AO 4', 'AO 5', ...
                 'Frame Index', 'Frame Rate', 'Gain', 'Offset', 'Duration' ...
                 'Select'};
             columns_editable = true;
@@ -712,8 +712,8 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
         function update_chan1_rate(self, src, ~)
             
             new = str2num(src.String);
-            if rem(new,1000) ~= 0 && new ~= 0
-                self.create_error_box("The value you've entered is not a multiple of 1000. Please double check your entry.");
+            if rem(new,100) ~= 0 && new ~= 0
+                self.create_error_box("The value you've entered is not a multiple of 100. Please double check your entry.");
             end
             self.doc.chan1_rate = new;
             if new == 0
