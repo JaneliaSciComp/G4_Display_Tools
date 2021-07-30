@@ -658,11 +658,14 @@
                             
                             pattern_movement_time = self.CombData.pattern_movement_time_avg;
                             
-                             plot_OL_timeseries(timeseries_data, self.CombData.timestamps, ...
+                            for k = 1:numel(self.timeseries_plot_settings.OL_TS_conds)
+                            plot_OL_timeseries(timeseries_data, self.CombData.timestamps, ...
                                 self.model, self.timeseries_plot_settings, self.exp_settings,...
                                 self.save_settings, self.gen_settings, self.model.num_groups, ...
                                 self.exp_settings.genotypes, single, k,  pattern_movement_time);
                             
+                            end
+                             
                      end
 
 
