@@ -4,6 +4,9 @@ function [hist_data] = calculate_histograms(da_data, hist_datatypes, Frame_ind, 
     %calculate histograms of/by pattern position
     num_hist_datatypes = length(hist_datatypes); 
     max_pos = max(max(max(da_data(Frame_ind,:,:,:),[],4),[],3),[],2);
+    if isnan(max_pos)
+        max_pos = 1;
+    end
     hist_data = nan([num_hist_datatypes num_conds num_reps max_pos]);
     p = permute(1:max_pos,[1 3 4 2]); %create array of all possible pattern position values along 4th dimension
     

@@ -47,9 +47,11 @@ function [bad_conds] = check_correlation(start_times, stop_times, exp_order, Log
             end
             percent_off_zero(cond, comp) = xval/size(lags{cond,comp},2);
         end
-        peaks(cond, comp+1) = nanmean(peaks(cond, 1:comp));
-        percent_off_zero(cond, comp+1) = nanmean(percent_off_zero(cond, 1:comp));
         
+        if exist('peaks', 'var') == 1
+            peaks(cond, comp+1) = nanmean(peaks(cond, 1:comp));
+            percent_off_zero(cond, comp+1) = nanmean(percent_off_zero(cond, 1:comp));
+        end
         index = 1;
         for c = 1:num_comparisons
             if abs(percent_off_zero(cond, c)) > .02

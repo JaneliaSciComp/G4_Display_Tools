@@ -726,7 +726,7 @@ classdef G4_conductor_controller < handle
                     [plot_path, plot_comm, ext] = fileparts(self.model.plotting_file);
                     if strcmp(ext,'.mat')
 
-                        self.run_single_fly_DA(self.model.plotting_file, fly_results_folder, trial_options, processed_filename, experiment_folder);
+                        self.run_single_fly_DA(self.model.plotting_file, fly_results_folder, trial_options, experiment_folder);
                     else
                         
                         %Do old analysis.
@@ -1363,9 +1363,9 @@ classdef G4_conductor_controller < handle
             
         end
         
-        function run_single_fly_DA(self, settings, save_path, trial_options, proc_file, exp_folder)
+        function run_single_fly_DA(self, settings, save_path, trial_options, exp_folder)
             [~, settings_filename, settings_ext] = fileparts(settings);
-            [~, proc_name, ~] = fileparts(proc_file);
+ %           [~, proc_name, ~] = fileparts(proc_file);
             
             %Load variables from the generic single-fly settings file. 
             load(settings);
@@ -1405,6 +1405,7 @@ classdef G4_conductor_controller < handle
             %exp_settings.path_to_processing_settings = proc_file;
             exp_settings.genotypes = [string(self.model.fly_genotype)];
             exp_settings.exp_folder = {save_path};
+            exp_settings.fly_path = save_path;
             save_settings.save_path = save_path;
             save_settings.report_path = fullfile(save_path, 'DA_report.pdf');
          
