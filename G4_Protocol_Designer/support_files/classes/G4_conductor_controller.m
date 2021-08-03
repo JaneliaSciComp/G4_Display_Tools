@@ -66,7 +66,7 @@ classdef G4_conductor_controller < handle
     
     methods
         
-        %constructor
+        %% constructor
         function self = G4_conductor_controller(varargin)
            
             self.model = G4_conductor_model();
@@ -608,6 +608,7 @@ classdef G4_conductor_controller < handle
             parameters = self.get_parameters_struct();
             
             parameters.experiment_folder = experiment_folder;
+            parameters.fly_results_folder = fly_results_folder;
             
             %save the experiment order
             exp_order = parameters.exp_order;
@@ -1162,6 +1163,15 @@ classdef G4_conductor_controller < handle
             parameters.is_randomized = self.doc.is_randomized;
             parameters.save_filename = self.doc.save_filename;
             parameters.fly_name = self.model.fly_name;
+            parameters.is_chan1 = self.doc.is_chan1;
+            parameters.is_chan2 = self.doc.is_chan2;
+            parameters.is_chan3 = self.doc.is_chan3;
+            parameters.is_chan4 = self.doc.is_chan4;
+            parameters.chan1_rate = self.doc.chan1_rate;
+            parameters.chan2_rate = self.doc.chan2_rate;
+            parameters.chan3_rate = self.doc.chan3_rate;
+            parameters.chan4_rate = self.doc.chan4_rate;
+            
 
          
             %-------------------------------------------------------------
@@ -1359,6 +1369,9 @@ classdef G4_conductor_controller < handle
             
             %Load variables from the generic single-fly settings file. 
             load(settings);
+            process_settings = load(exp_settings.path_to_processing_settings);
+            proc_settings = process_settings.settings;
+            
             
             %Check to make sure the variables were loaded correclty, return
             %if not.            
@@ -1378,13 +1391,20 @@ classdef G4_conductor_controller < handle
                 end
                 return;
             end
+            if exist('proc_settings') ~= 1
+                if ~isempty(self.view)
+                    self.create_error_box("Unable to find processing info in settings file. Make sure data analysis settings file is up to date.");
+                else
+                    disp("Data analysis not performed. Settings file missing processing info.");
+                end
+                return;
+            end
+            
             
             %Update settings to reflect this particular fly.
-            exp_settings.trial_options = trial_options;
+            %exp_settings.path_to_processing_settings = proc_file;
             exp_settings.genotypes = [string(self.model.fly_genotype)];
             exp_settings.exp_folder = {save_path};
-            exp_settings.processed_data_file = proc_name;
-            save_settings.path_to_protocol = exp_folder;
             save_settings.save_path = save_path;
             save_settings.report_path = fullfile(save_path, 'DA_report.pdf');
          
@@ -1394,7 +1414,7 @@ classdef G4_conductor_controller < handle
             %Save a new data analysis settings .mat file in this fly's
             %results folder.
             save(new_settings_path,'exp_settings', 'histogram_plot_settings', ...
-        'histogram_annotation_settings','CL_hist_plot_settings',...
+        'histogram_annotation_settings','CL_hist_plot_settings','proc_settings',...
         'timeseries_plot_settings', 'TC_plot_settings', 'MP_plot_settings', ...
         'pos_plot_settings', 'save_settings','comp_settings', 'gen_settings');
 
@@ -1503,7 +1523,7 @@ classdef G4_conductor_controller < handle
             
         end
 
-        %SETTERS
+        %% SETTERS
 
         
         function set.model(self, value)
@@ -1583,7 +1603,7 @@ classdef G4_conductor_controller < handle
         end
 
 
-        %GETTERS
+        %% GETTERS
         
         function value = get.model(self)
            value = self.model_;
@@ -1660,12 +1680,6 @@ classdef G4_conductor_controller < handle
             output = self.view_;
         end
 
-   
-        
-%         function [output] = get_fly_name(self)
-%             output = self.model.fly_name_;
-%         end
-        
         
         
        
