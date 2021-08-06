@@ -430,10 +430,10 @@ If you do not wish to plot multiple faLmR datasets on the same axis, or are not 
 
 ### faLmR Plot Both Directons
 
-`timeseries_plot_settings.faLmR_plot_both_directions`, similar to the LmR version, should be set to 1 if you plan on plotting two faLmR datasets on each axis, and set to 0 if you do not. 0
+`timeseries_plot_settings.faLmR_plot_both_directions`, similar to the [LmR version](#plot-both-directions), should be set to 1 if you plan on plotting two faLmR datasets on each axis, and set to 0 if you do not. 0
 
 ### faLmR Conds
-`timeseries_plot_settings.faLmR_conds` works exactly like the variable `OL_TS_conds` discussed earlier. The only difference is that instead of providing condition number, you will provide pair number, as defined in the processing settings (see faLmR Pairs for an explanation of this). 
+`timeseries_plot_settings.faLmR_conds` works exactly like the variable [OL_TS_conds](#timeseries-conditions) discussed earlier. The only difference is that instead of providing condition number, you will provide pair number, as defined in the processing settings (see faLmR Pairs for an explanation of this). 
 
 Example:
 `timeseries_plot_settings.faLmR_conds{1} = [1 2; 3 4];`
@@ -443,18 +443,18 @@ Indicates there will be two figures of 2 rows and 2 columns each. The first will
 
 ### faLmR Figure Names
 
-`timeseries_plot_settings.faLmR_figure_names` works exactly like the figure names variable discussed above, but will be applied to faLmR plots. As such it is just an array with a single string - whatever figure name you want applied to all your faLmR figures.  
+`timeseries_plot_settings.faLmR_figure_names` works exactly like the [figure names variable](#figure-names) discussed above, but will be applied to faLmR plots. As such it is just an array with a single string - whatever figure name you want applied to all your faLmR figures.  
 
 ### faLmR Subplot Figure Titles
 
-`timeseries_plot_settings.faLmR_subplot_figure_titles` works exactly like the `subplot_figure_titles` variable discussed above. The only difference is that it is not a cell array. Since this only applies to faLmR data, there can not be additional sets of figures from other datatypes. You will need to be aware of exactly how many faLmR figures you will be producing, so you can give them each a title. The number of figures should equal the number of cell array elements in `faLmR_conds`. 
+`timeseries_plot_settings.faLmR_subplot_figure_titles` works exactly like the [subplot figure titles](#subplot-figure-titles) variable discussed above. The only difference is that it is not a cell array. Since this only applies to faLmR data, there can not be additional sets of figures from other datatypes. You will need to be aware of exactly how many faLmR figures you will be producing, so you can give them each a title. The number of figures should equal the number of cell array elements in `faLmR_conds`. 
 
 Example:
 `timeseries_plot_settings.faLmR_subplot_figure_titles = ["Conds 1-4", "Conds 5-8"];` Would go along with the faLmR_conds example above. 
 
 ### faLmR Cond Name
 
-`timeseries_plot_settings.faLmR_cond_name` works exactly like the earlier `cond_name` variable. This provides titles for each axis on a figure. It will be a cell array with the number of cell elements matching the total number of faLmR figures you expect to create. 
+`timeseries_plot_settings.faLmR_cond_name` works exactly like the earlier [cond name](#condition-names) variable. This provides titles for each axis on a figure. It will be a cell array with the number of cell elements matching the total number of faLmR figures you expect to create. 
 
 Example: 
 `timeseries_plot_settings.faLmR_cond_name{1} = ["Pair 1", "Pair 2"; "Pair 3", "Pair 4"];`
@@ -464,26 +464,25 @@ Example:
 
 ### Closed loop datatypes
 
-`CL_hist_plot_settings.CL_datatypes` is a cell array containing the datatypes you'd like to plot as closed loop histograms. The datatype options are exactly the same as for timeseries above, and should be in the same order. 
+`CL_hist_plot_settings.CL_datatypes` is a cell array containing the datatypes you'd like to plot as closed loop histograms. The datatype options are exactly the same as for [timeseries](#datatypes-for-which-to-create-timeseries-plots) above, and should be in the same order. 
 
 Example: 
 `CL_hist_plot_settings.CL_datatypes = {'Frame Position'};`
 
- array is exactly the same as OL_TS_conds, except it will determine the layout of your closed loop histograms if you're creating any. Leave empty if you are not plotting histograms or would prefer the default layout.
 
 ### Closed loop histogram conditions
 
-`CL_hist_plot_settings.CL_hist_conds` is just like the `OL_TS_conds` variable described above, but instead controls the layout of your figures containing histograms of your closed loop conditions. Only include conditions in this array that are closed loop and should be plotted as histograms. 
+`CL_hist_plot_settings.CL_hist_conds` is just like the [timeseries conditions](#timeseries-conditions) variable described above, but instead controls the layout of your figures containing histograms of your closed loop conditions. Only include conditions in this array that are closed loop and should be plotted as histograms. 
 
-### Axis labels
+### Closed loop histogram axis labels
 
-`CL_hist_plot_settings.axis_labels` works exactly like the timeseries axis labels variable discussed above. However, there are no default axis labels if you choose not to provide any. 
+`CL_hist_plot_settings.axis_labels` works exactly like the [timeseries axis labels](#axis-labels) variable discussed above. However, there are no default axis labels if you choose not to provide any. 
 
 ## Settings related to Tuning Curves
 
 ### Tuning curve datatypes
 
-Like the other datatypes variables, `TC_plot_settings.TC_datatypes` is a cell array of all the datatypes you wish to display as tuning curves, drawing from the same list provided in the timeseries datatypes section.
+Like the other [datatypes variables](#datatypes-for-which-to-create-timeseries-plots), `TC_plot_settings.TC_datatypes` is a cell array of all the datatypes you wish to display as tuning curves, drawing from the same list provided in the timeseries datatypes section.
 
 ### open loop tuning curve conditions
 
@@ -527,17 +526,17 @@ This would go with the above example. Notice we are back to a one dimensional ce
 Example: 
 `TC_plot_settings.xaxis_values = [1, 10, 100, 1000];` This would go along with the above example. Each tuning curve contains four conditions, each one played at 1, 10, 100, or 1000 Hz. 
 
-### Axis labels
+### Tuning curve axis labels
 
-`TC_plot_settings.axis_labels` is a cell array much like the other axis_labels variables discussed above. If you are creating tuning curves for more than one datatype, then you'll need a cell array element for each datatype. 
+`TC_plot_settings.axis_labels` is a cell array much like the other [axis labels](#axis-labels) variables discussed above. If you are creating tuning curves for more than one datatype, then you'll need a cell array element for each datatype. 
 
 ### Tuning curve Subplot Figure titles
 
-`TC_plot_settings.subplot_figure_titles` works exactly like the timeseries equivalent discussed above. You should know how many total figures you expect to create for each datatype you're analyzing in order to provide the correct number of figure titles. 
+`TC_plot_settings.subplot_figure_titles` works exactly like the [timeseries equivalent](#subplot-figure-titles) discussed above. You should know how many total figures you expect to create for each datatype you're analyzing in order to provide the correct number of figure titles. 
 
 ### Tuning curve figure names:
 
-`TC_plot_settings.figure_names` works exactly like the timeseries figure names. 
+`TC_plot_settings.figure_names` works exactly like the [timeseries figure names](#figure-names). 
 
 ### Tuning curve plot both directions
 
@@ -559,7 +558,7 @@ One type of plot you can generate are Motion-Dependent (M) and Position-Dependen
 
 ### M and P condition names
 
-`MP_plot_settings.cond_name` works exactly like the timeseries settings `cond_name` variable, providing a title for each subplot on each figure. Please see that section for a description of how the setting works. 
+`MP_plot_settings.cond_name` works exactly like the timeseries settings `cond_name` variable, providing a title for each subplot on each figure. Please [see that section](#condition-names) for a description of how the setting works. 
 
 ### M and P x axis range
 
@@ -570,8 +569,9 @@ Example:
 
 ### M and P conversion applied to x axis 
 
-Sometimes you might not want to plot your data against the straight frame number, as discussed above, but you might want to convert that frame number to an angular position or percentage or some other representation of the pattern's position. `MP_plot_settings.new_xaxis`, in this case, should be set equal to whatever equation you want applied to the xaxis range set in the previous setting. By default, our lab changes this to angular position, using the equation below: 
+Sometimes you might not want to plot your data against the straight frame number, as discussed above, but you might want to convert that frame number to an angular position or percentage or some other representation of the pattern's position. `MP_plot_settings.new_xaxis`, in this case, should be set equal to whatever equation you want applied to the xaxis range set in the previous setting. By default, our lab changes this to angular position, using the equation below.
 
+Example:
 `MP_plot_settings.new_xaxis = circshift((360/MP_plot_settings.xaxis(end))*[(MP_plot_settings.xaxis) - 96], 96);`
 
 If you don't wish to apply any conversion to your x-axis, simply leave this setting empty (`MP_plot_settings.new_xaxis = [];`). 
