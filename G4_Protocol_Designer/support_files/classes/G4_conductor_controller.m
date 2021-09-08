@@ -5,6 +5,8 @@ classdef G4_conductor_controller < handle
         doc_
         settings_con_
         view_
+        fb_model_
+        fb_view_
         
         %Time tracking
 
@@ -26,6 +28,7 @@ classdef G4_conductor_controller < handle
         current_gain_
         current_offset_
         current_duration_
+        
 
     end
     
@@ -35,6 +38,8 @@ classdef G4_conductor_controller < handle
         doc
         settings_con
         view
+        fb_model
+        fb_view
 
         %These are pieces of text in the updates panel that are updated
         %every trial
@@ -70,6 +75,7 @@ classdef G4_conductor_controller < handle
         function self = G4_conductor_controller(varargin)
            
             self.model = G4_conductor_model();
+            
             self.elapsed_time = 0;
             
 
@@ -103,12 +109,15 @@ classdef G4_conductor_controller < handle
             self.current_offset = '';
             self.current_duration = '';
             self.is_aborted = 0;
+            
+            self.fb_model = feedback_model(self.doc);
 
         end
         
         function layout(self)
             
             self.view = G4_conductor_view(self);
+            self.fb_view = feedback_view(self, [15 15]);
             
         end
 
@@ -467,6 +476,7 @@ classdef G4_conductor_controller < handle
                 self.doc.num_rows = p.num_rows;
                 self.doc.set_config_data(p.num_rows, 0);
                 self.doc.update_config_file();
+                self.fb_model.update_model_channels(self.doc);
                 
                 for k = 1:13
 
@@ -599,6 +609,15 @@ classdef G4_conductor_controller < handle
             %appropriate values to be sent to panel_com       
             self.doc.replace_greyed_cell_values();
             
+            %If the user has provided processing settings, set the wing
+            %beat frequency limitations so data being streamed back in
+            %real time can provide wbf alerts. If no processing, default
+            %values are used.
+            
+            if self.model.do_processing && isfile(self.model.processing_file)
+                self.fb_model.get_wbf_limits(self.model.processing_file);
+            end
+            
             %get_parameters_struct creates a struct of all parameters so they 
             %can easily be passed to the run protocol. It calls a number of 
             %other functions in order to determine parameter values. It handles getting the
@@ -632,6 +651,10 @@ classdef G4_conductor_controller < handle
                 pause(.5);
                 
                 self.create_metadata_file();
+                
+                 %Clear out live feedback panel
+                self.fb_model = feedback_model(self.doc);
+                self.fb_view.clear_view(self.fb_model);
                 
 %                 [logs_removed, msg] = rmdir(fullfile(experiment_folder, 'Log Files'), 's');
 %                 pause(1);
@@ -675,6 +698,10 @@ classdef G4_conductor_controller < handle
             
             %create .mat file of metadata
             self.create_metadata_file();
+            
+             %Clear out live feedback panel
+            self.fb_model = feedback_model(self.doc);
+            self.fb_view.clear_view(self.fb_model);
                         
             if self.model.do_processing == 1 || self.model.do_plotting == 1
                 if ~isempty(self.view)
@@ -890,8 +917,24 @@ classdef G4_conductor_controller < handle
             self.update_view_if_exists();
             
         end
+       
         
-
+        function update_streamed_data(self, tcp_data, trialType, rep, cond, trialnum)
+            
+            self.fb_model.read_tcp_data(tcp_data, trialType); 
+            %Load raw data into feedback model and translate it into datasets
+            
+           
+                    
+            [bad_slope, bad_flier] = self.fb_model.check_if_bad(cond, rep, trialType);
+           
+             
+             if ~isempty(self.view)
+                 self.fb_view.update_feedback_view(self.fb_model, trialType, [trialnum cond rep], bad_slope, bad_flier);
+                 %update plots on GUI for streamed data
+             end
+            
+        end
         
         function browse_file(self, which_file)
            
@@ -1602,6 +1645,15 @@ classdef G4_conductor_controller < handle
         function set.view(self, value)
             self.view_ = value;
         end
+        
+        function set.fb_model(self, value)
+            self.fb_model_ = value; 
+        end
+        
+        function set.fb_view(self, value)
+            self.fb_view_ = value; 
+        end
+        
 
 
         %% GETTERS
@@ -1680,6 +1732,13 @@ classdef G4_conductor_controller < handle
         function output = get.view(self)
             output = self.view_;
         end
+        function output = get.fb_view(self)
+            output = self.fb_view_;
+        end
+        function output = get.fb_model(self)
+            output = self.fb_model_;
+        end
+        
 
         
         

@@ -4,6 +4,7 @@ classdef G4_conductor_view < handle
         con_
         
         fig_
+        fig_size_
         progress_axes_
         axes_label_
         progress_bar_
@@ -47,12 +48,17 @@ classdef G4_conductor_view < handle
         elapsed_time_text_
         remaining_time_text_
         
+        wbf_alert_text_
+        alignment_alert_text_
+        fly_position_line_
+        
     end
     
     properties (Dependent)
         con
         
         fig
+        fig_size
         progress_axes
         axes_label
         progress_bar
@@ -96,6 +102,10 @@ classdef G4_conductor_view < handle
         elapsed_time_text
         remaining_time_text
         
+        wbf_alert_text
+        alignment_alert_text
+        fly_position_line
+        
     end
     
     methods
@@ -107,8 +117,8 @@ classdef G4_conductor_view < handle
             self.con = con;
             % Layout the window
             pix = get(0, 'screensize');
-           fig_size = [.25*pix(3), .25*pix(4), .5*pix(3), .5*pix(4)];
-           set(self.fig,'Position',fig_size);
+           self.fig_size = [.25*pix(3), .15*pix(4), .5*pix(3), .75*pix(4)];
+           set(self.fig,'Position',self.fig_size);
 
            menu = uimenu(self.fig, 'Text', 'File');
            self.menu_open = uimenu(menu, 'Text', 'Open');
@@ -122,19 +132,21 @@ classdef G4_conductor_view < handle
             end
            
             start_button = uicontrol(self.fig,'Style','pushbutton', 'String', 'Run', ...
-                'units', 'pixels', 'Position', [15, fig_size(4)- 305, 115, 85],'Callback', @self.run_exp);
+                'units', 'pixels', 'Position', [15, self.fig_size(4)- 305, 115, 85],'Callback', @self.run_exp);
             abort_button = uicontrol(self.fig,'Style','pushbutton', 'String', 'Abort Experiment',...
-                'units', 'pixels', 'Position', [140, fig_size(4) - 305, 115, 85], 'Callback', @self.abort);
+                'units', 'pixels', 'Position', [140, self.fig_size(4) - 305, 115, 85], 'Callback', @self.abort);
             settings_pan = uipanel(self.fig, 'Title', 'Settings', 'FontSize', 13, 'units', 'pixels', ...
-                'Position', [15, fig_size(4) - 215, 370, 200]);
+                'Position', [15, self.fig_size(4) - 215, 370, 200]);
             metadata_pan = uipanel(self.fig, 'Title', 'Metadata', 'units', 'pixels', ...
-                'FontSize', 13, 'Position', [fig_size(3) - 300, fig_size(4) - 305, 275, 305]);
+                'FontSize', 13, 'Position', [self.fig_size(3) - 300, self.fig_size(4) - 305, 275, 305]);
             status_pan = uipanel(self.fig, 'Title', 'Status', 'FontSize', 13, 'units', 'pixels', ...
-                'Position', [15, 15, fig_size(3) - 30, fig_size(4)*.2]); 
+                'Position', [15, self.fig_size(4)*.33, self.fig_size(3) - 30, self.fig_size(4)*.14]); 
             open_google_sheet_button = uicontrol(self.fig, 'Style', 'pushbutton', 'String', 'Open Metadata Google Sheet', ...
                 'units', 'pixels', 'Position', [metadata_pan.Position(1), metadata_pan.Position(2) - 30,...
                 150, 25],'Callback', @self.open_gs);
-            
+%             streaming_pan = uipanel(self.fig, 'Title', 'Feedback', 'FontSize', 13, 'units', 'pixels', ...
+%                 'Position', [15, 15, self.fig_size(3) - 30, self.fig_size(4) *.3]);
+%             
             %Labels for status update showing current trial parameters
             current_trial = uicontrol(status_pan, 'Style', 'text', 'String', 'Current Trial:', 'FontSize', 10.5, ...
                 'HorizontalAlignment', 'center', 'units', 'pixels', 'Position', [0, 45, 70, 15]); 
@@ -245,9 +257,11 @@ classdef G4_conductor_view < handle
                 10.5, 'HorizontalAlignment', 'left', 'Units', 'pixels', 'Position', ...
                 [remaining_time_label.Position(1) + remaining_time_label.Position(3) + 10, 5, 120, 20]);
             
-            self.progress_axes = axes(self.fig, 'units','pixels', 'Position', [15, fig_size(4)*.2+30, fig_size(3) - 30 ,50]);
+            
+            %Progress bar items
+            self.progress_axes = axes(self.fig, 'units','pixels', 'Position', [15, self.fig_size(4)*.45+30, self.fig_size(3) - 30 ,50]);
             self.axes_label = uicontrol(self.fig, 'Style', 'text', 'String', 'Progress:', 'FontSize', 13, ...
-                'HorizontalAlignment', 'left', 'units', 'pixels', 'Position', [15, fig_size(4)*.2 + 85, 100, 20]);
+                'HorizontalAlignment', 'left', 'units', 'pixels', 'Position', [15, self.fig_size(4)*.45 + 85, 100, 20]);
             self.progress_bar = barh(0, 'Parent', self.progress_axes,'BaseValue', 0);
             self.progress_axes.XAxis.Limits = [0 1];
             self.progress_axes.YTickLabel = [];
@@ -271,6 +285,7 @@ classdef G4_conductor_view < handle
                 line('XData', [x, x], 'YDATA', [0,2]);
             end
             
+            %Metadata
             
             metadata_label_position = [10, metadata_pan.Position(4) - 45, 100, 15];
             metadata_box_position = [115, metadata_pan.Position(4) - 45, 150, 18];
@@ -368,6 +383,8 @@ classdef G4_conductor_view < handle
             self.comments_box = uicontrol(metadata_pan, 'Style', 'edit', 'String', self.con.model.metadata_comments, ...
                 'units', 'pixels', 'Position', metadata_box_position, 'Callback', @self.new_comments);
 
+            % Experiment settings items
+            
             exp_type_label = uicontrol(settings_pan, 'Style', 'text', 'String', 'Experiment Type:', ...
                 'HorizontalAlignment', 'left', 'units', 'pixels', 'Position', [10, 150, 100, 15]);
             self.exp_type_menu = uicontrol(settings_pan, 'Style', 'popupmenu', 'String', {'Flight','Camera walk', 'Chip walk'}, ...
@@ -403,6 +420,32 @@ classdef G4_conductor_view < handle
             self.browse_button_run = uicontrol(settings_pan, 'Style', 'pushbutton', 'units', 'pixels', ...
                 'String', 'Browse', 'Position', [285, 45, 65, 18], 'Callback', @self.run_browse);
             
+%             % Items for real-time data streaming
+%              wbf_label = uicontrol(streaming_pan, 'Style', 'text', 'String', 'Wing Beat Frequency:', ...
+%                  'HorizontalAlignment','left', 'FontSize', 13, 'units', 'pixels', 'Position', [10, 195, 200, 20]);
+%              
+%              self.wbf_alert_text = uicontrol(streaming_pan, 'Style', 'text', 'String', 'wbf ALERT', 'FontSize', 13, ...
+%                  'ForegroundColor', 'g', 'units', 'pixels', 'Position', [225, 195, 75, 20]);
+%              
+%              bad_trials_label = uicontrol(streaming_pan, 'Style', 'text', 'String', 'Bad Trials/Conditions:', ...
+%                  'HorizontalAlignment', 'left', 'FontSize', 13,'units', 'pixels', 'Position', [75, 160, 150, 20]);
+%              
+%              trial_label = uicontrol(streaming_pan, 'Style', 'text', 'String', 'Trial', 'HorizontalAlignment', ...
+%                  'center', 'units', 'pixels', 'Position', [225, 175, 30, 15]);
+%              cond_label = uicontrol(streaming_pan, 'Style', 'text', 'String', 'Condition', 'HorizontalAlignment', ...
+%                  'center', 'units','pixels', 'Position', [265, 175, 50, 15]);
+%              
+%              alignment_label = uicontrol(streaming_pan, 'Style', 'text', 'String', 'Fly Alignment:', ...
+%                  'HorizontalAlignment', 'left', 'FontSize', 13, 'units', 'pixels', 'Position', [400, 115, 100, 20]);
+%              
+%              alignment_axes = axes(streaming_pan, 'units','pixels', 'Position', [515, 70, 250 ,100]);
+%              alignment_axes.XAxis.Limits = [-180 180];
+%              alignment_axes.YTickLabel = [];
+%              %alignment_axes.XTickLabel = [];
+%              %alignment_axes.XTick = [];
+%              alignment_axes.YTick = [];
+%              xline(alignment_axes, 0);
+             
             
             self.update_run_gui();
         end
@@ -876,6 +919,22 @@ classdef G4_conductor_view < handle
              value = self.recent_file_menu_items_;
         end
         
+        function value = get.wbf_alert_text(self)
+             value = self.wbf_alert_text_;
+        end
+        
+        function value = get.alignment_alert_text(self)
+             value = self.alignment_alert_text_;
+        end
+        
+        function value = get.fly_position_line(self)
+             value = self.fly_position_line_;
+        end
+        
+        function value = get.fig_size(self)
+            value = self.fig_size_;
+        end
+        
         %% Setters
         
         function set.comments_box(self, value)
@@ -1048,7 +1107,21 @@ classdef G4_conductor_view < handle
              self.recent_file_menu_items_ = value;
         end
         
+        function set.wbf_alert_text(self, value)
+             self.wbf_alert_text_ = value;
+        end
         
+        function set.alignment_alert_text(self, value)
+             self.alignment_alert_text_ = value;
+        end
+        
+        function set.fly_position_line(self, value)
+             self.fly_position_line_ = value;
+        end
+        
+        function set.fig_size(self, value)
+            self.fig_size_ = value;
+        end
     end
     
     

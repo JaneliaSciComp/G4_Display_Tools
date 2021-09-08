@@ -153,9 +153,9 @@ switch lower(command)
     %% three byte commands
     
     case 'set_pattern_id'
-        if ((~isequal(length(argument),1))||(~isnumeric(argument))||(argument(1) >255)||(argument(1) <= 0))
-            error('Pattern ID command requires 1 numerical argument that is between 1 and 255');
-        end
+%         if ((~isequal(length(argument),1))||(~isnumeric(argument))||(argument(1) >255)||(argument(1) <= 0))
+%             error('Pattern ID command requires 1 numerical argument that is between 1 and 255');
+%         end
         % panel ID:  0x03, Panel_ID
         reply = send_tcp( char([3 3 dec2char(argument(1),2)]),1);
         if reply.success ~= 0 

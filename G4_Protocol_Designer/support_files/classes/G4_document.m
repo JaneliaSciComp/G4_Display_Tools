@@ -159,11 +159,27 @@ classdef G4_document < handle
             
             self.repetitions = 1;
             self.is_randomized = 0;
-            self.is_chan1 = 0;
-            self.is_chan2 = 0;
-            self.is_chan3 = 0;
-            self.is_chan4 = 0;
-            
+            if self.chan1_rate == 0
+                self.is_chan1 = 0;
+            else
+                self.is_chan1 = 1;
+            end
+            if self.chan2_rate == 0
+                self.is_chan2 = 0;
+            else
+                self.is_chan2 = 1;
+            end
+            if self.chan3_rate == 0
+                self.is_chan3 = 0;
+            else
+                self.is_chan3 = 1;
+            end
+            if self.chan4_rate == 0
+                self.is_chan4 = 0;
+            else
+                self.is_chan4 = 1;
+            end
+
             %Get the recently opened .g4p files
             %Get info from log of recently opened .g4p files
             recent_files_filename = 'recently_opened_g4p_files.m';
