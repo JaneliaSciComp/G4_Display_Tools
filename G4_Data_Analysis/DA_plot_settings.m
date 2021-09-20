@@ -448,7 +448,7 @@ function [exp_settings, histogram_plot_settings, histogram_annotation_settings, 
     %% Plot settings for tuning curves
 
     TC_plot_settings.timeseries_ylimits = [-1.1 1.1; -1 6; -1 6; -1 6; 1 192; 0 0; 0 0; 0 0];   
-%     TC_plot_settings.marker_type = 'o';
+    TC_plot_settings.marker_type = 'o';
     TC_plot_settings.default_conds_per_curve = 7; %If the conditions are not provided in a layout, it will by default include 7 conditions in each curve
 
     
