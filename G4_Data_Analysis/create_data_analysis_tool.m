@@ -705,7 +705,7 @@
                     end
 
                     for k = 1:length(self.TC_plot_settings.OL_TC_conds)
-                        plot_TC_specified_OLtrials(self.TC_plot_settings, self.gen_settings, self.TC_plot_settings.OL_TC_conds{k}, self.TC_plot_titles{k}, self.model.datatype_indices.TC_inds, ...
+                        plot_TC_specified_OLtrials(self.TC_plot_settings, self.gen_settings, self.TC_plot_settings.OL_TC_conds{k}, self.TC_plot_settings.TC_plot_titles{k}, self.model.datatype_indices.TC_inds, ...
                            self.exp_settings.genotypes, self.exp_settings.control_genotype, self.model.num_groups, summaries, single, self.save_settings, k);
                     end
                 end

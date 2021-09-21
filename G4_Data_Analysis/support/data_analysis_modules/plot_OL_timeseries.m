@@ -109,83 +109,98 @@ function plot_OL_timeseries(timeseries_data, timestampsIN, model, plot_settings,
                                     semdata(length(meandata)+1:end) = [];
                                 end
                             end
+                            
+                           if plot_opposing_directions
+                                opp_cond = get_opposing_condition(cond, condition_pairs);
+                                if single && show_ind_reps
+                                    tmpdataOpp = squeeze(timeseries_data(g,:,d,opp_cond,:,:));
+                                else
+                                    tmpdataOpp = squeeze(timeseries_data(g,:,d,opp_cond,:));
+                                end
+                                meandataOpp = nanmean(tmpdataOpp);
+                                nanidxOpp = isnan(meandataOpp);
+                                stddataOpp = nanstd(tmpdataOpp);
+                                semdataOpp = stddataOpp./sqrt(sum(max(~isnan(tmpdataOpp),[],2)));
+                                timestampsOpp = timestampsIN(~nanidxOpp);
+                                meandataOpp(nanidxOpp) = []; 
+                                semdataOpp(nanidxOpp) = [];
+
+                                if cutoff_time > 0
+                                    cutoff_indOpp = find(timestampsOpp>cutoff_time);
+                                    if ~isempty(cutoff_indOpp)
+                                       meandataOpp(cutoff_indOpp(1)+1:end) = [];
+                                       timestampsOpp(cutoff_indOpp(1)+1:end) = [];
+                                       semdataOpp(length(meandataOpp)+1:end) = [];
+                                    end
+                                end
+                            end
+                   
 
                             if single 
                                 if show_ind_reps
                                     for rep = 1:num_reps
                                         plot(repmat(timestampsIN',[1 rep]),tmpdata(rep,:)','Color',fly_Colors(rep*2,:),'LineWidth', rep_LineWidth);
                                     end
+                                    if plot_opposing_directions
+                                        for rep2 = 1:num_reps
+                                            plot(repmat(timestampsIN',[1 rep2]), tmpdataOpp(rep2,:)', 'Color', fly_Colors(rep2*2,:),'LineWidth', rep_LineWidth);
+                                        end
+                                        plot(timestampsOpp, meandataOpp, 'Color', .75*mean_Colors(g+1,:), 'LineWidth', mean_LineWidth);
+                                    end
                                     plot(timestamps, meandata, 'Color', .75*mean_Colors(g,:),'LineWidth', mean_LineWidth);
                                 else
                                     plot(repmat(timestampsIN',[1 num_exps]),tmpdata','Color',mean_Colors(g,:),'LineWidth',rep_LineWidth);
+                                    if plot_opposing_directions
+                                        plot(repmat(timestampsIN',[1 num_exps]),tmpdataOpp','Color',mean_Colors(g+1,:),'LineWidth',rep_LineWidth);
+                                    end
+                                        
                                 end
-                            elseif num_groups==1  && show_ind_flies == 1
-                                for exp = 1:num_exps
-                                    plot(repmat(timestampsIN',[1 exp]),tmpdata(exp,:)','Color',fly_Colors(exp,:),'LineWidth',rep_LineWidth);
+                            elseif num_groups==1
+                                
+                                if show_ind_flies == 1
+                                    
+                                    for exp = 1:num_exps
+                                        plot(repmat(timestampsIN',[1 exp]),tmpdata(exp,:)','Color',fly_Colors(exp,:),'LineWidth',rep_LineWidth);
+                                    end
+                                    
+                                    if plot_opposing_directions == 1
+                                        
+                                        for exp = 1:num_exps
+                                            plot(repmat(timestampsIN',[1 exp]),tmpdataOpp(exp,:)','Color',fly_Colors(exp,:),'LineWidth',rep_LineWidth);
+                                        end
+                                        plot(timestampsOpp,meandataOpp,'Color',mean_Colors(g+1,:),'LineWidth',mean_LineWidth);
+                                        patch([timestampsOpp fliplr(timestampsOpp)],[meandataOpp+semdataOpp fliplr(meandataOpp-semdataOpp)],'k','FaceColor',mean_Colors(g+1,:),'EdgeColor',EdgeColor,'FaceAlpha',patch_alpha)
+                                        
+                                    end
+                                    
+                                else
+                                    
+                                    if plot_opposing_directions == 1
+                                        
+                                        plot(timestampsOpp,meandataOpp,'Color',mean_Colors(g+1,:),'LineWidth',mean_LineWidth);
+                                        patch([timestampsOpp fliplr(timestampsOpp)],[meandataOpp+semdataOpp fliplr(meandataOpp-semdataOpp)],'k','FaceColor',mean_Colors(g+1,:),'EdgeColor',EdgeColor,'FaceAlpha',patch_alpha)
+                                        
+                                    end
+                                        
+                                    
                                 end
 
-                                plot(timestamps, meandata, 'Color', .75*mean_Colors(g,:),'LineWidth', mean_LineWidth);
+                                plot(timestamps, meandata, 'Color', mean_Colors(g,:),'LineWidth', mean_LineWidth);
+                                patch([timestamps fliplr(timestamps)],[meandata+semdata fliplr(meandata-semdata)],'k','FaceColor',mean_Colors(g,:),'EdgeColor',EdgeColor,'FaceAlpha',patch_alpha)
                             else
                                 if g == control_genotype
                                     plot(timestamps,meandata,'Color',control_color,'LineWidth',mean_LineWidth);
                                     patch([timestamps fliplr(timestamps)],[meandata+semdata fliplr(meandata-semdata)],'k','FaceColor',control_color,'EdgeColor',EdgeColor,'FaceAlpha',patch_alpha)
+                                    if plot_opposing_directions
+                                        plot(timestampsOpp,meandataOpp,'Color',control_color + .75,'LineWidth',mean_LineWidth);
+                                        patch([timestampsOpp fliplr(timestampsOpp)],[meandataOpp+semdataOpp fliplr(meandataOpp-semdataOpp)],'k','FaceColor',control_color,'EdgeColor',EdgeColor,'FaceAlpha',patch_alpha)
+                                    end
+                                        
                                 else
                                     plot(timestamps,meandata,'Color',mean_Colors(g,:),'LineWidth',mean_LineWidth);
                                     patch([timestamps fliplr(timestamps)],[meandata+semdata fliplr(meandata-semdata)],'k','FaceColor',mean_Colors(g,:),'EdgeColor',EdgeColor,'FaceAlpha',patch_alpha)
                                     
-                                end
-
-                                
-                            end
-                            
-                            if plot_opposing_directions == 1
-                                opp_cond = get_opposing_condition(cond, condition_pairs);
-                                if single && show_ind_reps
-                                    tmpdata = squeeze(timeseries_data(g,:,d,opp_cond,:,:));
-                                else
-                                    tmpdata = squeeze(timeseries_data(g,:,d,opp_cond,:));
-                                end
-                                meandata = nanmean(tmpdata);
-                                nanidx = isnan(meandata);
-                                stddata = nanstd(tmpdata);
-                                semdata = stddata./sqrt(sum(max(~isnan(tmpdata),[],2)));
-                                timestamps = timestampsIN(~nanidx);
-                                meandata(nanidx) = []; 
-                                semdata(nanidx) = [];
-                                
-                                if cutoff_time > 0
-                                    cutoff_ind = find(timestamps>cutoff_time);
-                                    if ~isempty(cutoff_ind)
-                                       meandata(cutoff_ind(1)+1:end) = [];
-                                       timestamps(cutoff_ind(1)+1:end) = [];
-                                       semdata(length(meandata)+1:end) = [];
-                                    end
-                                end
-                                
-                               
-                                %adjust color to make opposing direction
-                                %lighter
-  
-                                if single == 1
-                                    if show_ind_reps
-                                        for rep2 = 1:num_reps
-                                            plot(repmat(timestampsIN',[1 rep2]), tmpdata(rep2,:)', 'Color', fly_Colors(rep2*2,:),'LineWidth', rep_LineWidth);
-                                        end
-                                        plot(timestamps, meandata, 'Color', .75*mean_Colors(g+1,:), 'LineWidth', mean_LineWidth);
-                                    else
-                                        plot(repmat(timestampsIN',[1 num_exps]),tmpdata','Color',mean_Colors(g+1,:),'LineWidth',rep_LineWidth);
-                                    end
-                                elseif num_groups == 1
-                                    plot(timestamps,meandata,'Color',mean_Colors(g+1,:),'LineWidth',mean_LineWidth);
-                                    patch([timestamps fliplr(timestamps)],[meandata+semdata fliplr(meandata-semdata)],'k','FaceColor',mean_Colors(g+1,:),'EdgeColor',EdgeColor,'FaceAlpha',patch_alpha)
-
-                                else
-                                    if g == control_genotype
-                                        plot(timestamps,meandata,'Color',control_color + .75,'LineWidth',mean_LineWidth);
-                                        patch([timestamps fliplr(timestamps)],[meandata+semdata fliplr(meandata-semdata)],'k','FaceColor',control_color,'EdgeColor',EdgeColor,'FaceAlpha',patch_alpha)
-
-                                    else
-                                        
+                                    if plot_opposing_directions
                                         for rgb = 1:length(mean_Colors(g,:))
                                             if mean_Colors(g,rgb) > .75
                                                 color_adjust(rgb) = 0;
@@ -199,16 +214,16 @@ function plot_OL_timeseries(timeseries_data, timestampsIN, model, plot_settings,
                                             end
                                         end
                                         
-                                        plot(timestamps,meandata,'Color',mean_Colors(g,:) + color_adjust,'LineWidth',mean_LineWidth);
-                                        patch([timestamps fliplr(timestamps)],[meandata+semdata fliplr(meandata-semdata)],'k','FaceColor',mean_Colors(g,:),'EdgeColor',EdgeColor,'FaceAlpha',patch_alpha)
-                                
-                                    
+                                        plot(timestampsOpp,meandataOpp,'Color',mean_Colors(g,:) + color_adjust,'LineWidth',mean_LineWidth);
+                                        patch([timestampsOpp fliplr(timestampsOpp)],[meandataOpp+semdataOpp fliplr(meandataOpp-semdataOpp)],'k','FaceColor',mean_Colors(g,:),'EdgeColor',EdgeColor,'FaceAlpha',patch_alpha)
                                     end
+                                    
                                 end
+
                                 
-                                
-                               
                             end
+                            
+
                         end
 %                         titlestr = ['\fontsize{' num2str(subtitle_FontSize) '} Condition #{\color[rgb]{' num2str(mean_Colors(g,:)) '}' num2str(cond)]; 
                         if ~isempty(cond_name(1+(row-1),col))
@@ -249,17 +264,6 @@ function plot_OL_timeseries(timeseries_data, timestampsIN, model, plot_settings,
                         set(gca, 'FontSize', axis_num_fontSize);
                         
                         
-                        
-                       % timeseries_ylimits(d,:) = ylim;
- 
-                        %xlim(timeseries_xlimits)
-                        
-                        
-                        
-%                         title([titlestr '}'])
-                        % title
-                        %title(cond_name{cond},'FontSize',subtitle_FontSize)
-                        % legend
 
 
                     end
