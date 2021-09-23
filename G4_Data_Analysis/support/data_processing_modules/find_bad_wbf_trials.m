@@ -39,7 +39,7 @@ function [bad_trials, wbf_data] = find_bad_wbf_trials(Log, ts_data, wbf_range, w
                 %clustered in the end. 
                 end_count = 1;
                 for w = 1:length(bad_indices)
-                    if bad_indices(w) > .1*size(wbf_data,3)
+                    if bad_indices(w) > .9*size(wbf_data,3)
                         end_count = end_count + 1;
                     end
                 end
