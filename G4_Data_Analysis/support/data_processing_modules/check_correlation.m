@@ -59,7 +59,7 @@ function [bad_conds] = check_correlation(start_times, stop_times, exp_order, Log
                 index = index + 1;
             end
         end
-        if length(bad_comps) >= num_comparisons - ((floor(num_reps/2)-1)/2)*(floor(num_reps/2))
+        if length(bad_comps) >= num_comparisons - ((floor(num_reps/2)-1)/2)*(floor(num_reps/2)) && ~isempty(bad_comps)
             for i = 1:num_reps
                 bad_conds(bad_idx,:) = [i, cond];
                 bad_idx = bad_idx + 1;
