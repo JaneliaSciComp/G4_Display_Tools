@@ -6,47 +6,47 @@ function [exp_settings, histogram_plot_settings, histogram_annotation_settings, 
 %% Settings which need updating regularly (more static settings below)
 
     % The path to your processing settings for this protocol
-    exp_settings.path_to_processing_settings = '/Users/taylorl/Desktop/protocol_folder/new_processing_settings.mat';
+    exp_settings.path_to_processing_settings = '/Users/taylorl/Desktop/narrowGrating09-08-21_17-27-53/later_processing_settings.mat';
 
 %% Settings for exp_folder generation and saving results
     
     %The path where you wish to save the results of the data analysis
-    save_settings.save_path = '/Users/taylorl/Desktop/protocol_folder/new_analysis/group_two';
+    save_settings.save_path = '/Users/taylorl/Desktop/narrowGrating09-08-21_17-27-53/09_09_2021/Analysis';
     
-    save_settings.report_path = '/Users/taylorl/Desktop/protocol_folder/new_analysis/group_two/DA_report.pdf';    
+    save_settings.report_path = '/Users/taylorl/Desktop/narrowGrating09-08-21_17-27-53/09_09_2021/Analysis/DA_report.pdf';    
     
     %Field names are metadata field names
-    exp_settings.field_to_sort_by{1} = ["ablated"];
-    exp_settings.field_to_sort_by{2} = ["ablated"];
+    exp_settings.field_to_sort_by{1} = ["fly_genotype"];
+%    exp_settings.field_to_sort_by{2} = ["ablated"];
 %     exp_settings.field_to_sort_by{3} = ["fly_genotype", "experimenter"];
 %     exp_settings.field_to_sort_by{4} = ["fly_genotype", "experimenter"];
 
     %If plot_all_genotypes is 1, leave field_values empty.   
 %    exp_settings.field_values = {};
-    exp_settings.field_values{1} = ["n"];
-    exp_settings.field_values{2} = ["b"];
+    exp_settings.field_values{1} = ["DL"];
+%    exp_settings.field_values{2} = ["b"];
 %     exp_settings.field_values{3} = ["OL0042B_UAS_Kir_JFRC49", "arrudar"];
 %     exp_settings.field_values{4} = ["OL0042B_UAS_Kir_JFRC49", "kappagantular"];
 
     %For a single group or multiple groups, the flag is '-group'
-    exp_settings.single_group = 0;%1-all flies should be in one group, so exp_folder should be 1xX cell array
+    exp_settings.single_group = 1;%1-all flies should be in one group, so exp_folder should be 1xX cell array
     
     %The flag for a single fly is '-single'
     exp_settings.single_fly = 0;%1- only a single fly is being analyzed, the exp_folder will simply be the path to the fly
     
     %If you're running a single fly, you need to provide the path to that
     %fly folder
-    exp_settings.fly_path = '/Users/taylorl/Desktop/protocol_folder/N/SS01001_UASFRTStopFRTRicinA_JFRC12-09_33_58';
+    exp_settings.fly_path = '/Users/taylorl/Desktop/narrowGrating09-08-21_17-27-53/09_09_2021/DL-14_57_22';
     
     %1 - each genotype will be plotted in its own figure against a control. 
     %0 - groups will be plotted as laid out below. 
     exp_settings.plot_all_genotypes = 0; 
    
     %Control must match exactly the metadata genotype value. 
-    exp_settings.control_genotype = 'n';
+    exp_settings.control_genotype = '';
       
     %Array of genotype names
-    exp_settings.genotypes = ["Not Ablated", "All Ablated"];
+    exp_settings.genotypes = ["DL"];
     
 
 %% Experiment settings
@@ -56,7 +56,7 @@ function [exp_settings, histogram_plot_settings, histogram_annotation_settings, 
     exp_settings.plot_norm_and_unnorm = 1;  
 
     %Log file will be named using this
-    exp_settings.group_being_analyzed_name = 'CT1 Ablation Protocol';
+    exp_settings.group_being_analyzed_name = 'DL';
     
 %% Histogram settings ('-hist')
 
@@ -69,12 +69,12 @@ function [exp_settings, histogram_plot_settings, histogram_annotation_settings, 
     %datatype options for flying data: 'LmR_chan', 'L_chan', 'R_chan',
     %'F_chan', 'Frame Position', 'LmR', 'LpR', 'faLmRda
     %datatype options for walking data: 'Vx0_chan', 'Vx1_chan', 'Vy0_chan', 'Vy1_chan', 'Frame Position', 'Turning', 'Forward', 'Sideslip'
-    timeseries_plot_settings.OL_datatypes = {'LmR', 'faLmR'};
+    timeseries_plot_settings.OL_datatypes = {'LmR', 'LpR'};
     
     %OL_TS_conds indicates the layout of your timeseries figures. See
     %documentation for example. Leave empty ([]) for default layout.
-    timeseries_plot_settings.OL_TS_conds = [];
-%    timeseries_plot_settings.OL_TS_conds{1} = [1 3 5 7; 9 11 13 15; 17 19 21 23];
+ %   timeseries_plot_settings.OL_TS_conds = [];
+    timeseries_plot_settings.OL_TS_conds{1} = [1 3 5 7 9 11 13 15; 17 19 21 23 25 27 29 31; 33 35 37 39 41 43 45 47];
 %     timeseries_plot_settings.OL_TS_conds{2} = [13 14 15 16; 17 18 19 20; 21 22 23 24];
 %     timeseries_plot_settings.OL_TS_conds{3} = [25 26; 27 28];
 
@@ -97,7 +97,8 @@ function [exp_settings, histogram_plot_settings, histogram_annotation_settings, 
     timeseries_plot_settings.axis_labels = {};
     
     %Title for subplot/figure
-    timeseries_plot_settings.subplot_figure_title{1} = ["CT1 Ablation LmR"];
+    timeseries_plot_settings.subplot_figure_title{1} = ["DL LmR"];
+    timeseries_plot_settings.subplot_figure_title{2} = ["DL LpR"];
 %     timeseries_plot_settings.subplot_figure_title{2} = ["CT1 LmR both ablated Conds: 13-24"];
 %     timeseries_plot_settings.subplot_figure_title{3} = ["CT1 LmR both ablated Conds: 24-28"];%Cell array with same num cell elements as OL_TS_conds. 
     %Each cell should have one name for each datatype
@@ -122,7 +123,7 @@ function [exp_settings, histogram_plot_settings, histogram_annotation_settings, 
     
     %Set this to 1 if you are plotting only a single group and want lines
     %plotted for each fly as well as the average.
-    timeseries_plot_settings.show_individual_flies = 0;
+    timeseries_plot_settings.show_individual_flies = 1;
     
     %Set this to 1 if you are plotting only a single fly and want lines
     %plotted for each repetition as well as the fly's average.
@@ -219,8 +220,9 @@ function [exp_settings, histogram_plot_settings, histogram_annotation_settings, 
     %Create the layout of tuning curves in this array. It works differently
     %than OL_TS_conds - see documentation for details.
 %    TC_plot_settings.OL_TC_conds = [];
-     TC_plot_settings.OL_TC_conds{1}{2} = [13 15 17 19 21];
-     TC_plot_settings.OL_TC_conds{1}{3} = [23 25 27 29 31];
+     TC_plot_settings.OL_TC_conds{1}{1} = [1 3 5 7 9 11 13 15];
+     TC_plot_settings.OL_TC_conds{1}{2} = [17 19 21 23 25 27 29 31];
+     TC_plot_settings.OL_TC_conds{1}{3} = [33 35 37 39 41 43 45 47];
 
     %If you want your tuning curves to have their own plot titles, make an
     %array of titles for each PLOT (not each condition). So this should be
@@ -230,7 +232,7 @@ function [exp_settings, histogram_plot_settings, histogram_annotation_settings, 
     TC_plot_settings.cond_name = [];
     
     %The x-axis values for tuning curves
-    TC_plot_settings.xaxis_values = [0.625 1.25 2.5 5 10 20 40];
+    TC_plot_settings.xaxis_values = [0.625 1.25 2.5 5 10 20 40 60];
     
     %The xaxis label for tuning curves
 %     TC_plot_settings.TC_axis_labels{1} = ["Frequency(Hz)","LmR"];
@@ -238,7 +240,7 @@ function [exp_settings, histogram_plot_settings, histogram_annotation_settings, 
     TC_plot_settings.axis_labels = {};
     
     %Title for subplot/figure
-    TC_plot_settings.subplot_figure_title{1} = ["LmR Conds 1-27"; "LpR Conds 1-27"];
+    TC_plot_settings.subplot_figure_title{1} = ["LmR"; "LpR"];
     
     %An array of figure names for each figure(not printed on actual figure)
     TC_plot_settings.figure_names = [];
@@ -341,7 +343,6 @@ function [exp_settings, histogram_plot_settings, histogram_annotation_settings, 
     %Plot opposite direction
     pos_plot_settings.plot_opposing_directions = 0;
 
-
 %% Comparison figure settings
     
     %Ordering type of plots
@@ -419,7 +420,7 @@ function [exp_settings, histogram_plot_settings, histogram_annotation_settings, 
 %% Plot Settings for basic Histograms
 
     histogram_plot_settings.histogram_ylimits = [0 100; -6 6; 2 10];
-    histogram_plot_settings.xlimits = [-8, 6; 0 18]; % [LmR limits, LpR limits]
+    histogram_plot_settings.xlimits = [-7, 7; 0 16]; % [LmR limits, LpR limits]
     histogram_plot_settings.inter_in_degrees = 1;
 
     %% Annotation settings for basic Histograms
@@ -476,9 +477,5 @@ function [exp_settings, histogram_plot_settings, histogram_annotation_settings, 
     process_settings = load(exp_settings.path_to_processing_settings);
     proc_settings = process_settings.settings;
     [proc_settings.protocol_folder, ~, ~] = fileparts(proc_settings.path_to_protocol);
-    %% This will generate your exp_folder, do not edit. 
     
-   exp_settings.exp_folder = get_exp_folder(exp_settings.field_to_sort_by, exp_settings.field_values, exp_settings.single_group, ...
-        exp_settings.single_fly, exp_settings.fly_path, proc_settings.protocol_folder, exp_settings.control_genotype);
-
 end
