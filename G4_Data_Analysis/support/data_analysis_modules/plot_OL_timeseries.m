@@ -247,7 +247,9 @@ function plot_OL_timeseries(timeseries_data, timestampsIN, model, plot_settings,
                                 disp(msg);
                             end
                             disp_move_line = median(move_line);
-                            xline(disp_move_line);
+                            if ~isnan(disp_move_line) && ~isempty(disp_move_line)
+                                xline(disp_move_line);
+                            end
                         end
                         
                         if frame_superimpose==1
