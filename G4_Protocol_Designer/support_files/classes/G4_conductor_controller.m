@@ -117,7 +117,7 @@ classdef G4_conductor_controller < handle
         function layout(self)
             
             self.view = G4_conductor_view(self);
-            self.fb_view = feedback_view(self, [15 15]);
+            self.fb_view = feedback_view(self, [890 17]);
             
         end
 
@@ -282,21 +282,19 @@ classdef G4_conductor_controller < handle
             
         end
         
-        
+        function add_bad_trial_marker_progress(self, trialNum)
+            
+            num_trials = self.get_num_trials();
+            if ~isempty(self.view)
+                self.view.add_bad_trial_marker(num_trials, trialNum);
+            end
+            
+        end
+            
         
         function update_progress(self, trial_type, varargin)
             
-            trials = length(self.doc.block_trials(:,1)) * self.doc.repetitions;
-            if ~isempty(self.doc.intertrial{1})
-                trials = trials*2 - 1;
-            end
-            if ~isempty(self.doc.pretrial{1})
-                trials = trials + 1;
-            end
-            if ~isempty(self.doc.posttrial{1})
-                trials = trials + 1;
-            end
-
+            trials = self.get_num_trials();
             
             if strcmp(trial_type, 'pre')
 
@@ -677,6 +675,7 @@ classdef G4_conductor_controller < handle
                 end
                 
                 self.is_aborted = 0;
+
                     
                 return;
             end
@@ -767,6 +766,7 @@ classdef G4_conductor_controller < handle
             
             if ~isempty(self.view)
                 self.view.set_progress_title('Finished.');
+                
                 drawnow;
             end
 
@@ -1490,6 +1490,20 @@ classdef G4_conductor_controller < handle
             trial_options = [is_pretrial, is_intertrial, is_posttrial];
             
         end
+        
+        function [trials] = get_num_trials(self)
+            trials = length(self.doc.block_trials(:,1)) * self.doc.repetitions;
+            if ~isempty(self.doc.intertrial{1})
+                trials = trials*2 - 1;
+            end
+            if ~isempty(self.doc.pretrial{1})
+                trials = trials + 1;
+            end
+            if ~isempty(self.doc.posttrial{1})
+                trials = trials + 1;
+            end
+        end
+        
         
         function run_pdf_report(self, fly_results_folder, trial_options, processed_filename)
             

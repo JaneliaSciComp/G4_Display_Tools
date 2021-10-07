@@ -51,6 +51,7 @@ classdef G4_conductor_view < handle
         wbf_alert_text_
         alignment_alert_text_
         fly_position_line_
+        bad_trial_markers_
         
     end
     
@@ -105,6 +106,7 @@ classdef G4_conductor_view < handle
         wbf_alert_text
         alignment_alert_text
         fly_position_line
+        bad_trial_markers
         
     end
     
@@ -117,7 +119,7 @@ classdef G4_conductor_view < handle
             self.con = con;
             % Layout the window
             pix = get(0, 'screensize');
-           self.fig_size = [.25*pix(3), .15*pix(4), .5*pix(3), .75*pix(4)];
+           self.fig_size = [.25*pix(3), .15*pix(4), .85*pix(3), .6*pix(4)];
            set(self.fig,'Position',self.fig_size);
 
            menu = uimenu(self.fig, 'Text', 'File');
@@ -138,9 +140,9 @@ classdef G4_conductor_view < handle
             settings_pan = uipanel(self.fig, 'Title', 'Settings', 'FontSize', 13, 'units', 'pixels', ...
                 'Position', [15, self.fig_size(4) - 215, 370, 200]);
             metadata_pan = uipanel(self.fig, 'Title', 'Metadata', 'units', 'pixels', ...
-                'FontSize', 13, 'Position', [self.fig_size(3) - 300, self.fig_size(4) - 305, 275, 305]);
+                'FontSize', 13, 'Position', [settings_pan.Position(1) + settings_pan.Position(3) + 200, self.fig_size(4) - 305, 275, 305]);
             status_pan = uipanel(self.fig, 'Title', 'Status', 'FontSize', 13, 'units', 'pixels', ...
-                'Position', [15, self.fig_size(4)*.33, self.fig_size(3) - 30, self.fig_size(4)*.14]); 
+                'Position', [settings_pan.Position(1), self.fig_size(4)*.05, metadata_pan.Position(1) + metadata_pan.Position(3), self.fig_size(4)*.2]); 
             open_google_sheet_button = uicontrol(self.fig, 'Style', 'pushbutton', 'String', 'Open Metadata Google Sheet', ...
                 'units', 'pixels', 'Position', [metadata_pan.Position(1), metadata_pan.Position(2) - 30,...
                 150, 25],'Callback', @self.open_gs);
@@ -149,7 +151,7 @@ classdef G4_conductor_view < handle
 %             
             %Labels for status update showing current trial parameters
             current_trial = uicontrol(status_pan, 'Style', 'text', 'String', 'Current Trial:', 'FontSize', 10.5, ...
-                'HorizontalAlignment', 'center', 'units', 'pixels', 'Position', [0, 45, 70, 15]); 
+                'HorizontalAlignment', 'center', 'units', 'pixels', 'Position', [0, 50, 70, 15]); 
             
             mode_label = uicontrol(status_pan, 'Style', 'text', 'String', 'Mode', 'FontSize', 10.5, ...
                 'HorizontalAlignment', 'center', 'units', 'pixels', 'Position', ...
@@ -259,9 +261,9 @@ classdef G4_conductor_view < handle
             
             
             %Progress bar items
-            self.progress_axes = axes(self.fig, 'units','pixels', 'Position', [15, self.fig_size(4)*.45+30, self.fig_size(3) - 30 ,50]);
+            self.progress_axes = axes(self.fig, 'units','pixels', 'Position', [15, status_pan.Position(2) + status_pan.Position(4) + 15, status_pan.Position(3) ,50]);
             self.axes_label = uicontrol(self.fig, 'Style', 'text', 'String', 'Progress:', 'FontSize', 13, ...
-                'HorizontalAlignment', 'left', 'units', 'pixels', 'Position', [15, self.fig_size(4)*.45 + 85, 100, 20]);
+                'HorizontalAlignment', 'left', 'units', 'pixels', 'Position', [15, self.progress_axes.Position(2) + self.progress_axes.Position(4) + 10, 100, 20]);
             self.progress_bar = barh(0, 'Parent', self.progress_axes,'BaseValue', 0);
             self.progress_axes.XAxis.Limits = [0 1];
             self.progress_axes.YTickLabel = [];
@@ -420,31 +422,8 @@ classdef G4_conductor_view < handle
             self.browse_button_run = uicontrol(settings_pan, 'Style', 'pushbutton', 'units', 'pixels', ...
                 'String', 'Browse', 'Position', [285, 45, 65, 18], 'Callback', @self.run_browse);
             
-%             % Items for real-time data streaming
-%              wbf_label = uicontrol(streaming_pan, 'Style', 'text', 'String', 'Wing Beat Frequency:', ...
-%                  'HorizontalAlignment','left', 'FontSize', 13, 'units', 'pixels', 'Position', [10, 195, 200, 20]);
-%              
-%              self.wbf_alert_text = uicontrol(streaming_pan, 'Style', 'text', 'String', 'wbf ALERT', 'FontSize', 13, ...
-%                  'ForegroundColor', 'g', 'units', 'pixels', 'Position', [225, 195, 75, 20]);
-%              
-%              bad_trials_label = uicontrol(streaming_pan, 'Style', 'text', 'String', 'Bad Trials/Conditions:', ...
-%                  'HorizontalAlignment', 'left', 'FontSize', 13,'units', 'pixels', 'Position', [75, 160, 150, 20]);
-%              
-%              trial_label = uicontrol(streaming_pan, 'Style', 'text', 'String', 'Trial', 'HorizontalAlignment', ...
-%                  'center', 'units', 'pixels', 'Position', [225, 175, 30, 15]);
-%              cond_label = uicontrol(streaming_pan, 'Style', 'text', 'String', 'Condition', 'HorizontalAlignment', ...
-%                  'center', 'units','pixels', 'Position', [265, 175, 50, 15]);
-%              
-%              alignment_label = uicontrol(streaming_pan, 'Style', 'text', 'String', 'Fly Alignment:', ...
-%                  'HorizontalAlignment', 'left', 'FontSize', 13, 'units', 'pixels', 'Position', [400, 115, 100, 20]);
-%              
-%              alignment_axes = axes(streaming_pan, 'units','pixels', 'Position', [515, 70, 250 ,100]);
-%              alignment_axes.XAxis.Limits = [-180 180];
-%              alignment_axes.YTickLabel = [];
-%              %alignment_axes.XTickLabel = [];
-%              %alignment_axes.XTick = [];
-%              alignment_axes.YTick = [];
-%              xline(alignment_axes, 0);
+            self.bad_trial_markers = [];
+           
              
             
             self.update_run_gui();
@@ -657,11 +636,16 @@ classdef G4_conductor_view < handle
             self.update_run_gui();
             
         end
+
         
         function update_progress_bar(self, trial_type, data, varargin)
 
             if strcmp(trial_type, 'pre')
                 
+                for bt = 1:length(self.bad_trial_markers)
+                    delete(self.bad_trial_markers(bt));
+                end
+                self.bad_trial_markers = [];
                 self.progress_axes.Title.String = "Running Pretrial...";
                 self.progress_bar.YData = data;
                 
@@ -703,6 +687,12 @@ classdef G4_conductor_view < handle
         function set_progress_title(self, text)
            
             self.progress_axes.Title.String = text;
+            
+        end
+        
+        function add_bad_trial_marker(self, num_trials, trialNum)
+           
+            self.bad_trial_markers(end+1) = xline(self.progress_axes, trialNum/num_trials, 'Color', 'r');
             
         end
         
@@ -935,6 +925,10 @@ classdef G4_conductor_view < handle
             value = self.fig_size_;
         end
         
+        function value = get.bad_trial_markers(self)
+            value = self.bad_trial_markers_;
+        end
+        
         %% Setters
         
         function set.comments_box(self, value)
@@ -1121,6 +1115,10 @@ classdef G4_conductor_view < handle
         
         function set.fig_size(self, value)
             self.fig_size_ = value;
+        end
+        
+        function set.bad_trial_markers(self, value)
+            self.bad_trial_markers_ = value; 
         end
     end
     

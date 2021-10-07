@@ -17,7 +17,11 @@ classdef feedback_model < handle
         inter_hist_left
         inter_hist_right
         inter_hist_lmr
+        cond_hist_left
+        cond_hist_right
+        cond_hist_lmr
         inter_hist_axis
+        cond_hist_axis
         inter_lmr_axis
         num_chans
         ischan1
@@ -44,13 +48,14 @@ classdef feedback_model < handle
             self.wbf_data = [];
             self.avg_wbf = 0;
             self.update_model_channels(doc);  
-            self.inter_hist_axis = 2.5:.05:7.5;
-            self.inter_lmr_axis = 2.5:.05:7.5;
+            self.inter_hist_axis = 0:.1:10;
+            self.inter_lmr_axis = 0:.1:10;
+            self.cond_hist_axis = 0:.1:10;
             self.wbf_limits{1} = [150 260];
             self.wbf_limits{2} = .25;
             self.wbf_limits{3} = 1; 
             
-            % Load processing settings to get wbf_range?
+           
             
         end
         
@@ -80,7 +85,9 @@ classdef feedback_model < handle
             self.set_avg_wbf(mean(self.wbf_data));
             
             if strcmp(trialType, 'inter')
-                self.get_wing_histograms();
+                self.get_inter_histograms();
+            else
+                self.get_cond_histograms();
             end
                 
             
@@ -91,9 +98,10 @@ classdef feedback_model < handle
            
             S = load(processing_path);
             if isfield(S, settings)
-                self.wbf_limits{1} = S.settings.wbf_range;
-                self.wbf_limits{2} = S.settings.wbf_cutoff;
-                self.wbf_limits{3} = S.settings.wbf_end_percent;
+                wbf_lim{1} = S.settings.wbf_range;
+                wbf_lim{2} = S.settings.wbf_cutoff;
+                wbf_lim{3} = S.settings.wbf_end_percent;
+                self.set_wbf_limits(wbf_lim);
                 
             end
             
@@ -107,7 +115,7 @@ classdef feedback_model < handle
             cond_flat = 0;
             
             if ~strcmp(trialType, 'inter')
-            
+                diff = [];
                 for ind = 1:length(self.lmr_data)-1
                     diff(ind) = self.lmr_data(ind + 1) - self.lmr_data(ind);
                 end
@@ -115,11 +123,11 @@ classdef feedback_model < handle
                     cond_flat = 1;
                 end
 
-                if self.avg_wbf < self.wbf_limits{1}(1)/1000
+                if self.avg_wbf < self.wbf_limits{1}(1)/100
                     bad_flier = 1;
                 end
                 
-                count_low_wbf = sum(self.wbf_data()<self.wbf_limits{1}(1)/1000);
+                count_low_wbf = sum(self.wbf_data()<self.wbf_limits{1}(1)/100);
                 if (count_low_wbf/length(self.wbf_data)) > self.wbf_limits{2}
                     bad_flier = 1;
                 end
@@ -136,85 +144,67 @@ classdef feedback_model < handle
             
         end
         
-        function  get_wing_histograms(self)
-%             
-%             minleft = min(self.l_data);
-%             maxleft = max(self.l_data);
-%             minright = min(self.r_data);
-%             maxright = max(self.r_data);
-%             minlmr = min(self.lmr_data);
-%             maxlmr = max(self.lmr_data);
-% 
-%             if minleft < minright
-%                 mintot = minleft;
-%             else
-%                mintot = minright; 
-%             end
-% 
-%             if maxleft > maxright
-%                 maxtot = maxleft;
-%             else
-%                 maxtot = maxright;
-%             end
-% 
-%             xax = mintot:(maxtot-mintot)/100:maxtot;
-%             xax_lmr = minlmr:(maxlmr-minlmr)/100:maxlmr;
-
-        %% Average the new left and right wing data with the intertrials before it
+        function get_cond_histograms(self)
+           
+            %% Combine all conditions collected so far into one array for each wing
             
-        %get the length of the longest intertrial so far
-            longest_int_left = length(self.full_streamed_intertrials{1}{2});
-            longest_int_right = length(self.full_streamed_intertrials{1}{3});
-            longest_int_lmr = length(self.full_streamed_intertrials{1}{1});
-            for int = 1:size(self.full_streamed_intertrials,2)
-                templenleft = length(self.full_streamed_intertrials{int}{2});
-                templenright = length(self.full_streamed_intertrials{int}{3});
-                templenlmr = length(self.full_streamed_intertrials{int}{1});
-                if templenleft > longest_int_left
-                    longest_int_left = templenleft;
-                end
-                if templenright > longest_int_right
-                    longest_int_right = templenright;
-                end
-                if templenlmr > longest_int_lmr
-                    longest_int_lmr = templenlmr;
-                end
+            condition_data_left = [];
+            condition_data_right = [];
+            condition_data_lmr = [];
+            
+            for trial = 1:length(self.full_streamed_conditions)
+                
+                condition_data_left = [condition_data_left self.full_streamed_conditions{trial}{2}];
+                condition_data_right = [condition_data_right self.full_streamed_conditions{trial}{3}];
+                condition_data_lmr = [condition_data_lmr self.full_streamed_conditions{trial}{1}];
             end
-        % add Nans to all shorter intertrials so that they are all the same
-        % length
-            for trial = 1:size(self.full_streamed_intertrials,2)
-                if length(self.full_streamed_intertrials{trial}{2}) < longest_int_left
-                    self.full_streamed_intertrials{trial}{2}(end+1:longest_int_left) = NaN;
-                end
-                if length(self.full_streamed_intertrials{trial}{3}) < longest_int_right
-                    self.full_streamed_intertrials{trial}{3}(end+1:longest_int_right) = NaN;
-                end
-                if length(self.full_streamed_intertrials{trial}{1}) < longest_int_lmr
-                    self.full_streamed_intertrials{trial}{1}(end+1:longest_int_lmr) = NaN;
-                end
+            
+            %% Create histogram datasets for left, right, and lmr
+            
+            lendataleft = length(condition_data_left);
+            lendataright = length(condition_data_right);
+            lendatalmr = length(condition_data_lmr);
+            count_left = [];
+            probs_left = [];
+            count_right = [];
+            probs_right = [];
+            count_lmr = [];
+            probs_lmr = [];
+            
+            for i = 1:length(self.cond_hist_axis)-1
+                count_left(i) = sum(condition_data_left()>=self.cond_hist_axis(i) & condition_data_left<=self.cond_hist_axis(i+1));
+                count_right(i) = sum(condition_data_right()>=self.cond_hist_axis(i) & condition_data_right<=self.cond_hist_axis(i+1));
+                count_lmr(i) = sum(condition_data_lmr()>=self.cond_hist_axis(i) & condition_data_lmr<=self.cond_hist_axis(i+1));
+                probs_left(i) = count_left(i)/lendataleft;
+                probs_right(i) = count_right(i)/lendataright;
+                probs_lmr(i) = count_lmr(i)/lendatalmr;
             end
+            
+            %% Set histogram data
+            
+            self.set_cond_hist_left(probs_left);
+            self.set_cond_hist_right(probs_right);
+            self.set_cond_hist_lmr(probs_lmr);
+            
+        end
         
-         % move adjusted intertrials from cell array to regular array
-         
-            for t = 1:size(self.full_streamed_intertrials,2)
-                temp_intertrials_left(t,:) = self.full_streamed_intertrials{t}{2};
-                temp_intertrials_right(t,:) = self.full_streamed_intertrials{t}{3};
-                temp_intertrials_lmr(t,:) = self.full_streamed_intertrials{t}{1};
-            end
+        function  get_inter_histograms(self)
+%             
+
+
+        %% Combine intertrial with the intertrials before it
             
-         % Average all intertrials
-         
-            intertrial_data_left = nanmean(temp_intertrials_left,1);
-            intertrial_data_right = nanmean(temp_intertrials_right,1);
-            intertrial_data_lmr = nanmean(temp_intertrials_lmr,1);
-         
-%             if length(self.l_data) ~= length(self.r_data)
-%                 disp('warning: left and right wing data are different lengths. Cannot plot both histograms.');
-%                 probs_left = [];
-%                 probs_right = [];
-%                 probs_lmr = [];
-%                 return;
-%             end
+            intertrial_data_left = [];
+            intertrial_data_right = [];
+            intertrial_data_lmr = [];
+            
+            for trial = 1:length(self.full_streamed_intertrials)
+                
+                intertrial_data_left = [intertrial_data_left self.full_streamed_intertrials{trial}{2}];
+                intertrial_data_right = [intertrial_data_right self.full_streamed_intertrials{trial}{3}];
+                intertrial_data_lmr = [intertrial_data_lmr self.full_streamed_intertrials{trial}{1}];
+                
+            end
 
 %% Create histogram datasets for left wing, right wing, and lmr data. 
             lendataleft = length(intertrial_data_left); 
@@ -315,11 +305,12 @@ classdef feedback_model < handle
                 label_idx2 = strfind(raw,'!S');
 
                 if isempty(label_idx1) && ~isempty(label_idx2)
-                    raw = raw(1:label_idx2(2)-1);
+                   
+                     raw = raw(1:label_idx2(end)-1);
                 elseif ~isempty(label_idx1) && isempty(label_idx2)
                     raw = raw(label_idx1(1) + 2:end);
                 elseif ~isempty(label_idx1) && ~isempty(label_idx2)
-                    raw = raw(label_idx1(1) + 2:label_idx2(2)-1);
+                    raw = raw(label_idx1(1) + 2:label_idx2(end)-1);
                 end
 
                 raw = mod(256 + raw, 256); %convert signed bytes to 0-255 char vals
@@ -341,25 +332,35 @@ classdef feedback_model < handle
                 %I think are some kind of delineator.
                 
                 while idx < length(raw)
+                    
                     if self.ischan1
                     %convert 2 ADC0 bytes into 8-bit voltage double (-10 to +10)
-                        chan1(end+1) = double(typecast(uint8(raw(idx:idx+1)),'int16'))/6553.5; 
+                        chan1(end+1) = double(typecast(uint8(raw(idx:idx+1)),'int16'))/3276.75; 
                         idx = idx + 2;            
                     end
-        
+
                     if self.ischan2
-                        chan2(end+1) = double(typecast(uint8(raw(idx:idx+1)),'int16'))/6553.5;
-                        idx = idx + 2;
+                        if idx < length(raw)
+                            chan2(end+1) = double(typecast(uint8(raw(idx:idx+1)),'int16'))/3276.75;
+                            idx = idx + 2;
+                        end
                     end
-        
+
+
+
                     if self.ischan3
-                        chan3(end+1) = double(typecast(uint8(raw(idx:idx+1)),'int16'))/6553.5;
-                        idx = idx + 2;
+                        if idx < length(raw)
+                            chan3(end+1) = double(typecast(uint8(raw(idx:idx+1)),'int16'))/3276.75;
+                            idx = idx + 2;
+                        end
                     end
-        
+
+
                     if self.ischan4
-                        chan4(end+1) = double(typecast(uint8(raw(idx:idx+1)),'int16'))/6553.5;
-                        idx = idx + 2;
+                        if idx < length(raw)
+                            chan4(end+1) = double(typecast(uint8(raw(idx:idx+1)),'int16'))/3276.75;
+                            idx = idx + 2;
+                        end
                     end
         
                     idx = idx + 2;
@@ -425,6 +426,21 @@ classdef feedback_model < handle
         end
         function set_inter_lmr_axis(self, input)
             self.inter_lmr_axis = input;
+        end
+        function set_cond_hist_axis(self, input)
+            self.cond_hist_axis = input;
+        end
+        function set_cond_hist_left(self, input)
+            self.cond_hist_left = input;
+        end
+        function set_cond_hist_right(self, input)
+            self.cond_hist_right = input;
+        end
+        function set_cond_hist_lmr(self, input)
+            self.cond_hist_lmr = input;
+        end
+        function set_wbf_limits(self, input)
+            self.wbf_limits = input;
         end
         
         
@@ -536,7 +552,22 @@ classdef feedback_model < handle
         function output = get_inter_lmr_axis(self)
             output = self.inter_lmr_axis;
         end
-        
+        function output = get_cond_hist_axis(self)
+            output = self.cond_hist_axis;
+        end
+        function output = get_cond_hist_left(self)
+            output = self.cond_hist_left;
+        end
+        function output = get_cond_hist_right(self)
+            output = self.cond_hist_right;
+        end
+        function output = get_cond_hist_lmr(self)
+            output = self.cond_hist_lmr;
+        end
+        function output = get_wbf_lim(self)
+            output = self.wbf_limits;
+        end
+
         
     end
     
