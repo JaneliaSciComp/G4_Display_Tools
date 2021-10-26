@@ -129,7 +129,7 @@ function process_data(exp_folder, processing_settings_file)
 %%%%%the indices for the actual condition???
     [bad_duration_conds, bad_duration_intertrials] = check_condition_durations(cond_dur, intertrial_durs, path_to_protocol);
     [bad_slope_conds] = check_flat_conditions(trial_start_times, trial_stop_times, Log, num_reps, num_conds, exp_order);
-    [bad_crossCorr_conds] = check_correlation(trial_start_times, trial_stop_times, exp_order, Log);
+    [bad_crossCorr_conds] = check_correlation(trial_start_times, trial_stop_times, exp_order, Log, cond_modes);
     [bad_WBF_conds, wbf_data] = find_bad_wbf_trials(Log, ts_data, wbf_range, wbf_cutoff, ...
     wbf_end_percent, trial_start_times, trial_stop_times, num_conds, num_reps, exp_order);
 
