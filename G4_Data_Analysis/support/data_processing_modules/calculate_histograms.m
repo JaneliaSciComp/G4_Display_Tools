@@ -21,6 +21,24 @@ function [hist_data] = calculate_histograms(da_data, hist_datatypes, Frame_ind, 
     tmpdata(~p_idx) = nan;
     hist_data(2:3,:,:,:) = nanmean(tmpdata,4); %LmR and LpR by pattern position
     
+    % At this point, for any conditions that have been thrown out (meaning
+    % all the data in them is NaNs), the frame position data has been
+    % changed from NaNs to 0's which may effect user's ability to average
+    % histograms together later. So this loop changes all lines that are
+    % entirely 0's back to NaNs. 
+    
+    for cond = 1:num_conds
+        for rep = 1:num_reps
+        
+            if sum(hist_data(1, cond, rep, :)) == 0
+                for datapt = 1:size(hist_data,4)
+                    hist_data(1, cond, rep, datapt) = NaN;
+                end
+            end
+            
+        end
+    end
+    
     %do it again but with normalized 
 
 end
