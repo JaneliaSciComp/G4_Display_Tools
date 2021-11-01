@@ -148,7 +148,14 @@ switch lower(command)
             write_error_log(command, reply.responseData);
         end
         
-
+    case 'stream_channels'
+        
+        active_channels = argument;
+        
+        reply = send_tcp( char([2 hex2dec('13') active_channels]));
+        if reply.success ~= 0
+            write_error_log(command, reply.responseData);
+        end
         
     %% three byte commands
     
@@ -158,7 +165,8 @@ switch lower(command)
 %         end
         % panel ID:  0x03, Panel_ID
         reply = send_tcp( char([3 3 dec2char(argument(1),2)]),1);
-        if reply.success ~= 0 
+       
+       if reply.success ~= 0 
             %code to execute upon fail
             write_error_log(command, reply.responseData);
         end
@@ -332,6 +340,10 @@ switch lower(command)
             %code to execute upon fail
             write_error_log(command, reply.responseData);
         end
+        
+    
+        
+        
         
     otherwise
         error('invalid command name, please check help')
