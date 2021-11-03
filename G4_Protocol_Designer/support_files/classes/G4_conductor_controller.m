@@ -1463,7 +1463,7 @@ classdef G4_conductor_controller < handle
         'pos_plot_settings', 'save_settings','comp_settings', 'gen_settings');
 
             
-            da = create_data_analysis_tool(new_settings_path, '-single', '-hist', '-tsplot', '-tcplot');
+            da = create_data_analysis_tool(new_settings_path, '-single', '-hist', '-tsplot');
 
             da.run_analysis();
             
