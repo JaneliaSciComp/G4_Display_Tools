@@ -65,10 +65,26 @@ classdef feedback_model < handle
         
         function update_model_channels(self, doc)
             
-            self.ischan1 = doc.is_chan1;
-            self.ischan2 = doc.is_chan2;
-            self.ischan3 = doc.is_chan3;
-            self.ischan4 = doc.is_chan4;
+            if doc.chan1_rate ~= 0
+                self.ischan1 = 1;
+            else
+                self.ischan1 = 0;
+            end
+            if doc.chan2_rate ~= 0
+                self.ischan2 = 1;
+            else
+                self.ischan2 = 0;
+            end
+            if doc.chan3_rate ~= 0
+                self.ischan3 = 1;
+            else
+                self.ischan3 = 0;
+            end
+            if doc.chan4_rate ~= 0
+                self.ischan4 = 1;
+            else
+                self.ischan4 = 0;
+            end
             self.num_chans = self.calc_num_chans();
             
         end
