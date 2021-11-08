@@ -109,7 +109,7 @@ The conditions make up the majority of your experiment. Other parameters include
 
 ## How to create conditions
 
-This section will describe in detail how to create an experiment, but if you would like more detailed instructions or run into issues not addressed in this section, please see these tutorials on [creating a condition](tut_prot_create-condition.md) and [creating an experiment](../docs/experiment_tutorial.md).
+This section will describe in detail how to create an experiment, but if you would like more detailed instructions or run into issues not addressed in this section, please see these tutorials on [creating a condition](tut_prot_create-condition.md) and [creating an experiment](tut_prot_experiment.md).
 
 You can start creating conditions using the files imported in the previous step. The easiest starting point is to hit the *Auto-Fill*{:.gui-btn} button. This will create a block trial for every pattern imported, as well as create a pre-trial, inter-trial, and post-trial using the first pattern. Each trial will default to mode 1 and automatically pair a position function and one analog output function to each pattern (if they exist). Durations default to double the length of the position function. Hitting *Auto-Fill*{:.gui-btn} will produce something like this:
 
@@ -233,7 +233,7 @@ This pretty much covers the G4 Designer's features and how to use them. However,
 - [This tutorial on how to set up your Protocol Designer settings](tut_prot_configure-settings.md)
 - [This tutorial on how to set up your metadata Google Sheets](tut_prot_googlesheets-settings.md)
 - [This tutorial on how to create a single condition](tut_prot_create-condition.md)
-- [This tutorial on how to create a full experiment](../docs/experiment_tutorial.md)
+- [This tutorial on how to create a full experiment](tut_prot_experiment.md)
 - [This tutorial on how to use the arena without the Designer](../docs/run_protocol_tutorial.md)
 
 ## Trouble-shooting

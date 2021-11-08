@@ -6,7 +6,7 @@ nav_order: 5
 
 ---
 
-# Prerequistes
+# Prerequisites
 
 - [G4 Software Setup](G4_Software_Setup.md)
 - You must have created and saved all patterns needed for the experiment using the [G4 Pattern Generator](About_Pattern_Generator.md)
@@ -56,7 +56,7 @@ Hit *Delete Trial*{:.gui-btn} and your three selected conditions will be removed
 
 Now none of your conditions are selected. Without selecting any, click *Add Trial*{:.gui-btn} again. It still works. The new condition added to the end of the block is a copy of the last condition in the block. Delete, Shift up, and Shift down, however, do not work without at least one trial selected.
 
-Last is the *Invert Selection*{:.gui-btn} button. Select a couple, but not all, of your block trials and click invert selection. It will automatically un-select all of your selected trials and select all of your un-selected ones. This can be very handy if your experiment contains two different types of condition and you want to apply some change to all of them at once. You have to select all conditions of one type by hand the first time, but afteward you can use the invert selection button to change your selection to the other type. In other scenarios, you may not use this feature much.
+Last is the *Invert Selection*{:.gui-btn} button. Select a couple, but not all, of your block trials and click invert selection. It will automatically un-select all of your selected trials and select all of your un-selected ones. This can be very handy if your experiment contains two different types of condition and you want to apply some change to all of them at once. You have to select all conditions of one type by hand the first time, but afterward you can use the invert selection button to change your selection to the other type. In other scenarios, you may not use this feature much.
 
 # Pre, Inter, and Post-trial conditions
 
