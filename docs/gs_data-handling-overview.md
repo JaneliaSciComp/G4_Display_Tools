@@ -105,7 +105,7 @@ The protocol folder refers to the folder which contains your .g4p file as well a
 
 To have the Conductor then run this data analysis automatically, simply check the "Plotting" checkbox and provide a path to the settings file you've just created. If you want to run it yourself, later, you will run a command from the MATLAB command window that looks like this:
 
-```MATLAB
+```matlab
 da = create_data_analysis_tool('path to settings file', -flags)
 da.run_analysis
 ```

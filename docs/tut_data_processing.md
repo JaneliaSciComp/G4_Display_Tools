@@ -19,7 +19,7 @@ After opening `create_processing_settings.m` you will go through the file and ch
 
 `settings_file_path` is, by default, set equal to a string. Don't worry if you don't know what that means. Simply replace the filepath there with the filepath where you want your settings file to be saved. Include the name of the settings file (no extension), and be sure to leave the path inside the single quotation marks. For example, it should look something like this:
 
-```MATLAB
+```matlab
 settings_file_path = '/Users/username/Documents/experiment_folder/processing_settings';
 ```
 
@@ -29,7 +29,7 @@ settings_file_path = '/Users/username/Documents/experiment_folder/processing_set
 
 `trial_options` should be set equal to a 1×3 array of 1's and 0's. They represent the presence or absence of a pre-trial, inter-trial, and post-trial. For example, an experiment containing a pre-trial and post-trial, but no inter-trial, would look like this:
 
-```MATLAB
+```matlab
 settings.trial_options = [1 0 1];
 ```
 
@@ -178,7 +178,7 @@ You may leave `condition_pairs` empty, like this:
 
 If your experiment is not set up this way, where symmetrical conditions are right next to each other, then you will need to manually define which conditions should be flipped and averaged together. That will look something like this:
 
-```MATLAB
+```matlab
 settings.condition_pairs{1} = [1 6];
 settings.condition_pairs{2} = [2 5];
 settings.condition_pairs{3} = [3 8];
@@ -235,7 +235,7 @@ Once processing has been done, you will end up with a new .mat file in your fly 
 
 The first five variables you will see are:
 
-```MATLAB
+```matlab
 bad_crossCorr_conds
 bad_duration_conds
 bad_duration_intertrials
@@ -253,7 +253,7 @@ As you might guess, these variables hold the condition and repetition numbers of
 
 Next you have four variables relating to flipped and averaged data, assuming faLmR was enabled in your settings. If it was not, then you will not have these variables, or they will be empty. They are:
 
-```MATLAB
+```matlab
 faLmR_avg_over_reps
 faLmR_avg_reps_norm
 faLmR_timeseries
@@ -270,7 +270,7 @@ Note that we tried to keep this naming scheme the same for different datatypes (
 
 Next are four variables, similar to faLmR but containing LmR and LpR data:
 
-```MATLAB
+```matlab
 LmR_avg_over_reps
 LmR_avg_reps_norm
 LpR_avg_over_reps

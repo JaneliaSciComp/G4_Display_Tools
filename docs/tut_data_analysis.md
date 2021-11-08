@@ -45,7 +45,7 @@ We have tried to place all the settings that are regularly changed first in the 
 
 Notice that we have tried to leave examples of each setting commented out. Rather than typing any code, you may just be able to uncomment the line which most closely matches your need then replace the actual values of the variable. Make sure if you do this, you comment out any other lines setting the same variable. For example, at approximately lines 25-30 you'll see this:
 
-```MATLAB
+```matlab
 %    exp_settings.field_values = {};
 exp_settings.field_values{1} = ["metadata_field_value_1"];
 %    exp_settings.field_values{2} = ["metadata_field_value_2"];
@@ -55,7 +55,7 @@ exp_settings.field_values{1} = ["metadata_field_value_1"];
 
 In this case, all lines are commented out except for the second. If you wanted to leave this variable empty, you would simply type a `%` at the beginning of line 2 and remove the `%` at the beginning of line 1, creating this:  
 
-```MATLAB
+```matlab
 exp_settings.field_values = {};
 %    exp_settings.field_values{1} = ["metadata_field_value_1"];
 %    exp_settings.field_values{2} = ["metadata_field_value_2"];
@@ -65,7 +65,7 @@ exp_settings.field_values = {};
 
 Alternatively, you may have more than one metadata field by which to sort your data (see the below section on Field Values for an explanation of what this setting does). In that case you would comment out line 1 and uncomment lines 1-4 (or however many you need)  
 
-```MATLAB
+```matlab
 %    exp_settings.field_values = {};
 exp_settings.field_values{1} = ["metadata_field_value_1"];
 exp_settings.field_values{2} = ["metadata_field_value_2"];
@@ -85,8 +85,9 @@ Following is an explanation of each variable and what it does.
 
 Example:  
 
-```MATLAB
-exp_settings.path_to_processing_settings = '/Users/username/experiment_folder/processing_settings.mat';
+```matlab
+exp_settings.path_to_processing_settings = ...
+        '/Users/username/experiment_folder/processing_settings.mat';
 ```
 
 **NOTE** This path is used to get information from your processing settings, including the path to your protocol folder. This folder must be organized in a certain way for data analysis to work correctly. If you've maintained the default organization created when you run a fly through an experiment using the G4 Conductor, then you won't have to worry about this, but if you have manually changed the organization of your folder, you should ensure that your fly folders are two levels below your protocol folder. i.e. your folder's hierarchy should be `protocol_folder` → `subfolders` → `fly folders` → `individual fly data`. If there are more or fewer levels than this, you may get a browse window during the analysis run wanting you to browse to the protocol folder, or you could get errors.  
@@ -97,8 +98,9 @@ exp_settings.path_to_processing_settings = '/Users/username/experiment_folder/pr
 
 Example:
 
-```MATLAB
-save_settings.save_path = '/Users/username/experiment_folder/fly_folder/analysis';
+```matlab
+save_settings.save_path = ...
+        '/Users/username/experiment_folder/fly_folder/analysis';
 ```
 
 ### Report Path
@@ -107,7 +109,7 @@ The results of your data analysis will be summarized in a final pdf report which
 
 Example:
 
-```MATLAB
+```matlab
 save_settings.report_path = '/Users/username/experiment_folder/group_folder/group_analysis_report.pdf';
 ```
 
@@ -130,7 +132,7 @@ Now imagine you want to have two groups of flies. One group will be all flies th
 
 Example 3:  
 
-```MATLAB
+```matlab
 exp_settings.field_to_sort_by{1} = ["fly_genotype"];
 exp_settings.field_to_sort_by{2} = ["fly_genotype", "experimenter"];
 ```
@@ -141,7 +143,7 @@ exp_settings.field_to_sort_by{2} = ["fly_genotype", "experimenter"];
 
 Example1:  
 
-```MATLAB
+```matlab
 field_values{1} = ["genotype_1"];
 ```
 
@@ -149,7 +151,7 @@ The values you give here must match exactly the values in the `metadata.mat` fil
   
 Example 2:
 
-```MATLAB
+```matlab
 exp_settings.field_values{1} = ["genotype_1", "3-6 days"];
 ```
 
@@ -157,7 +159,7 @@ All flies of both this genotype AND this age will be put in a single group. Note
 
 Example 3:
 
-```MATLAB
+```matlab
 exp_settings.field_values{1} = ["genotype_1"];
 exp_settings.field_values{2} = ["genotype_1", "taylorl"];
 ```
@@ -166,7 +168,7 @@ Will produce two groups of files to compare – first group has all flies of tha
 
 Please note that if you want multiple groups, even if each group is only determined by genotype, then you must have that many groups defined in field_to_sort_by AND field_values. So for example, if you have four different genotypes you want to plot against each other, these two variables together would look like this:
 
-```MATLAB
+```matlab
 exp_settings.field_to_sort_by{1} = ["fly_genotype"];
 exp_settings.field_to_sort_by{2} = ["fly_genotype"];
 exp_settings.field_to_sort_by{3} = ["fly_genotype"];
@@ -188,7 +190,7 @@ Set `exp_settings.single_group` to 1 if you only want to plot a single group, 0 
 
 Example:
 
-```MATLAB
+```matlab
 exp_settings.single_group = 0;
 ```
 
@@ -209,8 +211,9 @@ Example:
 
 Example:
 
-```MATLAB
-exp_settings.control_genotype = 'genotype1';` or `exp_settings.control_genotype = '';
+```matlab
+exp_settings.control_genotype = 'genotype1';  % or 
+exp_settings.control_genotype = '';
 ```
 
 ### Genotypes
@@ -219,7 +222,7 @@ exp_settings.control_genotype = 'genotype1';` or `exp_settings.control_genotype 
 
 Example for two groups being compared to a third control group:
 
-```MATLAB
+```matlab
 exp_settings.genotypes = ["Control_genotype", "Genotype2", "Genotype3"];
 ```
 
@@ -231,7 +234,7 @@ exp_settings.genotypes = ["Control_genotype", "Genotype2", "Genotype3"];
   
 Example:
 
-```MATLAB
+```matlab
 exp_settings.plot_norm_and_unnorm = 1;
 ```
 
@@ -241,7 +244,7 @@ exp_settings.plot_norm_and_unnorm = 1;
 
 Example:
 
-```MATLAB
+```matlab
 exp_settings.group_being_analyzed_name = 'Protocol 1 all genotypes';
 ```
 
@@ -251,7 +254,7 @@ exp_settings.group_being_analyzed_name = 'Protocol 1 all genotypes';
 
 Example:
 
-```MATLAB
+```matlab
 histogram_annotation_settings.annotation_text = "important text for histogram"; % or 
 histogram_annotation_settings.annotation_text = "";
 ```
@@ -270,7 +273,7 @@ The datatype options for walking data are: 'Vx0_chan', 'Vx1_chan', 'Vy0_chan', '
 
 Example (Note the use of single quotes, curly brackets, and the comma. Capitalization DOES matter.):
 
-```MATLAB
+```matlab
 timeseries_plot_settings.OL_datatypes = {'LmR', 'faLmR'};
 ```
 
@@ -282,7 +285,7 @@ To layout the figures yourself, you will make OL_TS_conds a cell array, with eac
 
 Example:
 
-```MATLAB
+```matlab
 timeseries_plot_settings.OL_TS_conds{1} = [1 3 5 7; 9 11 13 15];
 timeseries_plot_settings.OL_TS_conds{2} = [17 19; 21 23; 25 27; 29 31];
 ```
@@ -311,7 +314,7 @@ In this way, you can plot any condition in any position on the figure. They do n
 
 Example (The durations array corresponding to the above OL_TS_conds array might look something like this):
 
-```MATLAB
+```matlab
 timeseries_plot_settings.OL_TS_durations{1} = [1.5 3.12 1.5 3.12; 1.5 3.12 1.5 3.12]
 timeseries_plot_settings.OL_TS_durations{2} = [1 3; 1 3; 1 3; 1 3];
 ```
@@ -327,9 +330,15 @@ If you left `OL_TS_conds` empty, leave this array empty as well (`timeseries_plo
 Example:
 The title array corresponding to the above conditions and durations example might be:
 
-```MATLAB
-timeseries_plot_settings.cond_name{1} = ["Condition 1", "Condition 3", "Condition 5", "Condition 7"; "Condition 9", "Condition 11", "Condition 13", "Condition 15"]
-timeseries_plot_settings.cond_name{2} = ["Condition 17", "Condition 19"; "Condition 21", "Condition 23"; "Condition 25", "Condition 27"; "Condition 29", "Condition 31"]
+```matlab
+timeseries_plot_settings.cond_name{1} = ...
+        ["Condition 1", "Condition 3", "Condition 5", ...
+        "Condition 7"; "Condition 9", "Condition 11", ...
+        "Condition 13", "Condition 15"]
+timeseries_plot_settings.cond_name{2} = ...
+        ["Condition 17", "Condition 19"; "Condition 21", ...
+        "Condition 23"; "Condition 25", "Condition 27"; ...
+        "Condition 29", "Condition 31"]
 ```
 
 ### Axis Labels
@@ -339,13 +348,13 @@ timeseries_plot_settings.cond_name{2} = ["Condition 17", "Condition 19"; "Condit
 Example:  
 To match the above timeseries examples, it would look like this:
 
-```MATLAB
+```matlab
 timeseries_plot_settings.axis_labels{1} = ["Time(sec)", "LmR"];
 ```
 
 Because we are only plotting one datatype, LmR. If we were plotting both LmR and LpR, it would look like this:
 
-```MATLAB
+```matlab
 timeseries_plot_settings.axis_labels{1} = ["Time(sec)", "LmR"];
 timeseries-plot_settings.axis_labels{2} = ["Time(sec)", "LpR"];
 ```
@@ -357,13 +366,13 @@ timeseries-plot_settings.axis_labels{2} = ["Time(sec)", "LpR"];
 Example:
 In the previous timeseries examples, we have been plotting one datatype (LmR) and splitting the plots up between two different figures. In this case, the corresponding `subplot_figure_title` variable would look like this:
 
-```MATLAB
+```matlab
 timeseries_plot_settings.subplot_figure_title{1} = ["LmR Figure 1 Title", "LmR Figure 2 title"];
 ```
 
 If we were plotting two datatypes, LmR and LpR, it would look like this:
 
-```MATLAB
+```matlab
 timeseries_plot_settings.subplot_figure_title{1} = ["LmR Figure 1 Title", "LmR Figure 2 title"];
 timeseries_plot_settings.subplot_figure_title{2} = ["LpR Figure 1 Title", "LpR Figure 2 title"];
 ```
@@ -390,7 +399,7 @@ If we were plotting two datatypes instead, LmR and LpR, with each being split ac
 
 Example:
 
-```MATLAB
+```matlab
 timeseries_plot_settings.pattern_motion_indicator = 0;
 ```
 
@@ -401,7 +410,7 @@ This setting has not actually been implemented as of 8/4/2021 but will be in the
 Example:
 corresponding with the `OL_TS_conds` example above:
 
-```MATLAB
+```matlab
 timeseries_plot_settings.other_indicators{1} = [1 2 1 2; 1 2 1 2];
 timeseries_plot_settings.other_indicators{2} = [1 0; 1 0; 2 0; 2 0];
 ```
@@ -421,7 +430,7 @@ Example:
 
 Example:
 
-```MATLAB
+```matlab
 timeseries_plot_settings.show_individual_flies = 0;
 ```
 
@@ -431,7 +440,7 @@ timeseries_plot_settings.show_individual_flies = 0;
 
 Example:
 
-```MATLAB
+```matlab
 timeseries_plot_settings.show_individual_reps = 1;
 ```
 
@@ -441,7 +450,7 @@ timeseries_plot_settings.show_individual_reps = 1;
 
 Example:
 
-```MATLAB
+```matlab
 timeseries_plot_settings.frame_superimpose = 0;
 ```
 
@@ -451,7 +460,7 @@ timeseries_plot_settings.frame_superimpose = 0;
 
 Example:
 
-```MATLAB
+```matlab
 timeseries_plot_settings.plot_both_directions = 1;
 ```
 
@@ -464,7 +473,7 @@ timeseries_plot_settings.plot_both_directions = 1;
 
 Example:
 
-```MATLAB
+```matlab
 timeseries_plot_settings.opposing_condition_pairs{1} = [1 6];
 timeseries_plot_settings.opposing_condition_pairs{2} = [2 5];
 timeseries_plot_settings.opposing_condition_pairs{3} = [3 8];
@@ -487,7 +496,7 @@ In `opposing_condition_pairs` you provide the condition number of each condition
 
 If your processing settings shows the following as your condition pairs:
 
-```MATLAB
+```matlab
 settings.condition_pairs{1} = [1 6];
 settings.condition_pairs{2} = [2 5];
 settings.condition_pairs{3} = [3 8];
@@ -500,16 +509,18 @@ settings.condition_pairs{8} = [12 11];
 
 Then  your `timeseries_plot_settings.faLmR_pairs` might look like:
 
-`timeseries_plot_settings.faLmR_pairs{1} = [1 2];`  
-`timeseries_plot_settings.faLmR_pairs{2} = [3 4];`  
-`timeseries_plot_settings.faLmR_pairs{3} = [5 6];`  
-`timeseries_plot_settings.faLmR_pairs{4} = [7 8];`  
+```matlab
+timeseries_plot_settings.faLmR_pairs{1} = [1 2];
+timeseries_plot_settings.faLmR_pairs{2} = [3 4];
+timeseries_plot_settings.faLmR_pairs{3} = [5 6];
+timeseries_plot_settings.faLmR_pairs{4} = [7 8];
+```
 
 Meaning that the first axis will plot the flipped and averaged data of conditions 1 and 6 and the flipped and averaged data of conditions 2 and 5 together. These two pairs are now pairs 1 and 2. The second row indicates that pairs 3 ([3 8]) and 4 ([4 7]) will be plotted on the same axis etc…
 
 If you do not wish to plot multiple faLmR datasets on the same axis, or are not using faLmR, simply leave this variable empty:
 
-```MATLAB
+```matlab
 timeseries_plot_settings.faLmR_pairs = [];
 ```
 
@@ -523,7 +534,7 @@ timeseries_plot_settings.faLmR_pairs = [];
 
 Example:
 
-```MATLAB
+```matlab
 timeseries_plot_settings.faLmR_conds{1} = [1 2; 3 4];
 timeseries_plot_settings.faLmR_conds{2} = [5 6; 7 8];
 ```
@@ -540,7 +551,7 @@ Indicates there will be two figures of 2 rows and 2 columns each. The first will
 
 Example (Would go along with the faLmR_conds example above):
 
-```MATLAB
+```matlab
 timeseries_plot_settings.faLmR_subplot_figure_titles = ["Conds 1-4", "Conds 5-8"];
 ```
 
@@ -550,7 +561,7 @@ timeseries_plot_settings.faLmR_subplot_figure_titles = ["Conds 1-4", "Conds 5-8"
 
 Example (Would go along with the examples above):
 
-```MATLAB
+```matlab
 timeseries_plot_settings.faLmR_cond_name{1} = ["Pair 1", "Pair 2"; "Pair 3", "Pair 4"];
 timeseries_plot_settings.faLmR_cond_name{2} = ["Pair 5", "Pair 6"; "Pair 7", "Pair 8"];
 ```
@@ -563,7 +574,7 @@ timeseries_plot_settings.faLmR_cond_name{2} = ["Pair 5", "Pair 6"; "Pair 7", "Pa
 
 Example:
 
-```MATLAB
+```matlab
 CL_hist_plot_settings.CL_datatypes = {'Frame Position'};
 ```
 
@@ -591,11 +602,15 @@ OL_TC_conds{fig #}{row #} = [condition #'s on first tuning curve; condition #'s 
 
 Example:
 
-```MATLAB
-TC_plot_settings.OL_TC_conds{1}{1} = [1 3 5 7; 9 11 13 15; 17 19 21 23];
-TC_plot_settings.OL_TC_conds{1}{2} = [25 27 29 31; 33 35 37 39; 41 43 45 47];
-TC_plot_settings.OL_TC_conds{2}{1} = [2 4 6 8; 10 12 14 16; 18 20 22 24];
-TC_plot_settings.OL_TC_conds{2}{2} = [26 28 30 32; 34 36 38 40; 42 44 46 48];
+```matlab
+TC_plot_settings.OL_TC_conds{1}{1} = ...
+        [1 3 5 7; 9 11 13 15; 17 19 21 23];
+TC_plot_settings.OL_TC_conds{1}{2} = ...
+        [25 27 29 31; 33 35 37 39; 41 43 45 47];
+TC_plot_settings.OL_TC_conds{2}{1} = ...
+        [2 4 6 8; 10 12 14 16; 18 20 22 24];
+TC_plot_settings.OL_TC_conds{2}{2} = ...
+        [26 28 30 32; 34 36 38 40; 42 44 46 48];
 ```
 
 The above code creates two figures, each with two rows. The first figure is laid out as below:
@@ -611,9 +626,13 @@ The above code creates two figures, each with two rows. The first figure is laid
 
 Example:
 
-```MATLAB
-TC_plot_settings.cond_name{1} = ["Conds 1-7", "Conds 9-15", "Conds 17-23"; "Conds 25-31", "Conds 33-39", "Conds 41-47"];
-TC_plot_settings.cond_name{2} = ["Conds 2-8", "Conds 10-16", "Conds 18-24"; "Conds 26-32", "Conds 34-40", "Conds 42-48"];
+```matlab
+TC_plot_settings.cond_name{1} = ...
+        ["Conds 1-7", "Conds 9-15", "Conds 17-23"; ...
+        "Conds 25-31", "Conds 33-39", "Conds 41-47"];
+TC_plot_settings.cond_name{2} = ...
+        ["Conds 2-8", "Conds 10-16", "Conds 18-24"; ...
+        "Conds 26-32", "Conds 34-40", "Conds 42-48"];
 ```
 
 This would go with the above example. Notice we are back to a one dimensional cell array where the cell element represents the figure number, and a semi-colon indicates moving to the next row.
@@ -624,7 +643,7 @@ This would go with the above example. Notice we are back to a one dimensional ce
 
 Example (This would go along with the above example. Each tuning curve contains four conditions, each one played at 1, 10, 100, or 1000 Hz):
 
-```MATLAB
+```matlab
 TC_plot_settings.xaxis_values = [1, 10, 100, 1000];
 ```
 
@@ -668,7 +687,7 @@ One type of plot you can generate are Motion-Dependent (M) and Position-Dependen
 
 Example:
 
-```MATLAB
+```matlab
 MP_plot_settings.xaxis = [1:192];
 ```
 
@@ -678,8 +697,9 @@ Sometimes you might not want to plot your data against the straight frame number
 
 Example:
 
-```MATLAB
-MP_plot_settings.new_xaxis = circshift((360/MP_plot_settings.xaxis(end))*[(MP_plot_settings.xaxis) - 96], 96);
+```matlab
+MP_plot_settings.new_xaxis = ...
+        circshift((360/MP_plot_settings.xaxis(end))*[(MP_plot_settings.xaxis) - 96], 96);
 ```
 
 If you don't wish to apply any conversion to your x-axis, simply leave this setting empty (`MP_plot_settings.new_xaxis = [];`).
@@ -690,7 +710,7 @@ If you don't wish to apply any conversion to your x-axis, simply leave this sett
 
 Example:
 
-```MATLAB
+```matlab
 MP_plot_settings.axis_labels{1} = ["Frame Position", "Motion-Dependent Response"];
 MP_plot_settings.axis_labels{2} = ["Frame Position", "Position-Dependent Response"];
 ```
@@ -701,7 +721,7 @@ MP_plot_settings.axis_labels{2} = ["Frame Position", "Position-Dependent Respons
 
 Example:
 
-```MATLAB
+```matlab
 MP_plot_settings.ylimits = [-10 10; 0 20];
 MP_plot_settings.xlimits = [1 192; 1 192];
 ```
@@ -718,7 +738,7 @@ By default our lab leaves these values empty (`MP_plot_settings.ylimits = [];`).
 
 Example:
 
-```MATLAB
+```matlab
 MP_plot_settings.figure_names = ["M", "P"];
 ```
 
@@ -748,8 +768,9 @@ In this case, "averaged position series" just refers to regular position series 
 
 Like the [M and P settings](#m-and-p-conversion-applied-to-x-axis) above, `pos_plot_settings.new_xaxis` can be set equal to an equation you'd like applied to your x-axis values, if you'd like to convert them from straight frame position to something else like angular position. It can also be left empty. Ours is generally set exactly the same way as the M and P version:
 
-```MATLAB
-pos_plot_settings.new_xaxis = circshift((360/MP_plot_settings.xaxis(end))*[(MP_plot_settings.xaxis) - 96], 96);
+```matlab
+pos_plot_settings.new_xaxis = ...
+        circshift((360/MP_plot_settings.xaxis(end))*[(MP_plot_settings.xaxis) - 96], 96);
 ```
 
 ### Position series axis labels
@@ -758,7 +779,7 @@ pos_plot_settings.new_xaxis = circshift((360/MP_plot_settings.xaxis(end))*[(MP_p
 
 Example:
 
-```MATLAB
+```matlab
 pos_plot_settings.axis_labels = ["Position", "Volts"];
 ```
 
@@ -768,7 +789,7 @@ pos_plot_settings.axis_labels = ["Position", "Volts"];
 
 Example:
 
-```MATLAB
+```matlab
 pos_plot_settings.ylimits = [-10 10];
 pos_plot_settings.xlimits = [1 192];
 ```
@@ -779,7 +800,7 @@ pos_plot_settings.xlimits = [1 192];
 
 Example:
 
-```MATLAB
+```matlab
 pos_plot_settings.figure_names = ["Position Series"];
 ```
 
@@ -789,7 +810,7 @@ pos_plot_settings.figure_names = ["Position Series"];
 
 Example (If your pos_conds setting splits your conditions among two figures):
 
-```MATLAB
+```matlab
 pos_plot_settings.subplot_figure_title = ["Pos Series Conds 1-15"; Pos Series Conds 17-31"];
 ```
 
@@ -829,7 +850,7 @@ We recommend choosing no more than four for a comparison plot for ease of readin
 
 Example (This means each row in the comparison figure will contain these plots, in this order, for a particular condition):
 
-```MATLAB
+```matlab
 comp_settings.plot_order = {'LmR', 'pos', 'M', 'P'};
 ```
 
@@ -841,7 +862,7 @@ You may leave this empty (`comp_settings.plot_order = {};`). If you do, and requ
 
 Example:
 
-```MATLAB
+```matlab
 comp_settings.conditions = [1,3,5,7,9,11,13,17,19,21,23,25,27,29,31];
 ```
 
@@ -851,18 +872,26 @@ comp_settings.conditions = [1,3,5,7,9,11,13,17,19,21,23,25,27,29,31];
 
 Example - Assuming the default plot order, the conditions in the example above being included, and four rows per figure:
 
-```MATLAB
-comp_settings.cond_name{1} = ["Cond1 LmR", "Cond1 Pos Series", "Cond1 M", "Cond1 P";...
-        "Cond3 LmR", "Cond3 Pos Series", "Cond3 M", "Cond3 P"; "Cond5 LmR", "Cond5 Pos Series", "Cond5 M", "Cond5 P";...
+```matlab
+comp_settings.cond_name{1} = ...
+        ["Cond1 LmR", "Cond1 Pos Series", "Cond1 M", "Cond1 P";...
+        "Cond3 LmR", "Cond3 Pos Series", "Cond3 M", "Cond3 P"; ...
+        "Cond5 LmR", "Cond5 Pos Series", "Cond5 M", "Cond5 P";...
         "Cond7 LmR", "Cond7 Pos Series", "Cond7 M", "Cond7 P"];
-comp_settings.cond_name{2} = ["Cond9 LmR", "Cond9 Pos Series", "Cond9 M", "Cond9 P";...
-        "Cond11 LmR", "Cond11 Pos Series", "Cond11 M", "Cond11 P"; "Cond13 LmR", "Cond13 Pos Series", "Cond13 M", "Cond13 P";...
+comp_settings.cond_name{2} = ...
+        ["Cond9 LmR", "Cond9 Pos Series", "Cond9 M", "Cond9 P";...
+        "Cond11 LmR", "Cond11 Pos Series", "Cond11 M", "Cond11 P"; ...
+        "Cond13 LmR", "Cond13 Pos Series", "Cond13 M", "Cond13 P";...
         "Cond15 LmR", "Cond15 Pos Series", "Cond15 M", "Cond15 P"];
-comp_settings.cond_name{3} = ["Cond17 LmR", "Cond17 Pos Series", "Cond17 M", "Cond17 P";...
-        "Cond19 LmR", "Cond19 Pos Series", "Cond19 M", "Cond19 P"; "Cond21 LmR", "Cond21 Pos Series", "Cond21 M", "Cond21 P";...
+comp_settings.cond_name{3} = ...
+        ["Cond17 LmR", "Cond17 Pos Series", "Cond17 M", "Cond17 P";...
+        "Cond19 LmR", "Cond19 Pos Series", "Cond19 M", "Cond19 P"; ...
+        "Cond21 LmR", "Cond21 Pos Series", "Cond21 M", "Cond21 P";...
         "Cond23 LmR", "Cond23 Pos Series", "Cond23 M", "Cond23 P"];
-comp_settings.cond_name{4} = ["Cond25 LmR", "Cond25 Pos Series", "Cond25 M", "Cond25 P"; ...
-        "Cond27 LmR", "Cond27 Pos Series", "Cond27 M", "Cond27 P"; "Cond29 LmR", "Cond29 Pos Series", "Cond29 M", "Cond29 P";...
+comp_settings.cond_name{4} = ...
+        ["Cond25 LmR", "Cond25 Pos Series", "Cond25 M", "Cond25 P"; ...
+        "Cond27 LmR", "Cond27 Pos Series", "Cond27 M", "Cond27 P"; ...
+        "Cond29 LmR", "Cond29 Pos Series", "Cond29 M", "Cond29 P";...
         "Cond31 LmR", "Cond31 Pos Series", "Cond31 M", "Cond31 P"];
 ```
 
@@ -872,7 +901,7 @@ comp_settings.cond_name{4} = ["Cond25 LmR", "Cond25 Pos Series", "Cond25 M", "Co
 
 Example:
 
-```MATLAB
+```matlab
 comp_settings.rows_per_fig = 4;
 ```
 
@@ -882,7 +911,7 @@ comp_settings.rows_per_fig = 4;
 
 Example:
 
-```MATLAB
+```matlab
 comp_settings.ylimits = [0 0];
 ```
 
@@ -892,8 +921,12 @@ Like previous plot types, you can use `comp_settings.subplot_figure_title` to pr
 
 Example (continuing on the above example):
 
-```MATLAB
-comp_settings.subplot_figure_title = {'LmR, Pos, M, P 1-7', 'LmR, Pos, M, P 9-15', 'LmR, Pos M, P 17-23', 'LmR, Pos, M, P 25-31'};
+```matlab
+comp_settings.subplot_figure_title = ...
+        {'LmR, Pos, M, P 1-7', ...
+         'LmR, Pos, M, P 9-15', ...
+         'LmR, Pos M, P 17-23', ...
+         'LmR, Pos, M, P 25-31'};
 ```
 
 ### Comparison figure names
@@ -902,8 +935,9 @@ Unlike previous figure names settings, with `comp_settings.figure_names` you wil
 
 Continuing the last example:
 
-```MATLAB
-comp_settings.figure_names = {'Comparison1-7', 'Comparison9-15', 'Comparison17-23', 'Comparison25-31'};
+```matlab
+comp_settings.figure_names = ...
+        {'Comparison1-7', 'Comparison9-15', 'Comparison17-23', 'Comparison25-31'};
 ```
 
 ### Comparison plot normalization
@@ -932,7 +966,7 @@ Now you are ready to run an analysis!
 
 There are two steps to running data analysis – the first is to run the file `create_data_analysis_tool.m.` This is not a regular script or function, so opening the file and hitting run in the MATLAB environment will not work. It is a class and when you run it, it creates an object. You should run it from the MATLAB command window. Here's an example:
 
-```MATLAB
+```matlab
 da = create_data_analysis_tool('path to the settings file', '-group', '-hist', '-tsplot');
 ```
 
@@ -959,9 +993,11 @@ It is not likely you will want to update variables this way – it would be easi
 
 Once you know there are no adjustments to be made, simply type in the command `da.run_analysis`, and this will start the analysis running. Assuming no adjustments after creating your data analysis tool, your command will look something like this:
 
-```MATLAB
-Create_settings_file(filename, filepath)  % If you were creating a new settings file, rather than using an existing one  
-da = create_data_analysis_tool(path_to_settings, '-group', '-hist', '-TSplot', '-tcplot');
+```matlab
+Create_settings_file(filename, filepath)  ...
+        % If you were creating a new settings file, rather than using an existing one  
+da = create_data_analysis_tool(...
+        path_to_settings, '-group', '-hist', '-TSplot', '-tcplot');
 da.run_analysis
 ```
 
