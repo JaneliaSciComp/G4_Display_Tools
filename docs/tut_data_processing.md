@@ -309,4 +309,4 @@ If you are interested in the code which actually runs the data processing, it is
 
 *Please do not edit or alter this code in any way unless you are very confident in your changes. Alterations to one function can have impacts on any other code that uses that function!*
 
-Now that your data processing is set up and you know what to expect out of it, you can move on to [data analysis](Data_analysis_documentation.md). There, you will create settings dictating what types of plots you want to be automatically generated, using the processed datasets, after an experiment runs. You can also set up analysis settings to quickly generate plots for groups of flies later.
+Now that your data processing is set up and you know what to expect out of it, you can move on to [data analysis](tut_data_analysis.md). There, you will create settings dictating what types of plots you want to be automatically generated, using the processed datasets, after an experiment runs. You can also set up analysis settings to quickly generate plots for groups of flies later.

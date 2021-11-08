@@ -51,7 +51,7 @@ The first field in the settings panel reads *Configuration file location:*{:.gui
 
 The next three fields are paths to your default run protocol file, processing file, and plotting file. A default run protocol is provided with the G4 software, but if you'd like to learn exactly what the run protocol does and how to create your own, please see the tutorial [Create a Run Protocol](tut_cond_run-protocol.md).
 
-Plotting and Processing refers to settings files dictating how you want your experimental data to be handled after the experiment. If you have not created these settings files, please see [Data Analysis](Data_analysis_documentation.md).
+Plotting and Processing refers to settings files dictating how you want your experimental data to be handled after the experiment. If you have not created these settings files, please see [Data Analysis](tut_data_analysis.md).
 
 Assuming you want to use the default run protocol, this field should read `G4_Display_Tools\G4_Protocol_Designer\run_protocols\G4_default_run_protocol.m`.  The other two should contain paths to your processing and data analysis settings files, or should be empty if you haven't created them.
 
@@ -221,7 +221,7 @@ To do this, select the condition you want to view and hit the *Dry Run*{:.gui-bt
 
 If you would like your data to be processed or have any our offered preliminary analyses done on it automatically at the end of your experiment, I would recommend you set that up when designing your experiment, so your experimental protocol is fresh in your mind. However, this process does not involve the G4 Designer and can be done at any time.
 
-For an overview on how this works, please see the [Data analysis overview](gs_data-handling-overview.md) or for more specific instructions, see the [Data Analysis doc](Data_analysis_documentation.md).
+For an overview on how this works, please see the [Data analysis overview](gs_data-handling-overview.md) or for more specific instructions, see the [Data Analysis doc](tut_data_analysis.md).
 
 # Final Details
 
