@@ -9,7 +9,7 @@ nav_order: 5
 # Prerequisites
 
 - [G4 Software Setup](G4_Software_Setup.md)
-- You must have created and saved all patterns needed for the experiment using the [G4 Pattern Generator](About_Pattern_Generator.md)
+- You must have created and saved all patterns needed for the experiment using the [G4 Pattern Generator](pattern-generator.md)
 - You must have created all the functions you need for the experiment (assuming you need any) using the [G4 Function Generator](About_Function_Generator.md)
 
 # Creating a single condition

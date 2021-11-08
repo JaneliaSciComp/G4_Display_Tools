@@ -9,7 +9,7 @@ nav_order: 4
 
 Before going through this tutorial, you should have done the following:
 
-- created one or more patterns using the [Pattern Generator](About_Pattern_Generator.md)
+- created one or more patterns using the [Pattern Generator](pattern-generator.md)
 - created one or more functions using the [Function Generator](About_Function_Generator.md)
 - Reviewed the different experiment modes
 - [Set up your system]({{site.baseurl}}/docs/G4-Assembly.html).
@@ -72,7 +72,7 @@ The set of block trials is played twice, but in random order each time.
 
 So you can see that being able to create a single condition is almost all you need to know in order to create an experiment. Once you can create one condition, all you have to do is make a bunch and put them together.
 
-So what follows is a step by step instructions on how to create a single condition in the [G4 Designer](G4_Designer_Manual.md). Please note that you should already have created any patterns and functions you might need for this. If you have not, please see documentation on the [Pattern Generator](About_Pattern_Generator.md) and [Function Generator](About_Function_Generator.md) for more details.
+So what follows is a step by step instructions on how to create a single condition in the [G4 Designer](G4_Designer_Manual.md). Please note that you should already have created any patterns and functions you might need for this. If you have not, please see documentation on the [Pattern Generator](pattern-generator.md) and [Function Generator](About_Function_Generator.md) for more details.
 
 # Open the designer
 

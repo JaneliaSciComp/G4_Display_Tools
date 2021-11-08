@@ -25,19 +25,19 @@ For now, here's an overview of the steps you will take to set up an experiment u
 
 ## Pattern and Function Generators
 
-The first thing you need to do is [create any patterns](About_Pattern_Generator.md):
+The first thing you need to do is [create any patterns](pattern-generator.md):
 ![pattern](assets/Pattern.png)
 
 and/or [functions](About_Function_Generator.md):
 ![function](assets/function_sawtooth.png)
 
-that will be necessary for the experiment. You don't want to create a pattern and add it to the experiment one at a time - create all your patterns and functions up front. You can do this using the [G4 Pattern Generator](About_Pattern_Generator.md) for patterns and [G4 Function Generator](About_Function_Generator.md) for functions.
+that will be necessary for the experiment. You don't want to create a pattern and add it to the experiment one at a time - create all your patterns and functions up front. You can do this using the [G4 Pattern Generator](pattern-generator.md) for patterns and [G4 Function Generator](About_Function_Generator.md) for functions.
 
 A couple tips:
 
 - Save all your patterns and functions together. This will make it easier to import them all to the [G4 Designer](G4_Designer_Manual.md) at once, rather than having to import them individually from different locations.
 - We suggest naming the patterns and functions by their ID number. In using the Pattern and Function generators, you will give each pattern or function its own unique ID. That ID will need to be passed to the arena later to tell it which pattern or function to use. So naming your patterns `Pattern_0001` for an ID number of 1, for example, will help keep your files organized.
-- See the [Pattern Generator](About_Pattern_Generator.md) and [Function Generator](About_Function_Generator.md) pages for in-depth instructions on how to use these tools.
+- See the [Pattern Generator](pattern-generator.md) and [Function Generator](About_Function_Generator.md) pages for in-depth instructions on how to use these tools.
 
 ## G4 Protocol Designer
 
