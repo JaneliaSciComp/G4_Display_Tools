@@ -18,7 +18,7 @@ Before going through this tutorial, you should have done the following:
 
 An experimental protocol is really just a set of what we call "conditions." A condition, viewed on the arena screens, is a single pattern being displayed to a fly for some number of seconds. The pattern can be moving, to simulate motion, or still. It can be played in a closed-loop or open-loop way. But the key is that it only involves a single pattern file.
 
-In the G4 Designer, a condition is a single row in a table. The pre-trial (optional) is a single condition that will play at the beginning of the experiment and then will not play again. The inter-trial (optional) is a single condition that will play in between each condition in the main experiment. It can be used to re-set the fly in between the main conditions of the experiment. The post-trial (optional) is a single condition that plays at the very end of the experiment. The block trials, contained in the large central table of the G4 Designer, are a set of conditions. There can be as many conditions in this block as you want. These conditions make up the main experiment and can be played in sequential or random order. 
+In the G4 Designer, a condition is a single row in a table. The pre-trial (optional) is a single condition that will play at the beginning of the experiment and then will not play again. The inter-trial (optional) is a single condition that will play in between each condition in the main experiment. It can be used to re-set the fly in between the main conditions of the experiment. The post-trial (optional) is a single condition that plays at the very end of the experiment. The block trials, contained in the large central table of the G4 Designer, are a set of conditions. There can be as many conditions in this block as you want. These conditions make up the main experiment and can be played in sequential or random order.
 
 ![G4 Protocol Designer after auto-fill](assets/protocol-designer_after_auto-fill.png){:.pop}
 
@@ -30,7 +30,7 @@ This is an example of a (tiny) experiment. In this case, the experiment will pla
 1. condition 2
 1. inter-trial
 1. condition 3
-1. inter-trial 
+1. inter-trial
 1. condition 4
 1. post-trial
 
@@ -56,13 +56,13 @@ Only block conditions are affected by the *Randomize trials*{:.gui-txt} feature.
 1. Condition 1
 1. inter-trial
 1. Condition 4
-1. inter-trial 
+1. inter-trial
 1. Condition 3
 1. inter-trial
 1. Condition 4
 1. inter-trial
 1. Condition 2
-1. inter-trial 
+1. inter-trial
 1. Condition 1
 1. inter-trial
 1. Condition 3
@@ -118,11 +118,11 @@ The *Filtered File*{:.gui-txt} option is there for your convenience. If you have
 
 In this case we are only creating a single condition, so select *File*{:.gui-txt} and browse to the .mat file that was produced when you used the Pattern Generator to create a pattern. You should get a little box saying that one file was successfully imported.
 
-The pattern has been imported but not much has changed about the Designer window. Now we can start creating our condition. 
+The pattern has been imported but not much has changed about the Designer window. Now we can start creating our condition.
 
 # Add a pattern to your condition
 
-In row 1 of the block trials table, click on the empty box under *Pattern Name*{:.gui-txt}, column 2. Not much happens at first glance -- a cursor appears in the box. But look to the bottom right hand side of the window and you will see the tall narrow box labeled *Imported files for selected cell:*{:.gui-txt}, which was empty before, now has an item in it. The item should match the name of the pattern you imported. 
+In row 1 of the block trials table, click on the empty box under *Pattern Name*{:.gui-txt}, column 2. Not much happens at first glance -- a cursor appears in the box. But look to the bottom right hand side of the window and you will see the tall narrow box labeled *Imported files for selected cell:*{:.gui-txt}, which was empty before, now has an item in it. The item should match the name of the pattern you imported.
 
 ![empty cell selected](assets/clickEmptyCell.png){:.pop}
 
@@ -146,15 +146,15 @@ Follow the same steps we completed when adding the pattern. Click the empty tabl
 
 ![function](assets/function_sawtooth.png){:.pop}
 
-You may see a red vertical line. This matches the duration set in your condition (row 12). Users may often want the duration of their condition to match the duration (x axis limit) of their position function, so the vertical red line just gives a quick and easy way to compare them. If there is no red vertical line, it means your condition duration is larger than the x axis (time) of your function. 
+You may see a red vertical line. This matches the duration set in your condition (row 12). Users may often want the duration of their condition to match the duration (x axis limit) of their position function, so the vertical red line just gives a quick and easy way to compare them. If there is no red vertical line, it means your condition duration is larger than the x axis (time) of your function.
 
-There are for cells for Analog Output functions. These are optional, but if you have them, they work exactly like the position function. The last cells, then, to edit are the Frame Index and the duration. Frame Index should be 1 by default, which means your pattern will start playing from frame 1. You can, however, set this to another number or to the letter 'r' if you want the pattern to play starting from a random frame index. This is only useful for certain modes. 
+There are for cells for Analog Output functions. These are optional, but if you have them, they work exactly like the position function. The last cells, then, to edit are the Frame Index and the duration. Frame Index should be 1 by default, which means your pattern will start playing from frame 1. You can, however, set this to another number or to the letter 'r' if you want the pattern to play starting from a random frame index. This is only useful for certain modes.
 
 # Preview your condition
 
-Congratulations, you've made a condition! There are two ways to preview the condition you've just created to see how it looks. 
+Congratulations, you've made a condition! There are two ways to preview the condition you've just created to see how it looks.
 
-## Method 1 - doesn't require that you are connected to an arena:
+## Method 1 - doesn't require that you are connected to an arena
 
 click the check box at the end of your condition to selected it, and then click the *Preview*{:.gui-btn} at the bottom right of the screen. A window will pop up that looks something like this:
 
@@ -182,11 +182,11 @@ Enter a frame rate of 60 or less and click Generate Video. A window will pop up 
 
 A progress bar will appear that looks like this: ![Progress bar](assets/videoGenProgress.png){:.ifr .pop}
 
-Wait for the progress bar to finish and close on its own. This may take several minutes. The faster your frame rate, the less time it will take. When it is finished, you will find an .avi video saved where you indicated. This video shows the entire preview window playing the condition, just as when you hit play earlier. Note that the *Real-time speed*{:.gui-txt} box should still be checked. If it is not, then your video will show the preview running at whatever speed indicated by the Frame Increment value. If the frame increment is low, then your video will take both a very long time to generate, and a long time to play. 
+Wait for the progress bar to finish and close on its own. This may take several minutes. The faster your frame rate, the less time it will take. When it is finished, you will find an .avi video saved where you indicated. This video shows the entire preview window playing the condition, just as when you hit play earlier. Note that the *Real-time speed*{:.gui-txt} box should still be checked. If it is not, then your video will show the preview running at whatever speed indicated by the Frame Increment value. If the frame increment is low, then your video will take both a very long time to generate, and a long time to play.
 
-Once the video is done generating, go back to the preview window and select *Pattern Only Video*{:.gui-txt}. Now gnerate the video again, ensuring *Real-time speed*{:.gui-txt} is still selected. 
+Once the video is done generating, go back to the preview window and select *Pattern Only Video*{:.gui-txt}. Now generate the video again, ensuring *Real-time speed*{:.gui-txt} is still selected.
 
-The same thing will happen, but this video, instead of showing the entire preview window, will show only the pattern. This gives a better idea of what the fly will actually see in the arena. 
+The same thing will happen, but this video, instead of showing the entire preview window, will show only the pattern. This gives a better idea of what the fly will actually see in the arena.
 
 ## Method 2 - requires the arena
 
