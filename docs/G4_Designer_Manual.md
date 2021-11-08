@@ -49,7 +49,7 @@ The first field in the settings panel reads *Configuration file location:*{:.gui
 
 ## Run, Plotting, and Processing
 
-The next three fields are paths to your default run protocol file, processing file, and plotting file. A default run protocol is provided with the G4 software, but if you'd like to learn exactly what the run protocol does and how to create your own, please see the tutorial [Create a Run Protocol](../docs/run_protocol_tutorial.md).
+The next three fields are paths to your default run protocol file, processing file, and plotting file. A default run protocol is provided with the G4 software, but if you'd like to learn exactly what the run protocol does and how to create your own, please see the tutorial [Create a Run Protocol](tut_cond_run-protocol.md).
 
 Plotting and Processing refers to settings files dictating how you want your experimental data to be handled after the experiment. If you have not created these settings files, please see [Data Analysis](Data_analysis_documentation.md).
 
@@ -234,7 +234,7 @@ This pretty much covers the G4 Designer's features and how to use them. However,
 - [This tutorial on how to set up your metadata Google Sheets](tut_prot_googlesheets-settings.md)
 - [This tutorial on how to create a single condition](tut_prot_create-condition.md)
 - [This tutorial on how to create a full experiment](tut_prot_experiment.md)
-- [This tutorial on how to use the arena without the Designer](../docs/run_protocol_tutorial.md)
+- [This tutorial on how to use the arena without the Designer](tut_cond_run-protocol.md)
 
 ## Trouble-shooting
 
