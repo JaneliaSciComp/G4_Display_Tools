@@ -244,15 +244,15 @@ classdef G4_settings_view < handle
             text_box_pos = self.calc_new_textbox_position(text_label_pos, gap_between_edges, textbox_label_ratio);
             self.disabled_text_textbox = self.create_text_box(self.fig, self.con.model.uneditable_cell_text, text_box_pos);
             
-            %% Google sheet information
-            % Google sheet key and GID values - panel
+            %% Google Sheets information
+            % Google Sheets key and GID values - panel
             panel_pos = [text_label.Position(1), text_label.Position(2) - gap_between_edges*2 - panel_height, panel_width, panel_height]; 
-            googlesheet_panel = uipanel(self.fig, 'Title', 'Metadata GoogleSheet Properties', ...
+            googlesheet_panel = uipanel(self.fig, 'Title', 'Metadata Google Sheets Properties', ...
                 'FontSize', 12, 'Position', panel_pos);
             
-            % Google sheet key and GID values - google sheet key
+            % Google Sheets key and GID values - Google Sheets key
             sheet_label_pos = [top_left_label(1), top_left_label(2) - .07, top_left_label(3), top_left_label(4) + .07];
-            sheet_label = self.create_label(googlesheet_panel, 'GoogleSheet Key: ', sheet_label_pos);
+            sheet_label = self.create_label(googlesheet_panel, 'Google Sheets Key: ', sheet_label_pos);
             
             sheet_box_pos = self.calc_new_textbox_position(sheet_label_pos, gap_between_edges, textbox_label_ratio);
             self.sheet_key_textbox = self.create_text_box(googlesheet_panel, self.con.model.metadata_sheet_key, sheet_box_pos);
@@ -265,7 +265,7 @@ classdef G4_settings_view < handle
             exp_box_pos = self.calc_new_textbox_position(exp_label_pos, gap_between_edges, textbox_label_ratio);
             self.experimenter_gid_textbox = self.create_text_box(googlesheet_panel, self.con.model.gids.experimenter, exp_box_pos);
             
-            % Google sheet key and GID values - Fly age tab GID
+            % Google Sheets key and GID values - Fly age tab GID
             
             age_label_pos = self.calc_new_label_position(exp_label_pos, gap_between_edges);
             age_label = self.create_label(googlesheet_panel, 'Fly Age Tab GID: ', age_label_pos);
@@ -273,7 +273,7 @@ classdef G4_settings_view < handle
             age_box_pos = self.calc_new_textbox_position(age_label_pos, gap_between_edges, textbox_label_ratio);
             self.age_gid_textbox = self.create_text_box(googlesheet_panel, self.con.model.gids.fly_age, age_box_pos);
             
-            % Google sheet key and GID values - Fly sex tab GID
+            % Google Sheets key and GID values - Fly sex tab GID
             
             sex_label_pos = self.calc_new_label_position(age_label_pos, gap_between_edges);
             sex_label = self.create_label(googlesheet_panel, 'Fly Sex Tab GID: ', sex_label_pos);
@@ -281,7 +281,7 @@ classdef G4_settings_view < handle
             sex_box_pos = self.calc_new_textbox_position(sex_label_pos, gap_between_edges, textbox_label_ratio);
             self.sex_gid_textbox = self.create_text_box(googlesheet_panel, self.con.model.gids.fly_sex, sex_box_pos);
             
-            % Google sheet key and GID values - Fly genotype tab GID
+            % Google Sheets key and GID values - Fly genotype tab GID
             
             geno_label_pos = self.calc_new_label_position(sex_label_pos, gap_between_edges);
             geno_label = self.create_label(googlesheet_panel, 'Fly Genotype Tab GID: ', geno_label_pos);
@@ -289,7 +289,7 @@ classdef G4_settings_view < handle
             geno_box_pos = self.calc_new_textbox_position(geno_label_pos, gap_between_edges, textbox_label_ratio);
             self.geno_gid_textbox = self.create_text_box(googlesheet_panel, self.con.model.gids.fly_geno, geno_box_pos);
             
-            % Google sheet key and GID values - Experiment temp tab GID
+            % Google Sheets key and GID values - Experiment temp tab GID
             
             temp_label_pos = self.calc_new_label_position(geno_label_pos, gap_between_edges);
             temp_label = self.create_label(googlesheet_panel, 'Experiment Temp tab GID: ', temp_label_pos);
@@ -297,7 +297,7 @@ classdef G4_settings_view < handle
             temp_box_pos = self.calc_new_textbox_position(temp_label_pos, gap_between_edges, textbox_label_ratio);
             self.temp_gid_textbox = self.create_text_box(googlesheet_panel, self.con.model.gids.exp_temp, temp_box_pos);
             
-            % Google sheet key and GID values - Rearing protocol tab GID
+            % Google Sheets key and GID values - Rearing protocol tab GID
             
             rearing_label_pos = self.calc_new_label_position(temp_label_pos, gap_between_edges);
             rearing_label = self.create_label(googlesheet_panel, 'Rearing Protocol tab GID: ', rearing_label_pos);
@@ -305,7 +305,7 @@ classdef G4_settings_view < handle
             rearing_box_pos = self.calc_new_textbox_position(rearing_label_pos, gap_between_edges, textbox_label_ratio);
             self.rearing_gid_textbox = self.create_text_box(googlesheet_panel, self.con.model.gids.rearing, rearing_box_pos);
             
-            % Google sheet key and GID values - Light Cycle tab GID
+            % Google Sheets key and GID values - Light Cycle tab GID
             
             light_label_pos = self.calc_new_label_position(rearing_label_pos, gap_between_edges);
             light_label = self.create_label(googlesheet_panel, 'Light Cycle tab GID: ', light_label_pos);

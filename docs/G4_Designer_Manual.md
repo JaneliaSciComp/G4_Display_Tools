@@ -27,19 +27,19 @@ This page constitutes the main user manual for the G4 Protocol Designer, but the
 
 If you already have a .g4p file saved and ready to run, you can open The Experiment Conductor directly instead of using the designer.
 
-## Start the protocol designer.  
+## Start the protocol designer
 
 In MATLAB open the file `G4_Experiment_Designer.m`, located in `G4_Display_Tools\G4_Protocol_Designer` and hit run. Alternatively, you can type `G4_Experiment_Designer` into the MATLAB command window and hit enter. This should open the "Fly Experiment Designer" in a Window that looks like this:
 
 ![Fly Protocol Designer main window](assets/protocol-designer_empty.png){:.pop}
 
-## Check the size of the LED arena you are using. 
+## Check the size of the LED arena you are using
 
-LED screen arenas come in three row screens and four row screens. Which patterns you can use are determined by the screen size, so be sure to check what type of arena you're using. 
+LED screen arenas come in three row screens and four row screens. Which patterns you can use are determined by the screen size, so be sure to check what type of arena you're using.
 
 Notice the radio button at the center left of the application indicating *3 Row Screen*{:.gui-btn} or *4 Row Screen*{:.gui-btn}. Set this to the correct screen size that corresponds with your [hardware setup](../../../docs/G4-Assembly.md) before doing anything else. This setting will become disabled as soon as you import a folder, so if it is incorrect when you import, you will need to restart the application.
 
-## Verify your settings are correct. 
+## Verify your settings are correct
 
 The next step after verifying your screen size is to verify your settings are correct. Click *File*{:.gui-btn} > *Settings*{:.gui-btn} to open up your settings window. It should look like this:
 
@@ -49,11 +49,11 @@ The first field in the settings panel reads *Configuration file location:*{:.gui
 
 ## Run, Plotting, and Processing
 
-The next three fields are paths to your default run protocol file, processing file, and plotting file. A default run protocol is provided with the G4 software, but if you'd like to learn exactly what the run protocol does and how to create your own, please see the tutorial [Create a Run Protocol](../docs/run_protocol_tutorial.md). 
+The next three fields are paths to your default run protocol file, processing file, and plotting file. A default run protocol is provided with the G4 software, but if you'd like to learn exactly what the run protocol does and how to create your own, please see the tutorial [Create a Run Protocol](../docs/run_protocol_tutorial.md).
 
 Plotting and Processing refers to settings files dictating how you want your experimental data to be handled after the experiment. If you have not created these settings files, please see [Data Analysis](Data_analysis_documentation.md).
 
-Assuming you want to use the default run protocol, this field should read `G4_Display_Tools\G4_Protocol_Designer\run_protocols\G4_default_run_protocol.m`.  The other two should contain paths to your processing and data analysis settings files, or should be empty if you haven't created them. 
+Assuming you want to use the default run protocol, this field should read `G4_Display_Tools\G4_Protocol_Designer\run_protocols\G4_default_run_protocol.m`.  The other two should contain paths to your processing and data analysis settings files, or should be empty if you haven't created them.
 
 *Note that these are defaults. Regardless of the paths here, when it is time to run an experiment you can always choose new files.*
 
@@ -63,13 +63,13 @@ The next three lines in the settings window provide paths to test protocols for 
 
 ## Disabled cells
 
-When using the protocol designer, cells for unavailable parameters will by default fill with `---------` on a grey background, to indicate that you cannot edit these cells. The next two fields in the settings file allow you to customize the color and text which fill disabled cells. 
+When using the protocol designer, cells for unavailable parameters will by default fill with `---------` on a grey background, to indicate that you cannot edit these cells. The next two fields in the settings file allow you to customize the color and text which fill disabled cells.
 
-## Metadata GoogleSheet Properties. 
+## Metadata Google Sheets Properties
 
-Notice the separate panel at the bottom of the Settings window called Metadata GoogleSheet Properties. These keys link to an online spreadsheet from which the Conductor dynamically pulls the possible values for each metadata field. The different fields labeled with "GID" define tabs in the metadata GoogleSheet. **The G4 Conductor requires you to have such a googlesheet** to populate the metadata options when you run an experiment. If you don't have this set up, please see the [metadata googlsheet tutorial](../docs/googlesheet_tutorial.md) for assistance. 
+Notice the separate panel at the bottom of the Settings window called Metadata Google Sheets Properties. These keys link to an online spreadsheet from which the Conductor dynamically pulls the possible values for each metadata field. The different fields labeled with "GID" define tabs in the metadata Google Sheets. **The G4 Conductor requires you to have such a Google Sheets** to populate the metadata options when you run an experiment. If you don't have this set up, please see the [metadata Google Sheets tutorial](tut_prot_googlesheets-settings.md) for assistance.
 
-Once you have completed the tutorial and filled in these GID values, you should not have to do it again unless you delete or create any tabs in your googlesheet. If you do this, the new keys will need to be obtained (as shown in the tutorial) for that tab and replaced here. Otherwise, set this up once, and then you can forget about it. 
+Once you have completed the tutorial and filled in these GID values, you should not have to do it again unless you delete or create any tabs in your Google Sheets. If you do this, the new keys will need to be obtained (as shown in the tutorial) for that tab and replaced here. Otherwise, set this up once, and then you can forget about it.
 
 # The Designer: Import files
 
@@ -85,27 +85,27 @@ After selecting the file or folder you wish to import and depending on the size 
 
 ## Experiment structure
 
-Notice the layout of the four tables that make up the majority of the Designer's interface. This gives you an idea of how it expects an experiment to be structured. An experiment is simply a set of conditions that are played on the screens in a particular order. 
+Notice the layout of the four tables that make up the majority of the Designer's interface. This gives you an idea of how it expects an experiment to be structured. An experiment is simply a set of conditions that are played on the screens in a particular order.
 
 ### Some terminology
 
-A single line in a table is called a **condition**. The pre-trial, inter-trial, and post-trial tables only allow for one condition. The block trials table can have as many conditions as you need, and the condition number is the row number of the table. A condition consists of [the mode](prot_display-modes.md), one pattern and optionally one position function and up to four analog output functions. Other parameters in the table will be editable depending on the mode of the condition. 
+A single line in a table is called a **condition**. The pre-trial, inter-trial, and post-trial tables only allow for one condition. The block trials table can have as many conditions as you need, and the condition number is the row number of the table. A condition consists of [the mode](prot_display-modes.md), one pattern and optionally one position function and up to four analog output functions. Other parameters in the table will be editable depending on the mode of the condition.
 
-On the left side of the main window is a set of radio buttons that say *Randomize Trials*{:.gui-btn} and *Sequential Trials*{:.gui-btn}. A **trial** is how we refer to any condition that plays on the screen. For example, if your trials are randomized, "Trial 1" (meaning the first item played on the screen) may be condition 12. And if you are repeating an entire set of 40 conditions 4 times, then you will only have 40 conditions, but you will have 160 trials. 
+On the left side of the main window is a set of radio buttons that say *Randomize Trials*{:.gui-btn} and *Sequential Trials*{:.gui-btn}. A **trial** is how we refer to any condition that plays on the screen. For example, if your trials are randomized, "Trial 1" (meaning the first item played on the screen) may be condition 12. And if you are repeating an entire set of 40 conditions 4 times, then you will only have 40 conditions, but you will have 160 trials.
 
-It's important to know this distinction to avoid confusion, as the conductor will provide you both the trial number and condition number when running an experiment. It will also save a .mat file in your results folder once an experiment is complete called exp_order.mat which will list the order in which your conditions were run. 
+It's important to know this distinction to avoid confusion, as the conductor will provide you both the trial number and condition number when running an experiment. It will also save a .mat file in your results folder once an experiment is complete called exp_order.mat which will list the order in which your conditions were run.
 
-**Block trials** are a set of conditions which make up the meat of your experiment. They are not dependent on one another and can vary in mode, length, and other parameters. 
+**Block trials** are a set of conditions which make up the meat of your experiment. They are not dependent on one another and can vary in mode, length, and other parameters.
 
-The **pre-trial** is a single condition that is run at the very beginning of an experiment and then not run again. It is often a condition meant to test that the fly is responding as expected or to get the fly oriented before the real experiment begins. 
+The **pre-trial** is a single condition that is run at the very beginning of an experiment and then not run again. It is often a condition meant to test that the fly is responding as expected or to get the fly oriented before the real experiment begins.
 
 The **inter-trial** is a single condition that is played in between each block trial. It is not played before the first block trial or after the last block trial as long as you are using the default run protocol. It's often used to re-orient the fly to baseline after some condition played and elicited a behavioral response.
 
-The **post-trial** is a single condition that is played at the very end of the experiment, after the last block trial. 
+The **post-trial** is a single condition that is played at the very end of the experiment, after the last block trial.
 
-### The rest of the experiment structure 
+### The rest of the experiment structure
 
-The conditions make up the majority of your experiment. Other parameters include the randomization of block conditions, the number of times block conditions should be repeated, and sample rates for any analog input channels in use. 
+The conditions make up the majority of your experiment. Other parameters include the randomization of block conditions, the number of times block conditions should be repeated, and sample rates for any analog input channels in use.
 
 ## How to create conditions
 
@@ -119,27 +119,27 @@ Notice that cells holding parameters not used in mode 1 (such as *Frame Rate*{:.
 
 The string in the cells under *Pattern Name*{:.gui-txt}, *Position Function*{:.gui-txt}, and *AO 1*{:.gui-txt} to *AO 4*{:.gui-txt} are the names of the files of that type you have imported. If you click on one of the Pattern cells, two things will happen. You will get a preview of that pattern in the preview pane. This preview starts at frame 1, and you can use the *Play*{:.gui-btn}, *Forward Frame*{:.gui-btn}, and *Back Frame*{:.gui-txt} buttons to look at the different frames of the selected pattern.
 
-If the small checkbox labeled "Arena preview" at the bottom right corner of the window is checked, the pattern you clicked on will also be displayed on the arena screens. This allows you to preview what that pattern will look like on the screen. As you play, move forward, or move back through the frames, the arena display will update as well. 
+If the small checkbox labeled "Arena preview" at the bottom right corner of the window is checked, the pattern you clicked on will also be displayed on the arena screens. This allows you to preview what that pattern will look like on the screen. As you play, move forward, or move back through the frames, the arena display will update as well.
 
 *Note: Please make sure this check box is not checked if your computer is not actually connected to the arena screens or if the screens are not completely set up as this could cause an error.*
 
 The second thing that will happen is that the embedded list to the right of the preview will fill with all the imported files of that type (patterns if you've selected a pattern cell, position functions if you've selected a position function cell, and an analog output function for the AO cells). The filename of the selected cell is highlighted, but you may choose other items in this list. If you do, a preview of the item you clicked in the list will appear in the preview frame (and on the arena if enabled). You may go through this list, previewing items, until you find the one you want. Confirm a change in your currently selected cell with the *Select*{:.gui-btn} button. Clicking an empty cell will also provide this list, and you can choose the item you want and hit select to populate the empty cell.
 
-## Other methods of arranging parameters and trials. 
+## Other methods of arranging parameters and trials
 
 Notice the buttons to the right of the block trials table. They modify the trial or trials currently selected through the checkbox at the end of each line. *Shift up*{:.gui-btn} and *Shift down*{:.gui-btn} will move your selected trial(s) up and down throughout the main block of trials. *Add trial*{:.gui-btn} will add a copy of the selected trials to the bottom of the block. If no trial is selected, the new trial is based on the last item in the block. *Delete Trial*{:.gui-btn} will remove the selected trial(s). Finally, the *Select All**{:.gui-txt} checkbox above the block will select all trials and *Invert Selection*{:.gui-btn} will uncheck all the checked trials, and check all the unchecked ones.
 
-If you select a trial in the block, then go to *File*{:.gui-btn} > *Copy To*{:.gui-btn}, you can copy that trial into the pre-trial, inter-trial, and/or post-trial spaces. *File*{:.gui-btn} > *Set Selected*{:.gui-txt} will let you type in the values you want for each parameter in the selected trial, though this is not recommended as it's generally faster to select from the list of imported items. 
+If you select a trial in the block, then go to *File*{:.gui-btn} > *Copy To*{:.gui-btn}, you can copy that trial into the pre-trial, inter-trial, and/or post-trial spaces. *File*{:.gui-btn} > *Set Selected*{:.gui-txt} will let you type in the values you want for each parameter in the selected trial, though this is not recommended as it's generally faster to select from the list of imported items.
 
-## Pre, Inter, and Post trials are not required.
+## Pre, Inter, and Post trials are not required
 
 If you do not wish to have a pre-trial in your experiment, simply erase the mode and hit enter. Leaving the mode blank will disable this section. The same can be done for inter-trial and post-trial, but the block trials must have at least one condition.
 
-## Frame Index.
+## Frame Index
 
 The frame index can be set in any mode, and will dictate where in the pattern library the animation will start. You may also enter *r*{:.gui-txt} instead of a number as the frame index. This tells the screens to start at a random frame within the frame library.
 
-## Infinite loop pre-trial.
+## Infinite loop pre-trial
 
 If you want the pre-trial to run indefinitely until you are ready to move on with the experiment, enter a duration of 0. This will cause the pre-trial to continue running until you hit a key or click the mouse to indicate the experiment should continue. This can give you time to make sure your fly is responding as it should.
 
@@ -147,7 +147,7 @@ Here is an example of a completed experiment. Be sure to change the name of your
 
 ![Example of a completed experiment](assets/protocol-designer_complete-experiment.png){:.pop}
 
-## Other parameters outside the tables.
+## Other parameters outside the tables
 
 There are a number of parameters outside the conditions themselves that need to be set.
 
@@ -159,15 +159,15 @@ There are a number of parameters outside the conditions themselves that need to 
 
 # Saving and opening experiments
 
-## Saving an experiment. 
+## Saving an experiment
 
-You'll notice that under the *File*{:.gui-btn} menu, there is no "Save" option, only *Save As*{:.gui-btn}. This is a safety precaution to prevent you from overwriting an older experimental protocol. When you hit *Save As*{:.gui-btn}, the application will immediately append a timestamp to the end of your experiment name and save the experiment in a folder of this name in whatever location you browse to. If the experiment name already has a timestamp at the end of it (if, for example, you opened an existing experiment and edited it without changing its name), that timestamp will be removed and replaced with a current one, so your old folder will not be overwritten. 
+You'll notice that under the *File*{:.gui-btn} menu, there is no "Save" option, only *Save As*{:.gui-btn}. This is a safety precaution to prevent you from overwriting an older experimental protocol. When you hit *Save As*{:.gui-btn}, the application will immediately append a timestamp to the end of your experiment name and save the experiment in a folder of this name in whatever location you browse to. If the experiment name already has a timestamp at the end of it (if, for example, you opened an existing experiment and edited it without changing its name), that timestamp will be removed and replaced with a current one, so your old folder will not be overwritten.
 
 *Note that the experiment does not contain any data at this point, only a protocol defining the experiment.*
 
 When you save an experiment, the application will automatically export all the files you need to run said experiment. It will create a folder which is named with your experiment name. This will generally be referred to as the **experiment folder**. Inside the experiment folder will be a `Patterns` Folder, `Functions` folder, and `Analog Output` folder, in addition to the `currentExp.mat` file and `.g4p` file:
 
-```
+```sh
 ├── Patterns
 ├── Functions
 ├── Analog Output
@@ -179,7 +179,7 @@ When you save an experiment, the application will automatically export all the f
 
 Once you have saved an experiment, if you want to design another one, there is no need to close the application. Simply click the *Clear All*{:.gui-btn} button at the top right corner, and it will clear out the currently loaded experiment. Be careful though, if you click *Clear All*{:.gui-btn} before saving the experiment, you will lose your work!
 
-## Opening an experiment.
+## Opening an experiment
 
 When you go to *File*{:.gui-btn} – *Open*{:.gui-btn}, you'll see one or more options. *.g4p file*{:.gui-btn} is the first and will always be there. Click this if you want to open an experiment file not listed. When you open an experiment, you should browse to the .g4p file inside the experiment folder and open that. Everything in the folder will automatically be imported.
 
@@ -191,7 +191,7 @@ When you open an experiment, the designer will automatically populate with the a
 
 # Previewing an Experiment
 
-## Previewing a full condition.
+## Previewing a full condition
 
 The in-screen preview panel shows you a preview of any pattern or function you select, but you can also get a holistic preview of a selected condition. Select the box at the end of the condition you want to see and hit the *Preview*{:.gui-btn} button to the right of the preview pane. You will see a separate window pop up that looks something like this, depending on the trial:
 
@@ -213,13 +213,13 @@ Notice on the right side there is a check box labeled *Pattern Only Video*{:.gui
 
 # Dry Run
 
-A dry run is the running of a single trial on the LED screen arena. This condition does not activate any analog input channels and does not include any pre- or post- trials. It will run the selected condition on the screens in isolation, so you can verify it appears on the arena as you expect. 
+A dry run is the running of a single trial on the LED screen arena. This condition does not activate any analog input channels and does not include any pre- or post- trials. It will run the selected condition on the screens in isolation, so you can verify it appears on the arena as you expect.
 
 To do this, select the condition you want to view and hit the *Dry Run*{:.gui-btn} button below the *Preview*{:.gui-btn} button. Please note that this could take a few seconds, as it may need to open and connect to the G4 Host. A dialog box will pop up when the screens are ready, asking you to click *Start*{:.gui-btn} or *Cancel*{:.gui-btn}. The condition will not begin running on the screens until you click *Start*{:.gui-btn}.
 
 # Prepare your automatic data processing and analysis
 
-If you would like your data to be processed or have any our offered preliminary analyses done on it automatically at the end of your experiment, I would recommend you set that up when designing your experiment, so your experimental protocol is fresh in your mind. However, this process does not involve the G4 Designer and can be done at any time. 
+If you would like your data to be processed or have any our offered preliminary analyses done on it automatically at the end of your experiment, I would recommend you set that up when designing your experiment, so your experimental protocol is fresh in your mind. However, this process does not involve the G4 Designer and can be done at any time.
 
 For an overview on how this works, please see the [Data analysis overview](gs_data-handling-overview.md) or for more specific instructions, see the [Data Analysis doc](Data_analysis_documentation.md).
 
@@ -227,11 +227,11 @@ For an overview on how this works, please see the [Data analysis overview](gs_da
 
 ## Additional Resources
 
-This pretty much covers the G4 Designer's features and how to use them. However, if you still have any questions or issues, you may refer to one of the additional resources below: 
+This pretty much covers the G4 Designer's features and how to use them. However, if you still have any questions or issues, you may refer to one of the additional resources below:
 
 - [This additional information about the experiment modes](prot_display-modes.md)
 - [This tutorial on how to set up your Protocol Designer settings](tut_prot_configure-settings.md)
-- [This tutorial on how to set up your metadata googlesheet](../docs/googlesheet_tutorial.md)
+- [This tutorial on how to set up your metadata Google Sheets](tut_prot_googlesheets-settings.md)
 - [This tutorial on how to create a single condition](tut_prot_create-condition.md)
 - [This tutorial on how to create a full experiment](../docs/experiment_tutorial.md)
 - [This tutorial on how to use the arena without the Designer](../docs/run_protocol_tutorial.md)
@@ -242,7 +242,7 @@ Many common errors will create a dialog box telling you there is a problem, but 
 
 ### "You must select a trial" or "Only one trial may be selected."
 
-Some of the functionality in the designer can only be performed on one condition at a time. If you get this error, scroll through all your trials and make sure one and only one condition is selected. 
+Some of the functionality in the designer can only be performed on one condition at a time. If you get this error, scroll through all your trials and make sure one and only one condition is selected.
 
 ### "You cannot edit that field in this mode."
 
@@ -250,15 +250,15 @@ Most modes only allow certain parameters to be changed. You are trying to edit a
 
 ### "The value you've entered is not a multiple of 1000. Please double check your entry."
 
-This is not actually an error, and will not prevent you from doing anything. However, the Analog Input sample rates usually should be multiples of 1000, so this warning is there in case you miss a zero or otherwise typo a sample rate. 
+This is not actually an error, and will not prevent you from doing anything. However, the Analog Input sample rates usually should be multiples of 1000, so this warning is there in case you miss a zero or otherwise typo a sample rate.
 
 ### "None of the patterns imported match the screen size selected."
 
-Check the screen size at the center left of the designer. The patterns you've tried to import were made for a different size screen than you have selected. 
+Check the screen size at the center left of the designer. The patterns you've tried to import were made for a different size screen than you have selected.
 
 ### "If you have imported from multiple locations, you must save your experiment before you can test it on the screens."
 
-This is also not an error, but a warning. If you have not saved your experiment yet, then the folder this application thinks of as the "experiment folder" is the last folder you imported from. If you have imported from multiple locations and try to test a trial on the screens, it may not work if it cannot find the pattern or function it needs in the last location you imported from. You can avoid this issue by saving the experiment before you dry run a trial. 
+This is also not an error, but a warning. If you have not saved your experiment yet, then the folder this application thinks of as the "experiment folder" is the last folder you imported from. If you have imported from multiple locations and try to test a trial on the screens, it may not work if it cannot find the pattern or function it needs in the last location you imported from. You can avoid this issue by saving the experiment before you dry run a trial.
 
 *Note: There are plans in the works to remove this limitation and allow the software to track where each imported file comes from. Look for this in future releases.*
 
@@ -268,14 +268,12 @@ This is also not an error, but a warning. If you have not saved your experiment 
 
 If you get this error message regarding the configuration file or any other important file, check that the path to this file is correct in your settings and make sure the file is on your MATLAB path. If you get this error regarding the `G4_Protocol_Designer_Settings.m` file, make sure it is located in `G4_Display_Tools\G4_Protocol_Designer`. Do not move it from this location. If you get this error regarding the `recently_opened_g4p_files.m` file, please make sure it is located in `G4_Display_Tools\G4_Protocol_Designer\support_files`. DO NOT edit this file.
 
-If everything is in the correct location, this error could mean that you as a user do not have permission to edit the file in question. Sometimes, especially if the configuration file is located in a root or program files folder, a user may not be allowed to edit those files unless their user profile is set to administrator privileges. If the user cannot edit the file, then the Designer cannot edit the file on the user's behalf. Fixing the permissions will fix the error. 
+If everything is in the correct location, this error could mean that you as a user do not have permission to edit the file in question. Sometimes, especially if the configuration file is located in a root or program files folder, a user may not be allowed to edit those files unless their user profile is set to administrator privileges. If the user cannot edit the file, then the Designer cannot edit the file on the user's behalf. Fixing the permissions will fix the error.
 
-# A few DO NOTs:
+# A few DO NOTs
 
-**DO NOT** edit any of the files in the `support_files` folder. 
-
-**DO NOT** move any files out of their original locations within the `G4_Display_Tools` folder (though you can save that folder wherever you like, as long as it is added to your MATLAB path)
-
-**DO NOT** allow multiple files of the same name to be on your MATLAB path, as this can cause conflicts.
+- **DO NOT** edit any of the files in the `support_files` folder.
+- **DO NOT** move any files out of their original locations within the `G4_Display_Tools` folder (though you can save that folder wherever you like, as long as it is added to your MATLAB path)
+- **DO NOT** allow multiple files of the same name to be on your MATLAB path, as this can cause conflicts.
 
 {::comment}this was copied from the original file `User_Instructions.docx`{:/comment}

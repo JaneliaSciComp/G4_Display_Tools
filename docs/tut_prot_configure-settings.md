@@ -62,13 +62,13 @@ Let's go through each field in the settings window and what it means.
 
 - *Color of disabled cells:*{:.gui-txt}. This takes a color in the form of a hexadecimal code. It defaults to #bdbdbd which is a grey color. You can change this if you'd like to change the background color of table cells in the G4 Designer when they are disabled. For example, in certain modes, a condition does not take a position function. If this is the case, the table cell for position functions will become gray and be filled with some text determined in the next field. You can change the fill color here if you like.
 
-- *Text inside disabled cells*{:.gui-txt}. The text that will fill disabled table cells in the G4 Designer. By default, they will turn gray and be filled with dashes, '--------'. You can change this to any string if you prefer, such as 'disabled' or '////////'.
+- *Text inside disabled cells*{:.gui-txt}. The text that will fill disabled table cells in the G4 Designer. By default, they will turn gray and be filled with dashes, *--------*{:.gui-txt}. You can change this to any string if you prefer, such as *disabled*{:.gui-txt} or *////////*{:.gui-txt}.
 
-The bottom section contains a panel called Metadata GoogleSheet Properties. We will not cover these fields in this tutorial. Please see our [Setting up your googlsheet tutorial](googlesheet_tutorial.md) for an explanation regarding these settings.
+The bottom section contains a panel called Metadata Google Sheets Properties. We will not cover these fields in this tutorial. Please see our [Setting up your Google Sheets tutorial](tut_prot_googlesheets-settings.md) for an explanation regarding these settings.
 
-# What if I don't have some of these? 
+# What if I don't have some of these?
 
-That's okay! The only settings which are required are the *Configuration file location*{:.gui-txt}, the *Default run protocol*{:.gui-txt}, and the color and text inside disabled cells. For any Google Sheets settings that are required, have a look at the [Google Sheets tutorial](googlesheets_tutorial.md). The rest can be left blank or at their default values, even if those paths don't exist on your computer.
+That's okay! The only settings which are required are the *Configuration file location*{:.gui-txt}, the *Default run protocol*{:.gui-txt}, and the color and text inside disabled cells. For any Google Sheets settings that are required, have a look at the [Google Sheets tutorial](tut_prot_googlesheets_settings.md). The rest can be left blank or at their default values, even if those paths don't exist on your computer.
 
 Note: When you click *Apply Changes*{:.gui-btn} the software will check each value for validity. If a field is empty or contains a path that doesn't exist, you will get a pop up warning you about it. That's okay, if you don't care about that field, just click ok through the warning boxes. The settings will still be saved. The warnings are for your information only.
 
