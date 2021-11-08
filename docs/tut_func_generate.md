@@ -38,7 +38,7 @@ Now that the function has been designed, we need to save it in the appropriate f
 # Generating an Analog Output Function
 {:#aofunction}
 
-The process for generating an analog output function is nearly the same as that for a position function, the primary difference being that the values in the function (the y-axis values in the graph) represent voltages rather than frames of the pattern. On the top-left of the GUI, select *Analog Output Function*{:.gui-txt} for the *Function type*{:.gui-txt} to start designing this function. 
+The process for generating an analog output function is nearly the same as that for a position function, the primary difference being that the values in the function (the y-axis values in the graph) represent voltages rather than frames of the pattern. On the top-left of the GUI, select *Analog Output Function*{:.gui-txt} for the *Function type*{:.gui-txt} to start designing this function.
 
 ![Switch to AO Function](assets/function-generator_switch-function.png){:.pop}
 

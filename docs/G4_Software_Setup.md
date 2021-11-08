@@ -22,7 +22,7 @@ For full functionality, you must add this folder to the MATLAB path with all its
 
 On the MATLAB home tab, click *set path*{:.gui-btn}, then *add with subfolders*{:.gui-btn}. Next, browse to the location where you saved G4_Display_Tools, save and close the *Set Path*{:.gui-txt} window.
 
-Alternatively, in the Current Folder pane in MATLAB, browse to the location where you saved G4_Display_Tools, right click this folder, and select *Add to Path: Selected folders and subfolders*{:.gui-btn}. 
+Alternatively, in the Current Folder pane in MATLAB, browse to the location where you saved G4_Display_Tools, right click this folder, and select *Add to Path: Selected folders and subfolders*{:.gui-btn}.
 
 ## Verify that old software is not interfering
 {:#verify-old}

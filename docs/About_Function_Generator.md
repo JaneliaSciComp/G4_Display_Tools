@@ -10,19 +10,20 @@ has_toc: false
 
 This set of scripts and GUIs can be used to design analog output functions and position functions to be used in conjunction with displaying patterns on a G4 display. Position functions control what frame of the selected pattern is displayed for every refresh cycle (when the display system is operating in position function mode), operating at a rate of either 500 or 1000 Hz (1-bit or 4-bit patterns, respectively). Analog output functions control the voltage of the analog output channels of the G4 system (accessed easily with the optional breakout box) in a way that is synchronized to the display refresh cycle, operating at 1000 Hz regardless of the pattern refresh rate. Similar to [G4_Pattern_Generator](About_Pattern_Generator.md), functions are created using the `G4_Function_Generator_gui.m` script based on input parameters that describe the desired function. These scripts output two types of files: The first type is a .mat file which contains the created function array and all the function parameters so that it can be easily read back into MATLAB. The second type is either a .afn (for analog output functions) or .pfn (for position functions) file containing a binary vector of the function that can be quickly accessed by the Display Controller.
 
-## Creating and visualizing functions in the GUI. 
+## Creating and visualizing functions in the GUI
 
 Running `G4_Function_Generator_gui` opens a window where functions can be quickly generated and viewed. Functions are displayed as a time-series plot, with time on the x-axis and either the voltage (for analog output functions) or frame # (for position functions) on the y-axis. Different types of waveforms can be generated in this GUI, such as sawtooth, square waves, or sine waves. A single function can be composed of different sections of waveforms to accommodate different use cases. Many parameters of these waveforms (such as their frequency or intensity) can be adjusted and immediately viewed in the GUI. At the end of this document, each parameter is listed and described for your reference.
 
-## Creating functions using scripts. 
+## Creating functions using scripts
 
 The G4_Function_Generator GUI is recommended for learning about the parameters of functions, testing out new functions, and debugging previously generated functions. For creating many functions at once, it is recommended to use the MATLAB script form of this tool. In addition, while the GUI only supports functions with a maximum of 5 waveform sections, the script version can accommodate any number of sections. The `create_experiment_G4_example` script located in `G4_Display_Tools\G4_Example_Experiment_Scripts` shows one example of creating many functions in a single script, and clicking *create script*{: .gui-btn} in the G4_Function_Generator GUI will generate and open a script in MATLAB based on the current GUI parameters so that you can see how the current function was generated.
 
-## Using functions in an experiment. 
+## Using functions in an experiment
 
-After functions have been created, they can be used with the G4 display system by incorporating them into an experiment folder and sending the appropriate commands to the display system. This can be achieved in multiple ways, such as 
+After functions have been created, they can be used with the G4 display system by incorporating them into an experiment folder and sending the appropriate commands to the display system. This can be achieved in multiple ways, such as
+
 1. using the script examples located in `G4_Display_Tools\G4_Example_Experiment_Scripts`,
-2. using the Protocol Designer located in `G4_Display_Tools\G4_Protocol_Designer`, or 
+2. using the Protocol Designer located in `G4_Display_Tools\G4_Protocol_Designer`, or
 3. by using `PControl_G4` located in `G4_Display_Tools\PControl_Matlab`.
 
 # Description of Parameters

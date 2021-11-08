@@ -13,25 +13,26 @@ has_toc: false
 
 This set of MATLAB scripts and GUIs can be used to design patterns (primarily for displaying motion, rather than pictures of objects) on a G4 display. Patterns are generated using the `G4_Pattern_Generator.m` script based on input parameters that describe the desired motion. These scripts output two types of pattern files: The first type is a .mat file which contains the created pattern matrix (named `Pats`) and all the pattern parameters so that it can be easily read back into MATLAB. The second type is a .pat file containing a binary vector of the pattern that can be quickly accessed by the Display Controller. Only the .pat file is necessary to be displayed on a G4 arena, though the .mat file is needed to be easily loaded back into MATLAB for viewing, debugging, or for creating experiments with the [G4_Protocol_Designer](G4_Designer_Manual.md).
 
-## Mapping the display pixel coordinates in 3D.
+## Mapping the display pixel coordinates in 3D
 
-[![Coordinate coventions](assets/coordinate-conventions.png){:.ifr}](assets/coordinate-conventions.pdf)
+[![Coordinate conventions](assets/coordinate-conventions.png){:.ifr}](assets/coordinate-conventions.pdf)
 
 G4_Pattern_Generator generates patterns based on the 3D coordinates of the pixels in the display from the perspective of an observer located at the origin `[0,0,0]`. Therefore, for this software to generate the correct patterns, it must know the size, shape, and orientation of the arena it is connected to. The image on the right and the file [coordinate conventions.pdf](assets/coordinate-conventions.pdf) show the details about the coordinate systems used in these scripts. For standard cylindrical arenas, these coordinates can easily be computed by running `configure_arena` and inputting the arena parameters as described in the [software setup section](G4_Software_Setup.md). By default, cylindrical arenas are modelled based on their shape as a polygonal cylinder made up of flat LED panels. However, one attribute of this model is that horizontal lines that are drawn according to the pixels' latitude coordinate can appear wavy when drawn above or below the "equator" of the arena (i.e. the height of the arena where the observer is located). This is due to the fact that LEDs in the middle of LED panels will appear to have a different height as those near the edges of LED panels (i.e. pixels in the same row of a panel will not always have the same latitude). If this attribute is not desired, another option in the `configure_arena` GUI is to model the arena as a smooth, perfectly round cylinder, which will cause latitude lines to be drawn perfectly straight along the horizontal of the cylinder.
 
-## Creating and visualizing patterns in the GUI.
+## Creating and visualizing patterns in the GUI
 
 Running `G4_Pattern_Generator_gui` opens a window where patterns can be quickly generated and viewed based on the size/shape/orientation of the configured arena. Clicking the backward *<*{: .gui-btn} or forward *>*{: .gui-btn} frame arrows shows how the pattern moves as the frame changes. By default, patterns are visualized on a Mercator projection of the arena, which incorporates how the arena is understood to be viewed by the observer at `[0,0,0]`. However, patterns can also be viewed in "grid" form, which ignores the position of the arena with respect to the observer, just showing the pattern matrix instead. Different types of motion patterns can be generated in this GUI, such as square or sine wave gratings, edges, and starfields. Many parameters of these patterns (such as the frequency/wavelength of gratings, or the brightness of different elements) can be adjusted in the GUI and can be viewed by clicking *update pattern*{: .gui-btn}. At the end of this document, each parameter is listed and described for your reference.
 
-## Creating patterns using scripts.
+## Creating patterns using scripts
 
 Creating patterns using the GUI is recommended for learning about the pattern types and parameters, testing out new patterns, and debugging previously generated patterns. For creating many patterns at once, which may be tedious to do one by one using the GUI, it is recommended to use the MATLAB script form of this tool which can take advantage of for loops (for example) to create many patterns at once. The `create_experiment_G4_example` script located in `G4_Display_Tools\G4_Example_Experiment_Scripts` shows one example of creating many patterns in a single script. In addition, clicking *create script*{: .gui-btn} in the G4_Pattern_Generator GUI will generate and open a script in MATLAB based on the current GUI parameters, so that you can see how the current pattern was generated.
 
-## Using patterns in an experiment.
+## Using patterns in an experiment
 
 After patterns have been created, they can be displayed on the G4 arena by incorporating them into an experiment folder and sending the appropriate commands to the display system. This can be achieved in multiple ways, such as:
-1. using the script examples located in `G4_Display_Tools\G4_Example_Experiment_Scripts`, 
-2. using the Protocol Designer located in `G4_Display_Tools\G4_Protocol_Designer`, or 
+
+1. using the script examples located in `G4_Display_Tools\G4_Example_Experiment_Scripts`,
+2. using the Protocol Designer located in `G4_Display_Tools\G4_Protocol_Designer`, or
 3. by using `PControl_G4` located in `G4_Display_Tools\PControl_Matlab`.
 
 ## Using patterns for 2-color LED panels or any driver-v2
@@ -41,7 +42,7 @@ Two different versions of the [panel driver board]({{site.baseurl}}/Generation%2
 
 # Description of Parameters
 
-**Note on units.** For parameters based on angles, units in the GUI are shown in degrees and units in scripts are shown in radians. Use the rad2deg and deg2rad functions to convert between these units. 
+**Note on units.** For parameters based on angles, units in the GUI are shown in degrees and units in scripts are shown in radians. Use the rad2deg and deg2rad functions to convert between these units.
 
 - `pattern_type`: (`string`) defines the type of motion pattern to be generated. Options are:
   - `square grating` – square wave of bright and dark bars that move perpendicular to the orientation of the bars (bright and dark pixel intensities are set by the `levels` parameter, described later)

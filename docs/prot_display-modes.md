@@ -5,7 +5,7 @@ grand_parent: Generation 4
 nav_order: 1
 ---
 
-In the [G4 Experiment Designer](G4_Designer_Manual.md), in order to determine how the stimuli in any particular condition is played on the screens, you will have to enter a trial mode. The key at the bottom left corner of the Experiment Designer gives a brief description of each mode, but see below for a more in-depth understanding of each one. 
+In the [G4 Experiment Designer](G4_Designer_Manual.md), in order to determine how the stimuli in any particular condition is played on the screens, you will have to enter a trial mode. The key at the bottom left corner of the Experiment Designer gives a brief description of each mode, but see below for a more in-depth understanding of each one.
 
 There are two main types of trial modes: closed-loop and open-loop. Closed-loop trials feature real-time feedback to the display based on signals acquired from the analog input, which is often used to update the display based on behavior from the animal. Open-loop trials display patterns in a more consistent way and are not modified by any external feedback (the animal's behavior won’t influence the stimuli on the screens). Modes 1 to 3 are open-loop and modes 4 to 7 are closed-loop. Additionally, some modes in the designer will require position functions, which can be made using the [Function Generator](About_Function_Generator.md). The seven trial modes are described below:
 
