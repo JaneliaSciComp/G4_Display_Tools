@@ -10,7 +10,7 @@ nav_order: 2
 
 # Prerequisites
 
-[Data Processing](data_processing_documentation.md). Automated data handling is split into two sections - data processing and data analysis. You cannot analyze the data until it has been processed, so please see the data processing documentation first if you have not been through it. 
+[Data Processing](tut_data_processing.md). Automated data handling is split into two sections - data processing and data analysis. You cannot analyze the data until it has been processed, so please see the data processing documentation first if you have not been through it. 
 
 # Data Analysis Tools Documentation
 
