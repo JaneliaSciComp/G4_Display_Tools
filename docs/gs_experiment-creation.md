@@ -6,7 +6,7 @@ nav_order: 3
 
 # Setting up an experiment - an overview
 
-At this point, your [hardware should be set up and working](../../../docs/gs-getting-hardware.md), and you should understand how to tether a fly inside the arena. If not, please see [Historic Background](../../../docs/gs-historic-background.md) and [Getting the hardware](../../../docs/gs-getting-hardware.md) pages under [Getting Started](../../../docs/getting-started.md). 
+At this point, your [hardware should be set up and working](../../../docs/gs_getting-hardware.md), and you should understand how to tether a fly inside the arena. If not, please see [Historic Background](../../../docs/gs_historic-background.md) and [Getting the hardware](../../../docs/gs_getting-hardware.md) pages under [Getting Started](../../../docs/getting-started.md). 
 
 So your hardware is set up and you're ready to run an experiment? You'll need the G4 Display Tools.
 
@@ -29,7 +29,7 @@ The first thing you need to do is [create any patterns](About_Pattern_Generator.
 ![pattern](assets/Pattern.png)
 
 and/or [functions](About_Function_Generator.md):
-![function](assets/function.png)
+![function](assets/function_sawtooth.png)
 
 that will be necessary for the experiment. You don't want to create a pattern and add it to the experiment one at a time - create all your patterns and functions up front. You can do this using the [G4 Pattern Generator](About_Pattern_Generator.md) for patterns and [G4 Function Generator](About_Function_Generator.md) for functions.
 
@@ -45,7 +45,7 @@ Once your patterns and functions have been created, you want to open the [G4 Pro
 
 Once you have organized your trials the way you want them, the G4 Designer will also let you save the protocol. This will save a file with extension .g4p (G4 protocol) in your save location. It will also create folders which hold copies of all the patterns and functions used in the protocol. I will refer to the folder in which you have saved this protocol as the *experiment folder*. The experiment folder will contain everything needed to run the experiment. If you open the [G4 Designer](G4_Designer_Manual.md) or [Conductor](G4_Conductor_Manual.md) and want to open an existing protocol, you will go to *File*{:.gui-btn} → *Open*{:.gui-btn} and browse to the .g4p file. Opening the .g4p file will import everything that is needed from the folder. However, you should not move your .g4p out of the experiment folder. Leave the folder organized as is.
 
-For detailed instructions on how to do this, please see the [G4 Protocol Designer User Manual](G4_Designer_Manual.md), the [Protocol Designer Settings tutorial](settings_tutorial.md), and the [Design a Condition Tutorial](condition_tutorial.md).
+For detailed instructions on how to do this, please see the [G4 Protocol Designer User Manual](G4_Designer_Manual.md), the [Protocol Designer Settings tutorial](tut_prot_configure-settings.md), and the [Design a Condition Tutorial](tut_prot_create-condition.md).
 
 At this point, your experiment is set up! All that remains is to tether your fly, open the protocol in the [G4 Conductor](G4_Conductor_Manual.md), and run it!
 

@@ -31,7 +31,7 @@ If you already have a .g4p file saved and ready to run, you can open The Experim
 
 In MATLAB open the file `G4_Experiment_Designer.m`, located in `G4_Display_Tools\G4_Protocol_Designer` and hit run. Alternatively, you can type `G4_Experiment_Designer` into the MATLAB command window and hit enter. This should open the "Fly Experiment Designer" in a Window that looks like this:
 
-![Fly Experiment Designer main window](../docs/assets/screenshot-1.png){:.pop}
+![Fly Protocol Designer main window](assets/protocol-designer_empty.png){:.pop}
 
 ## Check the size of the LED arena you are using. 
 
@@ -43,7 +43,7 @@ Notice the radio button at the center left of the application indicating *3 Row 
 
 The next step after verifying your screen size is to verify your settings are correct. Click *File*{:.gui-btn} > *Settings*{:.gui-btn} to open up your settings window. It should look like this:
 
-![Fly Experiment Settings window](../docs/assets/screenshot-2.png){:.pop}
+![G4 Protocol Designer Settings window](assets/protocol-designer_settings.png){:.pop}
 
 The first field in the settings panel reads *Configuration file location:*{:.gui-txt} If the path to the configuration file is incorrect, please update it by using the associated browse button or by typing the correct path into the field.
 
@@ -89,7 +89,7 @@ Notice the layout of the four tables that make up the majority of the Designer's
 
 ### Some terminology
 
-A single line in a table is called a **condition**. The pre-trial, inter-trial, and post-trial tables only allow for one condition. The block trials table can have as many conditions as you need, and the condition number is the row number of the table. A condition consists of [the mode](../docs/experiment_modes.md), one pattern and optionally one position function and up to four analog output functions. Other parameters in the table will be editable depending on the mode of the condition. 
+A single line in a table is called a **condition**. The pre-trial, inter-trial, and post-trial tables only allow for one condition. The block trials table can have as many conditions as you need, and the condition number is the row number of the table. A condition consists of [the mode](prot_display-modes.md), one pattern and optionally one position function and up to four analog output functions. Other parameters in the table will be editable depending on the mode of the condition. 
 
 On the left side of the main window is a set of radio buttons that say *Randomize Trials*{:.gui-btn} and *Sequential Trials*{:.gui-btn}. A **trial** is how we refer to any condition that plays on the screen. For example, if your trials are randomized, "Trial 1" (meaning the first item played on the screen) may be condition 12. And if you are repeating an entire set of 40 conditions 4 times, then you will only have 40 conditions, but you will have 160 trials. 
 
@@ -109,11 +109,11 @@ The conditions make up the majority of your experiment. Other parameters include
 
 ## How to create conditions
 
-This section will describe in detail how to create an experiment, but if you would like more detailed instructions or run into issues not addressed in this section, please see these tutorials on [creating a condition](../docs/condition_tutorial.md) and [creating an experiment](../docs/experiment_tutorial.md).
+This section will describe in detail how to create an experiment, but if you would like more detailed instructions or run into issues not addressed in this section, please see these tutorials on [creating a condition](tut_prot_create-condition.md) and [creating an experiment](../docs/experiment_tutorial.md).
 
 You can start creating conditions using the files imported in the previous step. The easiest starting point is to hit the *Auto-Fill*{:.gui-btn} button. This will create a block trial for every pattern imported, as well as create a pre-trial, inter-trial, and post-trial using the first pattern. Each trial will default to mode 1 and automatically pair a position function and one analog output function to each pattern (if they exist). Durations default to double the length of the position function. Hitting *Auto-Fill*{:.gui-btn} will produce something like this:
 
-![After Auto-fill](../docs/assets/screenshot-3.png "Main window of the experiment designer after hitting the Auto-Fill button"){:.pop}
+![After Auto-fill](assets/protocol-designer_after_auto-fill.png "Main window of the experiment designer after hitting the Auto-Fill button"){:.pop}
 
 Notice that cells holding parameters not used in mode 1 (such as *Frame Rate*{:.gui-txt}, *Gain*{:.gui-txt}, and *Offset*{:.gui-txt}) are disabled. If you try to edit these cells you will get a warning and your change will be reset. Each mode uses different parameters so if you change the mode of a condition, the cells will automatically adjust, enabling those used in that mode and disabling the rest.
 
@@ -145,7 +145,7 @@ If you want the pre-trial to run indefinitely until you are ready to move on wit
 
 Here is an example of a completed experiment. Be sure to change the name of your experiment at the bottom!
 
-![Example of a completed experiment](../docs/assets/screenshot-4.png){:.pop}
+![Example of a completed experiment](assets/protocol-designer_complete-experiment.png){:.pop}
 
 ## Other parameters outside the tables.
 
@@ -195,7 +195,7 @@ When you open an experiment, the designer will automatically populate with the a
 
 The in-screen preview panel shows you a preview of any pattern or function you select, but you can also get a holistic preview of a selected condition. Select the box at the end of the condition you want to see and hit the *Preview*{:.gui-btn} button to the right of the preview pane. You will see a separate window pop up that looks something like this, depending on the trial:
 
-![Experiment Preview](../docs/assets/screenshot-5.png){:.pop}
+![Experiment Preview](assets/protocol-designer_preview-experiment.png){:.pop}
 
 You have some options to set once this window is open. Notice the *Real-time Speed*{:.gui-txt} checkbox below the position function, and the *Frame Increment*{:.gui-txt} field below that. If you hit *Play*{:.gui-btn} immediately after the preview window opens, when the *Frame Increment*{:.gui-txt} is set to `1`, the preview will play VERY slowly. This is because these patterns play on the arena screens at 500 or 1000 frames per second, and a frame increment of 1 means you are showing every single frame on a screen that only refreshes at approximately 20 frames per second.
 
@@ -221,7 +221,7 @@ To do this, select the condition you want to view and hit the *Dry Run*{:.gui-bt
 
 If you would like your data to be processed or have any our offered preliminary analyses done on it automatically at the end of your experiment, I would recommend you set that up when designing your experiment, so your experimental protocol is fresh in your mind. However, this process does not involve the G4 Designer and can be done at any time. 
 
-For an overview on how this works, please see the [Data analysis overview](../docs/DAtools_overview.md) or for more specific instructions, see the [Data Analysis doc](Data_analysis_documentation.md).
+For an overview on how this works, please see the [Data analysis overview](gs_data-handling-overview.md) or for more specific instructions, see the [Data Analysis doc](Data_analysis_documentation.md).
 
 # Final Details
 
@@ -229,13 +229,10 @@ For an overview on how this works, please see the [Data analysis overview](../do
 
 This pretty much covers the G4 Designer's features and how to use them. However, if you still have any questions or issues, you may refer to one of the additional resources below: 
 
-{::comment}
-- [This additional information about the experiment modes](../docs/experiment_modes.md)
-{:/comment}
-
-- [This tutorial on how to set up your Designer settings](../docs/settings_tutorial.md)
+- [This additional information about the experiment modes](prot_display-modes.md)
+- [This tutorial on how to set up your Protocol Designer settings](tut_prot_configure-settings.md)
 - [This tutorial on how to set up your metadata googlesheet](../docs/googlesheet_tutorial.md)
-- [This tutorial on how to create a single condition](../docs/condition_tutorial.md)
+- [This tutorial on how to create a single condition](tut_prot_create-condition.md)
 - [This tutorial on how to create a full experiment](../docs/experiment_tutorial.md)
 - [This tutorial on how to use the arena without the Designer](../docs/run_protocol_tutorial.md)
 

@@ -6,7 +6,7 @@ nav_order: 4
 
 # How to run an experiment - an overview
 
-At this point, you should understand, in broad strokes at least, what it entails to [create an experiment](G4DisplayOverview.md). To learn to create an experiment in detail and access tutorials regarding the [Pattern Generator](About_Pattern_Generator.md), [Function Generator](About_Function_Generator.md), and [G4 Protocol Designer](G4_Designer_Manual.md), open the item [Generation 4](../../../docs/G4-index.md) on the left hand menu. 
+At this point, you should understand, in broad strokes at least, what it entails to [create an experiment](gs_running-experiment.md). To learn to create an experiment in detail and access tutorials regarding the [Pattern Generator](About_Pattern_Generator.md), [Function Generator](About_Function_Generator.md), and [G4 Protocol Designer](G4_Designer_Manual.md), open the item [Generation 4](../../../docs/G4-index.md) on the left hand menu. 
 
 Once you've created and saved an experiment, you will use the [G4 Conductor](G4_Conductor_Manual.md) to run it.
 
@@ -44,10 +44,10 @@ Once the metadata is configured, using the Conductor is a breeze. If you have no
 
 There is also a field for your *run protocol*{:.gui-txt}. This is a file that determines how exactly trials on run on the screens. There is a default run protocol provided and that will be the default path here. If you wanted to create your own custom run protocol, check out the [Custom Run Protocol tutorial](run_protocol_tutorial.md).
 
-The last thing you should be aware of is the *Run Test Protocol*{:.gui-btn} button. If you click this, the conductor will load a preset, short protocol that is designed to quickly test the fly and see if they are fixating correctly. It could also be used to make sure the screens are displaying correctly. A default test protocol has been provided, but you can always create your own and make it the default in the Designer settings. You can find more details in the [G4 Protocol Designer](G4_Designer_Manual.md) or in the [Designer Settings tutorial](settings_tutorial.md).
+The last thing you should be aware of is the *Run Test Protocol*{:.gui-btn} button. If you click this, the conductor will load a preset, short protocol that is designed to quickly test the fly and see if they are fixating correctly. It could also be used to make sure the screens are displaying correctly. A default test protocol has been provided, but you can always create your own and make it the default in the Designer settings. You can find more details in the [G4 Protocol Designer](G4_Designer_Manual.md) or in the [Designer Settings tutorial](tut_prot_configure-settings.md).
 
 Assuming the conductor is configured and your defaults are set, all you need to do is select your experiment type, fill in your metadata, and hit Run. A progress bar will appear, keeping you updated on which condition is running and what patterns or functions it is using (if any). After the progress bar fills, the text directly above it will read *post-processing*{:.gui-txt} and eventually *Experiment Finished*{:.gui-txt}" at which point you can start your next experiment. If, at any point during the experiment, something goes wrong, you can click *Abort*{:.gui-btn}. This will save any data you have collected and stop the experiment. You can hit *Run*{:.gui-btn} again to start over or get out of the program if you don't want to continue.
 
 This overview contained a lot of information about the Conductor, so don't forget to check out the [G4 Conductor Manual](G4_Conductor_Manual.md) for in depth instructions on its use. 
 
-Once an experiment is completed, the only thing left is to [analyze the data](DAtools_overview.md), using our tools, your own, or some combination. 
+Once an experiment is completed, the only thing left is to [analyze the data](gs_data-handling-overview.md), using our tools, your own, or some combination. 

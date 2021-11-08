@@ -2,7 +2,7 @@
 title:  Tutorial - Metadata Googlesheet
 parent: G4 Protocol Designer
 grand_parent: Generation 4
-nav_order: 2
+nav_order: 3
 ---
 
 1. TOC
@@ -82,7 +82,7 @@ To give it access, we must open the [G4 Protocol Designer](G4_Designer_Manual.md
 
 Once it's open, go to *File*{:.gui-btn} -> *Settings*{:.gui-btn} at the top left corner. This window should appear:
 
-![Designer Settings](assets/screenshot-2.png)
+![Protocol Designer Settings](assets/protocol-designer_settings.png)
 
 At the bottom, notice a panel called *Metadata GoogleSheet Properties*{:.gui-txt}. Within this panel are several fields: a googlesheet key and several types of GID field. 
 

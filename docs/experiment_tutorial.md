@@ -2,7 +2,7 @@
 title:  Tutorial - design an experiment
 parent: G4 Protocol Designer
 grand_parent: Generation 4
-nav_order: 4
+nav_order: 5
 
 ---
 
@@ -14,7 +14,7 @@ nav_order: 4
 
 # Creating a single condition
 
-Before starting this tutorial, please complete the [tutorial to create a condition](condition_tutorial.md). It will take you through step by step how to get your experiment started. This tutorial will pick up where that one left off, so please leave the designer with your condition open and return here when you are finished to continue creating a full experiment. 
+Before starting this tutorial, please complete the [tutorial to create a condition](tut_prot_create-condition.md). It will take you through step by step how to get your experiment started. This tutorial will pick up where that one left off, so please leave the designer with your condition open and return here when you are finished to continue creating a full experiment. 
 
 # Autofill
 
@@ -123,7 +123,7 @@ Below this button is a panel containing two radio buttons. You must choose one o
 
 ![Random or Sequential Radio Buttons](assets/randomRadios.png){:.ifr .pop}
 
-If you select *Randomize Trials*{:.gui-txt}, then every time your main block of trials runs, the conditions will be run in a random order. If you select *Sequential Trials*{:.gui-txt}, then every time the main block plays, the conditions will play in the order that they appear in the Block Trials table. For an example of the difference, refer back to the beginning of the [condition tutorial](condition_tutorial.md).
+If you select *Randomize Trials*{:.gui-txt}, then every time your main block of trials runs, the conditions will be run in a random order. If you select *Sequential Trials*{:.gui-txt}, then every time the main block plays, the conditions will play in the order that they appear in the Block Trials table. For an example of the difference, refer back to the beginning of the [condition tutorial](tut_prot_create-condition.md).
 
 Beneath the panel you'll see a text box labeled *Repetitions*{:.gui-txt}. This refers to the number of times the *Block Trials* as a whole will be repeated. The pre-trial and post-trial are not included in these repetitions. The default value here is 1. Change it to 3, and then click *Calculate Experiment Length*{:.gui-btn} again. You'll see that the experiment length will be updated to take into account how many times the block is repeated. 
 

@@ -2,7 +2,7 @@
 title:  Tutorial - create one condition
 parent: G4 Protocol Designer
 grand_parent: Generation 4
-nav_order: 3
+nav_order: 4
 ---
 
 # Requirements
@@ -20,7 +20,7 @@ An experimental protocol is really just a set of what we call "conditions." A co
 
 In the G4 Designer, a condition is a single row in a table. The pre-trial (optional) is a single condition that will play at the beginning of the experiment and then will not play again. The inter-trial (optional) is a single condition that will play in between each condition in the main experiment. It can be used to re-set the fly in between the main conditions of the experiment. The post-trial (optional) is a single condition that plays at the very end of the experiment. The block trials, contained in the large central table of the G4 Designer, are a set of conditions. There can be as many conditions in this block as you want. These conditions make up the main experiment and can be played in sequential or random order. 
 
-![G4 Designer](assets/screenshot-3.png){:.pop}
+![G4 Protocol Designer after auto-fill](assets/protocol-designer_after_auto-fill.png){:.pop}
 
 This is an example of a (tiny) experiment. In this case, the experiment will play as follows:
 
@@ -78,9 +78,9 @@ So what follows is a step by step instructions on how to create a single conditi
 
 First you have to open the Designer. There are two ways to do this. Assuming the [G4 Display Tools are on your MATLAB path](G4_Software_Setup.html#add-to-path), you can simply type `G4_Experiment_Designer` into your MATLAB command window. Alternatively, you can browse to the file `G4_Display_Tools/G4_Protocol_Designer/G4_Experiment_Designer.m`, open the file in MATLAB, and hit *Run*{:.gui-btn} at the top of the MATLAB window.
 
-You should get a screen that looks like this: 
+You should get a screen that looks like this:
 
-![Empty Designer](assets/screenshot-1.png){:.pop}
+![Empty Protocol Designer](assets/protocol-designer_empty.png){:.pop}
 
 If you get an error, first check that you have the configuration file referenced in [Setup](G4_Software_Setup.md) in place. Then open the file `G4_Display_Tools/G4_Protocol_Designer/G4_Protocol_Designer_Settings.m`. The first line of this file should read: `Configuration File Path: [path to your configuration file]`. If the path here is incorrect, replace it with the path to your Configuration file.
 
@@ -144,7 +144,7 @@ For now let's leave it in mode 1. This is the mode that uses a position function
 
 Follow the same steps we completed when adding the pattern. Click the empty table cell under *Position Function*{:.gui-txt}, then click the item that appears in the *Imported files for selected cell:*{:.gui-txt} box. A preview in the preview pane should appear that looks something like this:
 
-![function](assets/function.png){:.pop}
+![function](assets/function_sawtooth.png){:.pop}
 
 You may see a red vertical line. This matches the duration set in your condition (row 12). Users may often want the duration of their condition to match the duration (x axis limit) of their position function, so the vertical red line just gives a quick and easy way to compare them. If there is no red vertical line, it means your condition duration is larger than the x axis (time) of your function. 
 

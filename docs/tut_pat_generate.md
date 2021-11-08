@@ -17,7 +17,7 @@ In Matlab, type `G4_Pattern_Generator_gui` to begin designing your patterns. Whe
 
 Before continuing, verify that the current display matches your own arena by clicking on the *configure arena*{:.gui-btn} button on the top right. This will open a separate GUI allowing you to define the specific size, layout, and orientation of the display in your experimental setup. In particular, check that the number of rows and columns of LED panels (as well as the size of each panel, measured by the number of pixels wide) match your display. If the observer of the display is not located directly in the center of the display (both radially and vertically), use the *rotations*{:.gui-txt} and *translations*{:.gui-txt} fields to shift the display's position to match it's actual physical placement. Once you have verified that the display matches your current setup, click the *create arena*{:.gui-btn} button to return to the Pattern Generator. The arena you have just created will now be the default display that is loaded every time the Pattern Generator is used.
 
-![Configure Arena](assets/G4 Pattern Tutorial 1.png)
+![Configure Arena](assets/pattern-generator_configure-arena.png){:.pop}
 
 Now that the display has been configured, we are ready to create some patterns. These are descriptions of the two experiment-ready patterns that will be generated in this tutorial:
 
@@ -31,7 +31,7 @@ The default pattern settings already show a square-wave grating pattern (*Patter
 
 To make the pattern only show the moving gratings above the observer's horizon, we can create a mask using the *mask options*{:.gui-btn} button. Checking the *add latitude-longitude mask*{:.gui-txt} and setting *min latitude*{:.gui-txt} to *0*{:.gui-txt} (with the default *mask direction*{:.gui-txt} as *outside*{:.gui-txt} setting) will mask the pattern below a longitude of 0 (i.e. below the observer's horizon). Click *done*{:.gui-btn} and *Update Pattern*{:.gui-btn} to see this change take effect; the brightness of the masked area is set by the *mask level*{:.gui-txt} field, which is commonly set to a value between that of the *1st level*{:.gui-txt} and *2nd level*{:.gui-txt}.
 
-![Configure Arena](assets/G4 Pattern Tutorial 2.png)
+![Configure mask options](assets/pattern-generator_mask-options.png){:.pop}
 
 Pattern 1 has now been designed! Click on the forward *>*{:.gui-btn} and and backward *<*{:.gui-btn} arrows if you'd like to see how the pattern moves as the frames are cycled through. To save this pattern in the appropriate file structure so it can be added to experiments and displayed on the arena, verify the save directory and pattern name and click on the *save current pattern*{:.gui-btn} button. If you want to visualize this pattern later, click on the *load pattern*{:.gui-btn} button in the gui and navigate to this pattern to have all of the pattern's parameters loaded back into the GUI.
 
@@ -44,7 +44,7 @@ Next, we want to generate a grating pattern in only a small spot of the display 
 
 Change the *orientation of motion*{:.gui-txt} field to *local (mask-centered)*{:.gui-txt} and change *center longitude*{:.gui-txt} to *-60*{:.gui-txt}. Click *Update Pattern*{:.gui-btn} to see that the grating pattern is now being displayed in a smaller spot on the left side of the arena. Click the *>*{:.gui-btn} button to see how the grating pattern moves from left to right -- we want to change this to the opposite direction. Change *motion angle*{:.gui-txt} to *180*{:.gui-txt} and *Update Pattern*{:.gui-btn}, now cycling forward *>*{:.gui-btn} through the frames results in the desired leftward-moving grating. With pattern 2 now fully designed, verify the save directory and pattern name and click on the *save current pattern*{:.gui-btn} button
 
-![Configure Arena](assets/G4 Pattern Tutorial 3.png)
+![Configure Arena](assets/pattern-generator_pattern-type.png){:.pop}
 
 Both patterns have now been generated! But don't exit the GUI just yet…
 
@@ -63,5 +63,5 @@ The primary elements to using this tool in script form are:
 
 # Next steps
 
-With patterns now generated, the next logical step is to generate position functions -- these are simple data files that can be associated with a pattern file to tell the arena how that pattern should be displayed (i.e. how fast to cycle through the pattern's frames and in what order). To learn how to create position functions using the G4 Function Generator (as well as analog output functions using the same tool), read the [About Function Generator](About_Function_Generator.md) document and complete the associated [tutorial](../docs/function_generator_tutorial.md).
+With patterns now generated, the next logical step is to generate position functions -- these are simple data files that can be associated with a pattern file to tell the arena how that pattern should be displayed (i.e. how fast to cycle through the pattern's frames and in what order). To learn how to create position functions using the G4 Function Generator (as well as analog output functions using the same tool), read the [About Function Generator](About_Function_Generator.md) document and complete the associated [tutorial](tut_func_generate.md).
 
