@@ -32,7 +32,7 @@ A window like the one below will open. If it does not, or if you get a MATLAB er
 
 ![Empty Protocol Designer Window](assets/protocol-designer_empty.png){:.pop}
 
-Click *File*{:.gui-txt}->*Settings*{:.gui-txt} in the upper left hand corner of the window. A second window should pop up that looks like this:
+Click *File*{:.gui-txt} → *Settings*{:.gui-txt} in the upper left hand corner of the window. A second window should pop up that looks like this:
 
 ![Protocol Designer Settings](assets/protocol-designer_settings.png){:.pop}
 

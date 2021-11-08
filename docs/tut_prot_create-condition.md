@@ -100,7 +100,7 @@ As such, before doing anything else, you need to select which type of screen thi
 
 # Import
 
-Once the designer is open, you need to import the patterns you intend to use in the experiment, as well as any functions. To do this, click *File*{:.gui-btn} -> *Import*{:.gui-btn}. A small box should pop up:
+Once the designer is open, you need to import the patterns you intend to use in the experiment, as well as any functions. To do this, click *File*{:.gui-btn} → *Import*{:.gui-btn}. A small box should pop up:
 
 ![Import Window](assets/importWindow.png){:.ifr .pop}
 
@@ -198,7 +198,7 @@ The second way to preview a condition is to actually play it on the arena. You m
 - You must have imported your patterns and functions all from the same location
 - If your patterns and functions were imported from different locations, you must save your protocol before previewing on the screens. This is because the screens must be given a directory to pull the patterns and functions from, and it can't be given more than one.
 
-To save your experiment (though in this case it is not a full experiment), first give it a name in the *Experiment Name*{:.gui-txt} field at the bottom of the window. Then click *File*{:.gui-btn} -> *Save as*{:.gui-btn}. A timestamp will be added to your name and you can browse to the location where you want to save it.
+To save your experiment (though in this case it is not a full experiment), first give it a name in the *Experiment Name*{:.gui-txt} field at the bottom of the window. Then click *File*{:.gui-btn} → *Save as*{:.gui-btn}. A timestamp will be added to your name and you can browse to the location where you want to save it.
 
 We will cover saving a protocol and how it works in the experiment design tutorial. I am limiting this explanation to only what you need to know to preview your condition.
 

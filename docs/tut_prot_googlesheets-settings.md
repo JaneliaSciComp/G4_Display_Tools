@@ -80,7 +80,7 @@ So the Google Sheets is done. Great! But how does the Conductor access these val
 
 To give it access, we must open the [G4 Protocol Designer](G4_Designer_Manual.md). If you've never opened the designer before, [click here](G4_Designer_Manual.md) for details on how to open it. Simply put, you can browse to G4_Display_Tools/G4_Protocol_Designer/G4_Protocol_Designer.m, open this file in MATLAB, and run it. Assuming your path is set up correctly and you have your configuration file in place, it should open the main Designer window.
 
-Once it's open, go to *File*{:.gui-btn} -> *Settings*{:.gui-btn} at the top left corner. This window should appear:
+Once it's open, go to *File*{:.gui-btn} → *Settings*{:.gui-btn} at the top left corner. This window should appear:
 
 ![Protocol Designer Settings](assets/protocol-designer_settings.png)
 

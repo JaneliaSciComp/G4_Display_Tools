@@ -64,11 +64,11 @@ Last is the *Invert Selection*{:.gui-btn} button. Select a couple, but not all, 
 
 Notice that these buttons do not have any effect on the Pre, Inter, and Post-trials. These trials are usually just created manually, by the method shown in the previous tutorial on how to create a condition. However, there are a couple other tools you can use to speed this up.
 
-Select one of your conditions in the block trials. Then go to *File*{:.gui-btn} -> *Copy To*{:.gui-btn}. A box like this will pop up:
+Select one of your conditions in the block trials. Then go to *File*{:.gui-btn} → *Copy To*{:.gui-btn}. A box like this will pop up:
 
 Select one or more of the options and click *OK*{:.gui-btn}. You can select them one by one, or you can click the *Select All*{:.gui-btn} button at the bottom to select all three. The condition from your block trials which you have selected will be copied into all the tables that you chose in the pop up box - the Pre, Inter, or Post-trial areas. If you have a single trial you want to serve as pre, inter, and post-trial, or two of the three, this is a slightly quicker way to create them.
 
-Now select several conditions in your block trials. Then go to *File*{:.gui-btn} -> *Set Selected...*{:.gui-btn}. This feature will likely not be used much, but I just want to make you aware of it. In this case, a pop up window will appear giving you a field for every cell in the condition, like this:
+Now select several conditions in your block trials. Then go to *File*{:.gui-btn} → *Set Selected...*{:.gui-btn}. This feature will likely not be used much, but I just want to make you aware of it. In this case, a pop up window will appear giving you a field for every cell in the condition, like this:
 {:.clear}
 
 ![Set Selected Window](assets/SetSelectedBox.png){:.ifr .pop}
@@ -148,7 +148,7 @@ You've now been introduced to everything you need to create an entire experiment
 
 # Saving
 
-Now that you've created an experiment, let's save it! Go to *File*{:.gui-btn} -> *Save As*{:.gui-btn}. This window will appear:
+Now that you've created an experiment, let's save it! Go to *File*{:.gui-btn} → *Save As*{:.gui-btn}. This window will appear:
 
 ![Save As Window](assets/saveAs.png)
 
@@ -162,7 +162,7 @@ In this scenario, tutorial10-08-20_10-35-14 is what is referred to in the docume
 
 You may have noticed that there is no *Save* menu option, just *Save as*. This is intentional to prevent an experiment from being overwritten.
 
-Now that you have saved your experiment, go back to the designer and make a change other than the experiment name. Leave the experiment name the same. Perhaps you forgot to switch from *Sequential Trials*{:.gui-txt} to *Randomize Trials*{:.gui-txt}. Once you've changed this, go back and click *File*{:.gui-txt} -> *Save as*{:.gui-txt} again. You'll notice that in the browser window, the file name under which you're saving the experiment has automatically updated the timestamp. Go ahead and browse to the same location you saved the experiment before, and save it again. You will find you now have two experiment folders, both with the same name but a different timestamp. When you edit an experiment and save, this is always how it will work. You cannot save over a previous experiment. So if you need to update an experiment, go ahead and do so and re-save it. You must then go back and delete the previous experiment folder manually if you would like to do so.
+Now that you have saved your experiment, go back to the designer and make a change other than the experiment name. Leave the experiment name the same. Perhaps you forgot to switch from *Sequential Trials*{:.gui-txt} to *Randomize Trials*{:.gui-txt}. Once you've changed this, go back and click *File*{:.gui-txt} → *Save as*{:.gui-txt} again. You'll notice that in the browser window, the file name under which you're saving the experiment has automatically updated the timestamp. Go ahead and browse to the same location you saved the experiment before, and save it again. You will find you now have two experiment folders, both with the same name but a different timestamp. When you edit an experiment and save, this is always how it will work. You cannot save over a previous experiment. So if you need to update an experiment, go ahead and do so and re-save it. You must then go back and delete the previous experiment folder manually if you would like to do so.
 
 # Clear and start again
 

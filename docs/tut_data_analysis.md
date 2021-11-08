@@ -10,97 +10,96 @@ nav_order: 2
 
 # Prerequisites
 
-[Data Processing](tut_data_processing.md). Automated data handling is split into two sections - data processing and data analysis. You cannot analyze the data until it has been processed, so please see the data processing documentation first if you have not been through it. 
+[Data Processing](tut_data_processing.md). Automated data handling is split into two sections - data processing and data analysis. You cannot analyze the data until it has been processed, so please see the data processing documentation first if you have not been through it.
 
 # Data Analysis Tools Documentation
 
 The github repository at <https://github.com/JaneliaSciComp/G4_Display_Tools> has a suite of data analysis tools. Have a look at the [software installation guide](G4_Software_Setup.md) on how to set it up.
 
-In the typical use case of these tools, there is one file you need to worry about: `DA_plot_settings.m` at `G4_Display_Tools/G4_Data_Analysis`. This file contains many MATLAB variables which will dictate the settings of how your data is visualized. You will need to go through this file and update the settings according to your needs. This is the biggest task of setting up data analysis. Once your settings are correct and saved, the analysis itself will take less than a minute to run. 
+In the typical use case of these tools, there is one file you need to worry about: `DA_plot_settings.m` at `G4_Display_Tools/G4_Data_Analysis`. This file contains many MATLAB variables which will dictate the settings of how your data is visualized. You will need to go through this file and update the settings according to your needs. This is the biggest task of setting up data analysis. Once your settings are correct and saved, the analysis itself will take less than a minute to run.
 
-It is intended that, ideally, the user will create their data analysis settings at the same time that they create an experiment using the Designer and set up their data processing settings. You may want to set up two or three data analysis settings files, each of which will contain the settings for one type of analysis. Most commonly, this would be a settings file for plotting the data of a single fly, a settings file for plotting the data of a single group of flies (like a single genotype), and a settings file for plotting and comparing the data for many groups of flies. Each of these requires its own settings file, so it will be easiest if you create them at the same time as you create the experiment, so you don't have to go back and do it later. Once they've been created and saved, you can use them anytime to plot data. Data analysis settings can also be created and run anytime after an experiment has already been completed, so don't worry if you want to go back and do analysis on a previous experiment. This documentation will cover both scenarios. 
-                  
+It is intended that, ideally, the user will create their data analysis settings at the same time that they create an experiment using the Designer and set up their data processing settings. You may want to set up two or three data analysis settings files, each of which will contain the settings for one type of analysis. Most commonly, this would be a settings file for plotting the data of a single fly, a settings file for plotting the data of a single group of flies (like a single genotype), and a settings file for plotting and comparing the data for many groups of flies. Each of these requires its own settings file, so it will be easiest if you create them at the same time as you create the experiment, so you don't have to go back and do it later. Once they've been created and saved, you can use them anytime to plot data. Data analysis settings can also be created and run anytime after an experiment has already been completed, so don't worry if you want to go back and do analysis on a previous experiment. This documentation will cover both scenarios.
 
-# Plot Appearance Settings:
+# Plot Appearance Settings
 
-The first step to running analysis on your data is to create your settinsg file, so let's go over all the settings and what they do. Open `DA_plot_settings.m`. 
+The first step to running analysis on your data is to create your settinsg file, so let's go over all the settings and what they do. Open `DA_plot_settings.m`.
 
 The settings are split into eight different structures (not necessarily listed in the same order as you'll find them in the file). Keep in mind you may not need all of them. That's okay, you don't have to use them all.
 
-1. `Exp_settings`
-   - These are experiment settings and should be updated each time you create a settings file.
-2. `normalize_settings`
-   - These are all settings related to the normalization of the data.
-3. `histogram_plot_settings`
-   - These are settings related to plotting basic histograms of your inter-trial data, or stripe fixation data. These are not the same as the closed-loop histograms. 
-4. `histogram_annotation_settings`
-   - These control how the histograms from 3 are annotated – font, line type, and many other things. 
-5. `CL_hist_plot_settings`
-   - These are the settings for closed-loop histograms
-6. `timeseries_plot_settings`
-   - Contains appearance settings for the timeseries plots
-7. `TC_plot_settings`
-   - Appearance settings for tuning curves
-8. `save_settings`
-   - These settings affect how the results are saved.
-9. `MP_plot_settings`
-   - These settings are for a particular kind of plot, referred as M and P plots. These stand for Motion-Dependent response and Position-Dependent response. They are related to position series. 
-10. `pos_plot_settings`
-   - Plot settings for basic position series plots (plotting your data against the position of the pattern on the screen instead of against time)
-11. `comp_settings`
-   - These are settings for a comparison plot. The comparison plot is a figure which places four plots side by side for each condition - LmR timeseries, position series, M plot and P plot.
-12. `proc_settings`
-   - These are settings retrieved from your data processing - you will not edit these, so you don't need to worry about them.   
+1. `Exp_settings`: These are experiment settings and should be updated each time you create a settings file.
+2. `normalize_settings`: These are all settings related to the normalization of the data.
+3. `histogram_plot_settings`: These are settings related to plotting basic histograms of your inter-trial data, or stripe fixation data. These are not the same as the closed-loop histograms.
+4. `histogram_annotation_settings`: These control how the histograms from 3 are annotated – font, line type, and many other things.
+5. `CL_hist_plot_settings`: These are the settings for closed-loop histograms
+6. `timeseries_plot_settings`: Contains appearance settings for the timeseries plots
+7. `TC_plot_settings`: Appearance settings for tuning curves
+8. `save_settings`: These settings affect how the results are saved.
+9. `MP_plot_settings`: These settings are for a particular kind of plot, referred as M and P plots. These stand for Motion-Dependent response and Position-Dependent response. They are related to position series.
+10. `pos_plot_settings`: Plot settings for basic position series plots (plotting your data against the position of the pattern on the screen instead of against time)
+11. `comp_settings`: These are settings for a comparison plot. The comparison plot is a figure which places four plots side by side for each condition - LmR timeseries, position series, M plot and P plot.
+12. `proc_settings`: These are settings retrieved from your data processing - you will not edit these, so you don't need to worry about them.
 
-We have tried to place all the settings that are regularly changed first in the file, meaning not all settings for each group are together. There is a second section toward the bottom of the file which contains settings from all of the above groups that will change less frequently. Let's go over the settings and what they mean in the order you will find them in `DA_plot_settings.m`.  
+We have tried to place all the settings that are regularly changed first in the file, meaning not all settings for each group are together. There is a second section toward the bottom of the file which contains settings from all of the above groups that will change less frequently. Let's go over the settings and what they mean in the order you will find them in `DA_plot_settings.m`.
 
 # Settings in more detail
 
-Notice that we have tried to leave examples of each setting commented out. Rather than typing any code, you may just be able to uncomment the line which most closely matches your need then replace the actual values of the variable. Make sure if you do this, you comment out any other lines setting the same variable. For example, at approximately lines 25-30 you'll see this: 
+Notice that we have tried to leave examples of each setting commented out. Rather than typing any code, you may just be able to uncomment the line which most closely matches your need then replace the actual values of the variable. Make sure if you do this, you comment out any other lines setting the same variable. For example, at approximately lines 25-30 you'll see this:
 
-`%    exp_settings.field_values = {};`  
-`exp_settings.field_values{1} = ["metadata_field_value_1"];`  
-`%    exp_settings.field_values{2} = ["metadata_field_value_2"];`  
-`%     exp_settings.field_values{3} = ["metadata_field_value_1", "metadata_field_value_2"];`  
-`%     exp_settings.field_values{4} = ["metadata_field_value_1", "metadata_field_value_3"];`  
+```MATLAB
+%    exp_settings.field_values = {};
+exp_settings.field_values{1} = ["metadata_field_value_1"];
+%    exp_settings.field_values{2} = ["metadata_field_value_2"];
+%     exp_settings.field_values{3} = ["metadata_field_value_1", "metadata_field_value_2"];
+%     exp_settings.field_values{4} = ["metadata_field_value_1", "metadata_field_value_3"];
+```
 
 In this case, all lines are commented out except for the second. If you wanted to leave this variable empty, you would simply type a `%` at the beginning of line 2 and remove the `%` at the beginning of line 1, creating this:  
 
-`exp_settings.field_values = {};`  
-`%    exp_settings.field_values{1} = ["metadata_field_value_1"];`  
-`%    exp_settings.field_values{2} = ["metadata_field_vaue_2"];`  
-`%    exp_settings.field_values{3} = ["metadata_field_value_1", "metadata_field_value_2"];`  
-`%    exp_settings.field_values{4} = ["metadata_field_value_1", "metadata_field_value_3"];`  
+```MATLAB
+exp_settings.field_values = {};
+%    exp_settings.field_values{1} = ["metadata_field_value_1"];
+%    exp_settings.field_values{2} = ["metadata_field_vaue_2"];
+%    exp_settings.field_values{3} = ["metadata_field_value_1", "metadata_field_value_2"];
+%    exp_settings.field_values{4} = ["metadata_field_value_1", "metadata_field_value_3"];
+```
 
 Alternatively, you may have more than one metadata field by which to sort your data (see the below section on Field Values for an explanation of what this setting does). In that case you would comment out line 1 and uncomment lines 1-4 (or however many you need)  
 
-`%    exp_settings.field_values = {};`  
-`exp_settings.field_values{1} = ["metadata_field_value_1"];`  
-`exp_settings.field_values{2} = ["metadata_field_vaue_2"];`  
-`%    exp_settings.field_values{3} = ["metadata_field_value_1", "metadata_field_value_2"];`  
-`%    exp_settings.field_values{4} = ["metadata_field_value_1", "metadata_field_value_3"];`  
+```MATLAB
+%    exp_settings.field_values = {};
+exp_settings.field_values{1} = ["metadata_field_value_1"];
+exp_settings.field_values{2} = ["metadata_field_vaue_2"];
+%    exp_settings.field_values{3} = ["metadata_field_value_1", "metadata_field_value_2"];
+%    exp_settings.field_values{4} = ["metadata_field_value_1", "metadata_field_value_3"];
+```
 
-After uncommenting the lines you want, then you simply need to replace the text metadata_field_value_x with your value. The quotation marks, brackets, and other code elements can be left untouched. Much of the file can be filled out this way.   
+After uncommenting the lines you want, then you simply need to replace the text metadata_field_value_x with your value. The quotation marks, brackets, and other code elements can be left untouched. Much of the file can be filled out this way.
 
-Following is an explanation of each variable and what it does.   
+Following is an explanation of each variable and what it does.
 
 ## General experiment settings
 
 ### Path To Processing Settings
 
-`exp_settings.path_to_processing_settings` is a character vector indicating the processing settings file you created for this protocol.   
+`exp_settings.path_to_processing_settings` is a character vector indicating the processing settings file you created for this protocol.
 
 Example:  
-`exp_settings.path_to_processing_settings = '/Users/username/experiment_folder/processing_settings.mat';`  
 
-**NOTE** This path is used to get information from your processing settings, including the path to your protocol folder. This folder must be organized in a certain way for data analysis to work correctly. If you've maintained the default organization created when you run a fly through an experiment using the G4 Conductor, then you won't have to worry about this, but if you have manually changed the organization of your folder, you should ensure that your fly folders are two levels below your protocol folder. i.e. your folder's heirarchy should be protocl_folder -> subfolders -> fly folders -> individual fly data. If there are more or fewer levels than this, you may get a browse window during the analysis run wanting you to browse to the protocol folder, or you could get errors.  
+```MATLAB
+exp_settings.path_to_processing_settings = '/Users/username/experiment_folder/processing_settings.mat';
+```
+
+**NOTE** This path is used to get information from your processing settings, including the path to your protocol folder. This folder must be organized in a certain way for data analysis to work correctly. If you've maintained the default organization created when you run a fly through an experiment using the G4 Conductor, then you won't have to worry about this, but if you have manually changed the organization of your folder, you should ensure that your fly folders are two levels below your protocol folder. i.e. your folder's heirarchy should be protocl_folder → subfolders → fly folders → individual fly data. If there are more or fewer levels than this, you may get a browse window during the analysis run wanting you to browse to the protocol folder, or you could get errors.  
 
 ### Save Path
 
-`save_settings.save_path` is a character vector indicating where you wish to save the results of your data analysis. Note that the results will likely include several figures and a final pdf report.   
+`save_settings.save_path` is a character vector indicating where you wish to save the results of your data analysis. Note that the results will likely include several figures and a final pdf report.
 
-Example:   
-`save_settings.save_path = '/Users/username/experiment_folder/fly_folder/analysis';`  
+Example:
+
+```MATLAB
+save_settings.save_path = '/Users/username/experiment_folder/fly_folder/analysis';
+```
 
 ### Report Path
 
@@ -314,7 +313,7 @@ Note that it follows the same order as the datatypes array. LmR, if it is being 
 
 ### Figure names: 
 
-`timeseries_plot_settings.figure_names`, not to be confused with the previous variable, is an optional array of strings providing a figure name for each datatype of timeseries plots. This name will not be printed on the figure but be in the title bar along the top of the figure. We generally use the datatype being plotted as the figure name, but you can use any string you want. Just keep in mind that everything is done in the order LmR -> LpR, so if you are plotting both LmR and LpR, your LmR figure name should always come first. **Note that if your plots of a particular datatype are spread over multiple figures, those figures will all have the same figure name. This is not intended to identify any given figure but only to identify all figures of a given datatype.**  
+`timeseries_plot_settings.figure_names`, not to be confused with the previous variable, is an optional array of strings providing a figure name for each datatype of timeseries plots. This name will not be printed on the figure but be in the title bar along the top of the figure. We generally use the datatype being plotted as the figure name, but you can use any string you want. Just keep in mind that everything is done in the order LmR → LpR, so if you are plotting both LmR and LpR, your LmR figure name should always come first. **Note that if your plots of a particular datatype are spread over multiple figures, those figures will all have the same figure name. This is not intended to identify any given figure but only to identify all figures of a given datatype.**  
 
 Example:  
 Continuing with the same timeseries example as above, the corresponding figure names would look like this:   

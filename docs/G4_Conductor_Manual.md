@@ -62,7 +62,7 @@ You must set the paths to three files – the processing and plotting files (if 
 
 # Run a test protocol (optional)
 
-The *Run Test Protocol*{:.gui-btn} button will run the protocol listed in the settings file as the test protocol for that type. This will allow you to see a test run on the screens and make sure it looks right. If you need to adjust these settings, you cannot presently do it from the conductor. Close the conductor, adjust the settings through *File*{:.gui-btn} -> *Settings*{:.gui-btn} on the Designer, then return the conductor when finished.
+The *Run Test Protocol*{:.gui-btn} button will run the protocol listed in the settings file as the test protocol for that type. This will allow you to see a test run on the screens and make sure it looks right. If you need to adjust these settings, you cannot presently do it from the conductor. Close the conductor, adjust the settings through *File*{:.gui-btn} → *Settings*{:.gui-btn} on the Designer, then return the conductor when finished.
 
 ## The progress bar
 
