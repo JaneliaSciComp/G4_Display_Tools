@@ -29,9 +29,9 @@ If you already have a .g4p file saved and ready to run, you can open The Experim
 
 ## Start the protocol designer.  
 
-In MATLAB open the file `G4_Experiment_Designer.m`, located in `G4_Display_Tools\G4_Protocol_Designer` and hit run. Alternatively, you can type `G4_Experiment_Designer` into the matlab commandline and hit enter. This should open the "Fly Experiment Designer" in a Window that looks like this:
+In MATLAB open the file `G4_Experiment_Designer.m`, located in `G4_Display_Tools\G4_Protocol_Designer` and hit run. Alternatively, you can type `G4_Experiment_Designer` into the MATLAB command window and hit enter. This should open the "Fly Experiment Designer" in a Window that looks like this:
 
-![Fly Experiment Designer main window](../docs/assets/screenshot-1.png)
+![Fly Experiment Designer main window](../docs/assets/screenshot-1.png){:.pop}
 
 ## Check the size of the LED arena you are using. 
 
@@ -43,7 +43,7 @@ Notice the radio button at the center left of the application indicating *3 Row 
 
 The next step after verifying your screen size is to verify your settings are correct. Click *File*{:.gui-btn} > *Settings*{:.gui-btn} to open up your settings window. It should look like this:
 
-![Fly Experiment Settings window](../docs/assets/screenshot-2.png)
+![Fly Experiment Settings window](../docs/assets/screenshot-2.png){:.pop}
 
 The first field in the settings panel reads *Configuration file location:*{:.gui-txt} If the path to the configuration file is incorrect, please update it by using the associated browse button or by typing the correct path into the field.
 
@@ -113,7 +113,7 @@ This section will describe in detail how to create an experiment, but if you wou
 
 You can start creating conditions using the files imported in the previous step. The easiest starting point is to hit the *Auto-Fill*{:.gui-btn} button. This will create a block trial for every pattern imported, as well as create a pre-trial, inter-trial, and post-trial using the first pattern. Each trial will default to mode 1 and automatically pair a position function and one analog output function to each pattern (if they exist). Durations default to double the length of the position function. Hitting *Auto-Fill*{:.gui-btn} will produce something like this:
 
-![After Auto-fill](../docs/assets/screenshot-3.png "Main window of the experiment designer after hitting the Auto-Fill button")
+![After Auto-fill](../docs/assets/screenshot-3.png "Main window of the experiment designer after hitting the Auto-Fill button"){:.pop}
 
 Notice that cells holding parameters not used in mode 1 (such as *Frame Rate*{:.gui-txt}, *Gain*{:.gui-txt}, and *Offset*{:.gui-txt}) are disabled. If you try to edit these cells you will get a warning and your change will be reset. Each mode uses different parameters so if you change the mode of a condition, the cells will automatically adjust, enabling those used in that mode and disabling the rest.
 
@@ -145,7 +145,7 @@ If you want the pre-trial to run indefinitely until you are ready to move on wit
 
 Here is an example of a completed experiment. Be sure to change the name of your experiment at the bottom!
 
-![Example of a completed experiment](../docs/assets/screenshot-4.png)
+![Example of a completed experiment](../docs/assets/screenshot-4.png){:.pop}
 
 ## Other parameters outside the tables.
 
@@ -195,7 +195,7 @@ When you open an experiment, the designer will automatically populate with the a
 
 The in-screen preview panel shows you a preview of any pattern or function you select, but you can also get a holistic preview of a selected condition. Select the box at the end of the condition you want to see and hit the *Preview*{:.gui-btn} button to the right of the preview pane. You will see a separate window pop up that looks something like this, depending on the trial:
 
-![Experiment Preview](../docs/assets/screenshot-5.png)
+![Experiment Preview](../docs/assets/screenshot-5.png){:.pop}
 
 You have some options to set once this window is open. Notice the *Real-time Speed*{:.gui-txt} checkbox below the position function, and the *Frame Increment*{:.gui-txt} field below that. If you hit *Play*{:.gui-btn} immediately after the preview window opens, when the *Frame Increment*{:.gui-txt} is set to `1`, the preview will play VERY slowly. This is because these patterns play on the arena screens at 500 or 1000 frames per second, and a frame increment of 1 means you are showing every single frame on a screen that only refreshes at approximately 20 frames per second.
 
@@ -239,28 +239,27 @@ This pretty much covers the G4 Designer's features and how to use them. However,
 - [This tutorial on how to create a full experiment](../docs/experiment_tutorial.md)
 - [This tutorial on how to use the arena without the Designer](../docs/run_protocol_tutorial.md)
 
-
 ## Trouble-shooting
 
 Many common errors will create a dialog box telling you there is a problem, but some of them may be vague if you are new to MATLAB or to this software. Here are some of the most error messages and what to do about them:
 
-### "You must select a trial" or "Only one trial may be selected." 
+### "You must select a trial" or "Only one trial may be selected."
 
 Some of the functionality in the designer can only be performed on one condition at a time. If you get this error, scroll through all your trials and make sure one and only one condition is selected. 
 
 ### "You cannot edit that field in this mode."
 
-Most modes only allow certain parameters to be changed. You are trying to edit a parameter not available for the mode. Check the mode value for that condition and make sure it is correct for what you're trying to do. 
+Most modes only allow certain parameters to be changed. You are trying to edit a parameter not available for the mode. Check the mode value for that condition and make sure it is correct for what you're trying to do.
 
-### "The value you've entered is not a multiple of 1000. Please double check your entry." 
+### "The value you've entered is not a multiple of 1000. Please double check your entry."
 
 This is not actually an error, and will not prevent you from doing anything. However, the Analog Input sample rates usually should be multiples of 1000, so this warning is there in case you miss a zero or otherwise typo a sample rate. 
 
-### "None of the patterns imported match the screen size selected." 
+### "None of the patterns imported match the screen size selected."
 
 Check the screen size at the center left of the designer. The patterns you've tried to import were made for a different size screen than you have selected. 
 
-### "If you have imported from multiple locations, you must save your experiment before you can test it on the screens." 
+### "If you have imported from multiple locations, you must save your experiment before you can test it on the screens."
 
 This is also not an error, but a warning. If you have not saved your experiment yet, then the folder this application thinks of as the "experiment folder" is the last folder you imported from. If you have imported from multiple locations and try to test a trial on the screens, it may not work if it cannot find the pattern or function it needs in the last location you imported from. You can avoid this issue by saving the experiment before you dry run a trial. 
 
@@ -268,7 +267,7 @@ This is also not an error, but a warning. If you have not saved your experiment 
 
 **There are also errors that you might get in MATLAB that don't produce a dialog box. Some common ones include:**
 
-### "Error using fileread. Could not open file HHMI Panels Configuration.ini." 
+### "Error using fileread. Could not open file HHMI Panels Configuration.ini."
 
 If you get this error message regarding the configuration file or any other important file, check that the path to this file is correct in your settings and make sure the file is on your MATLAB path. If you get this error regarding the `G4_Protocol_Designer_Settings.m` file, make sure it is located in `G4_Display_Tools\G4_Protocol_Designer`. Do not move it from this location. If you get this error regarding the `recently_opened_g4p_files.m` file, please make sure it is located in `G4_Display_Tools\G4_Protocol_Designer\support_files`. DO NOT edit this file.
 

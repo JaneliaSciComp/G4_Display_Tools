@@ -16,7 +16,7 @@ nav_order: 2
 
 The github repository at <https://github.com/JaneliaSciComp/G4_Display_Tools> has a suite of data analysis tools. Have a look at the [software installation guide](G4_Software_Setup.md) on how to set it up.
 
-In the typical use case of these tools, there is one file you need to worry about: `DA_plot_settings.m` at `G4_Display_Tools/G4_Data_Analysis`. This file contains many matlab variables which will dictate the settings of how your data is visualized. You will need to go through this file and update the settings according to your needs. This is the biggest task of setting up data analysis. Once your settings are correct and saved, the analysis itself will take less than a minute to run. 
+In the typical use case of these tools, there is one file you need to worry about: `DA_plot_settings.m` at `G4_Display_Tools/G4_Data_Analysis`. This file contains many MATLAB variables which will dictate the settings of how your data is visualized. You will need to go through this file and update the settings according to your needs. This is the biggest task of setting up data analysis. Once your settings are correct and saved, the analysis itself will take less than a minute to run. 
 
 It is intended that, ideally, the user will create their data analysis settings at the same time that they create an experiment using the Designer and set up their data processing settings. You may want to set up two or three data analysis settings files, each of which will contain the settings for one type of analysis. Most commonly, this would be a settings file for plotting the data of a single fly, a settings file for plotting the data of a single group of flies (like a single genotype), and a settings file for plotting and comparing the data for many groups of flies. Each of these requires its own settings file, so it will be easiest if you create them at the same time as you create the experiment, so you don't have to go back and do it later. Once they've been created and saved, you can use them anytime to plot data. Data analysis settings can also be created and run anytime after an experiment has already been completed, so don't worry if you want to go back and do analysis on a previous experiment. This documentation will cover both scenarios. 
                   
@@ -585,7 +585,7 @@ Example:
 
 ### M and P x and y limits
 
-`MP_plot_settings.ylimits` and `MP_plot_settings.xlimits` should each be a 2x2 array providing the y or x min and max values for each M and P plots. They can also be left empty, in which case matlab will determine the x and y limits based on the data. The setup is [M-ymin M-ymax; P-ymin P-ymax] and similar for x axis. 
+`MP_plot_settings.ylimits` and `MP_plot_settings.xlimits` should each be a 2x2 array providing the y or x min and max values for each M and P plots. They can also be left empty, in which case MATLAB will determine the x and y limits based on the data. The setup is [M-ymin M-ymax; P-ymin P-ymax] and similar for x axis. 
 
 Example:   
 `MP_plot_settings.ylimits = [-10 10; 0 20];`  
@@ -641,7 +641,7 @@ Example:
 
 ### Position series X and y limits
 
-`pos_plot_settings.ylimits` and `pos_plot_settings.xlimits` are the same as in the M and P settings, but again are only needed for one figure or set of figures, not two. So they will each be a 1x2 array instead of 2x2, each containing one set of limits. They can also be left empty in order to allow matlab to set the limits based on the data. 
+`pos_plot_settings.ylimits` and `pos_plot_settings.xlimits` are the same as in the M and P settings, but again are only needed for one figure or set of figures, not two. So they will each be a 1x2 array instead of 2x2, each containing one set of limits. They can also be left empty in order to allow MATLAB to set the limits based on the data. 
 
 Example:   
 `pos_plot_settings.ylimits = [-10 10];`  
@@ -737,7 +737,7 @@ Example:
 
 ### Y axis limits 
 
-`comp_settings.ylimits` is an optional setting where you can provide a y limit that you want applied across all plots. This may not always make sense, so if you want y limits to be set by matlab, you should set this to [0 0]. Otherwise, you can provide whatever numbers make sense for you. 
+`comp_settings.ylimits` is an optional setting where you can provide a y limit that you want applied across all plots. This may not always make sense, so if you want y limits to be set by MATLAB, you should set this to [0 0]. Otherwise, you can provide whatever numbers make sense for you. 
 
 Example:   
 `comp_settings.ylimits = [0 0];`  
@@ -768,7 +768,7 @@ This covers the settings that should be regularly updated. At this point `DA_plo
 
 Now that you have your settings as you want them, you need to create a .mat file which contains all your preferences.  This will be used to actually run the data analysis. We do it this way because it is likely you will have only a few configurations of settings that you will use over and over again, in which case it is easier to create them once and be done. Be sure you save `DA_plot_settings.m` with all of your changes.
 
-In `G4_data_analysis/support` there is a function called `create_settings_file`. This function takes in two parameters, the name of your settings file and the path where you would like to save it. Run this function to create a .mat file at the location you specify. The .mat file will contain all the settings present in the `DA_plot_settings.m` file you've just adjusted. Do this by typing the following command into the matlab command window and hitting enter: 
+In `G4_data_analysis/support` there is a function called `create_settings_file`. This function takes in two parameters, the name of your settings file and the path where you would like to save it. Run this function to create a .mat file at the location you specify. The .mat file will contain all the settings present in the `DA_plot_settings.m` file you've just adjusted. Do this by typing the following command into the MATLAB command window and hitting enter: 
 
 `create_settings_file('name of file', 'path to file');` You should give your file a meaningful name that indicates whether it is for a single fly, a particular group, or multiple groups. I recommend saving it inside your experiment folder so you do not forget which experiment it was made for.
 
@@ -780,9 +780,11 @@ Now you are ready to run an analysis!
 
 ## Running a typical analysis:
 
-There are two steps to running data analysis – the first is to run the file `create_data_analysis_tool.m.` This is not a regular script or function, so opening the file and hitting run in the MATLAB environment will not work. It is a class and when you run it, it creates an object. You should run it from the matlab command line. Here's an example:
+There are two steps to running data analysis – the first is to run the file `create_data_analysis_tool.m.` This is not a regular script or function, so opening the file and hitting run in the MATLAB environment will not work. It is a class and when you run it, it creates an object. You should run it from the MATLAB command window. Here's an example:
 
-`da = create_data_analysis_tool('path to the settings file', '-group', '-hist', '-tsplot');`  
+```MATLAB
+da = create_data_analysis_tool('path to the settings file', '-group', '-hist', '-tsplot');
+```
 
 The first input is the path to the settings file which you just created. This will tell the class what settings to use in the analysis. After this are multiple inputs, or flags, which tell the `create_data_analysis_tool` function what analysis to do. The currently accepted flags are as follows:
 
@@ -815,7 +817,7 @@ This will produce a number of graphs, automatically saving them at the save path
 
 `Datatype_groupNames_plotType_#.pdf`  
 
-A matlab figure version of each will also be saved, so you can open the figures in matlab and continue to edit them on your own. Additionally, a .pdf report will be generated containing a copy of each figure for easy browsing. 
+A MATLAB figure version of each will also be saved, so you can open the figures in MATLAB and continue to edit them on your own. Additionally, a .pdf report will be generated containing a copy of each figure for easy browsing. 
 
 # Adding new modules:
 

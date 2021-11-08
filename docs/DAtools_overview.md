@@ -25,7 +25,7 @@ When an experiment finishes, your experiment folder will contain a new folder, n
         └──metadata.mat
 ```
 
-In the fly's folder, there will be a folder named with a timestamp. Inside are a set of tdms files. TDMS is a file type created by National Instruments and it generally takes some kind of special software to view them. Therefore, we have provided a function called `G4_TDMS_folder2struct.m` which will run automatically at the end of an experiment. This produces a .mat file called `G4_TDMS_Logs_[timestamp].mat`. It contains the raw data from the .tdms files, but in a format easy to open and navigate in matlab. This .mat file contains a structure called Log. The structure looks like this:
+In the fly's folder, there will be a folder named with a timestamp. Inside are a set of `*.tdms` files. [TDMS (Technical Data Management Solution)](https://www.ni.com/en-us/support/documentation/supplemental/06/the-ni-tdms-file-format.html) is a file type created by National Instruments and it generally takes some kind of special software to view them. Therefore, we have provided a function called `G4_TDMS_folder2struct.m` which will run automatically at the end of an experiment. This produces a `.mat` file called `G4_TDMS_Logs_[timestamp].mat`. It contains the raw data from the `.tdms` files, but in a format easy to open and navigate in MATLAB. This `.mat` file contains a structure called Log. The structure looks like this:
 
 ```
 Log
@@ -64,7 +64,7 @@ Please see the [G4 Data Analysis section](Data_analysis_documentation.md) for an
 
 You will access a file we have provided called create_processing_settings.m. This file contains many different parameters, which is covered in detail in the [G4 Data Analysis section](Data_analysis_documentation.md). Essentially, you will provide information such as file name and save locations, information pertaining to the structure of your experiment, information pertaining to channels you used and datatypes you'd like to analyze, and provide parameters for normalization and error checking. When you have your settings the way you want them, you can run the file and it will create a .mat file wherever you specified. This .mat file contains your processing settings, and I will refer to it from now on as your "processing settings file." It is suggested that you save it in your experiment folder, so that if you come back to that experiment months or years later, you can see exactly how its data was processed. 
 
-If you want the G4 Conductor to run this processing automatically, all you need to do is check the *Processing*{:.gui-txt} box and then provide the path to the processing settings file you created. However, if you did not process the data automatically, you can always run this processing on your own later. To do this, you would run the command `process_data('path to fly folder', 'path to settings file')` in your matlab command line. 
+If you want the G4 Conductor to run this processing automatically, all you need to do is check the *Processing*{:.gui-txt} box and then provide the path to the processing settings file you created. However, if you did not process the data automatically, you can always run this processing on your own later. To do this, you would run the command `process_data('path to fly folder', 'path to settings file')` in your MATLAB command window.
 
 This processing tool uses the tdms log .mat file to align the raw data and divide it into its appropriate trials, repetitions, and datatypes. It will create a new .mat file with many variables in it, but the basic data will be processed into a cell array of size {number datatypes x number trials per repetition x number of repetitions x datapoints per trial}. Several other datasets will be produced from this basic dataset depending on your settings. 
 
@@ -87,7 +87,7 @@ The first thing you will do, much like the data processing set, is open the file
 
 This settings file will allow you to do everything from setting the colors, fonts, and other aesthetic plot options, determining the layout of subplots on your figures, providing labels and alternate axis scales, and much more. You can also set a save location for a data analysis report, which will be provided at the end of the analysis. 
 
-Once your settings file is as you want it, you will run the function create_settings_file in your matlab commandline. It takes two inputs - the name that you want to give your settings file, and the path where you want to save it. So the command looks like this: `create_settings_file('name of file', 'path to file')`. 
+Once your settings file is as you want it, you will run the function create_settings_file in your MATLAB command window. It takes two inputs - the name that you want to give your settings file, and the path where you want to save it. So the command looks like this: `create_settings_file('name of file', 'path to file')`. 
 
 It's important to note that your experiment folder must follow a certain structure for this to work. If you have changed the organization of your experiment folder from the way it was produced by the G4 Protocol Designer, then you should become familiar with the organization requirements. The data analysis settings allows you to provide information which will let the software automatically pull data for flies you are interested in. For example, you can tell it that you want all flies of genotype1 and run by one experimenter in one group, and all flies of that same genotype but run by a different experimenter in a second group. Then your data analysis would be comparing flies of the same genotype run by two different experimenters. However, this sorting behavior requires that your experiment structure be set up in this general structure: 
 
@@ -104,9 +104,9 @@ It's important to note that your experiment folder must follow a certain structu
 
 The protocol folder refers to the folder which contains your .g4p file as well as an pattern or function folders. Inside the protocol folder should be some subfolders which organize your flies in some way. In our case, we create a folder for each date. That folder then contains the results of all flies run on that date. But these could be by genotype or any other organizational scheme. The important thing is that each individual fly folder, which contains that fly's results, are two levels below the protocol folder, as shown here. 
 
-To have the Conductor then run this data analysis automatically, simply check the "Plotting" checkbox and provide a path to the settings file you've just created. If you want to run it yourself, later, you will run a command from the matlab command line that looks like this: 
+To have the Conductor then run this data analysis automatically, simply check the "Plotting" checkbox and provide a path to the settings file you've just created. If you want to run it yourself, later, you will run a command from the MATLAB command window that looks like this: 
 
-```matlab
+```MATLAB
 da = create_data_analysis_tool('path to settings file', -flags)
 da.run_analysis
 ```

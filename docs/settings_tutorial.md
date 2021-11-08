@@ -18,7 +18,7 @@ Many features of the [G4 Designer](G4_Designer_Manual.md) and [Conductor](G4_Con
 
 Before you can even open the G4 Designer, you must update one thing - the path to your G4 Configuration file. 
 
-Open the file `G4_Display_Tools/G4_Protocol_Designer/G4_Protocol_Designer_Settings.m` in matlab. The first line of this file should read "Configuration File Path: /Users/taylorl/Desktop/HHMI Panels Configuration.ini" or something similar. This path must be accurate to open the Designer. If it is not, replace the current path with the correct path to your HHMI Panels Configuration.ini file. 
+Open the file `G4_Display_Tools/G4_Protocol_Designer/G4_Protocol_Designer_Settings.m` in MATLAB. The first line of this file should read "Configuration File Path: /Users/taylorl/Desktop/HHMI Panels Configuration.ini" or something similar. This path must be accurate to open the Designer. If it is not, replace the current path with the correct path to your HHMI Panels Configuration.ini file. 
 
 Note: There should be exactly one space between the ':' and the first character of your path. Additionally there should be no trailing spaces at the end of your path. Please ensure these two things are true before saving and closing the file. 
 
@@ -26,9 +26,9 @@ This is the only change you should make to this file. Please save and close the 
 
 # Open the G4 Designer
 
-Make sure that G4_Display_Tools and all its subfolders and files are on your matlab path. Then type 'G4_Experiment_Designer' into your matlab command line and hit 'Enter.' Alternatively, you could browse to the file `G4_Display_Tools/G4_Protocol_Designer/G4_Experiment_Designer.m`, open it in matlab, and hit *Run*{:.gui-btn}.
+Make sure that G4_Display_Tools and all its subfolders and files are on your MATLAB path. Then type 'G4_Experiment_Designer' into your MATLAB command window and hit 'Enter.' Alternatively, you could browse to the file `G4_Display_Tools/G4_Protocol_Designer/G4_Experiment_Designer.m`, open it in MATLAB, and hit *Run*{:.gui-btn}.
 
-A window like the one below will open. If it does not, or if you get a matlab error, see the [G4 Designer Manual](G4_Designer_Manual.md) for more help on errors and debugging. 
+A window like the one below will open. If it does not, or if you get a MATLAB error, see the [G4 Designer Manual](G4_Designer_Manual.md) for more help on errors and debugging. 
 
 ![Empty Designer Window](assets/screenshot-1.png){:.pop}
 

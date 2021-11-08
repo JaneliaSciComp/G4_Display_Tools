@@ -76,7 +76,7 @@ So what follows is a step by step instructions on how to create a single conditi
 
 # Open the designer
 
-First you have to open the Designer. There are two ways to do this. Assuming the [G4 Display Tools are on your matlab path](G4_Software_Setup.html#add-to-path), you can simply type `G4_Experiment_Designer` into your matlab command line. Alternatively, you can browse to the file `G4_Display_Tools/G4_Protocol_Designer/G4_Experiment_Designer.m`, open the file in matlab, and hit *Run*{:.gui-btn} at the top of the matlab window.
+First you have to open the Designer. There are two ways to do this. Assuming the [G4 Display Tools are on your MATLAB path](G4_Software_Setup.html#add-to-path), you can simply type `G4_Experiment_Designer` into your MATLAB command window. Alternatively, you can browse to the file `G4_Display_Tools/G4_Protocol_Designer/G4_Experiment_Designer.m`, open the file in MATLAB, and hit *Run*{:.gui-btn} at the top of the MATLAB window.
 
 You should get a screen that looks like this: 
 

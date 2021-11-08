@@ -53,7 +53,7 @@ Both patterns have now been generated! But don't exit the GUI just yet…
 
 This tutorial focused on using the GUI to generate patterns, but there are many situations where using this tool in script form will be more desireable. For instance, if you want to generate many patterns at once, this can be easily accomplished in script form but would be inconvenient to do manually with the GUI.
 
-To see how the current pattern can be generated using a script, click on the *create script*{:.gui-btn} button on the top-right section of the GUI. This will generate and open a new matlab script that is written to design and generate a pattern with the current parameters in the GUI.
+To see how the current pattern can be generated using a script, click on the *create script*{:.gui-btn} button on the top-right section of the GUI. This will generate and open a new MATLAB script that is written to design and generate a pattern with the current parameters in the GUI.
 
 The primary elements to using this tool in script form are:
 
