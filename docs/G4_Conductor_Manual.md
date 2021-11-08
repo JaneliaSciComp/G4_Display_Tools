@@ -33,7 +33,7 @@ Notice in the above picture, the metadata is already filled out for the most par
 
 *Note: You can add comments to the comments metadata field anytime during the experiment, and when the experiment ends it will pause and give you another chance to add any final comments.*
 
-If you are on a Windows operating system, and when you click Open Metadata Google Sheet nothing happens or you get an error that says, `'cmd.exe' is not recognized`, try running this command in the MATLAB command line once before clicking the button again: `setenv('PATH', [getenv('PATH') ';C:\Windows\system32'])`.
+If you are on a Windows operating system, and when you click Open Metadata Google Sheet nothing happens or you get an error that says, `'cmd.exe' is not recognized`, try running this command in the MATLAB command window once before clicking the button again: `setenv('PATH', [getenv('PATH') ';C:\Windows\system32'])`.
 
 # Experiment settings
 
