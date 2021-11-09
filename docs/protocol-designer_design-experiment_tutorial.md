@@ -114,14 +114,14 @@ NOTE: If you have not saved your experiment, this feature may not work. The reas
 
 Now that you're familiar with the tables and previewing options, lets look to the left side of the Designer.
 
-![Experiment Length Button](assets/expLength.png){:.ifr .pop}
+![Experiment Length Button](assets/p-d_d-e_t_calculate-experiment-length.png){:.ifr .pop}
 
 Click the *Calculate Experiment Length*{:.gui-btn} button. As you might expect, it provides you with an estimate of how long your experiment will take as it is arranged at that moment.
 
 Below this button is a panel containing two radio buttons. You must choose one option or the other.
 {:.clear}
 
-![Random or Sequential Radio Buttons](assets/randomRadios.png){:.ifr .pop}
+![Random or Sequential Radio Buttons](assets/p-d_d-e_t_trial-sequence.png){:.ifr .pop}
 
 If you select *Randomize Trials*{:.gui-txt}, then every time your main block of trials runs, the conditions will be run in a random order. If you select *Sequential Trials*{:.gui-txt}, then every time the main block plays, the conditions will play in the order that they appear in the Block Trials table. For an example of the difference, refer back to the beginning of the [condition tutorial](protocol-designer_create-condition_tutorial.md).
 
@@ -150,13 +150,13 @@ You've now been introduced to everything you need to create an entire experiment
 
 Now that you've created an experiment, let's save it! Go to *File*{:.gui-btn} → *Save As*{:.gui-btn}. This window will appear:
 
-![Save As Window](assets/saveAs.png)
+![Save As Window](assets/p-d_d-e_t_save-as.png){:.pop}
 
 Notice the program added a timestamp to the end of your experiment name automatically, and gave it the extension '.g4p.' This is the extension we assign to the .mat file which contains all the parameters and conditions for your experiment. It stands for G4 Protocol.
 
 Browse to the location you want to save and click save. Notice that it does not just save the .g4p file. There should now be a folder in the location you chose with the same name as the .g4p file. The inside of the folder should be structured something like this:
 
-![Experiment Folder example](assets/exportedFolder.png)
+![Experiment Folder example](assets/p-d_d-e_t_folder-structure.png){:.pop}
 
 In this scenario, tutorial10-08-20_10-35-14 is what is referred to in the documentation as my Experiment Folder. It contains everything needed to run this experiment. Inside is the .g4p file as well as the currentExp.mat file. This .mat file contains data regarding the patterns and function in your experiment, but you don't need to do anything with it. It should then contain three folders: 'Patterns', 'Functions', and "Analog Output Functions.' Inside each are both the binary files (.pat, .pfn, .afn) and .mat files associated with each pattern or function. Do not alter or move any of these files. Leave the folder arranged how it is.
 
