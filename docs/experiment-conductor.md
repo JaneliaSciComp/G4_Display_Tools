@@ -15,7 +15,7 @@ The G4 Conductor is the application you will use to run an experimental protocol
 
 To open this application directly from the [G4 Designer](protocol-designer.md), click the *Run Trials*{:.gui-btn} on the left side of the Designer window. The experimental protocol that was open in the Designer will automatically be opened in the Conductor, assuming you have saved the experimental protocol.
 
-If the Designer is not open, there is no need to open it. You can open the file `G4_Display_Tools/G4_Protocol_Designer/G4_Experiment_Conductor.m` in MATLAB and hit *Run*{:.gui-btn} to open the Conductor directly.
+If the Designer is not open, there is no need to open it. You can open the file `G4_Display_Tools\G4_Protocol_Designer\G4_Experiment_Conductor.m` in MATLAB and hit *Run*{:.gui-btn} to open the Conductor directly.
 
 The window that opens should look something like this:
 

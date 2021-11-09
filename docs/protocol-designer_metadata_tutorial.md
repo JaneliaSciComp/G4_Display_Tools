@@ -78,7 +78,7 @@ With all of this in mind, go through each tab and enter a starting set of values
 
 So the Google Sheets is done. Great! But how does the Conductor access these values?
 
-To give it access, we must open the [G4 Protocol Designer](protocol-designer.md). If you've never opened the designer before, [click here](protocol-designer.md) for details on how to open it. Simply put, you can browse to G4_Display_Tools/G4_Protocol_Designer/G4_Protocol_Designer.m, open this file in MATLAB, and run it. Assuming your path is set up correctly and you have your configuration file in place, it should open the main Designer window.
+To give it access, we must open the [G4 Protocol Designer](protocol-designer.md). If you've never opened the designer before, follow the documentation about the [G4 Protocol Designer](protocol-designer.md) for details on how to open it. Simply put, you can browse to `G4_Display_Tools/G4_Protocol_Designer/G4_Protocol_Designer.m`, open this file in MATLAB, and run it. Assuming your path is set up correctly and you have your configuration file in place, it should open the main Protocol Designer window.
 
 Once it's open, go to *File*{:.gui-btn} → *Settings*{:.gui-btn} at the top left corner. This window should appear:
 
