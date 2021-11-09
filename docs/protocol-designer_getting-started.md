@@ -6,13 +6,13 @@ nav_order: 3
 
 # Setting up an experiment - an overview
 
-At this point, your [hardware should be set up and working](../../../docs/gs_getting-hardware.md), and you should understand how to tether a fly inside the arena. If not, please see [Historic Background](../../../docs/gs_historic-background.md) and [Getting the hardware](../../../docs/gs_getting-hardware.md) pages under [Getting Started](../../../docs/getting-started.md).
+At this point, your [hardware should be set up and working]({{site.baseurl}}/docs/gs_getting-hardware.html), and you should understand how to tether a fly inside the arena. If not, please see [Historic Background]({{site.baseurl}}/docs/gs_historic-background.html) and [Getting the hardware]({{site.baseurl}}/docs/gs_getting-hardware.html) pages under [Getting Started]({{site.baseurl}}/docs/getting-started.html).
 
 So your hardware is set up and you're ready to run an experiment? You'll need the G4 Display Tools.
 
 ## What are the G4 Display Tools?
 
-The [G4 Display tools](../../../docs/G4-index.md#Display-Tools) are a suite of software tools that make it easy to run fly behavioral experiments on the Generation 4 (G4) arena. These tools allow you to:
+The [G4 Display tools]({{site.baseurl}}/docs/G4-index.html#Display-Tools) are a suite of software tools that make it easy to run fly behavioral experiments on the Generation 4 (G4) arena. These tools allow you to:
 
 - Create patterns to display on the screens
 - Generate functions to control the movement of patterns on the screens
@@ -21,7 +21,7 @@ The [G4 Display tools](../../../docs/G4-index.md#Display-Tools) are a suite of s
 - Automatically save and process data
 - Perform some types of data analysis automatically
 
-For now, here's an overview of the steps you will take to set up an experiment utilizing these tools. Please see the page for each individual tool, located under [Generation 4](../../../docs/G4-index.md) for further details on its use and tutorials to take you through this step by step.
+For now, here's an overview of the steps you will take to set up an experiment utilizing these tools. Please see the page for each individual tool, located under [Generation 4]({{site.baseurl}}/docs/G4-index.html) for further details on its use and tutorials to take you through this step by step.
 
 ## Pattern and Function Generators
 
