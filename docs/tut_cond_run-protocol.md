@@ -9,7 +9,7 @@ nav_order: 1
 
 - [G4 Setup](G4_Software_Setup.md)
 - have designed at least one pattern using the [Pattern Maker](pattern-generator.md)
-- have designed at least one position function using the [Function Generator](About_Function_Generator.md)
+- have designed at least one position function using the [Function Generator](function-generator.md)
 - Have some basic knowledge of programming in MATLAB
 
 # Introduction
@@ -38,7 +38,7 @@ As you can see, you send commands to the screen generally by typing `Panel_com(c
 
 Now that you know you can send commands to the screens via MATLAB command window, it becomes clear that you could run an entire condition this way if you knew which commands to use. I'll take you through the steps to do this now. Once you have run a condition via MATLAB command window, it will be much easier to understand the function of the run protocol.
 
-To do this, you will need an experiment folder, or at least a mock experiment folder, containing a pattern and function. If you've already done the tutorial on how to [design a condition](tut_prot_create-condition.md), you should have one, wherever you saved the file in that tutorial. If you've not done this yet, that's okay. Create a test folder on your desktop or somewhere else easily accessible (you can delete it later). Inside this folder should be two folders - one called Patterns and one called Functions. And each of these folders should contain at least one pattern and one function, created using the [Pattern Generator](pattern-generator.md) and the [Function Generator](About_Function_Generator.md). Both files associated with the pattern or function, .mat and .pat files, should be present. This next section will not work if you don't have a pattern and a function to send to the screens.
+To do this, you will need an experiment folder, or at least a mock experiment folder, containing a pattern and function. If you've already done the tutorial on how to [design a condition](tut_prot_create-condition.md), you should have one, wherever you saved the file in that tutorial. If you've not done this yet, that's okay. Create a test folder on your desktop or somewhere else easily accessible (you can delete it later). Inside this folder should be two folders - one called Patterns and one called Functions. And each of these folders should contain at least one pattern and one function, created using the [Pattern Generator](pattern-generator.md) and the [Function Generator](function-generator.md). Both files associated with the pattern or function, .mat and .pat files, should be present. This next section will not work if you don't have a pattern and a function to send to the screens.
 
 If you did not send the connectHost command to the screens earlier, do it now. Panel Host must be connected before sending any other commands via Panel_com.
 

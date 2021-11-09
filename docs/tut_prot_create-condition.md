@@ -10,7 +10,7 @@ nav_order: 4
 Before going through this tutorial, you should have done the following:
 
 - created one or more patterns using the [Pattern Generator](pattern-generator.md)
-- created one or more functions using the [Function Generator](About_Function_Generator.md)
+- created one or more functions using the [Function Generator](function-generator.md)
 - Reviewed the different experiment modes
 - [Set up your system]({{site.baseurl}}/docs/G4-Assembly.html).
 
@@ -72,7 +72,7 @@ The set of block trials is played twice, but in random order each time.
 
 So you can see that being able to create a single condition is almost all you need to know in order to create an experiment. Once you can create one condition, all you have to do is make a bunch and put them together.
 
-So what follows is a step by step instructions on how to create a single condition in the [G4 Designer](G4_Designer_Manual.md). Please note that you should already have created any patterns and functions you might need for this. If you have not, please see documentation on the [Pattern Generator](pattern-generator.md) and [Function Generator](About_Function_Generator.md) for more details.
+So what follows is a step by step instructions on how to create a single condition in the [G4 Designer](G4_Designer_Manual.md). Please note that you should already have created any patterns and functions you might need for this. If you have not, please see documentation on the [Pattern Generator](pattern-generator.md) and [Function Generator](function-generator.md) for more details.
 
 # Open the designer
 
@@ -138,7 +138,7 @@ Once you've verified the pattern looks as you expect, click *Select*{:.gui-btn} 
 
 Conditions default to mode 1 but there are 7 modes in all. Mode 6 is currently not functional, but the rest are available to you. When you change the mode, the disabled cells may change. This is because different modes allow different parameters.
 
-For now let's leave it in mode 1. This is the mode that uses a position function to determine which frame of the pattern is displaying at any given time. For mode 1, we need to import a position function. Repeat the import steps above, but this time import a position function that you created with the [Function Generator](About_Function_Generator.md).
+For now let's leave it in mode 1. This is the mode that uses a position function to determine which frame of the pattern is displaying at any given time. For mode 1, we need to import a position function. Repeat the import steps above, but this time import a position function that you created with the [Function Generator](function-generator.md).
 
 # Add a position function
 

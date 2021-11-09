@@ -6,7 +6,7 @@ nav_order: 4
 
 # How to run an experiment - an overview
 
-At this point, you should understand, in broad strokes at least, what it entails to [create an experiment](gs_running-experiment.md). To learn to create an experiment in detail and access tutorials regarding the [Pattern Generator](pattern-generator.md), [Function Generator](About_Function_Generator.md), and [G4 Protocol Designer](G4_Designer_Manual.md), open the item [Generation 4]({{site.baseurl}}/docs/G4-index.md) on the left hand menu.
+At this point, you should understand, in broad strokes at least, what it entails to [create an experiment](gs_running-experiment.md). To learn to create an experiment in detail and access tutorials regarding the [Pattern Generator](pattern-generator.md), [Function Generator](function-generator.md), and [G4 Protocol Designer](G4_Designer_Manual.md), open the item [Generation 4]({{site.baseurl}}/docs/G4-index.md) on the left hand menu.
 
 Once you've created and saved an experiment, you will use the [G4 Conductor](G4_Conductor_Manual.md) to run it.
 

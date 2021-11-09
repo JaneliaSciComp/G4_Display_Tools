@@ -73,7 +73,7 @@ Once you have completed the tutorial and filled in these GID values, you should 
 
 # The Designer: Import files
 
-To design an experiment, you must first import the files that you will use for the experiment. These files may include patterns, position functions, analog output functions, or the `currentExp.mat` file produced with every experiment. Patterns describe the visual output on the arena at any point in time. You can use the position functions to change this output over time. Analog output functions are used to generate a corresponding output on the BNC. You should have already created these using the [G4 Pattern Generator](pattern-generator.md) and [G4 Function Generator](About_Function_Generator.md). The file `currentExp.mat` is a description of the experiment itself.
+To design an experiment, you must first import the files that you will use for the experiment. These files may include patterns, position functions, analog output functions, or the `currentExp.mat` file produced with every experiment. Patterns describe the visual output on the arena at any point in time. You can use the position functions to change this output over time. Analog output functions are used to generate a corresponding output on the BNC. You should have already created these using the [G4 Pattern Generator](pattern-generator.md) and [G4 Function Generator](function-generator.md). The file `currentExp.mat` is a description of the experiment itself.
 
 *Note that the `currentExp.mat` file will only exist if you are importing an experiment that has already been designed and saved with the designer. If you are creating a new experiment from scratch, you won't have it. The Designer will create it for you.*
 
