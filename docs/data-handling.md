@@ -8,7 +8,7 @@ has_toc: false
 
 # Prerequisites
 
-Please make sure you have gone through the [G4 Experiment Designer](G4_Designer_Manual.md) documentation and are comfortable designing an experiment. Whether you have covered the [G4 Experiment Conductor](G4_Conductor_Manual.md) is optional.
+Please make sure you have gone through the [G4 Experiment Designer](protocol-designer.md) documentation and are comfortable designing an experiment. Whether you have covered the [G4 Experiment Conductor](experiment-conductor.md) is optional.
 
 # Overview
 
@@ -20,5 +20,5 @@ You must run data processing first, and data processing is required before data 
 
 Please see the following for detailed instructions.
 
-[G4 Data Processing](tut_data_processing.md)
-[G4 Data Analysis](tut_data_analysis.md)
+[G4 Data Processing](data-handling_processing.md)
+[G4 Data Analysis](data-handling_analysis.md)

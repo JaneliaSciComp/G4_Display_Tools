@@ -10,7 +10,7 @@ nav_order: 3
 
 # What are we doing?
 
-When you run an experiment using the [G4 Experiment Conductor](G4_Conductor_Manual.md), there are several metadata fields you'll need to fill out so it is easy later to sort your experiment results by their metadata. The metadata is crucial to looking for patterns in your results, and therefore it's important that everyone fills out the same metadata in the same way.
+When you run an experiment using the [G4 Experiment Conductor](experiment-conductor.md), there are several metadata fields you'll need to fill out so it is easy later to sort your experiment results by their metadata. The metadata is crucial to looking for patterns in your results, and therefore it's important that everyone fills out the same metadata in the same way.
 
 One can foresee a situation in which experimenters may provide different answers that mean the same thing. For example, one experimenter may write in a fly's age as 2 days, another might write two days, another might write 48 hours. It would be difficult to automatically pull all three of these experiments when looking for experiments done on two day old flies, because the fly age fields do not match.
 
@@ -78,7 +78,7 @@ With all of this in mind, go through each tab and enter a starting set of values
 
 So the Google Sheets is done. Great! But how does the Conductor access these values?
 
-To give it access, we must open the [G4 Protocol Designer](G4_Designer_Manual.md). If you've never opened the designer before, [click here](G4_Designer_Manual.md) for details on how to open it. Simply put, you can browse to G4_Display_Tools/G4_Protocol_Designer/G4_Protocol_Designer.m, open this file in MATLAB, and run it. Assuming your path is set up correctly and you have your configuration file in place, it should open the main Designer window.
+To give it access, we must open the [G4 Protocol Designer](protocol-designer.md). If you've never opened the designer before, [click here](protocol-designer.md) for details on how to open it. Simply put, you can browse to G4_Display_Tools/G4_Protocol_Designer/G4_Protocol_Designer.m, open this file in MATLAB, and run it. Assuming your path is set up correctly and you have your configuration file in place, it should open the main Designer window.
 
 Once it's open, go to *File*{:.gui-btn} → *Settings*{:.gui-btn} at the top left corner. This window should appear:
 
@@ -102,10 +102,10 @@ Your settings window should now look more similar to the photo above, with all t
 
 *Note that if you have not filled in all the fields in the top half of the settings window, you may get some pop up errors warning you that one or more of those values are incorrect - as in a "The path you've entered for the Default Camera Walk Test Protocol does not exist" type of warning. You can just click through these and ignore them. The settings will still save.*
 
-You should now be able to open the [G4 Experiment Conductor](G4_Conductor_Manual.md) without error. When you do, check the drop down lists in your metadata panel. They should contain all the values you have provided in your Google Sheets, and look something like this:
+You should now be able to open the [G4 Experiment Conductor](experiment-conductor.md) without error. When you do, check the drop down lists in your metadata panel. They should contain all the values you have provided in your Google Sheets, and look something like this:
 
 ![metadata panel](assets/metadataPanel.png)
 
 ![metadata list opened](assets/metadataPanel_open.png)
 
-To be sure everything has worked correctly, click the *Open Metadata Google Sheets*{:.gui-btn} button. Assuming you are connected to the internet, this should open the Google Sheets you just created in your browser. If you get an error, see the [Final Details](G4_Designer_Manual.md) in the G4 Designer Manual for some common errors and their solutions.
+To be sure everything has worked correctly, click the *Open Metadata Google Sheets*{:.gui-btn} button. Assuming you are connected to the internet, this should open the Google Sheets you just created in your browser. If you get an error, see the [Final Details](protocol-designer.md) in the G4 Designer Manual for some common errors and their solutions.

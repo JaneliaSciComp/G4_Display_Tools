@@ -72,7 +72,7 @@ The set of block trials is played twice, but in random order each time.
 
 So you can see that being able to create a single condition is almost all you need to know in order to create an experiment. Once you can create one condition, all you have to do is make a bunch and put them together.
 
-So what follows is a step by step instructions on how to create a single condition in the [G4 Designer](G4_Designer_Manual.md). Please note that you should already have created any patterns and functions you might need for this. If you have not, please see documentation on the [Pattern Generator](pattern-generator.md) and [Function Generator](function-generator.md) for more details.
+So what follows is a step by step instructions on how to create a single condition in the [G4 Designer](protocol-designer.md). Please note that you should already have created any patterns and functions you might need for this. If you have not, please see documentation on the [Pattern Generator](pattern-generator.md) and [Function Generator](function-generator.md) for more details.
 
 # Open the designer
 
@@ -82,11 +82,11 @@ You should get a screen that looks like this:
 
 ![Empty Protocol Designer](assets/protocol-designer_empty.png){:.pop}
 
-If you get an error, first check that you have the configuration file referenced in [Setup](G4_Software_Setup.md) in place. Then open the file `G4_Display_Tools/G4_Protocol_Designer/G4_Protocol_Designer_Settings.m`. The first line of this file should read: `Configuration File Path: [path to your configuration file]`. If the path here is incorrect, replace it with the path to your Configuration file.
+If you get an error, first check that you have the configuration file referenced in [Setup](software_setup.md) in place. Then open the file `G4_Display_Tools/G4_Protocol_Designer/G4_Protocol_Designer_Settings.m`. The first line of this file should read: `Configuration File Path: [path to your configuration file]`. If the path here is incorrect, replace it with the path to your Configuration file.
 
 **Please note that there should be exactly one space between the ':' and the first character of your path, and there should be no spaces after the last character of your path.** Once this first path has been set, you should never open this file again, and instead maintain your settings through the settings window in the Designer.
 
-If this does not solve your error, see the [G4 Designer documentation](G4_Designer_Manual.md) for more common troubleshooting.
+If this does not solve your error, see the [G4 Designer documentation](protocol-designer.md) for more common troubleshooting.
 
 ## Screen size
 
@@ -220,4 +220,4 @@ In short, the *Frame Rate* is used in mode 2. In this case, there is no position
 
 The gain and offset affect the appearance of the pattern on the screen and are used in Mode 5.
 
-For additional questions or resources, see the [G4 Designer Manual](G4_Designer_Manual.md).
+For additional questions or resources, see the [G4 Designer Manual](protocol-designer.md).

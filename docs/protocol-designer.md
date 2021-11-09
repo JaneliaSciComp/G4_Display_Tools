@@ -13,7 +13,7 @@ has_toc: false
 
 Author:  [Lisa (Taylor) Ferguson](mailto:taylorl@janelia.hhmi.org)
 
-Before you begin, make sure that you have [installed the Display tools](G4_Software_Setup.md). Also note that the Pattern, Position function, and AO function .mat files used by this program must be structured correctly for the program to read them.
+Before you begin, make sure that you have [installed the Display tools](software_setup.md). Also note that the Pattern, Position function, and AO function .mat files used by this program must be structured correctly for the program to read them.
 
 - Patterns, at a minimum, must be a struct named pattern with fields `pattern.Pats` and `pattern.gs_val`.
 - Position Functions, at a minimum, must be a struct named pfnparam with fields `pfnparam.gs_val`, `pfnparam.func`, and `pfnparam.size`
@@ -49,9 +49,9 @@ The first field in the settings panel reads *Configuration file location:*{:.gui
 
 ## Run, Plotting, and Processing
 
-The next three fields are paths to your default run protocol file, processing file, and plotting file. A default run protocol is provided with the G4 software, but if you'd like to learn exactly what the run protocol does and how to create your own, please see the tutorial [Create a Run Protocol](tut_cond_run-protocol.md).
+The next three fields are paths to your default run protocol file, processing file, and plotting file. A default run protocol is provided with the G4 software, but if you'd like to learn exactly what the run protocol does and how to create your own, please see the tutorial [Create a Run Protocol](experiment-conductor_run-protocol.md).
 
-Plotting and Processing refers to settings files dictating how you want your experimental data to be handled after the experiment. If you have not created these settings files, please see [Data Analysis](tut_data_analysis.md).
+Plotting and Processing refers to settings files dictating how you want your experimental data to be handled after the experiment. If you have not created these settings files, please see [Data Analysis](data-handling_analysis.md).
 
 Assuming you want to use the default run protocol, this field should read `G4_Display_Tools\G4_Protocol_Designer\run_protocols\G4_default_run_protocol.m`.  The other two should contain paths to your processing and data analysis settings files, or should be empty if you haven't created them.
 
@@ -67,7 +67,7 @@ When using the protocol designer, cells for unavailable parameters will by defau
 
 ## Metadata Google Sheets Properties
 
-Notice the separate panel at the bottom of the Settings window called Metadata Google Sheets Properties. These keys link to an online spreadsheet from which the Conductor dynamically pulls the possible values for each metadata field. The different fields labeled with "GID" define tabs in the metadata Google Sheets. **The G4 Conductor requires you to have such a Google Sheets** to populate the metadata options when you run an experiment. If you don't have this set up, please see the [metadata Google Sheets tutorial](tut_prot_googlesheets-settings.md) for assistance.
+Notice the separate panel at the bottom of the Settings window called Metadata Google Sheets Properties. These keys link to an online spreadsheet from which the Conductor dynamically pulls the possible values for each metadata field. The different fields labeled with "GID" define tabs in the metadata Google Sheets. **The G4 Conductor requires you to have such a Google Sheets** to populate the metadata options when you run an experiment. If you don't have this set up, please see the [metadata Google Sheets tutorial](protocol-designer_metadata_tutorial.md) for assistance.
 
 Once you have completed the tutorial and filled in these GID values, you should not have to do it again unless you delete or create any tabs in your Google Sheets. If you do this, the new keys will need to be obtained (as shown in the tutorial) for that tab and replaced here. Otherwise, set this up once, and then you can forget about it.
 
@@ -89,7 +89,7 @@ Notice the layout of the four tables that make up the majority of the Designer's
 
 ### Some terminology
 
-A single line in a table is called a **condition**. The pre-trial, inter-trial, and post-trial tables only allow for one condition. The block trials table can have as many conditions as you need, and the condition number is the row number of the table. A condition consists of [the mode](prot_display-modes.md), one pattern and optionally one position function and up to four analog output functions. Other parameters in the table will be editable depending on the mode of the condition.
+A single line in a table is called a **condition**. The pre-trial, inter-trial, and post-trial tables only allow for one condition. The block trials table can have as many conditions as you need, and the condition number is the row number of the table. A condition consists of [the mode](protocol-designer_display-modes.md), one pattern and optionally one position function and up to four analog output functions. Other parameters in the table will be editable depending on the mode of the condition.
 
 On the left side of the main window is a set of radio buttons that say *Randomize Trials*{:.gui-btn} and *Sequential Trials*{:.gui-btn}. A **trial** is how we refer to any condition that plays on the screen. For example, if your trials are randomized, "Trial 1" (meaning the first item played on the screen) may be condition 12. And if you are repeating an entire set of 40 conditions 4 times, then you will only have 40 conditions, but you will have 160 trials.
 
@@ -109,7 +109,7 @@ The conditions make up the majority of your experiment. Other parameters include
 
 ## How to create conditions
 
-This section will describe in detail how to create an experiment, but if you would like more detailed instructions or run into issues not addressed in this section, please see these tutorials on [creating a condition](tut_prot_create-condition.md) and [creating an experiment](tut_prot_experiment.md).
+This section will describe in detail how to create an experiment, but if you would like more detailed instructions or run into issues not addressed in this section, please see these tutorials on [creating a condition](protocol-designer_create-condition_tutorial.md) and [creating an experiment](protocol-designer_design-experiment_tutorial.md).
 
 You can start creating conditions using the files imported in the previous step. The easiest starting point is to hit the *Auto-Fill*{:.gui-btn} button. This will create a block trial for every pattern imported, as well as create a pre-trial, inter-trial, and post-trial using the first pattern. Each trial will default to mode 1 and automatically pair a position function and one analog output function to each pattern (if they exist). Durations default to double the length of the position function. Hitting *Auto-Fill*{:.gui-btn} will produce something like this:
 
@@ -221,7 +221,7 @@ To do this, select the condition you want to view and hit the *Dry Run*{:.gui-bt
 
 If you would like your data to be processed or have any our offered preliminary analyses done on it automatically at the end of your experiment, I would recommend you set that up when designing your experiment, so your experimental protocol is fresh in your mind. However, this process does not involve the G4 Designer and can be done at any time.
 
-For an overview on how this works, please see the [Data analysis overview](gs_data-handling-overview.md) or for more specific instructions, see the [Data Analysis doc](tut_data_analysis.md).
+For an overview on how this works, please see the [Data analysis overview](data-handling_getting-started.md) or for more specific instructions, see the [Data Analysis doc](data-handling_analysis.md).
 
 # Final Details
 
@@ -229,12 +229,12 @@ For an overview on how this works, please see the [Data analysis overview](gs_da
 
 This pretty much covers the G4 Designer's features and how to use them. However, if you still have any questions or issues, you may refer to one of the additional resources below:
 
-- [This additional information about the experiment modes](prot_display-modes.md)
-- [This tutorial on how to set up your Protocol Designer settings](tut_prot_configure-settings.md)
-- [This tutorial on how to set up your metadata Google Sheets](tut_prot_googlesheets-settings.md)
-- [This tutorial on how to create a single condition](tut_prot_create-condition.md)
-- [This tutorial on how to create a full experiment](tut_prot_experiment.md)
-- [This tutorial on how to use the arena without the Designer](tut_cond_run-protocol.md)
+- [This additional information about the experiment modes](protocol-designer_display-modes.md)
+- [This tutorial on how to set up your Protocol Designer settings](protocol-designer_configure-settings_tutorial.md)
+- [This tutorial on how to set up your metadata Google Sheets](protocol-designer_metadata_tutorial.md)
+- [This tutorial on how to create a single condition](protocol-designer_create-condition_tutorial.md)
+- [This tutorial on how to create a full experiment](protocol-designer_design-experiment_tutorial.md)
+- [This tutorial on how to use the arena without the Designer](experiment-conductor_run-protocol.md)
 
 ## Trouble-shooting
 

@@ -6,13 +6,13 @@ nav_order: 4
 
 # How to run an experiment - an overview
 
-At this point, you should understand, in broad strokes at least, what it entails to [create an experiment](gs_running-experiment.md). To learn to create an experiment in detail and access tutorials regarding the [Pattern Generator](pattern-generator.md), [Function Generator](function-generator.md), and [G4 Protocol Designer](G4_Designer_Manual.md), open the item [Generation 4]({{site.baseurl}}/docs/G4-index.md) on the left hand menu.
+At this point, you should understand, in broad strokes at least, what it entails to [create an experiment](experiment-conductor_getting-started.md). To learn to create an experiment in detail and access tutorials regarding the [Pattern Generator](pattern-generator.md), [Function Generator](function-generator.md), and [G4 Protocol Designer](protocol-designer.md), open the item [Generation 4]({{site.baseurl}}/docs/G4-index.md) on the left hand menu.
 
-Once you've created and saved an experiment, you will use the [G4 Conductor](G4_Conductor_Manual.md) to run it.
+Once you've created and saved an experiment, you will use the [G4 Conductor](experiment-conductor.md) to run it.
 
 ![G4 Conductor](assets/conductor_scrShot.png)
 
-There is one important requirement for using the [G4 Conductor](G4_Conductor_Manual.md) - you must have [Google Sheets containing your metadata](tut_prot_googlesheets-settings.md) values.
+There is one important requirement for using the [G4 Conductor](experiment-conductor.md) - you must have [Google Sheets containing your metadata](protocol-designer_metadata_tutorial.md) values.
 
 The G4 Conductor has several metadata fields that you need to set before running an experiment. They are:
 
@@ -30,7 +30,7 @@ The G4 Conductor has several metadata fields that you need to set before running
 
 Four of these metadata fields are simple text boxes that you can fill in or that are automatically generated: the experiment name, the fly name, the date and time, and the comments. The rest of the fields are drop down lists, and these drop down lists populate from a google sheet containing all possible values for each metadata field. This feature makes it easier to sort experiments by their metadata because there is no chance of misspellings or differences between users. For example, if one user put '3' in for the fly age, and another put in '3 days', and a third put in 'three days', all three experiments would not necessarily show up when you tried to pull out all experiments done on flies that were 3 days old.
 
-Please see the [Google Sheets set-up tutorial](tut_prot_googlesheets-settings.md) for a detailed walk-through on how to set this up, or read on for a brief overview.
+Please see the [Google Sheets set-up tutorial](protocol-designer_metadata_tutorial.md) for a detailed walk-through on how to set this up, or read on for a brief overview.
 
 Log in to a Google Drive account and create new Google Sheets. These Google Sheets should have a tab for each metadata field. Here is an example taken from our Google Sheets.
 
@@ -42,12 +42,12 @@ Okay, so you've made your Google Sheets - how do you connect them? You do this i
 
 Once the metadata is configured, using the Conductor is a breeze. If you have not automated your data processing and or data analysis using our data analysis tools, you should uncheck the boxes on the conductor labeled *Processing*{:.gui-txt} and *Plotting*{:.gui-txt}. If these are checked, they will run automatically after an experiment and you have to provide (by browsing) the appropriate settings file you've created with our data analysis tools. But if you don't want to bother with that right now, simply uncheck the boxes.
 
-There is also a field for your *run protocol*{:.gui-txt}. This is a file that determines how exactly trials on run on the screens. There is a default run protocol provided and that will be the default path here. If you wanted to create your own custom run protocol, check out the [Custom Run Protocol tutorial](tut_cond_run-protocol.md).
+There is also a field for your *run protocol*{:.gui-txt}. This is a file that determines how exactly trials on run on the screens. There is a default run protocol provided and that will be the default path here. If you wanted to create your own custom run protocol, check out the [Custom Run Protocol tutorial](experiment-conductor_run-protocol.md).
 
-The last thing you should be aware of is the *Run Test Protocol*{:.gui-btn} button. If you click this, the conductor will load a preset, short protocol that is designed to quickly test the fly and see if they are fixating correctly. It could also be used to make sure the screens are displaying correctly. A default test protocol has been provided, but you can always create your own and make it the default in the Designer settings. You can find more details in the [G4 Protocol Designer](G4_Designer_Manual.md) or in the [Designer Settings tutorial](tut_prot_configure-settings.md).
+The last thing you should be aware of is the *Run Test Protocol*{:.gui-btn} button. If you click this, the conductor will load a preset, short protocol that is designed to quickly test the fly and see if they are fixating correctly. It could also be used to make sure the screens are displaying correctly. A default test protocol has been provided, but you can always create your own and make it the default in the Designer settings. You can find more details in the [G4 Protocol Designer](protocol-designer.md) or in the [Designer Settings tutorial](protocol-designer_configure-settings_tutorial.md).
 
 Assuming the conductor is configured and your defaults are set, all you need to do is select your experiment type, fill in your metadata, and hit Run. A progress bar will appear, keeping you updated on which condition is running and what patterns or functions it is using (if any). After the progress bar fills, the text directly above it will read *post-processing*{:.gui-txt} and eventually *Experiment Finished*{:.gui-txt}" at which point you can start your next experiment. If, at any point during the experiment, something goes wrong, you can click *Abort*{:.gui-btn}. This will save any data you have collected and stop the experiment. You can hit *Run*{:.gui-btn} again to start over or get out of the program if you don't want to continue.
 
-This overview contained a lot of information about the Conductor, so don't forget to check out the [G4 Conductor Manual](G4_Conductor_Manual.md) for in depth instructions on its use.
+This overview contained a lot of information about the Conductor, so don't forget to check out the [G4 Conductor Manual](experiment-conductor.md) for in depth instructions on its use.
 
-Once an experiment is completed, the only thing left is to [analyze the data](gs_data-handling-overview.md), using our tools, your own, or some combination.
+Once an experiment is completed, the only thing left is to [analyze the data](data-handling_getting-started.md), using our tools, your own, or some combination.

@@ -9,7 +9,7 @@ nav_order: 1
 
 In this tutorial, one position function and one analog ouput function will be generated using the G4 Function Generator GUI. It is recommended to first complete the [Pattern Generator tutorial](pattern-generator_generate_tutorial.md) as this tutorial will be most helpful as a follow-up. Additionally, it is recommended to read the [About Function Generator](function-generator.md) document; this will provide both a broad overview of how this tool works as well as a reference for all the details and functionality of the tool that aren't covered in this tutorial. This tutorial will focus on using the GUI to generate functions, though as with the Pattern Generator, this tool can also be utilized from MATLAB scripts and the MATLAB command window, as demonstrated at the [end of this tutorial](#script).
 
-Following this tutorial, once both patterns and functions have been created, continue with creating and running experiment by either using the [provided example scripts](https://github.com/JaneliaSciComp/G4_Display_Tools/tree/master/G4_Example_Experiment_Scripts) or the [Protocol Designer GUI](G4_Designer_Manual.md).
+Following this tutorial, once both patterns and functions have been created, continue with creating and running experiment by either using the [provided example scripts](https://github.com/JaneliaSciComp/G4_Display_Tools/tree/master/G4_Example_Experiment_Scripts) or the [Protocol Designer GUI](protocol-designer.md).
 
 # Setting Up
 
@@ -59,4 +59,4 @@ The primary elements to using the tool in script form is setting all of the func
 
 # Next Steps
 
-Once patterns and functions have been generated, you are ready to progress to creating and running an actual experiment. This can be achieved using the [provided example scripts](https://github.com/JaneliaSciComp/G4_Display_Tools/tree/master/G4_Example_Experiment_Scripts) or by using the [Protocol Designer GUI](G4_Designer_Manual.md).
+Once patterns and functions have been generated, you are ready to progress to creating and running an actual experiment. This can be achieved using the [provided example scripts](https://github.com/JaneliaSciComp/G4_Display_Tools/tree/master/G4_Example_Experiment_Scripts) or by using the [Protocol Designer GUI](protocol-designer.md).

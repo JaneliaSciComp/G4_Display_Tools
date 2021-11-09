@@ -7,7 +7,7 @@ nav_order: 1
 
 # Prerequisites
 
-- [G4 Setup](G4_Software_Setup.md)
+- [G4 Setup](software_setup.md)
 - have designed at least one pattern using the [Pattern Maker](pattern-generator.md)
 - have designed at least one position function using the [Function Generator](function-generator.md)
 - Have some basic knowledge of programming in MATLAB
@@ -16,7 +16,7 @@ nav_order: 1
 
 You may have seen references to a **run protocol** throughout the documentation. This is an .m file which is responsible for actually sending any experiment you design to the screens. It thereby provides a structure and defines, for example, if inter-trials are run before the first trial. There are three run protocols included with the G4 Display Tools at `G4_Display_Tools/G4_Protocol_Designer/run_protocols`: `G4_default_run_protocol.m`, `G4_default_run_protocol_streaming.m`, and `G4_run_protocol_combinedCommand.m` -- but you can also write your own run protocol. The possible benefits of doing this will become clear throughout this tutorial, though for many use cases, you won't need one other than the default `G4_default_run_protocol.m`.
 
-By definition, this tutorial will also show you how to send specific commands to the screen without using any of the provided GUIs. This might be useful if you want to display a single pattern on the screen or try running a condition without using the [G4 Designer](G4_Designer_Manual.md).
+By definition, this tutorial will also show you how to send specific commands to the screen without using any of the provided GUIs. This might be useful if you want to display a single pattern on the screen or try running a condition without using the [G4 Designer](protocol-designer.md).
 
 # The Panel_com Wrapper
 
@@ -38,7 +38,7 @@ As you can see, you send commands to the screen generally by typing `Panel_com(c
 
 Now that you know you can send commands to the screens via MATLAB command window, it becomes clear that you could run an entire condition this way if you knew which commands to use. I'll take you through the steps to do this now. Once you have run a condition via MATLAB command window, it will be much easier to understand the function of the run protocol.
 
-To do this, you will need an experiment folder, or at least a mock experiment folder, containing a pattern and function. If you've already done the tutorial on how to [design a condition](tut_prot_create-condition.md), you should have one, wherever you saved the file in that tutorial. If you've not done this yet, that's okay. Create a test folder on your desktop or somewhere else easily accessible (you can delete it later). Inside this folder should be two folders - one called Patterns and one called Functions. And each of these folders should contain at least one pattern and one function, created using the [Pattern Generator](pattern-generator.md) and the [Function Generator](function-generator.md). Both files associated with the pattern or function, .mat and .pat files, should be present. This next section will not work if you don't have a pattern and a function to send to the screens.
+To do this, you will need an experiment folder, or at least a mock experiment folder, containing a pattern and function. If you've already done the tutorial on how to [design a condition](protocol-designer_create-condition_tutorial.md), you should have one, wherever you saved the file in that tutorial. If you've not done this yet, that's okay. Create a test folder on your desktop or somewhere else easily accessible (you can delete it later). Inside this folder should be two folders - one called Patterns and one called Functions. And each of these folders should contain at least one pattern and one function, created using the [Pattern Generator](pattern-generator.md) and the [Function Generator](function-generator.md). Both files associated with the pattern or function, .mat and .pat files, should be present. This next section will not work if you don't have a pattern and a function to send to the screens.
 
 If you did not send the connectHost command to the screens earlier, do it now. Panel Host must be connected before sending any other commands via Panel_com.
 

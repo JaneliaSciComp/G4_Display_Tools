@@ -13,7 +13,7 @@ has_toc: false
 
 The G4 Conductor is the application you will use to run an experimental protocol on the LED screen arena.
 
-To open this application directly from the [G4 Designer](G4_Designer_Manual.md), click the *Run Trials*{:.gui-btn} on the left side of the Designer window. The experimental protocol that was open in the Designer will automatically be opened in the Conductor, assuming you have saved the experimental protocol.
+To open this application directly from the [G4 Designer](protocol-designer.md), click the *Run Trials*{:.gui-btn} on the left side of the Designer window. The experimental protocol that was open in the Designer will automatically be opened in the Conductor, assuming you have saved the experimental protocol.
 
 If the Designer is not open, there is no need to open it. You can open the file `G4_Display_Tools/G4_Protocol_Designer/G4_Experiment_Conductor.m` in MATLAB and hit *Run*{:.gui-btn} to open the Conductor directly.
 
@@ -25,7 +25,7 @@ The top left section contains settings for your experiment. The top right sectio
 
 *Note: You must have set up a metadata Google Sheets and connected it to the G4 software through the G4 Designer Settings. If you have not done this, the Conductor will not open properly.*
 
-Please see the [tutorial on how to set this up](tut_prot_googlesheets-settings.md).
+Please see the [tutorial on how to set this up](protocol-designer_metadata_tutorial.md).
 
 # Fill out the metadata
 
@@ -51,7 +51,7 @@ Select whether you would like the application to perform automatic data processi
 
 For this to work, you should have created a data processing settings file and a data analysis settings file earlier in the experiment design process. If processing is checked, the associated filepath should be to your processing settings file, and the same for your plotting (analysis).
 
-If you want your data processed and analyzed automatically but have not set up these settings files, please see [Data analysis](tut_data_analysis.md). If you do not wish to use this feature right now, simply uncheck the processing and plotting boxes.
+If you want your data processed and analyzed automatically but have not set up these settings files, please see [Data analysis](data-handling_analysis.md). If you do not wish to use this feature right now, simply uncheck the processing and plotting boxes.
 
 ## Processing, Plotting, and Run Protocol paths
 
