@@ -26,7 +26,7 @@ For now, here's an overview of the steps you will take to set up an experiment u
 ## Pattern and Function Generators
 
 The first thing you need to do is [create any patterns](pattern-generator.md):
-![pattern](assets/Pattern.png)
+![pattern](assets/p-d_g-s_grating.png)
 
 and/or [functions](function-generator.md):
 ![function](assets/protocol-designer_function_sawtooth.png)

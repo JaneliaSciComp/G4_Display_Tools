@@ -15,7 +15,7 @@ Following this tutorial, once both patterns and functions have been created, con
 
 In MATLAB, type `G4_Function_Generator_gui` to begin designing your functions. When the GUI opens, it will display a default position function with many editable fields.
 
-![G4 Function Generator GUI Window](assets/function-generator_GUI.png){:.pop}
+![G4 Function Generator GUI Window](assets/function-generator_gui.png){:.pop}
 
 This GUI can be used to create both position functions, which control how and when frames of a pattern are displayed, as well as analog output functions, which control output voltage signals to control and synchronize external equipment to the display. The type of function being created can be set using the *Function type*{:.gui-txt} dropdown box on the top-left corner of the GUI. In this tutorial, we will create one of each function type. The position function and analog output function to be created are described below:
 

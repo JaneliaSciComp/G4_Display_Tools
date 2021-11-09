@@ -19,7 +19,7 @@ If the Designer is not open, there is no need to open it. You can open the file 
 
 The window that opens should look something like this:
 
-![Experiment Conductor](assets/experiment-conductor.png)
+![Experiment Conductor](assets/experiment-conductor_gui.png)
 
 The top left section contains settings for your experiment. The top right section is where you can fill in some basic experiment metadata. The center displays a progress bar, or will once an experiment begins running. Once you begin running an experiment, data relating to the current trial will display along the bottom.
 
