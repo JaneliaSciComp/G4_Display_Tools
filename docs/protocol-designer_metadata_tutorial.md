@@ -26,11 +26,11 @@ You may already have a Google account, or you may want to create one for yoursel
 
 Once you are signed into Google, the Google Sheets page should look something like this:
 
-![Google Sheets home page](assets/google_sheets_home.png)
+![Google Sheets home page](assets/p-d_m_t_sheets-home.png){:.pop}
 
 Click The big plus sign that says "Blank" underneath it in order to start your Google Sheets. Your blank spreadsheet will look something like this:
 
-![Blank Google Sheets](assets/blankSheet.png)
+![Blank Google Sheets](assets/p-d_m_t_blank-sheet.png){:.pop}
 
 Click on the words "Untitled spreadsheet" at the top left corner and give your spreadsheet a name which will be easy for you and any other users to remember. This Google Sheets is intended to be used by all users of the G4 system in your lab.
 
@@ -48,7 +48,7 @@ Now that your Google Sheets are created, the first thing you should do is create
 
 Future releases will come with the ability to customize these fields, but for now they are all required.
 
-![Initial tabs](assets/addTab.png){:.ifr}
+![Initial tabs](assets/p-d_m_t_add-tab.png){:.ifr .pop}
 
 Look at the bottom of your Google Sheets and you will see a section that looks like this:
 
@@ -62,13 +62,13 @@ Proceed to add a tab for every field listed above and name them appropriately. T
 
 When the G4 Conductor accesses one of these tabs to get the list of possible values, it will pull whatever items are in the first column, starting with row 2. This allows you to put a title in the first row so a user knows what the column represents. Here's an example from the Fly Sex tab of our lab's Google Sheets:
 
-![Fly Sex tab](assets/flySex.png)
+![Fly Sex tab](assets/p-d_m_t_sheet-fly-sex.png){:.pop}
 
 There are only three options for this metadata field - Male, Female, and unknown - so these values are placed in rows 2-4 of the first column. If there were more possible answers, we could simply continue adding them to that column. The first row, our title, will be ignored by the program.
 
 The conductor will also ignore all the other columns, so you can put anything you want there. We have a notes column in each of our tabs. This allows us to write a note by each value providing more information if desired. It looks something like this:
 
-![Fly Genotype tab](assets/flyGenos.png)
+![Fly Genotype tab](assets/p-d_m_t_sheet-fly-genotype.png){:.pop}
 
 Here you can see each genotype has a note next to it providing its shorthand name, and some also have an additional note with the full genotype. This is fine. Only the values in the first column will be pulled by the Conductor.
 
@@ -82,7 +82,7 @@ To give it access, we must open the [G4 Protocol Designer](protocol-designer.md)
 
 Once it's open, go to *File*{:.gui-btn} → *Settings*{:.gui-btn} at the top left corner. This window should appear:
 
-![Protocol Designer Settings](assets/protocol-designer_settings.png)
+![Protocol Designer Settings](assets/protocol-designer_settings.png){:.pop}
 
 At the bottom, notice a panel called *Metadata Google Sheets Properties*{:.gui-txt}. Within this panel are several fields: a Google Sheets key and several types of GID field.
 
@@ -104,8 +104,8 @@ Your settings window should now look more similar to the photo above, with all t
 
 You should now be able to open the [G4 Experiment Conductor](experiment-conductor.md) without error. When you do, check the drop down lists in your metadata panel. They should contain all the values you have provided in your Google Sheets, and look something like this:
 
-![metadata panel](assets/metadataPanel.png)
+![metadata panel](assets/p-d_m_t_metadata.png){:.pop}
 
-![metadata list opened](assets/metadataPanel_open.png)
+![metadata list opened](assets/p-d_m_t_metadata_fly-age.png){:.pop}
 
 To be sure everything has worked correctly, click the *Open Metadata Google Sheets*{:.gui-btn} button. Assuming you are connected to the internet, this should open the Google Sheets you just created in your browser. If you get an error, see the [Final Details](protocol-designer.md) in the G4 Designer Manual for some common errors and their solutions.
