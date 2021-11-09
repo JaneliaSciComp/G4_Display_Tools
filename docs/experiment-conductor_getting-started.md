@@ -10,7 +10,7 @@ At this point, you should understand, in broad strokes at least, what it entails
 
 Once you've created and saved an experiment, you will use the [G4 Conductor](experiment-conductor.md) to run it.
 
-![G4 Conductor](assets/conductor_scrShot.png)
+![G4 Conductor](assets/e-c_g-s_conductor-main.png){:.pop}
 
 There is one important requirement for using the [G4 Conductor](experiment-conductor.md) - you must have [Google Sheets containing your metadata](protocol-designer_metadata_tutorial.md) values.
 
@@ -34,7 +34,7 @@ Please see the [Google Sheets set-up tutorial](protocol-designer_metadata_tutori
 
 Log in to a Google Drive account and create new Google Sheets. These Google Sheets should have a tab for each metadata field. Here is an example taken from our Google Sheets.
 
-![google sheet example](assets/googleSheet_scrShot.png)
+![google sheet example](assets/e-c_g-s_metadata.png){:.pop}
 
 In this example, the drop down field in the conductor will have two options for light cycle: *01 17*{:.gui-txt} and *21 13*{:.gui-txt}. For the user's convenience, there is a button on the conductor linked to this Google Sheets, so if a user couldn't remember what these codes meant, they could simply click *Open Google Sheets*{:.gui-btn} and check in the notes. In addition, if a user needs to add a new metadata value which does not exist in the drop down lists, they can click *Open Google Sheets*{:gui-btn} and add the new value directly to the sheet, so from then on it will be an option in the associated dropdown list.
 
