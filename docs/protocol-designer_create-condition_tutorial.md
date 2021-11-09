@@ -90,7 +90,7 @@ If this does not solve your error, see the [G4 Designer documentation](protocol-
 
 ## Screen size
 
-![Screen size button](assets/ScreenSizeBtn.png){:.ifr .pop}
+![Screen size button](assets/p-d_c-c_t_arena-rowcount.png){:.ifr .pop}
 
 When you first open the designer, the first thing you should always do is set your screen type. On the left hand side of the designer you should see a pair of radio buttons that look like this:
 
@@ -102,17 +102,17 @@ As such, before doing anything else, you need to select which type of screen thi
 
 Once the designer is open, you need to import the patterns you intend to use in the experiment, as well as any functions. To do this, click *File*{:.gui-btn} → *Import*{:.gui-btn}. A small box should pop up:
 
-![Import Window](assets/importWindow.png){:.ifr .pop}
+![Import Window](assets/p-d_c-c_t_import-folder.png){:.ifr .pop}
 
 You have three choices - *Folder*{:.gui-txt}, *File*{:.gui-txt}, or *Filtered File*{:.gui-txt}. If you have saved all of your patterns and/or functions in a folder, then choosing *Folder*{:.gui-txt} might be the most convenient option for you.
 
-![Import Successful](assets/successfulImport.png){:.ifr .pop}
+![Import Successful](assets/p-d_c-c_t_import-confirm.png){:.ifr .pop}
 If you select folder, the Designer will attempt to import all files found in the folder. Don't worry if the folder has irrelevant files in it. The Designer will skip any files it doesn't recognize and provide a summary after the import is complete that looks like this:
 {:.clear}
 
 If you would rather import a single file at a time, simply click *File*{:.gui-txt} and browse to the file you want to import. That file could be a pattern .mat file, a function .mat file, or a currentExp.mat file (which you will only have if you have already designed and saved an experiment and you are trying to import that experiment).
 
-![filtered file box](assets/filteredFile.png){:.ifr .pop}
+![filtered file box](assets/p-d_c-c_t_filename-filter.png){:.ifr .pop}
 
 The *Filtered File*{:.gui-txt} option is there for your convenience. If you have some kind of naming convention for your files, you can provide a string that the file system can use to narrow down your options and only show you files which match the string. For example, if my patterns are all named `Pattern_001.mat`, `Pattern_002.mat`, `Pattern_003.mat`, etc, I can select *Filtered File*{:.gui-txt}. When this box appears. I could type Pattern into the box and hit okay. Now in my browse window, only files with "Pattern" in the name will be available. This is not case-sensitive.
 
@@ -124,11 +124,11 @@ The pattern has been imported but not much has changed about the Designer window
 
 In row 1 of the block trials table, click on the empty box under *Pattern Name*{:.gui-txt}, column 2. Not much happens at first glance -- a cursor appears in the box. But look to the bottom right hand side of the window and you will see the tall narrow box labeled *Imported files for selected cell:*{:.gui-txt}, which was empty before, now has an item in it. The item should match the name of the pattern you imported.
 
-![empty cell selected](assets/clickEmptyCell.png){:.pop}
+![empty cell selected](assets/p-d_c-c_t_add-trial.png){:.pop}
 
 Click on the name of your pattern in that tall box. When you click on it, a preview of the pattern should appear in the preview pane.
 
-![In screen preview](assets/inScreenPreview.png){:.pop}
+![In screen preview](assets/p-d_c-c_t_add-trial_preview.png){:.pop}
 
 When creating an experiment you would have an entire list of patterns here, and you could click through them, looking at the preview of each one until you find the one you want. It works exactly the same way for functions, when you click the empty cell under *Position Function*{:.gui-txt}.
 
@@ -144,7 +144,7 @@ For now let's leave it in mode 1. This is the mode that uses a position function
 
 Follow the same steps we completed when adding the pattern. Click the empty table cell under *Position Function*{:.gui-txt}, then click the item that appears in the *Imported files for selected cell:*{:.gui-txt} box. A preview in the preview pane should appear that looks something like this:
 
-![function](assets/function_sawtooth.png){:.pop}
+![function](assets/protocol-designer_function_sawtooth.png){:.pop}
 
 You may see a red vertical line. This matches the duration set in your condition (row 12). Users may often want the duration of their condition to match the duration (x axis limit) of their position function, so the vertical red line just gives a quick and easy way to compare them. If there is no red vertical line, it means your condition duration is larger than the x axis (time) of your function.
 
@@ -158,7 +158,7 @@ Congratulations, you've made a condition! There are two ways to preview the cond
 
 click the check box at the end of your condition to selected it, and then click the *Preview*{:.gui-btn} at the bottom right of the screen. A window will pop up that looks something like this:
 
-![Preview Screen](assets/previewScreen.png){:.pop}
+![Preview Screen](assets/p-d_c-c_t_trial_preview.png){:.pop}
 
 All the blank space in the right half of the screen is where your Analog Output functions will be displayed if you have any.
 
@@ -176,11 +176,11 @@ Notice that the *Frame Increment*{:.gui-txt} updated automatically. It has calcu
 
 From this preview panel you can also generate a video of what your condition will look like. On the right hand bottom side of the screen is a panel that looks like this:
 
-![Video panel](assets/videoGen.png){:.pop}
+![Video panel](assets/p-d_c-c_t_generate-video.png){:.pop}
 
 Enter a frame rate of 60 or less and click Generate Video. A window will pop up asking you to name the video and browse to the location where you want to save it. Do this and click *Save*{:.gui-btn}.
 
-A progress bar will appear that looks like this: ![Progress bar](assets/videoGenProgress.png){:.ifr .pop}
+A progress bar will appear that looks like this: ![Progress bar](assets/p-d_c-c_t_generate-video_progress.png){:.ifr .pop}
 
 Wait for the progress bar to finish and close on its own. This may take several minutes. The faster your frame rate, the less time it will take. When it is finished, you will find an .avi video saved where you indicated. This video shows the entire preview window playing the condition, just as when you hit play earlier. Note that the *Real-time speed*{:.gui-txt} box should still be checked. If it is not, then your video will show the preview running at whatever speed indicated by the Frame Increment value. If the frame increment is low, then your video will take both a very long time to generate, and a long time to play.
 

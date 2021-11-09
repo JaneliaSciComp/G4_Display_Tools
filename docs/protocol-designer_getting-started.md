@@ -29,7 +29,7 @@ The first thing you need to do is [create any patterns](pattern-generator.md):
 ![pattern](assets/Pattern.png)
 
 and/or [functions](function-generator.md):
-![function](assets/function_sawtooth.png)
+![function](assets/protocol-designer_function_sawtooth.png)
 
 that will be necessary for the experiment. You don't want to create a pattern and add it to the experiment one at a time - create all your patterns and functions up front. You can do this using the [G4 Pattern Generator](pattern-generator.md) for patterns and [G4 Function Generator](function-generator.md) for functions.
 
