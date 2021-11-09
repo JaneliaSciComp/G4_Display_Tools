@@ -134,7 +134,7 @@ Next is the *Run Trials*{:.gui-btn}. You can always open the G4 Conductor direct
 
 The next panel allows you to set the sample rates of any Analog Input Channels you might be using.
 
-![Analog Input Channels](assets/AIC.png){:.ifr .pop}
+![Analog Input Channels](assets/p-d_d-e_t_analog-input-channels.png){:.ifr .pop}
 
 If you do not want to use an input channel, simply set its sample rate to 0. It's common in our lab not to use any of them. Otherwise, this should be the sample rate (in Hz) that you want your input channel to use.
 

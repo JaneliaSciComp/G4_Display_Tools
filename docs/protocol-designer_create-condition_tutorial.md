@@ -11,14 +11,14 @@ Before going through this tutorial, you should have done the following:
 
 - created one or more patterns using the [Pattern Generator](pattern-generator.md)
 - created one or more functions using the [Function Generator](function-generator.md)
-- Reviewed the different experiment modes
+- Reviewed the different [experiment modes](protocol-designer_display-modes.md)
 - [Set up your system]({{site.baseurl}}/docs/G4-Assembly.html).
 
 # Experiment structure
 
-An experimental protocol is really just a set of what we call "conditions." A condition, viewed on the arena screens, is a single pattern being displayed to a fly for some number of seconds. The pattern can be moving, to simulate motion, or still. It can be played in a closed-loop or open-loop way. But the key is that it only involves a single pattern file.
+An experimental protocol is really just a set of what we call **conditions**. A condition, viewed on the arena screens, is a single pattern being displayed to a fly for some number of seconds. The pattern can be moving, to simulate motion, or still. It can be played in a closed-loop or open-loop way. But the key is that it only involves a single pattern file.
 
-In the G4 Designer, a condition is a single row in a table. The pre-trial (optional) is a single condition that will play at the beginning of the experiment and then will not play again. The inter-trial (optional) is a single condition that will play in between each condition in the main experiment. It can be used to re-set the fly in between the main conditions of the experiment. The post-trial (optional) is a single condition that plays at the very end of the experiment. The block trials, contained in the large central table of the G4 Designer, are a set of conditions. There can be as many conditions in this block as you want. These conditions make up the main experiment and can be played in sequential or random order.
+In the [G4 Protocol Designer](protocol-designer.md), a condition is a single row in a table. The pre-trial (optional) is a single condition that will play at the beginning of the experiment and then will not play again. The inter-trial (optional) is a single condition that will play in between each condition in the main experiment. It can be used to re-set the fly in between the main conditions of the experiment. The post-trial (optional) is a single condition that plays at the very end of the experiment. The block trials, contained in the large central table of the [G4 Protocol Designer](protocol-designer.md), are a set of conditions. There can be as many conditions in this block as you want. These conditions make up the main experiment and can be played in sequential or random order.
 
 ![G4 Protocol Designer after auto-fill](assets/protocol-designer_after_auto-fill.png){:.pop}
 
@@ -72,11 +72,11 @@ The set of block trials is played twice, but in random order each time.
 
 So you can see that being able to create a single condition is almost all you need to know in order to create an experiment. Once you can create one condition, all you have to do is make a bunch and put them together.
 
-So what follows is a step by step instructions on how to create a single condition in the [G4 Designer](protocol-designer.md). Please note that you should already have created any patterns and functions you might need for this. If you have not, please see documentation on the [Pattern Generator](pattern-generator.md) and [Function Generator](function-generator.md) for more details.
+So what follows is a step by step instructions on how to create a single condition in the [G4 Protocol Designer](protocol-designer.md). Please note that you should already have created any patterns and functions you might need for this. If you have not, please see documentation on the [G4 Pattern Generator](pattern-generator.md) and [G4 Function Generator](function-generator.md) for more details.
 
 # Open the designer
 
-First you have to open the Designer. There are two ways to do this. Assuming the [G4 Display Tools are on your MATLAB path](G4_Software_Setup.html#add-to-path), you can simply type `G4_Experiment_Designer` into your MATLAB command window. Alternatively, you can browse to the file `G4_Display_Tools/G4_Protocol_Designer/G4_Experiment_Designer.m`, open the file in MATLAB, and hit *Run*{:.gui-btn} at the top of the MATLAB window.
+First you have to open the [G4 Protocol Designer](protocol-designer.md). There are two ways to do this. Assuming the [G4 Display Tools are on your MATLAB path](G4_Software_Setup.html#add-to-path), you can simply type `G4_Experiment_Designer` into your MATLAB command window. Alternatively, you can browse to the file `G4_Display_Tools/G4_Protocol_Designer/G4_Experiment_Designer.m`, open the file in MATLAB, and hit *Run*{:.gui-btn} at the top of the MATLAB window.
 
 You should get a screen that looks like this:
 

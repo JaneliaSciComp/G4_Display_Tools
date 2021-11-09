@@ -70,6 +70,6 @@ The bottom section contains a panel called Metadata Google Sheets Properties. We
 
 That's okay! The only settings which are required are the *Configuration file location*{:.gui-txt}, the *Default run protocol*{:.gui-txt}, and the color and text inside disabled cells. For any Google Sheets settings that are required, have a look at the [Google Sheets tutorial](tut_prot_googlesheets_settings.md). The rest can be left blank or at their default values, even if those paths don't exist on your computer.
 
-Note: When you click *Apply Changes*{:.gui-btn} the software will check each value for validity. If a field is empty or contains a path that doesn't exist, you will get a pop up warning you about it. That's okay, if you don't care about that field, just click ok through the warning boxes. The settings will still be saved. The warnings are for your information only.
+Note: When you click *Apply Changes*{:.gui-btn} the software will check each value for validity. If a field is empty or contains a path that doesn't exist, you will get a pop up warning you about it. That's okay, if you don't care about that field, just click *OK*{:.gui-btn} through the warning boxes. The settings will still be saved. The warnings are for your information only.
 
 Once your settings are how you want them, just click *Apply Changes*{:.gui-btn} and you are done!
