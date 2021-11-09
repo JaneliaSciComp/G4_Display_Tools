@@ -30,7 +30,7 @@ When you click *Auto-Fill*{:.gui-btn}, the software does several things.
 
 Make sure you have imported at least two patterns and one function, and then click *Auto-Fill*{:.gui-btn} to test this feature out yourself. In my example, I have imported five patterns and one function, and *Auto-Fill*{:.gui-btn} produces this:
 
-![Auto-Fill Results](assets/autofill.png)
+![Auto-Fill Results](assets/p-d_d-e_t_autofill.png){:.pop}
 
 It's unlikely that you will want your experiment organized in exactly this order. Auto-Fill is not meant to create your experiment but simply to give you a starting point. However, when you're creating your patterns and functions, it might be helpful to keep the Auto-Fill function in mind. If you know what order you want your patterns to run in the experiment, giving them ID values ascending in that order will make organizing the experiment much easier in the Designer.
 
@@ -42,7 +42,7 @@ As in the previous tutorial, you can click on any cell in the table. If it is a 
 
 If you wish to use a different mode, just erase the current mode and type in a number 1-7. This will automatically change which cells are disabled. Here is an example of what various modes look like:
 
-![Different modes in the Designer](assets/modesInDesigner.png)
+![Different modes in the Designer](assets/p-d_d-e_t_display-modes.png){:.pop}
 
 Notice the buttons to the right side of the Block Trials table. These include the *Shift Up*{:.gui-btn}, *Shift Down*{:.gui-btn}, *Add Trial*{:.gui-btn}, *Delete Trial*{:.gui-btn}, and *Invert Selection*{:.gui-btn}. These can help you re-organize your conditions.
 
@@ -60,7 +60,7 @@ Last is the *Invert Selection*{:.gui-btn} button. Select a couple, but not all, 
 
 # Pre, Inter, and Post-trial conditions
 
-![Copy To Box](assets/CopyToBox.png){:.ifr .pop}
+![Copy To Box](assets/p-d_d-e_t_copy-to.png){:.ifr .pop}
 
 Notice that these buttons do not have any effect on the Pre, Inter, and Post-trials. These trials are usually just created manually, by the method shown in the previous tutorial on how to create a condition. However, there are a couple other tools you can use to speed this up.
 
@@ -71,7 +71,7 @@ Select one or more of the options and click *OK*{:.gui-btn}. You can select them
 Now select several conditions in your block trials. Then go to *File*{:.gui-btn} → *Set Selected...*{:.gui-btn}. This feature will likely not be used much, but I just want to make you aware of it. In this case, a pop up window will appear giving you a field for every cell in the condition, like this:
 {:.clear}
 
-![Set Selected Window](assets/SetSelectedBox.png){:.ifr .pop}
+![Set Selected Window](assets/p-d_d-e_t_trial-values.png){:.ifr .pop}
 
 Here you can type in the value for each field. Be aware that there is no error-checking here. It is up to you to make sure you type in the pattern and function names correctly. Otherwise when you try to run the condition, you will get an error because the screens will not be able to find the correct pattern or function file. You should also put in a frame index of 1, assuming you are not using a mode in which you might make the frame index something else. Frame index is, by default, 1. Type in mode 1, a pattern name, a function name, a frame index of 1, and a duration (any number). The rest you can leave blank, and click *OK*{:.gui-btn}. Every condition you have selected will be filled in with this information. This is another easy way to create many copies of the same condition.
 
@@ -82,7 +82,7 @@ In the condition tutorial, you went through how to preview a condition, using th
 Click on the pattern name in one of your conditions. When you click on it, the Preview pane should populate as shown below:
 {:.clear}
 
-![In Screen Preview](assets/inScrnPrv.png)
+![In Screen Preview](assets/p-d_d-e_t_preview.png){:.pop}
 
 Below the in screen preview are a number of buttons. Click *Forward Frame*{:.gui-btn}. Your pattern preview should change slightly. This button allows you to move through each frame in the pattern. Patterns are 3 dimensional arrays. The first two dimensions indicate the width and height of the pattern. The third dimension determines the number of frames in the pattern, so *Frame Forward*{:.gui-btn} and *Back Frame*{:.gui-btn} move you forward and backward through this third dimension. If you don't want to look at each frame individually, click *Play*{:.gui-btn}. This will cause the pattern to play through each frame at a relatively slow frame rate. You may hit *Pause*{:.gui-btn} to stop this play back where it is. Hit *Stop*{:.gui-btn} to stop the playing and return the preview back to the first frame. This allows you to explore any imported pattern and make sure it is as you expect.
 
@@ -92,7 +92,7 @@ Now click on a function in one of your conditions. The pattern display should be
 
 You may see a red vertical bar somewhere on your function. This indicates the duration set for the condition the pattern is in. For example, in this preview, the condition's duration is set to 3 seconds. Notice that the upper x-axis of the shown function represents time, and ends at 3 seconds.
 
-![Function Preview](assets/redBarFunc.png)
+![Function Preview](assets/p-d_d-e_t_preview-function.png){:.png}
 
 This is why the red vertical bar lines up with the end of the function. The red bar does not have to line up with the end, but normally this is what you would want, and condition that plays long enough to get through your position function exactly once. Of course, this is only relevant in modes that use a position function.
 
