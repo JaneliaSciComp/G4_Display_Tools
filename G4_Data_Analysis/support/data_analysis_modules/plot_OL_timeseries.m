@@ -96,11 +96,15 @@ function plot_OL_timeseries(timeseries_data, timestampsIN, model, plot_settings,
                             nanidx = isnan(meandata);
                             stddata = nanstd(tmpdata);
                             semdata = stddata./sqrt(sum(max(~isnan(tmpdata),[],2)));
-                            timestamps = timestampsIN(~nanidx);
+                            timestamps = timestamp----sIN(~nanidx);
                             meandata(nanidx) = []; 
                             semdata(nanidx) = [];
                             ms_to_move = nanmean(squeeze(pat_move_time(g,:,cond,:)))/1000;
-                            move_line(g) = timestamps(1) + ms_to_move;
+                            if ~isempty(timestamps)
+                                move_line(g) = timestamps(1) + ms_to_move;
+                            else
+                                move_line(g) = NaN;
+                            end
                             if cutoff_time > 0
                                 cutoff_ind = find(timestamps>cutoff_time);
                                 if ~isempty(cutoff_ind)
