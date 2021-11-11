@@ -27,6 +27,7 @@ classdef G4_conductor_model < handle
        timestamp_
        aborted_count_
        date_folder_
+       num_attempts_bad_conds_
 
        
         
@@ -59,6 +60,7 @@ classdef G4_conductor_model < handle
         timestamp
         aborted_count
         date_folder
+        num_attempts_bad_conds
        
     end
     
@@ -120,6 +122,7 @@ classdef G4_conductor_model < handle
             self.fly_save_name = [self.fly_genotype,'-',datestr(now, 'HH_MM_SS')];
             self.date_folder = datestr(now, 'mm_dd_yyyy');
             self.timestamp = datestr(now, 'mm-dd-yyyy HH:MM:SS');
+            self.num_attempts_bad_conds = 2;
  
         end
         
@@ -275,7 +278,13 @@ classdef G4_conductor_model < handle
             self.aborted_count = 0;
         end
         
+        function set_num_attempts_bad_conds(self, new_val)
+            self.num_attempts_bad_conds = new_val;
+        end
         
+        function value = get_num_attempts_bad_conds(self)
+            value = self.num_attempts_bad_conds;
+        end
         
         
         
@@ -377,6 +386,10 @@ classdef G4_conductor_model < handle
         function value = get.date_folder(self)
             value = self.date_folder_;
         end
+        
+        function value = get.num_attempts_bad_conds(self)
+            value = self.num_attempts_bad_conds_;
+        end
             
 
 
@@ -477,6 +490,10 @@ classdef G4_conductor_model < handle
         
         function set.date_folder(self, value)
             self.date_folder_ = value;
+        end
+        
+        function set.num_attempts_bad_conds(self, value)
+            self.num_attempts_bad_conds_ = value;
         end
         
         

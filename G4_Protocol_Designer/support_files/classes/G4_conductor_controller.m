@@ -336,6 +336,17 @@ classdef G4_conductor_controller < handle
                 if ~isempty(self.view)
                     self.view.update_progress_bar(trial_type, data);
                 end
+                
+            elseif strcmp(trial_type, 'rescheduled')
+                
+                cond = varargin{1};
+                total_trial = varargin{2};
+                data = total_trial/trials;
+                
+                if ~isempty(self.view)
+                    self.view.update_progress_bar(trial_type, data, cond);
+                end
+                
             else
                 disp("I couldn't update the progress bar");
                 return
@@ -641,6 +652,7 @@ classdef G4_conductor_controller < handle
             eval(run_command);
             pause(3);
             
+            
             if self.check_if_aborted()
                 %experiment has been aborted
                 self.model.aborted_count = self.model.aborted_count + 1;
@@ -889,6 +901,13 @@ classdef G4_conductor_controller < handle
             
         end
         
+        % After a fly is run, take the 
+        function create_fly_specific_g4p()
+           
+            
+            
+        end
+        
         function reopen_original_experiment(self, filepath, fly_name)
             
             line_to_match = 'Default run protocol file: ';
@@ -927,6 +946,12 @@ classdef G4_conductor_controller < handle
            
                     
             [bad_slope, bad_flier] = self.fb_model.check_if_bad(cond, rep, trialType);
+            
+            if strcmp(trialType, 'rescheduled')
+                if bad_slope == 0 && bad_flier == 0
+                    self.fb_model.remove_bad_condition(rep, cond);
+                end
+            end
            
              
              if ~isempty(self.view)
@@ -970,7 +995,7 @@ classdef G4_conductor_controller < handle
         
             metadata_names = {"experimenter", "experiment_name", "timestamp", "fly_name", "fly_genotype", "fly_age", "fly_sex", "experiment_temp", ...
                 "experiment_type", "rearing_protocol", "light_cycle", "do_plotting", "do_processing", "plotting_file", "processing_file", "run_protocol_file", ...
-                "comments", "fly_results_folder"};
+                "comments", "fly_results_folder", "trials re-run"};
             if ~isempty(self.view)
                 waitfor(errordlg("Please add any final comments, then click OK to continue." ...
                     + newline + newline + " Reminder: if you're changing flies for the next experiment, don't forget to update the fly name."));
@@ -989,7 +1014,8 @@ classdef G4_conductor_controller < handle
             model_metadata = {self.model.experimenter, self.doc.experiment_name, self.model.timestamp, self.model.fly_name, self.model.fly_genotype, ...
                 self.model.fly_age, self.model.fly_sex, self.model.experiment_temp, ...
                 self.model.experiment_type, self.model.rearing_protocol, self.model.light_cycle, self.model.do_plotting, self.model.do_processing, ...
-                self.model.plotting_file, self.model.processing_file, self.model.run_protocol_file, self.model.metadata_comments, fly_folder};
+                self.model.plotting_file, self.model.processing_file, self.model.run_protocol_file, self.model.metadata_comments, fly_folder, ...
+                self.fb_model.bad_trials_before_reruns};
 
         
             metadata = struct;
@@ -1403,6 +1429,13 @@ classdef G4_conductor_controller < handle
             end
             
             
+            
+        end
+        
+        function reschedule_bad_condition(self, cond)
+           
+            added_conds = [self.model.rescheduled_conditions cond];
+            self.model.set_rescheduled_conditions(added_conds);
             
         end
         

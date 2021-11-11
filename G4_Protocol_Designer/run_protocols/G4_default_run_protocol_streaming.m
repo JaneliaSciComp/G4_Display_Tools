@@ -50,7 +50,7 @@
  %p.active_ao_channels lists the channels that are active - [0 2 3] for
  %example means channels 1, 3, and 4 are active.
 
-function [success] = default_run_protocol_streaming_test(runcon, p)%input should always be 1 or 2 items
+function [success] = G4_default_run_protocol_streaming(runcon, p)%input should always be 1 or 2 items
 
 %% Get access to the figure and progress bar in the run gui IF it was passed in.
 global ctlr;
@@ -154,6 +154,7 @@ end
     end
     if p.chan3_rate ~= 0
         active_ai_streaming_channels(end+1) = 3;
+        
     end
     if p.chan4_rate ~= 0
         active_ai_streaming_channels(end+1) = 4;
@@ -518,6 +519,214 @@ end
                     end 
                  end
              end
+             
+             
+%% Run re-scheduled conditions if there are any------------------------------
+            
+            % Conditions that are marked as bad during streaming (meaning
+            % the fly stopped flying too much or the data had a slope of 0)
+            % are saved to the feedback model as bad_trials. This is a cell
+            % array of short 2x1 arrays containing the condition number and
+            % rep number of the bad trial, in the format bad_trials{1} =
+            % [cond, rep]; This loop will re-run every trial that was
+            % listed as bad however many times indicated in the settings
+            % (or a default of 2). A trial will only be re-run an
+            % additional time if the first re-run also fails. 
+            
+             
+            res_conds = runcon.fb_model.get_bad_trials();
+            num_attempts = runcon.model.num_attempts_bad_conds;
+            num_trial_including_rescheduled = num_trial_of_total;
+            
+            %No intertrial at end of regular block trials, so do one now, assuming the protocol has intertrials 
+            if ~isempty(res_conds) && inter_type == 1
+                
+                % run intertrial
+                
+                num_trial_including_rescheduled = num_trial_including_rescheduled + 1;
+                
+            end
+            
+            for attempt = 1:num_attempts
+                
+                %This line saves all the bad trials to a separate variable in
+            %the model so we can track how many extra conditions are run
+            %total
+                runcon.fb_model.set_bad_trials_before_reruns();
+            
+                for badtrial = 1:length(res_conds)
+
+                    cond = res_conds{badtrial}(1);
+                    rep = res_conds{badtrial}(2);
+                    
+                    % update the progress bar
+                    
+                    runcon.update_progress('rescheduled', cond, num_trial_of_total);
+                    num_trial_including_rescheduled = num_trial_including_rescheduled + 1;
+
+                    % run that condition
+                    
+                    %define parameters for this trial----------------
+                    trial_mode = block_trials{cond,1};
+                    pat_id = p.block_pat_indices(cond);
+                    pos_id = p.block_pos_indices(cond);
+                    if length(block_ao_indices) >= cond
+                        trial_ao_indices = block_ao_indices(cond,:);
+                    else
+                        trial_ao_indices = [];
+                    end
+                    %Set frame index
+                    if isempty(block_trials{cond,8})
+                        frame_ind = 1;
+                    elseif strcmp(block_trials{cond,8},'r')
+                        frame_ind = 0; %use this later to randomize
+                    else
+                       frame_ind = str2num(block_trials{cond,8});
+                    end
+                     
+                    frame_rate = block_trials{cond, 9};
+                    gain = block_trials{cond, 10};
+                    offset = block_trials{cond, 11};
+                    dur = block_trials{cond, 12};
+                     
+                    %Update panel_com-----------------------------
+                    Panel_com('set_control_mode', trial_mode)
+                    
+                    Panel_com('set_pattern_id', pat_id)
+                    
+                    if ~isempty(block_trials{cond,10})
+                        Panel_com('set_gain_bias', [gain, offset]);
+                    end
+                    if pos_id ~= 0
+
+                        Panel_com('set_pattern_func_id', pos_id)
+                        
+                    end
+                    if trial_mode == 2
+                        Panel_com('set_frame_rate',frame_rate);
+                    end
+                    
+                    if frame_ind == 0
+                        frame_ind = randperm(p.num_block_frames(c),1);
+                    end
+
+                    Panel_com('set_position_x', frame_ind);
+                    
+                    for i = 1:length(p.active_ao_channels)
+                        Panel_com('set_ao_function_id',[p.active_ao_channels(i), trial_ao_indices(i)]);
+                        
+                    end
+                    
+                    %Update status panel to show current parameters
+                   runcon.update_current_trial_parameters(trial_mode, pat_id, pos_id, p.active_ao_channels, ...
+                      trial_ao_indices, frame_ind, frame_rate, gain, offset, dur);
+            
+ 
+                    pause(0.01)
+                    
+                    tcpread = pnet(ctlr.tcpConn, 'read', 'noblock'); % clear cache
+                    
+                    %Run block trial--------------------------------------
+                    Panel_com('start_display', dur); %duration expected in 100ms units
+                    pause(dur + .01)
+                    tcpread = pnet(ctlr.tcpConn, 'read', 'noblock');
+                    runcon.update_streamed_data(tcpread, 'rescheduled', rep, cond, num_trial_including_rescheduled);
+                    isAborted = runcon.check_if_aborted();
+                    if isAborted == 1
+                        Panel_com('stop_display');
+                        Panel_com('stop_log');
+                        pause(1);
+                        disconnectHost;
+                        success = 0;
+                        return;
+                  
+                    end
+                    runcon.update_elapsed_time(round(toc,2));
+                    if badtrial == length(res_conds)
+                        continue;
+                    end
+
+
+
+                    %run intertrial if there is one
+                    
+                    if inter_type == 1
+                    
+                        %Update progress bar to indicate start of inter-trial
+                        num_trial_including_rescheduled = num_trial_including_rescheduled + 1;
+                        %runcon.update_progress('inter', r, reps, c, num_cond, num_trial_of_total)
+                       
+
+                        %Run intertrial-------------------------
+                        Panel_com('set_control_mode',inter_mode);
+                       
+                        Panel_com('set_pattern_id', inter_pat);
+                       
+                        %randomize frame index if indicated
+                        if inter_frame_ind == 0
+                            inter_frame_ind = randperm(p.num_intertrial_frames, 1);
+                        end
+                        Panel_com('set_position_x',inter_frame_ind);
+                        
+
+                        if inter_pos ~= 0
+                            Panel_com('set_pattern_func_id', inter_pos);
+                            
+                        end
+
+                         if ~isempty(inter_gain) %this assumes you'll never have gain without offset
+                             Panel_com('set_gain_bias', [inter_gain, inter_offset]);
+                         end
+
+                         if inter_mode == 2
+                             Panel_com('set_frame_rate', inter_frame_rate);
+                         end
+
+                         for i = 1:length(inter_ao_ind)
+                             if inter_ao_ind(i) ~= 0 %if it is zero, there was no ao function for this channel
+                                 Panel_com('set_ao_function_id',[p.active_ao_channels(i), inter_ao_ind(i)]);%[channel number, index of ao func]
+                                 
+                             end
+                         end
+                         
+                          %Update status panel to show current parameters
+                        runcon.update_current_trial_parameters(inter_mode, inter_pat, inter_pos, p.active_ao_channels, ...
+                            inter_ao_ind, inter_frame_ind, inter_frame_rate, inter_gain, inter_offset, inter_dur);
+                        
+                         tcpread = pnet(ctlr.tcpConn, 'read', 'noblock'); % clear cache
+                         pause(0.01);
+                         Panel_com('start_display', inter_dur);
+                         pause(inter_dur + .01);
+                         tcpread = pnet(ctlr.tcpConn, 'read', 'noblock');
+                         runcon.update_streamed_data(tcpread, 'inter', rep, cond, num_trial_including_rescheduled);
+                         if runcon.check_if_aborted() == 1
+                            Panel_com('stop_display');
+                            pause(.1);
+                            Panel_com('stop_log');
+                            pause(1);
+                            disconnectHost;
+                            success = 0;
+                            return;
+                         
+                         end
+                         
+                         runcon.update_elapsed_time(round(toc,2));
+                         
+                    end
+
+
+
+
+
+                end
+                
+                %reset res_conds to equal the new updated badTrials list.
+                %If it's empty, no more conditions will run
+                
+                res_conds = runcon.fb_model.get_bad_trials();
+                
+            end
+                
              
 %% Run post-trial if there is one--------------------------------------------
 
