@@ -241,18 +241,15 @@ end
                  %First update the progress bar to show pretrial is running----
                  runcon.update_progress('pre');
                  num_trial_of_total = num_trial_of_total + 1;
+                   %Update status panel to show current parameters
+                 runcon.update_current_trial_parameters(pre_mode, pre_pat, pre_pos, p.active_ao_channels, ...
+                    pre_ao_ind, pre_frame_ind, pre_frame_rate, pre_gain, pre_offset, pre_dur);
 
-                %Set the panel values appropriately----------------
-                 Panel_com('set_control_mode',pre_mode);
-                 if pre_mode == 3 %For some reason, mode 3 specifically screws up the run, making subsequent trials glitch. 
-                     pause(.1); %A pause is unnecessary with other modes but seems necessary with mode 3. Will investigate further.
-                 end
+                 pause(0.01);
                  
-                 Panel_com('set_pattern_id', pre_pat);
-                 if pre_mode == 3
-                     pause(.1);
-                 end
-                    
+                 Panel_com('start_log');
+                 pause(.003);
+                 
                  %randomize frame index if indicated
                  if pre_frame_ind == 0
                      pre_frame_ind = randperm(p.num_pretrial_frames, 1);
@@ -286,13 +283,19 @@ end
                         
                      end
                  end
-                 
-                 %Update status panel to show current parameters
-                 runcon.update_current_trial_parameters(pre_mode, pre_pat, pre_pos, p.active_ao_channels, ...
-                    pre_ao_ind, pre_frame_ind, pre_frame_rate, pre_gain, pre_offset, pre_dur);
 
-                 pause(0.01);
+                %Set the panel values appropriately----------------
+                 Panel_com('set_control_mode',pre_mode);
+                 if pre_mode == 3 %For some reason, mode 3 specifically screws up the run, making subsequent trials glitch. 
+                     pause(.1); %A pause is unnecessary with other modes but seems necessary with mode 3. Will investigate further.
+                 end
                  
+                 Panel_com('set_pattern_id', pre_pat);
+                 if pre_mode == 3
+                     pause(.1);
+                 end
+                    
+
                  %Run pretrial on screen
                  if pre_dur ~= 0
                     Panel_com('start_display', pre_dur+2);
@@ -303,6 +306,9 @@ end
                      %causes it to loop until you press a button.
                  end
              end
+             
+             Panel_com('stop_log');
+            
              
              if runcon.check_if_aborted()
                 Panel_com('stop_display');
@@ -352,11 +358,14 @@ end
                     gain = block_trials{cond, 10};
                     offset = block_trials{cond, 11};
                     dur = block_trials{cond, 12};
+                    
+                     %Update status panel to show current parameters
+                   runcon.update_current_trial_parameters(trial_mode, pat_id, pos_id, p.active_ao_channels, ...
+                      trial_ao_indices, frame_ind, frame_rate, gain, offset, dur);
+                  
+                    Panel_com('start_log');
                      
                     %Update panel_com-----------------------------
-                    Panel_com('set_control_mode', trial_mode)
-                    
-                    Panel_com('set_pattern_id', pat_id)
                     
                     if ~isempty(block_trials{cond,10})
                         Panel_com('set_gain_bias', [gain, offset]);
@@ -380,17 +389,16 @@ end
                         Panel_com('set_ao_function_id',[p.active_ao_channels(i), trial_ao_indices(i)]);
                         
                     end
+                    Panel_com('set_control_mode', trial_mode)
                     
-                    %Update status panel to show current parameters
-                   runcon.update_current_trial_parameters(trial_mode, pat_id, pos_id, p.active_ao_channels, ...
-                      trial_ao_indices, frame_ind, frame_rate, gain, offset, dur);
-            
- 
-                    pause(0.01)
+                    Panel_com('set_pattern_id', pat_id)
+                    
+                  
                     
                     %Run block trial--------------------------------------
                     Panel_com('start_display', dur+2); %duration expected in 100ms units
-                    pause(dur + .01)
+                    pause(dur + .001)
+                    Panel_com('stop_log');
                     isAborted = runcon.check_if_aborted();
                     if isAborted == 1
                         Panel_com('stop_display');
@@ -413,19 +421,20 @@ end
                     if inter_type == 1
                     
                         %Update progress bar to indicate start of inter-trial
+                          %Update progress bar to indicate start of inter-trial
                         num_trial_of_total = num_trial_of_total + 1;
                         runcon.update_progress('inter', r, reps, c, num_cond, num_trial_of_total)
-                        progress_axes.Title.String = "Rep " + r + " of " + reps +...
-                            ", Trial " + c + " of " + num_cond + ". Inter-trial running...";
-                        progress_bar.YData = num_trial_of_total/total_num_steps;
-                        drawnow;
+                         %Update status panel to show current parameters
+                        runcon.update_current_trial_parameters(inter_mode, inter_pat, inter_pos, p.active_ao_channels, ...
+                            inter_ao_ind, inter_frame_ind, inter_frame_rate, inter_gain, inter_offset, inter_dur);
+                        
+                         pause(0.01);
+                         
+                         Panel_com('start_log');
 
                         %Run intertrial-------------------------
-                        Panel_com('set_control_mode',inter_mode);
-                       
-                        Panel_com('set_pattern_id', inter_pat);
-                       
-                        %randomize frame index if indicated
+                        
+                         %randomize frame index if indicated
                         if inter_frame_ind == 0
                             inter_frame_ind = randperm(p.num_intertrial_frames, 1);
                         end
@@ -452,13 +461,15 @@ end
                              end
                          end
                          
-                          %Update status panel to show current parameters
-                        runcon.update_current_trial_parameters(inter_mode, inter_pat, inter_pos, p.active_ao_channels, ...
-                            inter_ao_ind, inter_frame_ind, inter_frame_rate, inter_gain, inter_offset, inter_dur);
-                        
-                         pause(0.01);
+                        Panel_com('set_control_mode',inter_mode);
+                       
+                        Panel_com('set_pattern_id', inter_pat);
+                       
+                       
+
                          Panel_com('start_display', inter_dur+2);
-                         pause(inter_dur + .01);
+                         pause(inter_dur + .001);
+                         Panel_com('stop_log');
                          if runcon.check_if_aborted() == 1
                             Panel_com('stop_display');
                             pause(.1);
@@ -483,12 +494,13 @@ end
                 %Update progress bar--------------------------
                 num_trial_of_total = num_trial_of_total + 1;
                 runcon.update_progress('post', num_trial_of_total);
-
-
-                 Panel_com('set_control_mode', post_mode);
+                     %Update status panel to show current parameters
+                 runcon.update_current_trial_parameters(post_mode, post_pat, post_pos, p.active_ao_channels, ...
+                     post_ao_ind, post_frame_ind, post_frame_rate, post_gain, post_offset, post_dur);
+                
                  
-                 Panel_com('set_pattern_id', post_pat);
-                 
+                 Panel_com('start_log');
+
                  if ~isempty(post_gain)
                      Panel_com('set_gain_bias', [post_gain, post_offset]);
                  end
@@ -511,15 +523,26 @@ end
                          
                      end
                  end
+
+                 Panel_com('set_control_mode', post_mode);
                  
-                  %Update status panel to show current parameters
-                 runcon.update_current_trial_parameters(post_mode, post_pat, post_pos, p.active_ao_channels, ...
-                     post_ao_ind, post_frame_ind, post_frame_rate, post_gain, post_offset, post_dur);
-                
+                 Panel_com('set_pattern_id', post_pat);
+                 
+                 
+                 
+             
 
                  Panel_com('start_display',post_dur+2);
 
                  pause(post_dur);
+                 
+                 %Panel_com('stop_log');
+                stop_log_response = send_tcp( char([1 hex2dec('40')]), 1);
+                if stop_log_response.success == 1
+                    waitfor(errordlg("Stop Log command failed, please stop log manually then hit a key"));
+                    waitforbuttonpress;
+                end
+
                  
                  if runcon.check_if_aborted() == 1
                     Panel_com('stop_display');
@@ -537,16 +560,7 @@ end
 
             Panel_com('stop_display');
             
-            pause(1);
-
-            %Panel_com('stop_log');
-            stop_log_response = send_tcp( char([1 hex2dec('40')]), 1);
-            if stop_log_response.success == 1
-                waitfor(errordlg("Stop Log command failed, please stop log manually then hit a key"));
-                waitforbuttonpress;
-            end
-
-            pause(1);          
+            pause(1);        
 
             disconnectHost;
             
