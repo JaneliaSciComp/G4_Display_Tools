@@ -12,8 +12,27 @@ classdef feedback_model < handle
         wbf_limits
         
         bad_trials
+        bad_trials_before_reruns
         full_streamed_intertrials
         full_streamed_conditions
+        
+        full_inter_left
+        full_inter_right
+        full_inter_lmr
+        
+        full_conds_left
+        full_conds_right       
+        full_conds_lmr
+        
+        full_inter_left_count
+        full_inter_right_count
+        full_inter_lmr_count
+        
+        full_conds_left_count
+        full_conds_right_count
+        full_conds_lmr_count
+        
+        
         inter_hist_left
         inter_hist_right
         inter_hist_lmr
@@ -41,16 +60,40 @@ classdef feedback_model < handle
             self.translated_data = {};
             self.full_streamed_intertrials = {};
             self.full_streamed_conditions = {};
+            self.full_inter_left = [];
+            self.full_inter_right = [];
+           
+            self.full_inter_lmr = [];       
+            self.full_conds_left = [];
+            self.full_conds_right = [];           
+            self.full_conds_lmr = [];
+            
+            self.inter_hist_axis = 0:.1:10;
+            self.inter_lmr_axis = 0:.1:10;
+            self.cond_hist_axis = 0:.1:10;
+            
+            self.full_conds_lmr_count = zeros(1,length(self.cond_hist_axis)-1);
+            self.full_conds_left_count = zeros(1,length(self.cond_hist_axis)-1);
+            self.full_conds_right_count = zeros(1,length(self.cond_hist_axis)-1);
+            
+            self.full_inter_left_count = zeros(1, length(self.inter_hist_axis)-1);
+            self.full_inter_right_count = zeros(1, length(self.inter_hist_axis)-1);
+            self.full_inter_lmr_count = zeros(1, length(self.inter_hist_axis)-1);
+            
             self.bad_trials = {};
+            self.bad_trials_before_reruns = {};
             self.lmr_data = [];
             self.l_data = [];
             self.r_data = [];
             self.wbf_data = [];
             self.avg_wbf = 0;
             self.update_model_channels(doc);  
-            self.inter_hist_axis = 0:.1:10;
-            self.inter_lmr_axis = 0:.1:10;
-            self.cond_hist_axis = 0:.1:10;
+            
+            self.cond_hist_left = zeros(1,length(self.cond_hist_axis)-1);
+            self.cond_hist_right = zeros(1,length(self.cond_hist_axis)-1);
+            self.cond_hist_lmr = zeros(1, length(self.cond_hist_axis)-1);
+            self.inter_hist_left = zeros(1, length(self.inter_hist_axis)-1);
+            self.inter_hist_right = zeros(1, length(self.inter_hist_axis)-1);
             self.wbf_limits{1} = [150 260];
             self.wbf_limits{2} = .25;
             self.wbf_limits{3} = 1; 
@@ -91,21 +134,34 @@ classdef feedback_model < handle
         
         function read_tcp_data(self, tcp_read_data, trialType)
             
+            %Save the raw data in case you want it later
             self.set_raw_data(tcp_read_data);
+            
+            %translate the data from binary and save it
+            
             self.set_translated_data(self.translate_data());
-            self.add_full_data(self.translated_data, trialType);
+            
+            %save full translated, divided up data
+            self.add_full_data(trialType);
+            
+            %save each stream to its own variable
             self.set_lmr_data(self.translated_data{1});
             self.set_l_data(self.translated_data{2});
             self.set_r_data(self.translated_data{3});
             self.set_wbf_data(self.translated_data{4});
+            
+            %get and save the average wbf for this dataset
             self.set_avg_wbf(mean(self.wbf_data));
             
-            if strcmp(trialType, 'inter')
-                self.get_inter_histograms();
-            else
-                self.get_cond_histograms();
-            end
-                
+            %Get the counts of each voltage reading for histogram for this
+            %trial, and add it to the previous totals
+            self.get_histogram_count(trialType);
+            
+            %Divide the total counts for each voltage reading by number of
+            %readings to get probability of each. This is the histogram
+            %data to be plotted
+            self.get_histograms(trialType);
+            
             
         
         end
@@ -148,112 +204,89 @@ classdef feedback_model < handle
                     bad_flier = 1;
                 end
 
-
-                if cond_flat == 1 || bad_flier == 1
-                    self.add_bad_condition(cond, rep);
+                if ~strcmp(trialType, 'rescheduled')
+                    if cond_flat == 1 || bad_flier == 1
+                        self.add_bad_condition(cond, rep);
+                    end
                 end
                 
             end
             
+        end
+        
+
+        
+        function get_histogram_count(self, trialType)
             
+            new_data = self.translated_data; 
             
+            new_data_lmr = new_data{1};
+            new_data_left = new_data{2};
+            new_data_right = new_data{3};          
+
+            count_left = [];
+            count_right = [];
+            count_lmr = [];
+            
+            if ~strcmp(trialType, 'inter')
+                for i = 1:length(self.cond_hist_axis)-1
+                    count_left(i) = sum(new_data_left()>=self.cond_hist_axis(i) & new_data_left<self.cond_hist_axis(i+1));
+                    count_right(i) = sum(new_data_right()>=self.cond_hist_axis(i) & new_data_right<self.cond_hist_axis(i+1));
+                    count_lmr(i) = sum(new_data_lmr()>=self.cond_hist_axis(i) & new_data_lmr<self.cond_hist_axis(i+1));
+    %                 probs_left(i) = count_left(i)/lendataleft;
+    %                 probs_right(i) = count_right(i)/lendataright;
+    %                 probs_lmr(i) = count_lmr(i)/lendatalmr;
+                end
+
+                self.full_conds_left_count = self.full_conds_left_count + count_left;
+                self.full_conds_right_count = self.full_conds_right_count + count_right;
+                self.full_conds_lmr_count = self.full_conds_lmr_count + count_lmr;
+                
+            else
+                for i = 1:length(self.inter_hist_axis)-1
+                    count_left(i) = sum(new_data_left()>=self.inter_hist_axis(i) & new_data_left<self.inter_hist_axis(i+1));
+                    count_right(i) = sum(new_data_right()>=self.inter_hist_axis(i) & new_data_right<self.inter_hist_axis(i+1));
+                    count_lmr(i) = sum(new_data_lmr()>=self.inter_hist_axis(i) & new_data_lmr<self.inter_hist_axis(i+1));
+    %                 probs_left(i) = count_left(i)/lendataleft;
+    %                 probs_right(i) = count_right(i)/lendataright;
+    %                 probs_lmr(i) = count_lmr(i)/lendatalmr;
+                end
+
+                self.full_inter_left_count = self.full_inter_left_count + count_left;
+                self.full_inter_right_count = self.full_inter_right_count + count_right;
+                self.full_inter_lmr_count = self.full_inter_lmr_count + count_lmr;
+                
+            end    
             
         end
         
-        function get_cond_histograms(self)
+        function get_histograms(self, trialType)
            
-            %% Combine all conditions collected so far into one array for each wing
-            
-            condition_data_left = [];
-            condition_data_right = [];
-            condition_data_lmr = [];
-            
-            for trial = 1:length(self.full_streamed_conditions)
+            if ~strcmp(trialType, 'inter')
+               probs_left = self.full_conds_left_count/length(self.full_conds_left);
+               probs_right = self.full_conds_right_count/length(self.full_conds_right);
+               probs_lmr = self.full_conds_lmr_count/length(self.full_conds_lmr);
+
+                %% Set histogram data
+
+                self.set_cond_hist_left(probs_left);
+                self.set_cond_hist_right(probs_right);
+                self.set_cond_hist_lmr(probs_lmr);
                 
-                condition_data_left = [condition_data_left self.full_streamed_conditions{trial}{2}];
-                condition_data_right = [condition_data_right self.full_streamed_conditions{trial}{3}];
-                condition_data_lmr = [condition_data_lmr self.full_streamed_conditions{trial}{1}];
+            else
+                
+                probs_left = self.full_inter_left_count/length(self.full_inter_left);
+                probs_right = self.full_inter_right_count/length(self.full_inter_right);
+                probs_lmr = self.full_inter_lmr_count/length(self.full_inter_lmr);
+                
+                self.set_inter_left(probs_left);
+                self.set_inter_right(probs_right);
+                self.set_inter_lmr(probs_lmr);
+                
             end
-            
-            %% Create histogram datasets for left, right, and lmr
-            
-            lendataleft = length(condition_data_left);
-            lendataright = length(condition_data_right);
-            lendatalmr = length(condition_data_lmr);
-            count_left = [];
-            probs_left = [];
-            count_right = [];
-            probs_right = [];
-            count_lmr = [];
-            probs_lmr = [];
-            
-            for i = 1:length(self.cond_hist_axis)-1
-                count_left(i) = sum(condition_data_left()>=self.cond_hist_axis(i) & condition_data_left<=self.cond_hist_axis(i+1));
-                count_right(i) = sum(condition_data_right()>=self.cond_hist_axis(i) & condition_data_right<=self.cond_hist_axis(i+1));
-                count_lmr(i) = sum(condition_data_lmr()>=self.cond_hist_axis(i) & condition_data_lmr<=self.cond_hist_axis(i+1));
-                probs_left(i) = count_left(i)/lendataleft;
-                probs_right(i) = count_right(i)/lendataright;
-                probs_lmr(i) = count_lmr(i)/lendatalmr;
-            end
-            
-            %% Set histogram data
-            
-            self.set_cond_hist_left(probs_left);
-            self.set_cond_hist_right(probs_right);
-            self.set_cond_hist_lmr(probs_lmr);
             
         end
-        
-        function  get_inter_histograms(self)
-%             
-
-
-        %% Combine intertrial with the intertrials before it
-            
-            intertrial_data_left = [];
-            intertrial_data_right = [];
-            intertrial_data_lmr = [];
-            
-            for trial = 1:length(self.full_streamed_intertrials)
-                
-                intertrial_data_left = [intertrial_data_left self.full_streamed_intertrials{trial}{2}];
-                intertrial_data_right = [intertrial_data_right self.full_streamed_intertrials{trial}{3}];
-                intertrial_data_lmr = [intertrial_data_lmr self.full_streamed_intertrials{trial}{1}];
-                
-            end
-
-%% Create histogram datasets for left wing, right wing, and lmr data. 
-            lendataleft = length(intertrial_data_left); 
-            lendataright = length(intertrial_data_right);
-            lendatalmr = length(intertrial_data_lmr);
-            count_left = [];
-            probs_left = [];
-            count_right = [];
-            probs_right = [];
-            count_lmr = [];
-            probs_lmr = [];
-
-            for i = 1:length(self.inter_hist_axis)-1
-                count_left(i) = sum(intertrial_data_left()>=self.inter_hist_axis(i) & intertrial_data_left<=self.inter_hist_axis(i+1));
-                count_right(i) = sum(intertrial_data_right()>=self.inter_hist_axis(i) & intertrial_data_right<=self.inter_hist_axis(i+1));
-                count_lmr(i) = sum(intertrial_data_lmr()>=self.inter_lmr_axis(i) & intertrial_data_lmr<=self.inter_lmr_axis(i+1));
-                probs_left(i) = count_left(i)/lendataleft;
-                probs_right(i) = count_right(i)/lendataright;
-                probs_lmr(i) = count_lmr(i)/lendatalmr;
-            end
-  
-%% Set histogram data
-            self.set_inter_left(probs_left);
-            self.set_inter_right(probs_right);
-            self.set_inter_lmr(probs_lmr);
-%             
-%             xax(1) = [];
-%             xax_lmr(1) = [];
-%             
-%             self.set_inter_axis(xax);
-%             self.set_inter_lmr_axis(xax_lmr);
-
-        end
+       
         
         function update_histogram_limits(self, newlimits)
            
@@ -272,21 +305,50 @@ classdef feedback_model < handle
             
             badTrials = self.bad_trials;
             badTrials{end+1} = [cond, rep];
-            self.set_bad_trials(badTrials);
-            
+            self.set_bad_trials(badTrials);            
             
         end
         
-        function add_full_data(self, new_data, trialType)
+        function remove_bad_condition(self, rep, cond)
+            element = 0;
+            for bad = 1:numel(self.bad_trials)
+                if self.bad_trials{bad} == [cond, rep]
+                    element = bad;
+                end
+            end
+            
+            if element ~= 0
+                self.bad_trials(element) = [];
+            end
+        end
+        
+        function add_full_data(self, trialType)
+            
+             %channel 1 = LmR
+                %channel 2 = Left wing
+                %channel 3 = Right wing
+                %channel 4 = WBF
+                
+            new_data = self.translated_data;
             
             if strcmp(trialType, 'inter')
                 fullData = self.full_streamed_intertrials;
                 fullData{end+1} = new_data;
                 self.set_full_intertrials(fullData);
+                
+                self.full_inter_left = [self.full_inter_left new_data{2}];
+                self.full_inter_right = [self.full_inter_right new_data{3}];              
+                self.full_inter_lmr = [self.full_inter_lmr new_data{1}];
             else
                 fullData = self.full_streamed_conditions;
                 fullData{end+1} = new_data;
                 self.set_full_conditions(fullData);
+                
+                self.full_conds_left = [self.full_conds_left new_data{2}];
+                self.full_conds_right = [self.full_conds_right new_data{3}];
+                self.full_conds_lmr = [self.full_conds_lmr new_data{1}];
+                
+                
             end
 
         end
@@ -307,10 +369,7 @@ classdef feedback_model < handle
                 num = num + 1;
             end
         end
-        
-            
-            
-        
+
         
         function data = translate_data(self)
             
@@ -459,6 +518,14 @@ classdef feedback_model < handle
             self.wbf_limits = input;
         end
         
+        % Do this after the main conditions of the protocol are finished
+        % but before any bad trials are re-run. Do it again after each full re-run attempt 
+        % so any conditions rescheduled more than once are reflected the correnct number of times.
+        % Done in the run protocol
+        function set_bad_trials_before_reruns(self)
+            self.bad_trials_before_reruns = [self.bad_trials_before_reruns self.bad_trials];
+        end
+        
         
         function set_num_chans(self, input)
             if input<4
@@ -582,6 +649,9 @@ classdef feedback_model < handle
         end
         function output = get_wbf_lim(self)
             output = self.wbf_limits;
+        end
+        function output = get_bad_trials_before_reruns(self)
+            output = self.bad_trials_before_reruns;
         end
 
         
