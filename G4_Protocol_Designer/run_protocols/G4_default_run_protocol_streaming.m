@@ -261,8 +261,7 @@ end
 
 %% Start log---------------------------------------------------------
 
-             Panel_com('start_log');
-             pause(1);
+             
 
 %% run pretrial if it exists----------------------------------------
              tic;
@@ -323,7 +322,9 @@ end
                  pause(0.01);
                  
                  %clear cache of junk streaming data built up 
-                 tcpread = pnet(ctlr.tcpConn, 'read', 'noblock'); %clear cache
+                 %tcpread = pnet(ctlr.tcpConn, 'read', 'noblock'); %clear cache
+                 Panel_com('start_log');
+                    pause(1);
                  
                  %Run pretrial on screen
                  if pre_dur ~= 0
@@ -337,7 +338,7 @@ end
              end
              
              tcpread = pnet(ctlr.tcpConn, 'read', 'noblock'); % read data that's been streamed since clearing cache
-             
+             Panel_com('stop_log');
 %              runcon.update_streamed_data(tcpread, 'pre'); %Function that updates feedback model
                                                    %and updates feedback
                                                    %gui
@@ -346,8 +347,8 @@ end
              if runcon.check_if_aborted()
                 Panel_com('stop_display');
                 pause(.1);
-                Panel_com('stop_log');
-                pause(1);
+                %Panel_com('stop_log');
+                %pause(1);
                 disconnectHost;
                 success = 0;
                 return;
@@ -427,18 +428,19 @@ end
  
                     pause(0.01)
                     
-                    tcpread = pnet(ctlr.tcpConn, 'read', 'noblock'); % clear cache
-                    
+                    %tcpread = pnet(ctlr.tcpConn, 'read', 'noblock'); % clear cache
+                    Panel_com('start_log');
                     %Run block trial--------------------------------------
                     Panel_com('start_display', dur); %duration expected in 100ms units
                     pause(dur + .01)
                     tcpread = pnet(ctlr.tcpConn, 'read', 'noblock');
+                    Panel_com('stop_log');
                     runcon.update_streamed_data(tcpread, 'block', r, c, num_trial_of_total);
                     isAborted = runcon.check_if_aborted();
                     if isAborted == 1
                         Panel_com('stop_display');
-                        Panel_com('stop_log');
-                        pause(1);
+                        %Panel_com('stop_log');
+                        %pause(1);
                         disconnectHost;
                         success = 0;
                         return;
@@ -496,17 +498,19 @@ end
                         runcon.update_current_trial_parameters(inter_mode, inter_pat, inter_pos, p.active_ao_channels, ...
                             inter_ao_ind, inter_frame_ind, inter_frame_rate, inter_gain, inter_offset, inter_dur);
                         
-                         tcpread = pnet(ctlr.tcpConn, 'read', 'noblock'); % clear cache
-                         pause(0.01);
+                         %tcpread = pnet(ctlr.tcpConn, 'read', 'noblock'); % clear cache
+                         %pause(0.01);
+                         Panel_com('start_log');
                          Panel_com('start_display', inter_dur);
                          pause(inter_dur + .01);
                          tcpread = pnet(ctlr.tcpConn, 'read', 'noblock');
+                         Panel_com('stop_log');
                          runcon.update_streamed_data(tcpread, 'inter', r, c, num_trial_of_total);
                          if runcon.check_if_aborted() == 1
                             Panel_com('stop_display');
                             pause(.1);
-                            Panel_com('stop_log');
-                            pause(1);
+                            %Panel_com('stop_log');
+                            %pause(1);
                             disconnectHost;
                             success = 0;
                             return;
@@ -559,18 +563,27 @@ end
                  runcon.update_current_trial_parameters(post_mode, post_pat, post_pos, p.active_ao_channels, ...
                      post_ao_ind, post_frame_ind, post_frame_rate, post_gain, post_offset, post_dur);
                 
-                 tcpread = pnet(ctlr.tcpConn, 'read', 'noblock'); % clear cache
+                 %tcpread = pnet(ctlr.tcpConn, 'read', 'noblock'); % clear cache
+                 Panel_com('start_log');
 
                  Panel_com('start_display',post_dur);
 
                  pause(post_dur);
-                 tcpread = pnet(ctlr.tcpConn, 'read', 'noblock');
+                 %tcpread = pnet(ctlr.tcpConn, 'read', 'noblock');
+                 
+                 stop_log_response = send_tcp( char([1 hex2dec('40')]), 1);
+                if stop_log_response.success == 1
+                    waitfor(errordlg("Stop Log command failed, please stop log manually then hit a key"));
+                    waitforbuttonpress;
+                end
+            
+                pause(1);
 %                  runcon.update_streamed_data(tcpread, 'post');
                  if runcon.check_if_aborted() == 1
                     Panel_com('stop_display');
                     pause(.1);
-                    Panel_com('stop_log');
-                    pause(1);
+                    %Panel_com('stop_log');
+                    %pause(1);
                     disconnectHost;
                     success = 0;
                     return;
@@ -585,13 +598,7 @@ end
             pause(1);
 
             %Panel_com('stop_log');
-            stop_log_response = send_tcp( char([1 hex2dec('40')]), 1);
-            if stop_log_response.success == 1
-                waitfor(errordlg("Stop Log command failed, please stop log manually then hit a key"));
-                waitforbuttonpress;
-            end
             
-            pause(1);
 
 
             disconnectHost;
