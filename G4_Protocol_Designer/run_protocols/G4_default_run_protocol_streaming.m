@@ -50,7 +50,7 @@
  %p.active_ao_channels lists the channels that are active - [0 2 3] for
  %example means channels 1, 3, and 4 are active.
 
-function [success] = G4_default_run_protocol_streaming(runcon, p)%input should always be 1 or 2 items
+function [success] = default_run_protocol_streaming_test(runcon, p)%input should always be 1 or 2 items
 
 %% Get access to the figure and progress bar in the run gui IF it was passed in.
 global ctlr;
@@ -270,14 +270,6 @@ end
                  %First update the progress bar to show pretrial is running----
                  runcon.update_progress('pre');
                  num_trial_of_total = num_trial_of_total + 1;
-                  %Update status panel to show current parameters
-                 runcon.update_current_trial_parameters(pre_mode, pre_pat, pre_pos, p.active_ao_channels, ...
-                    pre_ao_ind, pre_frame_ind, pre_frame_rate, pre_gain, pre_offset, pre_dur);
-
-                 pause(0.01);
-                 
-                 Panel_com('start_log');
-                 pause(.003);
 
                 %Set the panel values appropriately----------------
                  Panel_com('set_control_mode',pre_mode);
@@ -324,11 +316,16 @@ end
                      end
                  end
                  
-                
+                 %Update status panel to show current parameters
+                 runcon.update_current_trial_parameters(pre_mode, pre_pat, pre_pos, p.active_ao_channels, ...
+                    pre_ao_ind, pre_frame_ind, pre_frame_rate, pre_gain, pre_offset, pre_dur);
+
+                 pause(0.01);
                  
                  %clear cache of junk streaming data built up 
-                 tcpread = pnet(ctlr.tcpConn, 'read', 'noblock'); %clear cache
-                
+                 %tcpread = pnet(ctlr.tcpConn, 'read', 'noblock'); %clear cache
+                 Panel_com('start_log');
+                    pause(1);
                  
                  %Run pretrial on screen
                  if pre_dur ~= 0
@@ -372,12 +369,8 @@ end
                     %Update the progress bar--------------------------
                     num_trial_of_total = num_trial_of_total + 1;
                     runcon.update_progress('block', r, reps, c, num_cond, cond, num_trial_of_total);
-                    
-            
- 
-                    pause(0.01)
 
-                  
+                    
                     %define parameters for this trial----------------
                     trial_mode = block_trials{cond,1};
                     pat_id = p.block_pat_indices(cond);
@@ -400,15 +393,11 @@ end
                     gain = block_trials{cond, 10};
                     offset = block_trials{cond, 11};
                     dur = block_trials{cond, 12};
-                    
-                     %Update status panel to show current parameters
-                   runcon.update_current_trial_parameters(trial_mode, pat_id, pos_id, p.active_ao_channels, ...
-                      trial_ao_indices, frame_ind, frame_rate, gain, offset, dur);
-                  
-                    Panel_com('start_log');
-                    %pause(.003);
                      
                     %Update panel_com-----------------------------
+                    Panel_com('set_control_mode', trial_mode)
+                    
+                    Panel_com('set_pattern_id', pat_id)
                     
                     if ~isempty(block_trials{cond,10})
                         Panel_com('set_gain_bias', [gain, offset]);
@@ -433,18 +422,21 @@ end
                         
                     end
                     
-                    Panel_com('set_control_mode', trial_mode)
+                    %Update status panel to show current parameters
+                   runcon.update_current_trial_parameters(trial_mode, pat_id, pos_id, p.active_ao_channels, ...
+                      trial_ao_indices, frame_ind, frame_rate, gain, offset, dur);
+            
+ 
+                    pause(0.01)
                     
-                    Panel_com('set_pattern_id', pat_id)
-                  
-                    
-                   
-                    
-                    tcpread = pnet(ctlr.tcpConn, 'read', 'noblock'); % clear cache
-                    
+                    %tcpread = pnet(ctlr.tcpConn, 'read', 'noblock'); % clear cache
+                    Panel_com('start_log');
                     %Run block trial--------------------------------------
+
                     Panel_com('start_display', dur + .5); %duration expected in 100ms units
                     pause(dur + .001)
+
+
                     tcpread = pnet(ctlr.tcpConn, 'read', 'noblock');
                     runcon.update_streamed_data(tcpread, 'block', r, c, num_trial_of_total);
                     isAborted = runcon.check_if_aborted();
@@ -471,16 +463,14 @@ end
                         %Update progress bar to indicate start of inter-trial
                         num_trial_of_total = num_trial_of_total + 1;
                         runcon.update_progress('inter', r, reps, c, num_cond, num_trial_of_total)
-                        
-                         %Update status panel to show current parameters
-                        runcon.update_current_trial_parameters(inter_mode, inter_pat, inter_pos, p.active_ao_channels, ...
-                            inter_ao_ind, inter_frame_ind, inter_frame_rate, inter_gain, inter_offset, inter_dur);
-                        
-                        Panel_com('start_log');
-%                          pause(.003);
+                       
 
                         %Run intertrial-------------------------
-                         %randomize frame index if indicated
+                        Panel_com('set_control_mode',inter_mode);
+                       
+                        Panel_com('set_pattern_id', inter_pat);
+                       
+                        %randomize frame index if indicated
                         if inter_frame_ind == 0
                             inter_frame_ind = randperm(p.num_intertrial_frames, 1);
                         end
@@ -506,19 +496,19 @@ end
                                  
                              end
                          end
+                         
+                          %Update status panel to show current parameters
+                        runcon.update_current_trial_parameters(inter_mode, inter_pat, inter_pos, p.active_ao_channels, ...
+                            inter_ao_ind, inter_frame_ind, inter_frame_rate, inter_gain, inter_offset, inter_dur);
                         
-                        Panel_com('set_control_mode',inter_mode);
-                       
-                        Panel_com('set_pattern_id', inter_pat);
-                       
-                       
-                         
-                         
-                         tcpread = pnet(ctlr.tcpConn, 'read', 'noblock'); % clear cache
+                         %tcpread = pnet(ctlr.tcpConn, 'read', 'noblock'); % clear cache
                          %pause(0.01);
-                         
+                
+
+                         Panel_com('start_log');
                          Panel_com('start_display', inter_dur + .5);
                          pause(inter_dur + .001);
+
                          tcpread = pnet(ctlr.tcpConn, 'read', 'noblock');
 
                          runcon.update_streamed_data(tcpread, 'inter', r, c, num_trial_of_total);
@@ -546,16 +536,13 @@ end
                 %Update progress bar--------------------------
                 num_trial_of_total = num_trial_of_total + 1;
                 runcon.update_progress('post', num_trial_of_total);
-                
-                 %Update status panel to show current parameters
-                 runcon.update_current_trial_parameters(post_mode, post_pat, post_pos, p.active_ao_channels, ...
-                     post_ao_ind, post_frame_ind, post_frame_rate, post_gain, post_offset, post_dur);
-                
-                 
-                 Panel_com('start_log');
 
+
+                 Panel_com('set_control_mode', post_mode);
                  
-                  if ~isempty(post_gain)
+                 Panel_com('set_pattern_id', post_pat);
+                 
+                 if ~isempty(post_gain)
                      Panel_com('set_gain_bias', [post_gain, post_offset]);
                  end
                  if post_pos ~= 0
@@ -577,16 +564,14 @@ end
                          
                      end
                  end
-
-
-                 Panel_com('set_control_mode', post_mode);
                  
-                 Panel_com('set_pattern_id', post_pat);
-                 
+                  %Update status panel to show current parameters
+                 runcon.update_current_trial_parameters(post_mode, post_pat, post_pos, p.active_ao_channels, ...
+                     post_ao_ind, post_frame_ind, post_frame_rate, post_gain, post_offset, post_dur);
                 
-                 
-                 
                  %tcpread = pnet(ctlr.tcpConn, 'read', 'noblock'); % clear cache
+                 Panel_com('start_log');
+
                  Panel_com('start_display',post_dur);
 
                  pause(post_dur);

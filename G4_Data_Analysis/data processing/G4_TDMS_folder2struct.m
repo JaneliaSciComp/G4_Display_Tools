@@ -29,10 +29,9 @@ if any(subdir_idx) && ~contains([files.name],'.tdms')
     TDMS_folder = fullfile(exp_folder,filename);
 else
     TDMS_folder = exp_folder;
-   % out = regexp(TDMS_folder,'\','start');
-    %exp_folder = TDMS_folder(1:out(end)-1);
-    %filename = TDMS_folder(out(end)+1:end);
-    [exp_folder, filename] = fileparts(TDMS_folder);
+    out = regexp(TDMS_folder,'\','start');
+    exp_folder = TDMS_folder(1:out(end)-1);
+    filename = TDMS_folder(out(end)+1:end);
 end
 
 %get list of .tdms files
@@ -204,7 +203,5 @@ Log.Commands.Name = CommandName{1}; %{1} un-nests cell array
 Log.Commands.Data = CommandData{1}; %{1} un-nests cell array
 
 %save the new .mat struct in parent folder
-file_string = ['G4_TDMS_Logs_' filename '.mat'];
-save(fullfile(exp_folder, file_string), 'Log');
-%save([exp_folder '\G4_TDMS_Logs_' filename '.mat'],'Log');
+save([exp_folder '\G4_TDMS_Logs_' filename '.mat'],'Log');
 
