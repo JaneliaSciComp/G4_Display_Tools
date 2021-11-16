@@ -5,7 +5,7 @@ function [Log] = load_tdms_log(exp_folder)
     
     %Check if there are any files whose name contains 'G4_TDMS_Logs'
     try
-        TDMS_logs_name = files(contains({files.name},{'G4_TDMS_Logs_final'})).name;
+        TDMS_logs_name = files(contains({files.name},{'G4_TDMS_Logs'})).name;
     catch
         error('cannot find G4_TDMS_Logs file in specified folder')
        
