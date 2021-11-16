@@ -443,7 +443,7 @@ end
                     tcpread = pnet(ctlr.tcpConn, 'read', 'noblock'); % clear cache
                     
                     %Run block trial--------------------------------------
-                    Panel_com('start_display', dur); %duration expected in 100ms units
+                    Panel_com('start_display', dur + .5); %duration expected in 100ms units
                     pause(dur + .001)
                     tcpread = pnet(ctlr.tcpConn, 'read', 'noblock');
                     runcon.update_streamed_data(tcpread, 'block', r, c, num_trial_of_total);
@@ -517,7 +517,7 @@ end
                          tcpread = pnet(ctlr.tcpConn, 'read', 'noblock'); % clear cache
                          %pause(0.01);
                          
-                         Panel_com('start_display', inter_dur);
+                         Panel_com('start_display', inter_dur + .5);
                          pause(inter_dur + .001);
                          tcpread = pnet(ctlr.tcpConn, 'read', 'noblock');
 
