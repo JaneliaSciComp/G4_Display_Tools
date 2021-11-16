@@ -715,12 +715,9 @@ classdef G4_conductor_controller < handle
             end
             
             %Always run the post processing script that converts the TDMS
-            %files into mat files. Must do it in a loop for all conditions
-            
-            %
-            self.all_tdms_folders2structs(fly_results_folder);
-            self.move_excess_tdms(fly_results_folder);
-           % G4_TDMS_folder2struct(fly_results_folder);
+            %files into mat files.
+
+            G4_TDMS_folder2struct(fly_results_folder);
             
             %Get array indicating the presence of pretrial, intertrial, and
             %posttrial
@@ -895,6 +892,7 @@ classdef G4_conductor_controller < handle
             
         end
         
+
         function prepare_test_exp(self)
 
             line_to_match = 'Default test run protocol file: ';
