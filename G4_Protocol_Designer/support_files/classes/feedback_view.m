@@ -157,13 +157,18 @@ classdef feedback_view < handle
                 [self.rep_label.Position(1), self.rep_label.Position(2) - .07, .03, .06]);
             
             
-            cla(self.openLoop_axis);
-            cla(self.closeLoop_axis);
-            cla(self.wbf_axis);
-%            xline(self.openLoop_axis,0);
- %           hold on;
-            drawnow;
-            
+%             cla(self.openLoop_axis);
+%             cla(self.closeLoop_axis);
+             cla(self.wbf_axis);
+% %            xline(self.openLoop_axis,0);
+%  %           hold on;
+%             drawnow;
+
+                set(self.closeLoop_plot_left, 'YData', model.cond_hist_left);
+                set(self.closeLoop_plot_right, 'YData', model.cond_hist_right);
+                set(self.openLoop_plot_left, 'YData', model.inter_hist_left);
+                set(self.openLoop_plot_right, 'YData', model.inter_hist_right);
+%             
         end
         
         

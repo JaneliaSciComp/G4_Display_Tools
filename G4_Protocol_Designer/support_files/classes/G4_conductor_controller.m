@@ -784,7 +784,7 @@ classdef G4_conductor_controller < handle
            
         end
         
-        function all_tdms_folders2structs(fly_path)
+        function all_tdms_folders2structs(self, fly_path)
             
              % Take in the path to the folder, find all sub folders with tdms files
             % in them, and then run G4_TDMS_folder2struct on each, resulting in the
@@ -850,7 +850,7 @@ classdef G4_conductor_controller < handle
             
         end
         
-        function move_excess_tdms(fly_path)
+        function move_excess_tdms(self, fly_path)
             new_path = fullfile(fly_path, 'Trial_TDMS_Files');
             mkdir(new_path);
             
