@@ -698,6 +698,7 @@ classdef G4_conductor_controller < handle
             
             %create .mat file of metadata
             self.create_metadata_file();
+            self.create_timing_file(fly_results_folder);
             
              %Clear out live feedback panel
             self.fb_model = feedback_model(self.doc);
@@ -786,7 +787,7 @@ classdef G4_conductor_controller < handle
            
             filename = 'times_between_trials.mat';
             postTrialTimes = self.model.postTrialTimes;
-            save(fullfile(fly_path, filename), postTrialTimes);
+            save(fullfile(fly_path, filename), 'postTrialTimes');
             
         end
         
