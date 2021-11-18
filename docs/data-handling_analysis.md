@@ -14,7 +14,7 @@ nav_order: 2
 
 # Data Analysis Tools Documentation
 
-The github repository at <https://github.com/JaneliaSciComp/G4_Display_Tools> has a suite of data analysis tools. Have a look at the [software installation guide](software_setup.md) on how to set it up.
+This github repository has a suite of data analysis tools. Have a look at the [software installation guide](software_setup.md) on how to set it up.
 
 In the typical use case of these tools, there is one file you need to worry about: `DA_plot_settings.m` at `G4_Display_Tools/G4_Data_Analysis`. This file contains many MATLAB variables which will dictate the settings of how your data is visualized. You will need to go through this file and update the settings according to your needs. This is the biggest task of setting up data analysis. Once your settings are correct and saved, the analysis itself will take less than a minute to run.
 
@@ -226,7 +226,8 @@ Example for two groups being compared to a third control group:
 exp_settings.genotypes = ["Control_genotype", "Genotype2", "Genotype3"];
 ```
 
-**Note:** When running an experiment through the Conductor, you have the option of running analysis on that single fly automatically when the experiment is over. If you do this, the Conductor will automatically update this field (and a few others) to match the genotype of the fly being run, so don't worry about this being accurate in that case.
+__Note__: When running an experiment through the Conductor, you have the option of running analysis on that single fly automatically when the experiment is over. If you do this, the Conductor will automatically update this field (and a few others) to match the genotype of the fly being run, so don't worry about this being accurate in that case.
+{:.info}
 
 ### Plot norm and unnorm
 
@@ -306,7 +307,8 @@ The placement of the semi-colons determines where the break in row occurs. Note 
 
 In this way, you can plot any condition in any position on the figure. They do not have to be in numerical order. Note that if you're plotting more than one datatype, a figure is created for each datatype, so the above code, when run on two datatypes, would create four figures. Two for one datatype and two for the other.
 
-**Note: Later you will be given the option to pair conditions up so that two conditions are plotted on each axis for comparison instead of one. In this case, your conds array should only contain the first condition of each pair. This is why our example shows only odd conditions. In this example, the even conditions are plotted on the same axis as the condition before them, so we do not need to list them in this array. This will make more sense when you reach the `opposing_condition_pairs` setting.**
+__Note__: Later you will be given the option to pair conditions up so that two conditions are plotted on each axis for comparison instead of one. In this case, your conds array should only contain the first condition of each pair. This is why our example shows only odd conditions. In this example, the even conditions are plotted on the same axis as the condition before them, so we do not need to list them in this array. This will make more sense when you reach the `opposing_condition_pairs` setting.
+{:.warning}
 
 ### Timeseries durations
 
@@ -618,7 +620,8 @@ The above code creates two figures, each with two rows. The first figure is laid
 | TC w/ conds 1,3,5,7     | TC w/ conds 9,11,13,15  | TC w/ conds 17,19,21,23 |
 | TC w/ conds 25,27,29,31 | TC w/ conds 33,35,37,39 | TC w/conds 41,43,45,47  |
 
-**Note: Each tuning curve must have the same number of conditions in it.**
+__Note__: Each tuning curve must have the same number of conditions in it.
+{:.warning}
 
 ### Tuning curve condition name
 
@@ -956,7 +959,8 @@ In `G4_data_analysis/support` there is a function called `create_settings_file`.
 
 `create_settings_file('name of file', 'path to file');` You should give your file a meaningful name that indicates whether it is for a single fly, a particular group, or multiple groups. I recommend saving it inside your experiment folder so you do not forget which experiment it was made for.
 
-**Note: When you run an experiment through the Conductor, you may have it run single fly analysis automatically after the data has been processed. If you do this, the conductor will open the settings file you provide and replace things specific to the current fly with updated values (ie, the genotype or path to the fly folder). It will then save a new analysis settings file for that particular fly inside the fly folder, and use that to run its analysis. So if you plan to use this feature, you can create one single-fly analysis settings file which is generic and save it in your experiment folder. The conductor will then use this to create a new analysis settings file for each specific fly and run the analysis automatically. Group analysis, however, must be done after the fact by you.**
+__Note__: When you run an experiment through the Conductor, you may have it run single fly analysis automatically after the data has been processed. If you do this, the conductor will open the settings file you provide and replace things specific to the current fly with updated values (ie, the genotype or path to the fly folder). It will then save a new analysis settings file for that particular fly inside the fly folder, and use that to run its analysis. So if you plan to use this feature, you can create one single-fly analysis settings file which is generic and save it in your experiment folder. The conductor will then use this to create a new analysis settings file for each specific fly and run the analysis automatically. Group analysis, however, must be done after the fact by you.
+{:.warning}
 
 This settings file will be used to run the data analysis. Note that if a .mat file already exists with the name and filepath you specify, it will be replaced.
 

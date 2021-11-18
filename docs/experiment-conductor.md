@@ -23,7 +23,8 @@ The window that opens should look something like this:
 
 The top left section contains settings for your experiment. The top right section is where you can fill in some basic experiment metadata. The center displays a progress bar, or will once an experiment begins running. Once you begin running an experiment, data relating to the current trial will display along the bottom.
 
-*Note: You must have set up a metadata Google Sheets and connected it to the G4 software through the G4 Designer Settings. If you have not done this, the Conductor will not open properly.*
+__Note__: You must have set up a metadata Google Sheets and connected it to the G4 software through the G4 Designer Settings. If you have not done this, the Conductor will not open properly.
+{:.warning}
 
 Please see the [tutorial on how to set this up](protocol-designer_metadata_tutorial.md).
 
@@ -31,7 +32,8 @@ Please see the [tutorial on how to set this up](protocol-designer_metadata_tutor
 
 Notice in the above picture, the metadata is already filled out for the most part. That's because possible values for these metadata fields are stored in a Google Sheets created for this purpose. Most of the metadata fields have a drop down list which draws its options from this Google Sheets. This prevents people from introducing typos or stating the same metadata in different ways, making it difficult to search experiments by metadata values. If the value you need for a metadata field is not present in the drop down list, you can click the *Open Metadata Google Sheets*{:.gui-btn} button at the bottom. This will open the appropriate Google Sheets. You can find the tab that corresponds with the metadata field and add the value you need to the sheet. Any fields that do not have a drop down list or autofill, please fill in appropriately.
 
-*Note: You can add comments to the comments metadata field anytime during the experiment, and when the experiment ends it will pause and give you another chance to add any final comments.*
+__Note__: You can add comments to the comments metadata field anytime during the experiment, and when the experiment ends it will pause and give you another chance to add any final comments.
+{:.info}
 
 If you are on a Windows operating system, and when you click Open Metadata Google Sheets nothing happens or you get an error that says, `'cmd.exe' is not recognized`, try running this command in the MATLAB command window once before clicking the button again: `setenv('PATH', [getenv('PATH') ';C:\Windows\system32'])`.
 

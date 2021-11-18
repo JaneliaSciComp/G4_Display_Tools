@@ -22,7 +22,8 @@ By definition, this tutorial will also show you how to send specific commands to
 
 In the folder `G4_Display_Tools/PControl_Matlab/controller` you'll find a set of .m files. Some of these function names may be familiar from the [setup section]({{site.baseurl}}/docs/G4-Assembly.html#install-software) in this documentation.
 
-> You should not edit any of the files in `G4_Display_Tools/PControl_Matlab/controller`. Changes to any of these files could prevent the G4 system from working properly so please open the files carefully.
+You should not edit any of the files in `G4_Display_Tools/PControl_Matlab/controller`. Changes to any of these files could prevent the G4 system from working properly so please open the files carefully.
+{:.error}
 
 Open the file called `Panel_com.m` in MATLAB This function contains a large `switch` statement with many `case` conditions. This file is a wrapper around the TCP connection that is provided by the G4 Host LabView Software running on the Multi I/O card. This means, `Panel_com.m` accepts human readable commands and converts it into the correct TCP code and sends it along to the screens. This way, you never have to get into the other files in this folder, and you never have to worry about creating hexadecimal strings or other code that the screens will recognize.
 

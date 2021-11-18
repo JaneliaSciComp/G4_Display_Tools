@@ -13,7 +13,7 @@ Download and install the G4 Host LabVIEW executable. In addition to the HHMI G4 
 
 The G4 Host LabVIEW installer is available for [download](https://www.dropbox.com/s/mywy2a3gb6vxhec/HHMI%20G4%20Host%28Ver1-0-0-230%29%20with%20installer.zip?dl=0). After this installation, make sure to check for updates from the NI update manager. After the installation, you can upgrade to version 1.0.0.235 via this [patch](https://www.dropbox.com/s/cuhs907arnx4kfq/G4%20Host(Ver1-0-0-235).zip) by replacing the files in `C:\Program Files(x86)\HHMI G4`.
 
-Download (or clone) the [G4_Display_Tools GitHub repository](https://github.com/JaneliaSciComp/G4_Display_Tools).
+Download (or clone) the G4_Display_Tools GitHub repository.
 
 ## Add paths for G4_Display_Tools in MATLAB
 {:#add-to-path}

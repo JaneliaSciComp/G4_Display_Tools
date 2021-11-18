@@ -20,7 +20,8 @@ Before you can even open the G4 Designer, you must update one thing - the path t
 
 Open the file `G4_Display_Tools/G4_Protocol_Designer/G4_Protocol_Designer_Settings.m` in MATLAB. The first line of this file should read "Configuration File Path: /Users/taylorl/Desktop/HHMI Panels Configuration.ini" or something similar. This path must be accurate to open the Designer. If it is not, replace the current path with the correct path to your HHMI Panels Configuration.ini file.
 
-Note: There should be exactly one space between the ':' and the first character of your path. Additionally there should be no trailing spaces at the end of your path. Please ensure these two things are true before saving and closing the file.
+__Note__: There should be exactly one space between the ':' and the first character of your path. Additionally there should be no trailing spaces at the end of your path. Please ensure these two things are true before saving and closing the file.
+{:.warning}
 
 This is the only change you should make to this file. Please save and close the file when you are done.
 
@@ -70,6 +71,7 @@ The bottom section contains a panel called Metadata Google Sheets Properties. We
 
 That's okay! The only settings which are required are the *Configuration file location*{:.gui-txt}, the *Default run protocol*{:.gui-txt}, and the color and text inside disabled cells. For any Google Sheets settings that are required, have a look at the [Google Sheets tutorial](protocol-designer_metadata_tutorial.md). The rest can be left blank or at their default values, even if those paths don't exist on your computer.
 
-Note: When you click *Apply Changes*{:.gui-btn} the software will check each value for validity. If a field is empty or contains a path that doesn't exist, you will get a pop up warning you about it. That's okay, if you don't care about that field, just click *OK*{:.gui-btn} through the warning boxes. The settings will still be saved. The warnings are for your information only.
+__Note__: When you click *Apply Changes*{:.gui-btn} the software will check each value for validity. If a field is empty or contains a path that doesn't exist, you will get a pop up warning you about it. That's okay, if you don't care about that field, just click *OK*{:.gui-btn} through the warning boxes. The settings will still be saved. The warnings are for your information only.
+{:.warning}
 
 Once your settings are how you want them, just click *Apply Changes*{:.gui-btn} and you are done!
