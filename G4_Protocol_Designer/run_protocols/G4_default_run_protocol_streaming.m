@@ -54,7 +54,7 @@ function [success] = default_run_protocol_streaming_test(runcon, p)%input should
 
 %% Get access to the figure and progress bar in the run gui IF it was passed in.
 global ctlr;
-postTrialTimes = {};
+postTrialTimes = [];
 
 %        fig = runcon.fig;
 if ~isempty(runcon.view)
@@ -361,7 +361,7 @@ end
              runcon.update_elapsed_time(round(toc(startTime),2));
              
              
-             postTrialTimes{end+1} = toc(postPretrial);
+             postTrialTimes(end+1) = toc(postPretrial);
 
 %% Loop to run the block/inter trials --------------------------------------
 
@@ -455,7 +455,7 @@ end
                   
                     end
                     runcon.update_elapsed_time(round(toc(startTime),2));
-                    postTrialTimes{end + 1} = toc(postTrialTime);
+                    postTrialTimes(end + 1) = toc(postTrialTime);
                     
                     %Tells loop to skip the intertrial if this is the last iteration of the last rep
                     if r == reps && c == num_cond
@@ -530,7 +530,7 @@ end
                          end
                          
                          runcon.update_elapsed_time(round(toc(startTime),2));
-                         postTrialTimes{end + 1} = toc(postIntertrial);
+                         postTrialTimes(end + 1) = toc(postIntertrial);
                          
                     end 
                  end
@@ -589,7 +589,7 @@ end
                     waitfor(errordlg("Stop Log command failed, please stop log manually then hit a key"));
                     waitforbuttonpress;
                 end
-                postTrialTimes{end+1} = toc(postPosttrial);
+                postTrialTimes(end+1) = toc(postPosttrial);
             
                 pause(1);
 %                  runcon.update_streamed_data(tcpread, 'post');

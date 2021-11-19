@@ -121,7 +121,7 @@ function process_data(exp_folder, processing_settings_file)
     % log, and remove the data just previous to it covering the amount of
     % time indicated in postTrialTimes
     if ~isempty(postTrialTimes)
-        remove_excess_time(Log, start_times, stop_times, start_idx, stop_idx, postTrialTimes);
+        [Log, stop_times] = remove_excess_time(Log, start_times, stop_times, stop_idx, postTrialTimes);
     end
 
     %Determine start and stop times for different trial types (pre, inter,
