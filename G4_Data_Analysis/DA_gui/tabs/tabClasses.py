@@ -1044,7 +1044,7 @@ class appTab(tk.Frame):
         text_row = text_row + 1
         ttk.Label(text_frame, anchor="center", text = " - Edge Color is for if you want the edge of the patch to be a different color than the rest.").grid(row = text_row, column=text_col, sticky = "W")
         text_row = text_row + 1
-        ttk.Label(text_frame, anchor="center", text = "   - Use word colors recoginzed by matlab like 'blue' or 'red'.").grid(row = text_row, column=text_col, sticky = "W")
+        ttk.Label(text_frame, anchor="center", text = "   - Use word colors recoginzed by MATLAB like 'blue' or 'red'.").grid(row = text_row, column=text_col, sticky = "W")
         text_row = text_row + 1
 
 
