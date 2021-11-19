@@ -517,9 +517,9 @@ classdef G4_conductor_controller < handle
             
         end
 
-        %% Open  Google Sheet in browser
+        %% Open  Google Sheets in browser
         %
-        % Uses GoogleSheet key from Settings
+        % Uses Google Sheets key from Settings
         function open_google_sheet(self)
             base_url = 'https://docs.google.com/spreadsheets/d/';
             full_link = [base_url,self.model.google_sheet_key,'/edit?usp=sharing'];

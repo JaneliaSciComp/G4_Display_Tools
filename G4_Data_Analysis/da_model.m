@@ -77,7 +77,7 @@ classdef da_model < handle
             %so conditions 1 7, and 11 would be in places 1, 2, and 3 and
             %would be marked as being the leftmost plots. The bottom row,
             %conditions 11, 13, and 15, would be in places 3, 6, and 9.
-            %It's done this way because of the indexing in matlab. In this
+            %It's done this way because of the indexing in MATLAB. In this
             %example OL_conds, OL_conds(4) would be 3, because it goes down
             %columns, not across rows, as index increases. 
 

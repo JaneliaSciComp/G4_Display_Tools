@@ -69,7 +69,7 @@ classdef G4_conductor_model < handle
 
         function self = G4_conductor_model()
             
-            %%User adjusted lists based on settings file and metadata google sheet
+            %%User adjusted lists based on settings file and metadata Google Sheets
             list_of_setting_strings = {'Default run protocol file: ', 'Default processing file: ', ...
                 'Default plotting file: ', 'Metadata Google Sheet key: '}; %These strings must match the string
             %preceding the corresponding value in the settings file -
@@ -136,7 +136,7 @@ classdef G4_conductor_model < handle
             
         end
 
-        %Get the index of a desired metadata heading from the google sheet------  
+        %Get the index of a desired metadata heading from the Google Sheets------  
         function create_metadata_options(self, list)
             
             for i = 1:length(list)
