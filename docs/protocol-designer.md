@@ -37,7 +37,7 @@ In MATLAB open the file `G4_Experiment_Designer.m`, located in `G4_Display_Tools
 
 LED screen arenas come in three row screens and four row screens. Which patterns you can use are determined by the screen size, so be sure to check what type of arena you're using.
 
-Notice the radio button at the center left of the application indicating *3 Row Screen*{:.gui-btn} or *4 Row Screen*{:.gui-btn}. Set this to the correct screen size that corresponds with your [hardware setup]({{site.baseurl}}/docs/G4-Assembly.html) before doing anything else. This setting will become disabled as soon as you import a folder, so if it is incorrect when you import, you will need to restart the application.
+Notice the radio button at the center left of the application indicating *3 Row Screen*{:.gui-btn} or *4 Row Screen*{:.gui-btn}. Set this to the correct screen size that corresponds with your [hardware setup]({{site.baseurl}}/docs/g4_assembly.html) before doing anything else. This setting will become disabled as soon as you import a folder, so if it is incorrect when you import, you will need to restart the application.
 
 ## Verify your settings are correct
 
