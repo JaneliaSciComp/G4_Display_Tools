@@ -27,8 +27,8 @@ function [num_trials, trial_start_times, trial_stop_times,trial_move_start_times
         trial_modes = modeID_order(trial_start_ind:2:trial_end_ind);
 
         %get start times/modes of intertrials
-        intertrial_start_times = trial_start_times(2:2:end-1);
-        intertrial_stop_times = trial_stop_times(2:2:end-1);
+        intertrial_start_times = start_times(trial_start_ind+1:2:trial_end_ind-1);
+        intertrial_stop_times = stop_times(trial_start_ind+1:2:trial_end_ind-1);
         intertrial_modes = modeID_order(trial_start_ind+1:2:trial_end_ind-1);
         intertrial_durs = double(intertrial_stop_times - intertrial_start_times)/time_conv;
         assert(all(intertrial_modes-intertrial_modes(1)==0),...

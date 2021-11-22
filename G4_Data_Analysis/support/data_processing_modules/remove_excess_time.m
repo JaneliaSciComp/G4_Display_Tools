@@ -1,4 +1,4 @@
-function [Log, stop_times] = remove_excess_time(Log, start_times, stop_times, stop_idx, postTrialTimes)
+function [Log, stop_times] = remove_excess_time(Log, start_times, stop_times, stop_idx, postTrialTimes, time_conv, pre_dur)
     
     % This function takes in postTrialTimes, which contains the amount of
     % time elapsed after each trial while the data streaming stuff updated.
@@ -24,19 +24,21 @@ function [Log, stop_times] = remove_excess_time(Log, start_times, stop_times, st
         
             Log.Frames.Time(frameInd1:frameInd2) = [];
             Log.Frames.Position(frameInd1:frameInd2) = [];
+            Log.ADC.Time(:, ind1:ind2) = [];
+            Log.ADC.Volts(:, ind1:ind2) = [];
 
-            for chan = 1:4
-                Log.ADC.Time(chan, ind1:ind2) = [];
-                Log.ADC.Volts(chan, ind1:ind2) = [];
-
-            end
+%             for chan = 1:4
+%                 Log.ADC.Time(chan, ind1:ind2) = [];
+%                 Log.ADC.Volts(chan, ind1:ind2) = [];
+% 
+%             end
             
             stop_times(time-1) = Log.ADC.Time(1, ind1-1);
             
         end
     end
     
-    stop_times(end+1) = Log.Commands.Time(stop_idx);
+
             
 
 
