@@ -584,20 +584,15 @@ end
                  pause(post_dur);
                  %tcpread = pnet(ctlr.tcpConn, 'read', 'noblock');
                  postPosttrial = tic;
-                 stop_log_response = send_tcp( char([1 hex2dec('40')]), 1);
-                if stop_log_response.success == 1
-                    waitfor(errordlg("Stop Log command failed, please stop log manually then hit a key"));
-                    waitforbuttonpress;
-                end
-                postTrialTimes(end+1) = toc(postPosttrial);
+                 
             
                 pause(1);
 %                  runcon.update_streamed_data(tcpread, 'post');
                  if runcon.check_if_aborted() == 1
                     Panel_com('stop_display');
                     pause(.1);
-                    %Panel_com('stop_log');
-                    %pause(1);
+                    Panel_com('stop_log');
+                    pause(1);
                     disconnectHost;
                     success = 0;
                     return;
@@ -608,6 +603,13 @@ end
             end
 
             Panel_com('stop_display');
+            
+            stop_log_response = send_tcp( char([1 hex2dec('40')]), 1);
+            if stop_log_response.success == 1
+                waitfor(errordlg("Stop Log command failed, please stop log manually then hit a key"));
+                waitforbuttonpress;
+            end
+            postTrialTimes(end+1) = toc(postPosttrial);
             
             pause(1);
             
