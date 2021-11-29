@@ -6,7 +6,7 @@ nav_order: 4
 
 # How to run an experiment - an overview
 
-At this point, you should understand, in broad strokes at least, what it entails to [create an experiment](experiment-conductor_getting-started.md). To learn to create an experiment in detail and access tutorials regarding the [Pattern Generator](pattern-generator.md), [Function Generator](function-generator.md), and [G4 Protocol Designer](protocol-designer.md), open the item [Generation 4]({{site.baseurl}}/docs/g4_system.md) on the left hand menu.
+At this point, you should understand, in broad strokes at least, what it entails to [create an experiment](experiment-conductor_getting-started.md). To learn to create an experiment in detail and access tutorials regarding the [Pattern Generator](pattern-generator.md), [Function Generator](function-generator.md), and [G4 Protocol Designer](protocol-designer.md), open the item [Generation 4]({{site.baseurl}}/docs/g4_system.html) on the left hand menu.
 
 Once you've created and saved an experiment, you will use the [G4 Conductor](experiment-conductor.md) to run it.
 
@@ -42,7 +42,7 @@ Okay, so you've made your Google Sheets - how do you connect them? You do this i
 
 Once the metadata is configured, using the Conductor is a breeze. If you have not automated your data processing and or data analysis using our data analysis tools, you should uncheck the boxes on the conductor labeled *Processing*{:.gui-txt} and *Plotting*{:.gui-txt}. If these are checked, they will run automatically after an experiment and you have to provide (by browsing) the appropriate settings file you've created with our data analysis tools. But if you don't want to bother with that right now, simply uncheck the boxes.
 
-There is also a field for your *run protocol*{:.gui-txt}. This is a file that determines how exactly trials on run on the screens. There is a default run protocol provided and that will be the default path here. If you wanted to create your own custom run protocol, check out the [Custom Run Protocol tutorial](experiment-conductor_run-protocol.md).
+There is also a field for your *run protocol*{:.gui-txt}. This is a file that determines how exactly trials on run on the screens. There is a default run protocol provided and that will be the default path here. If you wanted to create your own custom run protocol, check out the [Custom Run Protocol tutorial](experiment-conductor_run-protocol_tutorial.md).
 
 The last thing you should be aware of is the *Run Test Protocol*{:.gui-btn} button. If you click this, the conductor will load a preset, short protocol that is designed to quickly test the fly and see if they are fixating correctly. It could also be used to make sure the screens are displaying correctly. A default test protocol has been provided, but you can always create your own and make it the default in the Designer settings. You can find more details in the [G4 Protocol Designer](protocol-designer.md) or in the [Designer Settings tutorial](protocol-designer_configure-settings_tutorial.md).
 
