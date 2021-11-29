@@ -266,45 +266,12 @@ classdef feedback_view < handle
                 
                 
             end
-                
-               
-            
-            
-                
-      
-            
-                
+  
            
             
         end
         
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
+   
     end
     
     
