@@ -6,7 +6,7 @@ nav_order: 15
 
 # PControl
 
-Running the [G4 Host]({{site.baseurl}}Display_Tools/docs/software_setup.html) software initiates the IO card of the system to start a TCP/IP server on the `localhost` at port `62222`. Through this TCP/IP connection, it is possible to communicate directly with the arena. Here we list the commands available in `Panel_com` which would allow you to implement the same functionality in a language of your choosing. For simplicity we document both, MATLAB's `Panel_com` command as well as the underlying TCP/IP data exchange. For the TCP/IP we use python as an example.
+Running the [G4 Host](software_setup.md) software initiates the IO card of the system to start a TCP/IP server on the `localhost` at port `62222`. Through this TCP/IP connection, it is possible to communicate directly with the arena. Here we list the commands available in `Panel_com` which would allow you to implement the same functionality in a language of your choosing. For simplicity we document both, MATLAB's `Panel_com` command as well as the underlying TCP/IP data exchange. For the TCP/IP we use python as an example.
 
 The TCP/IP commands follow a common structure: the first byte represents the length of package following the length command and the second byte is a command ID (_Stream frame_ and _Change root directory_ are notably different, they start with the command IDs followed by two bytes representing the length of the packet). This means, a two-byte TCP/IP command consists of a length of `1` and the command ID, a three-byte command would starte with a length of `2`, the command ID, and a value.
 
