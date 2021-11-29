@@ -20,7 +20,7 @@ By definition, this tutorial will also show you how to send specific commands to
 
 # The Panel_com Wrapper
 
-In the folder `G4_Display_Tools/PControl_Matlab/controller` you'll find a set of .m files. Some of these function names may be familiar from the [setup section]({{site.baseurl}}/docs/G4-Assembly.html#install-software) in this documentation.
+In the folder `G4_Display_Tools/PControl_Matlab/controller` you'll find a set of .m files. Some of these function names may be familiar from the [setup section]({{site.baseurl}}/docs/g4_assembly.html#install-software) in this documentation.
 
 You should not edit any of the files in `G4_Display_Tools/PControl_Matlab/controller`. Changes to any of these files could prevent the G4 system from working properly so please open the files carefully.
 {:.error}
@@ -29,7 +29,7 @@ Open the file called `Panel_com.m` in MATLAB This function contains a large `swi
 
 Within the `Panel_com.m` file, each `case` is a command that the screens can interpret. Again, *do not edit any code in `Pane_com.m`*, but use this as the most comprehensive reference list of commands available. Each string following a 'case' is a command you can use. For example, the first few commands in this file are `stop_display`, `all_off`, `all_on`, etc.
 
-Remember in the [software setup]({{site.baseurl}}/docs/G4-Assembly.html#install-software), to verify everything was working correctly, you clicked a button called *All On*{:.gui-txt} in the Panel Host GUI? When you clicked it, it used the `all_on` command you see in `Panel_com.m` to send that command to the screens. You can do this same test without the GUI:
+Remember in the [software setup]({{site.baseurl}}/docs/g4_assembly.html#install-software), to verify everything was working correctly, you clicked a button called *All On*{:.gui-txt} in the Panel Host GUI? When you clicked it, it used the `all_on` command you see in `Panel_com.m` to send that command to the screens. You can do this same test without the GUI:
 
 In your MATLAB command window, type `connectHost` and hit enter. Assuming your setup is working, the Panel Host GUI should open after a few seconds. Ignore the application and instead, in the MATLAB command window, type `Panel_com('all_on')` and hit enter. You should see all the LEDs in your arena come on, just like they did when you tested this through the Panel Host application. Now type `Panel_com('all_off')` in the MATLAB command window and hit enter. This should turn the lights back off.
 

@@ -12,7 +12,7 @@ Before going through this tutorial, you should have done the following:
 - created one or more patterns using the [Pattern Generator](pattern-generator.md)
 - created one or more functions using the [Function Generator](function-generator.md)
 - Reviewed the different [experiment modes](protocol-designer_display-modes.md)
-- [Set up your system]({{site.baseurl}}/docs/G4-Assembly.html).
+- [Set up your system]({{site.baseurl}}/docs/g4_assembly.html).
 
 # Experiment structure
 
