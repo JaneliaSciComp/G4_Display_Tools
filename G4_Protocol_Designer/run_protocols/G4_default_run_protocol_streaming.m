@@ -267,6 +267,7 @@ end
 
 %% run pretrial if it exists----------------------------------------
              startTime = tic;
+             prePreTrial = tic;
              if pre_start == 1
                  %First update the progress bar to show pretrial is running----
                  runcon.update_progress('pre');
@@ -326,7 +327,7 @@ end
                  %clear cache of junk streaming data built up 
                  %tcpread = pnet(ctlr.tcpConn, 'read', 'noblock'); %clear cache
                  
-                 
+                 postTrialTimes(end+1) = toc(prePreTrial);
                  %Run pretrial on screen
                  if pre_dur ~= 0
                     Panel_com('start_display', pre_dur);
@@ -368,6 +369,7 @@ end
              for r = 1:reps
                  for c = 1:num_cond
                     %define which condition we're using
+                    preTrialTime = tic;
                     cond = p.exp_order(r,c);
                     
                     %Update the progress bar--------------------------
@@ -433,6 +435,8 @@ end
                     
                     tcpread = pnet(ctlr.tcpConn, 'read', 'noblock'); % clear cache
                     
+                    postTrialTimes(end+1) = toc(preTrialTime);
+                    
 
                     %Run block trial--------------------------------------
 
@@ -465,7 +469,9 @@ end
                     
         %Run inter-trial assuming there is one-------------------------
                     if inter_type == 1
-                    
+                        
+                        preInterTime = tic;
+                        
                         %Update progress bar to indicate start of inter-trial
                         num_trial_of_total = num_trial_of_total + 1;
                         runcon.update_progress('inter', r, reps, c, num_cond, num_trial_of_total)
@@ -509,6 +515,8 @@ end
                         
                          tcpread = pnet(ctlr.tcpConn, 'read', 'noblock'); % clear cache
                          %pause(0.01);
+                         
+                         postTrialTimes(end+1) = toc(preInterTime);
                 
 
                          Panel_com('start_display', inter_dur + .5);
@@ -539,6 +547,7 @@ end
 %% Run post-trial if there is one--------------------------------------------
 
             if post_type == 1
+                prePostTime = tic;
                 
                 %Update progress bar--------------------------
                 num_trial_of_total = num_trial_of_total + 1;
@@ -577,6 +586,8 @@ end
                      post_ao_ind, post_frame_ind, post_frame_rate, post_gain, post_offset, post_dur);
                 
                  tcpread = pnet(ctlr.tcpConn, 'read', 'noblock'); % clear cache
+                 
+                 postTrialTimes(end+1) = toc(prePostTime);
 
 
                  Panel_com('start_display',post_dur);
