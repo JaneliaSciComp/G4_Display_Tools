@@ -11,9 +11,9 @@ Download and install the latest version of MATLAB. Required toolboxes are [instr
 
 Download and install the G4 Host LabVIEW executable. In addition to the HHMI G4 Files, this installs NI R RIO Driver 16.0, NI-Serial 15.0, NI-VISA 16.0, NI System Configuration 16.0 and NI-488.2 14.0. If you want to use more recent drivers and software it is recommended to install these drivers first. The link for the [RIO driver](https://www.ni.com/en-us/support/downloads/drivers/download.ni-r-series-multifunction-rio.html) is difficult to find[^1]. The other software packages are easy to find on <https://ni.com>. Once you installed the old version that comes with the G4 Host application, it's difficult to upgrade.
 
-The G4 Host LabVIEW installer is available for [download](https://www.dropbox.com/s/mywy2a3gb6vxhec/HHMI%20G4%20Host%28Ver1-0-0-230%29%20with%20installer.zip?dl=0). After this installation, make sure to check for updates from the NI update manager. After the installation, you can upgrade to version 1.0.0.235 via this [patch](https://www.dropbox.com/s/cuhs907arnx4kfq/G4%20Host(Ver1-0-0-235).zip) by replacing the files in `C:\Program Files(x86)\HHMI G4`.
+The G4 Host LabVIEW installer is available for [download](https://github.com/floesche/LED-Display_G4_Display-Tools/releases/download/host-v235/HHMI.G4.Host.Ver1-0-0-230.with.installer.zip) ([mirror](https://www.dropbox.com/s/mywy2a3gb6vxhec/HHMI%20G4%20Host%28Ver1-0-0-230%29%20with%20installer.zip?dl=0)). After this installation, make sure to check for updates from the NI update manager. After the installation, you can upgrade to version 1.0.0.235 via this [patch](https://github.com/floesche/LED-Display_G4_Display-Tools/releases/download/host-v235/G4.Host.Ver1-0-0-235.zip) ([mirror](https://www.dropbox.com/s/cuhs907arnx4kfq/G4%20Host(Ver1-0-0-235).zip)) by replacing the files in `C:\Program Files(x86)\HHMI G4`.
 
-Download (or clone) the G4_Display_Tools GitHub repository.
+Download (or clone) the [G4_Display_Tools GitHub repository](https://github.com/JaneliaSciComp/G4_Display_Tools).
 
 ## Add paths for G4_Display_Tools in MATLAB {#add-to-path}
 
