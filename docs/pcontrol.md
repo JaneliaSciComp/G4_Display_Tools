@@ -43,7 +43,7 @@ connectHost;
 % … commands follow here
 ```
 
-### Turn all panels on
+### Turn all panels on {#all_on}
 
 This command turns all panels on to the brightest level. If the arena is already on, you should not see a change. Use this for checking if your arena works.
 
@@ -61,7 +61,7 @@ The corresponding MATLAB code:
 Panel_com('all_on');
 ```
 
-### Turn all panels off
+### Turn all panels off {#all_off}
 
 This command turns all panels off. If the arena is already turned off, there will be no change.
 
@@ -79,7 +79,7 @@ The corresponding MATLAB code:
 Panel_com('all_off');
 ```
 
-### Stop Display
+### Stop Display {#stop_display}
 
 This command deactivates the display.
 
@@ -97,7 +97,7 @@ The corresponding MATLAB code:
 Panel_com('stop_display');
 ```
 
-### Reset Display
+### Reset Display {#reset_display}
 
 Reset the display. All panels will be off.
 
@@ -115,7 +115,7 @@ The corresponding MATLAB code:
 Panel_com('reset_display');
 ```
 
-### Reset Panel
+### Reset Panel {#reset}
 
 Reset a single panel.
 
@@ -134,7 +134,7 @@ The corresponding MATLAB code:
 Panel_com('reset', 2);
 ```
 
-### Controller reset
+### Controller reset {#ctr_reset}
 
 This is a two-byte command with the length `0x01` and the command `0x60`.
 
@@ -150,7 +150,7 @@ The corresponding MATLAB code:
 Panel_com('ctr_reset');
 ```
 
-### Get Version
+### Get Version {#get_version}
 
 This is a two-byte command with the length `0x01` and the command `0x46`. It returns the version and Panel_com logs this to the error log file.
 
@@ -168,7 +168,7 @@ The corresponding MATLAB code:
 Panel_com('get_version');
 ```
 
-### Reset Counter
+### Reset Counter {#reset_counter}
 
 This is a two-byte command with the length `0x01` and the command `0x42`.
 
@@ -187,7 +187,7 @@ The corresponding MATLAB code:
 Panel_com('reset_counter');
 ```
 
-### Request Treadmill Data
+### Request Treadmill Data {#request_treadmill_data}
 
 This is a two-byte command with the length `0x01` and the command `0x45`.
 
@@ -206,7 +206,7 @@ The corresponding MATLAB code:
 Panel_com('request_treadmill_data');
 ```
 
-### Update GUI Info
+### Update GUI Info {#update_gui_info}
 
 This is a two-byte command with the length `0x01` and the command `0x19`.
 
@@ -225,7 +225,7 @@ The corresponding MATLAB code:
 Panel_com('update_gui_info');
 ```
 
-### Start Log
+### Start Log {#start_log}
 
 Sending this command starts the logging process. The data is logged directly from the IO card and into the TDMS file format (see [data handling](data-handling.md)).
 
@@ -243,7 +243,7 @@ The corresponding MATLAB code:
 Panel_com('start_log');
 ```
 
-### Stop Log
+### Stop Log {#stop_log}
 
 Sending this command stops the logging process.
 
@@ -263,7 +263,7 @@ The corresponding MATLAB code:
 Panel_com('stop_log');
 ```
 
-### Set Control Mode
+### Set Control Mode {#set_control_mode}
 
 This defines the [display mode](protocol-designer_display-modes.md) and requires an argument between 0 and 7.
 
@@ -283,7 +283,7 @@ The corresponding MATLAB code:
 Panel_com('set_control_mode', 1);
 ```
 
-### Set active Analog Output Channels
+### Set active Analog Output Channels {#set_active_ao_channels}
 
 This command activates or deactivates the four possible output channels. The channels are encoded as binary flags, channel 0 for the lowest bit, channel 1 for the second etc… Channel 0 would therefore be `0b00000001`, channels 1 and 3 would be `0b00001010`.
 
@@ -304,7 +304,7 @@ The corresponding MATLAB code:
 Panel_com('set_active_ao_channels', '0101'); % Only last 4 bits required.
 ```
 
-### Stream channels
+### Stream channels {#stream_channels}
 
 The command is used to set the analog input channels.
 
@@ -325,7 +325,7 @@ The corresponding MATLAB code:
 Panel_com('stream_channels', '1');
 ```
 
-### Set Pattern ID
+### Set Pattern ID {#set_pattern_id}
 
 Displays the pattern with the specified ID on the panels.
 
@@ -344,7 +344,7 @@ The corresponding MATLAB code:
 Panel_com('set_pattern_id', '1285'); 
 ```
 
-### Set Pattern Function ID
+### Set Pattern Function ID {#set_pattern_func_id}
 
 Use a the function with the specified ID.
 
@@ -363,10 +363,10 @@ The corresponding MATLAB code:
 
 ```matlab
 % … initiate the connection (see above)
-Panel_com('set_pattern_id', '1794'); 
+Panel_com('set_pattern_func_id', '1794'); 
 ```
 
-### Start Display
+### Start Display {#start_display}
 
 Start Display tells the arena to show the currently configured function and pattern for a specified time. The time in the TCP/IP command is specified in tenth of a second.
 
@@ -385,7 +385,7 @@ The corresponding MATLAB code (internal conversion from second to decisecond):
 Panel_com('start_display', 6); 
 ```
 
-### Set Framerate
+### Set Framerate {#set_frame_rate}
 
 This four-byte command has a length of `0x03`, command of `0x12`, and sends a little-endian encoded two-byte framerate.
 
@@ -405,7 +405,7 @@ The corresponding MATLAB code:
 Panel_com('set_frame_rate', 500); 
 ```
 
-### Set Position X
+### Set Position X {#set_position_x}
 
 This four-byte command requires the length byte as `0x03`, the command as `0x70`, and has a little-endian encoded two-byte value for the X-position.
 
@@ -422,7 +422,7 @@ The corresponding MATLAB code:
 Panel_com('set_position_x', 17); 
 ```
 
-### Set Position Y
+### Set Position Y {#set_position_y}
 
 This four-byte command requires the length byte as `0x03`, the command as `0x71`, and has a little-endian encoded two-byte value for the Y-position.
 
@@ -439,7 +439,7 @@ The corresponding MATLAB code:
 Panel_com('set_position_y', 10); 
 ```
 
-### Set Analog Output Function ID
+### Set Analog Output Function ID {#set_ao_function_id}
 
 This five-byte command requires the length byte as `0x04`, the command as `0x31`. The third byte represents the analog output channel, a value between 0 and 3. The fourth and fifth byte is the little-endian encoded ID of the function.
 
@@ -458,7 +458,7 @@ The corresponding MATLAB code:
 Panel_com('set_ao_function_id', 1, 23); 
 ```
 
-### Set Analog Output
+### Set Analog Output {#set_ao}
 
 Set the voltage of a channel to a specified value.
 
@@ -483,7 +483,7 @@ The corresponding MATLAB code:
 Panel_com('set_ao', 1, 32767); 
 ```
 
-### Set Gain Bias
+### Set Gain Bias {#set_gain_bias}
 
 This six-byte command has a length of `0x05` and a command byte of `0x01`. Bytes 3 and 4 are a little-endian representation of the signed gain value, bytes 5 and 6 of the signed bias value.
 
@@ -503,7 +503,7 @@ The corresponding MATLAB code:
 Panel_com('set_gain_bias', 100, 100); 
 ```
 
-### Set Pattern and Position Function
+### Set Pattern and Position Function {#set_pattern_and_position_function}
 
 The six-byte command has a length of `0x05` and uses command `0x05`. Bytes 3 and 4 are used for a little-endian representation of the pattern ID, 5 and 6 of a function ID.
 
@@ -523,7 +523,7 @@ The corresponding MATLAB code:
 Panel_com('set_pattern_and_position_function', 100, 100); 
 ```
 
-### Stream Frame
+### Stream Frame {#stream_frame}
 
 Stream a full frame to the panels.
 
@@ -552,7 +552,7 @@ The corresponding MATLAB code:
 Panel_com('stream_frame', dataLength, x_ao, y_ao, frame_content);
 ```
 
-### Change Root Directory
+### Change Root Directory {#change_root_dir}
 
 Set the root directory where pattern and functions are stored.
 
@@ -572,10 +572,10 @@ The corresponding MATLAB code:
 
 ```matlab
 % … initiate the connection (see above)
-Panel_com('change_root_dir', 26, "C:\\my path to the patterns");
+Panel_com('change_root_dir', "C:\\my path to the patterns");
 ```
 
-### Combined Command
+### Combined Command {#combined_command}
 
 This 19-byte command sends several settings at once. The length is set as `0x12` (=18) and the command ID is `0x07`. The third byte represents the display mode and the following pairs of bytes represents IDs of pattern, function, and the four AO functions. This is followed by two bytes for the frame rate and two bytes for the duration in tenth of a second.
 

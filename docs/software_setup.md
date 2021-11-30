@@ -39,6 +39,14 @@ In MATLAB, open `G4_Display_Tools\PControl_Matlab\userSettings.m` and set the `N
 
 In MATLAB, run `configure_arena` (located in `G4_Display_Tools\G4_Pattern_Generator\support\configure_arena.m`). Make sure the # of rows/columns of panels is correct. If you are using G4 panels consisting of 16x16 LEDs, set the panel size to be 16. If you are using a G4 arena consisting of 12 LED columns that would fully enclose the cylindrical arena (e.g. the 12" arena), set the arena circumference to 12. If you are using a differently-sized arena, such as the open-form 12/18 cylindrical arena (where 18 panel columns would be needed to fully enclose the cylinder), set the circumference to 18. If the center of the arena (located between columns 6 and 7) is not oriented directly "forward" from the center of the cylinder, use the `arena rotations` to account for that, otherwise some motion types will not be oriented correctly.
 
+## Verify software is working {#verify}
+
+After the hardware and software setup is complete, try to start the application `Panel_Host` that you previous installed in `C:\Program Files(x86)\HHMI G4`. Instead of running the `g4host.exe` directly, calling the command `PControl_G4` in MATLAB should open two two windows: the *Panel_Host*{:.gui-txt} LabVIEW window and a MATLAB GUI.
+
+Switch to the *Panel_Host*{:.gui-txt} window and try to send an *all on*{:.gui-btn} command through the interface. If this is the first time you send a command, the Windows firewall might ask you to *allow network access to the `g4host.exe`*{:.gui-txt}. To use the G4 system, you will need to grant that right. If the arena is connected and powered on, all panels should light up -- if not, have a look at the [troubleshooting guide]({{site.baseurl}}/docs/g4_troubleshooting.html) or [get in contact]({{site.baseurl}}/Contact). Turn them back off by sending the *all off*{:.gui-btn} command through the GUI.
+
+The second test will verify that the connection between MATLAB and the *Panel_Host*{:.gui-txt} software is working. Switch back to the MATLAB PControl_G4 GUI and click on the *arena*{:.gui-txt} tab and then *all on*{:.gui-btn}. If all LEDs on the arena turn on, then the system has been set up successfully -- and you can turn it off the same way as before. Otherwise and most likely you will need to [trouble shoot your system]({{site.baseurl}}/docs/g4_troubleshooting.html) or [get in contact]({{site.baseurl}}/Contact).
+
 ---
 
 [^1]: In July 2020, the NI R RIO Driver and most other software packages are available in version 20.0.
