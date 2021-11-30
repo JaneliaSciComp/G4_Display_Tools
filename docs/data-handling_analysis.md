@@ -90,7 +90,8 @@ exp_settings.path_to_processing_settings = ...
         '/Users/username/experiment_folder/processing_settings.mat';
 ```
 
-**NOTE** This path is used to get information from your processing settings, including the path to your protocol folder. This folder must be organized in a certain way for data analysis to work correctly. If you've maintained the default organization created when you run a fly through an experiment using the G4 Conductor, then you won't have to worry about this, but if you have manually changed the organization of your folder, you should ensure that your fly folders are two levels below your protocol folder. i.e. your folder's hierarchy should be `protocol_folder` → `subfolders` → `fly folders` → `individual fly data`. If there are more or fewer levels than this, you may get a browse window during the analysis run wanting you to browse to the protocol folder, or you could get errors.  
+__NOTE__: This path is used to get information from your processing settings, including the path to your protocol folder. This folder must be organized in a certain way for data analysis to work correctly. If you've maintained the default organization created when you run a fly through an experiment using the G4 Conductor, then you won't have to worry about this, but if you have manually changed the organization of your folder, you should ensure that your fly folders are two levels below your protocol folder. i.e. your folder's hierarchy should be `protocol_folder` → `subfolders` → `fly folders` → `individual fly data`. If there are more or fewer levels than this, you may get a browse window during the analysis run wanting you to browse to the protocol folder, or you could get errors.
+{:.info}
 
 ### Save Path
 
@@ -182,7 +183,8 @@ exp_settings.field_values{4} = ["genotype4"];
 
 HOWEVER, if those four genotypes are the ONLY genotypes of fly you have run through the protocol (so all flies in your experiment folder match one of those genotypes), then the easier way to do it is to set `exp_settings.plot_all_genotypes = 1` (covered below) and leave the field_values empty and field_to_sort_by as only `exp_settings.field_to_sort_by{1} = ["fly_genotype"];`. If you do this, each different genotype that can be found in the experiment folder will be plotted on its own axis against whichever genotype you establish as the control.
 
-**NOTE** If you are analyzing only a single fly, field_values should be empty.
+__NOTE__: If you are analyzing only a single fly, field_values should be empty.
+{:.info}
 
 ### Single group
 
@@ -270,7 +272,8 @@ The datatype options for flying data are: 'LmR_chan', 'L_chan', 'R_chan', 'F_cha
 
 The datatype options for walking data are: 'Vx0_chan', 'Vx1_chan', 'Vy0_chan', 'Vy1_chan', 'Frame Position', 'Turning', 'Forward', and 'Sideslip'.
 
-**Note** The last three datatypes of each are most likely the data you'd want to plot as timeseries, as these have been processed and aligned properly. The first five are raw data.
+__Note__ The last three datatypes of each are most likely the data you'd want to plot as timeseries, as these have been processed and aligned properly. The first five are raw data.
+{:.info}
 
 Example (Note the use of single quotes, curly brackets, and the comma. Capitalization DOES matter.):
 
@@ -379,13 +382,16 @@ timeseries_plot_settings.subplot_figure_title{1} = ["LmR Figure 1 Title", "LmR F
 timeseries_plot_settings.subplot_figure_title{2} = ["LpR Figure 1 Title", "LpR Figure 2 title"];
 ```
 
-Note that it follows the same order as the datatypes array. LmR, if it is being plotted, should be first, followed by LpR. **faLmR should not be included here. It has its own version of all of these settings listed below**
+Note that it follows the same order as the datatypes array. LmR, if it is being plotted, should be first, followed by LpR. __faLmR should not be included here. It has its own version of all of these settings listed below__
 
 ### Figure names
 
-`timeseries_plot_settings.figure_names`, not to be confused with the previous variable, is an optional array of strings providing a figure name for each datatype of timeseries plots. This name will not be printed on the figure but be in the title bar along the top of the figure. We generally use the datatype being plotted as the figure name, but you can use any string you want. Just keep in mind that everything is done in the order LmR → LpR, so if you are plotting both LmR and LpR, your LmR figure name should always come first. **Note that if your plots of a particular datatype are spread over multiple figures, those figures will all have the same figure name. This is not intended to identify any given figure but only to identify all figures of a given datatype.**  
+`timeseries_plot_settings.figure_names`, not to be confused with the previous variable, is an optional array of strings providing a figure name for each datatype of timeseries plots. This name will not be printed on the figure but be in the title bar along the top of the figure. We generally use the datatype being plotted as the figure name, but you can use any string you want. Just keep in mind that everything is done in the order LmR → LpR, so if you are plotting both LmR and LpR, your LmR figure name should always come first.
 
-Example:  
+Note that if your plots of a particular datatype are spread over multiple figures, those figures will all have the same figure name. This is not intended to identify any given figure but only to identify all figures of a given datatype.
+{:.info}
+
+Example:
 Continuing with the same timeseries example as above, the corresponding figure names would look like this:
 
 `timeseries_plot_settings.figure_names = ["LmR"];` Even though the LmR data is split over two figures, only one datatype is being plotted so this will be applied to both figures.
@@ -670,7 +676,7 @@ TC_plot_settings.xaxis_values = [1, 10, 100, 1000];
 
 Position series data is generated by the data processing. This data shows the fly's motion against the position of the pattern on the arena screen (rather than against time). There are a few different ways to use this data.
 
-One type of plot you can generate are Motion-Dependent (M) and Position-Dependent (P) position series plots. These are only relevant to certain types of experiments, namely one that passes a single bar around the arena in a clockwise or counter-clockwise direction. Put simply, P is calculated by adding the fly response to each direction together and dividing by two. M is calculated by subtracting the counter-clockwise (or negative) direction from the clockwise direction and dividing by two. For more details on the origin and purpose of these equations, see [Object tracking in motion-blind flies](https://www.nature.com/articles/nn.3386)[^1]. For additional reading on the subject, see [A theory of the pattern induced flight orientation of the fly Musca domestica](https://pubmed.ncbi.nlm.nih.gov/4718020/)[^2] The following settings relate to these M and P plots.
+One type of plot you can generate are Motion-Dependent (M) and Position-Dependent (P) position series plots. These are only relevant to certain types of experiments, namely one that passes a single bar around the arena in a clockwise or counter-clockwise direction. Put simply, P is calculated by adding the fly response to each direction together and dividing by two. M is calculated by subtracting the counter-clockwise (or negative) direction from the clockwise direction and dividing by two. For more details on the origin and purpose of these equations, see [Object tracking in motion-blind flies](https://doi.org/10.1038/nn.3386)[^1]. For additional reading on the subject, see [A theory of the pattern induced flight orientation of the fly _Musca domestica_](https://doi.org/10.1007/bf00270572)[^2] The following settings relate to these M and P plots.
 
 ### Plot M and P
 
@@ -977,7 +983,7 @@ da = create_data_analysis_tool('path to the settings file', '-group', '-hist', '
 The first input is the path to the settings file which you just created. This will tell the class what settings to use in the analysis. After this are multiple inputs, or flags, which tell the `create_data_analysis_tool` function what analysis to do. The currently accepted flags are as follows:
 
 - `'-group'` – Include this if you're analyzing multiple flies  
-- `'-single'` – include this if you're analyzing a single fly. **NOTE:** You MUST include either single or group flag!
+- `'-single'` – include this if you're analyzing a single fly. __NOTE:__ You MUST include either single or group flag!
 - `'-hist'` – plot basic histograms of your inter-trial (or stripe fixation) data
 - `'-tsplot'` – plot open loop timeseries data
 - `'-clhist'` – plot closed loop histograms
@@ -1024,4 +1030,4 @@ Coming soon
 # Citations
 
 [^1]: Bahl, A., Ammer, G., Schilling, T. et al. Object tracking in motion-blind flies. Nat Neurosci 16, 730–738 (2013). <https://doi.org/10.1038/nn.3386>
-[^2]: Poggio, T. & Reichardt, W. A theory of the pattern induced flight orientation of the fly Musca domestica. Kybernetik 12, 185–203 (1973).
+[^2]: Poggio, T. & Reichardt, W. A theory of the pattern induced flight orientation of the fly _Musca domestica_. Kybernetik 12, 185–203 (1973). <https://doi.org/10.1007/bf00270572>

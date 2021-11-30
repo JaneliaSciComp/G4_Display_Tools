@@ -1,14 +1,14 @@
 ---
-title:  PControl
+title:  Panel_com
 parent: Generation 4
 nav_order: 15
 ---
 
-# PControl
+# The `Panel_com` command
 
 Running the [G4 Host](software_setup.md) software initiates the IO card of the system to start a TCP/IP server on the `localhost` at port `62222`. Through this TCP/IP connection, it is possible to communicate directly with the arena. Here we list the commands available in `Panel_com` which would allow you to implement the same functionality in a language of your choosing. For simplicity we document both, MATLAB's `Panel_com` command as well as the underlying TCP/IP data exchange. For the TCP/IP we use python as an example.
 
-The TCP/IP commands follow a common structure: the first byte represents the length of package following the length command and the second byte is a command ID (_Stream frame_ and _Change root directory_ are notably different, they start with the command IDs followed by two bytes representing the length of the packet). This means, a two-byte TCP/IP command consists of a length of `1` and the command ID, a three-byte command would starte with a length of `2`, the command ID, and a value.
+The TCP/IP commands follow a common structure: the first byte represents the length of package following the length command and the second byte is a command ID (_Stream frame_ and _Change root directory_ are notably different, they start with the command IDs followed by two bytes representing the length of the packet). This means, a two-byte TCP/IP command consists of a length of `1` and the command ID, a three-byte command would start with a length of `2`, the command ID, and a value.
 
 ## Initiate the connection
 
@@ -45,7 +45,7 @@ connectHost;
 
 ### Turn all panels on
 
-This commamnd turns all panels on to the brightest level. If the arena is already on, you should not see a change. Use this for checking if your arena works.
+This command turns all panels on to the brightest level. If the arena is already on, you should not see a change. Use this for checking if your arena works.
 
 This is a two-byte command (notation in hexadecimal): length is set to `0x01` (`1` in integer, `0b00000001` in binary), the command is `0xff` (`255` in decimal, `0b11111111` in binary). The following paragraphs will only use hexadecimal notation of the bytes.
 
@@ -231,7 +231,6 @@ Sending this command starts the logging process. The data is logged directly fro
 
 This is a two-byte command with the length `0x01` and the command `0x41`.
 
-
 ```python
     # … initiate the connection (see above)
     s.sendall(b'\x01\x41')
@@ -250,7 +249,7 @@ Sending this command stops the logging process.
 
 __Note__: This command seems to respond slowly. The MATLAB code has some fallback and potential manual intervention: if the stop_log fails, MATLAB tries again after 100ms. If that still fails, a popup window asks the user to manually stop  the log file. If you use the TCP/IP command, try to use a similar strategy.
 
-This is a two-byte command with the lenght `0x01` and command `0x40`.
+This is a two-byte command with the length `0x01` and command `0x40`.
 
 ```python
     # … initiate the connection (see above)
@@ -268,7 +267,7 @@ Panel_com('stop_log');
 
 This defines the [display mode](protocol-designer_display-modes.md) and requires an argument between 0 and 7.
 
-This is a three-byte command with the length `0x02`, the command `0x10`, and the third byte with the desired control mode. The MATLAB code sends the command in blocking mode, so you might want to set the `MSG_WAITALL` flag in the `sendall` call. 
+This is a three-byte command with the length `0x02`, the command `0x10`, and the third byte with the desired control mode. The MATLAB code sends the command in blocking mode, so you might want to set the `MSG_WAITALL` flag in the `sendall` call.
 
 ```python
     # … initiate the connection (see above)
@@ -311,7 +310,7 @@ The command is used to set the analog input channels.
 
 This is a three-byte command with the length `0x02`, the command `0x13`, and the value in the third byte representing the active channels.
 
-__Note__: TODO: The exact usage is unlcear. 
+__Note__: TODO: The exact usage is unclear.
 
 ```python
     # … initiate the connection (see above)
@@ -528,7 +527,7 @@ Panel_com('set_pattern_and_position_function', 100, 100);
 
 Stream a full frame to the panels.
 
-This command has a variable length and starts with the first byte `0x32`. Bytes 2 and 3 represent the length of the data, which is the length of the data minus seven bytes for the _header_. 
+This command has a variable length and starts with the first byte `0x32`. Bytes 2 and 3 represent the length of the data, which is the length of the data minus seven bytes for the _header_.
 
 __TODO__: Clarify if `x_ao` and `y_ao` specify a value or (more likely) the ID of a function.
 {:.warning}
@@ -559,7 +558,6 @@ Set the root directory where pattern and functions are stored.
 
 This is a variable length command with the first byte `0x43`. Bytes 2 and 3 define the length of the directory name and the following  bytes contain the directory name.
 
-
 ```python
     # … initiate the connection (see above)
     root_directory_name = 'C:\my path to the patterns' # actual path
@@ -577,7 +575,7 @@ The corresponding MATLAB code:
 Panel_com('change_root_dir', 26, "C:\\my path to the patterns");
 ```
 
-### Combined Commmand
+### Combined Command
 
 This 19-byte command sends several settings at once. The length is set as `0x12` (=18) and the command ID is `0x07`. The third byte represents the display mode and the following pairs of bytes represents IDs of pattern, function, and the four AO functions. This is followed by two bytes for the frame rate and two bytes for the duration in tenth of a second.
 
@@ -609,5 +607,5 @@ The corresponding MATLAB code:
 
 ```matlab
 % … initiate the connection (see above)
-Panel_com('combined_commandr', 1, 27, 11, 25, 0, 1512, 0, 500, 6);
+Panel_com('combined_command', 1, 27, 11, 25, 0, 1512, 0, 500, 6);
 ```

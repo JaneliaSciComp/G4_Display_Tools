@@ -28,7 +28,7 @@ After functions have been created, they can be used with the G4 display system b
 
 # Description of Parameters
 
-**Note on units.** The rate of change of each repeating waveform type (e.g. sawtooth, triangle) is controlled by the frequency parameter, in Hz. When creating position functions, it may instead be useful to understand the speed of the moving pattern in terms of degrees-per-second (dps). Use the dps2freq function (which requires the step_size of the pattern) to convert between these units.
+__Note on units__: The rate of change of each repeating waveform type (e.g. sawtooth, triangle) is controlled by the frequency parameter, in Hz. When creating position functions, it may instead be useful to understand the speed of the moving pattern in terms of degrees-per-second (dps). Use the `dps2freq` function (which requires the `step_size` of the pattern) to convert between these units.
 
 - `type`: (string) sets the type of function to create. Options are:
   - `pfn` – position function (controls what frame is displayed during each display refresh cycle)
