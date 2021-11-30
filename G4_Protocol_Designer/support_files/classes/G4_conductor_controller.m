@@ -649,6 +649,7 @@ classdef G4_conductor_controller < handle
                 pause(.5);
                 
                 self.create_metadata_file();
+                self.create_timing_file();
                 
                  %Clear out live feedback panel
                 self.fb_model = feedback_model(self.doc);
@@ -697,6 +698,7 @@ classdef G4_conductor_controller < handle
             
             %create .mat file of metadata
             self.create_metadata_file();
+            self.create_timing_file(fly_results_folder);
             
              %Clear out live feedback panel
             self.fb_model = feedback_model(self.doc);
@@ -779,6 +781,14 @@ classdef G4_conductor_controller < handle
                 self.create_error_box("If you are changing flies, please remember to update the fly name.");
            end
            
+        end
+        
+        function create_timing_file(self, fly_path)
+           
+            filename = 'times_between_trials.mat';
+            postTrialTimes = self.model.postTrialTimes;
+            save(fullfile(fly_path, filename), 'postTrialTimes');
+            
         end
         
         function all_tdms_folders2structs(self, fly_path)
