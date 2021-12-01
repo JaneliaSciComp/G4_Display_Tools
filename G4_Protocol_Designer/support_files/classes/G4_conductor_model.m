@@ -27,6 +27,7 @@ classdef G4_conductor_model < handle
        timestamp_
        aborted_count_
        date_folder_
+       postTrialTimes_
 
        
         
@@ -59,6 +60,7 @@ classdef G4_conductor_model < handle
         timestamp
         aborted_count
         date_folder
+        postTrialTimes
        
     end
     
@@ -120,6 +122,7 @@ classdef G4_conductor_model < handle
             self.fly_save_name = [self.fly_genotype,'-',datestr(now, 'HH_MM_SS')];
             self.date_folder = datestr(now, 'mm_dd_yyyy');
             self.timestamp = datestr(now, 'mm-dd-yyyy HH:MM:SS');
+            self.postTrialTimes = [];
  
         end
         
@@ -275,6 +278,12 @@ classdef G4_conductor_model < handle
             self.aborted_count = 0;
         end
         
+        function set_postTrialTimes(self, new_val)
+            self.postTrialTimes = new_val;
+        end
+        
+            
+        
         
         
         
@@ -377,6 +386,10 @@ classdef G4_conductor_model < handle
         function value = get.date_folder(self)
             value = self.date_folder_;
         end
+        
+        function value = get.postTrialTimes(self)
+            value = self.postTrialTimes_;
+        end
             
 
 
@@ -477,6 +490,10 @@ classdef G4_conductor_model < handle
         
         function set.date_folder(self, value)
             self.date_folder_ = value;
+        end
+        
+        function set.postTrialTimes(self, value)
+            self.postTrialTimes_ = value;
         end
         
         

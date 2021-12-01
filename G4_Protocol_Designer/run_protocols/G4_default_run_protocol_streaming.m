@@ -50,10 +50,11 @@
  %p.active_ao_channels lists the channels that are active - [0 2 3] for
  %example means channels 1, 3, and 4 are active.
 
-function [success] = default_run_protocol_streaming_test(runcon, p)%input should always be 1 or 2 items
+function [success] = G4_default_run_protocol_streaming(runcon, p)%input should always be 1 or 2 items
 
 %% Get access to the figure and progress bar in the run gui IF it was passed in.
 global ctlr;
+postTrialTimes = [];
 
 %        fig = runcon.fig;
 if ~isempty(runcon.view)
@@ -265,7 +266,7 @@ end
              
 
 %% run pretrial if it exists----------------------------------------
-             tic;
+             startTime = tic;
              if pre_start == 1
                  %First update the progress bar to show pretrial is running----
                  runcon.update_progress('pre');
@@ -337,6 +338,8 @@ end
                  end
              end
              
+             postPretrial = tic;
+             
              tcpread = pnet(ctlr.tcpConn, 'read', 'noblock'); % read data that's been streamed since clearing cache
 %             Panel_com('stop_log');
 %              runcon.update_streamed_data(tcpread, 'pre'); %Function that updates feedback model
@@ -355,8 +358,10 @@ end
              
              end
              
-             runcon.update_elapsed_time(round(toc,2));
+             runcon.update_elapsed_time(round(toc(startTime),2));
              
+             
+             postTrialTimes(end+1) = toc(postPretrial);
 
 %% Loop to run the block/inter trials --------------------------------------
 
@@ -427,11 +432,13 @@ end
 
                     
                     tcpread = pnet(ctlr.tcpConn, 'read', 'noblock'); % clear cache
+                    
 
                     %Run block trial--------------------------------------
 
                     Panel_com('start_display', dur + .5); %duration expected in 100ms units
                     pause(dur)
+                    postTrialTime = tic;
 
 
                     tcpread = pnet(ctlr.tcpConn, 'read', 'noblock');
@@ -447,7 +454,8 @@ end
                         return;
                   
                     end
-                    runcon.update_elapsed_time(round(toc,2));
+                    runcon.update_elapsed_time(round(toc(startTime),2));
+                    postTrialTimes(end + 1) = toc(postTrialTime);
                     
                     %Tells loop to skip the intertrial if this is the last iteration of the last rep
                     if r == reps && c == num_cond
@@ -505,6 +513,7 @@ end
 
                          Panel_com('start_display', inter_dur + .5);
                          pause(inter_dur);
+                         postIntertrial = tic;
 
                          tcpread = pnet(ctlr.tcpConn, 'read', 'noblock');
 
@@ -520,7 +529,8 @@ end
                          
                          end
                          
-                         runcon.update_elapsed_time(round(toc,2));
+                         runcon.update_elapsed_time(round(toc(startTime),2));
+                         postTrialTimes(end + 1) = toc(postIntertrial);
                          
                     end 
                  end
@@ -573,32 +583,37 @@ end
 
                  pause(post_dur);
                  %tcpread = pnet(ctlr.tcpConn, 'read', 'noblock');
+                 postPosttrial = tic;
                  
-                 stop_log_response = send_tcp( char([1 hex2dec('40')]), 1);
-                if stop_log_response.success == 1
-                    waitfor(errordlg("Stop Log command failed, please stop log manually then hit a key"));
-                    waitforbuttonpress;
-                end
             
                 pause(1);
 %                  runcon.update_streamed_data(tcpread, 'post');
                  if runcon.check_if_aborted() == 1
                     Panel_com('stop_display');
                     pause(.1);
-                    %Panel_com('stop_log');
-                    %pause(1);
+                    Panel_com('stop_log');
+                    pause(1);
                     disconnectHost;
                     success = 0;
                     return;
                  
                  end
-                 runcon.update_elapsed_time(round(toc,2));
+                 runcon.update_elapsed_time(round(toc(startTime),2));
                  
             end
 
             Panel_com('stop_display');
             
+            stop_log_response = send_tcp( char([1 hex2dec('40')]), 1);
+            if stop_log_response.success == 1
+                waitfor(errordlg("Stop Log command failed, please stop log manually then hit a key"));
+                waitforbuttonpress;
+            end
+            postTrialTimes(end+1) = toc(postPosttrial);
+            
             pause(1);
+            
+            runcon.model.set_postTrialTimes(postTrialTimes);
 
             %Panel_com('stop_log');
             

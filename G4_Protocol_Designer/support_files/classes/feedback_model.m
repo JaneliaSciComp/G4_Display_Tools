@@ -375,18 +375,23 @@ classdef feedback_model < handle
             
             raw = self.raw_data;
             
-            if ~isempty(raw)
+           if ~isempty(raw)
                 label_idx1 = strfind(raw,'ms');
-                label_idx2 = strfind(raw,'!S');
-
-                if isempty(label_idx1) && ~isempty(label_idx2)
-                   
-                     raw = raw(1:label_idx2(end)-1);
-                elseif ~isempty(label_idx1) && isempty(label_idx2)
+%                label_idx2 = strfind(raw,'!S');
+ 
+%                 if isempty(label_idx1) && ~isempty(label_idx2)
+%                    
+%                      raw = raw(1:label_idx2(end)-1);
+%                 elseif ~isempty(label_idx1) && isempty(label_idx2)
+%                     raw = raw(label_idx1(1) + 2:end);
+%                 elseif ~isempty(label_idx1) && ~isempty(label_idx2)
+%                     raw = raw(label_idx1(1) + 2:label_idx2(end)-1);
+%                 end
+ 
+                if ~isempty(label_idx1)
                     raw = raw(label_idx1(1) + 2:end);
-                elseif ~isempty(label_idx1) && ~isempty(label_idx2)
-                    raw = raw(label_idx1(1) + 2:label_idx2(end)-1);
                 end
+
 
                 raw = mod(256 + raw, 256); %convert signed bytes to 0-255 char vals
                 idx = 3;
