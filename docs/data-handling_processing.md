@@ -39,20 +39,25 @@ settings.trial_options = [1 0 1];
 
 `path_to_protocol` is set equal to a filepath string, exactly like number 1. This path, however, should be the path to your experiment's .g4p file. For example:
 
-`settings.path_to_protocol = '/Users/username/Documents/experiment_folder/experiment_file.g4p';`
+```matlab
+settings.path_to_protocol = '/Users/username/Documents/experiment_folder/experiment_file.g4p';
+```
 
 ### Channel Order
 
 `channel_order` should not generally change, except for perhaps when you first set up your arena. This indicates the order of your input channels. The default is as follows:
 
-`settings.channel_order = {'LmR_chan', 'L_chan', 'R_chan', 'F_chan', 'Frame Position', 'LmR', 'LpR'};` where
+```matlab
+settings.channel_order = {'LmR_chan', 'L_chan', 'R_chan', 'F_chan', 'Frame Position', 'LmR', 'LpR'};
+```
+where
 
-`LmR_chan` is the channel returning left minus right data
-`L_chan` is the channel returning left wing data
-`R_chan` is the channel returning right wing data
-`F_chan` is the channel returning wing beat frequency data
-`Frame Position` is the channel returning the position of the pattern on the screen
-`LmR` and `LpR` are empty. These are simply place holders indicating where the final aligned and processed Left minus Right and Left plus Right data will be stored.
+- `LmR_chan` is the channel returning left minus right data
+- `L_chan` is the channel returning left wing data
+- `R_chan` is the channel returning right wing data
+- `F_chan` is the channel returning wing beat frequency data
+- `Frame Position` is the channel returning the position of the pattern on the screen
+- `LmR` and `LpR` are empty. These are simply place holders indicating where the final aligned and processed Left minus Right and Left plus Right data will be stored.
 
 So essentially this order indicates channel 1 returns Left minus right data, channel 2 returns left wing only data, channel three returns right wing only data, etc. If your hardware is set up differently to this, you may need to change the order. However, DO NOT change the codes used to indicate each channel. The software will search this array for 'LmR_chan' to figure out which channel number should be associated with LmR_chan, but if you were to change the code to LmR_channel, it would not be able to find it. So rearrange the codes only if necessary, but do not change them.
 
@@ -98,7 +103,9 @@ Exactly the same as `da_start`, but instead `da_stop` is the number of seconds t
 
 `processed_file_name` should be set to a string indicating what you want your file of processed data to be called (do not include an extension). This does not refer to the processing settings .mat file - that name is assigned in the very first variable. Instead this refers to the file that will be created after an experiment is run and the data has been processed into datasets. Those datasets are saved as a .mat file inside the fly folder that is generated when you run a fly through the protocol. So each fly that is run through this experiment will end up with its own folder, and each fly folder will have a .mat file in it with this name, containing all the data collected for that fly. For example:
 
-`settings.processed_file_name = 'processed_data';`
+```matlab
+settings.processed_file_name = 'processed_data';
+```
 
 ### Are you using the combined command in your run protocol?
 
@@ -144,7 +151,9 @@ Position series data is when we create plots similar to time series plots, but i
 
 `pos_conditions` should be set equal to an array indicating what condition numbers to include in the position series data if it is enabled. If enable_pos_series is set to 0, then leave this at its default value - it won't be used. If position series is enabled and you want all of your conditions to be included in the position series data, then you can leave this as an empty array, which would look like:
 
-`settings.pos_conditions = [];`
+```matlab
+settings.pos_conditions = [];
+```
 
 If position series is enabled and you only want certain conditions to be used, then fill the array with the appropriate condition numbers. For example, `[1:28]` would indicate conditions 1 through 28, or `[1 3 5 7 9 11 13 15 17 19]` would indicate only condition numbers listed in the brackets should be included.
 
@@ -201,17 +210,23 @@ Once all the data has been processing, any trials that were bad will have their 
 
 `summary_filename` is where you can set the filename for this text file. It should be a string. Default is:
 
-`settings.summary_filename = 'Summary_of_bad_trials';`
+```matlab
+settings.summary_filename = 'Summary_of_bad_trials';
+```
 
 ### Save path to the summary file
 
 By default, this summary file of bad trials will be saved inside the fly folder, where that fly's raw data and processed results are saved. If this is what you want, simply leave this variable empty, like this:
 
-`settings.summary_save_path = [];`
+```matlab
+settings.summary_save_path = [];
+```
 
 However, if you want to save this file elsewhere, you should set this variable equal to a string containing the filepath, like this:
 
-`settings.summary_save_path = '\Users\username\Documents\bad_trials';`
+```matlab
+settings.summary_save_path = '\Users\username\Documents\bad_trials';
+```
 
 # Okay I've adjusted all the settings. Now what?
 
@@ -225,7 +240,9 @@ First if you haven't done it, you should go through the processing settings exac
 
 Making sure all the files in `G4_Display_Tools` is on your MATLAB path, type the following into your MATLAB command window:
 
-`process_data('path to fly folder', 'path to processing settings file');`
+```matlab
+process_data('path to fly folder', 'path to processing settings file');
+```
 
 Replace the text inside the single quotes with the path to your fly's folder (not to the TDMS files or .mat file) and the path to the settings file you just saved, respectively. This command will start the data processing, and it may take a minute or two to run. When it is finished running, a new .mat file should have appeared in your fly folder containing your data.
 
@@ -307,6 +324,7 @@ These variables are the same as `faLmR_avg_over_reps` and `faLmR_avg_reps_norm`,
 
 If you are interested in the code which actually runs the data processing, it is located at `G4_Display_Tools/G4_Data_Analysis/new_data_processing/process_data.m`.  This file calls many different functions that are used throughout processing. These functions can all be found in `G4_Display_Tools/G4_Data_Analysis/support/data_processing_modules`.
 
-*Please do not edit or alter this code in any way unless you are very confident in your changes. Alterations to one function can have impacts on any other code that uses that function!*
+__Warning__: Please do not edit or alter this code in any way unless you are very confident in your changes. Alterations to one function can have impacts on any other code that uses that function!
+{:.warning}
 
 Now that your data processing is set up and you know what to expect out of it, you can move on to [data analysis](data-handling_analysis.md). There, you will create settings dictating what types of plots you want to be automatically generated, using the processed datasets, after an experiment runs. You can also set up analysis settings to quickly generate plots for groups of flies later.
