@@ -579,6 +579,9 @@ Panel_com('change_root_dir', "C:\\my path to the patterns");
 
 This 19-byte command sends several settings at once. The length is set as `0x12` (=18) and the command ID is `0x07`. The third byte represents the display mode and the following pairs of bytes represents IDs of pattern, function, and the four AO functions. This is followed by two bytes for the frame rate and two bytes for the duration in tenth of a second.
 
+This command is relatively new and mostly untested. The [`G4_run_protocol_combinedCommand.m`](https://github.com/JaneliaSciComp/G4_Display_Tools/blob/master/G4_Protocol_Designer/run_protocols/G4_run_protocol_combinedCommand.m) used this, but apparently there were some timing issues. Needs more exploration.
+{:.warning}
+
 ```python
     # … initiate the connection (see above)
     display_mode = 1
