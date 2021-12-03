@@ -1,4 +1,4 @@
-function [Log, stop_times] = remove_excess_time(Log, start_times, stop_times, stop_idx, postTrialTimes, time_conv, pre_dur)
+function [Log, stop_times] = remove_excess_time(Log, start_times, stop_times, trial_options, postTrialTimes, time_conv, pre_dur)
     
     % This function takes in postTrialTimes, which contains the amount of
     % time elapsed before and after each trial while other code was running
@@ -18,10 +18,20 @@ function [Log, stop_times] = remove_excess_time(Log, start_times, stop_times, st
     timestamp_diff = Log.ADC.Time(1,2)-Log.ADC.Time(1,1);
     frame_timestamp_diff = Log.Frames.Time(2) - Log.Frames.Time(1);
     postTrialTimes = postTrialTimes*time_conv;
-     for time = 2:length(start_times)-1
+    if trial_options(1) %There is a pretrial
+        start_cond = 2;
+    else
+        start_cond = 1;
+    end
+     for time = start_cond:length(start_times)-1
         if time <= length(postTrialTimes)/2
-            time1 = postTrialTimes(time*2);
-            time2 = postTrialTimes(time*2 + 1);
+            if trial_options(1) 
+                time1 = postTrialTimes(time*2);
+                time2 = postTrialTimes(time*2 + 1);
+            else
+                time1 = postTrialTimes(time*2 - 1);
+                time2 = postTrialTimes(time*2);
+            end
             totTime = time1 + time2;
             num_inds_erase = totTime/timestamp_diff;
             

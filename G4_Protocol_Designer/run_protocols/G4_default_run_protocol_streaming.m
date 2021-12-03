@@ -267,8 +267,9 @@ end
 
 %% run pretrial if it exists----------------------------------------
              startTime = tic;
-             prePreTrial = tic;
+             
              if pre_start == 1
+                 prePreTrial = tic;
                  %First update the progress bar to show pretrial is running----
                  runcon.update_progress('pre');
                  num_trial_of_total = num_trial_of_total + 1;
@@ -611,6 +612,8 @@ end
                  end
                  runcon.update_elapsed_time(round(toc(startTime),2));
                  
+                 postTrialTimes(end+1) = toc(postPosttrial);
+                 
             end
 
             Panel_com('stop_display');
@@ -620,7 +623,7 @@ end
                 waitfor(errordlg("Stop Log command failed, please stop log manually then hit a key"));
                 waitforbuttonpress;
             end
-            postTrialTimes(end+1) = toc(postPosttrial);
+            
             
             pause(1);
             
