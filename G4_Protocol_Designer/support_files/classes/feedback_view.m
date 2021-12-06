@@ -163,7 +163,9 @@ classdef feedback_view < handle
             
 %             cla(self.openLoop_axis);
 %             cla(self.closeLoop_axis);
-             cla(self.wbf_axis);
+            cla(self.wbf_axis);
+            yline(self.wbf_axis, self.min_wbf{1}(1)/100);
+            hold(self.wbf_axis, 'on');
 % %            xline(self.openLoop_axis,0);
 %  %           hold on;
              drawnow;
@@ -272,42 +274,10 @@ classdef feedback_view < handle
                 
                 
             end
-                
-               
-            
-            
-                
-      
-            
-                
-           
+  
             
         end
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
+       
         
         
         

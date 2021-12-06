@@ -43,10 +43,26 @@ function [Log, stop_times] = remove_excess_time(Log, start_times, stop_times, tr
             %remove data corresponding to the amount of time in time1 from
             %data directly preceding the start time (so remove it from the
             %end of the previous trial)
-            ind1 = start_time_ind - num_inds_erase;
-            ind2 = start_time_ind - 1;
-            frameInd1 = frame_start_ind - frame_inds_erase;
-            frameInd2 = frame_start_ind - 1;
+            if num_inds_erase < start_time_ind
+                ind1 = start_time_ind - num_inds_erase;
+            else
+                ind1 = 1;
+            end
+            if start_time_ind > 1
+                ind2 = start_time_ind - 1;
+            else
+                ind2 = 1;
+            end
+            if frame_inds_erase < frame_start_ind
+                frameInd1 = frame_start_ind - frame_inds_erase;
+            else
+                frameInd1 = 1;
+            end
+            if frame_start_ind > 1
+               frameInd2 = frame_start_ind - 1;
+            else
+                frameInd2 = 1;
+            end
         
             Log.Frames.Time(frameInd1:frameInd2) = [];
             Log.Frames.Position(frameInd1:frameInd2) = [];
@@ -64,8 +80,10 @@ function [Log, stop_times] = remove_excess_time(Log, start_times, stop_times, tr
 %                 Log.ADC.Volts(chan, ind1:ind2) = [];
 % 
 %             end
+            if time > 1
+               stop_times(time-1) = Log.ADC.Time(1, ind1-1);
+            end
             
-            stop_times(time-1) = Log.ADC.Time(1, ind1-1);
             
         end
     end
