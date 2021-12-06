@@ -121,7 +121,7 @@ save_settings.report_path = '/Users/username/experiment_folder/group_folder/grou
 Example 1:  
 `exp_settings.field_to_sort_by{1} = ["fly_genotype"];`  
 
-Notice that the string `fly_genotype` must match exactly the field name for genotype in your metadata.mat file.  
+Notice that the string `fly_genotype` must match exactly the field name for genotype in your `metadata.mat` file.
 
 You can also group flies using more than one metadata field. Say you want only flies that are both of a certain genotype and of a certain age.  
 Example 2:  
@@ -959,16 +959,16 @@ This covers the settings that should be regularly updated. At this point `DA_plo
 
 # Creating your data analysis settings file
 
-Now that you have your settings as you want them, you need to create a .mat file which contains all your preferences.  This will be used to actually run the data analysis. We do it this way because it is likely you will have only a few configurations of settings that you will use over and over again, in which case it is easier to create them once and be done. Be sure you save `DA_plot_settings.m` with all of your changes.
+Now that you have your settings as you want them, you need to create a `.mat` file which contains all your preferences.  This will be used to actually run the data analysis. We do it this way because it is likely you will have only a few configurations of settings that you will use over and over again, in which case it is easier to create them once and be done. Be sure you save `DA_plot_settings.m` with all of your changes.
 
-In `G4_data_analysis/support` there is a function called `create_settings_file`. This function takes in two parameters, the name of your settings file and the path where you would like to save it. Run this function to create a .mat file at the location you specify. The .mat file will contain all the settings present in the `DA_plot_settings.m` file you've just adjusted. Do this by typing the following command into the MATLAB command window and hitting enter:
+In `G4_data_analysis/support` there is a function called `create_settings_file`. This function takes in two parameters, the name of your settings file and the path where you would like to save it. Run this function to create a `.mat` file at the location you specify. The `.mat` file will contain all the settings present in the `DA_plot_settings.m` file you've just adjusted. Do this by typing the following command into the MATLAB command window and hitting enter:
 
 `create_settings_file('name of file', 'path to file');` You should give your file a meaningful name that indicates whether it is for a single fly, a particular group, or multiple groups. I recommend saving it inside your experiment folder so you do not forget which experiment it was made for.
 
 __Note__: When you run an experiment through the Conductor, you may have it run single fly analysis automatically after the data has been processed. If you do this, the conductor will open the settings file you provide and replace things specific to the current fly with updated values (ie, the genotype or path to the fly folder). It will then save a new analysis settings file for that particular fly inside the fly folder, and use that to run its analysis. So if you plan to use this feature, you can create one single-fly analysis settings file which is generic and save it in your experiment folder. The conductor will then use this to create a new analysis settings file for each specific fly and run the analysis automatically. Group analysis, however, must be done after the fact by you.
 {:.warning}
 
-This settings file will be used to run the data analysis. Note that if a .mat file already exists with the name and filepath you specify, it will be replaced.
+This settings file will be used to run the data analysis. Note that if a `.mat` file already exists with the name and filepath you specify, it will be replaced.
 
 Now you are ready to run an analysis!
 
