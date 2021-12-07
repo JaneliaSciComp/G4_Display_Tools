@@ -195,7 +195,7 @@ __NOTE__: If you are analyzing only a single fly, field_values should be empty.
 
 ### Single group
 
-Set `exp_settings.single_group` to 1 if you only want to plot a single group, 0 if you are plotting a single fly or multiple groups
+Set `exp_settings.single_group` to `1` if you only want to plot a single group, `0` if you are plotting a single fly or multiple groups
 
 __Example__:
 
@@ -205,7 +205,7 @@ exp_settings.single_group = 0;
 
 ### Single fly
 
-Set `exp_settings.single_fly` to 1 if you only want to analyze a single fly, 0 if multiple flies/groups.
+Set `exp_settings.single_fly` to `1` if you only want to analyze a single fly, `0` if multiple flies/groups.
 
 __Example__:
 
@@ -215,7 +215,7 @@ exp_settings.single_fly = 0;
 
 ### Plot all genotypes
 
-`exp_settings.plot_all_genotypes` should be either `0` or `1`. If it is set to `1`, then each fly of a particular value of `field to sort by` will be placed in a group together. All values will be grouped. This does not only apply to genotypes. If your `field_to_sort_by` is fly age, then this will separate all flies that have been run through the protocol by the age field into groups.  In addition, each group will be plotted individually against the control. If you have results for five genotypes and you set group1 as the control, you'll end up with four sets of graphs – group1 v group2, group1 v group3, etc.  Set this to 0 if you want to only include a subset of your total flies, or if you want to put them on all one plot together rather than comparing to the control one by one.
+`exp_settings.plot_all_genotypes` should be either `0` or `1`. If it is set to `1`, then each fly of a particular value of `field to sort by` will be placed in a group together. All values will be grouped. This does not only apply to genotypes. If your `field_to_sort_by` is fly age, then this will separate all flies that have been run through the protocol by the age field into groups.  In addition, each group will be plotted individually against the control. If you have results for five genotypes and you set group1 as the control, you'll end up with four sets of graphs – group1 v group2, group1 v group3, etc.  Set this to `0` if you want to only include a subset of your total flies, or if you want to put them on all one plot together rather than comparing to the control one by one.
 
 ### Control genotype
 
@@ -230,7 +230,7 @@ exp_settings.control_genotype = '';
 
 ### Genotypes
 
-`exp_settings.genotypes` is an array of names, in double quotations, by which your groups should be labeled. These are intended to be simpler, human readable labels representing the metadata values. If you have set a control group, its label should come first, and the labels should otherwise be in the same order as `field_values`. If `field_values` is empty and `plot_all_genotypes` is set to 1, then the groups will be generated in the order than they are found in the file system. So in your first group folder (named as a date if you're using the default saving scheme), the first fly will dictate the first  and will get the first (non-control) label, the second fly will dictate the second group, etc. The label for the control should still go first.
+`exp_settings.genotypes` is an array of names, in double quotations, by which your groups should be labeled. These are intended to be simpler, human readable labels representing the metadata values. If you have set a control group, its label should come first, and the labels should otherwise be in the same order as `field_values`. If `field_values` is empty and `plot_all_genotypes` is set to `1`, then the groups will be generated in the order than they are found in the file system. So in your first group folder (named as a date if you're using the default saving scheme), the first fly will dictate the first  and will get the first (non-control) label, the second fly will dictate the second group, etc. The label for the control should still go first.
 
 __Example__ for two groups being compared to a third control group:
 
@@ -243,7 +243,7 @@ __Note__: When running an experiment through the Conductor, you have the option 
 
 ### Plot norm and unnorm
 
-`exp_settings.plot_norm_and_unnorm` should be set to 0 or 1. If 1, whatever analysis you're doing will be done twice, once with un-normalized data and once again with normalized data. If it is set to zero, you will only get normalized results.
+`exp_settings.plot_norm_and_unnorm` should be set to `0` or `1`. If `1`, whatever analysis you're doing will be done twice, once with un-normalized data and once again with normalized data. If it is set to `0`, you will only get normalized results.
   
 __Example__:
 
@@ -340,7 +340,7 @@ If you left `OL_TS_conds` empty, leave this array empty as well (`timeseries_plo
 
 ### Condition Names
 
-`timeseries_plot_settings.cond_name` is a cell array that also corresponds to `OL_TS_conds` in shape and size. In this case, instead of condition number, you would provide a string (in double quotation marks) that will act as the title for that plot. These titles will be generated by default if you leave the array empty (`timeseries_plot_settings.cond_name = [];`) using the names of the pattern and/or function implemented in that condition. If you would like no titles for your individual plots, then set this to 0 (`timeseries_plot_settings.cond_name = 0;`).
+`timeseries_plot_settings.cond_name` is a cell array that also corresponds to `OL_TS_conds` in shape and size. In this case, instead of condition number, you would provide a string (in double quotation marks) that will act as the title for that plot. These titles will be generated by default if you leave the array empty (`timeseries_plot_settings.cond_name = [];`) using the names of the pattern and/or function implemented in that condition. If you would like no titles for your individual plots, then set this to `0` (`timeseries_plot_settings.cond_name = 0;`).
 
 __Example__:
 The title array corresponding to the above conditions and durations example might be:
@@ -413,7 +413,7 @@ If we were plotting two datatypes instead, `LmR` and `LpR`, with each being spli
 
 ### Pattern Motion Indicator
 
-`timeseries_plot_settings.pattern_motion_indicator` is a variable that should be set to either 0 or 1. The pattern motion indicator is a vertical line which will be placed on all timeseries plots indicating the moment at which your pattern actually started moving (which is generally some number of milliseconds after the official start of the condition). If you would like this vertical line to be present, set this variable equal to 1. If you would not like it, set it to 0.
+`timeseries_plot_settings.pattern_motion_indicator` is a variable that should be set to either 0 or 1. The pattern motion indicator is a vertical line which will be placed on all timeseries plots indicating the moment at which your pattern actually started moving (which is generally some number of milliseconds after the official start of the condition). If you would like this vertical line to be present, set this variable equal to `1`. If you would not like it, set it to `0`.
 
 __Example__:
 
@@ -433,11 +433,11 @@ timeseries_plot_settings.other_indicators{1} = [1 2 1 2; 1 2 1 2];
 timeseries_plot_settings.other_indicators{2} = [1 0; 1 0; 2 0; 2 0];
 ```
 
-Indicating that conditions 1, 5, 9, 13, 17, and 21 will have vertical lines at x = 1, conditions 3, 7, 11, 15, 25, and 29 will have one at x = 2, and conditions 19 and 23 will have no vertical line. These are in addition to the pattern motion indicator, if it is set to 1.
+Indicating that conditions 1, 5, 9, 13, 17, and 21 will have vertical lines at x = 1, conditions 3, 7, 11, 15, 25, and 29 will have one at x = 2, and conditions 19 and 23 will have no vertical line. These are in addition to the pattern motion indicator, if it is set to `1`.
 
 ### Cutoff Time
 
-`timeseries_plot_settings.cutoff_time` allows you to set an x-value at which the plot should end, so that small variations in the duration of each condition do not cause the timeseries plots to all vary by small amounts in the length of their x-axis. If the duration of a condition is less than this cutoff value, then that condition's x-axis will end at the duration - it will not extend longer. But if the condition's duration is longer than this cutoff value, then the x-axis maximum value will be changed to this cutoff time. Set to 0 if you do not want a cutoff limit.
+`timeseries_plot_settings.cutoff_time` allows you to set an x-value at which the plot should end, so that small variations in the duration of each condition do not cause the timeseries plots to all vary by small amounts in the length of their x-axis. If the duration of a condition is less than this cutoff value, then that condition's x-axis will end at the duration - it will not extend longer. But if the condition's duration is longer than this cutoff value, then the x-axis maximum value will be changed to this cutoff time. Set to `0` if you do not want a cutoff limit.
 
 __Example__:
 
@@ -449,7 +449,7 @@ This means that each timeseries plot will not have an x-axis longer than 2 secon
 
 ### Show individual flies
 
-`timeseries_plot_settings.show_individual_flies` should be set to 0 or 1. 1 indicates that each individual fly should be plotted on the timeseries plots as well as the average, which is useful when plotting one group of flies. This should be set to 0 if you are analyzing only a single fly or multiple groups of flies.
+`timeseries_plot_settings.show_individual_flies` should be set to `0` or `1`. `1` indicates that each individual fly should be plotted on the timeseries plots as well as the average, which is useful when plotting one group of flies. This should be set to `0` if you are analyzing only a single fly or multiple groups of flies.
 
 __Example__:
 
@@ -459,7 +459,7 @@ timeseries_plot_settings.show_individual_flies = 0;
 
 ### Show Individual Reps
 
-`timeseries_plot_settings.show_individual_reps` is similar to the previous setting, except this should only be used when analyzing a single fly. Normally when you analyze a fly, all the repetitions of the protocol done by that fly are averaged into one dataset. If you set this 1, you will get the average of all repetitions for that fly plus each individual repetition plotted in various shades of gray in the background. Set it to 1 to plot each repetition, 0 to plot only the average.
+`timeseries_plot_settings.show_individual_reps` is similar to the previous setting, except this should only be used when analyzing a single fly. Normally when you analyze a fly, all the repetitions of the protocol done by that fly are averaged into one dataset. If you set this `1`, you will get the average of all repetitions for that fly plus each individual repetition plotted in various shades of gray in the background. Set it to `1` to plot each repetition, `0` to plot only the average.
 
 __Example__:
 
@@ -469,7 +469,7 @@ timeseries_plot_settings.show_individual_reps = 1;
 
 ### Frame superimpose
 
-`timeseries_plot_settings.frame_superimpose` should be set to 0 or 1. 1 indicates that the frame position (meaning the position of your pattern on the arena screen at x time) should be plotted in light grey on each timeseries axis, in addition to the timeseries data. 0 turns this feature off. (Default is 0)
+`timeseries_plot_settings.frame_superimpose` should be set to `0` or `1`. `1` indicates that the frame position (meaning the position of your pattern on the arena screen at x time) should be plotted in light grey on each timeseries axis, in addition to the timeseries data. 0 turns this feature off. (Default is 0)
 
 __Example__:
 
@@ -479,7 +479,7 @@ timeseries_plot_settings.frame_superimpose = 0;
 
 ### Plot both directions
 
-`timeseries_plot_settings.plot_both_directions` should be set to 0 or 1. 1 indicates that each timeseries plot on your figure should plot the condition assigned to it as well as its corresponding condition of the opposite direction. Some experiments utilize two symmetric directions, like clockwise and counter-clockwise, or up and down, and it's helpful in this case to plot conditions that are symmetrical to each other on the same axis. To do this, set this variable equal to 1. Next, you will have the opportunity to define which conditions should be paired together.
+`timeseries_plot_settings.plot_both_directions` should be set to `0` or `1`. `1` indicates that each timeseries plot on your figure should plot the condition assigned to it as well as its corresponding condition of the opposite direction. Some experiments utilize two symmetric directions, like clockwise and counter-clockwise, or up and down, and it's helpful in this case to plot conditions that are symmetrical to each other on the same axis. To do this, set this variable equal to `1`. Next, you will have the opportunity to define which conditions should be paired together.
 
 __Example__:
 
@@ -492,7 +492,7 @@ timeseries_plot_settings.plot_both_directions = 1;
 
 ### Opposing Condition Pairs
 
-`timeseries_plot_settings.opposing_condition_pairs` is where you will set which conditions are symmetrical pairs if plotting both directions is set to 1. You can leave it empty (`timeseries_plot_settings.opposing_condition_pairs = [];`), in which case the software will assume the pairs are even/odd - 1-2, 3-4, 5-6, etc through the number of conditions in the experiment. However, you can pair conditions manually however you like. It should be laid out as a cell array. Each cell element should have a 1×2 array containing the condition numbers that make up that pair. So the number of cell array elements should match the number of pairs. Note that you can repeat conditions if multiple pairs if you have a more complicated matching scheme than 1 to 1.
+`timeseries_plot_settings.opposing_condition_pairs` is where you will set which conditions are symmetrical pairs if plotting both directions is set to `1`. You can leave it empty (`timeseries_plot_settings.opposing_condition_pairs = [];`), in which case the software will assume the pairs are even/odd - 1-2, 3-4, 5-6, etc through the number of conditions in the experiment. However, you can pair conditions manually however you like. It should be laid out as a cell array. Each cell element should have a 1×2 array containing the condition numbers that make up that pair. So the number of cell array elements should match the number of pairs. Note that you can repeat conditions if multiple pairs if you have a more complicated matching scheme than 1 to 1.
 
 __Example__:
 
@@ -550,7 +550,7 @@ timeseries_plot_settings.faLmR_pairs = [];
 
 ### `faLmR` Plot Both Directions
 
-`timeseries_plot_settings.faLmR_plot_both_directions`, similar to the [`LmR` version](#plot-both-directions), should be set to 1 if you plan on plotting two `faLmR` datasets on each axis, and set to `0` if you do not.
+`timeseries_plot_settings.faLmR_plot_both_directions`, similar to the [`LmR` version](#plot-both-directions), should be set to `1` if you plan on plotting two `faLmR` datasets on each axis, and set to `0` if you do not.
 
 ### `faLmR` Conditions {#faLmR-conditions}
 
@@ -647,7 +647,7 @@ __Note__: Each tuning curve must have the same number of conditions in it.
 
 ### Tuning curve condition name
 
-`TC_plot_settings.cond_name` serves the same function as the timeseries cond_name variable, but each title will be given to a tuning curve, rather than a condition, since each axis plots multiple conditions. If you want to assign custom subplot titles, create an array just like the timeseries cond_name array, giving a title to each subplot. Leave this empty (`TC_plot_settings.cond_name = [];`) if you would like default names to be created. Set to 0 if you would like no titles for each tuning curve.
+`TC_plot_settings.cond_name` serves the same function as the timeseries cond_name variable, but each title will be given to a tuning curve, rather than a condition, since each axis plots multiple conditions. If you want to assign custom subplot titles, create an array just like the timeseries cond_name array, giving a title to each subplot. Leave this empty (`TC_plot_settings.cond_name = [];`) if you would like default names to be created. Set to `0` if you would like no titles for each tuning curve.
 
 __Example__:
 
@@ -686,7 +686,7 @@ TC_plot_settings.xaxis_values = [1, 10, 100, 1000];
 
 ### Tuning curve plot both directions
 
-`TC_plot_settings.plot_both_directions` is more limited than the equivalent feature for timeseries. You can not set your own custom pairings. If this is set to 1, it will assume every condition is followed by its symmetric counterpart (meaning condition pairs are 1-2, 3-4, 5-6, etc). On each tuning curve axis, the software will take the conditions listed in `OL_TC_conds` for that axis, and add 1 to each number. It will then create a second tuning curve for those conditions and plot it on the same axis. So in the above example, the first tuning curve contains conditions 1, 3, 5, and 7. If this variable is set to 1, an additional tuning curve with conditions 2, 4, 6, and 8 will be plotted on that axis. If your conditions are not set up this way, then as of right now this feature will not be much use to you.
+`TC_plot_settings.plot_both_directions` is more limited than the equivalent feature for timeseries. You can not set your own custom pairings. If this is set to `1`, it will assume every condition is followed by its symmetric counterpart (meaning condition pairs are 1-2, 3-4, 5-6, etc). On each tuning curve axis, the software will take the conditions listed in `OL_TC_conds` for that axis, and add 1 to each number. It will then create a second tuning curve for those conditions and plot it on the same axis. So in the above example, the first tuning curve contains conditions 1, 3, 5, and 7. If this variable is set to `1`, an additional tuning curve with conditions 2, 4, 6, and 8 will be plotted on that axis. If your conditions are not set up this way, then as of right now this feature will not be much use to you.
 
 ## Settings for Position Series Plots - M and P
 
@@ -696,7 +696,7 @@ One type of plot you can generate are Motion-Dependent (M) and Position-Dependen
 
 ### Plot M and P
 
-`MP_plot_settings.plot_MandP` should be set to either 1 or 0. 1 indicates that you would like to generate M and P plots (which are only one type of position series plot) while 0 indicates you do not wish to generate these plots. If this setting is set to 0, you can ignore the rest of the `MP_plot_settings` structure.
+`MP_plot_settings.plot_MandP` should be set to either `1` or `0`. `1` indicates that you would like to generate M and P plots (which are only one type of position series plot) while `0` indicates you do not wish to generate these plots. If this setting is set to `0`, you can ignore the rest of the `MP_plot_settings` structure.
 
 ### M and P conditions
 
@@ -708,7 +708,7 @@ One type of plot you can generate are Motion-Dependent (M) and Position-Dependen
 
 ### M and P x axis range
 
-`MP_plot_settings.xaxis` should provide your xaxis range. Using the G4 arena, the standard x-axis would be [1:192] since there are 192 frames in our patterns. The x axis is position of the pattern on the arena screen so from left to right, there are 192 possible positions normally. However, if this is different for your set up or particular experiment, change this range to 1 through however many possible positions there are for your bar or pattern.
+`MP_plot_settings.xaxis` should provide your x-axis range. Using the G4 arena, the standard x-axis would be [1:192] since there are 192 frames in our patterns. The x axis is position of the pattern on the arena screen so from left to right, there are 192 possible positions normally. However, if this is different for your set up or particular experiment, change this range to `1` through however many possible positions there are for your bar or pattern.
 
 __Example__:
 
@@ -769,7 +769,7 @@ MP_plot_settings.figure_names = ["M", "P"];
 
 ### M and P show individual flies
 
-`MP_plot_settings.show_individual_flies`, much like previous versions of this setting, should be set to either 1 or 0. If it is 1, individual fly data will be plotted behind the average data. If it is set to 0, only the average for the group will be plotted.
+`MP_plot_settings.show_individual_flies`, much like previous versions of this setting, should be set to either `1` or `0`. If it is `1`, individual fly data will be plotted behind the average data. If it is set to `0`, only the average for the group will be plotted.
 
 ## Settings for other position series plots
 
@@ -841,11 +841,11 @@ pos_plot_settings.subplot_figure_title = ["Pos Series Conds 1-15"; Pos Series Co
 
 ### Position series show individual flies
 
-`pos_plot_settings.show_individual_flies`, like other settings of the same name, should be set to 0 if you only want to plot the average of all flies in the group, or 1 if you'd like to plot each individual fly's data behind the average.
+`pos_plot_settings.show_individual_flies`, like other settings of the same name, should be set to `0` if you only want to plot the average of all flies in the group, or `1` if you'd like to plot each individual fly's data behind the average.
 
 ### Position series plot opposing directions
 
-This setting is not yet implemented but will be in the coming weeks. `pos_plot_settings.plot_opposing_directions`, like [the timeseries version](#plot-both-directions), should be set to either 0 or 1. If it is set to 1, it will use the same pairings provided for the timeseries plots, so even if you are not plotting timeseries, make sure to fill out the pairings [as described above](#opposing-condition-pairs) if you want to plot symmetrical conditions on the same axis in your position series figures. Set this to 0 if you do not want to plot symmetrical conditions on the same axis.
+This setting is not yet implemented but will be in the coming weeks. `pos_plot_settings.plot_opposing_directions`, like [the timeseries version](#plot-both-directions), should be set to either `0` or `1`. If it is set to `1`, it will use the same pairings provided for the timeseries plots, so even if you are not plotting timeseries, make sure to fill out the pairings [as described above](#opposing-condition-pairs) if you want to plot symmetrical conditions on the same axis in your position series figures. Set this to `0` if you do not want to plot symmetrical conditions on the same axis.
 
 ## Settings for creating a comparison figure
 
@@ -967,7 +967,7 @@ comp_settings.figure_names = ...
 
 ### Comparison plot normalization
 
-`comp_settings.norm` should be set either to 0 or 1. 1 indicates you want all data plotted on the comparison plot to be normalized. 0 indicates you would like un-normalized data. As of yet there is no option to do both, and your `plot_norm_and_unnorm` setting from the timeseries section does not apply here.
+`comp_settings.norm` should be set either to `0` or `1`. `1` indicates you want all data plotted on the comparison plot to be normalized. `0` indicates you would like un-normalized data. As of yet there is no option to do both, and your `plot_norm_and_unnorm` setting from the timeseries section does not apply here.
 
 ## Further settings (which may not need changing as often)
 
