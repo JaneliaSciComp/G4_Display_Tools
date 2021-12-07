@@ -757,7 +757,7 @@ By default our lab leaves these values empty (`MP_plot_settings.ylimits = [];`).
 
 `MP_plot_settings.subplot_figure_title` works exactly like the timeseries `subplot_figure_title` variable. [See that section above](#Subplot-Figure-Titles) for a detailed explanation of how it works.
 
-### M and p figure names
+### M and P figure names
 
 `MP_plot_settings.figure_names` works just like `figure_names` for the timeseries plots, except that you will always have two sets of figures in this case - one for M plots and one for P plots (even if each of those are split among multiple figures, all M figures will have the same figure name). So you'll provide two strings which will be in the figure's title bar at the top.
 
