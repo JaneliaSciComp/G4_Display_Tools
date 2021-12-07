@@ -2467,7 +2467,9 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                 patLabel = 'Pattern';
                 frameLabel = 'Frame Number';
                 yax = [min(self.model.current_preview_file) max(self.model.current_preview_file)];
-                
+                if yax(1) == yax(2)
+                    yax = [yax(1)-1 yax(2) + 1];
+                end
                 if frame_rate == 1000
                     time_in_ms = length(self.model.current_preview_file(1,:));
                     

@@ -118,7 +118,7 @@ classdef G4_settings_model < handle
                 self.(self.list_of_settings_needed{i}) = strtrim(self.settings_data{path}(index:end));
             end
             
-            %Put all GID values for metadata tabs in the google sheet in a
+            %Put all GID values for metadata tabs in the Google Sheets in a
             %struct called gids, with fieldnames reflecting the metadata
             %field.
             if length(self.list_of_gid_strings) ~= length(self.list_of_metadata_fields)

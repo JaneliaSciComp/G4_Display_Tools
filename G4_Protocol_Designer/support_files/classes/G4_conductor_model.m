@@ -27,7 +27,10 @@ classdef G4_conductor_model < handle
        timestamp_
        aborted_count_
        date_folder_
+
        num_attempts_bad_conds_
+
+       postTrialTimes_
 
        
         
@@ -61,6 +64,8 @@ classdef G4_conductor_model < handle
         aborted_count
         date_folder
         num_attempts_bad_conds
+
+        postTrialTimes
        
     end
     
@@ -71,7 +76,7 @@ classdef G4_conductor_model < handle
 
         function self = G4_conductor_model()
             
-            %%User adjusted lists based on settings file and metadata google sheet
+            %%User adjusted lists based on settings file and metadata Google Sheets
             list_of_setting_strings = {'Default run protocol file: ', 'Default processing file: ', ...
                 'Default plotting file: ', 'Metadata Google Sheet key: '}; %These strings must match the string
             %preceding the corresponding value in the settings file -
@@ -123,6 +128,8 @@ classdef G4_conductor_model < handle
             self.date_folder = datestr(now, 'mm_dd_yyyy');
             self.timestamp = datestr(now, 'mm-dd-yyyy HH:MM:SS');
             self.num_attempts_bad_conds = 2;
+
+            self.postTrialTimes = [];
  
         end
         
@@ -139,7 +146,7 @@ classdef G4_conductor_model < handle
             
         end
 
-        %Get the index of a desired metadata heading from the google sheet------  
+        %Get the index of a desired metadata heading from the Google Sheets------  
         function create_metadata_options(self, list)
             
             for i = 1:length(list)
@@ -278,9 +285,16 @@ classdef G4_conductor_model < handle
             self.aborted_count = 0;
         end
         
+
         function set_num_attempts_bad_conds(self, new_val)
             self.num_attempts_bad_conds = new_val;
         end
+
+        function set_postTrialTimes(self, new_val)
+            self.postTrialTimes = new_val;
+        end
+        
+
         
         function value = get_num_attempts_bad_conds(self)
             value = self.num_attempts_bad_conds;
@@ -390,6 +404,9 @@ classdef G4_conductor_model < handle
         function value = get.num_attempts_bad_conds(self)
             value = self.num_attempts_bad_conds_;
         end
+        function value = get.postTrialTimes(self)
+            value = self.postTrialTimes_;
+        end
             
 
 
@@ -494,6 +511,10 @@ classdef G4_conductor_model < handle
         
         function set.num_attempts_bad_conds(self, value)
             self.num_attempts_bad_conds_ = value;
+        end
+
+        function set.postTrialTimes(self, value)
+            self.postTrialTimes_ = value;
         end
         
         

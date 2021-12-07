@@ -54,6 +54,7 @@ function [success] = G4_default_run_protocol_streaming(runcon, p)%input should a
 
 %% Get access to the figure and progress bar in the run gui IF it was passed in.
 global ctlr;
+postTrialTimes = [];
 
 %        fig = runcon.fig;
 if ~isempty(runcon.view)
@@ -263,11 +264,13 @@ end
 %% Start log---------------------------------------------------------
 
              Panel_com('start_log');
-             pause(1);
+             
 
 %% run pretrial if it exists----------------------------------------
-             tic;
+             startTime = tic;
+             
              if pre_start == 1
+                 prePreTrial = tic;
                  %First update the progress bar to show pretrial is running----
                  runcon.update_progress('pre');
                  num_trial_of_total = num_trial_of_total + 1;
@@ -324,8 +327,9 @@ end
                  pause(0.01);
                  
                  %clear cache of junk streaming data built up 
-                 tcpread = pnet(ctlr.tcpConn, 'read', 'noblock'); %clear cache
+                 %tcpread = pnet(ctlr.tcpConn, 'read', 'noblock'); %clear cache
                  
+                 postTrialTimes(end+1) = toc(prePreTrial);
                  %Run pretrial on screen
                  if pre_dur ~= 0
                     Panel_com('start_display', pre_dur);
@@ -337,8 +341,10 @@ end
                  end
              end
              
-             tcpread = pnet(ctlr.tcpConn, 'read', 'noblock'); % read data that's been streamed since clearing cache
+             postPretrial = tic;
              
+             tcpread = pnet(ctlr.tcpConn, 'read', 'noblock'); % read data that's been streamed since clearing cache
+%             Panel_com('stop_log');
 %              runcon.update_streamed_data(tcpread, 'pre'); %Function that updates feedback model
                                                    %and updates feedback
                                                    %gui
@@ -355,14 +361,17 @@ end
              
              end
              
-             runcon.update_elapsed_time(round(toc,2));
+             runcon.update_elapsed_time(round(toc(startTime),2));
              
+             
+             postTrialTimes(end+1) = toc(postPretrial);
 
 %% Loop to run the block/inter trials --------------------------------------
 
              for r = 1:reps
                  for c = 1:num_cond
                     %define which condition we're using
+                    preTrialTime = tic;
                     cond = p.exp_order(r,c);
                     
                     %Update the progress bar--------------------------
@@ -424,16 +433,22 @@ end
                     %Update status panel to show current parameters
                    runcon.update_current_trial_parameters(trial_mode, pat_id, pos_id, p.active_ao_channels, ...
                       trial_ao_indices, frame_ind, frame_rate, gain, offset, dur);
-            
- 
-                    pause(0.01)
+
                     
                     tcpread = pnet(ctlr.tcpConn, 'read', 'noblock'); % clear cache
                     
+                    postTrialTimes(end+1) = toc(preTrialTime);
+                    
+
                     %Run block trial--------------------------------------
-                    Panel_com('start_display', dur); %duration expected in 100ms units
-                    pause(dur + .01)
+
+                    Panel_com('start_display', dur + .5); %duration expected in 100ms units
+                    pause(dur)
+                    postTrialTime = tic;
+
+
                     tcpread = pnet(ctlr.tcpConn, 'read', 'noblock');
+
                     runcon.update_streamed_data(tcpread, 'block', r, c, num_trial_of_total);
                     isAborted = runcon.check_if_aborted();
                     if isAborted == 1
@@ -445,7 +460,8 @@ end
                         return;
                   
                     end
-                    runcon.update_elapsed_time(round(toc,2));
+                    runcon.update_elapsed_time(round(toc(startTime),2));
+                    postTrialTimes(end + 1) = toc(postTrialTime);
                     
                     %Tells loop to skip the intertrial if this is the last iteration of the last rep
                     if r == reps && c == num_cond
@@ -455,7 +471,9 @@ end
                     
         %Run inter-trial assuming there is one-------------------------
                     if inter_type == 1
-                    
+                        
+                        preInterTime = tic;
+                        
                         %Update progress bar to indicate start of inter-trial
                         num_trial_of_total = num_trial_of_total + 1;
                         runcon.update_progress('inter', r, reps, c, num_cond, num_trial_of_total)
@@ -498,10 +516,17 @@ end
                             inter_ao_ind, inter_frame_ind, inter_frame_rate, inter_gain, inter_offset, inter_dur);
                         
                          tcpread = pnet(ctlr.tcpConn, 'read', 'noblock'); % clear cache
-                         pause(0.01);
-                         Panel_com('start_display', inter_dur);
-                         pause(inter_dur + .01);
+                         %pause(0.01);
+                         
+                         postTrialTimes(end+1) = toc(preInterTime);
+                
+
+                         Panel_com('start_display', inter_dur + .5);
+                         pause(inter_dur);
+                         postIntertrial = tic;
+
                          tcpread = pnet(ctlr.tcpConn, 'read', 'noblock');
+
                          runcon.update_streamed_data(tcpread, 'inter', r, c, num_trial_of_total);
                          if runcon.check_if_aborted() == 1
                             Panel_com('stop_display');
@@ -514,7 +539,8 @@ end
                          
                          end
                          
-                         runcon.update_elapsed_time(round(toc,2));
+                         runcon.update_elapsed_time(round(toc(startTime),2));
+                         postTrialTimes(end + 1) = toc(postIntertrial);
                          
                     end 
                  end
@@ -731,6 +757,7 @@ end
 %% Run post-trial if there is one--------------------------------------------
 
             if post_type == 1
+                prePostTime = tic;
                 
                 %Update progress bar--------------------------
                 num_trial_of_total = num_trial_of_total + 1;
@@ -769,11 +796,18 @@ end
                      post_ao_ind, post_frame_ind, post_frame_rate, post_gain, post_offset, post_dur);
                 
                  tcpread = pnet(ctlr.tcpConn, 'read', 'noblock'); % clear cache
+                 
+                 postTrialTimes(end+1) = toc(prePostTime);
+
 
                  Panel_com('start_display',post_dur);
 
                  pause(post_dur);
-                 tcpread = pnet(ctlr.tcpConn, 'read', 'noblock');
+                 %tcpread = pnet(ctlr.tcpConn, 'read', 'noblock');
+                 postPosttrial = tic;
+                 
+            
+                pause(1);
 %                  runcon.update_streamed_data(tcpread, 'post');
                  if runcon.check_if_aborted() == 1
                     Panel_com('stop_display');
@@ -785,22 +819,27 @@ end
                     return;
                  
                  end
-                 runcon.update_elapsed_time(round(toc,2));
+                 runcon.update_elapsed_time(round(toc(startTime),2));
+                 
+                 postTrialTimes(end+1) = toc(postPosttrial);
                  
             end
 
             Panel_com('stop_display');
             
-            pause(1);
-
-            %Panel_com('stop_log');
             stop_log_response = send_tcp( char([1 hex2dec('40')]), 1);
             if stop_log_response.success == 1
                 waitfor(errordlg("Stop Log command failed, please stop log manually then hit a key"));
                 waitforbuttonpress;
             end
             
+            
             pause(1);
+            
+            runcon.model.set_postTrialTimes(postTrialTimes);
+
+            %Panel_com('stop_log');
+            
 
 
             disconnectHost;

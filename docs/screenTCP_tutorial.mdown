@@ -1,8 +1,0 @@
----
-title:  Use screens with only PControl - tutorial
-parent: PControl
-grand_parent: Generation 4
-nav_order: 1
----
-
-A tutorial on how to send commands to the screen without the Designer or Conductor. (coming soon)

@@ -1,0 +1,8 @@
+---
+title:  Tutorial - Set up data analysis
+parent: G4 Data Analysis
+grand_parent: Display Tools
+nav_order: 2
+---
+
+Tutorial on creating data analysis settings. Pre-requisite: Processing settings. (Coming soon)
