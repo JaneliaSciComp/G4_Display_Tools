@@ -558,7 +558,7 @@ end
             % listed as bad however many times indicated in the settings
             % (or a default of 2). A trial will only be re-run an
             % additional time if the first re-run also fails. 
-            
+            resTrialTime = tic;
              
             res_conds = runcon.fb_model.get_bad_trials();
             num_attempts = runcon.model.num_attempts_bad_conds;
@@ -652,9 +652,14 @@ end
                     
                     tcpread = pnet(ctlr.tcpConn, 'read', 'noblock'); % clear cache
                     
+                    postTrialTimes(end + 1) = toc(resTrialTime);
+                    
                     %Run block trial--------------------------------------
-                    Panel_com('start_display', dur); %duration expected in 100ms units
-                    pause(dur + .01)
+                    Panel_com('start_display', dur + .5); %duration expected in 100ms units
+                    pause(dur)
+                    
+                    resTrialPostTime = tic;
+                    
                     tcpread = pnet(ctlr.tcpConn, 'read', 'noblock');
                     runcon.update_streamed_data(tcpread, 'rescheduled', rep, cond, num_trial_including_rescheduled);
                     isAborted = runcon.check_if_aborted();
@@ -671,12 +676,16 @@ end
                     if badtrial == length(res_conds)
                         continue;
                     end
+                    
+                    postTrialTimes(end + 1) = toc(resTrialPostTime);
 
 
 
                     %run intertrial if there is one
                     
                     if inter_type == 1
+                        
+                        resPreInterTime = tic;
                     
                         %Update progress bar to indicate start of inter-trial
                         num_trial_including_rescheduled = num_trial_including_rescheduled + 1;
@@ -721,8 +730,13 @@ end
                         
                          tcpread = pnet(ctlr.tcpConn, 'read', 'noblock'); % clear cache
                          pause(0.01);
-                         Panel_com('start_display', inter_dur);
-                         pause(inter_dur + .01);
+                         
+                         postTrialTimes(end+1) = toc(resPreInterTime);
+                         
+                         Panel_com('start_display', inter_dur + .5);
+                         pause(inter_dur);
+                         
+                         resPostIntertrial = tic;
                          tcpread = pnet(ctlr.tcpConn, 'read', 'noblock');
                          runcon.update_streamed_data(tcpread, 'inter', rep, cond, num_trial_including_rescheduled);
                          if runcon.check_if_aborted() == 1
@@ -737,6 +751,8 @@ end
                          end
                          
                          runcon.update_elapsed_time(round(toc,2));
+                         
+                         postTrialTimes(end+1) = toc(resPostIntertrial);
                          
                     end
 
