@@ -1,5 +1,6 @@
-function [start_idx, stop_idx, start_times, stop_times] = get_start_stop_times(Log, command_string, manual_first_start)
-    
+function [start_idx, stop_idx, start_times, stop_times] = get_start_stop_times(Log, ...
+    command_string, manual_first_start)
+
 start_idx = strcmpi(Log.Commands.Name,command_string);
 start_times = Log.Commands.Time(start_idx);
 %stop_idx = strcmpi(Log.Commands.Name,'Stop-Display');
