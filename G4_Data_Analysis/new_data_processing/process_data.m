@@ -91,7 +91,7 @@ function process_data(exp_folder, processing_settings_file)
     num_ts_datatypes = length(channel_order);
     num_ADC_chans = length(Log.ADC.Channels);
     
-%    timing_file = fullfile(exp_folder, 'times_between_trials.mat');
+
     metadata_file = fullfile(exp_folder, 'metadata.mat');
     
 
