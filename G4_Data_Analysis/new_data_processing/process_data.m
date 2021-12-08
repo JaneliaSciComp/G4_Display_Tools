@@ -91,14 +91,10 @@ function process_data(exp_folder, processing_settings_file)
     num_ts_datatypes = length(channel_order);
     num_ADC_chans = length(Log.ADC.Channels);
     
-    timing_file = fullfile(exp_folder, 'times_between_trials.mat');
+%    timing_file = fullfile(exp_folder, 'times_between_trials.mat');
     metadata_file = fullfile(exp_folder, 'metadata.mat');
     
-    if isfile(timing_file)
-        load(timing_file);
-    else
-        postTrialTimes = {};
-    end
+
     
     % Metadata file contains list of conditions that were bad the first
     % time and re-run.
@@ -118,6 +114,7 @@ function process_data(exp_folder, processing_settings_file)
     %conditions and reps
     [exp_order, num_conds, num_reps] = get_exp_order(exp_folder);
 
+
     % Determine the start and stop times of each trial (if we want to create a
     % different method of doing this, just write a new module and plug it in
     % here)
@@ -134,18 +131,10 @@ function process_data(exp_folder, processing_settings_file)
     %get order of pattern IDs (maybe use for error-checking?)
     [modeID_order, patternID_order] = get_modeID_order(combined_command, Log, times.origin_start_idx);
     
-   
-    
-    % Use the data from the loaded timing file to remove erroneous data
-    % from the log that was collected in between conditions while the data
-    % streaming stuff ran. Each element in postTrialTimes gives the number
-    % of seconds (usually .2 - .3) that elapsed between conditions while
-    % the log was still running. Go to the start time of each trial in the
-    % log, and remove the data just previous to it covering the amount of
-    % time indicated in postTrialTimes
-    if ~isempty(postTrialTimes)
-        [Log, stop_times] = remove_excess_time(Log, start_times, stop_times, trial_options, postTrialTimes, time_conv, pre_dur);
-    end
+
+    %load the order in which conditions were run, as well as the number of
+    %conditions and reps
+    [exp_order, num_conds, num_reps] = get_exp_order(exp_folder);
 
     %Determine start and stop times for different trial types (pre, inter,
     %regular)
