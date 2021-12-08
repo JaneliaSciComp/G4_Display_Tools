@@ -558,7 +558,6 @@ end
             % listed as bad however many times indicated in the settings
             % (or a default of 2). A trial will only be re-run an
             % additional time if the first re-run also fails. 
-            resTrialTime = tic;
              
             res_conds = runcon.fb_model.get_bad_trials();
             num_attempts = runcon.model.num_attempts_bad_conds;
@@ -581,7 +580,7 @@ end
                 runcon.fb_model.set_bad_trials_before_reruns();
             
                 for badtrial = 1:length(res_conds)
-
+                    resTrialTime = tic;
                     cond = res_conds{badtrial}(1);
                     rep = res_conds{badtrial}(2);
                     
@@ -672,12 +671,13 @@ end
                         return;
                   
                     end
-                    runcon.update_elapsed_time(round(toc,2));
+                    runcon.update_elapsed_time(round(toc(startTime),2));
+                    postTrialTimes(end + 1) = toc(resTrialPostTime);
                     if badtrial == length(res_conds)
                         continue;
                     end
                     
-                    postTrialTimes(end + 1) = toc(resTrialPostTime);
+                   
 
 
 
@@ -750,7 +750,7 @@ end
                          
                          end
                          
-                         runcon.update_elapsed_time(round(toc,2));
+                         runcon.update_elapsed_time(round(toc(startTime),2));
                          
                          postTrialTimes(end+1) = toc(resPostIntertrial);
                          

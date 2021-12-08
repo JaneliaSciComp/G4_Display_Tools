@@ -80,7 +80,7 @@ function [Log, stop_times] = remove_excess_time(Log, start_times, stop_times, tr
 %                 Log.ADC.Volts(chan, ind1:ind2) = [];
 % 
 %             end
-            if time > 1
+            if time > start_cond
                stop_times(time-1) = Log.ADC.Time(1, ind1-1);
             end
             

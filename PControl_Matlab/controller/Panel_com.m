@@ -1,4 +1,4 @@
-function Panel_com(command, argument)
+function reply = Panel_com(command, argument)
 
 %   Sends commands out to the panels
 %  ARGUMENTS MUST BE ROW VECTORS
