@@ -1,16 +1,19 @@
 function [times] = separate_originals_from_reruns(start_times, ...
     stop_times, start_idx, trial_options, trials_rerun, num_conds, num_reps, frame_movement_start_times)
    
-   num_trials = num_conds*num_reps; 
+    num_trials = num_conds*num_reps; 
    
-   total_original_trials = num_trials + trial_options(1) + trial_options(3) + ((num_trials-1)*trial_options(2)); 
-    
-   total_rerun_trials = length(trials_rerun) + (length(trials_rerun)-1)*trial_options(2);
+    total_original_trials = num_trials + trial_options(1) + trial_options(3) + ((num_trials-1)*trial_options(2)); 
+    if length(trials_rerun) ~= 0
+        total_rerun_trials = length(trials_rerun) + (length(trials_rerun)-1)*trial_options(2);
+    else
+        total_rerun_trials = 0;
+    end
    
-   assert(total_original_trials + total_rerun_trials == length(start_times),...
+    assert(total_original_trials + total_rerun_trials == length(start_times),...
        'The total rerun trials and original trials do not add up to the number of trials detected.');
    
-   if length(start_times) > total_original_trials
+    if length(start_times) > total_original_trials
        
        % Set origin_start_times, stop times, and stop idx to reflect only
        % the times of the original trials
@@ -44,7 +47,7 @@ function [times] = separate_originals_from_reruns(start_times, ...
            rerun_movement_start_times(rerun) = frame_movement_start_times(idx);
        end
        
-   else
+    else
        
        origin_start_times = start_times;
        origin_stop_times = stop_times;
@@ -57,16 +60,17 @@ function [times] = separate_originals_from_reruns(start_times, ...
        rerun_movement_start_times = [];
        
        
-   end
+       
+    end
    
-   times = struct;
-   times.origin_start_times = origin_start_times;
-   times.origin_stop_times = origin_stop_times;
-   times.origin_start_idx = origin_start_idx;
-   times.origin_movement_start_times = origin_movement_start_times;
-   times.rerun_start_times = rerun_start_times;
-   times.rerun_stop_times = rerun_stop_times;
-   times.rerun_start_idx = rerun_start_idx;
-   times.rerun_movement_start_times = rerun_movement_start_times;
+    times = struct;
+    times.origin_start_times = origin_start_times;
+    times.origin_stop_times = origin_stop_times;
+    times.origin_start_idx = origin_start_idx;
+    times.origin_movement_start_times = origin_movement_start_times;
+    times.rerun_start_times = rerun_start_times;
+    times.rerun_stop_times = rerun_stop_times;
+    times.rerun_start_idx = rerun_start_idx;
+    times.rerun_movement_start_times = rerun_movement_start_times;
    
 end

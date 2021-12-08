@@ -104,8 +104,14 @@ function process_data(exp_folder, processing_settings_file)
     % time and re-run.
     if isfile(metadata_file)
         load(metadata_file)
+        if isfield(metadata, 'trials_rerun')
+            trials_rerun = metadata.trials_rerun;
+        else
+            trials_rerun = [];
+        end
     else
         metadata = {};
+        trials_rerun = [];
     end
     
      %load the order in which conditions were run, as well as the number of
@@ -123,7 +129,7 @@ function process_data(exp_folder, processing_settings_file)
     % start idx, and movement times for the original trials and the rerun
     % trials. 
     times = separate_originals_from_reruns(start_times, stop_times, start_idx, ...
-        trial_options, metadata.trials_rerun, num_conds, num_reps, frame_movement_start_times);
+        trial_options, trials_rerun, num_conds, num_reps, frame_movement_start_times);
     
     %get order of pattern IDs (maybe use for error-checking?)
     [modeID_order, patternID_order] = get_modeID_order(combined_command, Log, times.origin_start_idx);
@@ -147,7 +153,7 @@ function process_data(exp_folder, processing_settings_file)
     [num_trials, trial_start_times, trial_stop_times, ...
     trial_move_start_times,trial_modes, intertrial_start_times, intertrial_stop_times, ...
     intertrial_durs, times] = get_trial_startStop(exp_order, trial_options, ...
-    times, modeID_order, time_conv, metadata.trials_rerun);
+    times, modeID_order, time_conv, trials_rerun);
 
     %organize trial duration and control mode by condition/repetition
     [cond_dur, cond_modes,  cond_frame_move_time] = organize_durations_modes(num_conds, num_reps, ...

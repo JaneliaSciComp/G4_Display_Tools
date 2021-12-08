@@ -34,9 +34,19 @@ function [num_trials, trial_start_times, trial_stop_times,trial_move_start_times
         trial_move_start_times = frame_movement_start_times(trial_start_ind:2:trial_end_ind);
         trial_modes = modeID_order(trial_start_ind:2:trial_end_ind);
         
-        rerun_trial_start_times = rerun_start_times(1:2:end);
-        rerun_trial_stop_times = rerun_stop_times(1:2:end);
-        rerun_trial_move_start_times = rerun_movement_start_times(1:2:end);
+        if ~isempty(rerun_start_times)
+            rerun_trial_start_times = rerun_start_times(1:2:end);
+            rerun_trial_stop_times = rerun_stop_times(1:2:end);
+            rerun_trial_move_start_times = rerun_movement_start_times(1:2:end);
+            rerun_intertrial_start_times = rerun_start_times(2:2:end-1);
+            rerun_intertrial_stop_times = rerun_stop_times(2:2:end-1);
+        else
+            rerun_trial_start_times = [];
+            rerun_trial_stop_times = [];
+            rerun_trial_move_start_times = [];
+            rerun_intertrial_start_times = [];
+            rerun_intertrial_stop_times = [];
+        end
 
         %get start times/modes of intertrials
         intertrial_start_times = start_times(trial_start_ind+1:2:trial_end_ind-1);
@@ -45,10 +55,7 @@ function [num_trials, trial_start_times, trial_stop_times,trial_move_start_times
         intertrial_durs = double(intertrial_stop_times - intertrial_start_times)/time_conv;
         assert(all(intertrial_modes-intertrial_modes(1)==0),...
             'unexpected order of trials and intertrials - check that pre-trial, post-trial, and intertrial options are correct')
-        
-        rerun_intertrial_start_times = rerun_start_times(2:2:end-1);
-        rerun_intertrial_stop_times = rerun_stop_times(2:2:end-1);
-        
+
     else
         %get start times/modes of trials
         trial_start_times = start_times(trial_start_ind:trial_end_ind);
@@ -58,6 +65,19 @@ function [num_trials, trial_start_times, trial_stop_times,trial_move_start_times
         intertrial_start_times = [];
         intertrial_stop_times = [];
         intertrial_durs = [];
+        
+        if ~isempty(rerun_start_times)
+            rerun_trial_start_times = rerun_start_times;
+            rerun_trial_stop_times = rerun_stop_times;
+            rerun_trial_move_start_times = rerun_movement_start_times;
+        else
+            rerun_trial_start_times = [];
+            rerun_trial_stop_times = [];
+            rerun_trial_move_start_times = [];
+        end
+        rerun_intertrial_start_times = [];
+        rerun_intertrial_stop_times = [];
+            
     end
     
     
