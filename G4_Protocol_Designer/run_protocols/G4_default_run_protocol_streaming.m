@@ -54,6 +54,7 @@ function [success] = G4_default_run_protocol_streaming(runcon, p)%input should a
 
 %% Get access to the figure and progress bar in the run gui IF it was passed in.
 global ctlr;
+tcpread = {};
 
 
 %        fig = runcon.fig;
@@ -270,7 +271,6 @@ end
              startTime = tic;
              
              if pre_start == 1
-                 prePreTrial = tic;
                  %First update the progress bar to show pretrial is running----
                  runcon.update_progress('pre');
                  num_trial_of_total = num_trial_of_total + 1;
@@ -329,7 +329,6 @@ end
                  %clear cache of junk streaming data built up 
                  %tcpread = pnet(ctlr.tcpConn, 'read', 'noblock'); %clear cache
                  
-                 postTrialTimes(end+1) = toc(prePreTrial);
                  %Run pretrial on screen
                  if pre_dur ~= 0
                     Panel_com('start_display', pre_dur);
@@ -342,7 +341,7 @@ end
              end
              
              
-             tcpread = pnet(ctlr.tcpConn, 'read', 'noblock'); % read data that's been streamed since clearing cache
+             tcpread{end+1} = pnet(ctlr.tcpConn, 'read', 'noblock'); % read data that's been streamed since clearing cache
 %             Panel_com('stop_log');
 %              runcon.update_streamed_data(tcpread, 'pre'); %Function that updates feedback model
                                                    %and updates feedback
@@ -369,10 +368,9 @@ end
              for r = 1:reps
                  for c = 1:num_cond
                     %define which condition we're using
-                    preTrialTime = tic;
                     cond = p.exp_order(r,c);
                     
-                    %Update the progress bar--------------------------
+                    
                     num_trial_of_total = num_trial_of_total + 1;
                     
 
@@ -427,30 +425,39 @@ end
                         Panel_com('set_ao_function_id',[p.active_ao_channels(i), trial_ao_indices(i)]);
                         
                     end
-                    
-                    
 
-                    
-                    tcpread = pnet(ctlr.tcpConn, 'read', 'noblock'); % clear cache
-                    
-                    postTrialTimes(end+1) = toc(preTrialTime);
-                    
+                    tcpread_cache = pnet(ctlr.tcpConn, 'read', 'noblock'); % clear cache
+                                        
 
                     %Run block trial--------------------------------------
 
                     Panel_com('start_display', dur + .5); %duration expected in 100ms units
                     timeSinceTrial = tic;
                     
+                    %Update the progress bar--------------------------
                     runcon.update_progress('block', r, reps, c, num_cond, cond, num_trial_of_total);
                     %Update status panel to show current parameters
-                   runcon.update_current_trial_parameters(trial_mode, pat_id, pos_id, p.active_ao_channels, ...
+                    runcon.update_current_trial_parameters(trial_mode, pat_id, pos_id, p.active_ao_channels, ...
                       trial_ao_indices, frame_ind, frame_rate, gain, offset, dur);
-                    runcon.update_streamed_data(tcpread, 'block', r, c, num_trial_of_total);
-                    
+                   % Update plots showing previous trials data-----------
+                    if r ~= 1 || c ~= 1
+                        if inter_type
+                            runcon.update_streamed_data(tcpread{end}, 'inter', prev_r, prev_c, prev_num_trials);
+                        else
+                            runcon.update_streamed_data(tcpread{end}, 'block', prev_r, prev_c, prev_num_trials);
+                        end
+                    end
+                    %pause for however much time is left after doing updates
                     pause(dur - toc(timeSinceTrial));
 
 
-                    tcpread = pnet(ctlr.tcpConn, 'read', 'noblock');
+                    tcpread{end+1} = pnet(ctlr.tcpConn, 'read', 'noblock');
+                    
+                    % Save values of this trial so they can be used in next
+                    % streaming update
+                    prev_c = c;
+                    prev_r = r;
+                    prev_num_trials = num_trial_of_total;
 
                     
                     isAborted = runcon.check_if_aborted();
@@ -474,7 +481,6 @@ end
         %Run inter-trial assuming there is one-------------------------
                     if inter_type == 1
                         
-                        preInterTime = tic;
                         
                         %Update progress bar to indicate start of inter-trial
                         num_trial_of_total = num_trial_of_total + 1;
@@ -515,10 +521,9 @@ end
                          
                          
                         
-                         tcpread = pnet(ctlr.tcpConn, 'read', 'noblock'); % clear cache
+                         tcpread_cache = pnet(ctlr.tcpConn, 'read', 'noblock'); % clear cache
                          %pause(0.01);
                          
-                         postTrialTimes(end+1) = toc(preInterTime);
                 
 
                          Panel_com('start_display', inter_dur + .5);
@@ -528,13 +533,14 @@ end
                           %Update status panel to show current parameters
                         runcon.update_current_trial_parameters(inter_mode, inter_pat, inter_pos, p.active_ao_channels, ...
                             inter_ao_ind, inter_frame_ind, inter_frame_rate, inter_gain, inter_offset, inter_dur);
-                         runcon.update_streamed_data(tcpread, 'inter', r, c, num_trial_of_total);
+                         runcon.update_streamed_data(tcpread{end}, 'block', r, c, prev_num_trials);
                          
                          pause(inter_dur - toc(timeSinceInter));
 
-                         tcpread = pnet(ctlr.tcpConn, 'read', 'noblock');
+                         tcpread{end+1} = pnet(ctlr.tcpConn, 'read', 'noblock');
+                         prev_num_trials = num_trial_of_total;
+                         
 
-                         runcon.update_streamed_data(tcpread, 'inter', r, c, num_trial_of_total);
                          if runcon.check_if_aborted() == 1
                             Panel_com('stop_display');
                             pause(.1);
@@ -568,15 +574,7 @@ end
             res_conds = runcon.fb_model.get_bad_trials();
             num_attempts = runcon.model.num_attempts_bad_conds;
             num_trial_including_rescheduled = num_trial_of_total;
-            
-            %No intertrial at end of regular block trials, so do one now, assuming the protocol has intertrials 
-            if ~isempty(res_conds) && inter_type == 1
-                
-                % run intertrial
-                
-                num_trial_including_rescheduled = num_trial_including_rescheduled + 1;
-                
-            end
+
             
             for attempt = 1:num_attempts
                 
@@ -584,15 +582,84 @@ end
             %the model so we can track how many extra conditions are run
             %total
                 runcon.fb_model.set_bad_trials_before_reruns();
+                
+                %No intertrial at end of regular block trials, so do one now, assuming the protocol has intertrials 
+                if ~isempty(res_conds) && inter_type == 1
+                
+                    %Update progress bar to indicate start of inter-trial
+                    num_trial_including_rescheduled = num_trial_including_rescheduled + 1;
+
+                    %Run intertrial-------------------------
+                    Panel_com('set_control_mode',inter_mode);
+
+                    Panel_com('set_pattern_id', inter_pat);
+
+                    %randomize frame index if indicated
+                    if inter_frame_ind == 0
+                        inter_frame_ind = randperm(p.num_intertrial_frames, 1);
+                    end
+                    Panel_com('set_position_x',inter_frame_ind);
+
+
+                    if inter_pos ~= 0
+                        Panel_com('set_pattern_func_id', inter_pos);
+
+                    end
+
+                     if ~isempty(inter_gain) %this assumes you'll never have gain without offset
+                         Panel_com('set_gain_bias', [inter_gain, inter_offset]);
+                     end
+
+                     if inter_mode == 2
+                         Panel_com('set_frame_rate', inter_frame_rate);
+                     end
+
+                     for i = 1:length(inter_ao_ind)
+                         if inter_ao_ind(i) ~= 0 %if it is zero, there was no ao function for this channel
+                             Panel_com('set_ao_function_id',[p.active_ao_channels(i), inter_ao_ind(i)]);%[channel number, index of ao func]
+
+                         end
+                     end
+
+                     tcpread_cache = pnet(ctlr.tcpConn, 'read', 'noblock'); % clear cache
+                     %pause(0.01);
+
+                     Panel_com('start_display', inter_dur + .5);
+                     timeSinceInter = tic;
+
+                     runcon.update_progress('inter', r, reps, c, num_cond, num_trial_of_total)
+                      %Update status panel to show current parameters
+                    runcon.update_current_trial_parameters(inter_mode, inter_pat, inter_pos, p.active_ao_channels, ...
+                        inter_ao_ind, inter_frame_ind, inter_frame_rate, inter_gain, inter_offset, inter_dur);
+                     runcon.update_streamed_data(tcpread{end}, 'block', prev_r, prev_c, prev_num_trials);
+
+                     pause(inter_dur - toc(timeSinceInter));
+
+                     tcpread{end+1} = pnet(ctlr.tcpConn, 'read', 'noblock');
+                     prev_num_trials = num_trial_including_rescheduled;
+
+
+                     if runcon.check_if_aborted() == 1
+                        Panel_com('stop_display');
+                        pause(.1);
+                        Panel_com('stop_log');
+                        pause(1);
+                        disconnectHost;
+                        success = 0;
+                        return;
+
+                     end
+
+                     runcon.update_elapsed_time(round(toc(startTime),2));
+                end
             
                 for badtrial = 1:length(res_conds)
-                    resTrialTime = tic;
                     cond = res_conds{badtrial}(1);
                     rep = res_conds{badtrial}(2);
                     
                     % update the progress bar
                     
-                    runcon.update_progress('rescheduled', cond, num_trial_of_total);
+                    
                     num_trial_including_rescheduled = num_trial_including_rescheduled + 1;
 
                     % run that condition
@@ -648,25 +715,36 @@ end
                         
                     end
                     
-                    %Update status panel to show current parameters
-                   runcon.update_current_trial_parameters(trial_mode, pat_id, pos_id, p.active_ao_channels, ...
-                      trial_ao_indices, frame_ind, frame_rate, gain, offset, dur);
+                    
             
  
                     pause(0.01)
                     
-                    tcpread = pnet(ctlr.tcpConn, 'read', 'noblock'); % clear cache
+                    tcpread_cache = pnet(ctlr.tcpConn, 'read', 'noblock'); % clear cache
                     
-                    postTrialTimes(end + 1) = toc(resTrialTime);
                     
                     %Run block trial--------------------------------------
                     Panel_com('start_display', dur + .5); %duration expected in 100ms units
-                    pause(dur)
+                    timeSinceRes = tic;
                     
-                    resTrialPostTime = tic;
+                    runcon.update_progress('rescheduled', cond, num_trial_of_total);
+                    %Update status panel to show current parameters
+                   runcon.update_current_trial_parameters(trial_mode, pat_id, pos_id, p.active_ao_channels, ...
+                      trial_ao_indices, frame_ind, frame_rate, gain, offset, dur);
+                    if inter_type
+                        runcon.update_streamed_data(tcpread{end}, 'inter', prev_r, prev_c, prev_num_trials);
+                    else
+                        runcon.update_streamed_data(tcpread{end}, 'rescheduled', prev_r, prev_c, prev_num_trials);
+                    end
                     
-                    tcpread = pnet(ctlr.tcpConn, 'read', 'noblock');
-                    runcon.update_streamed_data(tcpread, 'rescheduled', rep, cond, num_trial_including_rescheduled);
+                    pause(dur - toc(timeSinceRes));
+                   
+                    
+                    tcpread{end+1} = pnet(ctlr.tcpConn, 'read', 'noblock');
+                    prev_r = rep;
+                    prev_c = cond;
+                    prev_num_trials = num_trial_including_rescheduled;
+                    
                     isAborted = runcon.check_if_aborted();
                     if isAborted == 1
                         Panel_com('stop_display');
@@ -678,20 +756,14 @@ end
                   
                     end
                     runcon.update_elapsed_time(round(toc(startTime),2));
-                    postTrialTimes(end + 1) = toc(resTrialPostTime);
+
                     if badtrial == length(res_conds)
                         continue;
                     end
-                    
-                   
-
-
-
                     %run intertrial if there is one
                     
                     if inter_type == 1
                         
-                        resPreInterTime = tic;
                     
                         %Update progress bar to indicate start of inter-trial
                         num_trial_including_rescheduled = num_trial_including_rescheduled + 1;
@@ -729,22 +801,22 @@ end
                                  
                              end
                          end
+
+                         tcpread_cache = pnet(ctlr.tcpConn, 'read', 'noblock'); % clear cache
                          
+                         Panel_com('start_display', inter_dur + .5);
+                         
+                         timeSinceResInter = tic;
                           %Update status panel to show current parameters
                         runcon.update_current_trial_parameters(inter_mode, inter_pat, inter_pos, p.active_ao_channels, ...
                             inter_ao_ind, inter_frame_ind, inter_frame_rate, inter_gain, inter_offset, inter_dur);
-                        
-                         tcpread = pnet(ctlr.tcpConn, 'read', 'noblock'); % clear cache
-                         pause(0.01);
+                         runcon.update_streamed_data(tcpread{end}, 'rescheduled', prev_r, prev_c, prev_num_trials);
                          
-                         postTrialTimes(end+1) = toc(resPreInterTime);
+                         pause(inter_dur - toc(timeSinceResInter));
                          
-                         Panel_com('start_display', inter_dur + .5);
-                         pause(inter_dur);
+                         tcpread{end+1} = pnet(ctlr.tcpConn, 'read', 'noblock');
+                         prev_num_trials = num_trial_including_rescheduled;
                          
-                         resPostIntertrial = tic;
-                         tcpread = pnet(ctlr.tcpConn, 'read', 'noblock');
-                         runcon.update_streamed_data(tcpread, 'inter', rep, cond, num_trial_including_rescheduled);
                          if runcon.check_if_aborted() == 1
                             Panel_com('stop_display');
                             pause(.1);
@@ -756,15 +828,9 @@ end
                          
                          end
                          
-                         runcon.update_elapsed_time(round(toc(startTime),2));
-                         
-                         postTrialTimes(end+1) = toc(resPostIntertrial);
+                         runcon.update_elapsed_time(round(toc(startTime),2));                  
                          
                     end
-
-
-
-
 
                 end
                 
@@ -779,13 +845,11 @@ end
 %% Run post-trial if there is one--------------------------------------------
 
             if post_type == 1
-                prePostTime = tic;
                 
                 %Update progress bar--------------------------
+                num_trial_including_rescheduled = num_trial_including_rescheduled + 1;
                 num_trial_of_total = num_trial_of_total + 1;
-                runcon.update_progress('post', num_trial_of_total);
-
-
+                
                  Panel_com('set_control_mode', post_mode);
                  
                  Panel_com('set_pattern_id', post_pat);
@@ -813,18 +877,27 @@ end
                      end
                  end
                  
-                  %Update status panel to show current parameters
-                 runcon.update_current_trial_parameters(post_mode, post_pat, post_pos, p.active_ao_channels, ...
-                     post_ao_ind, post_frame_ind, post_frame_rate, post_gain, post_offset, post_dur);
+                  
                 
-                 tcpread = pnet(ctlr.tcpConn, 'read', 'noblock'); % clear cache
+                 tcpread_cache = pnet(ctlr.tcpConn, 'read', 'noblock'); % clear cache
                  
-                 postTrialTimes(end+1) = toc(prePostTime);
 
 
                  Panel_com('start_display',post_dur);
-
-                 pause(post_dur);
+                 timeSincePost = tic;
+                 runcon.update_progress('post', num_trial_of_total);
+                 
+                 %Update status panel to show current parameters
+                 runcon.update_current_trial_parameters(post_mode, post_pat, post_pos, p.active_ao_channels, ...
+                     post_ao_ind, post_frame_ind, post_frame_rate, post_gain, post_offset, post_dur);
+                 
+                 if num_trial_including_rescheduled > num_trial_of_total
+                     runcon.update_streamed_data(tcpread{end}, 'rescheduled', prev_r, prev_c, prev_num_trials);
+                 else
+                     runcon.update_streamed_data(tcpread{end}, 'block', prev_r, prev_c, prev_num_trials);
+                 end
+                     
+                 pause(post_dur - toc(timeSincePost));
                  %tcpread = pnet(ctlr.tcpConn, 'read', 'noblock');
                  
             
@@ -842,7 +915,6 @@ end
                  end
                  runcon.update_elapsed_time(round(toc(startTime),2));
                  
-                 postTrialTimes(end+1) = toc(postPosttrial);
                  
             end
 
@@ -853,15 +925,7 @@ end
                 waitfor(errordlg("Stop Log command failed, please stop log manually then hit a key"));
                 waitforbuttonpress;
             end
-
-            
             pause(1);
-            
-
-            %Panel_com('stop_log');
-            
-
-
             disconnectHost;
             
             pause(1);

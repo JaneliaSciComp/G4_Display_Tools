@@ -661,7 +661,6 @@ classdef G4_conductor_controller < handle
                 pause(.5);
                 
                 self.create_metadata_file();
- %               self.create_timing_file();
                 
                  %Clear out live feedback panel
                 self.fb_model = feedback_model(self.doc);
@@ -710,7 +709,6 @@ classdef G4_conductor_controller < handle
             
             %create .mat file of metadata
             self.create_metadata_file();
- %           self.create_timing_file(fly_results_folder);
             
              %Clear out live feedback panel
             self.fb_model = feedback_model(self.doc);
