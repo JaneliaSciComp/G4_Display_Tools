@@ -137,7 +137,9 @@ function process_data(exp_folder, processing_settings_file)
     [exp_order, num_conds, num_reps] = get_exp_order(exp_folder);
 
     %Determine start and stop times for different trial types (pre, inter,
-    %regular)
+    %regular). This also replaces start/stop times of trials marked as bad
+    %during streaming with the start/stop times of the final re-run of that
+    %trial so the correct data will be pulled later1`
 
     [num_trials, trial_start_times, trial_stop_times, ...
     trial_move_start_times,trial_modes, intertrial_start_times, intertrial_stop_times, ...

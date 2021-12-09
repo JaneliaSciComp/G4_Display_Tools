@@ -5,7 +5,7 @@ function [times] = separate_originals_from_reruns(start_times, ...
    
     total_original_trials = num_trials + trial_options(1) + trial_options(3) + ((num_trials-1)*trial_options(2)); 
     if length(trials_rerun) ~= 0
-        total_rerun_trials = length(trials_rerun) + (length(trials_rerun)-1)*trial_options(2);
+        total_rerun_trials = length(trials_rerun) + (length(trials_rerun)-1)*trial_options(2)+1;
     else
         total_rerun_trials = 0;
     end
