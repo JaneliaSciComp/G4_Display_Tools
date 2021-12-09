@@ -399,16 +399,16 @@ end
                     dur = block_trials{cond, 12};
                      
                     %Update panel_com-----------------------------
-                    Panel_com('set_control_mode', trial_mode)
+                    Panel_com('set_control_mode', trial_mode);
                     
-                    Panel_com('set_pattern_id', pat_id)
+                    Panel_com('set_pattern_id', pat_id);
                     
                     if ~isempty(block_trials{cond,10})
                         Panel_com('set_gain_bias', [gain, offset]);
                     end
                     if pos_id ~= 0
 
-                        Panel_com('set_pattern_func_id', pos_id)
+                        Panel_com('set_pattern_func_id', pos_id);
                         
                     end
                     if trial_mode == 2
@@ -529,7 +529,7 @@ end
                          Panel_com('start_display', inter_dur + .5);
                          timeSinceInter = tic;
                          
-                         runcon.update_progress('inter', r, reps, c, num_cond, num_trial_of_total)
+                         runcon.update_progress('inter', r, reps, c, num_cond, num_trial_of_total);
                           %Update status panel to show current parameters
                         runcon.update_current_trial_parameters(inter_mode, inter_pat, inter_pos, p.active_ao_channels, ...
                             inter_ao_ind, inter_frame_ind, inter_frame_rate, inter_gain, inter_offset, inter_dur);
@@ -627,7 +627,7 @@ end
                      Panel_com('start_display', inter_dur + .5);
                      timeSinceInter = tic;
 
-                     runcon.update_progress('inter', r, reps, c, num_cond, num_trial_of_total)
+                     runcon.update_progress('inter', r, reps, c, num_cond, num_trial_of_total);
                       %Update status panel to show current parameters
                     runcon.update_current_trial_parameters(inter_mode, inter_pat, inter_pos, p.active_ao_channels, ...
                         inter_ao_ind, inter_frame_ind, inter_frame_rate, inter_gain, inter_offset, inter_dur);
@@ -688,16 +688,16 @@ end
                     dur = block_trials{cond, 12};
                      
                     %Update panel_com-----------------------------
-                    Panel_com('set_control_mode', trial_mode)
+                    Panel_com('set_control_mode', trial_mode);
                     
-                    Panel_com('set_pattern_id', pat_id)
+                    Panel_com('set_pattern_id', pat_id);
                     
                     if ~isempty(block_trials{cond,10})
                         Panel_com('set_gain_bias', [gain, offset]);
                     end
                     if pos_id ~= 0
 
-                        Panel_com('set_pattern_func_id', pos_id)
+                        Panel_com('set_pattern_func_id', pos_id);              
                         
                     end
                     if trial_mode == 2

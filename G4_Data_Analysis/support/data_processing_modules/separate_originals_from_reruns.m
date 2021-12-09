@@ -20,7 +20,7 @@ function [times] = separate_originals_from_reruns(start_times, ...
        if trial_options(3)
            originalEndPt = total_original_trials - 1;
        else
-           originalEndPot = total_original_trials;
+           originalEndPt = total_original_trials;
        end
        
        for trial = 1:originalEndPt
