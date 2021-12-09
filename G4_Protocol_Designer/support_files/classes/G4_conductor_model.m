@@ -127,7 +127,7 @@ classdef G4_conductor_model < handle
             self.fly_save_name = [self.fly_genotype,'-',datestr(now, 'HH_MM_SS')];
             self.date_folder = datestr(now, 'mm_dd_yyyy');
             self.timestamp = datestr(now, 'mm-dd-yyyy HH:MM:SS');
-            self.num_attempts_bad_conds = 2;
+            self.num_attempts_bad_conds = 1;
 
             self.postTrialTimes = [];
  
