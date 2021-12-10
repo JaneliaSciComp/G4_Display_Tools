@@ -7,8 +7,7 @@ nav_order: 2
 
 # Prerequisites
 
-[Generation 4 Setup](software_setup.md)
-You must have cloned the G4 Display Tools repository as described in the [Designer Manual](protocol-designer.md)
+You must have cloned the G4 Display Tools repository as described in the [Generation 4 Software Setup](software_setup.md#download).
 
 # Getting Started
 
