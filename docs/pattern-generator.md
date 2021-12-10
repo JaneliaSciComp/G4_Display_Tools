@@ -35,14 +35,13 @@ After patterns have been created, they can be displayed on the G4 arena by incor
 2. using the Protocol Designer located in `G4_Display_Tools\G4_Protocol_Designer`, or
 3. by using `PControl_G4` located in `G4_Display_Tools\PControl_Matlab`.
 
-## Using patterns for 2-color LED panels or any driver-v2
-{:#checkerboard}
+## Using patterns for 2-color LED panels or any driver-v2 {#checkerboard}
 
 Two different versions of the [panel driver board]({{site.baseurl}}/Generation%204/Panel/docs/driver.html) currently exist, the [driver-v1.x]({{site.baseurl}}/Generation%204/Panel/docs/driver.html#driver-v1) for single-colored displays and [driver-v2.x]({{site.baseurl}}/Generation%204/Panel/docs/driver.html#driver-v2) with pixels arranged in a "checkerboard circuit"  (e.g. for UV/Green LED panels). Displaying a pattern on LED panels of this type requires a rearrangement of the pattern matrix so that it conforms to this layout. When saving a pattern for use on LED panels with a checkerboard layout, setting the pattern parameter `checker_layout` to `1` will use the `checkerboard_pattern` function to rearrange pattern matrices to fit this checkerboard layout. This function takes 2 pattern matrices (`Pats`) as inputs, where the 1st pattern matrix is rearranged to be displayed on one half of the checkerboard (e.g. on the green LEDs) and the 2nd is displayed on the other half (e.g. on the UV LEDs). To display a single pattern on both halves of the checkerboard, either leave the 2nd input blank or duplicate the 1st pattern for both inputs, which is the default setting in the `G4_Pattern_Generator_gui`. To display a single pattern on only one half of the checkerboard, leave the other input as `0`.
 
 # Description of Parameters
 
-**Note on units.** For parameters based on angles, units in the GUI are shown in degrees and units in scripts are shown in radians. Use the rad2deg and deg2rad functions to convert between these units.
+__Note on units__: For parameters based on angles, units in the GUI are shown in degrees and units in scripts are shown in radians. Use the `rad2deg` and `deg2rad` functions to convert between these units.
 
 - `pattern_type`: (`string`) defines the type of motion pattern to be generated. Options are:
   - `square grating` – square wave of bright and dark bars that move perpendicular to the orientation of the bars (bright and dark pixel intensities are set by the `levels` parameter, described later)

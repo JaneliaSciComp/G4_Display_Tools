@@ -22,8 +22,7 @@ This GUI can be used to create both position functions, which control how and wh
 1. [A position function](#pfunction) which begins by cycling forward through every frame of a 24-frame pattern at a rate of 3 Hz before pausing at the last frame, then cycling backward through the pattern at the same rate before pausing at the first frame.
 2. [An analog output function](#aofunction) to be associated with the previous position function, which outputs a HIGH (5 V) signal when the pattern's frames are being cycled through (i.e. when the pattern is moving) and a LOW (0 V) signal when the pattern is held still.
 
-# Generating a Position Function
-{:#pfunction}
+# Generating a Position Function {#pfunction}
 
 The default function settings display a position function which cycles forward (increasing frame number) through a 24-frame pattern at a rate of 3 Hz for 1 second. This is the correct beginning section of our desired position function, but there is more to add. Next, we'll add a pause on the last frame by enabling *section 2*{:.gui-txt} and using the *static*{:.gui-txt} option under *section type*{:.gui-txt} -- this holds the pattern on a static frame for a set duration. Change *static value*{:.gui-txt} to *24*{:.gui-txt} so that the pattern is held on the last frame.
 
@@ -35,8 +34,7 @@ For our final section, we'll again hold the pattern static but this time on the 
 
 Now that the function has been designed, we need to save it in the appropriate file structure so it can be added to experiments and used for displaying patterns on the arena. Verify the save directory and function name and click on the *save current function*{:.gui-btn} button. If you want to visualize the function saved in this file later, use the *load function*{:.gui-btn} button.
 
-# Generating an Analog Output Function
-{:#aofunction}
+# Generating an Analog Output Function {#aofunction}
 
 The process for generating an analog output function is nearly the same as that for a position function, the primary difference being that the values in the function (the y-axis values in the graph) represent voltages rather than frames of the pattern. On the top-left of the GUI, select *Analog Output Function*{:.gui-txt} for the *Function type*{:.gui-txt} to start designing this function.
 
@@ -50,8 +48,7 @@ Change all 4 enabled *section type*{:.gui-txt} fields to *static*{:.gui-txt} and
 
 The section-based approach used by this tool allows for many different functions to be generated easily; however, the GUI is currently limited to a maximum of 5 sections per function. If more than 5 sections are needed, the tool must be used in script form, which allows for an arbitrary number of sections.
 
-# Generate Functions with a Script (optional)
-{:#script}
+# Generate Functions with a Script (optional) {#script}
 
 As with the Pattern Generator tool, the Function Generator can also be utilized from Matlab scripts and the command window. To see how the current analog output function can be generated using a script, click on the *create script*{:.gui-btn} button on the top-right section of the GUI. This will generate and open a new MATLAB script that is written to design and generate a function with the current parameters in the GUI. Similarly, to see how this tool can be used in script form to create a position function, select *Position Function*{:.gui-txt} from the *Function type*{:.gui-txt} dropdown and click the *create script*{:.gui-btn} button again.
 

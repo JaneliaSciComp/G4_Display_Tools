@@ -24,8 +24,7 @@ Now that the display has been configured, we are ready to create some patterns. 
 1. [A low contrast square-wave grating](#pattern1) that simulates a rotation around the z-axis, but that only presents this motion above the "horizon" from the observer's perspective -- as if the observer is rotating in place on the ground.
 2. [A high-contrast sine-wave grating](#pattern2) that is presented locally to a specific spot of the visual field, presenting a leftward motion on the left side of the observer's visual field.
 
-# Generating Pattern 1
-{:#pattern1}
+# Generating Pattern 1 {#pattern1}
 
 The default pattern settings already show a square-wave grating pattern (*Pattern Type*{:.gui-txt} is *square grating*{:.gui-txt}) that rotates around the z axis (*pole longitude*{:.gui-txt} is *0*{:.gui-txt} and *pole latitude*{:.gui-txt} is *-90*{:.gui-txt}), but there are a few changes we need to make to create pattern 1. First, to make the grating pattern have a lower contrast, we'll adjust the brightness of the bright and dark bars by adjusting levels 1 and 2. Setting the *1st level*{:.gui-txt} (the bright bar) to *9*{:.gui-txt} and the *2nd level*{:.gui-txt} (the dark bar) to *5*{:.gui-txt} reduces the pattern's contrast. After editing those fields, click on the *Update Pattern*{:.gui-btn} button to visualize the change made.
 
@@ -35,8 +34,7 @@ To make the pattern only show the moving gratings above the observer's horizon, 
 
 Pattern 1 has now been designed! Click on the forward *>*{:.gui-btn} and and backward *<*{:.gui-btn} arrows if you'd like to see how the pattern moves as the frames are cycled through. To save this pattern in the appropriate file structure so it can be added to experiments and displayed on the arena, verify the save directory and pattern name and click on the *save current pattern*{:.gui-btn} button. If you want to visualize this pattern later, click on the *load pattern*{:.gui-btn} button in the gui and navigate to this pattern to have all of the pattern's parameters loaded back into the GUI.
 
-# Generating Pattern 2
-{:#pattern2}
+# Generating Pattern 2 {#pattern2}
 
 For pattern 2, we can start by setting the pattern back to a default high-contrast grating by setting *1st level* to *15*{:.gui-txt} and *2nd level*{:.gui-txt} to *0*{:.gui-txt}. To switch the grating type to be a sine-wave intensity rather than square-wave intensity grating, set the *Pattern Type*{:.gui-txt} to *sine grating*{:.gui-txt}.
 
@@ -48,8 +46,7 @@ Change the *orientation of motion*{:.gui-txt} field to *local (mask-centered)*{:
 
 Both patterns have now been generated! But don't exit the GUI just yet…
 
-# Generate Patterns with a Script (optional)
-{:#script}
+# Generate Patterns with a Script (optional) {#script}
 
 This tutorial focused on using the GUI to generate patterns, but there are many situations where using this tool in script form will be more desireable. For instance, if you want to generate many patterns at once, this can be easily accomplished in script form but would be inconvenient to do manually with the GUI.
 
