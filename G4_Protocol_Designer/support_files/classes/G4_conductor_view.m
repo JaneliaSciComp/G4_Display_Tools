@@ -676,6 +676,10 @@ classdef G4_conductor_view < handle
                 self.progress_axes.Title.String = "Running Posttrial...";
                 self.progress_bar.YData = data; 
                 %update using post text
+                
+            elseif strcmp(trial_type, 'rescheduled')
+                cond = varargin{1};
+                self.progress_axes.Title.String = "Running rescheduled condition #: " + cond;
             else
                 disp("I can't update the progress bar.");
             end
