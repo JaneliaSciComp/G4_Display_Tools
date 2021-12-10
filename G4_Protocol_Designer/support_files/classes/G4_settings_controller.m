@@ -77,7 +77,7 @@ classdef G4_settings_controller < handle
                 self.model.config_filepath = filepath;
                 self.model.set_new_setting(self.model.lines_to_match.config, filepath);
              else
-                 self.create_error_box("This configuration filepath does not exist.");
+                 self.create_error_box("The configuration file does not exist.");
              end
         
         end
@@ -88,7 +88,7 @@ classdef G4_settings_controller < handle
                 self.model.default_run_protocol = filepath;
                 self.model.set_new_setting(self.model.lines_to_match.run, filepath);
             else
-                self.create_error_box("This run protocol filepath does not exist.");
+                self.create_error_box("The file path for 'Default Run Protocol' does not exist.");
             end
             
         end
@@ -99,7 +99,7 @@ classdef G4_settings_controller < handle
                 self.model.default_plot_protocol = filepath;
                 self.model.set_new_setting(self.model.lines_to_match.plot, filepath);
             else
-                disp("This plotting file does not exist.");
+                self.create_error_box("The file path for 'Default Plotting Protocol' does not exist.");
             end
             
         end
@@ -110,7 +110,7 @@ classdef G4_settings_controller < handle
                 self.model.default_proc_protocol = filepath;
                 self.model.set_new_setting(self.model.lines_to_match.proc, filepath);
             else
-                self.create_error_box("This processing file does not exist.");
+                self.create_error_box("The file path for 'Default Processing Protocol' does not exist.");
             end
             
         end
@@ -121,7 +121,7 @@ classdef G4_settings_controller < handle
                 self.model.flight_test_protocol = filepath;
                 self.model.set_new_setting(self.model.lines_to_match.flight, filepath);
             else
-                self.create_error_box("This flight test protocol file does not exist.");
+                self.create_error_box("The file path for 'Default Flight Test Protocol' does not exist.");
             end
             
         end
@@ -132,7 +132,7 @@ classdef G4_settings_controller < handle
                 self.model.cam_walk_test_protocol = filepath;
                 self.model.set_new_setting(self.model.lines_to_match.cam, filepath);
             else
-                disp("This Camera walk test protocol file does not exist.");
+                disp("The file path for 'Default Camera Walk Test Protocol' does not exist.");
             end
             
         end
@@ -143,7 +143,7 @@ classdef G4_settings_controller < handle
                 self.model.chip_walk_test_protocol = filepath;
                 self.model.set_new_setting(self.model.lines_to_match.chip, filepath)
             else
-                disp("This Chip Walk test protocol file does not exist.");
+                disp("The file path for 'Default Chip Walk Test Protocol' does not exist.");
             end
             
         end
@@ -154,7 +154,7 @@ classdef G4_settings_controller < handle
                 self.model.test_run_protocol = filepath;
                 self.model.set_new_setting(self.model.lines_to_match.testrun, filepath);
             else
-                self.create_error_box("This run protocol filepath does not exist.");
+                self.create_error_box("The file path for 'Default Run Protocol for Test' does not exist.");
             end
             
         end
@@ -165,7 +165,7 @@ classdef G4_settings_controller < handle
                 self.model.test_process_file = filepath;
                 self.model.set_new_setting(self.model.lines_to_match.testproc, filepath);
             else
-                self.create_error_box("This processing file does not exist.");
+                self.create_error_box("The file path for 'Default Processing File for Test' does not exist.");
             end
             
         end
@@ -176,7 +176,7 @@ classdef G4_settings_controller < handle
                 self.model.test_plot_file = filepath;
                 self.model.set_new_setting(self.model.lines_to_match.testplot, filepath);
             else
-                disp("This plotting file does not exist.");
+                self.create_error_box("The file path for 'Default Plotting File for Test' does not exist.");
             end
             
         end
@@ -184,11 +184,11 @@ classdef G4_settings_controller < handle
         
         function check_valid_color(self, string)
             
-            if strncmp(string, '#', 1)
+            if regexp(string, '\<#[a-zA-Z0-9]{6}\>')
                 self.model.uneditable_cell_color = string;
                 self.model.set_new_setting(self.model.lines_to_match.color, string);
             else
-                self.create_error_box("Make sure your color is in hexidecimal color code format.");
+                self.create_error_box("Make sure your color is in 6 digit hexidecimal color code format (e.g. '#CC3300').");
             end
         end
         

@@ -30,7 +30,7 @@ __Note__: There should be exactly one space between the ':' and the first charac
 
 # Open the G4 Designer
 
-Make sure that G4_Display_Tools and all its subfolders and files are on your MATLAB path. Then type 'G4_Experiment_Designer' into your MATLAB command window and hit 'Enter.' Alternatively, you could browse to the file `G4_Display_Tools/G4_Protocol_Designer/G4_Experiment_Designer.m`, open it in MATLAB, and hit *Run*{:.gui-btn}.
+Make sure that G4_Display_Tools and all its subfolders and files are on your MATLAB path. Then type `G4_Experiment_Designer` into your MATLAB Command Window and hit *Enter*{:.kbd}. Alternatively, you could browse to the file `G4_Display_Tools/G4_Protocol_Designer/G4_Experiment_Designer.m`, open it in MATLAB, and hit *Run*{:.gui-btn}.
 
 A window like the one below will open. If it does not, or if you get a MATLAB error, see the [G4 Designer Manual](protocol-designer.md) for more help on errors and debugging.
 
