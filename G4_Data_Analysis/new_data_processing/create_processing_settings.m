@@ -4,13 +4,13 @@ function create_processing_settings()
     
     %% Save settings
     
-    settings_file_path = '/Users/taylorl/Desktop/protocol_folder/new_processing_settings';
+    settings_file_path = '/Users/taylorl/Downloads/emptySplit_UAS_Kir_JFRC49-17_02_28/processing_settings';
     
     
     
     %% General settings
     settings.trial_options = [1 1 1];
-    settings.path_to_protocol = '/Users/taylorl/Desktop/protocol_folder/CT1_Ablation_Final_04-07-20_10-39-32.g4p';
+    settings.path_to_protocol = '/Users/taylorl/Downloads/streaming_test_protocol08-26-21_12-50-35.g4p';
     settings.channel_order = {'LmR_chan', 'L_chan', 'R_chan', 'F_chan', 'Frame Position', 'LmR', 'LpR'}; 
     settings.hist_datatypes = {'Frame Position', 'LmR', 'LpR'};
     settings.manual_first_start = 0;
@@ -21,7 +21,7 @@ function create_processing_settings()
     settings.da_stop = .15; %seconds before end of trial to end data analysis
     settings.time_conv = 1000000; %converts seconds to microseconds (TDMS timestamps are in micros)
     settings.common_cond_dur = 0; %sets whether all condition durations are the same (1) or not (0), for error-checking
-    settings.processed_file_name = 'testing_new_processing';
+    settings.processed_file_name = 'processedData';
     settings.combined_command = 0; %Set to 1 if using the combined command
     settings.percent_to_shift = .015;
     
@@ -87,14 +87,14 @@ function create_processing_settings()
     settings.condition_pairs{6} = [10 9];
     settings.condition_pairs{7} = [11 12];
     settings.condition_pairs{8} = [12 11];
-    settings.condition_pairs{9} = [13 18];
-    settings.condition_pairs{10} = [14 17];
-    settings.condition_pairs{11} = [15 20];
-    settings.condition_pairs{12} = [16 19];
-    settings.condition_pairs{13} = [21 26];
-    settings.condition_pairs{14} = [22 25];
-    settings.condition_pairs{15} = [23 28];
-    settings.condition_pairs{16} = [24 27];
+    settings.condition_pairs{9} = [13 14];
+    settings.condition_pairs{10} = [14 13];
+%     settings.condition_pairs{11} = [15 20];
+%     settings.condition_pairs{12} = [16 19];
+%     settings.condition_pairs{13} = [21 26];
+%     settings.condition_pairs{14} = [22 25];
+%     settings.condition_pairs{15} = [23 28];
+%     settings.condition_pairs{16} = [24 27];
                             
     %% Summary settings
     settings.summary_filename = 'Summary_of_bad_trials'; %Filename of the summary of which trials weren't run and why

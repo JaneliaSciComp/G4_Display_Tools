@@ -91,13 +91,29 @@ function process_data(exp_folder, processing_settings_file)
     num_ts_datatypes = length(channel_order);
     num_ADC_chans = length(Log.ADC.Channels);
     
-    timing_file = fullfile(exp_folder, 'times_between_trials.mat');
+
+    metadata_file = fullfile(exp_folder, 'metadata.mat');
     
-    if isfile(timing_file)
-        load(timing_file);
+
+    
+    % Metadata file contains list of conditions that were bad the first
+    % time and re-run.
+    if isfile(metadata_file)
+        load(metadata_file)
+        if isfield(metadata, 'trials_rerun')
+            trials_rerun = metadata.trials_rerun;
+        else
+            trials_rerun = [];
+        end
     else
-        postTrialTimes = {};
+        metadata = {};
+        trials_rerun = [];
     end
+    
+     %load the order in which conditions were run, as well as the number of
+    %conditions and reps
+    [exp_order, num_conds, num_reps] = get_exp_order(exp_folder);
+
 
     % Determine the start and stop times of each trial (if we want to create a
     % different method of doing this, just write a new module and plug it in
@@ -106,31 +122,29 @@ function process_data(exp_folder, processing_settings_file)
     [start_idx, stop_idx, start_times, stop_times] = get_start_stop_times(Log, command_string, manual_first_start);
     [frame_movement_start_times] = get_pattern_movement_times(start_times, Log);
     
-    %get order of pattern IDs (maybe use for error-checking?)
-    [modeID_order, patternID_order] = get_modeID_order(combined_command, Log, start_idx);
+    % Returns a struct, times, with 8 fields. The start times, stop times,
+    % start idx, and movement times for the original trials and the rerun
+    % trials. 
+    times = separate_originals_from_reruns(start_times, stop_times, start_idx, ...
+        trial_options, trials_rerun, num_conds, num_reps, frame_movement_start_times);
     
+    %get order of pattern IDs (maybe use for error-checking?)
+    [modeID_order, patternID_order] = get_modeID_order(combined_command, Log, times.origin_start_idx);
+    
+
     %load the order in which conditions were run, as well as the number of
     %conditions and reps
     [exp_order, num_conds, num_reps] = get_exp_order(exp_folder);
-    
-    % Use the data from the loaded timing file to remove erroneous data
-    % from the log that was collected in between conditions while the data
-    % streaming stuff ran. Each element in postTrialTimes gives the number
-    % of seconds (usually .2 - .3) that elapsed between conditions while
-    % the log was still running. Go to the start time of each trial in the
-    % log, and remove the data just previous to it covering the amount of
-    % time indicated in postTrialTimes
-    if ~isempty(postTrialTimes)
-        [Log, stop_times] = remove_excess_time(Log, start_times, stop_times, stop_idx, postTrialTimes, time_conv, pre_dur);
-    end
 
     %Determine start and stop times for different trial types (pre, inter,
-    %regular)
+    %regular). This also replaces start/stop times of trials marked as bad
+    %during streaming with the start/stop times of the final re-run of that
+    %trial so the correct data will be pulled later1`
 
     [num_trials, trial_start_times, trial_stop_times, ...
     trial_move_start_times,trial_modes, intertrial_start_times, intertrial_stop_times, ...
-    intertrial_durs] = get_trial_startStop(exp_order, trial_options, start_times, ...
-    stop_times, frame_movement_start_times, modeID_order, time_conv);
+    intertrial_durs, times] = get_trial_startStop(exp_order, trial_options, ...
+    times, modeID_order, time_conv, trials_rerun);
 
     %organize trial duration and control mode by condition/repetition
     [cond_dur, cond_modes,  cond_frame_move_time] = organize_durations_modes(num_conds, num_reps, ...
