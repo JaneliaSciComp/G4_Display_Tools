@@ -16,7 +16,7 @@ Before going through this tutorial, you should have done the following:
 
 # Experiment structure
 
-An experimental protocol is really just a set of what we call **conditions**. A condition, viewed on the arena screens, is a single pattern being displayed to a fly for some number of seconds. The pattern can be moving, to simulate motion, or still. It can be played in a closed-loop or open-loop way. But the key is that it only involves a single pattern file.
+An experimental protocol is really just a set of what we call __conditions__. A condition, viewed on the arena screens, is a single pattern being displayed to a fly for some number of seconds. The pattern can be moving, to simulate motion, or still. It can be played in a closed-loop or open-loop way. But the key is that it only involves a single pattern file.
 
 In the [G4 Protocol Designer](protocol-designer.md), a condition is a single row in a table. The pre-trial (optional) is a single condition that will play at the beginning of the experiment and then will not play again. The inter-trial (optional) is a single condition that will play in between each condition in the main experiment. It can be used to re-set the fly in between the main conditions of the experiment. The post-trial (optional) is a single condition that plays at the very end of the experiment. The block trials, contained in the large central table of the [G4 Protocol Designer](protocol-designer.md), are a set of conditions. There can be as many conditions in this block as you want. These conditions make up the main experiment and can be played in sequential or random order.
 
@@ -84,7 +84,10 @@ You should get a screen that looks like this:
 
 If you get an error, first check that you have the configuration file referenced in [Setup](software_setup.md) in place. Then open the file `G4_Display_Tools/G4_Protocol_Designer/G4_Protocol_Designer_Settings.m`. The first line of this file should read: `Configuration File Path: [path to your configuration file]`. If the path here is incorrect, replace it with the path to your Configuration file.
 
-**Please note that there should be exactly one space between the ':' and the first character of your path, and there should be no spaces after the last character of your path.** Once this first path has been set, you should never open this file again, and instead maintain your settings through the settings window in the Designer.
+Please note that there should be exactly one space between the ':' and the first character of your path, and there should be no spaces after the last character of your path.
+{:.warning}
+
+Once this first path has been set, you should never open this file again, and instead maintain your settings through the settings window in the Designer.
 
 If this does not solve your error, see the [G4 Designer documentation](protocol-designer.md) for more common troubleshooting.
 

@@ -67,7 +67,7 @@ When using the protocol designer, cells for unavailable parameters will by defau
 
 ## Metadata Google Sheets Properties
 
-Notice the separate panel at the bottom of the Settings window called Metadata Google Sheets Properties. These keys link to an online spreadsheet from which the Conductor dynamically pulls the possible values for each metadata field. The different fields labeled with "GID" define tabs in the metadata Google Sheets. **The G4 Conductor requires you to have such a Google Sheets** to populate the metadata options when you run an experiment. If you don't have this set up, please see the [metadata Google Sheets tutorial](protocol-designer_metadata_tutorial.md) for assistance.
+Notice the separate panel at the bottom of the Settings window called Metadata Google Sheets Properties. These keys link to an online spreadsheet from which the Conductor dynamically pulls the possible values for each metadata field. The different fields labeled with "GID" define tabs in the metadata Google Sheets. __The G4 Conductor requires you to have such a Google Sheets__ to populate the metadata options when you run an experiment. If you don't have this set up, please see the [metadata Google Sheets tutorial](protocol-designer_metadata_tutorial.md) for assistance.
 
 Once you have completed the tutorial and filled in these GID values, you should not have to do it again unless you delete or create any tabs in your Google Sheets. If you do this, the new keys will need to be obtained (as shown in the tutorial) for that tab and replaced here. Otherwise, set this up once, and then you can forget about it.
 
@@ -75,7 +75,8 @@ Once you have completed the tutorial and filled in these GID values, you should 
 
 To design an experiment, you must first import the files that you will use for the experiment. These files may include patterns, position functions, analog output functions, or the `currentExp.mat` file produced with every experiment. Patterns describe the visual output on the arena at any point in time. You can use the position functions to change this output over time. Analog output functions are used to generate a corresponding output on the BNC. You should have already created these using the [G4 Pattern Generator](pattern-generator.md) and [G4 Function Generator](function-generator.md). The file `currentExp.mat` is a description of the experiment itself.
 
-*Note that the `currentExp.mat` file will only exist if you are importing an experiment that has already been designed and saved with the designer. If you are creating a new experiment from scratch, you won't have it. The Designer will create it for you.*
+Note that the `currentExp.mat` file will only exist if you are importing an experiment that has already been designed and saved with the designer. If you are creating a new experiment from scratch, you won't have it. The Designer will create it for you.
+{:.info}
 
 Go to *File*{:.gui-btn} → *Import*{:.gui-btn} at the top left of the application. A box will appear giving you three options – Folder, File, or Filtered File. Select *Folder*{:.gui-btn} if you want to import all files from a particular folder. Alternatively, you can also import patterns or functions individually, one file at a time. The option *File*{:.gui-btn} allows you to choose a single file. The text you enter after selecting *Filtered File*{:.gui-btn} acts as an additional filter for the file selection dialog. For example, entering 'horizontal' or '0001' in the Filter Import Results will result in a `*horizontal*.mat` or `*0001*.mat` filter respectively. It is therefore like a permanent alternative to typing `*horizontal*.mat` as a filename in the file selector dialog.
 
@@ -89,19 +90,19 @@ Notice the layout of the four tables that make up the majority of the Designer's
 
 ### Some terminology
 
-A single line in a table is called a **condition**. The pre-trial, inter-trial, and post-trial tables only allow for one condition. The block trials table can have as many conditions as you need, and the condition number is the row number of the table. A condition consists of [the mode](protocol-designer_display-modes.md), one pattern and optionally one position function and up to four analog output functions. Other parameters in the table will be editable depending on the mode of the condition.
+A single line in a table is called a __condition__. The pre-trial, inter-trial, and post-trial tables only allow for one condition. The block trials table can have as many conditions as you need, and the condition number is the row number of the table. A condition consists of [the mode](protocol-designer_display-modes.md), one pattern and optionally one position function and up to four analog output functions. Other parameters in the table will be editable depending on the mode of the condition.
 
-On the left side of the main window is a set of radio buttons that say *Randomize Trials*{:.gui-btn} and *Sequential Trials*{:.gui-btn}. A **trial** is how we refer to any condition that plays on the screen. For example, if your trials are randomized, "Trial 1" (meaning the first item played on the screen) may be condition 12. And if you are repeating an entire set of 40 conditions 4 times, then you will only have 40 conditions, but you will have 160 trials.
+On the left side of the main window is a set of radio buttons that say *Randomize Trials*{:.gui-btn} and *Sequential Trials*{:.gui-btn}. A __trial__ is how we refer to any condition that plays on the screen. For example, if your trials are randomized, "Trial 1" (meaning the first item played on the screen) may be condition 12. And if you are repeating an entire set of 40 conditions 4 times, then you will only have 40 conditions, but you will have 160 trials.
 
 It's important to know this distinction to avoid confusion, as the conductor will provide you both the trial number and condition number when running an experiment. It will also save a .mat file in your results folder once an experiment is complete called exp_order.mat which will list the order in which your conditions were run.
 
-**Block trials** are a set of conditions which make up the meat of your experiment. They are not dependent on one another and can vary in mode, length, and other parameters.
+__Block trials__ are a set of conditions which make up the meat of your experiment. They are not dependent on one another and can vary in mode, length, and other parameters.
 
-The **pre-trial** is a single condition that is run at the very beginning of an experiment and then not run again. It is often a condition meant to test that the fly is responding as expected or to get the fly oriented before the real experiment begins.
+The __pre-trial__ is a single condition that is run at the very beginning of an experiment and then not run again. It is often a condition meant to test that the fly is responding as expected or to get the fly oriented before the real experiment begins.
 
-The **inter-trial** is a single condition that is played in between each block trial. It is not played before the first block trial or after the last block trial as long as you are using the default run protocol. It's often used to re-orient the fly to baseline after some condition played and elicited a behavioral response.
+The __inter-trial__ is a single condition that is played in between each block trial. It is not played before the first block trial or after the last block trial as long as you are using the default run protocol. It's often used to re-orient the fly to baseline after some condition played and elicited a behavioral response.
 
-The **post-trial** is a single condition that is played at the very end of the experiment, after the last block trial.
+The __post-trial__ is a single condition that is played at the very end of the experiment, after the last block trial.
 
 ### The rest of the experiment structure
 
@@ -128,7 +129,7 @@ The second thing that will happen is that the embedded list to the right of the 
 
 ## Other methods of arranging parameters and trials
 
-Notice the buttons to the right of the block trials table. They modify the trial or trials currently selected through the checkbox at the end of each line. *Shift up*{:.gui-btn} and *Shift down*{:.gui-btn} will move your selected trial(s) up and down throughout the main block of trials. *Add trial*{:.gui-btn} will add a copy of the selected trials to the bottom of the block. If no trial is selected, the new trial is based on the last item in the block. *Delete Trial*{:.gui-btn} will remove the selected trial(s). Finally, the *Select All**{:.gui-txt} checkbox above the block will select all trials and *Invert Selection*{:.gui-btn} will uncheck all the checked trials, and check all the unchecked ones.
+Notice the buttons to the right of the block trials table. They modify the trial or trials currently selected through the checkbox at the end of each line. *Shift up*{:.gui-btn} and *Shift down*{:.gui-btn} will move your selected trial(s) up and down throughout the main block of trials. *Add trial*{:.gui-btn} will add a copy of the selected trials to the bottom of the block. If no trial is selected, the new trial is based on the last item in the block. *Delete Trial*{:.gui-btn} will remove the selected trial(s). Finally, the *Select All*{:.gui-txt} checkbox above the block will select all trials and *Invert Selection*{:.gui-btn} will uncheck all the checked trials, and check all the unchecked ones.
 
 If you select a trial in the block, then go to *File*{:.gui-btn} > *Copy To*{:.gui-btn}, you can copy that trial into the pre-trial, inter-trial, and/or post-trial spaces. *File*{:.gui-btn} > *Set Selected*{:.gui-txt} will let you type in the values you want for each parameter in the selected trial, though this is not recommended as it's generally faster to select from the list of imported items.
 
@@ -166,7 +167,7 @@ You'll notice that under the *File*{:.gui-btn} menu, there is no "Save" option, 
 
 *Note that the experiment does not contain any data at this point, only a protocol defining the experiment.*
 
-When you save an experiment, the application will automatically export all the files you need to run said experiment. It will create a folder which is named with your experiment name. This will generally be referred to as the **experiment folder**. Inside the experiment folder will be a `Patterns` Folder, `Functions` folder, and `Analog Output` folder, in addition to the `currentExp.mat` file and `.g4p` file:
+When you save an experiment, the application will automatically export all the files you need to run said experiment. It will create a folder which is named with your experiment name. This will generally be referred to as the __experiment folder__. Inside the experiment folder will be a `Patterns` Folder, `Functions` folder, and `Analog Output` folder, in addition to the `currentExp.mat` file and `.g4p` file:
 
 ```sh
 ├── Patterns
@@ -272,8 +273,9 @@ If everything is in the correct location, this error could mean that you as a us
 
 # A few DO NOTs
 
-- **DO NOT** edit any of the files in the `support_files` folder.
-- **DO NOT** move any files out of their original locations within the `G4_Display_Tools` folder (though you can save that folder wherever you like, as long as it is added to your MATLAB path)
-- **DO NOT** allow multiple files of the same name to be on your MATLAB path, as this can cause conflicts.
+- __DO NOT__ edit any of the files in the `support_files` folder.
+- __DO NOT__ move any files out of their original locations within the `G4_Display_Tools` folder (though you can save that folder wherever you like, as long as it is added to your MATLAB path)
+- __DO NOT__ allow multiple files of the same name to be on your MATLAB path, as this can cause conflicts.
+{:.error}
 
 {::comment}this was copied from the original file `User_Instructions.docx`{:/comment}
