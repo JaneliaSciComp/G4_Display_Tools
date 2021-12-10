@@ -7,7 +7,7 @@ nav_order: 2
 
 # Prerequisites
 
-You must have cloned the G4 Display Tools repository as described in the [Generation 4 Software Setup](software_setup.md#download).
+You must have cloned the G4 Display Tools repository as described in the [Generation 4 Software Setup](software_setup.md#download-display-tools).
 
 # Getting Started
 
@@ -17,12 +17,16 @@ Many features of the [G4 Designer](protocol-designer.md) and [Conductor](experim
 
 Before you can even open the G4 Designer, you must update one thing - the path to your G4 Configuration file.
 
-Open the file `G4_Display_Tools/G4_Protocol_Designer/G4_Protocol_Designer_Settings.m` in MATLAB. The first line of this file should read "Configuration File Path: /Users/taylorl/Desktop/HHMI Panels Configuration.ini" or something similar. This path must be accurate to open the Designer. If it is not, replace the current path with the correct path to your HHMI Panels Configuration.ini file.
+Open the file `G4_Display_Tools/G4_Protocol_Designer/G4_Protocol_Designer_Settings.m` in MATLAB, for example by typing `edit G4_Protocol_Designer_Settings` into the MATLAB Command Window. An early line of this file should read something like the following.
+
+```
+Configuration File Path: Configuration File Path: C:\Program Files (x86)\HHMI G4\Support Files\HHMI Panels Configuration.ini
+```
+
+Double check that the file exists at this location as this is required to open the [Protocol Designer](protocol-design.md). It is also possible to have this file outside the standard location, for example it could be `/Users/taylorl/Desktop/HHMI Panels Configuration.ini` (on a Mac). If the location is not correct, replace the current path with the correct path to your `HHMI Panels Configuration.ini` file. This is the only change you should make to the filet. Please save and close the file when you are done.
 
 __Note__: There should be exactly one space between the ':' and the first character of your path. Additionally there should be no trailing spaces at the end of your path. Please ensure these two things are true before saving and closing the file.
 {:.warning}
-
-This is the only change you should make to this file. Please save and close the file when you are done.
 
 # Open the G4 Designer
 
