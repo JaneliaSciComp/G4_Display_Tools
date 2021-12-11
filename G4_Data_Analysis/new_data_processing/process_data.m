@@ -57,7 +57,12 @@ function process_data(exp_folder, processing_settings_file)
     wbf_range = s.settings.wbf_range;
     wbf_cutoff = s.settings.wbf_cutoff;
     wbf_end_percent = s.settings.wbf_end_percent;
-    duration_diff_limit = s.settings.duration_diff_limit;
+
+    if isfield(s.settings, 'duration_diff_limit')
+        duration_diff_limit = s.settings.duration_diff_limit;
+    else
+        duration_diff_limit = .1;
+    end
     
     if isempty(s.settings.summary_save_path)
         summary_save_path = exp_folder;
