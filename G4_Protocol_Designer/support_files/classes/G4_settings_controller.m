@@ -1,6 +1,5 @@
 classdef G4_settings_controller < handle
     
-    
     properties
         
         model_
@@ -16,17 +15,14 @@ classdef G4_settings_controller < handle
     end
 
     methods
-        
+
         %% Constructor
         function self = G4_settings_controller(varargin)
-            
             %Create the model and wait for the window to be opened. 
             self.model = G4_settings_model();
-
         end
         
         function layout_view(self)
-        
             %Run this when the user clicks the settings option in the
             %designer to open up the settings window
             
@@ -34,18 +30,14 @@ classdef G4_settings_controller < handle
             
             %Don't forget to clear this out somehow when they close the
             %settings window
-        
         end
         
         function close_window(self)
-            
             close(self.view.fig);
-            
         end
         
         
         function update_view(self)
-        
             self.view.config_filepath_textbox.String = self.model.config_filepath;
             self.view.sheet_key_textbox.String = self.model.metadata_sheet_key;
             self.view.experimenter_gid_textbox.String = self.model.gids.experimenter;
@@ -66,124 +58,101 @@ classdef G4_settings_controller < handle
             self.view.test_plot_textbox.String = self.model.test_plot_file;
             self.view.disabled_color_textbox.String = self.model.uneditable_cell_color;
             self.view.disabled_text_textbox.String = self.model.uneditable_cell_text;
-
         end
         
         %% Functions to check input values are correct. If valid, these 
         %  functions then call the model to set the new values
         function check_valid_config(self, filepath)
-        
              if isfile(filepath)
                 self.model.config_filepath = filepath;
                 self.model.set_new_setting(self.model.lines_to_match.config, filepath);
              else
                  self.create_error_box("The configuration file does not exist.");
              end
-        
         end
         
         function check_valid_run_file(self, filepath)
-            
             if isfile(filepath)
                 self.model.default_run_protocol = filepath;
                 self.model.set_new_setting(self.model.lines_to_match.run, filepath);
             else
                 self.create_error_box("The file path for 'Default Run Protocol' does not exist.");
             end
-            
         end
         
         function check_valid_plot_file(self, filepath)
-            
             if isfile(filepath)
                 self.model.default_plot_protocol = filepath;
                 self.model.set_new_setting(self.model.lines_to_match.plot, filepath);
             else
                 self.create_error_box("The file path for 'Default Plotting Protocol' does not exist.");
             end
-            
         end
         
         function check_valid_proc_file(self, filepath)
-            
             if isfile(filepath)
                 self.model.default_proc_protocol = filepath;
                 self.model.set_new_setting(self.model.lines_to_match.proc, filepath);
             else
                 self.create_error_box("The file path for 'Default Processing Protocol' does not exist.");
             end
-            
         end
         
         function check_valid_flight_file(self, filepath)
-            
-            if isfile(filepath)
+            if any(regexpi(filepath, "insert.*here")) || isfile(filepath)
                 self.model.flight_test_protocol = filepath;
                 self.model.set_new_setting(self.model.lines_to_match.flight, filepath);
             else
                 self.create_error_box("The file path for 'Default Flight Test Protocol' does not exist.");
             end
-            
         end
         
         function check_valid_camWalk_file(self, filepath)
-            
-            if isfile(filepath)
+            if any(regexpi(filepath, "insert.*here")) || isfile(filepath)
                 self.model.cam_walk_test_protocol = filepath;
                 self.model.set_new_setting(self.model.lines_to_match.cam, filepath);
             else
-                disp("The file path for 'Default Camera Walk Test Protocol' does not exist.");
+                self.create_error_box("The file path for 'Default Camera Walk Test Protocol' does not exist.");
             end
-            
         end
         
         function check_valid_chipWalk_file(self, filepath)
-            
-            if isfile(filepath)
+            if any(regexpi(filepath, "insert.*here")) || isfile(filepath)
                 self.model.chip_walk_test_protocol = filepath;
                 self.model.set_new_setting(self.model.lines_to_match.chip, filepath)
             else
-                disp("The file path for 'Default Chip Walk Test Protocol' does not exist.");
+                self.create_error_box("The file path for 'Default Chip Walk Test Protocol' does not exist.");
             end
-            
         end
         
         function check_valid_test_run(self, filepath)
-            
             if isfile(filepath)
                 self.model.test_run_protocol = filepath;
                 self.model.set_new_setting(self.model.lines_to_match.testrun, filepath);
             else
                 self.create_error_box("The file path for 'Default Run Protocol for Test' does not exist.");
             end
-            
         end
         
         function check_valid_test_process(self, filepath)
-            
             if isfile(filepath)
                 self.model.test_process_file = filepath;
                 self.model.set_new_setting(self.model.lines_to_match.testproc, filepath);
             else
                 self.create_error_box("The file path for 'Default Processing File for Test' does not exist.");
             end
-            
         end
         
         function check_valid_test_plot(self, filepath)
-            
             if isfile(filepath)
                 self.model.test_plot_file = filepath;
                 self.model.set_new_setting(self.model.lines_to_match.testplot, filepath);
             else
                 self.create_error_box("The file path for 'Default Plotting File for Test' does not exist.");
             end
-            
         end
-        
-        
+
         function check_valid_color(self, string)
-            
             if regexp(string, '\<#[a-zA-Z0-9]{6}\>')
                 self.model.uneditable_cell_color = string;
                 self.model.set_new_setting(self.model.lines_to_match.color, string);
@@ -192,7 +161,7 @@ classdef G4_settings_controller < handle
             end
         end
         
-        %% These functions set new values like those above, but have no limitation on the values
+        %% These functions set new values like those above, but have no constraints on the values
         function check_valid_text(self, string)
             self.model.uneditable_cell_text = string;
             self.model.set_new_setting(self.model.lines_to_match.text, string);            
@@ -237,10 +206,7 @@ classdef G4_settings_controller < handle
             self.model.gids.light_cycle = string;
             self.model.set_new_setting(self.model.lines_to_match.lightGID, string)
         end
-                
-        
-        
-        
+
         %% General error message produced when something isn't valid
         
         function create_error_box(~, varargin)
