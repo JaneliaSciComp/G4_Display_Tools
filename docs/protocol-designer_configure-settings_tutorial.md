@@ -17,10 +17,10 @@ Many features of the [G4 Designer](protocol-designer.md) and [Conductor](experim
 
 Before you can even open the G4 Designer, you must update one thing - the path to your G4 Configuration file.
 
-Open the file `G4_Display_Tools/G4_Protocol_Designer/G4_Protocol_Designer_Settings.m` in MATLAB, for example by typing `edit G4_Protocol_Designer_Settings` into the MATLAB Command Window. An early line of this file should look similar to the following:
+Open the file `G4_Display_Tools/G4_Protocol_Designer/G4_Protocol_Designer_Settings.m` in MATLAB, for example by typing `edit G4_Protocol_Designer_Settings` into the MATLAB Command Window. An early line (usually line 3) of this file should look similar to the following:
 
 ```conf
-Configuration File Path: Configuration File Path: C:\Program Files (x86)\HHMI G4\Support Files\HHMI Panels Configuration.ini
+Configuration File Path: C:\Program Files (x86)\HHMI G4\Support Files\HHMI Panels Configuration.ini
 ```
 
 Double check that the file exists at this location as this is required to open the [Protocol Designer](protocol-design.md). It is also possible to have this file outside the standard location, for example it could be `/Users/taylorl/Desktop/HHMI Panels Configuration.ini` (on a Mac). If the location is not correct, replace the current path with the correct path to your `HHMI Panels Configuration.ini` file. This is the only change you should make to the filet. Please save and close the file when you are done.
