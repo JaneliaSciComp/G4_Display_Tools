@@ -24,6 +24,7 @@ function create_processing_settings()
     settings.processed_file_name = 'processedData';
     settings.combined_command = 0; %Set to 1 if using the combined command
     settings.percent_to_shift = .015;
+    settings.duration_diff_limit = .15; %If a trial takes longer than its intended duration by more than this percentage, throw it out
     
     %% Wing Beat Frequency Settings
     

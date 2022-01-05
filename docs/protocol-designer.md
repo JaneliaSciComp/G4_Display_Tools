@@ -155,7 +155,7 @@ There are a number of parameters outside the conditions themselves that need to 
 
 - You may choose whether your block conditions run in sequential order or random order.
 - You may choose how many times your experiment is repeated. For example, if *repetitions*{:.gui-txt} is set to 2, the pre-trial will run once, the block will run twice, with an inter-trial between each block trial, and the post-trial will run once. Note that the inter-trial does NOT run before the first block trial OR after the last block trial.
-- You need to set the sample rates for your Analog Input Channels. If a channel is not in use, set its sample rate to 0.
+- You need to set the sample rates for your Analog Input Channels. When running an experiment, data from the fly can be streamed back and plotted on the Conductor after each trial, allowing the user to monitor the fly's performance. To do this, the sample rates must be set (the recommended value is 1000).
 - You must set your screen size BEFORE importing.
 - You must also give your experimental protocol a name at the bottom.
 

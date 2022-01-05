@@ -423,7 +423,7 @@ timeseries_plot_settings.pattern_motion_indicator = 0;
 
 ### Other Indicators
 
-This setting has not actually been implemented as of 8/4/2021 but will be in the coming weeks. `timeseries_plot_settings.other_indicators` is an array which should match in shape and size the other timeseries arrays like `OL_TS_conds`. This allows you to place an indicator (vertical line) at any point of each condition's plot. Instead of the condition number, as provided in `OL_TS_conds` you would provide the x value at which you want a vertical line to appear. If you want no vertical line on that particular condition, you would enter 0.
+This setting has not actually been implemented as of yet but will be in the coming weeks. `timeseries_plot_settings.other_indicators` is an array which should match in shape and size the other timeseries arrays like `OL_TS_conds`. This allows you to place an indicator (vertical line) at any point of each condition's plot. Instead of the condition number, as provided in `OL_TS_conds` you would provide the x value at which you want a vertical line to appear. If you want no vertical line on that particular condition, you would enter 0.
 
 __Example__:
 corresponding with the `OL_TS_conds` example above:
@@ -990,7 +990,15 @@ Now you are ready to run an analysis!
 
 ## Running a typical analysis
 
-There are two steps to running data analysis – the first is to run the file `create_data_analysis_tool.m.` This is not a regular script or function, so opening the file and hitting run in the MATLAB environment will not work. It is a class and when you run it, it creates an object. You should run it from the MATLAB command window. Here's an __example__:
+There are a few steps to running data analysis – the first is to run a function called find_flies.m. This function takes in the settings file you created for the analysis and searches for all flies that should be included for that analysis, based on the determining metadata values you provided and the path to the experiment in the settings. We do this as a separate step so that if you have run more flies between the last time you ran this analysis and this time, the new flies will be included. Here's an __example__:
+
+```matlab
+Find_flies(‘path to the settings file you just created’);
+```
+
+This will update your settings file to contain paths to all the flies being analyzed.
+
+The second step is to run the file `create_data_analysis_tool.m.` This is not a regular script or function, so opening the file and hitting run in the MATLAB environment will not work. It is a class and when you run it, it creates an object. You should run it from the MATLAB command window. Here's an __example__:
 
 ```matlab
 da = create_data_analysis_tool('path to the settings file', '-group', '-hist', '-tsplot');
@@ -1015,15 +1023,16 @@ When you run create_data_analysis_tool, you want to store it in a variable. In t
 
 This in itself will not run the analysis. What it does is creates an object, da, with all of your settings stored in it and the options for whatever flags you passed in turned on. You can use this object to double check if everything is correct if you would like. For example, you could now type `da.save_settings` into the MATLAB command window to review your save settings. If you forgot to pass in a flag, you could say `da.TC_plot_option = 1` to retroactively tell it you want to make tuning curves as well. If you forgot to update the colors of your timeseries plot, you could say `da.timeseries_plot_settings.rep_colors = [0 0 0; 0 1 0; 0 0 1]` and update them.
 
-It is not likely you will want to update variables this way – it would be easier to create a new settings file. But when this tool needs to be called by other pieces of software, this system makes it much easier to automatically run the correct analysis without the software having to edit or create any settings files.
+It is not likely you will want to update variables this way – it would be easier to create a new settings file. But when this tool needs to be called by other pieces of software, this system makes it much easier to automatically run the correct analysis without the software having to edit or create any files.
 
-Once you know there are no adjustments to be made, simply type in the command `da.run_analysis`, and this will start the analysis running. Assuming no adjustments after creating your data analysis tool, your command will look something like this:
+Once you know there are no adjustments to be made, simply type in the command `da.run_analysis`, and this will start the analysis running. Assuming no adjustments after creating your data analysis tool, the full process will look something like this:
 
 ```matlab
 Create_settings_file(filename, filepath)  ...
         % If you were creating a new settings file, rather than using an existing one  
+Find_flies('path to your settings file');
 da = create_data_analysis_tool(...
-        path_to_settings, '-group', '-hist', '-TSplot', '-tcplot');
+        'path to your settings file', '-group', '-hist', '-TSplot', '-tcplot');
 da.run_analysis
 ```
 
@@ -1031,7 +1040,7 @@ This will produce a number of graphs, automatically saving them at the save path
 
 `Datatype_groupNames_plotType_#.pdf`
 
-A MATLAB figure version of each will also be saved, so you can open the figures in MATLAB and continue to edit them on your own. Additionally, a .pdf report will be generated containing a copy of each figure for easy browsing.
+A MATLAB figure version of each will also be saved, so you can open the figures in MATLAB and continue to edit them on your own. Additionally, a single .pdf report will be generated containing a copy of each figure for easy browsing.
 
 # Adding new modules
 

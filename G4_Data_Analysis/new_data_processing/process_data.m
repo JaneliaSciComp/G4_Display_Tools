@@ -57,6 +57,12 @@ function process_data(exp_folder, processing_settings_file)
     wbf_range = s.settings.wbf_range;
     wbf_cutoff = s.settings.wbf_cutoff;
     wbf_end_percent = s.settings.wbf_end_percent;
+
+    if isfield(s.settings, 'duration_diff_limit')
+        duration_diff_limit = s.settings.duration_diff_limit;
+    else
+        duration_diff_limit = .1;
+    end
     
     if isempty(s.settings.summary_save_path)
         summary_save_path = exp_folder;
@@ -159,7 +165,7 @@ function process_data(exp_folder, processing_settings_file)
 %%%%%Maybe create wbf_data in a different function to include intertrials,
 %%%%%then pass it in to the function to find bad wbfs where I only look at
 %%%%%the indices for the actual condition???
-    [bad_duration_conds, bad_duration_intertrials] = check_condition_durations(cond_dur, intertrial_durs, path_to_protocol);
+    [bad_duration_conds, bad_duration_intertrials] = check_condition_durations(cond_dur, intertrial_durs, path_to_protocol, duration_diff_limit);
     [bad_slope_conds] = check_flat_conditions(trial_start_times, trial_stop_times, Log, num_reps, num_conds, exp_order);
     [bad_crossCorr_conds] = check_correlation(trial_start_times, trial_stop_times, exp_order, Log, cond_modes);
     [bad_WBF_conds, wbf_data] = find_bad_wbf_trials(Log, ts_data, wbf_range, wbf_cutoff, ...
