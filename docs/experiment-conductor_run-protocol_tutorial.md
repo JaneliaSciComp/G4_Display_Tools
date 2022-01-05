@@ -14,7 +14,9 @@ nav_order: 1
 
 # Introduction
 
-You may have seen references to a __run protocol__ throughout the documentation. This is an `.m` file which sends [the experiment you design](protocol-designer.md) to the panels. It provides a structure and defines, for example, whether to run inter-trials before the first trial. There are three run protocols included with the G4 Display Tools at `G4_Display_Tools/G4_Protocol_Designer/run_protocols`: `G4_default_run_protocol.m`, `G4_default_run_protocol_streaming.m`, and `G4_run_protocol_combinedCommand.m` -- but you can also write your own run protocol. The potential benefits of doing this will become clear throughout this tutorial, though for many use cases, you won't need one other than the default `G4_default_run_protocol.m`.
+You may have seen references to a __run protocol__ throughout the documentation. This is an `.m` file which sends [the experiment you design](protocol-designer.md) to the panels. It provides a structure and defines, for example, whether to run inter-trials before the first trial. There are three run protocols included with the G4 Display Tools at `G4_Display_Tools/G4_Protocol_Designer/run_protocols`: `G4_default_run_protocol.m`, `G4_default_run_protocol_streaming.m`, and `G4_run_protocol_combinedCommand.m` -- but you can also write your own run protocol. The potential benefits of doing this will become clear throughout this tutorial, though for many use cases, you won't need one other than the defaults `G4_default_run_protocol.m`.
+
+- Please note that the run protocol `G4_run_protocol_combinedCommand.m` should not currently be used. It utilizes a new Panel_com command which still has unresolved bugs. 
 
 By definition, this tutorial will also show you how to send specific commands to the panels using none of the provided GUIs. This might be useful if you want to display a single pattern on the panels or try running a condition without using the [G4 Designer](protocol-designer.md).
 
@@ -138,7 +140,7 @@ Keep in mind you never have to use any of these commands. All of this is handled
 
 But now that you have seen how these commands work, it might be more clear what the run protocol file does. The run protocol is the file which actually utilizes these commands to send the patterns, functions, and other parameters saved in your experiment to the panels. You could create your own run protocol if you wanted to change how or when any given condition in your experiment is displayed on the panels.
 
-So let's look at the default run protocol and see what it controls and what it doesn't.
+So let's look at the default run protocol and see what it controls and what it doesn't. Please note that this tutorial does not use the default streaming protocol. However, if you wanted to create your own run protocol that does collect data as the experiment runs for display on the Conductor, you would want to base your run protocol off of the default streaming run protocol.
 
 __Warning__: Please do not alter the default run protocol file. If you would like to create your own run protocol, you may start a new `.m` file, or make a copy of the default run protocol and alter that.
 {:.warning}

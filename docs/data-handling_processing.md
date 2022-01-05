@@ -116,6 +116,10 @@ If you are using the default run protocol to run your experiment, `combined_comm
 
 It's not uncommon for the trial data and the timestamp data to be slightly misaligned. `percent_to_shift` sets a tolerance for how much trial data can be shifted in either direction for the sake of alignment before the trial is considered bad and tossed out. (don't worry, by tossed out, I don't mean that the data will be deleted - it will just be logged as a failed trial and left out of any plotting or analysis done. It will still be accessible). Default is .015, meaning if we need to shift data by more than 1.5% either direction to get it to align appropriately, then we assume something went wrong in that trial and we mark it as bad.
 
+### How much can the duration of a trial vary before tossing it out?
+
+It's not uncommon for the data collected for a trial to be slightly longer than the intended duration of the trial. This is because data is collected the entire time that the experiment is running, so any code that executes in between trials (like code that updates the progress bar on the Conductor) adds time between trials where the log is collecting data, but nothing is happening in the arena. This amount of extraneous time should generally be very small and negligible. However, sometimes if the computer freezes or arena has a glitch, you'll end up with more time than expected where nothing is happening but data is still being collected. In this case, a trial may have much more data than it should. This value, `duration_diff_limit`, is given as a decimal representing a percentage. By default, it is set to .15, or 15%. This means if the data collected for a given trial is more than 15% larger or smaller than it should be, then the data should be left out of the analysis, assuming too much of it is erroneous. 
+
 ## Wing Beat Frequency Settings
 
 ### Acceptable Wing Beat Frequency Range
