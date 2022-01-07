@@ -1,8 +1,6 @@
 classdef G4_settings_view < handle
-    
-    
+
     properties
-        
         fig_
         con_
         config_filepath_textbox_
@@ -25,12 +23,9 @@ classdef G4_settings_view < handle
         test_plot_textbox_
         disabled_color_textbox_
         disabled_text_textbox_
-
-
     end
     
     properties (Dependent)
-        
         fig
         con
         config_filepath_textbox
@@ -53,15 +48,13 @@ classdef G4_settings_view < handle
         test_plot_textbox
         disabled_color_textbox
         disabled_text_textbox
-
     end
     
     methods
         
         function self = G4_settings_view(controller)
-            
             %% User adjusted values to control appearance and object
-            %positions
+            %  positions
             self.con = controller;
             figure_position = [.1 .1 .8 .8];
             top_left_label = [.01,.95, .24, .04]; %position of the first label
@@ -99,25 +92,10 @@ classdef G4_settings_view < handle
             browse2_pos = self.calc_new_browse_position(run_box_pos, gap_between_edges, button_textbox_ratio);
             run_browse_button = self.create_button(self.fig, 'Browse', browse2_pos);
             
-            %% Default plotting protocol
-            %Def plot protocol - label
-            
-            plot_label_pos = self.calc_new_label_position(run_label_pos, gap_between_edges);
-            plot_label = self.create_label(self.fig, 'Default Plotting Protocol: ', plot_label_pos);
-            
-            %Def plot protocol - textbox
-            
-            plot_box_pos = self.calc_new_textbox_position(plot_label_pos, gap_between_edges, textbox_label_ratio);
-            self.plot_protocol_textbox = self.create_text_box(self.fig, self.con.model.default_plot_protocol, plot_box_pos);
-            
-            %Def plot protocol - browse button
-            browse3_pos = self.calc_new_browse_position(plot_box_pos, gap_between_edges, button_textbox_ratio);
-            plot_browse_button = self.create_button(self.fig, 'Browse', browse3_pos);
-            
             %% Default processing protocol
              %Def processing protocol - label
             
-            proc_label_pos = self.calc_new_label_position(plot_label_pos, gap_between_edges);
+            proc_label_pos = self.calc_new_label_position(run_label_pos, gap_between_edges);
             proc_label = self.create_label(self.fig, 'Default Processing Protocol: ', proc_label_pos);
             
             %Def processing protocol - textbox
@@ -129,14 +107,27 @@ classdef G4_settings_view < handle
             browse4_pos = self.calc_new_browse_position(proc_box_pos, gap_between_edges, button_textbox_ratio);
             proc_browse_button = self.create_button(self.fig, 'Browse', browse4_pos);
             
+            %% Default plotting protocol
+            %Def plot protocol - label
+            
+            plot_label_pos = self.calc_new_label_position(proc_label_pos, gap_between_edges);
+            plot_label = self.create_label(self.fig, 'Default Plotting Protocol: ', plot_label_pos);
+            
+            %Def plot protocol - textbox
+            plot_box_pos = self.calc_new_textbox_position(plot_label_pos, gap_between_edges, textbox_label_ratio);
+            self.plot_protocol_textbox = self.create_text_box(self.fig, self.con.model.default_plot_protocol, plot_box_pos);
+            
+            %Def plot protocol - browse button
+            browse3_pos = self.calc_new_browse_position(plot_box_pos, gap_between_edges, button_textbox_ratio);
+            plot_browse_button = self.create_button(self.fig, 'Browse', browse3_pos);
+            
             %% Default flight test protocol
              %Def flight test protocol - label
             
-            flight_label_pos = self.calc_new_label_position(proc_label_pos, gap_between_edges);
+            flight_label_pos = self.calc_new_label_position(plot_label_pos, gap_between_edges);
             flight_label = self.create_label(self.fig, 'Default Flight Test Protocol: ', flight_label_pos);
             
             %Def flight test protocol - textbox
-            
             flight_box_pos = self.calc_new_textbox_position(flight_label_pos, gap_between_edges, textbox_label_ratio);
             self.flight_test_textbox = self.create_text_box(self.fig, self.con.model.flight_test_protocol, flight_box_pos);
             
@@ -205,42 +196,34 @@ classdef G4_settings_view < handle
             test_process_browse_button = self.create_button(self.fig, 'Browse', browse9_pos);
             
             %% Default plotting file for the TEST
-            
             %Def plot file for test - label
-            
             test_plot_label_pos = self.calc_new_label_position(test_process_label_pos, gap_between_edges);
             test_plot_label = self.create_label(self.fig, 'Default Plotting file for Test: ', test_plot_label_pos);
             
             %Def plot file for test - textbox
-            
             test_plot_box_pos = self.calc_new_textbox_position(test_plot_label_pos, gap_between_edges, textbox_label_ratio);
             self.test_plot_textbox = self.create_text_box(self.fig, self.con.model.test_plot_file, test_plot_box_pos);
             
             %Def plot file for test - browse button
-            
             browse10_pos = self.calc_new_browse_position(test_plot_box_pos, gap_between_edges, button_textbox_ratio);
             test_plot_browse_button = self.create_button(self.fig, 'Browse', browse10_pos);
             
            
             %% The fill color of disabled cells
             %Disabled cell color - label
-            
             color_label_pos = self.calc_new_label_position(test_plot_label_pos, gap_between_edges);
             color_label = self.create_label(self.fig, 'Color of disabled cells: ', color_label_pos);
             
             %Disabled cell color - textbox
-            
             color_box_pos = self.calc_new_textbox_position(color_label_pos, gap_between_edges, textbox_label_ratio);
             self.disabled_color_textbox = self.create_text_box(self.fig, self.con.model.uneditable_cell_color, color_box_pos);
             
             %% The fill text of disabled cells
             %Disabled cell text - label
-            
             text_label_pos = self.calc_new_label_position(color_label_pos, gap_between_edges);
             text_label = self.create_label(self.fig, 'Text inside disabled cells: ', text_label_pos);
             
             %Disabled cell text - textbox
-            
             text_box_pos = self.calc_new_textbox_position(text_label_pos, gap_between_edges, textbox_label_ratio);
             self.disabled_text_textbox = self.create_text_box(self.fig, self.con.model.uneditable_cell_text, text_box_pos);
             
@@ -258,7 +241,6 @@ classdef G4_settings_view < handle
             self.sheet_key_textbox = self.create_text_box(googlesheet_panel, self.con.model.metadata_sheet_key, sheet_box_pos);
             
             % Google sheet key and GID values - Experimenter tab GID
-            
             exp_label_pos = self.calc_new_label_position(sheet_label_pos, gap_between_edges);
             exp_label = self.create_label(googlesheet_panel, 'Experimenter Tab GID: ', exp_label_pos);
             
@@ -266,7 +248,6 @@ classdef G4_settings_view < handle
             self.experimenter_gid_textbox = self.create_text_box(googlesheet_panel, self.con.model.gids.experimenter, exp_box_pos);
             
             % Google Sheets key and GID values - Fly age tab GID
-            
             age_label_pos = self.calc_new_label_position(exp_label_pos, gap_between_edges);
             age_label = self.create_label(googlesheet_panel, 'Fly Age Tab GID: ', age_label_pos);
             
@@ -274,7 +255,6 @@ classdef G4_settings_view < handle
             self.age_gid_textbox = self.create_text_box(googlesheet_panel, self.con.model.gids.fly_age, age_box_pos);
             
             % Google Sheets key and GID values - Fly sex tab GID
-            
             sex_label_pos = self.calc_new_label_position(age_label_pos, gap_between_edges);
             sex_label = self.create_label(googlesheet_panel, 'Fly Sex Tab GID: ', sex_label_pos);
             
@@ -282,7 +262,6 @@ classdef G4_settings_view < handle
             self.sex_gid_textbox = self.create_text_box(googlesheet_panel, self.con.model.gids.fly_sex, sex_box_pos);
             
             % Google Sheets key and GID values - Fly genotype tab GID
-            
             geno_label_pos = self.calc_new_label_position(sex_label_pos, gap_between_edges);
             geno_label = self.create_label(googlesheet_panel, 'Fly Genotype Tab GID: ', geno_label_pos);
             
@@ -290,7 +269,6 @@ classdef G4_settings_view < handle
             self.geno_gid_textbox = self.create_text_box(googlesheet_panel, self.con.model.gids.fly_geno, geno_box_pos);
             
             % Google Sheets key and GID values - Experiment temp tab GID
-            
             temp_label_pos = self.calc_new_label_position(geno_label_pos, gap_between_edges);
             temp_label = self.create_label(googlesheet_panel, 'Experiment Temp tab GID: ', temp_label_pos);
             
@@ -298,7 +276,6 @@ classdef G4_settings_view < handle
             self.temp_gid_textbox = self.create_text_box(googlesheet_panel, self.con.model.gids.exp_temp, temp_box_pos);
             
             % Google Sheets key and GID values - Rearing protocol tab GID
-            
             rearing_label_pos = self.calc_new_label_position(temp_label_pos, gap_between_edges);
             rearing_label = self.create_label(googlesheet_panel, 'Rearing Protocol tab GID: ', rearing_label_pos);
             
@@ -306,7 +283,6 @@ classdef G4_settings_view < handle
             self.rearing_gid_textbox = self.create_text_box(googlesheet_panel, self.con.model.gids.rearing, rearing_box_pos);
             
             % Google Sheets key and GID values - Light Cycle tab GID
-            
             light_label_pos = self.calc_new_label_position(rearing_label_pos, gap_between_edges);
             light_label = self.create_label(googlesheet_panel, 'Light Cycle tab GID: ', light_label_pos);
             
@@ -316,7 +292,6 @@ classdef G4_settings_view < handle
             %% Apply and cancel buttons
             apply_button_pos = [gap_between_edges, gap_between_edges, self.config_filepath_textbox.Position(3)*button_textbox_ratio + .03, self.config_filepath_textbox.Position(4)];
             apply_button = self.create_button(self.fig, 'Apply Changes', apply_button_pos);
-            
             cancel_button_pos = [apply_button_pos(1) + apply_button_pos(3) + .01, apply_button_pos(2), apply_button_pos(3), apply_button_pos(4)];
             cancel_button = self.create_button(self.fig, 'Cancel', cancel_button_pos);
             
@@ -333,18 +308,10 @@ classdef G4_settings_view < handle
             set(testRun_browse_button, 'Callback', @self.browse_for_testRun);
             set(test_process_browse_button, 'Callback', @self.browse_for_testProc);
             set(test_plot_browse_button, 'Callback', @self.browse_for_testPlot);
-
-            
         end
-        
-        
-        
-        
-        
+
         %% Callback functions - buttons
-        
         function apply_changes(self, ~, ~)
-            
            %Calls function for each value in the window checking that it's
            %value is valid. If it is (or has no limitation), the controller then calls the model
            %to update its value and the settings file accordingly. If not
@@ -375,58 +342,44 @@ classdef G4_settings_view < handle
 
            %This updates the gui with the most current model values. 
            self.con.update_view();
-            
-            
         end
+        
         function cancel_changes(self, ~, ~)
-            
             self.con.close_window();
-            
         end
         
         function browse_for_config(self, ~, ~)
-            
             new_file = self.con.browse();
             if new_file ~= 0
                 self.config_filepath_textbox.String = new_file;
-                
             end
-            
         end
         
         function browse_for_run(self, ~, ~)
-            
             new_file = self.con.browse('*.m');
             if new_file ~= 0
                 self.run_protocol_textbox.String = new_file;
-                
             end
         end
         
         function browse_for_plot(self, ~, ~)
-            
             new_file = self.con.browse('*.m');
             if new_file ~= 0
                 self.plot_protocol_textbox.String = new_file;
-                
             end
         end
         
         function browse_for_proc(self, ~, ~)
-            
             new_file = self.con.browse('*.m');
             if new_file ~= 0
                 self.proc_protocol_textbox.String = new_file;
-                
             end
         end
         
         function browse_for_flight(self, ~, ~)
-            
             new_file = self.con.browse('*.g4p');
             if new_file ~= 0
                 self.flight_test_textbox.String = new_file;
-                
             end
         end
         
@@ -440,217 +393,241 @@ classdef G4_settings_view < handle
         end
         
         function browse_for_walkChip(self, ~, ~)
-            
             new_file = self.con.browse('*.g4p');
             if new_file ~= 0
                 self.walkChip_test_textbox.String = new_file;
-                
             end
         end
         
         function browse_for_testRun(self, ~, ~)
-            
             new_file = self.con.browse('*.m');
             if new_file ~= 0
                 self.test_run_textbox.String = new_file;
             end
         end
+        
         function browse_for_testProc(self, ~, ~)
-            
-            new_file = self.con.browse('*.mat');
+            new_file = self.con.browse('*.m');
             if new_file ~= 0
                 self.test_process_textbox.String = new_file;
             end
         end
+        
         function browse_for_testPlot(self, ~, ~)
-            
-            new_file = self.con.browse('*.mat');
+            new_file = self.con.browse('*.m');
             if new_file ~= 0
                 self.test_plot_textbox.String = new_file;
             end
         end
-        
-        
-        
+
         %% Functions to create GUI objects
         function label = create_label(self, parent, text, position)
-        
             label = uicontrol(parent, 'Style', 'text', 'units', 'normalized', ...
                 'FontSize', 14, 'HorizontalAlignment', 'left', 'String', text, 'Position', position);
         end
-        
+
         function box = create_text_box(self, parent, value, position)
-            
             box = uicontrol(parent, 'Style', 'edit', 'units', 'normalized', ...
                 'FontSize', 14, 'String', value, 'Position', position);      
         end
-        
+
         function button = create_button(self, parent, text, position)
-        
             button = uicontrol(parent, 'Style', 'pushbutton', 'units', 'normalized', ...
                 'FontSize', 14, 'String', text, 'Position', position);
         end
-        
+
         function position = calc_new_label_position(self, prev_pos, gap)
-        
             position = [prev_pos(1), prev_pos(2) - gap - prev_pos(4), ...
                 prev_pos(3), prev_pos(4)];
         end
-        
+
         function position = calc_new_textbox_position(self, prev_pos, gap, ratio)
-        
             position = [prev_pos(1) + prev_pos(3) + gap, ...
                 prev_pos(2), prev_pos(3) * ratio, prev_pos(4)];
         end
-        
+
         function position = calc_new_browse_position(self, prev_pos, gap, ratio)
-           
             position = [prev_pos(1) + prev_pos(3) + gap, ...
                 prev_pos(2), prev_pos(3)*ratio, prev_pos(4)];
-            
         end
 
         
         %% Getters
-
         function value = get.fig(self)
             value = self.fig_;
         end
+
         function value = get.con(self)
             value = self.con_;
         end
+
         function value = get.config_filepath_textbox(self)
             value = self.config_filepath_textbox_;
         end
+
         function value = get.sheet_key_textbox(self)
             value = self.sheet_key_textbox_;
         end
+
         function value = get.experimenter_gid_textbox(self)
             value = self.experimenter_gid_textbox_;
         end
+
         function value = get.age_gid_textbox(self)
             value = self.age_gid_textbox_;
         end
+
         function value = get.sex_gid_textbox(self)
             value = self.sex_gid_textbox_;
         end
+
         function value = get.geno_gid_textbox(self)
             value = self.geno_gid_textbox_;
         end
+
         function value = get.temp_gid_textbox(self)
             value = self.temp_gid_textbox_;
         end
+
         function value = get.rearing_gid_textbox(self)
             value = self.rearing_gid_textbox_;
         end
+
         function value = get.light_gid_textbox(self)
             value = self.light_gid_textbox_;
         end
+
         function value = get.run_protocol_textbox(self)
             value = self.run_protocol_textbox_;
         end
+
         function value = get.plot_protocol_textbox(self)
             value = self.plot_protocol_textbox_;
         end
+
         function value = get.proc_protocol_textbox(self)
             value = self.proc_protocol_textbox_;
         end
+
         function value = get.flight_test_textbox(self)
             value = self.flight_test_textbox_;
         end
+
         function value = get.walkCam_test_textbox(self)
             value = self.walkCam_test_textbox_;
         end
+
         function value = get.walkChip_test_textbox(self)
             value = self.walkChip_test_textbox_;
         end
+
         function value = get.disabled_color_textbox(self)
             value = self.disabled_color_textbox_;
         end
+
         function value = get.disabled_text_textbox(self)
             value = self.disabled_text_textbox_;
         end
+
         function value = get.test_run_textbox(self)
             value = self.test_run_textbox_;
         end
+
         function value = get.test_process_textbox(self)
             value = self.test_process_textbox_;
         end
+
         function value = get.test_plot_textbox(self)
             value = self.test_plot_textbox_;
         end
+        
         %% Setters
-
         function set.fig(self, value)
             self.fig_ = value;
         end
+
         function set.con(self, value)
             self.con_ = value;
         end
+
         function set.config_filepath_textbox(self, value)
             self.config_filepath_textbox_ = value;
         end
+
         function set.sheet_key_textbox(self, value)
             self.sheet_key_textbox_ = value;
         end
+
         function set.experimenter_gid_textbox(self, value)
             self.experimenter_gid_textbox_ = value;
         end
+
         function set.age_gid_textbox(self, value)
             self.age_gid_textbox_ = value;
         end
+
         function set.sex_gid_textbox(self, value)
             self.sex_gid_textbox_ = value;
         end
+
         function set.geno_gid_textbox(self, value)
             self.geno_gid_textbox_ = value;
         end
+
         function set.temp_gid_textbox(self, value)
             self.temp_gid_textbox_ = value;
         end
+
         function set.rearing_gid_textbox(self, value)
             self.rearing_gid_textbox_ = value;
         end
+
         function set.light_gid_textbox(self, value)
             self.light_gid_textbox_ = value;
         end
+
         function set.run_protocol_textbox(self, value)
             self.run_protocol_textbox_ = value;
         end
+
         function set.plot_protocol_textbox(self, value)
             self.plot_protocol_textbox_ = value;
         end
+
         function set.proc_protocol_textbox(self, value)
             self.proc_protocol_textbox_ = value;
         end
+
         function set.flight_test_textbox(self, value)
             self.flight_test_textbox_ = value;
         end
+
         function set.walkCam_test_textbox(self, value)
             self.walkCam_test_textbox_ = value;
         end
+
         function set.walkChip_test_textbox(self, value)
             self.walkChip_test_textbox_ = value;
         end
+
         function set.disabled_color_textbox(self, value)
             self.disabled_color_textbox_ = value;
         end
+
         function set.disabled_text_textbox(self, value)
             self.disabled_text_textbox_ = value;
         end
+
         function set.test_run_textbox(self, value)
             self.test_run_textbox_ = value;
         end
+
         function set.test_process_textbox(self, value)
             self.test_process_textbox_ = value;
         end
+
         function set.test_plot_textbox(self, value)
             self.test_plot_textbox_ = value;
         end
-
-
-
-        
     end
-    
 end

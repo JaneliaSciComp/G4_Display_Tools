@@ -7,25 +7,48 @@ nav_order: 2
 
 # G4 Software Setup
 
-Download and install the latest version of MATLAB. Required toolboxes are [instrument control](https://www.mathworks.com/help/instrument/index.html) and [statistics and machine learning](https://www.mathworks.com/help/stats/index.html). A recommended toolbox is [parallel computing](https://www.mathworks.com/help/parallel-computing/index.html).
+The software required to run Generation 4 of the Modular LED Display three main parts. The first component is the G4 Host application that directly communicates with the NI IO card. Secondly, a MATLAB programming environment is requried to run user interfaces and software developed for the G4 displays. And finally, these user interfaces and software tools need to be installed.
 
-Download and install the G4 Host LabVIEW executable. In addition to the HHMI G4 Files, this installs NI R RIO Driver 16.0, NI-Serial 15.0, NI-VISA 16.0, NI System Configuration 16.0 and NI-488.2 14.0. If you want to use more recent drivers and software it is recommended to install these drivers first. The link for the [RIO driver](https://www.ni.com/en-us/support/downloads/drivers/download.ni-r-series-multifunction-rio.html) is difficult to find[^1]. The other software packages are easy to find on <https://ni.com>. Once you installed the old version that comes with the G4 Host application, it's difficult to upgrade.
+## Download and install G4 Host {#download-main-host}
 
-The G4 Host LabVIEW installer is available for [download](https://github.com/floesche/LED-Display_G4_Display-Tools/releases/download/host-v235/HHMI.G4.Host.Ver1-0-0-230.with.installer.zip) ([mirror](https://www.dropbox.com/s/mywy2a3gb6vxhec/HHMI%20G4%20Host%28Ver1-0-0-230%29%20with%20installer.zip?dl=0)). After this installation, make sure to check for updates from the NI update manager. After the installation, you can upgrade to version 1.0.0.235 via this [patch](https://github.com/floesche/LED-Display_G4_Display-Tools/releases/download/host-v235/G4.Host.Ver1-0-0-235.zip) ([mirror](https://www.dropbox.com/s/cuhs907arnx4kfq/G4%20Host(Ver1-0-0-235).zip)) by replacing the files in `C:\Program Files(x86)\HHMI G4`.
+We provide the G4 *Main Host*{:.gui-txt} application as a compiled binary and free of cost, although we are not at liberty to share the LABVIEW sources. Please [get in contact]({{site.baseurl}}/Contact) if you notice an error or if you have special requrirements. The current version requires a two-step process to install: version v1.0.0.230 that is packaged with an installer and an additional patch that upgrades the software to version v1.0.0.235.
 
-Download (or clone) the [G4_Display_Tools GitHub repository](https://github.com/JaneliaSciComp/G4_Display_Tools).
+The G4 Main Host v1.0.0.230 that is packaged with the installer pulls in required libaries such as the NI R RIO Driver v16.0, NI-Serial v15.0, NI-VISA v16.0, NI System Configuration v16.0 and NI-488.2 v14.0. If you want to use more recent versions that include NI bug fixes and performance improvements, the we suggest installing these NI packages prior to running the G4 Main Host installer since it is more difficult to update afterwards. For us, the link for the [RIO driver](https://www.ni.com/en-us/support/downloads/drivers/download.ni-r-series-multifunction-rio.html)[^1] was difficult to find, but the other software packages are readily available via the search function on the NI homepage <https://ni.com>.
 
-## Add paths for G4_Display_Tools in MATLAB {#add-to-path}
+The compiled G4 *Main Host*{:.gui-txt} application in version v1.0.0.230 is available for [download](https://github.com/floesche/LED-Display_G4_Display-Tools/releases/download/host-v235/HHMI.G4.Host.Ver1-0-0-230.with.installer.zip) ([mirror](https://www.dropbox.com/s/mywy2a3gb6vxhec/HHMI%20G4%20Host%28Ver1-0-0-230%29%20with%20installer.zip?dl=0)). The compressed archive contains an installer that also includes a LabVIEW runtime environment. Once you have installed the application and even if you had previously installed the NI packages separately, we recommend pulling the latest updates through the NI update manager that was installed in the process. You can verify the installation by checking if the G4 *Main Host*{:.gui-txt} software exists in a folder at `C:\Program Fiels(x86)\HHMI G4`.
 
-For full functionality, you must add this folder to the MATLAB path with all its subfolders and files.
+In a second step you will need to patch the G4 *Main Host*{:.gui-txt} application to the most recent version v1.0.0.235. Download the archive from [GitHub](https://github.com/floesche/LED-Display_G4_Display-Tools/releases/download/host-v235/G4.Host.Ver1-0-0-235.zip) ([mirror](https://www.dropbox.com/s/cuhs907arnx4kfq/G4%20Host(Ver1-0-0-235).zip)) and unzip the file. Patch the G4 *Main Host*{:.gui-txt} by replacing the files in `C:\Program Files(x86)\HHMI G4` with recently downloaded versions.
 
-On the MATLAB home tab, click *set path*{:.gui-btn}, then *add with subfolders*{:.gui-btn}. Next, browse to the location where you saved G4_Display_Tools, save and close the *Set Path*{:.gui-txt} window.
+## Download and install MATLAB {#download-matlab}
 
-Alternatively, in the Current Folder pane in MATLAB, browse to the location where you saved G4_Display_Tools, right click this folder, and select *Add to Path: Selected folders and subfolders*{:.gui-btn}.
+Download and install the [latest version of MATLAB](https://www.mathworks.com/products/matlab.html). Required toolboxes are [instrument control](https://www.mathworks.com/help/instrument/index.html) and [statistics and machine learning](https://www.mathworks.com/help/stats/index.html). A recommended toolbox is [parallel computing](https://www.mathworks.com/help/parallel-computing/index.html). You will need a license to run MATLAB and many research institutions have campus licenses available.
+
+## Download Display Tools {#download-display-tools}
+
+![On the GitHub repository website, click on "Code" and either use the HTTPS or SSH URL in your git client or choose to "Download ZIP" file](assets/p-d_c-s_t_download-or-clone.png){:standalone .ifr data-img-class="pop"}
+
+To download the G4 Display Tools, navigate to the [G4_Display_Tools GitHub Repository](https://github.com/JaneliaSciComp/G4_Display_Tools). There are two different ways to download the Display Tools: either through git or by downloading a recent archive in your web browser. Download the sofware to a directory of your choice (e.g. `%HOMEPATH%\srcs\G4_Display_Tools`) using either method. If you know about git and know how to download the files you can skip to the next heading.
+
+__Small detour__: using git allows easy updates of the Display Tools in the future but requires additional software on your computer, namely a git client. Instead, using the _download ZIP_ option gives quick access to the most recent version of the G4 Display Tools, but updates are a bit more difficult and potentially dangerous.
+{:.info}
+
+[Git](https://git-scm.com/) is a software to control different versions of files within a single directory. Git and other so called version control systems are efficient in recognizing even small changes in a path that contains many (hundreds, thousands, …) files. Organized in these so-called repositories, git makes it easy to keep track of the different combinations of changes over time. We share our G4 Display Tools git repository on the website GitHub. This means whenever we fix bugs and update the software, you can just _pull_ the latest release with a simple command (or button click). 
+
+If you don't want to [read more about git](https://git-scm.com/book) now, [GitHub Desktop](https://desktop.github.com/) is an easily accessible GUI to get started: Just download and install the [GitHub Desktop](https://desktop.github.com/). Once started, go to *File*{:.gui-btn} → *Clone Repository*{:.gui-btn}, and click on the *URL*{:.gui-txt}. There you can paste the G4 Display Tools HTTPS URL <https://github.com/JaneliaSciComp/G4_Display_Tools.git> and configure your local path where you want to store the software (e.g. `C:\Users\YOURNAME\srcs\` - this will download a copy to `%HOMEPATH%\srcs\G4_Display_Tools`). If you want to update the software at a later point, you can do this by clicking *Repository*{:.gui-btn} → *Pull*{:.gui-btn}.
+
+Instead, if you download the ZIP file from the GitHub repository website, this is a one-time solution. If you want to update the software at a later point, you will need to delete the existing directory and replace it with a [freshly downloaded version from GitHub](https://github.com/JaneliaSciComp/G4_Display_Tools). There is a danger that this might delete some of your own files, a problem unlikely to happen when using git instead.
+
+## Set up Display Tools in MATLAB {#add-to-path}
+
+For full functionality, you must add the folder with your downloaded G4 Display Tools to the MATLAB path.
+
+On the MATLAB home tab, click *set path*{:.gui-btn}, then *add with subfolders*{:.gui-btn}. Next, browse to the location where you downloaded G4_Display_Tools, save and close the *Set Path*{:.gui-txt} window.
+
+Alternatively, in the *Current Folder*{:.gui-txt} pane in MATLAB, browse to the location where you saved G4_Display_Tools, right click this folder, and select *Add to Path: Selected folders and subfolders*{:.gui-btn}.
 
 ## Verify that old software is not interfering {#verify-old}
 
-Lastly, please ensure that `C:\matlabroot\PControl_G4_V01\TDMSReaderv2p5` is NOT on your MATLAB path. This folder contains files from previous versions of this software that may conflict with the current files. You can check this via the MATLAB command `contains(path, "TDMSReaderv2p5")` – a return value of `1` means the folder needs to be removed from your path.
+If you have previously used a version of Modular LED Displays, please ensure that `C:\matlabroot\PControl_G4_V01\TDMSReaderv2p5` is NOT on your MATLAB path. This folder contains files from previous versions of this software that may conflict with the current files. You can check this via the MATLAB command `contains(path, "TDMSReaderv2p5")` – a return value of `1` means the folder needs to be removed from your path.
 
 ## Configure the arena size for the display controller {#configure-controller}
 
@@ -49,4 +72,4 @@ The second test will verify that the connection between MATLAB and the *Panel_Ho
 
 ---
 
-[^1]: In July 2020, the NI R RIO Driver and most other software packages are available in version 20.0.
+[^1]: In November 2021, the NI R RIO Driver and most other software packages are available in version 21.3 (previously in July 2020: v20.0).
