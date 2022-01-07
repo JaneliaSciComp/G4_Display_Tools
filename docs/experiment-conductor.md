@@ -26,6 +26,8 @@ The top left section contains settings for your experiment. The Metadata section
 __Note__: You must have set up a metadata Google Sheets and connected it to the G4 software through the G4 Designer Settings. If you have not done this, the Conductor will not open properly.
 {:.warning}
 
+__Note__: The Conductor opens and utilizes the configuration .ini file. If your account does not have permission to access this file, you may get errors. Please make sure your account has permission to open and edit the .ini file before using the Designer and Conductor. (If you successfully used the Designer to create an experiment, then you have the necessary permissions) 
+
 Please see the [tutorial on how to set this up](protocol-designer_metadata_tutorial.md).
 
 # Fill out the metadata
