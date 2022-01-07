@@ -74,6 +74,12 @@ Here you can see each genotype has a note next to it providing its shorthand nam
 
 With all of this in mind, go through each tab and enter a starting set of values. You can always come back and add more later. If you will not be using any of the fields and so don't have any values to add, simply put in an 'N/A' or something similar in column 1, line 2. If this is the only value, then that field will always be marked as N/A in your experiment.
 
+# Required Permissions for the Google Sheet
+
+Your metadata googlesheet must be accessible by anyone who has the link to it. This is not the default permission setting, so you may need to adjust this. To do so, open the google sheet and click the green button in the top right hand corner labeled "Share." At the bottom of the window that opens, you should see a section called "Get link." It may say "Restricted: Only people added can open with this link." Below this will be blue text that says "Change to anyone with the link." Click on this blue text to make sure that anyone (or in this case, any software) with the link to this document can open it. 
+
+If it already says that anyone with the link can access the document, then you are good to go!
+
 # Connecting the Google Sheets and the G4 Display Tools
 
 So the Google Sheets is done. Great! But how does the Conductor access these values?
