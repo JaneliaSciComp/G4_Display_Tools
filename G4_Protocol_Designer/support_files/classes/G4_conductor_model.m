@@ -299,6 +299,10 @@ classdef G4_conductor_model < handle
         function value = get_num_attempts_bad_conds(self)
             value = self.num_attempts_bad_conds;
         end
+
+        function value = get_timestamp(self)
+            value = self.timestamp;
+        end
         
         
         

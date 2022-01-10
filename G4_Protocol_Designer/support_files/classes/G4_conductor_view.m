@@ -435,7 +435,7 @@ classdef G4_conductor_view < handle
             self.exp_name_box.String = self.con.doc.experiment_name;
             self.fly_name_box.String = self.con.model.fly_name;
             self.fly_genotype_box.Value = find(strcmp(self.con.model.metadata_options.fly_geno,self.con.model.fly_genotype));
-            self.date_and_time_box.String = datestr(now, 'mm-dd-yyyy HH:MM:SS');
+            self.date_and_time_box.String = self.con.get_timestamp();
             self.age_box.Value = find(strcmp(self.con.model.metadata_options.fly_age,self.con.model.fly_age));
             self.sex_box.Value = find(strcmp(self.con.model.metadata_options.fly_sex, self.con.model.fly_sex));
             self.temperature_box.Value = find(strcmp(self.con.model.metadata_options.exp_temp, self.con.model.experiment_temp));

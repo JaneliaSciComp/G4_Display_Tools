@@ -76,6 +76,7 @@ classdef G4_conductor_controller < handle
            
             self.model = G4_conductor_model();
             
+            
             self.elapsed_time = 0;
             
 
@@ -124,6 +125,8 @@ classdef G4_conductor_controller < handle
         function update_timestamp(self, new_val)
             %No error checking
             self.model.set_timestamp(new_val);
+           
+            
         end
         function update_fly_name(self, new_val)
             
@@ -551,6 +554,9 @@ classdef G4_conductor_controller < handle
             
             self.is_aborted = false; %change aborted back to zero in case the experiment was aborted earlier. 
             
+            % Update timestamp to reflect actual start time of experiment
+            self.update_timestamp(datestr(now, 'mm-dd-yyyy HH:MM:SS'));
+
             %get path to experiment folder
             [experiment_path, ~, ~] = fileparts(self.doc.save_filename);
             experiment_folder = experiment_path;
@@ -641,6 +647,9 @@ classdef G4_conductor_controller < handle
             %save the experiment order
             exp_order = parameters.exp_order;
             save(fullfile(experiment_folder,'Log Files','exp_order.mat'),'exp_order')
+
+            % Update gui
+            self.update_view_if_exists();
 
             %Get function name of the script which will run the experiment
             [~, run_name, ~] = fileparts(self.model.run_protocol_file);
@@ -1732,6 +1741,11 @@ classdef G4_conductor_controller < handle
             movefile(pdf_path, new_pdf_path);
 
             
+        end
+
+        function ts = get_timestamp(self)
+
+            ts = self.model.get_timestamp();
         end
 
         %% SETTERS
