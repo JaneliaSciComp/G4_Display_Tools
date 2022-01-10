@@ -121,7 +121,7 @@ classdef G4_conductor_view < handle
             self.con = con;
             % Layout the window
             pix = get(0, 'screensize');
-           self.fig_size = [.25*pix(3), .15*pix(4), .85*pix(3), .6*pix(4)];
+           self.fig_size = [.15*pix(3), .15*pix(4), .8*pix(3), .6*pix(4)];
            set(self.fig,'Position',self.fig_size);
 
            menu = uimenu(self.fig, 'Text', 'File');
