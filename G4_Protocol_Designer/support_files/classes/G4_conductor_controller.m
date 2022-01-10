@@ -290,6 +290,11 @@ classdef G4_conductor_controller < handle
             new_val = self.doc.calc_exp_length();
             self.model.set_expected_time(new_val);
         end
+
+        function update_num_attempts(self, new_val)
+            
+            self.model.set_num_attempts_bad_conds(str2num(new_val));
+        end
         
         function add_bad_trial_marker_progress(self, trialNum)
             
@@ -1754,6 +1759,11 @@ classdef G4_conductor_controller < handle
         function ts = get_timestamp(self)
 
             ts = self.model.get_timestamp();
+        end
+
+        function num_attempts = get_num_attempts(self)
+
+            num_attempts = self.model.get_num_attempts_bad_conds();
         end
 
         %% SETTERS

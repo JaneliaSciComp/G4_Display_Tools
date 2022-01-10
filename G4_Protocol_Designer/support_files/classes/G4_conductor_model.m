@@ -293,8 +293,7 @@ classdef G4_conductor_model < handle
         function set_postTrialTimes(self, new_val)
             self.postTrialTimes = new_val;
         end
-        
-
+       
         
         function value = get_num_attempts_bad_conds(self)
             value = self.num_attempts_bad_conds;
