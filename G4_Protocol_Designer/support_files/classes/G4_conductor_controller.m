@@ -284,6 +284,12 @@ classdef G4_conductor_controller < handle
             self.update_view_if_exists();
             
         end
+
+        function update_expected_time(self)
+
+            new_val = self.doc.calc_exp_length();
+            self.model.set_expected_time(new_val);
+        end
         
         function add_bad_trial_marker_progress(self, trialNum)
             
@@ -522,6 +528,8 @@ classdef G4_conductor_controller < handle
                 self.doc.set_recent_files(filepath);
                 self.doc.update_recent_files_file();
                 self.model.fly_name = self.model.create_fly_name(top_folder_path);
+                self.update_expected_time();
+                self.update_elapsed_time(0);
 
                 self.update_view_if_exists();
                 
