@@ -678,8 +678,9 @@ classdef G4_conductor_controller < handle
             if self.check_if_aborted()
                 %experiment has been aborted
                 self.model.aborted_count = self.model.aborted_count + 1;
-                aborted_filename = ['Aborted_exp_data',num2str(self.model.aborted_count)];
-                [logs_removed, logs_msg] = movefile(fullfile(experiment_folder,'Log Files','*'),fullfile(fly_results_folder,aborted_filename));
+                aborted_filename = ['Aborted_exp_data',self.get_timestamp()];
+                aborted_results_folder = fullfile(experiment_folder, 'Aborted_Experiments');
+                [logs_removed, logs_msg] = movefile(fullfile(experiment_folder,'Log Files','*'),fullfile(aborted_results_folder,aborted_filename));
                 pause(.5);
                 
                 self.create_metadata_file();
@@ -1148,8 +1149,8 @@ classdef G4_conductor_controller < handle
             if self.is_aborted == 0
                 fly_folder = fullfile(experiment_path, self.model.date_folder, self.model.fly_save_name);
             else
-                aborted_filename = ['Aborted_exp_data',num2str(self.model.aborted_count)];
-                fly_folder = fullfile(experiment_path, self.model.date_folder, self.model.fly_save_name, aborted_filename);
+                aborted_filename = ['Aborted_exp_data',self.get_timestamp()];
+                fly_folder = fullfile(experiment_path, 'Aborted_Experiments', aborted_filename);
             end
             
             
