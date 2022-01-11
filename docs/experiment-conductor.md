@@ -57,12 +57,25 @@ For this to work, you should have created a data processing settings file and a 
 
 If you want your data processed and analyzed automatically but have not set up these settings files, please see [Data analysis](data-handling_analysis.md). If you do not wish to use this feature right now, simply uncheck the processing and plotting boxes.
 
-## Processing, Plotting, and Run Protocol paths
+## Processing and Plotting paths
 
-You must set the paths to three files – the processing and plotting files (if you've selected to use them) and the run protocol file. The default paths in the settings file will be placed here automatically, so if you don't wish to change from the defaults, you don't have to do anything. However, you can change these without altering the defaults. Hit the *browse*{:.gui-btn} button at the end of each text box to change the file being used in this particular experiment.
+You must set the paths to three files – the processing and plotting files (if you've selected to use them) and the run protocol file (covered in the next section). The default paths in the settings file will be placed here automatically, so if you don't wish to change from the defaults, you don't have to do anything. However, you can change these without altering the defaults. Hit the *browse*{:.gui-btn} button at the end of each text box to change the file being used in this particular experiment.
 
-- Please note that the run protocol file is set up to be edited by users if they wish. There are two run protocols currently to choose from: `G4_default_run_protocol.m` and `G4_default_run_protocol_streaming.m`. If you'd like to collect and plot data from your fly as the experiment runs, please select the latter. Your experiment, when you created in the Designer, must have been given non-zero values for the sample rates for analog input channels (1000 is recommended) for this to work. If you do not wish to stream and plot data throughout the experiment, please select the former run protocol. The graphs in the Data Monitoring Panel, in this case, will remain empty. It is also possible to design and save your own run protocols. You should always save these in `G4_Display_Tools\G4_Protocol_Designer\run_protocols` with the defaults. Whatever .m file is in this text box is the one that will be run. Please only do this if you are comfortable coding in MATLAB.
+These paths should point to the settings files you generated for data processing and plotting earlier in the process. If you did not set up any settings for data processing or plotting, then uncheck the plotting and processing checkboxess. 
+
 - Please note that you cannot change the experiment name in the conductor. The designer, if it is open, and the conductor share the same underlying experiment. If you change the experiment in the designer, it will change in the conductor, but if you have opened the conductor independently, it will not. For this reason, changing the experiment name in the conductor could lead to confusion as to which is experiment is actually loaded. If you must make any changes, close the conductor and go back to the designer.
+
+## Run Protocol Path
+
+The run protocol does not refer to the .g4p file, but to a different .m file which controls how exactly the .g4p file is run on the arena. For more details on how exactly the run protocol works, see [this tutorial](experiment-conductor_run-protocol_tutorial.md). There are two default run protocols to choose from: `G4_default_run_protocol.m` and `G4_default_run_protocol_streaming.m`, both located in `G4_Display_Tools/G4_Protocol_Designer/run_protocols`. A third run protocol, called `G4_run_protocol_combinedCommand.m` is also present, but as of now should not be used, as it still has bugs to be worked out. 
+
+Which of the two default protocols you use depends on whether you'd like to use the recently added streaming feature. To use it, the experiment must have non-zero sample rates set for the Analog Input Channels. You set these values in the Designer when creating your experiment. 
+
+The streaming feature does two things. First, it collects data from your fly at the end of each trial and plots it on the graphs shown in the Data Monitoring Panel (more on these in the Data Monitoring section below). This allows you to monitor how centered your fly is and how well it is flying. Second, it catches any conditions where the fly was not flying enough, marks them as bad, and attempts to re-run them at the end of the experiment. This way, if the fly successfully runs through the condition on the re-run, you still get data for that condition. The data processing will automatically use the re-run's data instead of the bad data from the first attempt. 
+
+If you'd like to utilize these features in your experiment, all you have to do is set the run protocol to `G4_default_run_protocol_streaming.m`. If you do not want these features, set the run protocol to `G4_default_run_protocol.m`. If you are comfortable with programming in matlab, you can also see [this tutorial](experiment-conductor_run-protocol_tutorial.md) showing how to create your own run protocol.
+
+Notice the next line in the Conductor asking how many times bad conditions should be re-attempted at the end of the experiment. By default this is set to 1. If you're using the streaming protocol, and a bad condition is re-attempted at the end of the experiment and still fails, it will not be attempted again. You can set this to a higher number, meaning if the first re-attempt fails, the condition will be tried again, up to the number of re-attempts you have set. Keep in mind that if your fly stops flying a lot, your experiment may end up being much longer than originally anticipated if you are re-running multiple trials many times at the end of the experiment. And a fly that stops flying a lot will very likely refuse to fly much at all by the end of a long experiment. Note, however, that you can also set this number to 0. If you set it to 0, you will get the benefit of seeing the fly's data throughout the experiment on the plots provided, but bad conditions will NOT be re-attempted at the end of the experiment. 
 
 ## Run a test protocol (optional)
 
@@ -80,7 +93,7 @@ Also beneath this will be the total time the experiment is expected to take.
 
 # Data Monitoring
 
-In the Data Monitoring Panel you'll find three plots as well as some labels. *Last trial avg WBF:*{:.gui-txt} will display, at the end of each trial, your fly's average wing beat frequency for that trial. To the right of this you'll see *Bad Trials/Conditions:*{:.gui-txt} and *Trial*{:.gui-txt}, *Condition*{:.gui-txt}, and *Repetition*{:.gui-txt} labels. These used to display the details of any condition that was marked as bad, but in the interest of speed we have removed this feature. These labels will be removed in future versions. 
+In the Data Monitoring Panel you'll find three plots as well as some labels. *Last trial avg WBF:*{:.gui-txt} will display, at the end of each trial, your fly's average wing beat frequency for that trial. Note that the items in the Data Monitoring panel will only update if you are using the run protocol called `G4_default_run_protocol_streaming.m`.
 
 There are three axes visible in this panel.
 
