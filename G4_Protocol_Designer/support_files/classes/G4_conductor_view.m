@@ -25,6 +25,7 @@ classdef G4_conductor_view < handle
         processing_checkbox_
         processing_textbox_
         run_textbox_
+        num_attempts_textbox_
         current_running_trial_
         browse_button_plotting_
         browse_button_processing_
@@ -80,6 +81,7 @@ classdef G4_conductor_view < handle
         processing_checkbox
         processing_textbox
         run_textbox
+        num_attempts_textbox
         current_running_trial
         browse_button_plotting
         browse_button_processing
@@ -119,7 +121,7 @@ classdef G4_conductor_view < handle
             self.con = con;
             % Layout the window
             pix = get(0, 'screensize');
-           self.fig_size = [.25*pix(3), .15*pix(4), .85*pix(3), .6*pix(4)];
+           self.fig_size = [.15*pix(3), .15*pix(4), .8*pix(3), .6*pix(4)];
            set(self.fig,'Position',self.fig_size);
 
            menu = uimenu(self.fig, 'Text', 'File');
@@ -421,6 +423,13 @@ classdef G4_conductor_view < handle
                 'String', self.con.model.run_protocol_file, 'Position', [80, 45, 200, 18]);
             self.browse_button_run = uicontrol(settings_pan, 'Style', 'pushbutton', 'units', 'pixels', ...
                 'String', 'Browse', 'Position', [285, 45, 65, 18], 'Callback', @self.run_browse);
+
+            num_attempts_label = uicontrol(settings_pan, 'Style', 'text', 'String', ...
+                'Number times to re-attempt bad trials:', 'HorizontalAlignment','left', ...
+                'units', 'pixels', 'Position', [10, 20, 200, 15]);
+            self.num_attempts_textbox = uicontrol(settings_pan, 'Style', 'edit', 'units', 'pixels',...
+                'String', self.con.model.num_attempts_bad_conds, 'Position', [210, 20, 50, 15], ...
+                'Callback', @self.new_num_attempts);
             
             self.bad_trial_markers = [];
            
@@ -446,6 +455,7 @@ classdef G4_conductor_view < handle
             self.plotting_textbox.String = self.con.model.plotting_file;
             self.processing_checkbox.Value = self.con.model.do_processing;
             self.processing_textbox.String = self.con.model.processing_file;
+            self.num_attempts_textbox.String = self.con.get_num_attempts();
             self.exp_type_menu.Value = self.con.model.experiment_type;
             self.run_textbox.String = self.con.model.run_protocol_file;
             self.set_expected_time();
@@ -528,6 +538,12 @@ classdef G4_conductor_view < handle
             
         end
         
+        function new_num_attempts(self, src, ~)
+
+            self.con.update_num_attempts(src.String)
+            self.update_run_gui();
+        end
+
         function new_experiment_type(self, src, ~)
             
             self.con.update_experiment_type(src.Value);
@@ -932,6 +948,10 @@ classdef G4_conductor_view < handle
         function value = get.bad_trial_markers(self)
             value = self.bad_trial_markers_;
         end
+
+        function value = get.num_attempts_textbox(self)
+            value = self.num_attempts_textbox_;
+        end
         
         %% Setters
         
@@ -1123,6 +1143,9 @@ classdef G4_conductor_view < handle
         
         function set.bad_trial_markers(self, value)
             self.bad_trial_markers_ = value; 
+        end
+        function set.num_attempts_textbox(self, value)
+            self.num_attempts_textbox_ = value; 
         end
     end
     

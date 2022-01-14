@@ -572,7 +572,7 @@ end
             % additional time if the first re-run also fails. 
              
             res_conds = runcon.fb_model.get_bad_trials();
-            num_attempts = runcon.model.num_attempts_bad_conds;
+            num_attempts = runcon.get_num_attempts();
             num_trial_including_rescheduled = num_trial_of_total;
 
             

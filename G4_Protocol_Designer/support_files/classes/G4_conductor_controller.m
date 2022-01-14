@@ -290,6 +290,11 @@ classdef G4_conductor_controller < handle
             new_val = self.doc.calc_exp_length();
             self.model.set_expected_time(new_val);
         end
+
+        function update_num_attempts(self, new_val)
+            
+            self.model.set_num_attempts_bad_conds(str2num(new_val));
+        end
         
         function add_bad_trial_marker_progress(self, trialNum)
             
@@ -563,7 +568,7 @@ classdef G4_conductor_controller < handle
             self.is_aborted = false; %change aborted back to zero in case the experiment was aborted earlier. 
             
             % Update timestamp to reflect actual start time of experiment
-            self.update_timestamp(datestr(now, 'mm-dd-yyyy HH:MM:SS'));
+            self.update_timestamp(datestr(now, 'mm-dd-yyyyHH_MM_SS'));
 
             %get path to experiment folder
             [experiment_path, ~, ~] = fileparts(self.doc.save_filename);
@@ -576,6 +581,11 @@ classdef G4_conductor_controller < handle
             %create Log Files folder if it doesn't exist
             if ~exist(fullfile(experiment_folder,'Log Files'),'dir')
                 mkdir(experiment_folder,'Log Files');
+            end
+
+            %create Aborted Experiments folder if it doesn't exist
+            if ~exist(fullfile(experiment_folder,'Aborted_Experiments'),'dir')
+                mkdir(experiment_folder,'Aborted_Experiments');
             end
             
 %Check for issues that might disrupt the run 
@@ -673,8 +683,9 @@ classdef G4_conductor_controller < handle
             if self.check_if_aborted()
                 %experiment has been aborted
                 self.model.aborted_count = self.model.aborted_count + 1;
-                aborted_filename = ['Aborted_exp_data',num2str(self.model.aborted_count)];
-                [logs_removed, logs_msg] = movefile(fullfile(experiment_folder,'Log Files','*'),fullfile(fly_results_folder,aborted_filename));
+                aborted_filename = ['Aborted_exp_data',self.get_timestamp()];
+                aborted_results_folder = fullfile(experiment_folder, 'Aborted_Experiments');
+                [logs_removed, logs_msg] = movefile(fullfile(experiment_folder,'Log Files','*'),fullfile(aborted_results_folder,aborted_filename));
                 pause(.5);
                 
                 self.create_metadata_file();
@@ -1143,8 +1154,8 @@ classdef G4_conductor_controller < handle
             if self.is_aborted == 0
                 fly_folder = fullfile(experiment_path, self.model.date_folder, self.model.fly_save_name);
             else
-                aborted_filename = ['Aborted_exp_data',num2str(self.model.aborted_count)];
-                fly_folder = fullfile(experiment_path, self.model.date_folder, self.model.fly_save_name, aborted_filename);
+                aborted_filename = ['Aborted_exp_data',self.get_timestamp()];
+                fly_folder = fullfile(experiment_path, 'Aborted_Experiments', aborted_filename);
             end
             
             
@@ -1754,6 +1765,11 @@ classdef G4_conductor_controller < handle
         function ts = get_timestamp(self)
 
             ts = self.model.get_timestamp();
+        end
+
+        function num_attempts = get_num_attempts(self)
+
+            num_attempts = self.model.get_num_attempts_bad_conds();
         end
 
         %% SETTERS
