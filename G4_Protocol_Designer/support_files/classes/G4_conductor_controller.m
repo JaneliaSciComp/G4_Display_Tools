@@ -568,7 +568,7 @@ classdef G4_conductor_controller < handle
             self.is_aborted = false; %change aborted back to zero in case the experiment was aborted earlier. 
             
             % Update timestamp to reflect actual start time of experiment
-            self.update_timestamp(datestr(now, 'mm-dd-yyyy HH:MM:SS'));
+            self.update_timestamp(datestr(now, 'mm-dd-yyyyHH_MM_SS'));
 
             %get path to experiment folder
             [experiment_path, ~, ~] = fileparts(self.doc.save_filename);
@@ -581,6 +581,11 @@ classdef G4_conductor_controller < handle
             %create Log Files folder if it doesn't exist
             if ~exist(fullfile(experiment_folder,'Log Files'),'dir')
                 mkdir(experiment_folder,'Log Files');
+            end
+
+            %create Aborted Experiments folder if it doesn't exist
+            if ~exist(fullfile(experiment_folder,'Aborted_Experiments'),'dir')
+                mkdir(experiment_folder,'Aborted_Experiments');
             end
             
 %Check for issues that might disrupt the run 
