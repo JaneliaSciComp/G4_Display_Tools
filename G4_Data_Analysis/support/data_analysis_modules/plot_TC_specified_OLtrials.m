@@ -22,7 +22,11 @@ function plot_TC_specified_OLtrials(TC_plot_settings, gen_settings, TC_conds, pl
     xaxis_values = TC_plot_settings.xaxis_values;
     fig_names = TC_plot_settings.figure_names;
     xtick_fontSize = gen_settings.axis_num_fontSize;
-    subplot_figure_titles = TC_plot_settings.subplot_figure_title{fig_num};
+    if ~isempty(TC_plot_settings.subplot_figure_title)
+        subplot_figure_titles = TC_plot_settings.subplot_figure_title{fig_num};
+    else
+        subplot_figure_titles = [];
+    end
     figTitle_fontSize = gen_settings.figTitle_fontSize;
     
     

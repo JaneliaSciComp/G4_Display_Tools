@@ -96,7 +96,7 @@ function plot_OL_timeseries(timeseries_data, timestampsIN, model, plot_settings,
                             nanidx = isnan(meandata);
                             stddata = nanstd(tmpdata);
                             semdata = stddata./sqrt(sum(max(~isnan(tmpdata),[],2)));
-                            timestamps = timestamp----sIN(~nanidx);
+                            timestamps = timestampsIN(~nanidx);
                             meandata(nanidx) = []; 
                             semdata(nanidx) = [];
                             ms_to_move = nanmean(squeeze(pat_move_time(g,:,cond,:)))/1000;

@@ -15,33 +15,33 @@ function  Simple_DA_settings()
     
 
     % Where do you want to save your settings file for this data analysis? 
-    settings_path = '';
+    settings_path = 'C:\Users\taylo\Documents\Programming\Reiser\simNarrowGrating09-17-21_16-10-12';
 
     %What filename would you like to give the settings file for this data
     %analysis? 
-    filename = '';
+    filename = 'D_simulans_multigroup_analysis';
 
     % The path to your processing settings for this protocol
-    exp_settings.path_to_processing_settings = '/Users/taylorl/Desktop/narrowGrating09-08-21_17-27-53/later_processing_settings.mat';
+    exp_settings.path_to_processing_settings = 'C:\Users\taylo\Documents\Programming\Reiser\simNarrowGrating09-17-21_16-10-12\sim_processing_settings.mat';
     
     %The path where you wish to save the results of the data analysis
-    save_settings.save_path = '/Users/taylorl/Desktop/narrowGrating09-08-21_17-27-53/09_09_2021/Analysis';
+    save_settings.save_path = 'C:\Users\taylo\Documents\Programming\Reiser\simNarrowGrating09-17-21_16-10-12\MultiGroupAnalysis';
     
     %The path where the pdf report of the results should be saved,
     %including the name of the pdf report file and its extension (.pdf). 
-    save_settings.report_path = '/Users/taylorl/Desktop/narrowGrating09-08-21_17-27-53/09_09_2021/Analysis/DA_report.pdf';        
+    save_settings.report_path = 'C:\Users\taylo\Documents\Programming\Reiser\simNarrowGrating09-17-21_16-10-12\MultiGroupAnalysis\DA_report.pdf';        
 
-    % Set this equal to 1 if you are analyzing a single group of flies.
-    % Otherwise set it equal to 0
-    exp_settings.single_group = 1;
-    
     %Set this equal to 1 if you will only be analyzing a single fly.
     %Otherwise, set this equal to 0
     exp_settings.single_fly = 0;
     
+    % Set this equal to 1 if you are analyzing a single group of flies.
+    % Otherwise set it equal to 0
+    exp_settings.single_group = 1;
+    
     %If you're running a single fly (the above variable single_fly is set to 1), 
     % you need to provide the path to that fly folder
-    exp_settings.fly_path = '/Users/taylorl/Desktop/narrowGrating09-08-21_17-27-53/09_09_2021/DL-14_57_22';
+    exp_settings.fly_path = 'C:\Users\taylo\Documents\Programming\Reiser\simNarrowGrating09-17-21_16-10-12\09_23_2021\D_simulans-15_11_20';
 
     %The following variable determines which flies will be included in the
     %analysis. If single_fly = 1, it is irrelevant and can be left as is.
@@ -51,20 +51,25 @@ function  Simple_DA_settings()
     %corresponding field. Fly group 1 will be flies that have the metadata
     %field field_to_sort_by{1} equal to field_values{1}. Fly group 2 will
     %be flies that have the meatdata field field_to_sort_by{2} equal to
-    %field_values{2}. You may repeat metadata fields to group flies with
-    %two different values for the same field separately. See examples and
+    %field_values{2}. See examples and
     %more details here: 
     % https://reiserlab.github.io/Modular-LED-Display/Generation%204/Display_Tools/docs/data-handling_analysis.html#field-to-sort-by
     
+    % NOTE THAT USING MULTIPLE FIELDS PER GROUP WILL NOT WORK! In the full
+    % data analysis software, you may create groups by matching multiple
+    % metadata fields, i.e. flies of a particular genotype AND age in one
+    % group. There are examples of this in the documentation, but it WILL
+    % NOT WORK in the simplified data analysis. You are limited to grouping
+    % by only one metadata field.
     exp_settings.field_to_sort_by{1} = ["fly_genotype"];
-%    exp_settings.field_to_sort_by{2} = ["ablated"];
+%    exp_settings.field_to_sort_by{2} = ["fly_age"];
 %     exp_settings.field_to_sort_by{3} = ["fly_genotype", "experimenter"];
 %     exp_settings.field_to_sort_by{4} = ["fly_genotype", "experimenter"];
 
     %If plot_all_genotypes is 1, leave field_values empty.   
 %    exp_settings.field_values = {};
-    exp_settings.field_values{1} = ["DL"];
-%    exp_settings.field_values{2} = ["b"];
+    exp_settings.field_values{1} = ["D_simulans"];
+%    exp_settings.field_values{2} = ["4-6 days"];
 %     exp_settings.field_values{3} = ["OL0042B_UAS_Kir_JFRC49", "arrudar"];
 %     exp_settings.field_values{4} = ["OL0042B_UAS_Kir_JFRC49", "kappagantular"];
 
@@ -91,7 +96,7 @@ function  Simple_DA_settings()
     exp_settings.plot_norm_and_unnorm = 1;  
 
     % Give your analysis a name. Log file will be named using this
-    exp_settings.group_being_analyzed_name = 'DL';
+    exp_settings.group_being_analyzed_name = 'Simplified DSim Mult Groups';
 
 %% TIMESERIES SETTINGS - if you don't want timeseries plots, can leave as is
 
@@ -101,7 +106,7 @@ function  Simple_DA_settings()
     % used for timeseries. Options for walking data are: 'Vx0_chan', 'Vx1_chan', 
     % 'Vy0_chan', 'Vy1_chan', 'Frame Position', 'Turning', 'Forward', 'Sideslip'
 
-    timeseries_plot_settings.OL_datatypes = {'LmR', 'LpR'};
+    timeseries_plot_settings.OL_datatypes = {'LmR', 'faLmR'};
 
     % If your conditions come in symmetrical pairs and you want those pairs
     % plotted on the same axis, set this to 1. Otherwise, set it to 0.
@@ -137,7 +142,7 @@ function  Simple_DA_settings()
     % Set this to 1 if you are plotting only a single fly and want lines
     % plotted for each repetition as well as the fly's average. Otherwise
     % leave it at 0.
-    timeseries_plot_settings.show_individual_reps = 0;
+    timeseries_plot_settings.show_individual_reps = 1;
 
 %% FALMR TIMESERIES SETTINGS - if faLmR is not included in your timeseries datatypes, you may ignore these
         
@@ -174,7 +179,7 @@ function  Simple_DA_settings()
 
     % Datatypes for which to plot tuning curves. Options are the same as
     % for timeseries datatypes
-    TC_plot_settings.TC_datatypes = {'LmR','LpR'};
+    TC_plot_settings.TC_datatypes = {'LmR'};
 
     % The x-axis values for tuning curves
     TC_plot_settings.xaxis_values = [0.625 1.25 2.5 5 10 20 40 60];

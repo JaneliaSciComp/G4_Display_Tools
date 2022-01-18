@@ -73,8 +73,8 @@
     %folder. This folder should have subfolders named by date, and each of
     %those should have the fly folders for all flies run on that date. 
 
-%% This is the function for the new file system arrangement. Find old system below.
-function exp_folder = get_exp_folder(field_to_sort_by, field_values, single_group, single_fly, single_fly_path,  path_to_protocol, control)
+%% This is the function for the new file system arrangement. 
+function [exp_folder, field_values] = get_exp_folder(field_to_sort_by, field_values, single_group, single_fly, single_fly_path,  path_to_protocol, control)
 
      if single_fly == 1
         exp_folder = {single_fly_path};

@@ -98,8 +98,10 @@ classdef da_model < handle
             
             %faLmR timeseries
             if da.faLmR == 1 && da.timeseries_plot_option ==1
-                [self.falmr_bottom_left_places, self.falmr_left_column_places] = ...
-                    get_plot_placements(da.timeseries_plot_settings.faLmR_conds);
+                if ~isempty(da.timeseries_plot_settings.faLmR_conds)
+                    [self.falmr_bottom_left_places, self.falmr_left_column_places] = ...
+                        get_plot_placements(da.timeseries_plot_settings.faLmR_conds);
+                end
             else
                 self.falmr_bottom_left_places = [];
                 self.falmr_left_column_places = [];

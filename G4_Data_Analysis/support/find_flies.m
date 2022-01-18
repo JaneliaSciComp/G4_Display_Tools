@@ -12,10 +12,39 @@ function find_flies(settings_file)
 
      %% This will generate your exp_folder, do not edit. 
     
-   exp_settings.exp_folder = get_exp_folder(exp_settings.field_to_sort_by, exp_settings.field_values, exp_settings.single_group, ...
+   [exp_settings.exp_folder, field_values] = get_exp_folder(exp_settings.field_to_sort_by, exp_settings.field_values, exp_settings.single_group, ...
         exp_settings.single_fly, exp_settings.fly_path, proc_settings.protocol_folder, exp_settings.control_genotype);
 
-    save(settings_file, 'exp_settings', 'histogram_plot_settings', ...
+% When using the simplified data analysis, users cannot define their
+% genotype labels. They are defined automatically unless the user is using
+% the plot_all_genotypes feature. In this case, the various field values
+% were not known until running get_exp_folder, so here we must update
+% genotypes before re-saving the settings file.
+    if isempty(exp_settings.genotypes) || strcmp(exp_settings.genotypes(1),"")
+       if ~isempty(exp_settings.control_genotype)
+            exp_settings.genotypes(1) = string(exp_settings.control_genotype);
+       end
+       for f = 1:length(field_values)
+            match = [];
+            for g = 1:length(exp_settings.genotypes)
+                match(g) = strcmp(field_values{f}, exp_settings.genotypes(g));
+            end
+    
+            if sum(match) > 0
+                continue;
+            end
+    
+            if ~strcmp(exp_settings.genotypes(end), "")
+                exp_settings.genotypes(end+1) = field_values{f};
+            else
+                exp_settings.genotypes(end) = field_values{f};
+            end
+                   
+       end
+    end
+
+
+   save(settings_file, 'exp_settings', 'histogram_plot_settings', ...
         'histogram_annotation_settings','CL_hist_plot_settings', 'proc_settings',...
         'timeseries_plot_settings', 'TC_plot_settings', 'MP_plot_settings', ...
         'pos_plot_settings', 'save_settings','comp_settings', 'gen_settings');

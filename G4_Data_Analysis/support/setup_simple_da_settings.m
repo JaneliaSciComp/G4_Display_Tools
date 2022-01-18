@@ -10,10 +10,14 @@ process_settings = load(exp_settings.path_to_processing_settings);
 proc_settings = process_settings.settings;
 [proc_settings.protocol_folder, ~, ~] = fileparts(proc_settings.path_to_protocol);
 
+if ~isfolder(save_settings.save_path)
+    mkdir(save_settings.save_path);
+end
+
 %% Create Array of genotype names for labeling
 if exp_settings.single_fly % if it's a single fly analysis, just get genotype from metadata. No control
 
-    metadata = load(fullfile(exp_settings.fly_path, 'metadata.mat'));
+    load(fullfile(exp_settings.fly_path, 'metadata.mat'));
     exp_settings.genotypes = [metadata.fly_genotype];
 
 elseif exp_settings.single_group % if it's a single group, a field value must 
@@ -26,25 +30,34 @@ elseif ~exp_settings.plot_all_genotypes % If it's multiple groups but not all ge
     % control. Put control at front of genotypes, then copy the rest from
     % field values
 
-    exp_settings.genotypes = [];
+    exp_settings.genotypes = strings(1);
     if ~isempty(exp_settings.control_genotype)
-        exp_settings.genotypes = [string(exp_settings.control_genotype)];
+        exp_settings.genotypes(1) = string(exp_settings.control_genotype);
     end
     
     for f = 1:length(exp_settings.field_values)
         match = [];
         for g = 1:length(exp_settings.genotypes)
+           
             match(g) = strcmp(exp_settings.field_values{f}, exp_settings.genotypes(g));
+          
         end
+
         if sum(match) > 0
             continue;
         end
-        exp_settings.genotypes(end+1) = exp_settings.field_values{f};
+
+        if ~strcmp(exp_settings.genotypes(end), "")
+            exp_settings.genotypes(end+1) = exp_settings.field_values{f};
+        else
+            exp_settings.genotypes(end) = exp_settings.field_values{f};
+        end
+               
     end
 
 else %if using plot_all_genotypes, the actual analysis generates its own labels based on what it finds.
 
-    exp_settings.genotypes = [];
+    exp_settings.genotypes = strings(1);
 end
 
     
@@ -60,10 +73,13 @@ end
     timeseries_plot_settings.cond_name = [];
     timeseries_plot_settings.axis_labels = {};
     timeseries_plot_settings.subplot_figure_title = {};
-    timeseries_plot_settings.figure_names = []; %will be adjusted if timeseries are being plotted
-
-    for dt = 1:length(timeseries_plot_settings.OL_datatypes)
-        timeseries_plot_settings.figure_names(dt) = string(timeseries_plot_settings.OL_datatypes{dt});
+%     timeseries_plot_settings.figure_names = []; %will be adjusted if timeseries are being plotted
+    if ~isempty(timeseries_plot_settings.OL_datatypes)
+        for dt = 1:length(timeseries_plot_settings.OL_datatypes)
+            timeseries_plot_settings.figure_names(dt) = string(timeseries_plot_settings.OL_datatypes{dt});
+        end
+    else
+        timeseries_plot_settings.figure_names = [];
     end
 
     timeseries_plot_settings.pattern_motion_indicator = 1;
@@ -88,12 +104,21 @@ end
     TC_plot_settings.plot_both_directions = 0;
     TC_plot_settings.axis_labels = {}; % will be adjusted if tuning curves are being done
     TC_plot_settings.subplot_figure_title = {};   
-    TC_plot_settings.figure_names = [];
-
+%     TC_plot_settings.figure_names = [];
+    
+    
     for tc = 1:length(TC_plot_settings.TC_datatypes)
         TC_plot_settings.axis_labels{tc} = [TC_plot_settings.xaxis_label, string(TC_plot_settings.TC_datatypes{tc})];
     end
-    
+
+    if ~isempty(TC_plot_settings.TC_datatypes)
+        for d = 1:length(TC_plot_settings.TC_datatypes)
+            TC_plot_settings.figure_names(d) = string(TC_plot_settings.TC_datatypes{d});
+        end
+    else
+        TC_plot_settings.figure_names = [];
+    end
+
 %% Position-Series M and P Plot Settings ('-posplot)
 
     MP_plot_settings.plot_MandP = 0;   
