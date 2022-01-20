@@ -15,33 +15,33 @@ function  Simple_DA_settings()
     
 
     % Where do you want to save your settings file for this data analysis? 
-    settings_path = 'C:\Users\taylo\Documents\Programming\Reiser\simNarrowGrating09-17-21_16-10-12';
+    settings_path = 'C:\Users\taylo\Documents\Programming\Reiser\simMel';
 
     %What filename would you like to give the settings file for this data
     %analysis? 
-    filename = 'D_simulans_multigroup_analysis';
+    filename = 'simMel_single_fly_analysis';
 
     % The path to your processing settings for this protocol
-    exp_settings.path_to_processing_settings = 'C:\Users\taylo\Documents\Programming\Reiser\simNarrowGrating09-17-21_16-10-12\sim_processing_settings.mat';
+    exp_settings.path_to_processing_settings = 'C:\Users\taylo\Documents\Programming\Reiser\simMel\afterExp_ProcessSettings1.mat';
     
     %The path where you wish to save the results of the data analysis
-    save_settings.save_path = 'C:\Users\taylo\Documents\Programming\Reiser\simNarrowGrating09-17-21_16-10-12\MultiGroupAnalysis';
+    save_settings.save_path = 'C:\Users\taylo\Documents\Programming\Reiser\simMel\OreR-15_28_08\Analysis';
     
     %The path where the pdf report of the results should be saved,
     %including the name of the pdf report file and its extension (.pdf). 
-    save_settings.report_path = 'C:\Users\taylo\Documents\Programming\Reiser\simNarrowGrating09-17-21_16-10-12\MultiGroupAnalysis\DA_report.pdf';        
+    save_settings.report_path = 'C:\Users\taylo\Documents\Programming\Reiser\simMel\OreR-15_28_08\Analysis\DA_report.pdf';        
 
     %Set this equal to 1 if you will only be analyzing a single fly.
     %Otherwise, set this equal to 0
-    exp_settings.single_fly = 0;
+    exp_settings.single_fly = 1;
     
     % Set this equal to 1 if you are analyzing a single group of flies.
     % Otherwise set it equal to 0
-    exp_settings.single_group = 1;
+    exp_settings.single_group = 0;
     
     %If you're running a single fly (the above variable single_fly is set to 1), 
     % you need to provide the path to that fly folder
-    exp_settings.fly_path = 'C:\Users\taylo\Documents\Programming\Reiser\simNarrowGrating09-17-21_16-10-12\09_23_2021\D_simulans-15_11_20';
+    exp_settings.fly_path = 'C:\Users\taylo\Documents\Programming\Reiser\simMel\OreR-15_28_08';
 
     %The following variable determines which flies will be included in the
     %analysis. If single_fly = 1, it is irrelevant and can be left as is.
@@ -96,7 +96,7 @@ function  Simple_DA_settings()
     exp_settings.plot_norm_and_unnorm = 1;  
 
     % Give your analysis a name. Log file will be named using this
-    exp_settings.group_being_analyzed_name = 'Simplified DSim Mult Groups';
+    exp_settings.group_being_analyzed_name = 'simMel Fly';
 
 %% TIMESERIES SETTINGS - if you don't want timeseries plots, can leave as is
 

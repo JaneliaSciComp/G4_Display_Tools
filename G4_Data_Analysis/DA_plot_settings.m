@@ -207,8 +207,15 @@ function [exp_settings, histogram_plot_settings, histogram_annotation_settings, 
     %Array layout of conditions 
     CL_hist_plot_settings.CL_hist_conds = [];
     
+    %Array of titles for each axis
+    CL_hist_plot_settings.cond_name = [];
+    
     %Axis labels for the timeseries plots [x, y].
     CL_hist_plot_settings.axis_labels = {};
+
+    %This would allow you to overlap conditions on the same axis but
+    %generally should not be used. Leave set to 0
+    CL_hist_plot_settings.overlap = 0;
     
 
 %% Tuning Curve plot settings ('TCplot')
@@ -460,7 +467,7 @@ function [exp_settings, histogram_plot_settings, histogram_annotation_settings, 
 
 
     %% Save settings
-    save_settings.report_plotType_order = {'_hist_','timeseries', 'TC', 'M_', 'P_', 'MeanPositionSeries', 'Comparison'};
+    save_settings.report_plotType_order = {'_hist_','timeseries', 'TC', 'M_', 'P_', 'MeanPositionSeries', 'CLhistogram', 'Comparison'};
     save_settings.norm_order = {'unnormalized', 'normalized'};
     save_settings.paperunits = 'inches';
     save_settings.x_width = 8; 

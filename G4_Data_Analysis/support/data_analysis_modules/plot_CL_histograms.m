@@ -6,15 +6,16 @@
 %rep_Colors, rep_lineWidth, mean_colors, mean_lineWidth, histogram_ylimits,
 %subtitle_FontSize, 
 function plot_CL_histograms(CL_conds, CL_inds, histogram_data, num_groups, ...
-    plot_settings)
+    plot_settings, gen_settings, save_settings)
     
     overlap = plot_settings.overlap;
-    rep_Colors = plot_settings.rep_colors;
-    rep_LineWidth = plot_settings.rep_lineWidth;
-    mean_Colors = plot_settings.mean_colors;
-    mean_LineWidth = plot_settings.mean_lineWidth;
+    rep_Colors = gen_settings.rep_colors;
+    rep_LineWidth = gen_settings.rep_lineWidth;
+    mean_Colors = gen_settings.mean_colors;
+    mean_LineWidth = gen_settings.mean_lineWidth;
     histogram_ylimits = plot_settings.histogram_ylimits;
-    subtitle_FontSize = plot_settings.subtitle_fontSize;
+    subtitle_FontSize = gen_settings.subtitle_fontSize;
+    figure_titles = plot_settings.figure_names;
    
     
     if ~isempty(CL_conds)
@@ -57,7 +58,16 @@ function plot_CL_histograms(CL_conds, CL_inds, histogram_data, num_groups, ...
                         end
                     end
                 end
+                if find(CL_inds==d) <= length(figure_titles)
+                    if ~isempty(figure_titles(CL_inds==d))
+                        set(gcf, 'Name', figure_titles(CL_inds==d));
+                    end
+                end
             end
         end
+        figH = gcf;
+        fig_title = figH.Name(~isspace(figH.Name));
+
+        save_figure(save_settings, fig_title, 'CLhistogram', num2str(fig));
     end
 end

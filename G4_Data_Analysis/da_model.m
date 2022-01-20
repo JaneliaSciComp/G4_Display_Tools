@@ -129,7 +129,7 @@ classdef da_model < handle
             %Closed loop histograms
             if da.CL_histogram_plot_option
                 [self.CL_bottom_left_places, self.CL_left_column_places] = ...
-                    get_plot_placements(da.CL_hist_plot_settings.CL_conds);
+                    get_plot_placements(da.CL_hist_plot_settings.CL_hist_conds);
             else
                 self.CL_bottom_left_places = [];
                 self.CL_left_column_places = [];

@@ -238,13 +238,13 @@
             end
             
             % Closed loop histograms
-            if self.CL_histogram_plot_option && isempty(self.CL_hist_plot_settings.CL_conds)
+            if self.CL_histogram_plot_option && isempty(self.CL_hist_plot_settings.CL_hist_conds)
                 
                 %Figure out which conditions need to be plotted.
                 [conds_vec_cl] = get_conds_to_plot('cl_hist', conditionModes);
                 
                  %Create default layout for given condition vector
-                self.CL_hist_plot_settings.CL_conds = create_default_plot_layout(conds_vec_cl);
+                self.CL_hist_plot_settings.CL_hist_conds = create_default_plot_layout(conds_vec_cl);
             end
             
             % Position series plots
@@ -285,7 +285,7 @@
             end
             %closed loop histograms
             if self.CL_histogram_plot_option && isempty(self.CL_hist_plot_settings.cond_name)
-                self.CL_hist_plot_settings.cond_name = create_default_plot_titles(self.CL_hist_plot_settings.CL_conds, self.CL_hist_plot_settings.cond_name, self.model.g4p_path);
+                self.CL_hist_plot_settings.cond_name = create_default_plot_titles(self.CL_hist_plot_settings.CL_hist_conds, self.CL_hist_plot_settings.cond_name, self.model.g4p_path);
             end
             %position series
             if self.pos_plot_option && isempty(self.pos_plot_settings.cond_name) && ...
@@ -315,7 +315,7 @@
             %function)
             if self.CL_histogram_plot_option 
                 self.CL_hist_plot_settings.figure_names = get_figure_names('cl_hist',...
-                    self.CL_hist_plot_settings.figure_names, self.CL_hist_plot_settings.CL_datatypes, self.CL_hist_plot_settings.CL_conds);
+                    self.CL_hist_plot_settings.figure_names, self.CL_hist_plot_settings.CL_datatypes, self.CL_hist_plot_settings.CL_hist_conds);
             end
             
             %for tuning curves
@@ -564,9 +564,9 @@
 
             if self.CL_histogram_plot_option == 1
 
-                for k = 1:numel(self.CL_hist_plot_settings.CL_conds)
-                    plot_CL_histograms(self.CL_hist_plot_settings.CL_conds{k}, self.model.datatype_indices.CL_inds, ...
-                        self.CombData.histograms, self.model.num_groups, self.CL_hist_plot_settings);
+                for k = 1:numel(self.CL_hist_plot_settings.CL_hist_conds)
+                    plot_CL_histograms(self.CL_hist_plot_settings.CL_hist_conds{k}, self.model.datatype_indices.CL_inds, ...
+                        self.CombData.histograms_CL, self.model.num_groups, self.CL_hist_plot_settings, self.gen_settings, self.save_settings);
                 end
 
                 analyses_run{end+1} = 'CL histograms';

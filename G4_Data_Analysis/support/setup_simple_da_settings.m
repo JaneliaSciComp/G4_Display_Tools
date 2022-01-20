@@ -95,7 +95,16 @@ end
 %% Closed loop histogram settings ('-CLhist')
    
     CL_hist_plot_settings.CL_hist_conds = [];
+    CL_hist_plot_settings.cond_name = [];
     CL_hist_plot_settings.axis_labels = {};
+    if ~isempty(CL_hist_plot_settings.CL_datatypes)
+        for ch = 1:length(CL_hist_plot_settings.CL_datatypes)
+            CL_hist_plot_settings.figure_names(ch) = string(CL_hist_plot_settings.CL_datatypes{ch});
+        end
+    else
+        CL_hist_plot_settings.figure_names = [];
+    end
+    CL_hist_plot_settings.overlap = 0;
     
 
 %% Tuning Curve plot settings ('-TCplot')
@@ -228,7 +237,7 @@ end
 
 
     %% Save settings
-    save_settings.report_plotType_order = {'_hist_','timeseries', 'TC', 'M_', 'P_', 'MeanPositionSeries', 'Comparison'};
+    save_settings.report_plotType_order = {'_hist_','timeseries', 'TC', 'M_', 'P_', 'MeanPositionSeries', 'CLhistogram', 'Comparison'};
     save_settings.norm_order = {'unnormalized', 'normalized'};
     save_settings.paperunits = 'inches';
     save_settings.x_width = 8; 
