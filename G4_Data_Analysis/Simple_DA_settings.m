@@ -19,17 +19,17 @@ function  Simple_DA_settings()
 
     %What filename would you like to give the settings file for this data
     %analysis? 
-    filename = 'MultiGroupCLAnalysis';
+    filename = 'SingleGroupAnalysis';
 
     % The path to your processing settings for this protocol
     exp_settings.path_to_processing_settings = 'C:\Users\taylo\Documents\Programming\Reiser\simMel\afterExp_ProcessSettings1.mat';
     
     %The path where you wish to save the results of the data analysis
-    save_settings.save_path = 'C:\Users\taylo\Documents\Programming\Reiser\simMel\MultiGroupAnalysis';
+    save_settings.save_path = 'C:\Users\taylo\Documents\Programming\Reiser\simMel\SingleGroupAnalysis';
     
     %The path where the pdf report of the results should be saved,
     %including the name of the pdf report file and its extension (.pdf). 
-    save_settings.report_path = 'C:\Users\taylo\Documents\Programming\Reiser\simMel\MultiGroupAnalysis\DA_report.pdf';        
+    save_settings.report_path = 'C:\Users\taylo\Documents\Programming\Reiser\simMel\SingleGroupAnalysis\DA_report.pdf';        
 
     %Set this equal to 1 if you will only be analyzing a single fly.
     %Otherwise, set this equal to 0
@@ -88,7 +88,7 @@ function  Simple_DA_settings()
     % the metadata field you are sorting by. It should match one of the
     % values in the field_values array above. If no control, leave empty
     % (meaning control_genotype = '')
-    exp_settings.control_genotype = 'OreR';
+    exp_settings.control_genotype = '';
 
     % Set this equal to 1 if you want two copies of each plot, one
     % normalized and one unnormalized. Set it to 0 if you only want to plot
@@ -96,7 +96,7 @@ function  Simple_DA_settings()
     exp_settings.plot_norm_and_unnorm = 1;  
 
     % Give your analysis a name. Log file will be named using this
-    exp_settings.group_being_analyzed_name = 'simMel OreR vs sim192';
+    exp_settings.group_being_analyzed_name = 'simMel OreR';
 
 %% TIMESERIES SETTINGS - if you don't want timeseries plots, can leave as is
 
@@ -137,7 +137,7 @@ function  Simple_DA_settings()
     
     % Set this to 1 if you are plotting a single group and want lines
     % plotted for each fly as well as the average. Otherwise leave it at 0
-    timeseries_plot_settings.show_individual_flies = 0;
+    timeseries_plot_settings.show_individual_flies = 1;
     
     % Set this to 1 if you are plotting only a single fly and want lines
     % plotted for each repetition as well as the fly's average. Otherwise
