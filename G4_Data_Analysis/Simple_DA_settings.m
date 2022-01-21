@@ -15,29 +15,29 @@ function  Simple_DA_settings()
     
 
     % Where do you want to save your settings file for this data analysis? 
-    settings_path = 'C:\Users\taylo\Documents\Programming\Reiser\simNarrowGrating09-17-21_16-10-12';
+    settings_path = 'C:\Users\taylo\Documents\Programming\Reiser\simMel';
 
     %What filename would you like to give the settings file for this data
     %analysis? 
-    filename = 'SingleFlyAnalysis';
+    filename = 'MultiGroupCLAnalysis';
 
     % The path to your processing settings for this protocol
-    exp_settings.path_to_processing_settings = 'C:\Users\taylo\Documents\Programming\Reiser\simNarrowGrating09-17-21_16-10-12\sim_processing_settings.mat';
+    exp_settings.path_to_processing_settings = 'C:\Users\taylo\Documents\Programming\Reiser\simMel\afterExp_ProcessSettings1.mat';
     
     %The path where you wish to save the results of the data analysis
-    save_settings.save_path = 'C:\Users\taylo\Documents\Programming\Reiser\simNarrowGrating09-17-21_16-10-12\MultiGroupControl';
+    save_settings.save_path = 'C:\Users\taylo\Documents\Programming\Reiser\simMel\MultiGroupAnalysis';
     
     %The path where the pdf report of the results should be saved,
     %including the name of the pdf report file and its extension (.pdf). 
-    save_settings.report_path = 'C:\Users\taylo\Documents\Programming\Reiser\simNarrowGrating09-17-21_16-10-12\MultiGroupControl\DA_report.pdf';        
+    save_settings.report_path = 'C:\Users\taylo\Documents\Programming\Reiser\simMel\MultiGroupAnalysis\DA_report.pdf';        
 
     %Set this equal to 1 if you will only be analyzing a single fly.
     %Otherwise, set this equal to 0
-    exp_settings.single_fly = 1;
+    exp_settings.single_fly = 0;
     
     % Set this equal to 1 if you are analyzing a single group of flies.
     % Otherwise set it equal to 0
-    exp_settings.single_group = 0;
+    exp_settings.single_group = 1;
     
     %If you're running a single fly (the above variable single_fly is set to 1), 
     % you need to provide the path to that fly folder
@@ -62,14 +62,14 @@ function  Simple_DA_settings()
     % NOT WORK in the simplified data analysis. You are limited to grouping
     % by only one metadata field.
     exp_settings.field_to_sort_by{1} = ["fly_genotype"];
-%    exp_settings.field_to_sort_by{2} = ["fly_age"];
+%    exp_settings.field_to_sort_by{2} = ["fly_genotype"];
 %     exp_settings.field_to_sort_by{3} = ["fly_genotype", "experimenter"];
 %     exp_settings.field_to_sort_by{4} = ["fly_genotype", "experimenter"];
 
     %If plot_all_genotypes is 1, leave field_values empty.   
-%    exp_settings.field_values = {};
-    exp_settings.field_values{1} = ["D_simulans"];
-%    exp_settings.field_values{2} = ["4-6 days"];
+    exp_settings.field_values = {};
+    exp_settings.field_values{1} = ["OreR"];
+%    exp_settings.field_values{2} = ["sim192"];
 %     exp_settings.field_values{3} = ["OL0042B_UAS_Kir_JFRC49", "arrudar"];
 %     exp_settings.field_values{4} = ["OL0042B_UAS_Kir_JFRC49", "kappagantular"];
 
@@ -88,7 +88,7 @@ function  Simple_DA_settings()
     % the metadata field you are sorting by. It should match one of the
     % values in the field_values array above. If no control, leave empty
     % (meaning control_genotype = '')
-    exp_settings.control_genotype = '';
+    exp_settings.control_genotype = 'OreR';
 
     % Set this equal to 1 if you want two copies of each plot, one
     % normalized and one unnormalized. Set it to 0 if you only want to plot
@@ -96,7 +96,7 @@ function  Simple_DA_settings()
     exp_settings.plot_norm_and_unnorm = 1;  
 
     % Give your analysis a name. Log file will be named using this
-    exp_settings.group_being_analyzed_name = 'simMel Fly';
+    exp_settings.group_being_analyzed_name = 'simMel OreR vs sim192';
 
 %% TIMESERIES SETTINGS - if you don't want timeseries plots, can leave as is
 
@@ -142,7 +142,7 @@ function  Simple_DA_settings()
     % Set this to 1 if you are plotting only a single fly and want lines
     % plotted for each repetition as well as the fly's average. Otherwise
     % leave it at 0.
-    timeseries_plot_settings.show_individual_reps = 1;
+    timeseries_plot_settings.show_individual_reps = 0;
 
 %% FALMR TIMESERIES SETTINGS - if faLmR is not included in your timeseries datatypes, you may ignore these
         
