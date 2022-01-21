@@ -15,21 +15,21 @@ function  Simple_DA_settings()
     
 
     % Where do you want to save your settings file for this data analysis? 
-    settings_path = 'C:\Users\taylo\Documents\Programming\Reiser\simMel';
+    settings_path = 'C:\Users\taylo\Documents\Programming\Reiser\simNarrowGrating09-17-21_16-10-12';
 
     %What filename would you like to give the settings file for this data
     %analysis? 
-    filename = 'simMel_single_fly_analysis';
+    filename = 'SingleFlyAnalysis';
 
     % The path to your processing settings for this protocol
-    exp_settings.path_to_processing_settings = 'C:\Users\taylo\Documents\Programming\Reiser\simMel\afterExp_ProcessSettings1.mat';
+    exp_settings.path_to_processing_settings = 'C:\Users\taylo\Documents\Programming\Reiser\simNarrowGrating09-17-21_16-10-12\sim_processing_settings.mat';
     
     %The path where you wish to save the results of the data analysis
-    save_settings.save_path = 'C:\Users\taylo\Documents\Programming\Reiser\simMel\OreR-15_28_08\Analysis';
+    save_settings.save_path = 'C:\Users\taylo\Documents\Programming\Reiser\simNarrowGrating09-17-21_16-10-12\MultiGroupControl';
     
     %The path where the pdf report of the results should be saved,
     %including the name of the pdf report file and its extension (.pdf). 
-    save_settings.report_path = 'C:\Users\taylo\Documents\Programming\Reiser\simMel\OreR-15_28_08\Analysis\DA_report.pdf';        
+    save_settings.report_path = 'C:\Users\taylo\Documents\Programming\Reiser\simNarrowGrating09-17-21_16-10-12\MultiGroupControl\DA_report.pdf';        
 
     %Set this equal to 1 if you will only be analyzing a single fly.
     %Otherwise, set this equal to 0
@@ -168,6 +168,9 @@ function  Simple_DA_settings()
     % setting your pairing in processing settings up that way so that you
     % don't have to dictate pairs here as well.
     timeseries_plot_settings.faLmR_pairs = [];
+%     timeseries_plot_settings.faLmR_pairs{1} = [1 4];
+%     timeseries_plot_settings.faLmR_pairs{2} = [2 3];
+%     etc...
 
 %% CLOSED LOOP HISTOGRAM SETTINGS - you may skip these if you do not want to plot closed-loop histograms
 
