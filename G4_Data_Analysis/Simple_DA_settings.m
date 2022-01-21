@@ -67,7 +67,7 @@ function  Simple_DA_settings()
 %     exp_settings.field_to_sort_by{4} = ["fly_genotype", "experimenter"];
 
     %If plot_all_genotypes is 1, leave field_values empty.   
-    exp_settings.field_values = {};
+%    exp_settings.field_values = {};
     exp_settings.field_values{1} = ["OreR"];
 %    exp_settings.field_values{2} = ["sim192"];
 %     exp_settings.field_values{3} = ["OL0042B_UAS_Kir_JFRC49", "arrudar"];
