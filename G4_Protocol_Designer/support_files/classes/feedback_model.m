@@ -10,6 +10,8 @@ classdef feedback_model < handle
         r_data
         avg_wbf
         wbf_limits
+        OL_custom_function
+        CL_custom_function
         
         bad_trials
         bad_trials_before_reruns
@@ -79,6 +81,9 @@ classdef feedback_model < handle
             self.full_inter_left_count = zeros(1, length(self.inter_hist_axis)-1);
             self.full_inter_right_count = zeros(1, length(self.inter_hist_axis)-1);
             self.full_inter_lmr_count = zeros(1, length(self.inter_hist_axis)-1);
+
+            self.CL_custom_function = '';
+            self.OL_custom_function = '';
             
             self.bad_trials = {};
             self.bad_trials_before_reruns = {};
@@ -572,6 +577,14 @@ classdef feedback_model < handle
                 disp("feedback_model.ischan4 must equal 0 or 1. Update to this variable failed.");
             end
         end
+
+        function set_OL_analysis(self, input)
+            self.OL_custom_function = input;
+        end
+
+        function set_CL_analysis(self, input)
+            self.CL_custom_function = input;
+        end
         
         
 
@@ -657,6 +670,12 @@ classdef feedback_model < handle
         end
         function output = get_bad_trials_before_reruns(self)
             output = self.bad_trials_before_reruns;
+        end
+        function output = get_OL_function(self)
+            output = self.OL_custom_function;
+        end
+        function output = get_CL_function(self)
+            output = self.CL_custom_function;
         end
 
         

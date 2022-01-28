@@ -11,9 +11,6 @@ classdef feedback_view < handle
         closeLoop_axis
         wbf_axis
         avg_wbf
-%         badTrials
-%         badConds
-%         badReps
         trial_label
         cond_label
         rep_label
@@ -23,9 +20,9 @@ classdef feedback_view < handle
         closeLoop_plot_right
         openLoop_plot_left
         openLoop_plot_right
-        
-        
-        
+        OL_function_box
+        CL_function_box
+
         
         
     end
@@ -52,34 +49,27 @@ classdef feedback_view < handle
             self.avg_wbf = uicontrol(self.panel, 'Style','text','String', string(con.fb_model.avg_wbf), ...
                 'FontSize', 11, 'HorizontalAlignment', 'center', 'units', ...
                 'normalized', 'Position', [.25, .9, .1, .05]);
-%             bad_trials_label = uicontrol(self.panel, 'Style', 'text', 'String', ...
-%                 'Bad Trials/Conditions:', 'FontSize', 9, 'HorizontalAlignment', ...
-%                 'center', 'units', 'normalized', 'Position', [.4,.9,.23,.05]);
-%             self.trial_label = uicontrol(self.panel, 'Style', 'text', 'String', 'Trial', ...
-%                 'HorizontalAlignment', 'center', 'units', 'normalized', 'Position', [.65, .93, .06, .05]);
-%             self.cond_label = uicontrol(self.panel, 'Style', 'text', 'String', 'Condition', ...
-%                 'HorizontalAlignment', 'center', 'units', 'normalized', 'Position', [.72, .93, .12, .05]);
-%             self.rep_label = uicontrol(self.panel, 'Style', 'text', 'String', 'Repetition', ...
-%                 'HorizontalAlignment', 'center', 'units', 'normalized', 'Position', [.85, .93, .14, .05]);
-            
-%             self.badTrials{1} = uicontrol(self.panel, 'Style', 'text', 'String', '', ...
-%                 'HorizontalAlignment', 'center', 'units', 'normalized', 'Position', ...
-%                 [self.trial_label.Position(1), self.trial_label.Position(2) - .05, .03, .04]);
-%             
-%             self.badConds{1} = uicontrol(self.panel, 'Style', 'text', 'String', '', ...
-%                 'HorizontalAlignment', 'center', 'units', 'normalized', 'Position', ...
-%                 [self.cond_label.Position(1), self.cond_label.Position(2) - .05, .03, .04]);
-%             
-%             self.badReps{1} = uicontrol(self.panel, 'Style', 'text', 'String', '', ...
-%                 'HorizontalAlignment', 'center', 'units', 'normalized', 'Position', ...
-%                 [self.rep_label.Position(1), self.rep_label.Position(2) - .05, .03, .04]);
-            
+
             
 % Set up axes for plotting streamed data
             self.openLoop_axis = axes(self.panel, 'units','normalized', 'Position', [.1, .67, .5 ,.2]);
+            OL_box_label = uicontrol(self.panel, 'style', 'text', 'String', 'Custom Analysis: ', ...
+                'units', 'normalized', 'Position', [.65, .77, .2, .03]);
+            self.OL_function_box = uicontrol(self.panel, 'style', 'edit', 'String', ...
+                self.runcon.get_custom_OL_function(), 'units', 'normalized', ...
+                'Position', [.63, .72, .25, .05], 'Callback', @self.new_OL_function);
+            OL_browse_btn = uicontrol(self.panel, 'Style', 'pushbutton', 'String', 'Browse', ...
+                'units', 'normalized', 'Position', [.89, .72, .1, .05], 'Callback', @self.OL_browse);
             self.closeLoop_axis = axes(self.panel, 'units', 'normalized', 'Position', [.1, .37, .5, .2]);
+            CL_box_label = uicontrol(self.panel, 'style', 'text', 'String', 'Custom Analysis: ', ...
+                'units', 'normalized', 'Position', [.65, .47, .2, .03]);
+            self.CL_function_box = uicontrol(self.panel, 'style', 'edit', 'String', ...
+                self.runcon.get_custom_CL_function(), 'units', 'normalized', ...
+                'Position', [.63, .42, .25, .05], 'Callback', @self.new_CL_function);
+            CL_browse_btn = uicontrol(self.panel, 'style', 'pushbutton', 'String', 'Browse', ...
+                'units', 'normalized', 'Position', [.89, .42, .1, .05], 'Callback', @self.CL_browse);
             self.wbf_axis = axes(self.panel, 'units', 'normalized', 'Position', [.1, .07, .8, .2]);
-            
+
             %Create initial plots so when it is time to update them, we can
             %just update the xdata of the existing plots, rather than
             %re-plotting
@@ -119,55 +109,27 @@ classdef feedback_view < handle
             yline(self.wbf_axis, self.min_wbf{1}(1)/100);
             hold(self.wbf_axis, 'on');
 
-%             self.openLoop_axis.YTickLabel = [];
-%             self.openLoop_axis.YTick = [];
-%            self.openLoop_axis.XAxis.Limits = [-180 180];
-%            xline(self.openLoop_axis, 0);
-%            hold on;
             
 
         end
         
-          function clear_view(self, model)
+        function clear_view(self, model)
         
             set(self.avg_wbf, 'String',string(round(model.avg_wbf,4)));
-            
-            
-%             for label = 1:length(self.badTrials)
-%                 self.badTrials{label}.String = '';
-%                 self.badConds{label}.String = '';
-%                 self.badReps{label}.String = '';
-%             end
-                       
-%             self.badTrials = {};
-%             self.badConds = {};
-%             self.badReps = {};
+           
             self.current_trial = 1;
-            
-%             self.badTrials{1} = uicontrol(self.panel, 'Style', 'text', 'String', '', ...
-%                 'HorizontalAlignment', 'center', 'units', 'normalized', 'Position', ...
-%                 [self.trial_label.Position(1), self.trial_label.Position(2) - .07, .03, .06]);
-%             
-%             self.badConds{1} = uicontrol(self.panel, 'Style', 'text', 'String', '', ...
-%                 'HorizontalAlignment', 'center', 'units', 'normalized', 'Position', ...
-%                 [self.cond_label.Position(1), self.cond_label.Position(2) - .07, .03, .06]);
-%             
-%             self.badReps{1} = uicontrol(self.panel, 'Style', 'text', 'String', '', ...
-%                 'HorizontalAlignment', 'center', 'units', 'normalized', 'Position', ...
-%                 [self.rep_label.Position(1), self.rep_label.Position(2) - .07, .03, .06]);
+           
             
             set(self.closeLoop_plot_left, 'YData', model.cond_hist_left);
             set(self.closeLoop_plot_right, 'YData', model.cond_hist_right);
             set(self.openLoop_plot_left, 'YData', model.inter_hist_left);
             set(self.openLoop_plot_right, 'YData', model.inter_hist_right);
             
-%             cla(self.openLoop_axis);
-%             cla(self.closeLoop_axis);
+
             cla(self.wbf_axis);
             yline(self.wbf_axis, self.min_wbf{1}(1)/100);
             hold(self.wbf_axis, 'on');
-% %            xline(self.openLoop_axis,0);
-%  %           hold on;
+
              drawnow;
 
                 
@@ -181,50 +143,22 @@ classdef feedback_view < handle
            set(self.avg_wbf, 'String', string(round(model.avg_wbf,4)));
             
             if ~strcmp(trialType, 'inter')
-            
-                %trialinfo = [trial number, condition number, rep number]
-                
-                %Set if it was a bad condition
-           
+
                 if bad_slope == 1 || bad_flier == 1
-%                     self.badTrials{end}.String = string(trialinfo(1));
-%                     self.badConds{end}.String = string(trialinfo(2));
-%                     self.badReps{end}.String = string(trialinfo(3));
-%           
-%                     self.badTrials{end+1} = uicontrol(self.panel, 'Style', 'text', 'String', '', ...
-%                         'HorizontalAlignment', 'center', 'units', 'normalized', 'Position', ...
-%                         [self.badTrials{end}.Position(1), self.badTrials{end}.Position(2) - .05, .03, .04]);
-%                     
-%                     self.badConds{end+1} = uicontrol(self.panel, 'Style', 'text', 'String', '', ...
-%                         'HorizontalAlignment', 'center', 'units', 'normalized', 'Position', ...
-%                         [self.badConds{end}.Position(1), self.badConds{end}.Position(2) - .05, .03, .04]);
-%                     
-%                     self.badReps{end+1} = uicontrol(self.panel, 'Style', 'text', 'String', '', ...
-%                         'HorizontalAlignment', 'center', 'units', 'normalized', 'Position', ...
-%                         [self.badReps{end}.Position(1), self.badReps{end}.Position(2) - .05, .03, .04]);
-
-
-                    
+  
                     trialNum = length(model.full_streamed_intertrials) + length(model.full_streamed_conditions);
                     if trialNum <= trialinfo(1)
                         self.runcon.add_bad_trial_marker_progress(trialNum);
                     
                     end
-                    
-
-                    
+    
                 end
-                
-            
                 
                 % Plot the conditions histogram
                 
                 
                 set(self.closeLoop_plot_left, 'YData', model.cond_hist_left);
                 set(self.closeLoop_plot_right, 'YData', model.cond_hist_right);
-                
-                
-                
                 num_trials = self.runcon.get_num_trials();
                 
                 % If we are running rescheduled conditions, then the axis
@@ -250,9 +184,7 @@ classdef feedback_view < handle
                
                 set(self.openLoop_plot_left, 'YData', model.inter_hist_left);
                 set(self.openLoop_plot_right, 'YData', model.inter_hist_right);
-                
-                
-               
+ 
                num_trials = self.runcon.get_num_trials();
                 
                 % If we are running rescheduled conditions, then the axis
@@ -277,6 +209,40 @@ classdef feedback_view < handle
   
             
         end
+
+        function CL_browse(self, ~, ~)
+            
+            self.runcon.browse_file('CL_cust')
+
+        end
+
+        function OL_browse(self, ~, ~)
+
+            self.runcon.browse_file('OL_cust');
+            
+        end
+
+
+        function new_OL_function(self, src, ~)
+            
+            self.runcon.update_custom_OL_analysis(src.String);
+
+        end
+
+        function new_CL_function(self, src, ~)
+
+            self.runcon.update_custom_CL_analysis(src.String);
+        
+        end
+
+        function update_custom_functions(self)
+            self.OL_function_box.String = self.runcon.get_custom_OL_function();
+            self.CL_function_box.String = self.runcon.get_custom_CL_function();
+
+        end
+
+
+       
         
 
             
