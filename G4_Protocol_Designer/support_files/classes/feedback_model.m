@@ -157,19 +157,93 @@ classdef feedback_model < handle
             
             %get and save the average wbf for this dataset
             self.set_avg_wbf(mean(self.wbf_data));
+
+            % If they have their own custom functions to determine the data
+            % for the OL and CL axes, we should run it here INTEAD Of
+            % get_histogram_count and get_histograms, which together
+            % create the data to be plotted by default. 
+
+            if isempty(self.CL_custom_function) && isempty(self.OL_custom_function)
             
-            %Get the counts of each voltage reading for histogram for this
-            %trial, and add it to the previous totals
-            self.get_histogram_count(trialType);
-            
-            %Divide the total counts for each voltage reading by number of
-            %readings to get probability of each. This is the histogram
-            %data to be plotted
-            self.get_histograms(trialType);
+                %Get the counts of each voltage reading for histogram for this
+                %trial, and add it to the previous totals
+                self.get_histogram_count(trialType);
+                
+                %Divide the total counts for each voltage reading by number of
+                %readings to get probability of each. This is the histogram
+                %data to be plotted
+                self.get_histograms(trialType);
+            elseif ~isempty(self.CL_custom_function) && ~isempty(self.OL_custom_function)
+
+                % run custom functions. Custom functions must take in one 
+                % variable, the translated data that was collected from a
+                % single condition. It is laid out like so: 
+
+                % data{1} = channel 1 data (LmR)
+                % data{2} = channel 2 data (Left wing)
+                % data{3} = channel 3 data (right wing)
+                % data{4} = channel 4 data (wbf)
+
+                % Each cell element is an array of numbers, size 1 x number of datapoints
+                % streamed for that condition
+
+                % The function must return two 1 x some number arrays. The
+                % first should be the plot's ydata for the left wing, and
+                % the second should be the plot's ydata for the right wing.
+                % To save time, the axis and lines are created at the
+                % beginning, and only the Ydata of the lines are updated
+                % after each condition.
+
+                self.run_custom_function(1,1);
+
+            elseif isempty(self.CL_custom_function) && ~isempty(self.OL_custom_function)
+
+                % Run default histogram stuff to get CL axis data, then run
+                % custom OL function and replace the OL axis data with
+                % its output
+
+                self.get_histogram_count(trialType);
+                self.get_histograms(trialType);
+
+                % run custom OL function
+                self.run_custom_function(1, 0)
+
+            else
+
+                % Run default histogram stuff to get OL axis data, then run
+                % custom CL function and replace the CL axis data with
+                % its output
+
+                self.get_histogram_count(trialType);
+                self.get_histograms(trialType);
+
+                % run custom CL function
+                self.run_custom_function(0,1);
+
+            end
             
             
         
         end
+
+        function run_custom_function(self, ol, cl)
+            
+            if ol
+                data = self.translated_data;
+                [ol_leftWing, ol_rightWing] = feval(self.OL_custom_function, data);
+                self.set_inter_left(ol_leftWing);
+                self.set_inter_right(ol_rightWing);
+            end
+            if cl
+                 data = self.translated_data;
+                [cl_leftWing, cl_rightWing] = feval(self.CL_custom_function, data);
+                self.set_cond_0000000hist_left(cl_leftWing);
+                self.set_cond_hist_right(cl_rightWing);
+            end
+        end
+
+
+        
         
         function get_wbf_limits(self, processing_path)
            
