@@ -237,7 +237,7 @@ classdef feedback_model < handle
             if cl
                  data = self.translated_data;
                 [cl_leftWing, cl_rightWing] = feval(self.CL_custom_function, data);
-                self.set_cond_0000000hist_left(cl_leftWing);
+                self.set_cond_hist_left(cl_leftWing);
                 self.set_cond_hist_right(cl_rightWing);
             end
         end
