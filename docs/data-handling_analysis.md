@@ -16,9 +16,36 @@ nav_order: 2
 
 This github repository has a suite of data analysis tools. Have a look at the [software installation guide](software_setup.md) on how to set it up.
 
-In the typical use case of these tools, there is one file you need to worry about: `DA_plot_settings.m` at `G4_Display_Tools/G4_Data_Analysis`. This file contains many MATLAB variables which will dictate the settings of how your data is visualized. You will need to go through this file and update the settings according to your needs. This is the biggest task of setting up data analysis. Once your settings are correct and saved, the analysis itself will take less than a minute to run.
+There are two versions of the data analysis tool that you can use - a simplified version, and a full version. Both require you to update variables in an .m file, which will then be saved as a settings file, exactly the way that the data processing works. Here are some details about each version.
 
-It is intended that, ideally, the user will create their data analysis settings at the same time that they create an experiment using the Designer and set up their data processing settings. You may want to set up two or three data analysis settings files, each of which will contain the settings for one type of analysis. Most commonly, this would be a settings file for plotting the data of a single fly, a settings file for plotting the data of a single group of flies (like a single genotype), and a settings file for plotting and comparing the data for many groups of flies. Each of these requires its own settings file, so it will be easiest if you create them at the same time as you create the experiment, so you don't have to go back and do it later. Once they've been created and saved, you can use them anytime to plot data. Data analysis settings can also be created and run anytime after an experiment has already been completed, so don't worry if you want to go back and do analysis on a previous experiment. This documentation will cover both scenarios.
+## Simplified Data Analysis
+
+The simplified data analysis tool is likely sufficient for many use cases. This version does not give the user much control over things like colors, legends, or titles. These things are all done by default. The user can, of course, determine what data is being plotted, what type of plot to use, and what flies should be included. The plots are not as pretty but are sufficient for things like checking the quality of your fly and checking for phenotypes. 
+
+To use the simplified data analysis, you will open the file `Simple_DA_settings.m` located in `G4_Display_Tools/G4_Data_Analysis`. In it, you'll find an array of variables. These are a subset of the variables found in the full version of the data analysis. A detailed description of each variable in the full version, including everything found in the simplified version, can be found in the next section. Once you understand what each setting is for, you'll fill them out and save the file. Then you will simply run:
+
+```matlab
+Simple_DA_settings();
+```
+
+This will save your settings file at the location you indicated. I recommend at the very least, making a settings file for a single fly analysis at the same time as you create your experiment, and saving it in your experiment folder. This can then be used by the Conductor to run automatic analysis on every fly after it is finished. Note that all variables specific to a particular fly (like the path to the fly's folder) will be updated by the Conductor when the analysis is run automatically, so they can be left set to any value if the settings file is going to be used to run automatic analysis after every experiment. If you plan to use the settings file to run analysis on single flies manually though, you'll need one for each fly, which is a lot more work. 
+
+Please note there are a few limitations to the simplified version. You will not be able to generate Comparison plots with the simplified data analysis. This refers to a matlab figure with several rows of plots. Each row represents the same fly or group of flies, and contains several different types of plots. You'd use this if you want to plot, for example, the timeseries, position series, and histogram plots for a particular fly or group next to each other on the same figure for comparison. You must use the full version for this type of figure. The other restriction is in how you can group flies together. In the full version of the analysis, you can narrow down your group of flies any way you like (more details on this below). You could, for example, say only flies of a particular genotype AND a particular age AND run by a particular experimenter should be included in the group for analysis. Using the simplified version, you can only narrow your group down by one metadata field. So you can include only flies of a particular genotype OR only flies of a particular age, but not both. This will make more sense after you finish reading this page, but is important to keep in mind when deciding which version to use. 
+
+## Full Data Analysis
+
+The full version of the data analysis tool will allow you to customize almost every aspect of your plots. This may be more useful to you if you are generating final plots that you want to share with others or publish in a paper. Because of the variety of customization options, the associated settings file is necessarily long and more complicated to fill out. 
+
+To use the full version, you will open `DA_plot_settings.m`, located at `G4_Display_Tools/G4_Data_Analysis`. It serves exactly the same purpose as `Simple_DA_settings.m`, but is longer. The next section will describe each variable in this file in detail. 
+
+Once you have filled out `DA_plot_settings.m` to your satisfaction, you should save it. You will then run the following code: 
+
+```matlab
+create_settings_file('name of file', 'path to file');
+```
+
+This will save your settings file so that it is ready to use for any future analysis. More details on running the analysis can be found after the detailed description of each variable. 
+
 
 # Plot Appearance Settings
 
@@ -979,12 +1006,20 @@ Now that you have your settings as you want them, you need to create a `.mat` fi
 
 In `G4_data_analysis/support` there is a function called `create_settings_file`. This function takes in two parameters, the name of your settings file and the path where you would like to save it. Run this function to create a `.mat` file at the location you specify. The `.mat` file will contain all the settings present in the `DA_plot_settings.m` file you've just adjusted. Do this by typing the following command into the MATLAB command window and hitting enter:
 
-`create_settings_file('name of file', 'path to file');` You should give your file a meaningful name that indicates whether it is for a single fly, a particular group, or multiple groups. I recommend saving it inside your experiment folder so you do not forget which experiment it was made for.
+```matlab
+create_settings_file('name of file', 'path to file');
+```
+
+If instead, you have used `Simple_DA_settings.m`, then the command to create your settings file will look like this. You do not need to pass in the name or path of the settings file (you entered it when filling the file out): 
+
+```matlab
+Simple_DA_settings();
+```
 
 __Note__: When you run an experiment through the Conductor, you may have it run single fly analysis automatically after the data has been processed. If you do this, the conductor will open the settings file you provide and replace things specific to the current fly with updated values (ie, the genotype or path to the fly folder). It will then save a new analysis settings file for that particular fly inside the fly folder, and use that to run its analysis. So if you plan to use this feature, you can create one single-fly analysis settings file which is generic and save it in your experiment folder. The conductor will then use this to create a new analysis settings file for each specific fly and run the analysis automatically. Group analysis, however, must be done after the fact by you.
 {:.warning}
 
-This settings file will be used to run the data analysis. Note that if a `.mat` file already exists with the name and filepath you specify, it will be replaced.
+This settings file will be used to run the data analysis. If a `.mat` file already exists with the name and filepath you specify, it will be replaced. Note that from this step forward, the simplified and full versions of the data analysis work in exactly the same way. The settings file that has been saved is at this point indistinguishable, regardless of which version you used to create it. 
 
 Now you are ready to run an analysis!
 
@@ -1028,8 +1063,11 @@ It is not likely you will want to update variables this way – it would be easi
 Once you know there are no adjustments to be made, simply type in the command `da.run_analysis`, and this will start the analysis running. Assuming no adjustments after creating your data analysis tool, the full process will look something like this:
 
 ```matlab
+        % If you are using the full version of the data analysis and are creating a new settings file, rather than using an existing one
 Create_settings_file(filename, filepath)  ...
-        % If you were creating a new settings file, rather than using an existing one  
+        % OR If you are using the simplified version and are creating a new settings file
+Simple_DA_settings();
+        % Regardless of version
 Find_flies('path to your settings file');
 da = create_data_analysis_tool(...
         'path to your settings file', '-group', '-hist', '-TSplot', '-tcplot');
