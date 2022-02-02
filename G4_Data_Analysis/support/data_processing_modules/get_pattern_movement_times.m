@@ -6,9 +6,9 @@ function [frame_movement_start_times] = get_pattern_movement_times(start_times, 
  
     
     init_fidx = 1;
-    frame_movement_start_times = NaN(length(start_times));
+    frame_movement_start_times = NaN(size(start_times));
 
-    while Log.Frames.Position(init_fidx + 1) - Log.Frames.Position(init_fidx) == 0
+    while double(Log.Frames.Position(init_fidx + 1)) - double(Log.Frames.Position(init_fidx)) == 0
         init_fidx = init_fidx + 1;
     end
 
@@ -23,9 +23,11 @@ function [frame_movement_start_times] = get_pattern_movement_times(start_times, 
             ftime = ftime + 1;
         end
         
-        movetime = ftime;
+        movetime = ftime + 11; % In Log.Frames.Position, the first 9-11 frame numbers after the start time
+                                % seem random and do not reflect the frame
+                                % actually being displayed - so skip them. 
             
-        while Log.Frames.Position(movetime + 1) - Log.Frames.Position(movetime) == 0
+        while double(Log.Frames.Position(movetime + 1)) - double(Log.Frames.Position(movetime)) == 0
             movetime = movetime + 1; 
         end
         

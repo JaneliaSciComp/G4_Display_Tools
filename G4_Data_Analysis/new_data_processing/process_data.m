@@ -182,9 +182,9 @@ function process_data(exp_folder, processing_settings_file)
     
     if ~isempty(bad_conds)
         for c = 1:length(bad_conds)
-            for r = 1:length(bad_reps)
-                cond_frame_move_time(bad_conds(c), bad_reps(r)) = NaN;
-            end
+            
+            cond_frame_move_time(bad_conds(c), bad_reps(c)) = NaN;
+           
         end
     end
     
