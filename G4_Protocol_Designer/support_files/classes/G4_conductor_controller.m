@@ -396,6 +396,32 @@ classdef G4_conductor_controller < handle
             self.update_view_if_exists();
             
         end
+
+        function update_custom_OL_analysis(self, new_val)
+            
+            if isfile(new_val) || isempty(new_val)
+                self.fb_model.set_OL_analysis(new_val);
+            else
+                errormsg = "This file does not exist. Please check the path.";
+                self.create_error_box(errormsg);
+            end
+
+            self.fb_view.update_custom_OL_function();
+            
+        end
+
+        function update_custom_CL_analysis(self, new_val)
+
+             if isfile(new_val) || isempty(new_val)
+                self.fb_model.set_CL_analysis(new_val);
+            else
+                errormsg = "This file does not exist. Please check the path.";
+                self.create_error_box(errormsg);
+             end
+
+             self.fb_view.update_custom_CL_function();
+
+        end
         
         function open_settings(self, ~, ~)
         
@@ -1112,7 +1138,11 @@ classdef G4_conductor_controller < handle
         function browse_file(self, which_file)
            
             [file, path] = uigetfile('*.m');
-            filepath = fullfile(path,file);
+            if ~ischar(file) && ~isstring(file)
+                return;
+            else
+                filepath = fullfile(path,file);
+            end
             if ~isfile(filepath)
                 errormsg = "The file you entered does not exist.";
                 self.create_error_box(errormsg);
@@ -1124,6 +1154,10 @@ classdef G4_conductor_controller < handle
                 self.model.set_plot_file(filepath);
             elseif strcmp(which_file, 'proc')
                 self.model.set_proc_file(filepath);
+            elseif strcmp(which_file, 'CL_cust')
+                self.update_custom_CL_analysis(filepath);
+            elseif strcmp(which_file, 'OL_cust')
+                self.update_custom_OL_analysis(filepath);
             else
                 errormsg = 'You must tell me which file this is. Please enter run, plot, or proc.';
                 self.create_error_box(errormsg);
@@ -1770,6 +1804,15 @@ classdef G4_conductor_controller < handle
         function num_attempts = get_num_attempts(self)
 
             num_attempts = self.model.get_num_attempts_bad_conds();
+        end
+
+        function OL_function = get_custom_OL_function(self)
+
+            OL_function = self.fb_model.get_OL_function();
+        end
+        function CL_function = get_custom_CL_function(self)
+
+            CL_function = self.fb_model.get_CL_function();
         end
 
         %% SETTERS
