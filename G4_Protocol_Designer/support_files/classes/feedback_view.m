@@ -125,10 +125,26 @@ classdef feedback_view < handle
             set(self.avg_wbf, 'String',string(round(model.avg_wbf,4)));
            
             self.current_trial = 1;
-           
             
+            if ~isempty(self.OL_function_box.String)
+                
+                self.new_OL_function(self.OL_function_box, 0);
+            end
+            if ~isempty(self.CL_function_box.String)
+                self.new_CL_function(self.CL_function_box,0);
+            end
+           
+            cond_xax = model.cond_hist_axis;
+            cond_xax(1) = [];
+            set(self.closeLoop_plot_left, 'XData', cond_xax);
+            set(self.closeLoop_plot_right, 'XData', cond_xax);
             set(self.closeLoop_plot_left, 'YData', model.cond_hist_left);
             set(self.closeLoop_plot_right, 'YData', model.cond_hist_right);
+            
+            inter_xax = model.inter_hist_axis;
+            inter_xax(1) = [];
+            set(self.openLoop_plot_left, 'XData', inter_xax);
+            set(self.openLoop_plot_right, 'XData', inter_xax);
             set(self.openLoop_plot_left, 'YData', model.inter_hist_left);
             set(self.openLoop_plot_right, 'YData', model.inter_hist_right);
             
@@ -162,7 +178,12 @@ classdef feedback_view < handle
                 end
                 
                 % Plot the conditions histogram
-                
+                if length(model.cond_hist_left) ~= length(self.closeLoop_plot_left.XData)
+                    set(self.closeLoop_plot_left, 'XData', [1:1:length(model.cond_hist_left)]);
+                end
+                if length(model.cond_hist_right) ~= length(self.closeLoop_plot_right.XData)
+                    set(self.closeLoop_plot_right, 'XData', [1:1:length(model.cond_hist_right)]);
+                end
                 
                 set(self.closeLoop_plot_left, 'YData', model.cond_hist_left);
                 set(self.closeLoop_plot_right, 'YData', model.cond_hist_right);
@@ -189,6 +210,13 @@ classdef feedback_view < handle
                 
             else
                
+                if length(model.inter_hist_left) ~= length(self.openLoop_plot_left.XData)
+                    set(self.openLoop_plot_left, 'XData', [1:1:length(model.inter_hist_left)]);
+                end
+                if length(model.inter_hist_right) ~= length(self.openLoop_plot_right.XData)
+                    set(self.openLoop_plot_right, 'XData', [1:1:length(model.inter_hist_right)]);
+                end
+                
                 set(self.openLoop_plot_left, 'YData', model.inter_hist_left);
                 set(self.openLoop_plot_right, 'YData', model.inter_hist_right);
  
@@ -233,17 +261,23 @@ classdef feedback_view < handle
         function new_OL_function(self, src, ~)
             
             self.runcon.update_custom_OL_analysis(src.String);
+            self.openLoop_axis.XAxis.Limits = [-inf inf];
 
         end
 
         function new_CL_function(self, src, ~)
 
             self.runcon.update_custom_CL_analysis(src.String);
+            self.closeLoop_axis.XAxis.Limits = [-inf inf];
         
         end
 
-        function update_custom_functions(self)
+        function update_custom_OL_function(self)
             self.OL_function_box.String = self.runcon.get_custom_OL_function();
+            
+        end
+        
+        function update_custom_CL_function(self)
             self.CL_function_box.String = self.runcon.get_custom_CL_function();
 
         end

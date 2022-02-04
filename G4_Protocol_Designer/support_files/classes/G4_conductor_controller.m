@@ -406,7 +406,7 @@ classdef G4_conductor_controller < handle
                 self.create_error_box(errormsg);
             end
 
-            self.fb_view.update_custom_functions();
+            self.fb_view.update_custom_OL_function();
             
         end
 
@@ -419,7 +419,7 @@ classdef G4_conductor_controller < handle
                 self.create_error_box(errormsg);
              end
 
-             self.fb_view.update_custom_functions();
+             self.fb_view.update_custom_CL_function();
 
         end
         

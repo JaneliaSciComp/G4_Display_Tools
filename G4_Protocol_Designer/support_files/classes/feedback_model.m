@@ -230,15 +230,17 @@ classdef feedback_model < handle
             
             if ol
                 data = self.translated_data;
-                [ol_leftWing, ol_rightWing] = feval(self.OL_custom_function, data);
-                self.set_cond_hist_left(ol_leftWing);
-                self.set_cond_hist_right(ol_rightWing);
+                [~, OLfuncName] = fileparts(self.OL_custom_function);
+                [ol_leftWing, ol_rightWing] = feval(OLfuncName, data);
+                self.set_inter_left(ol_leftWing);
+                self.set_inter_right(ol_rightWing);
             end
             if cl
                  data = self.translated_data;
-                [cl_leftWing, cl_rightWing] = feval(self.CL_custom_function, data);
-                self.set_inter_left(cl_leftWing);
-                self.set_inter_right(cl_rightWing);
+                 [~, CLfuncName] = fileparts(self.CL_custom_function);
+                [cl_leftWing, cl_rightWing] = feval(CLfuncName, data);
+                self.set_cond_hist_left(cl_leftWing);
+                self.set_cond_hist_right(cl_rightWing);
             end
         end
 
