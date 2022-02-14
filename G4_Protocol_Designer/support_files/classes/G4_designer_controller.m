@@ -1521,6 +1521,10 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                      Panel_com('stop_display');
                         self.model.screen_on = 0;
                  end
+                 if self.model.host_connected
+                     disconnectHost();
+                     self.model.host_connected = 0;
+                 end
                      
              else
                  self.preview_on_arena = 1;
@@ -1879,20 +1883,22 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                 return;
             end
             
-            connectHost;
-            pause(10);
-            
+            if ~self.model.host_connected
+                connectHost;
+                pause(10);
+            end
+
             Panel_com('change_root_directory', experiment_folder)
             start = questdlg('Start Dry Run?','Confirm Start','Start','Cancel','Start');
             switch start
                 case 'Cancel'
                     
-                    Panel_com('stop_display')
-                    disconnectHost;
+%                     Panel_com('stop_display')
+%                     disconnectHost;
                     return;
                     
                 case 'Start'
-            
+                    self.model.screen_on = 1;
                     pattern_index = self.doc.get_pattern_index(trial{2});
                     func_index = self.doc.get_posfunc_index(trial{3});
                     
@@ -1920,6 +1926,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
   
                         Panel_com('start_display', (trial_duration*10)); %duration expected in 100ms units
                         pause(trial_duration + 0.01)
+                        self.model.screen_on = 0;
                         
                     else
                         
@@ -1927,10 +1934,12 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                         w = waitforbuttonpress; %If pretrial duration is set to zero, this
                         %causes it to loop until a button is press or
                         %mouse clicked
+                        Panel_com('stop_display');
+                        self.model.screen_on = 0;
 
                     end
-                    Panel_com('stop_display');
-                    disconnectHost;
+                    
+                    %disconnectHost;
 
             end
         end
