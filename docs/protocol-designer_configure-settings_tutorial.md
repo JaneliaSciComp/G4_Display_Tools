@@ -23,7 +23,7 @@ Open the file `G4_Display_Tools/G4_Protocol_Designer/G4_Protocol_Designer_Settin
 Configuration File Path: C:\Program Files (x86)\HHMI G4\Support Files\HHMI Panels Configuration.ini
 ```
 
-Double check that the file exists at this location as this is required to open the [Protocol Designer](protocol-design.md). It is also possible to have this file outside the standard location, for example it could be `/Users/taylorl/Desktop/HHMI Panels Configuration.ini` (on a Mac). If the location is not correct, replace the current path with the correct path to your `HHMI Panels Configuration.ini` file. This is the only change you should make to the filet. Please save and close the file when you are done.
+Double check that the file exists at this location as this is required to open the [Protocol Designer](protocol-designer.md). It is also possible to have this file outside the standard location, for example it could be `/Users/taylorl/Desktop/HHMI Panels Configuration.ini` (on a Mac). If the location is not correct, replace the current path with the correct path to your `HHMI Panels Configuration.ini` file. This is the only change you should make to the filet. Please save and close the file when you are done.
 
 __Note__: There should be exactly one space between the ':' and the first character of your path. Additionally there should be no trailing spaces at the end of your path. Please ensure these two things are true before saving and closing the file.
 {:.warning}
@@ -64,9 +64,9 @@ The _G4 Settings_ GUI that just opened is a graphical interface to the configura
 
 - *Default Plotting file for Test*{:.gui-txt} Similarly to the *Default Plotting Protocol*{:.gui-txt}, this field defines the plotting protocol for the _test protocols_ and is only required if at least one of them is set. While customizable this field most likely contains the same `.m` file used for the main experiment.
 
-- *Color of disabled cells:*{:.gui-txt} This field defines a color in the six-digit form of a [hexadecimal code](https://en.wikipedia.org/wiki/Web_colors#Hex_triplet). It defaults to `#bdbdbd`, which is a grey color. You can change this if you'd like to change the background color of table cells in the [G4 Protocol Designer](protocol-designer.md) when they are disabled. For example, in certain [modes](protcol-designer_display-modes.md), a condition does not take a position function. If this is the case, the table cell for position functions will be drawn in the background color defined here (default: gray). You can change the fill color here if you like.
+- *Color of disabled cells:*{:.gui-txt} This field defines a color in the six-digit form of a [hexadecimal code](https://en.wikipedia.org/wiki/Web_colors#Hex_triplet). It defaults to `#bdbdbd`, which is a grey color. You can change this if you'd like to change the background color of table cells in the [G4 Protocol Designer](protocol-designer.md) when they are disabled. For example, in certain [modes](protocol-designer_display-modes.md), a condition does not take a position function. If this is the case, the table cell for position functions will be drawn in the background color defined here (default: gray). You can change the fill color here if you like.
 
-- *Text inside disabled cells*{:.gui-txt} The text that will fill disabled table cells in the [G4 Protocol Designer](protcol-designer.md). By default, they will turn gray and be filled with dashes, *--------*{:.gui-txt}. You can change this to any string if you prefer, such as *disabled*{:.gui-txt} or *////////*{:.gui-txt}.
+- *Text inside disabled cells*{:.gui-txt} The text that will fill disabled table cells in the [G4 Protocol Designer](protocol-designer.md). By default, they will turn gray and be filled with dashes, *--------*{:.gui-txt}. You can change this to any string if you prefer, such as *disabled*{:.gui-txt} or *////////*{:.gui-txt}.
 
 The bottom section contains a panel called *Metadata Google Sheets Properties*{:.gui-txt}. Please refer to the [Setting up your Google Sheets tutorial](protocol-designer_metadata_tutorial.md) for an explanation of these settings.
 
