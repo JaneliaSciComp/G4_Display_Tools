@@ -1886,6 +1886,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
             if ~self.model.host_connected
                 connectHost;
                 pause(10);
+                self.model.host_connected = 1;
             end
 
             Panel_com('change_root_directory', experiment_folder)
@@ -1924,7 +1925,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                     
                     if trial_duration ~= 0
   
-                        Panel_com('start_display', (trial_duration*10)); %duration expected in 100ms units
+                        Panel_com('start_display', (trial_duration)); %duration expected in 100ms units
                         pause(trial_duration + 0.01)
                         self.model.screen_on = 0;
                         
