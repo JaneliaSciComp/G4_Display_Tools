@@ -5,10 +5,12 @@ function charArray = dec2char(num, num_chars)
 % to decode, for e.g. a 3 char array:
 % ans = charArray(1)*2^16 + charArray(2)*2^8 + charArray(3)*2^0
 % JL 2/2/2016 dec2char cannot handle negative numbers
+% FL 3/1/2022 fix constraint check to avoid overflow error
 
 charArray = zeros(1,num_chars);
-if (num > 2^(8*num_chars))
-    error('not enough characters for a number of this size' );
+if (num > (2^(8*num_chars)-1))
+    error("not enough characters for a number of size %d (should be between 0...%d)", ...
+        num_chars, (2^(8*num_chars)-1) );
 end
 
 if (num < 0 )
