@@ -8,7 +8,11 @@ ctlr.open();
 
 if ctlr.tcpConn == -1
     system('"C:\Program Files (x86)\HHMI G4\G4 Host" &');
-    pause(15);
+    status = 1;
+    while status~=0
+        [status, ~] = system('tasklist | find /I "G4 Host.exe"');
+        pause(0.1);
+    end
     ctlr = PanelsController();
     ctlr.mode = 0;
     ctlr.open();
