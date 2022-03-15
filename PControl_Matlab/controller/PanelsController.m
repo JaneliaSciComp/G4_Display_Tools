@@ -1,15 +1,19 @@
 
 classdef PanelsController < handle
+    % PanelsController Mapping of `G4 Host.exe` TCP functions to object
+    % oriented MATLAB interface
 
     properties (Constant)
         defaultHostName = 'localhost';
         defaultPort = 62222;
+        defaultHostExec = "C:\Program Files (x86)\HHMI G4\G4 Host";
         numSubPanel = 4;
         dimSubPanel = 8;
         subPanelMsgLength16 = 33;
         subPanelMsgLength2 = 9;
         idGrayScale2 = 0;
         idGrayScale16 = 1;
+        iBufSz = 2^20;  % Size of the input buffer (iBuf)
     end
 
     properties
@@ -27,6 +31,10 @@ classdef PanelsController < handle
     properties (Dependent)
         isOpen;
     end
+    
+    properties (Access = private)
+        iBuf = uint8([]);  % input buffer
+    end
 
 
     methods 
@@ -40,8 +48,34 @@ classdef PanelsController < handle
             end
         end
 
-
-        function open(self)
+        function open(self, startHost)
+            % PanelsController.open Establish a connection to "Main Host"
+            %
+            % Connect to the webserver started by `G4 Host.exe`. If
+            % startHost is true then make stop all running G4 Host
+            % processes and start a new one and wait until it is up and
+            % running. Disconnect via PanelsController.close.
+            arguments
+                self (1,1) PanelsController
+                startHost (1,1) logical = false
+            end
+            if startHost
+                [~,~] = system('taskkill /IM "G4 Host.exe"');
+                status = 0;
+                while status == 0
+                    [status, ~] = system('tasklist | find /I "G4 Host.exe"');
+                    pause(0.01);
+                end
+                system(sprintf('"%s" &', self.defaultHostExec));
+                isRunning = false;
+                while ~isRunning
+                    [status, ~] = system('tasklist | find /I "G4 Host.exe"');
+                    pause(0.1);
+                    if status==0
+                        isRunning = true;
+                    end
+                end
+            end
             if ~self.isOpen
                 self.tcpConn = pnet('tcpconnect', self.hostName, self.port);
             else
@@ -50,28 +84,49 @@ classdef PanelsController < handle
         end
 
 
-        function close(self)
+        function close(self, stopHost)
+            % PanelsController.close Disconnect from Main Host
+            % 
+            % Disconnect the connection established in
+            % PanelsController.open. If stopHost is true then also stop the
+            % `G4 Host.exe`.
+            arguments
+                self (1,1) PanelsController
+                stopHost (1,1) logical = false
+            end
             if self.isOpen
                 pnet(self.tcpConn, 'close');
                 self.tcpConn = [];
+                if stopHost
+                    [~,~] = system('taskkill /IM "G4 Host.exe"');
+                    status = 0;
+                    while status == 0
+                        [status, ~] = system('tasklist | find /I "G4 Host.exe"');
+                        pause(0.01);
+                    end
+                end
             end
         end
 
 
         function isOpen = get.isOpen(self)
+            % PanelsController.isOpen confirms a working connection
+            %
+            % returns true if the TCP connection to the webserver behind G4
+            % Host.exe is active.
             isOpen = true;
             if isempty(self.tcpConn)
                 isOpen = false;
             else
-                rval = pnet(self.tcpConn,'status');
+                rval = pnet(self.tcpConn, 'status');
                 if rval <= 0
                     isOpen = false;
                 end
             end
         end
 
-
         function setHostName(self,hostName)
+            % PanelsController.setHostName update the host name
             if ~self.isOpen
                 self.hostName = hostName;
             else
@@ -81,23 +136,135 @@ classdef PanelsController < handle
 
 
         function setPort(self,port)
+            % setPort update the host port
             if ~self.isOpen
                 self.port = port
             else
-                warning('tcp connection open - unableto change port');
+                warning('tcp connection open - unable to change port');
+            end
+        end
+
+        function rtn = stopDisplay(self)
+            % PanelsController.stopDisplay send 'stop_display' command
+            %
+            % Triggers the 'stop display' TCP command on the G4 Main Host
+            % and checks for the response.
+            % 
+            % Returns true if 'stop display' was confirmed, and false if
+            % either an error was reported by the G4 Main Host, an
+            % unexpected response was received, or the operation timed out
+            % after 100ms.
+            rtn = false;
+            cmdData = uint8([1 48]); % Command 0x01 0x30
+            self.write(cmdData);
+            resp = self.expectResponse([0 1], 48, "Display has been stopped", 0.1);
+            if ~isempty(resp) && resp(2) == 0
+                rtn = true;
+            end
+        end
+
+        function rtn = allOn(self)
+            % allOn Send 'all on' command
+            %
+            % Triggers the 'all on' TCP command on the G4 Main Host and
+            % checks for the response.
+            %
+            % Returns true if 'all on' was confirmed and false if the
+            % operation timed out after 100ms or an unexpected response was
+            % received.
+            %
+            % SEE ALSO allOff
+            rtn = false;
+            cmdData = uint8([1 255]); % Command 0x01 0xFF
+            self.write(cmdData);
+            resp = self.expectResponse(0, 255, "All-On Received", 0.1);
+            if ~isempty(resp)
+                rtn = true;
             end
         end
 
 
-        function allOn(self)
-            cmdData = char([1, hex2dec('FF')]);
+        function rtn = allOff(self)
+            % allOff Send 'all off' command
+            %
+            % Triggers the 'all off' TCP command on the G4 Main Host and
+            % checks for the response.
+            %
+            % Returns true if 'all off' was confirmed and false if the
+            % operation timed out after 300ms or an unexpected response was
+            % received. A longer timeout of 300ms was chosen, since the
+            % Main Host happened to have slower responses in many cases.
+            %
+            % SEE ALSO allOn
+            rtn = false;
+            cmdData = char([1 0]); % Command 0x01 0x00
             self.write(cmdData);
+            resp = self.expectResponse(0, 0, "All-Off Received", 0.3);
+            if ~isempty(resp)
+                rtn = true;
+            end
         end
-
-
-        function allOff(self)
-            cmdData = char([1, hex2dec('00')]);
-            self.write(cmdData);
+        
+        function rtn = setRootDirectory(self, dirName, createDir)
+            % setRootDirectory Set Root directory
+            %
+            % Triggers the 'Change Root Directory' TCP command on the G4
+            % Main Host and checks for the correct response.
+            %
+            % RTN = SETROOTDIRECTORY(SELF, DIRNAME, CREATEDIR)
+            %
+            % Returns true if 'Change Root Directory' was confirmed and
+            % false if the operation timed out after 100ms or an enexpected
+            % response was received.
+            %
+            
+            arguments
+                self (1,1) PanelsController
+                dirName (1,1) string
+                createDir (1,1) logical = true
+            end
+            cmdData = char([67]);   % Command 0x43
+            rtn = false;
+            if 7~=exist(dirName, 'dir') % doesn't exist
+                if createDir
+                    mkdir(dirName);
+                else
+                    return;
+                end
+            end
+            rootPath = java.io.File(dirName);
+            if rootPath.isAbsolute()
+                rootPathName = char(dirName);
+            else
+                rootPathName = char(rootPath.getCanonicalPath());
+            end
+            rootPathLength = length(rootPathName);
+            self.write([cmdData dec2char(rootPathLength, 2) uint8(rootPathName)]);
+            resp = self.expectResponse(0, 67, [], 0.1);
+            if ~isempty(resp)
+                rtn = true;
+            end
+        end
+        
+        function rtn = setActiveAOChannels(self, activeChannels)
+            % PanelsController.setActiveAOChannels Set active analoge
+            % output channels
+            %
+            % Triggers the 'Set Active Analog Output Channels' TCP command
+            % on the G4 Main Host and checks for the correct response.
+            %
+            % Returns true if the
+            arguments
+                self (1,1) PanelsController
+                activeChannels (1,4) logical = [false false false false]
+            end
+            cmdData = char([2 17]);  % Command 0x02 0x11            
+            chn = uint8(activeChannels(1)*8+activeChannels(2)*4+activeChannels(3)*2+activeChannels(4));
+            self.write([cmdData chn]);
+            resp = self.expectResponse(0, 17, "Active Analog Output Channel Value", 0.1);
+            if ~isempty(resp)
+                rtn = true;
+            end
         end
 
 
@@ -313,6 +480,54 @@ classdef PanelsController < handle
                 n1 = 1 + (i-1)*16;
                 n2 = n1 + 15;
                 frameNew(n1:n2,:) = flipud(frameNew(n1:n2,:));
+            end
+        end
+
+        function pullResponse(self)
+            self.iBuf = [self.iBuf pnet(self.tcpConn, 'read', 65536, 'uint8', 'noblock')];            
+            if length(self.iBuf) > self.iBufSz
+                self.iBuf(1, length(self.iBuf) - self.iBufSz) = [];
+            end
+        end
+
+        function response = expectResponse(self, rsp, cmd, rspString, timeout)
+            arguments
+                self (1,1) PanelsController
+                rsp (1,:) uint8 
+                cmd (1,1) uint8
+                rspString (1,:) string
+                timeout (1,1) double = 0.1
+            end
+            found_response = false;
+            timedOut = false;
+            ltim = tic;
+            while ~found_response && ~timedOut
+                response = [];
+                pat.start = [];                
+                self.pullResponse();
+                for rsp_i = rsp
+                    pat.start = [pat.start strfind(self.iBuf, [rsp_i cmd])-1];
+                end
+                if ~isempty(pat.start)
+                    pat.end = pat.start + self.iBuf(pat.start);
+                    pat.start = pat.start(pat.end <= length(self.iBuf));
+                    pat.end = pat.end(pat.end <= length(self.iBuf));
+                    for i = 1:length(pat.start)
+                        response = char(self.iBuf(pat.start(i):pat.end(i)));
+                        if (~isempty(response) && isempty(rspString)) || ...
+                           (~isempty(response) && contains(response, rspString))
+                            found_response = true;                            
+                            self.iBuf(pat.start(i):pat.end(i)) = [];
+                            break;
+                        else
+                            response = [];
+                        end
+                    end
+                end
+                actTime = toc(ltim);
+                if ~found_response && actTime > timeout
+                    timedOut = true;
+                end
             end
         end
 
