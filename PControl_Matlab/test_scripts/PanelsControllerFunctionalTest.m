@@ -45,6 +45,38 @@ classdef PanelsControllerFunctionalTest < matlab.unittest.TestCase
                     sprintf("PanelsController.allOn wasn't successfully completed in iteration %d.", i));
                 testCase.verifyTrue(testCase.panelsController.allOff(), ...
                     sprintf("PanelController.allOff wasn't successfully completed in iteration %d", i));
+                testCase.verifyTrue(testCase.panelsController.allOn(), ...
+                    sprintf("PanelsController.allOn wasn't successfully completed in iteration %d.", i));
+                testCase.verifyTrue(testCase.panelsController.allOff(), ...
+                    sprintf("PanelController.allOff wasn't successfully completed in iteration %d", i));
+            end
+        end
+        
+        function sendAllOnAndOffWithDelay(testCase)
+            delayOnOff = 0.004;
+            delayOffOn = 0;
+            boff = tic;
+            for i = 1:1000000
+                while toc(boff) < delayOffOn
+                end
+                bon = tic;
+                testCase.verifyTrue(testCase.panelsController.allOn(), ...
+                    sprintf("PanelsController.allOn wasn't successfully completed in iteration %d, round 1.", i));
+                while toc(bon) < delayOnOff
+                end
+                boff = tic;
+                testCase.verifyTrue(testCase.panelsController.allOff(), ...
+                    sprintf("PanelController.allOff wasn't successfully completed in iteration %d, round 1.", i));
+                while toc(boff) < delayOffOn % Copy&Paste earlier code to reduce the delay introduced by for-loop.
+                end
+                bon = tic;
+                testCase.verifyTrue(testCase.panelsController.allOn(), ...
+                    sprintf("PanelsController.allOn wasn't successfully completed in iteration %d, round 2.", i));
+                while toc(bon) < delayOnOff
+                end
+                boff = tic;
+                testCase.verifyTrue(testCase.panelsController.allOff(), ...
+                    sprintf("PanelController.allOff wasn't successfully completed in iteration %d, round 2", i));
             end
         end
         
@@ -62,12 +94,45 @@ classdef PanelsControllerFunctionalTest < matlab.unittest.TestCase
         function sendActiveAO(testCase)
             for i = [0:15]
                 onOff = str2num(char(num2cell(dec2bin(i))))';
-                onOff = padarray(onOff, [0 4-length(onOff)], 0, 'pre')
+                onOff = padarray(onOff, [0 4-length(onOff)], 0, 'pre');
                 testCase.verifyTrue(testCase.panelsController.setActiveAOChannels(onOff), ...
                     sprintf("PanelsController.setActiveAOChannels wasn't successfully completed for %d", i));
             end
         end
         
+        function sendActiveAI(testCase)
+            for i = [0:15]
+                onOff = str2num(char(num2cell(dec2bin(i))))';
+                onOff = padarray(onOff, [0 4-length(onOff)], 0, 'pre');
+                testCase.verifyTrue(testCase.panelsController.setActiveAIChannels(onOff), ...
+                    sprintf("PanelsController.setActiveAIChannels wasn't successfully completed for %d", i));
+            end
+        end
+        
+        function testLoggingRepeatedOn(testCase)
+             for i = [0:15]
+                 testCase.verifyTrue(testCase.panelsController.startLog(), ...
+                    sprintf("Starting the log didn't work in iteration %d", i));
+             end
+             testCase.panelsController.stopLog();
+        end
+        
+        function testLoggingRepeatedOff(testCase)
+              testCase.panelsController.startLog();
+              for i = [0:15]
+                 testCase.verifyTrue(testCase.panelsController.stopLog(), ...
+                    sprintf("Stopping the log didn't work in iteration %d", i));
+             end
+        end
+        
+        function testLogging(testCase)
+            for i = [0:15]
+                testCase.verifyTrue(testCase.panelsController.startLog(), ...
+                    sprintf("Starting the log didn't work in iteration %d", i));
+                testCase.verifyTrue(testCase.panelsController.stopLog(), ...
+                    sprintf("Stopping the log didn't work in iteration %d", i));
+            end
+        end
         
         
     end

@@ -34,6 +34,8 @@ classdef PanelsController < handle
     
     properties (Access = private)
         iBuf = uint8([]);  % input buffer
+        prevLogStart = uint64(0);
+        isLogRunning = false;
     end
 
 
@@ -49,12 +51,14 @@ classdef PanelsController < handle
         end
 
         function open(self, startHost)
-            % PanelsController.open Establish a connection to "Main Host"
+            % open Establish a connection to "Main Host"
             %
             % Connect to the webserver started by `G4 Host.exe`. If
             % startHost is true then make stop all running G4 Host
             % processes and start a new one and wait until it is up and
             % running. Disconnect via PanelsController.close.
+            %
+            % see also close
             arguments
                 self (1,1) PanelsController
                 startHost (1,1) logical = false
@@ -85,11 +89,13 @@ classdef PanelsController < handle
 
 
         function close(self, stopHost)
-            % PanelsController.close Disconnect from Main Host
+            % close Disconnect from Main Host
             % 
             % Disconnect the connection established in
             % PanelsController.open. If stopHost is true then also stop the
             % `G4 Host.exe`.
+            %
+            % see also open
             arguments
                 self (1,1) PanelsController
                 stopHost (1,1) logical = false
@@ -110,7 +116,7 @@ classdef PanelsController < handle
 
 
         function isOpen = get.isOpen(self)
-            % PanelsController.isOpen confirms a working connection
+            % isOpen Confirms a working connection
             %
             % returns true if the TCP connection to the webserver behind G4
             % Host.exe is active.
@@ -126,7 +132,7 @@ classdef PanelsController < handle
         end
 
         function setHostName(self,hostName)
-            % PanelsController.setHostName update the host name
+            % setHostName update the host name
             if ~self.isOpen
                 self.hostName = hostName;
             else
@@ -136,7 +142,7 @@ classdef PanelsController < handle
 
 
         function setPort(self,port)
-            % setPort update the host port
+            % setPort Update the host port
             if ~self.isOpen
                 self.port = port
             else
@@ -145,7 +151,7 @@ classdef PanelsController < handle
         end
 
         function rtn = stopDisplay(self)
-            % PanelsController.stopDisplay send 'stop_display' command
+            % stopDisplay send 'stop_display' command
             %
             % Triggers the 'stop display' TCP command on the G4 Main Host
             % and checks for the response.
@@ -173,7 +179,7 @@ classdef PanelsController < handle
             % operation timed out after 100ms or an unexpected response was
             % received.
             %
-            % SEE ALSO allOff
+            % see also allOff
             rtn = false;
             cmdData = uint8([1 255]); % Command 0x01 0xFF
             self.write(cmdData);
@@ -195,7 +201,7 @@ classdef PanelsController < handle
             % received. A longer timeout of 300ms was chosen, since the
             % Main Host happened to have slower responses in many cases.
             %
-            % SEE ALSO allOn
+            % see also allOn
             rtn = false;
             cmdData = char([1 0]); % Command 0x01 0x00
             self.write(cmdData);
@@ -211,13 +217,9 @@ classdef PanelsController < handle
             % Triggers the 'Change Root Directory' TCP command on the G4
             % Main Host and checks for the correct response.
             %
-            % RTN = SETROOTDIRECTORY(SELF, DIRNAME, CREATEDIR)
-            %
             % Returns true if 'Change Root Directory' was confirmed and
             % false if the operation timed out after 100ms or an enexpected
             % response was received.
-            %
-            
             arguments
                 self (1,1) PanelsController
                 dirName (1,1) string
@@ -246,26 +248,95 @@ classdef PanelsController < handle
             end
         end
         
-        function rtn = setActiveAOChannels(self, activeChannels)
-            % PanelsController.setActiveAOChannels Set active analoge
-            % output channels
+        function rtn = setActiveAOChannels(self, activeOutputChannels)
+            % setActiveAOChannels Set active analoge output channels
             %
             % Triggers the 'Set Active Analog Output Channels' TCP command
             % on the G4 Main Host and checks for the correct response.
             %
-            % Returns true if the
+            % Returns true if the active channel was set and false if an
+            % unexpected response was received or the response timed out
+            % after 100ms.
+            %
+            % see also setActiveAIChannels
             arguments
                 self (1,1) PanelsController
-                activeChannels (1,4) logical = [false false false false]
+                activeOutputChannels (1,4) logical = [false false false false]
             end
+            rtn = false;
             cmdData = char([2 17]);  % Command 0x02 0x11            
-            chn = uint8(activeChannels(1)*8+activeChannels(2)*4+activeChannels(3)*2+activeChannels(4));
+            chn = uint8(...
+                activeOutputChannels(1)*8+activeOutputChannels(2)*4+ ...
+                activeOutputChannels(3)*2+activeOutputChannels(4));
             self.write([cmdData chn]);
             resp = self.expectResponse(0, 17, "Active Analog Output Channel Value", 0.1);
             if ~isempty(resp)
                 rtn = true;
             end
         end
+        
+        function rtn = setActiveAIChannels(self, activeInputChannels)
+            % setActiveAIChannels Set active analoge input channels
+            %
+            % Triggers the 'Set Active Analog Input Channels For TCP
+            % Stream' TCP command on the G4 Main Host and checks for the
+            % correct response.
+            %
+            % Return true if the active input channels were set correctly
+            % and false if an unexpected response was received or the
+            % response timed out after 100ms.
+            %
+            % see also setActiveAOChannel
+            arguments
+                self (1,1) PanelsController
+                activeInputChannels (1,4) logical = [false false false false]
+            end
+            rtn = false;
+            cmdData = char([2 19]); % Command 0x02 0x13
+            chn = uint8(...
+                activeInputChannels(1)*8+activeInputChannels(2)*4+ ...
+                activeInputChannels(3)*2+activeInputChannels(4));
+            self.write([cmdData chn]);
+            resp = self.expectResponse(0, 19, "Active Analog Input Channel For TCP Stream Value", 0.1);
+            if ~isempty(resp)
+                rtn = true;
+            end
+        end
+        
+        function rtn = startLog(self)
+            if self.isLogRunning == true
+                rtn = true;
+                return;
+            end
+            rtn = false;
+            cmdData = char([1 65]); % Command 0x01 0x41
+            while toc(self.prevLogStart)<1
+                pause(0.01);
+            end
+            self.prevLogStart = tic;
+            self.write(cmdData);
+            resp = self.expectResponse(0, 65, [], 10);
+            if ~isempty(resp)
+                rtn = true;
+                self.isLogRunning = true;
+            end
+        end
+        
+        function rtn = stopLog(self)
+            if self.isLogRunning == false
+                rtn = true;
+                return;
+            end
+            rtn = false;
+            cmdData = char([1 64]); % Command 0x01 0x40
+            self.write(cmdData);
+            resp = self.expectResponse(0, 64, [], 30);
+            if ~isempty(resp)
+                rtn = true;
+                self.isLogRunning = false;
+            end
+        end
+        
 
 
         function setGrayScaleLevel16(self)
