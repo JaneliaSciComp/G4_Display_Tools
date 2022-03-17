@@ -7,8 +7,9 @@ function charArray = dec2char(num, num_chars)
 % JL 2/2/2016 dec2char cannot handle negative numbers
 % FL 3/1/2022 fix constraint check to avoid overflow error
 % FL 3/16/2022 fix constraint with large num_chars
+% FL 3/17/2022 limit return type to uint8 with values 0..255
 
-charArray = zeros(1,num_chars);
+charArray = uint8(zeros(1,num_chars));
 if (num > (2^(8*num_chars)-1))
     error("G4DT:dec2char:numchar", "not enough characters for a number of size %d (should be between 0...%d)", ...
         num_chars, (2^(8*num_chars)-1) );
