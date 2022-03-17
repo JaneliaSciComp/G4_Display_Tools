@@ -6,7 +6,7 @@ classdef dec2charTest < matlab.unittest.TestCase
             % Randomly test a subset of the acceptable dec2char argument space
             for i = randi([0 255], 1, 50)
                 for j = randi([1 128], 1, 50)
-                    expectedResult = zeros(1,j);
+                    expectedResult = uint8(zeros(1,j));
                     expectedResult(1) = i;
                     testCase.verifyEqual(dec2char(i, j), expectedResult, ...
                         sprintf("dec2char produces an error for value %d and dimension %d", i, j));
@@ -16,7 +16,7 @@ classdef dec2charTest < matlab.unittest.TestCase
         
         function negativeNumbersFail(testCase)
             for i = randi([-128 -1], 1, 10)
-                testCase.verifyError(@()dec2char(i, 1), 'G4DT:dec2char:neg');
+                testCase.verifyError(@()dec2char(i, 1), 'MATLAB:validators:mustBeGreaterThanOrEqual');
             end
         end
         
