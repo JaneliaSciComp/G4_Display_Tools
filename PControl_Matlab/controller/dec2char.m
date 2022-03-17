@@ -6,15 +6,20 @@ function charArray = dec2char(num, num_chars)
 % ans = charArray(1)*2^16 + charArray(2)*2^8 + charArray(3)*2^0
 % JL 2/2/2016 dec2char cannot handle negative numbers
 % FL 3/1/2022 fix constraint check to avoid overflow error
+% FL 3/16/2022 fix constraint with large num_chars
 
 charArray = zeros(1,num_chars);
 if (num > (2^(8*num_chars)-1))
-    error("not enough characters for a number of size %d (should be between 0...%d)", ...
+    error("G4DT:dec2char:numchar", "not enough characters for a number of size %d (should be between 0...%d)", ...
         num_chars, (2^(8*num_chars)-1) );
 end
 
 if (num < 0 )
-    error('this function does not handle negative numbers correctly' );
+    error("G4DT:dec2char:neg", 'this function does not handle negative numbers correctly');
+end
+
+if (2^(8*(num_chars-1)) == Inf)
+    error("G4DT:dec2char:overflow","the number of characters is too much for MATLAB to handle");
 end
 
 num_rem = num;
