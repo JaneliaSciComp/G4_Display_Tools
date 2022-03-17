@@ -274,7 +274,7 @@ classdef PanelsController < handle
                 rtn = true;
             end
         end
-        
+
         function rtn = setActiveAIChannels(self, activeInputChannels)
             % setActiveAIChannels Set active analoge input channels
             %
@@ -304,6 +304,14 @@ classdef PanelsController < handle
         end
         
         function rtn = startLog(self)
+            % startLog Start logging on the the Main Host
+            %
+            % Triggers the 'Start Log' TCP command if the log is not
+            % already running. Returns true if logging started or is
+            % already running, returns false if an unexpected response was
+            % received or timed out after 10 seconds.
+            %
+            % see also stopLog
             if self.isLogRunning == true
                 rtn = true;
                 return;
@@ -323,6 +331,14 @@ classdef PanelsController < handle
         end
         
         function rtn = stopLog(self)
+            % stopLog Stop logging on the the Main Host
+            %
+            % Triggers the 'Stop Log' TCP command if the log is still 
+            % running. Returns true if logging stopped or has already 
+            % stopped, returns false if an unexpected response was
+            % received or timed out after 30 seconds.
+            %
+            % see also startLog
             if self.isLogRunning == false
                 rtn = true;
                 return;
@@ -336,8 +352,37 @@ classdef PanelsController < handle
                 self.isLogRunning = false;
             end
         end
-        
 
+        function rtn = setControlMode(self, controlMode)
+            arguments
+                self (1,1) PanelsController
+                controlMode (1,1) ...
+                    {mustBeInteger, ...
+                     mustBeGreaterThanOrEqual(controlMode, 0), ...
+                     mustBeLessThanOrEqual(controlMode, 7)}
+            end
+            rtn = false;
+            cmdData = char([2 16]); % Command 0x02 0x10
+            self.write([cmdData controlMode]);
+            resp = self.expectResponse([0 1], 16, [], 0.1);
+            if ~isempty(resp) && uint8(resp(2)) == 0
+                rtn = true;
+            end
+        end
+        
+%         function rtn = setPatternID(self, patternID)
+%             arguments
+%                 self (1,1) PanelsController
+%                 patternID (1,1) ...
+%                     {mustBeInteger, ...
+%                      mustBeGreaterThanOrEqual(patternID, 0), ...
+%                      mustBeLessThan(patternID, 2^16)}
+%             end
+%             rtn = false;
+%             cmdData = char([3 3]); % Command 0x03 0x03
+%             self.write([cmdData dec2char
+%         end
+        
 
         function setGrayScaleLevel16(self)
             cmdData = char([2,4,16]);
@@ -654,33 +699,6 @@ function char_val = signed16BitToChar(B)
     temp_val = mod(65536 + B, 65536);
     for cnt =1 : length(temp_val)
         char_val(2*cnt-1:2*cnt) = dec2char(temp_val(cnt),2);
-    end
-end
-
-
-function charArray = dec2char(num, num_chars)
-    % this functions makes an array of char values (0-255) from a decimal number
-    % this is listed in MSB first order.
-    % untested for negative numbers, probably wrong!
-    % to decode, for e.g. a 3 char array:
-    % ans = charArray(1)*2^16 + charArray(2)*2^8 + charArray(3)*2^0
-    
-    charArray = zeros(1,num_chars);    
-    if (num > (2^(8*num_chars)-1))
-        error("not enough characters for a number of size %d (should be between 0...%d)", ...
-            num_chars, (2^(8*num_chars)-1) );
-    end
-
-    if (num < 0 )
-        error('this function does not handle negative numbers correctly' );
-    end
-    
-    num_rem = num;
-    
-    for j = num_chars:-1:1
-        temp = floor((num_rem)/(2^(8*(j-1))));
-        num_rem = num_rem - temp*(2^(8*(j-1)));
-        charArray(j) = temp;
     end
 end
 

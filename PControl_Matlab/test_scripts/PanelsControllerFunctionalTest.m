@@ -133,8 +133,20 @@ classdef PanelsControllerFunctionalTest < matlab.unittest.TestCase
                     sprintf("Stopping the log didn't work in iteration %d", i));
             end
         end
+
+        function testControlMode(testCase)
+            for i = randi([0,7], 1,10)
+                testCase.verifyTrue(testCase.panelsController.setControlMode(i), ...
+                    sprintf("Setting the control mode to %d didn't work", i));
+            end
+        end
         
-        
+        function testControlModeFail(testCase)
+            testCase.verifyTrue(testCase.panelsController.setControlMode(2.7), ...
+                "ASD");
+            disp("a");
+        end
+
     end
      
 end
