@@ -122,9 +122,9 @@ classdef G4_conductor_controller < handle
             
         end
 
-        function update_timestamp(self, new_val)
+        function update_timestamp(self)
             %No error checking
-            self.model.set_timestamp(new_val);
+            self.model.set_timestamp();
            
             
         end
@@ -594,7 +594,7 @@ classdef G4_conductor_controller < handle
             self.is_aborted = false; %change aborted back to zero in case the experiment was aborted earlier. 
             
             % Update timestamp to reflect actual start time of experiment
-            self.update_timestamp(datestr(now, 'mm-dd-yyyyHH_MM_SS'));
+            self.update_timestamp();
 
             %get path to experiment folder
             [experiment_path, ~, ~] = fileparts(self.doc.save_filename);
