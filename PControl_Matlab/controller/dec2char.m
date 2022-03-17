@@ -9,20 +9,21 @@ function charArray = dec2char(num, num_chars)
 % FL 3/16/2022 fix constraint with large num_chars
 % FL 3/17/2022 limit return type to uint8 with values 0..255
 
+arguments % simple argument verification
+    num (1,1) {mustBeInteger, mustBeGreaterThanOrEqual(num, 0)}
+    num_chars (1,1) {mustBeGreaterThanOrEqual(num_chars, 0)}
+end
+% more difficult argument verification
+assert(num <  2^(8*num_chars), ...
+    "G4DT:dec2char:numchar",... 
+    "Not enough characters for a number of size %d (should be between 0...%d)", ...
+    num_chars, (2^(8*num_chars)-1))
+assert(2^(8*(num_chars-1)) ~= Inf,...
+    "G4DT:dec2char:overflow", ...
+    "the number of characters (%d) is too much for MATLAB to handle", num_chars);
+% end argument verification
+
 charArray = uint8(zeros(1,num_chars));
-if (num > (2^(8*num_chars)-1))
-    error("G4DT:dec2char:numchar", "not enough characters for a number of size %d (should be between 0...%d)", ...
-        num_chars, (2^(8*num_chars)-1) );
-end
-
-if (num < 0 )
-    error("G4DT:dec2char:neg", 'this function does not handle negative numbers correctly');
-end
-
-if (2^(8*(num_chars-1)) == Inf)
-    error("G4DT:dec2char:overflow","the number of characters is too much for MATLAB to handle");
-end
-
 num_rem = num;
 
 for j = num_chars:-1:1
