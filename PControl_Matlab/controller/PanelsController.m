@@ -370,19 +370,93 @@ classdef PanelsController < handle
             end
         end
         
-%         function rtn = setPatternID(self, patternID)
-%             arguments
-%                 self (1,1) PanelsController
-%                 patternID (1,1) ...
-%                     {mustBeInteger, ...
-%                      mustBeGreaterThanOrEqual(patternID, 0), ...
-%                      mustBeLessThan(patternID, 2^16)}
-%             end
-%             rtn = false;
-%             cmdData = char([3 3]); % Command 0x03 0x03
-%             self.write([cmdData dec2char
-%         end
+        function rtn = setPatternID(self, patternID)
+            arguments
+                self (1,1) PanelsController
+                patternID (1,1) ...
+                    {mustBeInteger, ...
+                     mustBeGreaterThanOrEqual(patternID, 0), ...
+                     mustBeLessThanOrEqual(patternID, 65535)}
+            end
+            rtn = false;
+            cmdData = char([3 3]); % Command 0x03 0x03
+            self.write([cmdData dec2char(patternID, 2)]);
+            resp = self.expectResponse([0 1], 3, [], 0.1);
+            if ~isempty(resp) && uint8(resp(2)) == 0
+                rtn = true;
+            end
+        end
         
+        function setPositionX(self, position)
+            arguments
+                self (1,1) PanelsController
+                position (1,1) ...
+                    {mustBeInteger,...
+                     mustBeGreaterThanOrEqual(position, 0),...
+                     mustBeLessThanOrEqual(position, 65535)}
+            end
+            cmdData = char([3 112]); % Command 0x03 0x70
+            self.write([cmdData dec2char(position, 2)]);
+        end
+        
+        function setPositionY(self, position)
+            arguments
+                self (1,1) PanelsController
+                position (1,1) ...
+                    {mustBeInteger,...
+                     mustBeGreaterThanOrEqual(position, 0),...
+                     mustBeLessThanOrEqual(position, 65535)}
+            end
+            cmdData = char([3 113]); % Command 0x03 0x71
+            self.write([cmdData dec2char(position, 2)]);
+        end
+        
+        function setPositionAndFunctionID(self, positionID, functionID)
+            arguments
+                self (1,1) PanelsController
+                positionID (1,1) ...
+                    {mustBeInteger,...
+                     mustBeGreaterThanOrEqual(positionID, 0),...
+                     mustBeLessThanOrEqual(positionID, 65535)}
+                 functionID (1,1) ...
+                    {mustBeInteger,...
+                     mustBeGreaterThanOrEqual(functionID, 0),...
+                     mustBeLessThanOrEqual(functionID, 65535)}
+            end
+            cmdData = char([5 5]); % Command 0x05 0x05
+            self.write([cmdData dec2char(positionID, 2) dec2char(functionID, 2)]);
+        end
+        
+        function setGain(self, gain, bias)
+            arguments
+                self (1,1) PanelsController
+                gain (1,1) {mustBeInteger,...
+                     mustBeGreaterThanOrEqual(gain, -32768),...
+                     mustBeLessThanOrEqual(gain, 32767)}
+                bias (1,1) {mustBeInteger,...
+                     mustBeGreaterThanOrEqual(bias, -32768),...
+                     mustBeLessThanOrEqual(bias, 32767)}
+            end
+            cmdData = char([5 1]); % Command 0x05 0x01
+            self.write([cmdData signed16BitToChar(gain) signed16BitToChar(bias)]);
+        end
+        
+        function rtn = setFrameRate(self, fps)
+            arguments
+                self (1,1) PanelsController
+                fps (1,1) {mustBeInteger,...
+                     mustBeGreaterThanOrEqual(fps, -32768),...
+                     mustBeLessThanOrEqual(fps, 32767)}
+            end
+            rtn = false;
+            cmdData = char([3 18]); % Command 0x03 0x12
+            self.write([cmdData signed16BitToChar(fps)]);
+            resp = self.expectResponse([0 1], 18, [], 0.1);
+            if ~isempty(resp) && uint8(resp(2)) == 0
+                rtn = true;
+            end
+        end
+
 
         function setGrayScaleLevel16(self)
             cmdData = char([2,4,16]);

@@ -142,9 +142,63 @@ classdef PanelsControllerFunctionalTest < matlab.unittest.TestCase
         end
         
         function testControlModeFail(testCase)
-            testCase.verifyTrue(testCase.panelsController.setControlMode(2.7), ...
-                "ASD");
-            disp("a");
+            testCase.verifyError(@()testCase.panelsController.setControlMode(2.7), 'MATLAB:validators:mustBeInteger', ...
+                "Trying to set a non-integer value for control mode didn't fail as expected.");
+            testCase.verifyError(@()testCase.panelsController.setControlMode(-1), 'MATLAB:validators:mustBeGreaterThanOrEqual', ...
+                "Setting a negative control mode didn't fail as expected.");
+            testCase.verifyError(@()testCase.panelsController.setControlMode(8), 'MATLAB:validators:mustBeLessThanOrEqual', ...
+                "Setting a control mode > 7 didn't fail as expected.");
+        end
+        
+        function testSetPatternID(testCase)
+            testCase.panelsController.setRootDirectory("C:\matlabroot\G4");
+            testCase.verifyTrue(testCase.panelsController.setPatternID(1), ...
+                "Setting pattern 1 didn't work (make sure pattern 1 exists in root directory).");
+        end
+        
+        function setPositionX(testCase)
+            testCase.panelsController.setRootDirectory("C:\matlabroot\G4");
+            testCase.panelsController.setControlMode(3);
+            for i = randi([0 65535], 1, 50)
+                testCase.verifyWarningFree(@() testCase.panelsController.setPositionX(i), ...
+                    sprintf("Couldn't set position X to %d", i));
+            end
+        end
+        
+        function setPositionY(testCase)
+            testCase.panelsController.setRootDirectory("C:\matlabroot\G4");
+            testCase.panelsController.setControlMode(3);
+            for i = randi([0 65535], 1, 50)
+                testCase.verifyWarningFree(...
+                    @() testCase.panelsController.setPositionY(i), ...
+                    sprintf("Couldn't set position Y to %d", i));
+            end
+        end
+        
+        function sendPositionIDAndFunctionID(testCase)
+            testCase.panelsController.setRootDirectory("C:\matlabroot\G4");
+            testCase.panelsController.setControlMode(3);
+            for ii = randi([0 65535], 2, 50)
+                testCase.verifyWarningFree(...
+                    @() testCase.panelsController.setPositionAndFunctionID(ii(1), ii(2)),...
+                    sprintf("Could not set PositionID %d and FunctionID %d", ii(1), ii(2)));
+            end
+        end
+        
+        function sendGain(testCase)
+            for ii = randi([-32768 32767], 2, 50)
+                testCase.verifyWarningFree(...
+                    @() testCase.panelsController.setGain(ii(1), ii(2)),...
+                    sprintf("Could not set Gain %d and Bias %d", ii(1), ii(2)));
+            end
+        end
+        
+        function sendFrameRate(testCase)
+            for i = [-500:500]% randi([-32768 32767], 1, 50)
+                testCase.verifyTrue(...
+                    testCase.panelsController.setFrameRate(i),...
+                    sprintf("Could not send FPS %d", i));
+            end
         end
 
     end
