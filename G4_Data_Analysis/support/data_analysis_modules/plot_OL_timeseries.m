@@ -23,7 +23,13 @@ function plot_OL_timeseries(timeseries_data, timestampsIN, model, plot_settings,
     show_ind_reps = plot_settings.show_individual_reps;
     subplot_figure_titles = plot_settings.subplot_figure_title;
     cutoff_time = plot_settings.cutoff_time;
-    other_indicators = plot_settings.other_indicators;
+
+    if ~isempty(plot_settings.other_indicators)
+        other_indicators = plot_settings.other_indicators{fig_num};
+    else
+        other_indicators = [];
+    end
+
     pattern_motion_indicator = plot_settings.pattern_motion_indicator;
     condition_pairs = plot_settings.opposing_condition_pairs;
     
@@ -255,6 +261,13 @@ function plot_OL_timeseries(timeseries_data, timestampsIN, model, plot_settings,
                                 xline(disp_move_line);
                             end
                         end
+
+                        if ~isempty(other_indicators)
+                            line_value = other_indicators(1+(row-1),col);
+                            if ~isnan(line_value) && line_value ~= 0
+                                xline(line_value);
+                            end
+                        end
                         
                         if frame_superimpose==1
                             curr_ylim = ylim(gca);
@@ -269,12 +282,7 @@ function plot_OL_timeseries(timeseries_data, timestampsIN, model, plot_settings,
                         end
                         set(gca, 'FontSize', axis_num_fontSize);
                         
-                        
-
-
                     end
-
-
 
                     % setting axes and labels
 
