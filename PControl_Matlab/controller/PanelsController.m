@@ -82,6 +82,10 @@ classdef PanelsController < handle
             end
             if ~self.isOpen
                 self.tcpConn = pnet('tcpconnect', self.hostName, self.port);
+                while ~self.isOpen
+                    disp("WAIT");
+                    pause(0.01);
+                end
             else
                 warning('tcp connection already open');
             end
@@ -163,8 +167,8 @@ classdef PanelsController < handle
             rtn = false;
             cmdData = uint8([1 48]); % Command 0x01 0x30
             self.write(cmdData);
-            resp = self.expectResponse([0 1], 48, "Display has been stopped", 0.1);
-            if ~isempty(resp) && resp(2) == 0
+            resp = self.expectResponse(0, 48, "Display has been stopped", 0.3);
+            if ~isempty(resp)
                 rtn = true;
             end
         end
@@ -354,6 +358,23 @@ classdef PanelsController < handle
         end
 
         function rtn = setControlMode(self, controlMode)
+            % setControlMode Set control mode on Main Host
+            %
+            % Modes:
+            %   0-Stream
+            %   1 - Fixed Rate Position Function
+            %   2 - Constant Rate Playback
+            %   3 - Stream Pattern Position
+            %   4 - Closed Loop:ADC
+            %   5 - Closed Loop + Function
+            %   6 - Both Mode 1 and 4
+            %   7 - ADC Sets Index
+            %
+            % Triggers the 'Set Control Mode' TCP command. Returns true if
+            % control mode is successfully set. Returns false if an
+            % unexpected response is received, the Main host reports out of
+            % range (should not happen with current constraint checks), or
+            % if command times out.
             arguments
                 self (1,1) PanelsController
                 controlMode (1,1) ...
@@ -427,6 +448,23 @@ classdef PanelsController < handle
             self.write([cmdData dec2char(positionID, 2) dec2char(functionID, 2)]);
         end
         
+        function rtn = setPatternFunctionID(self, patternID)
+            arguments
+                self (1,1) PanelsController
+                patternID (1,1) ...
+                    {mustBeInteger,...
+                    mustBeGreaterThanOrEqual(patternID, 0),...
+                    mustBeLessThanOrEqual(patternID, 65535)}
+            end
+            rtn = false;
+            cmdData = char([3 21]); % Command 0x03 0x15
+            self.write([cmdData dec2char(patternID, 2)]);
+            resp = self.expectResponse([0 1], 21, "Pattern Function", 0.1);
+            if ~isempty(resp) && uint8(resp(2)) == 0
+                rtn = true;
+            end
+        end
+        
         function setGain(self, gain, bias)
             arguments
                 self (1,1) PanelsController
@@ -457,6 +495,48 @@ classdef PanelsController < handle
             end
         end
 
+        function rtn = startDisplay(self, deciSeconds, waitForEnd)
+            arguments
+                self (1,1) PanelsController
+                deciSeconds (1,1) {mustBeInteger,...
+                    mustBeGreaterThanOrEqual(deciSeconds, 0),...
+                    mustBeLessThanOrEqual(deciSeconds, 65535)}
+                waitForEnd (1,1) logical = true
+            end
+            rtn = false;
+            cmdData = char([3 33]); % Command 0x03 0x21
+            self.write([cmdData dec2char(deciSeconds, 2)]);
+            resp = self.expectResponse([0 1], 33, [], 0.1);
+            if waitForEnd == true && ~isempty(resp) && resp(2) == 0
+                resp2 = self.expectResponse(0, 33, sprintf("Sequence completed in %d ms", deciSeconds*100), deciSeconds*1.0/10 + 1);
+                % disp(sprintf("Waitfor was %d and response was '%s'.",  deciSeconds, resp2));
+                if ~isempty(resp2)
+                    rtn = true;
+                end
+            elseif waitForEnd == false && ~isempty(resp) && resp(2) == 0
+                rtn = true;
+            end
+        end
+        
+        function rtn = setAOFunctionID(self, aoChannels, aoFunctionID)
+            arguments
+                self (1,1) PanelsController
+                aoChannels (1,4) logical
+                aoFunctionID (1,1) {mustBeInteger,...
+                    mustBeGreaterThanOrEqual(aoFunctionID, 0),...
+                    mustBeLessThanOrEqual(aoFunctionID, 65535)}
+            end
+            rtn = false;
+            cmdData = char([4 49]); % 0x04 0x31
+            chn = uint8(...
+                aoChannels(1)*8+aoChannels(2)*4+ ...
+                aoChannels(3)*2+aoChannels(4));
+            self.write([cmdData chn, dec2char(aoFunctionID, 2)]);
+            resp = self.expectResponse([0 1], 49, [], 0.1);
+            if ~isempty(resp) && resp(2) == 0
+                rtn = true;
+            end
+        end
 
         function setGrayScaleLevel16(self)
             cmdData = char([2,4,16]);
@@ -706,7 +786,7 @@ classdef PanelsController < handle
                         response = char(self.iBuf(pat.start(i):pat.end(i)));
                         if (~isempty(response) && isempty(rspString)) || ...
                            (~isempty(response) && contains(response, rspString))
-                            found_response = true;                            
+                            found_response = true;            
                             self.iBuf(pat.start(i):pat.end(i)) = [];
                             break;
                         else

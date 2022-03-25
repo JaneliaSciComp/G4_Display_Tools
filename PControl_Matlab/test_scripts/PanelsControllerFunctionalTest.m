@@ -185,6 +185,16 @@ classdef PanelsControllerFunctionalTest < matlab.unittest.TestCase
             end
         end
         
+        function sendPatternFunctionID(testCase)
+            testCase.panelsController.setRootDirectory("C:\matlabroot\G4");
+            testCase.panelsController.setControlMode(3);
+            for i = [1:100]
+                testCase.verifyTrue(...
+                    testCase.panelsController.setPatternFunctionID(1),...
+                    sprintf("Could not set FunctionID %d", i));
+            end
+        end
+        
         function sendGain(testCase)
             for ii = randi([-32768 32767], 2, 50)
                 testCase.verifyWarningFree(...
@@ -198,6 +208,58 @@ classdef PanelsControllerFunctionalTest < matlab.unittest.TestCase
                 testCase.verifyTrue(...
                     testCase.panelsController.setFrameRate(i),...
                     sprintf("Could not send FPS %d", i));
+            end
+        end
+        
+%         function sendStartDisplayXLSX(testCase)
+%             testCase.panelsController.setRootDirectory("C:\matlabroot\G4");
+%             testCase.panelsController.setControlMode(2);
+%             testCase.panelsController.setPatternID(1);
+%             rsps = [];
+%             runTime = [];
+%             seqTime = [];
+%             for i =   [randi([0, 2500], 1, 50) randi([0, 65534], 1, 20)] % [1878 637 1265 1748]
+%                 disp(i);
+%                 startTime = tic;
+%                 rsp = testCase.panelsController.startDisplay(i);
+%                 seqComplete = toc(startTime);
+%                 rsps = [rsps; rsp];
+%                 runTime = [runTime; i];
+%                 seqTime = [seqTime; seqComplete];
+%             end
+%             T = table(rsps, runTime, seqTime);
+%             writetable(T, "startDisplayTimes2.xlsx", "Sheet", "2022-03-25")
+%         end
+        
+        function sendStartDisplay(testCase)
+            testCase.panelsController.setRootDirectory("C:\matlabroot\G4");
+            testCase.panelsController.setControlMode(2);
+            testCase.panelsController.setPatternID(1);
+            waitDecSec = randi([1, 500], 1, 1);
+            startTime = tic;
+            rsp = testCase.panelsController.startDisplay(waitDecSec);
+            testCase.verifyTrue(rsp, "startDisplay didn't return true as expected");
+            seqComplete = toc(startTime);
+            testCase.verifyEqual(seqComplete, waitDecSec*1.0/10, "AbsTol", 2, ...
+                sprintf("Wait %d deciseconds didn't work, it was %.2f seconds instead", waitDecSec, seqComplete));
+        end
+        
+        function sendStartStop(testCase)
+            testCase.panelsController.setRootDirectory("C:\matlabroot\G4");
+            testCase.panelsController.setControlMode(1);
+            testCase.panelsController.setPatternID(1);
+            for i = randi([1, 10], 1, 100)
+                testCase.verifyTrue(testCase.panelsController.startDisplay(i));
+                testCase.verifyTrue(testCase.panelsController.stopDisplay());
+            end
+        end
+        
+        function sendAOFunctionID(testCase)
+            testCase.panelsController.setRootDirectory("C:\matlabroot\G4");
+            for i = [0:15]
+                onOff = str2num(char(num2cell(dec2bin(i))))';
+                onOff = padarray(onOff, [0 4-length(onOff)], 0, 'pre');
+                testCase.verifyTrue(testCase.panelsController.setAOFunctionID(onOff, 1));
             end
         end
 
