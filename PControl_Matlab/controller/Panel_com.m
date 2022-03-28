@@ -137,9 +137,9 @@ switch lower(command)
     case 'set_active_ao_channels'
 %         First 4 bits represent the active channels i.e. 0001 - ch0, 0110 - ch2&3
 %         Input should be a binary string
-        assert(ischar(argument), 'Input should be a 4bit binary string')
-        assert(length(argument) == 4, 'Input should be a 4bit binary string')
-        assert(ismember(unique(argument), {'0', '1', '01'}), 'Input was not binary string') 
+        assert(ischar(argument), 'Input should be a list of char representing a 4bit binary (eg 0101)')
+        assert(length(argument) == 4, 'Input should be 4 elements long')
+        assert(ismember(unique(argument), {'0', '1', '01'}), 'Input contained other values than 0 or 1') 
         relCh = bin2dec(['0000', argument]);
         
         reply = send_tcp( char([2 hex2dec('11') relCh]));

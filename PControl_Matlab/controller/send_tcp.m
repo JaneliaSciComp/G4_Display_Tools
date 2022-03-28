@@ -23,7 +23,7 @@ message = pnet(ctlr.tcpConn, 'read','noblock');
 
 %Step 2: check whether the connection is open 
 %success is the number of the elements has been sent successfully
-if  ctlr.isOpen() == 0
+if ~ctlr.isOpen
     ctlr = PanelsController();        
     ctlr.mode = 1;
     ctlr.open();

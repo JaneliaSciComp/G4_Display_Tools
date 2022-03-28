@@ -643,12 +643,12 @@ void my_mexReturnArrayFromBuff(const int argno,io_buff *buff,const int line)
 {
     const int maxelements=my_mexInputSize(argno);
     const mxClassID id=str2classid(my_mexInputOptionString(argno+1));
-    int dims[20]={0,0,0,0,0, 0,0,0,0,0, 0,0,0,0,0, 0,0,0,0,0 };
+    mwSize dims[20]={0,0,0,0,0, 0,0,0,0,0, 0,0,0,0,0, 0,0,0,0,0 };
     const int si=classid2size(id);
     int returnelements= ( (buff->pos/si)< maxelements )?(buff->pos/si):maxelements;
     int deleteelements=returnelements;
     int swap=2;
-    int return_no_dims= my_mexIsInputArgOK(argno) && !mxIsChar(my_mexInputArg(argno))?mxGetNumberOfElements(my_mexInputArg(argno)):1;
+    mwSize return_no_dims= my_mexIsInputArgOK(argno) && !mxIsChar(my_mexInputArg(argno))?mxGetNumberOfElements(my_mexInputArg(argno)):1;
 
     if(my_mexFindInputOption(argno+1,"NATIVE"))  swap=0;
     if(my_mexFindInputOption(argno+1,"SWAP"))    swap=1;
