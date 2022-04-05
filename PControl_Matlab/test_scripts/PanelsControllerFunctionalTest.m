@@ -56,7 +56,7 @@ classdef PanelsControllerFunctionalTest < matlab.unittest.TestCase
             delayOnOff = 0.004;
             delayOffOn = 0;
             boff = tic;
-            for i = 1:1000000
+            for i = 1:15
                 while toc(boff) < delayOffOn
                 end
                 bon = tic;
@@ -92,7 +92,7 @@ classdef PanelsControllerFunctionalTest < matlab.unittest.TestCase
         end
         
         function sendActiveAO(testCase)
-            for i = [0:15]
+            for i = 0:15
                 onOff = str2num(char(num2cell(dec2bin(i))))';
                 onOff = padarray(onOff, [0 4-length(onOff)], 0, 'pre');
                 testCase.verifyTrue(testCase.panelsController.setActiveAOChannels(onOff), ...
@@ -101,7 +101,7 @@ classdef PanelsControllerFunctionalTest < matlab.unittest.TestCase
         end
         
         function sendActiveAI(testCase)
-            for i = [0:15]
+            for i = 0:15
                 onOff = str2num(char(num2cell(dec2bin(i))))';
                 onOff = padarray(onOff, [0 4-length(onOff)], 0, 'pre');
                 testCase.verifyTrue(testCase.panelsController.setActiveAIChannels(onOff), ...
@@ -110,28 +110,37 @@ classdef PanelsControllerFunctionalTest < matlab.unittest.TestCase
         end
         
         function testLoggingRepeatedOn(testCase)
-             for i = [0:15]
-                 testCase.verifyTrue(testCase.panelsController.startLog(), ...
+            newDir = tempname;
+            testCase.panelsController.setRootDirectory(newDir);
+            for i = 0:15
+                testCase.verifyTrue(testCase.panelsController.startLog(), ...
                     sprintf("Starting the log didn't work in iteration %d", i));
-             end
-             testCase.panelsController.stopLog();
+            end
+            testCase.panelsController.stopLog();
+            rmdir(newDir, 's');
         end
         
         function testLoggingRepeatedOff(testCase)
-              testCase.panelsController.startLog();
-              for i = [0:15]
-                 testCase.verifyTrue(testCase.panelsController.stopLog(), ...
+            newDir = tempname;
+            testCase.panelsController.setRootDirectory(newDir);
+            testCase.panelsController.startLog();
+            for i = 0:15
+                testCase.verifyTrue(testCase.panelsController.stopLog(), ...
                     sprintf("Stopping the log didn't work in iteration %d", i));
-             end
+            end
+            rmdir(newDir, 's');
         end
         
         function testLogging(testCase)
-            for i = [0:15]
+            newDir = tempname;
+            testCase.panelsController.setRootDirectory(newDir);
+            for i = 0:15
                 testCase.verifyTrue(testCase.panelsController.startLog(), ...
                     sprintf("Starting the log didn't work in iteration %d", i));
                 testCase.verifyTrue(testCase.panelsController.stopLog(), ...
                     sprintf("Stopping the log didn't work in iteration %d", i));
             end
+            rmdir(newDir, 's');
         end
 
         function testControlMode(testCase)
@@ -188,7 +197,7 @@ classdef PanelsControllerFunctionalTest < matlab.unittest.TestCase
         function sendPatternFunctionID(testCase)
             testCase.panelsController.setRootDirectory("C:\matlabroot\G4");
             testCase.panelsController.setControlMode(3);
-            for i = [1:100]
+            for i = 1:100
                 testCase.verifyTrue(...
                     testCase.panelsController.setPatternFunctionID(1),...
                     sprintf("Could not set FunctionID %d", i));
@@ -204,7 +213,7 @@ classdef PanelsControllerFunctionalTest < matlab.unittest.TestCase
         end
         
         function sendFrameRate(testCase)
-            for i = [-500:500]% randi([-32768 32767], 1, 50)
+            for i = -500:500 % randi([-32768 32767], 1, 50)
                 testCase.verifyTrue(...
                     testCase.panelsController.setFrameRate(i),...
                     sprintf("Could not send FPS %d", i));
@@ -218,7 +227,8 @@ classdef PanelsControllerFunctionalTest < matlab.unittest.TestCase
 %             rsps = [];
 %             runTime = [];
 %             seqTime = [];
-%             for i =   [randi([0, 2500], 1, 50) randi([0, 65534], 1, 20)] % [1878 637 1265 1748]
+%             for i =   [randi([1, 50], 1, 50)]% randi([0, 65534], 1, 20)] % 
+%             %for i = [1878 637 1265 1748]
 %                 disp(i);
 %                 startTime = tic;
 %                 rsp = testCase.panelsController.startDisplay(i);
@@ -232,31 +242,36 @@ classdef PanelsControllerFunctionalTest < matlab.unittest.TestCase
 %         end
         
         function sendStartDisplay(testCase)
+            % This is the unit test doing the same as sendStartDisplayXLSX
             testCase.panelsController.setRootDirectory("C:\matlabroot\G4");
             testCase.panelsController.setControlMode(2);
             testCase.panelsController.setPatternID(1);
-            waitDecSec = randi([1, 500], 1, 1);
-            startTime = tic;
-            rsp = testCase.panelsController.startDisplay(waitDecSec);
-            testCase.verifyTrue(rsp, "startDisplay didn't return true as expected");
-            seqComplete = toc(startTime);
-            testCase.verifyEqual(seqComplete, waitDecSec*1.0/10, "AbsTol", 2, ...
-                sprintf("Wait %d deciseconds didn't work, it was %.2f seconds instead", waitDecSec, seqComplete));
+            for waitDecSec = randi([1, 50], 1, 20)
+                startTime = tic;
+                rsp = testCase.panelsController.startDisplay(waitDecSec);
+                testCase.verifyTrue(rsp, "startDisplay didn't return true as expected");
+                seqComplete = toc(startTime);
+                testCase.verifyEqual(seqComplete, waitDecSec*1.0/10, "AbsTol", 0.2, ...
+                    sprintf("Wait %d deciseconds didn't work, it was %.2f seconds instead", waitDecSec, seqComplete));
+            end
         end
         
         function sendStartStop(testCase)
             testCase.panelsController.setRootDirectory("C:\matlabroot\G4");
             testCase.panelsController.setControlMode(1);
             testCase.panelsController.setPatternID(1);
-            for i = randi([1, 10], 1, 100)
-                testCase.verifyTrue(testCase.panelsController.startDisplay(i));
-                testCase.verifyTrue(testCase.panelsController.stopDisplay());
+            for i = randi([500, 3000], 1, 100)
+                testCase.panelsController.setControlMode(1);
+                testCase.verifyTrue(testCase.panelsController.startDisplay(i, false));
+                % As suggested in issue #21:
+                % https://github.com/JaneliaSciComp/G4_Display_Tools/issues/21
+                testCase.panelsController.setControlMode(0);        
             end
         end
         
         function sendAOFunctionID(testCase)
             testCase.panelsController.setRootDirectory("C:\matlabroot\G4");
-            for i = [0:15]
+            for i = 0:15
                 onOff = str2num(char(num2cell(dec2bin(i))))';
                 onOff = padarray(onOff, [0 4-length(onOff)], 0, 'pre');
                 testCase.verifyTrue(testCase.panelsController.setAOFunctionID(onOff, 1));

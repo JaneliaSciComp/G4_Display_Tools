@@ -499,7 +499,7 @@ classdef PanelsController < handle
             arguments
                 self (1,1) PanelsController
                 deciSeconds (1,1) {mustBeInteger,...
-                    mustBeGreaterThanOrEqual(deciSeconds, 0),...
+                    mustBeGreaterThan(deciSeconds, 0),...   % the G4 Host doesn't accept 0
                     mustBeLessThanOrEqual(deciSeconds, 65535)}
                 waitForEnd (1,1) logical = true
             end
