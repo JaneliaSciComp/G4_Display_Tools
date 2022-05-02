@@ -240,6 +240,29 @@ classdef PanelsControllerFunctionalTest < matlab.unittest.TestCase
 %             T = table(rsps, runTime, seqTime);
 %             writetable(T, "startDisplayTimes2.xlsx", "Sheet", "2022-03-25")
 %         end
+
+        function gapsInLogXLSX(testCase)
+            testCase.panelsController.setRootDirectory("C:\matlabroot\G4");
+            testCase.panelsController.setControlMode(1);
+            rsps = [];
+            runTime = [];
+            seqTime = [];            
+            for ii=1:400
+                testCase.panelsController.startLog()        
+                testCase.panelsController.setPatternID(ii);
+                testCase.panelsController.setPatternFunctionID(ii);
+                testCase.panelsController.setPositionX(ii);
+                startTime = tic;
+                rsp = testCase.panelsController.startDisplay(23);
+                seqComplete = toc(startTime);
+                rsps = [rsps; rsp];
+                runTime = [runTime; 23];
+                seqTime = [seqTime; seqComplete];
+                testCase.panelsController.stopLog();
+            end
+            T = table(rsps, runTime, seqTime);
+            writetable(T, "gapsInLog.xlsx", "Sheet", "gaps")
+        end
         
         function sendStartDisplay(testCase)
             % This is the unit test doing the same as sendStartDisplayXLSX
