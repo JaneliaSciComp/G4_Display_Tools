@@ -2,6 +2,7 @@ function disconnectHost
 
 global ctlr;
 
-ctlr.close();
+if isa(ctlr, 'PanelsController')
+    ctlr.close();
+end
 clear global;
-

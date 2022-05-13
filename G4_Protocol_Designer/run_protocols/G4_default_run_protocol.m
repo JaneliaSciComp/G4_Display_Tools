@@ -354,16 +354,16 @@ end
                     dur = block_trials{cond, 12};
                      
                     %Update panel_com-----------------------------
-                    Panel_com('set_control_mode', trial_mode)
+                    Panel_com('set_control_mode', trial_mode);
                     
-                    Panel_com('set_pattern_id', pat_id)
+                    Panel_com('set_pattern_id', pat_id);
                     
                     if ~isempty(block_trials{cond,10})
                         Panel_com('set_gain_bias', [gain, offset]);
                     end
                     if pos_id ~= 0
 
-                        Panel_com('set_pattern_func_id', pos_id)
+                        Panel_com('set_pattern_func_id', pos_id);
                         
                     end
                     if trial_mode == 2

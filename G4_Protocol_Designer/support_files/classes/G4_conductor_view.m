@@ -584,9 +584,9 @@ classdef G4_conductor_view < handle
             
         end
         
-        function new_timestamp(self, src, ~)
+        function new_timestamp(self, ~, ~)
             
-            self.con.update_timestamp(src.String)
+            self.con.update_timestamp();
             self.update_run_gui();
         end
         

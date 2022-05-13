@@ -273,8 +273,8 @@ classdef G4_conductor_model < handle
             self.expected_time = new_val;
         end
         
-        function set_timestamp(self, new_val)
-            self.timestamp = new_val;
+        function set_timestamp(self)
+            self.timestamp = datestr(now, 'mm-dd-yyyyHH_MM_SS');
         end
         
         function reset_num_tests_conducted(self)

@@ -199,7 +199,7 @@ function plot_basic_histograms(model, timeseries_data, interhistogram_data, ...
                 set(currPlot, 'FontSize', 8);
             
             elseif trial_options(2) == 1 && single == 1
-                
+               
                 fly_line = squeeze(nanmean(interhistogram_data(g,:,:,:),3));
                 total_points = nansum(interhistogram_data(1,1,1,:),4);
                 fly_line = fly_line/total_points;
@@ -230,8 +230,9 @@ function plot_basic_histograms(model, timeseries_data, interhistogram_data, ...
                
                 avg_val = mean(fly_line);
                 xl_fly = xlim;
-                plot(xl_fly,[avg_val avg_val],'--','Color',rep_Colors(g,:)','LineWidth',rep_LineWidth)
-                
+                if ~isempty(avg_val)
+                    plot(xl_fly,[avg_val avg_val],'--','Color',rep_Colors(g,:)','LineWidth',rep_LineWidth)
+                end
                  ylimit = ylim; 
                set(gca, 'YTick', ylimit(1):.01:ylimit(2))
                yticklabels(yticks*100);
