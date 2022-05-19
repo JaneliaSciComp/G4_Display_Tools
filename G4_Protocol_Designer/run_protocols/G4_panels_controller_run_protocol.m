@@ -215,4 +215,179 @@ end
     end
     ctlr.setActiveAIChannels(aibits);
 
+
+   %% confirm start experiment
+    if ~isempty(runcon.view)
+        start = questdlg('Start Experiment?','Confirm Start','Start','Cancel','Start');
+    else
+        start = 'Start';
+    end
+ 
+     switch start
+     
+         case 'Cancel'
+             if isa(ctlr, 'PanelsController')
+                ctlr.close();
+             end
+             clear global;
+             success = 0;
+             return;
+         case 'Start' 
+
+             %The rest of the code to run the experiment goes under this case
+         
+%% Determine the total number of trials in order to define in what increments 
+%the progress bar will progress.-------------------------------------------
+            total_num_steps = 0; 
+            if pre_start == 1
+                total_num_steps = total_num_steps + 1;
+            end
+            if inter_type == 1
+                total_num_steps = total_num_steps + (reps*num_cond) - 1;
+                %Minus 1 because there is no intertrial before the first
+                %block trial OR after the last block trial.
+
+            end
+            if post_type == 1
+                total_num_steps = total_num_steps + 1;
+            end
+            total_num_steps = total_num_steps + (reps*num_cond);
+            %adds total number of block trials (not including intertrials)
+
+            %% Determine how long the experiment will take and update the title of the 
+%progress bar to reflect it------------------------------------------------
+            total_time = 0; 
+            if inter_type == 1
+                for i = 1:num_cond
+                    total_time = total_time + p.block_trials{i,12} + inter_dur;
+                end
+                total_time = (total_time * reps) - inter_dur; %bc no intertrial before first rep OR after last rep of the block.
+            else %meaning no intertrial
+                for i = 1:num_cond
+                    total_time = total_time + p.block_trials{i,12};
+                end
+                total_time = total_time * reps;
+            end
+
+            if pre_start == 1
+                total_time = total_time + pre_dur;
+            end
+            if post_type == 1
+                total_time = total_time + post_dur;
+            end
+            
+            %Update the progress bar's label to reflect the expected
+            %duration.
+            axes_label.String = "Estimated experiment duration: " + num2str(total_time/60) + " minutes.";
+            
+            %Will increment this every time a trial is completed to track how far along 
+            %in the experiment we are
+            num_trial_of_total = 0;
+
+            %% Start log, if fails twice, abort------------------------------------
+
+             log_started = ctlr.startLog();
+             if ~log_started
+                 disp("Log failed to start, retrying...");
+                 log_started = ctlr.startLog();
+                 if ~log_started
+                     disp("Log failed a second time, aborting experiment.");
+                     runcon.abort_experiment();
+                 end
+             end
+             if runcon.check_if_aborted()
+                
+                if isa(ctlr, 'PanelsController')
+                    ctlr.close();
+                end
+                clear global;
+                success = 0;
+                return;
+             
+             end
+
+             %% run pretrial if it exists----------------------------------------
+             startTime = tic;
+             
+             if pre_start == 1
+                 %First update the progress bar to show pretrial is running----
+                 runcon.update_progress('pre');
+                 num_trial_of_total = num_trial_of_total + 1;
+
+                %Set the panel values appropriately----------------
+                 ctlr.setControlMode(pre_mode);
+                 ctlr.setPatternID(pre_pat);
+                    
+                 %randomize frame index if indicated
+                 if pre_frame_ind == 0
+                     pre_frame_ind = randperm(p.num_pretrial_frames, 1);  
+                 end
+                 
+                 ctlr.setPositionX(pre_frame_ind);
+                 if pre_pos ~= 0
+                     ctlr.setPatternFunctionID(pre_pos); 
+                 end
+
+                 if ~isempty(pre_gain) %this assumes you'll never have gain without offset
+                     ctlr.setGain(pre_gain, pre_offset);                     
+                 end
+
+                 if pre_mode == 2
+                     ctlr.setFrameRate(pre_frame_rate);         
+                 end
+
+                 for i = 1:length(pre_ao_ind)
+                     if pre_ao_ind(i) ~= 0 %if it is zero, there was no ao function for this channel
+                         ctlr.setAOFunctionID(p.active_ao_channels(i), pre_ao_ind(i));%[channel number, index of ao func]                    
+                     end
+                 end
+                 
+                 %Update status panel to show current parameters
+                 runcon.update_current_trial_parameters(pre_mode, pre_pat, pre_pos, p.active_ao_channels, ...
+                    pre_ao_ind, pre_frame_ind, pre_frame_rate, pre_gain, pre_offset, pre_dur);
+
+                 pause(0.01);
+                 
+                 %Run pretrial on screen
+                 if pre_dur ~= 0
+                    ctlr.startDisplay(pre_dur);
+                 else
+
+  %THIS MAY NEED TO BE RE-THOUGHT OUT IF THE CODE WILL NOT CONTINUE ON
+  %UNTIL THE FULL 2000 SECONDS HAVE BEEN DISPLAYED - TEST
+                     ctlr.startDisplay(2000);
+                     w = waitforbuttonpress; %If pretrial duration is set to zero, this
+                     %causes it to loop until you press a button.
+                 end
+             end
+             
+             tcpread{end+1} = pnet(ctlr.tcpConn, 'read', 'noblock'); % read data that's been streamed since clearing cache
+
+             if runcon.check_if_aborted()
+                ctlr.stopDisplay();
+                log_stopped = ctlr.stopLog();
+                if ~log_stopped
+                    disp("Log failed to stop. Retrying...");
+                    log_stopped = ctlr.stopLog();
+                    if ~log_stopped
+                        disp("Log failed to stop. Please stop manually.");
+                    end
+                end
+                if isa(ctlr, 'PanelsController')
+                    ctlr.close();
+                end
+                clear global;
+                success = 0;
+                return;
+             
+             end
+             
+             runcon.update_elapsed_time(round(toc(startTime),2));
+
+
+
+
+
+     end
+
 end
