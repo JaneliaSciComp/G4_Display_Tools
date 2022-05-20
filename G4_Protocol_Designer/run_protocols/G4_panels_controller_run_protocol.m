@@ -350,12 +350,9 @@ end
                  
                  %Run pretrial on screen
                  if pre_dur ~= 0
-                    ctlr.startDisplay(pre_dur);
+                    ctlr.startDisplay(pre_dur*10); %Panel_com usually did the *10 for us. Controller expects time in deciseconds
                  else
-
-  %THIS MAY NEED TO BE RE-THOUGHT OUT IF THE CODE WILL NOT CONTINUE ON
-  %UNTIL THE FULL 2000 SECONDS HAVE BEEN DISPLAYED - TEST
-                     ctlr.startDisplay(2000);
+                     ctlr.startDisplay(2000, false); %second input, waitforend, equals false so code will continue executing
                      w = waitforbuttonpress; %If pretrial duration is set to zero, this
                      %causes it to loop until you press a button.
                  end
@@ -383,6 +380,201 @@ end
              end
              
              runcon.update_elapsed_time(round(toc(startTime),2));
+
+             %% Loop to run the block/inter trials --------------------------------------
+
+             for r = 1:reps
+                 for c = 1:num_cond
+                    %define which condition we're using
+                    cond = p.exp_order(r,c);
+                    
+                    
+                    num_trial_of_total = num_trial_of_total + 1;
+                    
+
+                    
+                    %define parameters for this trial----------------
+                    trial_mode = block_trials{cond,1};
+                    pat_id = p.block_pat_indices(cond);
+                    pos_id = p.block_pos_indices(cond);
+                    if length(block_ao_indices) >= cond
+                        trial_ao_indices = block_ao_indices(cond,:);
+                    else
+                        trial_ao_indices = [];
+                    end
+                    %Set frame index
+                    if isempty(block_trials{cond,8})
+                        frame_ind = 1;
+                    elseif strcmp(block_trials{cond,8},'r')
+                        frame_ind = 0; %use this later to randomize
+                    else
+                       frame_ind = str2num(block_trials{cond,8});
+                    end
+                     
+                    frame_rate = block_trials{cond, 9};
+                    gain = block_trials{cond, 10};
+                    offset = block_trials{cond, 11};
+                    dur = block_trials{cond, 12};
+                     
+                    %Update panel_com-----------------------------
+                    Panel_com('set_control_mode', trial_mode);
+                    
+                    Panel_com('set_pattern_id', pat_id);
+                    
+                    if ~isempty(block_trials{cond,10})
+                        Panel_com('set_gain_bias', [gain, offset]);
+                    end
+                    if pos_id ~= 0
+
+                        Panel_com('set_pattern_func_id', pos_id);
+                        
+                    end
+                    if trial_mode == 2
+                        Panel_com('set_frame_rate',frame_rate);
+                    end
+                    
+                    if frame_ind == 0
+                        frame_ind = randperm(p.num_block_frames(c),1);
+                    end
+
+                    Panel_com('set_position_x', frame_ind);
+                    
+                    for i = 1:length(p.active_ao_channels)
+                        Panel_com('set_ao_function_id',[p.active_ao_channels(i), trial_ao_indices(i)]);
+                        
+                    end
+
+                    tcpread_cache = pnet(ctlr.tcpConn, 'read', 'noblock'); % clear cache
+                                        
+
+                    %Run block trial--------------------------------------
+
+                    Panel_com('start_display', dur + .5); %duration expected in 100ms units
+                    timeSinceTrial = tic;
+                    
+                    %Update the progress bar--------------------------
+                    runcon.update_progress('block', r, reps, c, num_cond, cond, num_trial_of_total);
+                    %Update status panel to show current parameters
+                    runcon.update_current_trial_parameters(trial_mode, pat_id, pos_id, p.active_ao_channels, ...
+                      trial_ao_indices, frame_ind, frame_rate, gain, offset, dur);
+                   % Update plots showing previous trials data-----------
+                    if r ~= 1 || c ~= 1
+                        if inter_type
+                            runcon.update_streamed_data(tcpread{end}, 'inter', prev_r, prev_c, prev_num_trials);
+                        else
+                            runcon.update_streamed_data(tcpread{end}, 'block', prev_r, prev_c, prev_num_trials);
+                        end
+                    end
+                    %pause for however much time is left after doing updates
+                    pause(dur - toc(timeSinceTrial));
+
+
+                    tcpread{end+1} = pnet(ctlr.tcpConn, 'read', 'noblock');
+                    
+                    % Save values of this trial so they can be used in next
+                    % streaming update
+                    prev_c = c;
+                    prev_r = r;
+                    prev_num_trials = num_trial_of_total;
+
+                    
+                    isAborted = runcon.check_if_aborted();
+                    if isAborted == 1
+                        Panel_com('stop_display');
+                        Panel_com('stop_log');
+                        pause(1);
+                        disconnectHost;
+                        success = 0;
+                        return;
+                  
+                    end
+                    runcon.update_elapsed_time(round(toc(startTime),2));
+                    
+                    %Tells loop to skip the intertrial if this is the last iteration of the last rep
+                    if r == reps && c == num_cond
+   
+                        continue 
+                    end
+                    
+        %Run inter-trial assuming there is one-------------------------
+                    if inter_type == 1
+                        
+                        
+                        %Update progress bar to indicate start of inter-trial
+                        num_trial_of_total = num_trial_of_total + 1;
+                        
+                       
+
+                        %Run intertrial-------------------------
+                        Panel_com('set_control_mode',inter_mode);
+                       
+                        Panel_com('set_pattern_id', inter_pat);
+                       
+                        %randomize frame index if indicated
+                        if inter_frame_ind == 0
+                            inter_frame_ind = randperm(p.num_intertrial_frames, 1);
+                        end
+                        Panel_com('set_position_x',inter_frame_ind);
+                        
+
+                        if inter_pos ~= 0
+                            Panel_com('set_pattern_func_id', inter_pos);
+                            
+                        end
+
+                         if ~isempty(inter_gain) %this assumes you'll never have gain without offset
+                             Panel_com('set_gain_bias', [inter_gain, inter_offset]);
+                         end
+
+                         if inter_mode == 2
+                             Panel_com('set_frame_rate', inter_frame_rate);
+                         end
+
+                         for i = 1:length(inter_ao_ind)
+                             if inter_ao_ind(i) ~= 0 %if it is zero, there was no ao function for this channel
+                                 Panel_com('set_ao_function_id',[p.active_ao_channels(i), inter_ao_ind(i)]);%[channel number, index of ao func]
+                                 
+                             end
+                         end
+                         
+                         
+                        
+                         tcpread_cache = pnet(ctlr.tcpConn, 'read', 'noblock'); % clear cache
+                         %pause(0.01);
+                         
+                
+
+                         Panel_com('start_display', inter_dur + .5);
+                         timeSinceInter = tic;
+                         
+                         runcon.update_progress('inter', r, reps, c, num_cond, num_trial_of_total);
+                          %Update status panel to show current parameters
+                        runcon.update_current_trial_parameters(inter_mode, inter_pat, inter_pos, p.active_ao_channels, ...
+                            inter_ao_ind, inter_frame_ind, inter_frame_rate, inter_gain, inter_offset, inter_dur);
+                         runcon.update_streamed_data(tcpread{end}, 'block', r, c, prev_num_trials);
+                         
+                         pause(inter_dur - toc(timeSinceInter));
+
+                         tcpread{end+1} = pnet(ctlr.tcpConn, 'read', 'noblock');
+                         prev_num_trials = num_trial_of_total;
+                         
+
+                         if runcon.check_if_aborted() == 1
+                            Panel_com('stop_display');
+                            pause(.1);
+                            Panel_com('stop_log');
+                            pause(1);
+                            disconnectHost;
+                            success = 0;
+                            return;
+                         
+                         end
+                         
+                         runcon.update_elapsed_time(round(toc(startTime),2));
+                         
+                    end 
+                 end
+             end
 
 
 
