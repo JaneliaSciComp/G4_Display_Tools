@@ -12,7 +12,7 @@ So your hardware is set up and you're ready to run an experiment? You'll need th
 
 ## What are the G4 Display Tools?
 
-The [G4 Display tools]({{site.baseurl}}/docs/g4_system.html#Display-Tools) are a suite of software tools that make it easy to run fly behavioral experiments on the Generation 4 (G4) arena. These tools allow you to:
+The [G4 Display tools]({{site.baseurl}}/G4/#Display-Tools) are a suite of software tools that make it easy to run fly behavioral experiments on the Generation 4 (G4) arena. These tools allow you to:
 
 - Create patterns to display on the screens
 - Generate functions to control the movement of patterns on the screens
@@ -21,7 +21,7 @@ The [G4 Display tools]({{site.baseurl}}/docs/g4_system.html#Display-Tools) are a
 - Automatically save and process data
 - Perform some types of data analysis automatically
 
-For now, here's an overview of the steps you will take to set up an experiment utilizing these tools. Please see the page for each individual tool, located under [Generation 4]({{site.baseurl}}/docs/g4_system.html) for further details on its use and tutorials to take you through this step by step.
+For now, here's an overview of the steps you will take to set up an experiment utilizing these tools. Please see the page for each individual tool, located under [Generation 4]({{site.baseurl}}/G4) for further details on its use and tutorials to take you through this step by step.
 
 ## Pattern and Function Generators
 
