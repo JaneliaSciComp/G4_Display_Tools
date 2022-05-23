@@ -54,18 +54,18 @@
      %p.active_ao_channels lists the channels that are active - [0 2 3] for
      %example means channels 1, 3, and 4 are active.
 
-function [success] = G4_panels_controller_run_protocol(runcon, p)%input should always be 1 or 2 items
+function [success] = G4_panels_controller_stream_protocol(runcon, p)%input should always be 1 or 2 items
 
     %% Get access to the figure and progress bar in the run gui IF it was passed in.
-global ctlr;
-tcpread = {};
-
-
-%        fig = runcon.fig;
-if ~isempty(runcon.view)
-
-    axes_label = runcon.view.axes_label;
-end
+    global ctlr;
+    tcpread = {};
+    
+    
+    %        fig = runcon.fig;
+    if ~isempty(runcon.view)
+    
+        axes_label = runcon.view.axes_label;
+    end
 
 
  %% Set up parameters 
@@ -352,7 +352,7 @@ end
                  if pre_dur ~= 0
                     ctlr.startDisplay(pre_dur*10); %Panel_com usually did the *10 for us. Controller expects time in deciseconds
                  else
-                     ctlr.startDisplay(2000, false); %second input, waitforend, equals false so code will continue executing
+                     ctlr.startDisplay(2000, false); %second input, waitForEnd, equals false so code will continue executing
                      w = waitforbuttonpress; %If pretrial duration is set to zero, this
                      %causes it to loop until you press a button.
                  end
@@ -416,32 +416,31 @@ end
                     offset = block_trials{cond, 11};
                     dur = block_trials{cond, 12};
                      
-                    %Update panel_com-----------------------------
-                    Panel_com('set_control_mode', trial_mode);
-                    
-                    Panel_com('set_pattern_id', pat_id);
+                    %Update controller-----------------------------
+
+                    ctlr.setControlMode(trial_mode);
+                    ctlr.setPatternID(pat_id);
                     
                     if ~isempty(block_trials{cond,10})
-                        Panel_com('set_gain_bias', [gain, offset]);
+                        ctlr.setGain(gain, offset);
                     end
                     if pos_id ~= 0
 
-                        Panel_com('set_pattern_func_id', pos_id);
+                       ctlr.setPatternFunctionID(pos_id);
                         
                     end
                     if trial_mode == 2
-                        Panel_com('set_frame_rate',frame_rate);
+                        ctlr.setFrameRate(frame_rate);
                     end
                     
                     if frame_ind == 0
                         frame_ind = randperm(p.num_block_frames(c),1);
                     end
 
-                    Panel_com('set_position_x', frame_ind);
+                    ctlr.setPositionX(frame_ind);
                     
                     for i = 1:length(p.active_ao_channels)
-                        Panel_com('set_ao_function_id',[p.active_ao_channels(i), trial_ao_indices(i)]);
-                        
+                        ctlr.setAOFunctionID(p.active_ao_channels(i), trial_ao_indices(i));  
                     end
 
                     tcpread_cache = pnet(ctlr.tcpConn, 'read', 'noblock'); % clear cache
@@ -449,7 +448,10 @@ end
 
                     %Run block trial--------------------------------------
 
-                    Panel_com('start_display', dur + .5); %duration expected in 100ms units
+                    ctlr.startDisplay((dur + .5)*10, false); %duration expected in 100ms units
+                    % Need waitForEnd to be false so all the streaming
+                    % updates can happen while it runs - otherwise, they
+                    % slow the experiment down too much.
                     timeSinceTrial = tic;
                     
                     %Update the progress bar--------------------------
@@ -480,10 +482,19 @@ end
                     
                     isAborted = runcon.check_if_aborted();
                     if isAborted == 1
-                        Panel_com('stop_display');
-                        Panel_com('stop_log');
-                        pause(1);
-                        disconnectHost;
+                        ctlr.stopDisplay();
+                        log_stopped = ctlr.stopLog();
+                        if ~log_stopped
+                            disp("Log failed to stop. Retrying...");
+                            log_stopped = ctlr.stopLog();
+                            if ~log_stopped
+                                disp("Log failed to stop. Please stop manually.");
+                            end
+                        end
+                        if isa(ctlr, 'PanelsController')
+                            ctlr.close();
+                        end
+                        clear global;
                         success = 0;
                         return;
                   
@@ -497,59 +508,48 @@ end
                     end
                     
         %Run inter-trial assuming there is one-------------------------
-                    if inter_type == 1
-                        
+                    if inter_type == 1                       
                         
                         %Update progress bar to indicate start of inter-trial
                         num_trial_of_total = num_trial_of_total + 1;
-                        
-                       
 
                         %Run intertrial-------------------------
-                        Panel_com('set_control_mode',inter_mode);
-                       
-                        Panel_com('set_pattern_id', inter_pat);
+                        ctlr.setControlMode(inter_mode);
+                        ctlr.setPatternID(inter_pat);
                        
                         %randomize frame index if indicated
                         if inter_frame_ind == 0
                             inter_frame_ind = randperm(p.num_intertrial_frames, 1);
                         end
-                        Panel_com('set_position_x',inter_frame_ind);
-                        
+                        ctlr.setPositionX(inter_frame_ind);
 
                         if inter_pos ~= 0
-                            Panel_com('set_pattern_func_id', inter_pos);
-                            
+                            ctlr.setPatternFunctionID(inter_pos);
                         end
 
                          if ~isempty(inter_gain) %this assumes you'll never have gain without offset
-                             Panel_com('set_gain_bias', [inter_gain, inter_offset]);
+                             ctlr.setGain(inter_gain, inter_offset);
                          end
 
                          if inter_mode == 2
-                             Panel_com('set_frame_rate', inter_frame_rate);
+                             ctlr.setFrameRate(inter_frame_rate);
                          end
 
                          for i = 1:length(inter_ao_ind)
                              if inter_ao_ind(i) ~= 0 %if it is zero, there was no ao function for this channel
-                                 Panel_com('set_ao_function_id',[p.active_ao_channels(i), inter_ao_ind(i)]);%[channel number, index of ao func]
+                                 ctlr.setAOFunctionID(p.active_ao_channels(i), inter_ao_ind(i));%[channel number, index of ao func]
                                  
                              end
                          end
-                         
-                         
-                        
+                  
                          tcpread_cache = pnet(ctlr.tcpConn, 'read', 'noblock'); % clear cache
-                         %pause(0.01);
-                         
-                
 
-                         Panel_com('start_display', inter_dur + .5);
+                         ctlr.startDisplay((inter_dur + .5)*10, false);
                          timeSinceInter = tic;
                          
                          runcon.update_progress('inter', r, reps, c, num_cond, num_trial_of_total);
                           %Update status panel to show current parameters
-                        runcon.update_current_trial_parameters(inter_mode, inter_pat, inter_pos, p.active_ao_channels, ...
+                         runcon.update_current_trial_parameters(inter_mode, inter_pat, inter_pos, p.active_ao_channels, ...
                             inter_ao_ind, inter_frame_ind, inter_frame_rate, inter_gain, inter_offset, inter_dur);
                          runcon.update_streamed_data(tcpread{end}, 'block', r, c, prev_num_trials);
                          
@@ -560,11 +560,19 @@ end
                          
 
                          if runcon.check_if_aborted() == 1
-                            Panel_com('stop_display');
-                            pause(.1);
-                            Panel_com('stop_log');
-                            pause(1);
-                            disconnectHost;
+                            ctlr.stopDisplay();
+                            log_stopped = ctlr.stopLog();
+                            if ~log_stopped
+                                disp("Log failed to stop. Retrying...");
+                                log_stopped = ctlr.stopLog();
+                                if ~log_stopped
+                                    disp("Log failed to stop. Please stop manually.");
+                                end
+                            end
+                            if isa(ctlr, 'PanelsController')
+                                ctlr.close();
+                            end
+                            clear global;
                             success = 0;
                             return;
                          
@@ -575,10 +583,6 @@ end
                     end 
                  end
              end
-
-
-
-
 
      end
 
