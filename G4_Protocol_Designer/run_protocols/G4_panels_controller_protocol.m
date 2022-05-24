@@ -1,5 +1,5 @@
 % Run protocol that uses the Panels controller directly, rather than the
-% panel_com wrapper, and also streams back data for real time monitoring. 
+% panel_com wrapper, but does not include real time monitoring. 
 
 % COPIED FROM OTHER RUN PROTOCOLS: 
 
@@ -54,21 +54,17 @@
      %p.active_ao_channels lists the channels that are active - [0 2 3] for
      %example means channels 1, 3, and 4 are active.
 
-function [success] = G4_panels_controller_stream_protocol(runcon, p)%input should always be 1 or 2 items
-
+function [success] = G4_panels_controller_protocol(runcon, p)%input should always be 1 or 2 items
+    
     %% Get access to the figure and progress bar in the run gui IF it was passed in.
     global ctlr;
-    tcpread = {};
-    
-    
-    %        fig = runcon.fig;
+
     if ~isempty(runcon.view)
     
         axes_label = runcon.view.axes_label;
     end
 
-
- %% Set up parameters 
+     %% Set up parameters 
  %pretrial params-----------------------------------------------------
      if isempty(p.pretrial{1}) %no need to set up pretrial params
          pre_start = 0;
@@ -166,10 +162,6 @@ function [success] = G4_panels_controller_stream_protocol(runcon, p)%input shoul
         active_ai_streaming_channels(end+1) = 4;
     end
     
-%     %establish cell array to carry all the raw streamed data
-%     streamed_data = {};
-    
-
 %% Make sure panels controller isn't already open. If it is, close it
     if ~isempty(ctlr)
         if ctlr.isOpen() == 1
@@ -194,7 +186,7 @@ function [success] = G4_panels_controller_stream_protocol(runcon, p)%input shoul
         ctlr.open();
     end
 
-%% Set root directory to the experiment folder
+    %% Set root directory to the experiment folder
     ctlr.setRootDirectory(p.experiment_folder);
 
 %% set active ao channels
@@ -235,7 +227,7 @@ function [success] = G4_panels_controller_stream_protocol(runcon, p)%input shoul
          case 'Start' 
 
              %The rest of the code to run the experiment goes under this case
-         
+
 %% Determine the total number of trials in order to define in what increments 
 %the progress bar will progress.-------------------------------------------
             total_num_steps = 0; 
@@ -306,7 +298,7 @@ function [success] = G4_panels_controller_stream_protocol(runcon, p)%input shoul
              
              end
 
-             %% run pretrial if it exists----------------------------------------
+              %% run pretrial if it exists----------------------------------------
              startTime = tic;
              
              if pre_start == 1
@@ -358,8 +350,6 @@ function [success] = G4_panels_controller_stream_protocol(runcon, p)%input shoul
                  end
              end
              
-             tcpread{end+1} = pnet(ctlr.tcpConn, 'read', 'noblock'); % read data that's been streamed since clearing cache
-
              if runcon.check_if_aborted()
                 ctlr.stopDisplay();
                 log_stopped = ctlr.stopLog();
@@ -387,12 +377,9 @@ function [success] = G4_panels_controller_stream_protocol(runcon, p)%input shoul
                  for c = 1:num_cond
                     %define which condition we're using
                     cond = p.exp_order(r,c);
-                    
-                    
-                    num_trial_of_total = num_trial_of_total + 1;
-                    
 
-                    
+                    num_trial_of_total = num_trial_of_total + 1;
+            
                     %define parameters for this trial----------------
                     trial_mode = block_trials{cond,1};
                     pat_id = p.block_pat_indices(cond);
@@ -441,45 +428,19 @@ function [success] = G4_panels_controller_stream_protocol(runcon, p)%input shoul
                     
                     for i = 1:length(p.active_ao_channels)
                         ctlr.setAOFunctionID(p.active_ao_channels(i), trial_ao_indices(i));  
-                    end
-
-                    tcpread_cache = pnet(ctlr.tcpConn, 'read', 'noblock'); % clear cache
-                                        
+                    end                                      
 
                     %Run block trial--------------------------------------
 
-                    ctlr.startDisplay((dur + .5)*10, false); %duration expected in 100ms units
-                    % Need waitForEnd to be false so all the streaming
-                    % updates can happen while it runs - otherwise, they
-                    % slow the experiment down too much.
-                    timeSinceTrial = tic;
+                    ctlr.startDisplay((dur + .5)*10); %duration expected in 100ms units
                     
                     %Update the progress bar--------------------------
                     runcon.update_progress('block', r, reps, c, num_cond, cond, num_trial_of_total);
+                    
                     %Update status panel to show current parameters
                     runcon.update_current_trial_parameters(trial_mode, pat_id, pos_id, p.active_ao_channels, ...
                       trial_ao_indices, frame_ind, frame_rate, gain, offset, dur);
-                   % Update plots showing previous trials data-----------
-                    if r ~= 1 || c ~= 1
-                        if inter_type
-                            runcon.update_streamed_data(tcpread{end}, 'inter', prev_r, prev_c, prev_num_trials);
-                        else
-                            runcon.update_streamed_data(tcpread{end}, 'block', prev_r, prev_c, prev_num_trials);
-                        end
-                    end
-                    %pause for however much time is left after doing updates
-                    pause(dur - toc(timeSinceTrial));
-
-
-                    tcpread{end+1} = pnet(ctlr.tcpConn, 'read', 'noblock');
-                    
-                    % Save values of this trial so they can be used in next
-                    % streaming update
-                    prev_c = c;
-                    prev_r = r;
-                    prev_num_trials = num_trial_of_total;
-
-                    
+ 
                     isAborted = runcon.check_if_aborted();
                     if isAborted == 1
                         ctlr.stopDisplay();
@@ -506,8 +467,8 @@ function [success] = G4_panels_controller_stream_protocol(runcon, p)%input shoul
    
                         continue 
                     end
-                    
-        %Run inter-trial assuming there is one-------------------------
+
+                     %Run inter-trial assuming there is one-------------------------
                     if inter_type == 1                       
                         
                         %Update progress bar to indicate start of inter-trial
@@ -541,23 +502,14 @@ function [success] = G4_panels_controller_stream_protocol(runcon, p)%input shoul
                                  
                              end
                          end
-                  
-                         tcpread_cache = pnet(ctlr.tcpConn, 'read', 'noblock'); % clear cache
 
-                         ctlr.startDisplay((inter_dur + .5)*10, false);
-                         timeSinceInter = tic;
+                         ctlr.startDisplay((inter_dur + .5)*10);
+
                          
                          runcon.update_progress('inter', r, reps, c, num_cond, num_trial_of_total);
                           %Update status panel to show current parameters
                          runcon.update_current_trial_parameters(inter_mode, inter_pat, inter_pos, p.active_ao_channels, ...
                             inter_ao_ind, inter_frame_ind, inter_frame_rate, inter_gain, inter_offset, inter_dur);
-                         runcon.update_streamed_data(tcpread{end}, 'block', r, c, prev_num_trials);
-                         
-                         pause(inter_dur - toc(timeSinceInter));
-
-                         tcpread{end+1} = pnet(ctlr.tcpConn, 'read', 'noblock');
-                         prev_num_trials = num_trial_of_total;
-                         
 
                          if runcon.check_if_aborted() == 1
                             ctlr.stopDisplay();
@@ -585,5 +537,6 @@ function [success] = G4_panels_controller_stream_protocol(runcon, p)%input shoul
              end
 
      end
+
 
 end
