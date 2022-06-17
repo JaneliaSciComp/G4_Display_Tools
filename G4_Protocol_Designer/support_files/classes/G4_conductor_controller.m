@@ -422,6 +422,34 @@ classdef G4_conductor_controller < handle
              self.fb_view.update_custom_CL_function();
 
         end
+
+        function update_gui_progress(prog_bar_vars, trial_params, stream_params)
+            
+            %Inputs defined in the run protocol as experiment runs. Each is
+            %a cell array of parameters. 
+
+            %Update the progress bar-------------------------
+             
+            self.update_progress(prog_bar_vars{1}, prog_bar_vars{2:end});
+
+            %Update status panel to show current parameters
+            if length(trial_params) ~= 10
+                disp("Cannot update trial information. Missing parameters");
+            end
+            self.update_current_trial_parameters(trial_params{1}, trial_params{2},...
+                trial_params{3}, trial_params{4}, trial_params{5}, trial_params{6}, ...
+                trial_params{7}, trial_params{8}, trial_params{9}, trial_params{10});
+           % Update plots showing previous trials data-----------
+           if ~isempty(stream_params)
+               if length(stream_params) ~= 5
+                   disp("Cannot update streaming plots. Missing parameters.");
+               end
+
+               self.update_streamed_data(stream_params{1}, stream_params{2}, ...
+                   stream_params{3}, stream_params{4}, stream_params{5});
+           end
+
+        end
         
         function open_settings(self, ~, ~)
         
