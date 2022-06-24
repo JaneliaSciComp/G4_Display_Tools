@@ -13,9 +13,9 @@ has_toc: false
 
 The G4 Conductor is the application you will use to run an experimental protocol on the LED screen arena.
 
-To open this application directly from the [G4 Designer](protocol-designer.md), click the *Run Trials*{:.gui-btn} on the left side of the Designer window. The experimental protocol that was open in the Designer will automatically be opened in the Conductor, assuming you have saved the experimental protocol.
+To open this application directly from the [G4 Designer](protocol-designer.md), click the _Run Trials_{:.gui-btn} on the left side of the Designer window. The experimental protocol that was open in the Designer will automatically be opened in the Conductor, assuming you have saved the experimental protocol.
 
-If the Designer is not open, there is no need to open it. You can open the file `G4_Display_Tools\G4_Protocol_Designer\G4_Experiment_Conductor.m` in MATLAB and hit *Run*{:.gui-btn} to open the Conductor directly.
+If the Designer is not open, there is no need to open it. You can open the file `G4_Display_Tools\G4_Protocol_Designer\G4_Experiment_Conductor.m` in MATLAB and hit _Run_{:.gui-btn} to open the Conductor directly.
 
 The window that opens should look something like this:
 
@@ -33,7 +33,7 @@ Please see the [tutorial on how to set this up](protocol-designer_metadata_tutor
 
 # Fill out the metadata
 
-Notice in the above picture, the metadata is already filled out for the most part. That's because possible values for these metadata fields are stored in a Google Sheets created for this purpose. Most of the metadata fields have a drop down list which draws its options from this Google Sheets. This prevents people from introducing typos or stating the same metadata in different ways, making it difficult to search experiments by metadata values. If the value you need for a metadata field is not present in the drop down list, you can click the *Open Metadata Google Sheets*{:.gui-btn} button at the bottom. This will open the appropriate Google Sheets. You can find the tab that corresponds with the metadata field and add the value you need to the sheet. Any fields that do not have a drop down list or autofill, please fill in appropriately.
+Notice in the above picture, the metadata is already filled out for the most part. That's because possible values for these metadata fields are stored in a Google Sheets created for this purpose. Most of the metadata fields have a drop down list which draws its options from this Google Sheets. This prevents people from introducing typos or stating the same metadata in different ways, making it difficult to search experiments by metadata values. If the value you need for a metadata field is not present in the drop down list, you can click the _Open Metadata Google Sheets_{:.gui-btn} button at the bottom. This will open the appropriate Google Sheets. You can find the tab that corresponds with the metadata field and add the value you need to the sheet. Any fields that do not have a drop down list or autofill, please fill in appropriately.
 
 __Note__: You can add comments to the comments metadata field anytime during the experiment, and when the experiment ends it will pause and give you another chance to add any final comments.
 {:.info}
@@ -48,7 +48,7 @@ Next, take a look at the top left panel and fill out your experiment settings ap
 
 Select the correct experiment type. Experiment type refers to your arena set up - whether you have a fly tethered and flying, or whether you have a fly walking on a ball.
 
-This is important because, in the Designer settings, you have a default test protocol for each experiment type. When you click the *Run Test Protocol*{:.gui-btn} button, the file associated with that experiment type in your settings will run automatically. More on the test protocol later.
+This is important because, in the Designer settings, you have a default test protocol for each experiment type. When you click the _Run Test Protocol_{:.gui-btn} button, the file associated with that experiment type in your settings will run automatically. More on the test protocol later.
 
 ## Processing and Plotting
 
@@ -60,7 +60,7 @@ If you want your data processed and analyzed automatically but have not set up t
 
 ## Processing and Plotting paths
 
-You must set the paths to three files – the processing and plotting files (if you've selected to use them) and the run protocol file (covered in the next section). The default paths in the settings file will be placed here automatically, so if you don't wish to change from the defaults, you don't have to do anything. However, you can change these without altering the defaults. Hit the *browse*{:.gui-btn} button at the end of each text box to change the file being used in this particular experiment.
+You must set the paths to three files – the processing and plotting files (if you've selected to use them) and the run protocol file (covered in the next section). The default paths in the settings file will be placed here automatically, so if you don't wish to change from the defaults, you don't have to do anything. However, you can change these without altering the defaults. Hit the _browse_{:.gui-btn} button at the end of each text box to change the file being used in this particular experiment.
 
 These paths should point to the settings files you generated for data processing and plotting earlier in the process. If you did not set up any settings for data processing or plotting, then uncheck the plotting and processing checkboxes.
 
@@ -80,7 +80,7 @@ Notice the next line in the Conductor asking how many times bad conditions shoul
 
 ## Run a test protocol (optional)
 
-The *Run Test Protocol*{:.gui-btn} button will run the protocol listed in the settings file as the test protocol for that type. This will allow you to see a test run on the screens and make sure it looks right. If you need to adjust these settings, you cannot presently do it from the conductor. Close the conductor, adjust the settings through *File*{:.gui-btn} → *Settings*{:.gui-btn} on the Designer, then return the conductor when finished.
+The _Run Test Protocol_{:.gui-btn} button will run the protocol listed in the settings file as the test protocol for that type. This will allow you to see a test run on the screens and make sure it looks right. If you need to adjust these settings, you cannot presently do it from the conductor. Close the conductor, adjust the settings through _File_{:.gui-btn} → _Settings_{:.gui-btn} on the Designer, then return the conductor when finished.
 
 # The progress bar
 
@@ -88,13 +88,13 @@ You'll notice in the image above, the progress bar is simply a long empty box. W
 
 # Trial Data
 
-Below the progress bar will be the parameters for the trial currently running on the screen. You'll notice that the *Pattern*{:.gui-txt}, *position function*{:.gui-txt}, and *AO functions*{:.gui-txt} give numbers, not file names. This is the value being sent to the screens. If `Pattern_0008` is the fourth pattern in the patterns field of `currentExp.mat`, then the number provided under *Pattern*{:.gui-txt} will be 4. The `currentExp.mat` file stores all the experiment parameters and sends them to the screen in a way the screens can understand.
+Below the progress bar will be the parameters for the trial currently running on the screen. You'll notice that the _Pattern_{:.gui-txt}, _position function_{:.gui-txt}, and _AO functions_{:.gui-txt} give numbers, not file names. This is the value being sent to the screens. If `Pattern_0008` is the fourth pattern in the patterns field of `currentExp.mat`, then the number provided under _Pattern_{:.gui-txt} will be 4. The `currentExp.mat` file stores all the experiment parameters and sends them to the screen in a way the screens can understand.
 
 Also beneath this will be the total time the experiment is expected to take.
 
 # Data Monitoring
 
-In the Data Monitoring Panel you'll find three plots as well as some labels. *Last trial avg WBF:*{:.gui-txt} will display, at the end of each trial, your fly's average wing beat frequency for that trial. Note that the items in the Data Monitoring panel will only update if you are using the run protocol called `G4_default_run_protocol_streaming.m`.
+In the Data Monitoring Panel you'll find three plots as well as some labels. _Last trial avg WBF:_{:.gui-txt} will display, at the end of each trial, your fly's average wing beat frequency for that trial. Note that the items in the Data Monitoring panel will only update if you are using the run protocol called `G4_default_run_protocol_streaming.m`.
 
 There are three axes visible in this panel.
 
@@ -102,14 +102,14 @@ There are three axes visible in this panel.
 
 Assuming your experiment includes an intertrial, this axis will plot a histogram of the fly's intertrial data. The histogram will be updated at the end of every intertrial, taking into account all intertrials up to that point. After a few intertrials, the histogram should settle into a pattern which will help the user understand at a glance how well-centered their fly is.
 
-To the right of this axis is a textbox and browse button labeled *Custom Analysis*{:.gui-txt}. It's possible a user might want to plot their inter-trial data in some other way than the default histogram generated by the Conductor. If so, users are able to write their own functions which take in the streamed data, perform a function on it, and return it for plotting. They would browse to that function here, putting the path to the function in the text box. Make sure your function (and any it relies on) are on the matlab path and do not have a filename which conflicts with any of the many functions in G4_Display_Tools.
+To the right of this axis is a textbox and browse button labeled _Custom Analysis_{:.gui-txt}. It's possible a user might want to plot their inter-trial data in some other way than the default histogram generated by the Conductor. If so, users are able to write their own functions which take in the streamed data, perform a function on it, and return it for plotting. They would browse to that function here, putting the path to the function in the text box. Make sure your function (and any it relies on) are on the matlab path and do not have a filename which conflicts with any of the many functions in G4_Display_Tools.
 
 There are certain restrictions on a custom function as described above.
 
 1. The function must take in one variable. This variable will contain the data that has been streamed back from the arena during the previous condition. It is a cell array arranged as follows:\\
 `data{1}` = data collected from channel 1 (LmR data in the case of our lab).\\
-`data{2}` = data collected from channel 2 (Left wing data)
-`data{3}` = data collected from channel 3 (Right wing data)
+`data{2}` = data collected from channel 2 (Left wing data)\\
+`data{3}` = data collected from channel 3 (Right wing data)\\
 `data{4}` = data collected from channel 4 (WBF data)
 
 Each of data's cell elements are a 1×n array of floats.
@@ -134,19 +134,19 @@ When a trial is marked as bad, a red line will appear on the progress bar to giv
 
 # Running the experiment
 
-When you are ready to go, hit the *Run Experiment*{:.gui-btn} button. It will take a few seconds to connect to the G4 Host, but when everything is ready, a dialog box will pop up asking you to *Start*{:.gui-btn} or *Cancel*{:.gui-btn}. If you entered a duration of zero for your pre-trial, don't forget you will need to hit a button to make the experiment go past the pre-trial.
+When you are ready to go, hit the _Run Experiment_{:.gui-btn} button. It will take a few seconds to connect to the G4 Host, but when everything is ready, a dialog box will pop up asking you to _Start_{:.gui-btn} or _Cancel_{:.gui-btn}. If you entered a duration of zero for your pre-trial, don't forget you will need to hit a button to make the experiment go past the pre-trial.
 
 ## Abort an experiment
 
-If something goes wrong and you need to abort an experiment in the middle, hit the *Abort Experiment*{:.gui-btn} button. This will finish the currently running trial, then stop the experiment. It will automatically clear out any lingering log files, so once you get the dialog box saying the experiment was aborted successfully, you can hit *Run*{:.gui-btn} to restart the experiment.
+If something goes wrong and you need to abort an experiment in the middle, hit the _Abort Experiment_{:.gui-btn} button. This will finish the currently running trial, then stop the experiment. It will automatically clear out any lingering log files, so once you get the dialog box saying the experiment was aborted successfully, you can hit _Run_{:.gui-btn} to restart the experiment.
 
 ## Open a subsequent experiment
 
-If you are done with the experiment currently loaded in the conductor and wish to run another, no need to close the application. Just go to *File*{:.gui-btn} – *open*{:.gui-btn} and open the new experiment. It will automatically replace the old one.
+If you are done with the experiment currently loaded in the conductor and wish to run another, no need to close the application. Just go to _File_{:.gui-btn} – _open_{:.gui-btn} and open the new experiment. It will automatically replace the old one.
 
 ## Using the conductor without the designer
 
-The conductor can also be opened on its own, without going through the experiment designer. To open the conductor directly, run the `G4_Experiment_Conductor.m` file in `G4_Display_Tools\G4_Protocol_Designer`. If you open the conductor this way, then you will need to go to *File*{:.gui-btn} – *Open*{:.gui-btn} to open the .g4p file you want to run. Other than that, it operates exactly the same as described above.
+The conductor can also be opened on its own, without going through the experiment designer. To open the conductor directly, run the `G4_Experiment_Conductor.m` file in `G4_Display_Tools\G4_Protocol_Designer`. If you open the conductor this way, then you will need to go to _File_{:.gui-btn} – _Open_{:.gui-btn} to open the .g4p file you want to run. Other than that, it operates exactly the same as described above.
 
 # Post-experiment data analysis
 

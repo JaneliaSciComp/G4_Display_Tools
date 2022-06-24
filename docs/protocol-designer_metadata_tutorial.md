@@ -86,11 +86,11 @@ So the Google Sheets is done. Great! But how does the Conductor access these val
 
 To give it access, we must open the [G4 Protocol Designer](protocol-designer.md). If you've never opened the designer before, follow the documentation about the [G4 Protocol Designer](protocol-designer.md) for details on how to open it. Simply put, you can browse to `G4_Display_Tools/G4_Protocol_Designer/G4_Protocol_Designer.m`, open this file in MATLAB, and run it. Assuming your path is set up correctly and you have your configuration file in place, it should open the main Protocol Designer window.
 
-Once it's open, go to *File*{:.gui-btn} → *Settings*{:.gui-btn} at the top left corner. This window should appear:
+Once it's open, go to _File_{:.gui-btn} → _Settings_{:.gui-btn} at the top left corner. This window should appear:
 
 ![Protocol Designer Settings](assets/protocol-designer_settings.png){:.pop}
 
-At the bottom, notice a panel called *Metadata Google Sheets Properties*{:.gui-txt}. Within this panel are several fields: a Google Sheets key and several types of GID field.
+At the bottom, notice a panel called _Metadata Google Sheets Properties_{:.gui-txt}. Within this panel are several fields: a Google Sheets key and several types of GID field.
 
 These values are unique codes Google assigns to your Google Sheets and each tab within it, and they are how the G4 Display Tools will access your Google Sheets.
 
@@ -100,13 +100,14 @@ To find the key to your new Google Sheets, look at the address bar of your brows
 
 `https://docs.google.com/spreadsheets/d/ [Google Sheets Key] /edit#gid= [GID value]`
 
-The [Google Sheets Key] section of the URL will contain a long string. No matter which tab you click on within the Google Sheets, this part of the address should not change. This string should remain the same. This string is your Google Sheets Key. Copy this string (everything between the '/d/' and '/edit') and paste it into the *Google Sheets Key:*{:.gui-txt} field in the Designer's settings window.
+The [Google Sheets Key] section of the URL will contain a long string. No matter which tab you click on within the Google Sheets, this part of the address should not change. This string should remain the same. This string is your Google Sheets Key. Copy this string (everything between the '/d/' and '/edit') and paste it into the _Google Sheets Key:_{:.gui-txt} field in the Designer's settings window.
 
-The [GID value] section in your url is the GID value for whatever tab you have open in your Google Sheets. Each tab has its own GID value. The first tab you created may have a 0 - that's fine. Google uses these strings, which are usually just a series of digits, to refer to a particular tab inside your Google Sheets. Go through each GID field in the settings window and copy the GID value from the appropriate tab into its text box. For example, the first field reads *Experimenter Tab GID:*{:.gui-txt}. This refers to the Users tab (you could also name it Experimenters, it's up to you). Open the Users tab in your Google Sheets, get the GID value from the address bar (everything after the '='), and paste it into the settings window. Do this for each tab in your Google Sheets.
+The [GID value] section in your url is the GID value for whatever tab you have open in your Google Sheets. Each tab has its own GID value. The first tab you created may have a 0 - that's fine. Google uses these strings, which are usually just a series of digits, to refer to a particular tab inside your Google Sheets. Go through each GID field in the settings window and copy the GID value from the appropriate tab into its text box. For example, the first field reads _Experimenter Tab GID:_{:.gui-txt}. This refers to the Users tab (you could also name it Experimenters, it's up to you). Open the Users tab in your Google Sheets, get the GID value from the address bar (everything after the '='), and paste it into the settings window. Do this for each tab in your Google Sheets.
 
-Your settings window should now look more similar to the photo above, with all the Google Sheets metadata panel filled out. When you are done, click *Apply Changes*{:.gui-btn} at the bottom left hand corner of the settings window, and you are done!
+Your settings window should now look more similar to the photo above, with all the Google Sheets metadata panel filled out. When you are done, click _Apply Changes_{:.gui-btn} at the bottom left hand corner of the settings window, and you are done!
 
-*Note that if you have not filled in all the fields in the top half of the settings window, you may get some pop up errors warning you that one or more of those values are incorrect - as in a "The path you've entered for the Default Camera Walk Test Protocol does not exist" type of warning. You can just click through these and ignore them. The settings will still save.*
+Note: that if you have not filled in all the fields in the top half of the settings window, you may get some pop up errors warning you that one or more of those values are incorrect - as in a "The path you've entered for the Default Camera Walk Test Protocol does not exist" type of warning. You can just click through these and ignore them. The settings will still save.
+{:.info}
 
 You should now be able to open the [G4 Experiment Conductor](experiment-conductor.md) without error. When you do, check the drop down lists in your metadata panel. They should contain all the values you have provided in your Google Sheets, and look something like this:
 
@@ -114,4 +115,4 @@ You should now be able to open the [G4 Experiment Conductor](experiment-conducto
 
 ![metadata list opened](assets/p-d_m_t_metadata_fly-age.png){:.pop}
 
-To be sure everything has worked correctly, click the *Open Metadata Google Sheets*{:.gui-btn} button. Assuming you are connected to the internet, this should open the Google Sheets you just created in your browser. If you get an error, see the [Final Details](protocol-designer.md) in the G4 Designer Manual for some common errors and their solutions.
+To be sure everything has worked correctly, click the _Open Metadata Google Sheets_{:.gui-btn} button. Assuming you are connected to the internet, this should open the Google Sheets you just created in your browser. If you get an error, see the [Final Details](protocol-designer.md) in the G4 Designer Manual for some common errors and their solutions.

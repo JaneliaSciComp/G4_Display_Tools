@@ -29,7 +29,7 @@ __Mode 3__ will show a single frame from your pattern on the screen. The user wi
 
 __Mode 4__ will play a closed-loop trial that will set the frame based on signals acquired from the analog input channel `ADC0`. Positive voltages set a positive frame rate for the pattern to be played through, resulting in a similar function as [Mode 2](#mode-2), while negative voltages result in patterns played in reverse through the negative frame rate.
 
-How the voltage scales to the frame rate can be modified using the gain, which works as a multiplier of the relationship between voltage and frame rate; larger values for gain cause the pattern to be played through faster at the same voltage value, and negative gain values reverse the direction that frames are played through. Additionally, the neutral value of the input signal, which is the voltage that results in a frame rate of 0, can be changed by the *Offset*{:.gui-txt}. Thus, the relationship between voltage and frame rate is defined by the following equation: `Frame Rate = Gain * (Voltage + Offset)`.
+How the voltage scales to the frame rate can be modified using the gain, which works as a multiplier of the relationship between voltage and frame rate; larger values for gain cause the pattern to be played through faster at the same voltage value, and negative gain values reverse the direction that frames are played through. Additionally, the neutral value of the input signal, which is the voltage that results in a frame rate of 0, can be changed by the _Offset_{:.gui-txt}. Thus, the relationship between voltage and frame rate is defined by the following equation: `Frame Rate = Gain * (Voltage + Offset)`.
 
 ## Display Mode 5 {#mode-5}
 

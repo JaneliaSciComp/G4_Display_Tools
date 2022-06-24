@@ -36,7 +36,7 @@ This is an example of a (tiny) experiment. In this case, the experiment will pla
 
 Note that only the block conditions are referred to by their numbers. The others are referred to by their position, pre-, inter-, or post-. Also notice that the inter-trial does not play before the first block condition or after the last block condition.
 
-If, at the left side of the image, we had selected *Randomize Trials*{:.gui-txt} instead of sequential, then the four conditions would play in random order. So it might be something like this:
+If, at the left side of the image, we had selected _Randomize Trials_{:.gui-txt} instead of sequential, then the four conditions would play in random order. So it might be something like this:
 
 1. pre-trial
 1. Condition 2
@@ -48,7 +48,7 @@ If, at the left side of the image, we had selected *Randomize Trials*{:.gui-txt}
 1. Condition 3
 1. Post-trial
 
-Only block conditions are affected by the *Randomize trials*{:.gui-txt} feature. We also could have changed *Repetitions*{:.gui-txt} on the left to be more than one. If there are 2 repetitions, that means the block conditions will be repeated a second time. With trials playing randomly, it might look something like this:
+Only block conditions are affected by the _Randomize trials_{:.gui-txt} feature. We also could have changed _Repetitions_{:.gui-txt} on the left to be more than one. If there are 2 repetitions, that means the block conditions will be repeated a second time. With trials playing randomly, it might look something like this:
 
 1. pre-trial
 1. Condition 2
@@ -76,7 +76,7 @@ So what follows is a step by step instructions on how to create a single conditi
 
 # Open the designer
 
-First you have to open the [G4 Protocol Designer](protocol-designer.md). There are two ways to do this. Assuming the [G4 Display Tools are on your MATLAB path](software_setup.md#add-to-path), you can simply type `G4_Experiment_Designer` into your MATLAB command window. Alternatively, you can browse to the file `G4_Display_Tools/G4_Protocol_Designer/G4_Experiment_Designer.m`, open the file in MATLAB, and hit *Run*{:.gui-btn} at the top of the MATLAB window.
+First you have to open the [G4 Protocol Designer](protocol-designer.md). There are two ways to do this. Assuming the [G4 Display Tools are on your MATLAB path](software_setup.md#add-to-path), you can simply type `G4_Experiment_Designer` into your MATLAB command window. Alternatively, you can browse to the file `G4_Display_Tools/G4_Protocol_Designer/G4_Experiment_Designer.m`, open the file in MATLAB, and hit _Run_{:.gui-btn} at the top of the MATLAB window.
 
 You should get a screen that looks like this:
 
@@ -103,29 +103,29 @@ As such, before doing anything else, you need to select which type of screen thi
 
 # Import
 
-Once the designer is open, you need to import the patterns you intend to use in the experiment, as well as any functions. To do this, click *File*{:.gui-btn} → *Import*{:.gui-btn}. A small box should pop up:
+Once the designer is open, you need to import the patterns you intend to use in the experiment, as well as any functions. To do this, click _File_{:.gui-btn} → _Import_{:.gui-btn}. A small box should pop up:
 
 ![Import Window](assets/p-d_c-c_t_import-folder.png){:.ifr .pop}
 
-You have three choices - *Folder*{:.gui-txt}, *File*{:.gui-txt}, or *Filtered File*{:.gui-txt}. If you have saved all of your patterns and/or functions in a folder, then choosing *Folder*{:.gui-txt} might be the most convenient option for you.
+You have three choices - _Folder_{:.gui-txt}, _File_{:.gui-txt}, or _Filtered File_{:.gui-txt}. If you have saved all of your patterns and/or functions in a folder, then choosing _Folder_{:.gui-txt} might be the most convenient option for you.
 
 ![Import Successful](assets/p-d_c-c_t_import-confirm.png){:.ifr .pop}
 If you select folder, the Designer will attempt to import all files found in the folder. Don't worry if the folder has irrelevant files in it. The Designer will skip any files it doesn't recognize and provide a summary after the import is complete that looks like this:
 {:.clear}
 
-If you would rather import a single file at a time, simply click *File*{:.gui-txt} and browse to the file you want to import. That file could be a pattern .mat file, a function .mat file, or a currentExp.mat file (which you will only have if you have already designed and saved an experiment and you are trying to import that experiment).
+If you would rather import a single file at a time, simply click _File_{:.gui-txt} and browse to the file you want to import. That file could be a pattern .mat file, a function .mat file, or a currentExp.mat file (which you will only have if you have already designed and saved an experiment and you are trying to import that experiment).
 
 ![filtered file box](assets/p-d_c-c_t_filename-filter.png){:.ifr .pop}
 
-The *Filtered File*{:.gui-txt} option is there for your convenience. If you have some kind of naming convention for your files, you can provide a string that the file system can use to narrow down your options and only show you files which match the string. For example, if my patterns are all named `Pattern_001.mat`, `Pattern_002.mat`, `Pattern_003.mat`, etc, I can select *Filtered File*{:.gui-txt}. When this box appears. I could type Pattern into the box and hit okay. Now in my browse window, only files with "Pattern" in the name will be available. This is not case-sensitive.
+The _Filtered File_{:.gui-txt} option is there for your convenience. If you have some kind of naming convention for your files, you can provide a string that the file system can use to narrow down your options and only show you files which match the string. For example, if my patterns are all named `Pattern_001.mat`, `Pattern_002.mat`, `Pattern_003.mat`, etc, I can select _Filtered File_{:.gui-txt}. When this box appears. I could type Pattern into the box and hit okay. Now in my browse window, only files with "Pattern" in the name will be available. This is not case-sensitive.
 
-In this case we are only creating a single condition, so select *File*{:.gui-txt} and browse to the .mat file that was produced when you used the Pattern Generator to create a pattern. You should get a little box saying that one file was successfully imported.
+In this case we are only creating a single condition, so select _File_{:.gui-txt} and browse to the .mat file that was produced when you used the Pattern Generator to create a pattern. You should get a little box saying that one file was successfully imported.
 
 The pattern has been imported but not much has changed about the Designer window. Now we can start creating our condition.
 
 # Add a pattern to your condition
 
-In row 1 of the block trials table, click on the empty box under *Pattern Name*{:.gui-txt}, column 2. Not much happens at first glance -- a cursor appears in the box. But look to the bottom right hand side of the window and you will see the tall narrow box labeled *Imported files for selected cell:*{:.gui-txt}, which was empty before, now has an item in it. The item should match the name of the pattern you imported.
+In row 1 of the block trials table, click on the empty box under _Pattern Name_{:.gui-txt}, column 2. Not much happens at first glance -- a cursor appears in the box. But look to the bottom right hand side of the window and you will see the tall narrow box labeled _Imported files for selected cell:_{:.gui-txt}, which was empty before, now has an item in it. The item should match the name of the pattern you imported.
 
 ![empty cell selected](assets/p-d_c-c_t_add-trial.png){:.pop}
 
@@ -133,9 +133,9 @@ Click on the name of your pattern in that tall box. When you click on it, a prev
 
 ![In screen preview](assets/p-d_c-c_t_add-trial_preview.png){:.pop}
 
-When creating an experiment you would have an entire list of patterns here, and you could click through them, looking at the preview of each one until you find the one you want. It works exactly the same way for functions, when you click the empty cell under *Position Function*{:.gui-txt}.
+When creating an experiment you would have an entire list of patterns here, and you could click through them, looking at the preview of each one until you find the one you want. It works exactly the same way for functions, when you click the empty cell under _Position Function_{:.gui-txt}.
 
-Once you've verified the pattern looks as you expect, click *Select*{:.gui-btn} under the box. This will populate the table cell with the pattern name.
+Once you've verified the pattern looks as you expect, click _Select_{:.gui-btn} under the box. This will populate the table cell with the pattern name.
 
 # Choose your mode
 
@@ -145,7 +145,7 @@ For now let's leave it in mode 1. This is the mode that uses a position function
 
 # Add a position function
 
-Follow the same steps we completed when adding the pattern. Click the empty table cell under *Position Function*{:.gui-txt}, then click the item that appears in the *Imported files for selected cell:*{:.gui-txt} box. A preview in the preview pane should appear that looks something like this:
+Follow the same steps we completed when adding the pattern. Click the empty table cell under _Position Function_{:.gui-txt}, then click the item that appears in the _Imported files for selected cell:_{:.gui-txt} box. A preview in the preview pane should appear that looks something like this:
 
 ![function](assets/protocol-designer_function-sawtooth.png){:.pop}
 
@@ -159,21 +159,21 @@ Congratulations, you've made a condition! There are two ways to preview the cond
 
 ## Method 1 - doesn't require that you are connected to an arena
 
-click the check box at the end of your condition to selected it, and then click the *Preview*{:.gui-btn} at the bottom right of the screen. A window will pop up that looks something like this:
+click the check box at the end of your condition to selected it, and then click the _Preview_{:.gui-btn} at the bottom right of the screen. A window will pop up that looks something like this:
 
 ![Preview Screen](assets/p-d_c-c_t_trial_preview.png){:.pop}
 
 All the blank space in the right half of the screen is where your Analog Output functions will be displayed if you have any.
 
-Hit the *Play*{:.gui-btn} button at the bottom of the screen. Your pattern will begin to move, and a moving vertical bar on the position function will track where you are in the function at any given time. Notice that the condition plays very slowly. By default, it is not playing at the speed it will play on the screen. This is because the arena plays patterns and 500 or 1000 frames per second while your computer screen refreshes at something more like 24 frames per second.
+Hit the _Play_{:.gui-btn} button at the bottom of the screen. Your pattern will begin to move, and a moving vertical bar on the position function will track where you are in the function at any given time. Notice that the condition plays very slowly. By default, it is not playing at the speed it will play on the screen. This is because the arena plays patterns and 500 or 1000 frames per second while your computer screen refreshes at something more like 24 frames per second.
 
-There are some controls which will let you change this. The first is the *Frame Increment*{:.gui-txt} box below the play button. By default it is set to 1 meaning the preview is showing you every single frame of the pattern when it plays. Increase this increment to skip frames and therefore increase the speed of the playback.
+There are some controls which will let you change this. The first is the _Frame Increment_{:.gui-txt} box below the play button. By default it is set to 1 meaning the preview is showing you every single frame of the pattern when it plays. Increase this increment to skip frames and therefore increase the speed of the playback.
 
-Click *Pause*{:.gui-btn} to stop your preview, and then change the frame increment to 10. Hit *play*{:.gui-btn}. You will notice the preview resumes at a much faster pace.
+Click _Pause_{:.gui-btn} to stop your preview, and then change the frame increment to 10. Hit _play_{:.gui-btn}. You will notice the preview resumes at a much faster pace.
 
-Another useful way to speed up your preview is to check the *Real-time speed*{:.gui-txt} checkbox to the right of the *pause*{:.gui-btn} button. Check this box now.
+Another useful way to speed up your preview is to check the _Real-time speed_{:.gui-txt} checkbox to the right of the _pause_{:.gui-btn} button. Check this box now.
 
-Notice that the *Frame Increment*{:.gui-txt} updated automatically. It has calculated how many frames it must skip between each frame that is displayed, in order to play the preview as quickly as it will play on the arena screen. Press *Stop*{:.gui-btn} to return the preview back to the beginning, and then click *Play*{:.gui-btn}. The preview should now approximately match the speed with which it will display on the arena.
+Notice that the _Frame Increment_{:.gui-txt} updated automatically. It has calculated how many frames it must skip between each frame that is displayed, in order to play the preview as quickly as it will play on the arena screen. Press _Stop_{:.gui-btn} to return the preview back to the beginning, and then click _Play_{:.gui-btn}. The preview should now approximately match the speed with which it will display on the arena.
 
 ### Generate a video
 
@@ -181,13 +181,13 @@ From this preview panel you can also generate a video of what your condition wil
 
 ![Video panel](assets/p-d_c-c_t_generate-video.png){:.pop}
 
-Enter a frame rate of 60 or less and click Generate Video. A window will pop up asking you to name the video and browse to the location where you want to save it. Do this and click *Save*{:.gui-btn}.
+Enter a frame rate of 60 or less and click Generate Video. A window will pop up asking you to name the video and browse to the location where you want to save it. Do this and click _Save_{:.gui-btn}.
 
 A progress bar will appear that looks like this: ![Progress bar](assets/p-d_c-c_t_generate-video_progress.png){:.ifr .pop}
 
-Wait for the progress bar to finish and close on its own. This may take several minutes. The faster your frame rate, the less time it will take. When it is finished, you will find an .avi video saved where you indicated. This video shows the entire preview window playing the condition, just as when you hit play earlier. Note that the *Real-time speed*{:.gui-txt} box should still be checked. If it is not, then your video will show the preview running at whatever speed indicated by the Frame Increment value. If the frame increment is low, then your video will take both a very long time to generate, and a long time to play.
+Wait for the progress bar to finish and close on its own. This may take several minutes. The faster your frame rate, the less time it will take. When it is finished, you will find an .avi video saved where you indicated. This video shows the entire preview window playing the condition, just as when you hit play earlier. Note that the _Real-time speed_{:.gui-txt} box should still be checked. If it is not, then your video will show the preview running at whatever speed indicated by the Frame Increment value. If the frame increment is low, then your video will take both a very long time to generate, and a long time to play.
 
-Once the video is done generating, go back to the preview window and select *Pattern Only Video*{:.gui-txt}. Now generate the video again, ensuring *Real-time speed*{:.gui-txt} is still selected.
+Once the video is done generating, go back to the preview window and select _Pattern Only Video_{:.gui-txt}. Now generate the video again, ensuring _Real-time speed_{:.gui-txt} is still selected.
 
 The same thing will happen, but this video, instead of showing the entire preview window, will show only the pattern. This gives a better idea of what the fly will actually see in the arena.
 
@@ -201,15 +201,15 @@ The second way to preview a condition is to actually play it on the arena. You m
 - You must have imported your patterns and functions all from the same location
 - If your patterns and functions were imported from different locations, you must save your protocol before previewing on the screens. This is because the screens must be given a directory to pull the patterns and functions from, and it can't be given more than one.
 
-To save your experiment (though in this case it is not a full experiment), first give it a name in the *Experiment Name*{:.gui-txt} field at the bottom of the window. Then click *File*{:.gui-btn} → *Save as*{:.gui-btn}. A timestamp will be added to your name and you can browse to the location where you want to save it.
+To save your experiment (though in this case it is not a full experiment), first give it a name in the _Experiment Name_{:.gui-txt} field at the bottom of the window. Then click _File_{:.gui-btn} → _Save as_{:.gui-btn}. A timestamp will be added to your name and you can browse to the location where you want to save it.
 
 We will cover saving a protocol and how it works in the experiment design tutorial. I am limiting this explanation to only what you need to know to preview your condition.
 
-Now that the experiment is saved, select your condition using the checkbox on its right end (if it is not already selected) and then click *Dry Run*{:.gui-btn} just below the *Preview*{:.gui-btn}.
+Now that the experiment is saved, select your condition using the checkbox on its right end (if it is not already selected) and then click _Dry Run_{:.gui-btn} just below the _Preview_{:.gui-btn}.
 
-You will get a warning saying you must save the experiment before doing a dry run - this is not an error, but just a reminder. We have saved it, and you can just click *OK*{:.gui-btn}.
+You will get a warning saying you must save the experiment before doing a dry run - this is not an error, but just a reminder. We have saved it, and you can just click _OK_{:.gui-btn}.
 
-Give the system a minute. At this point, the software will be running `connectHost` to open up the arena software and connect to the screens. This may take several seconds or even up to a minute. When everything is connected and the system is ready to play your condition on the screens, you will be prompted with a box saying it is ready. You may hit *Start*{:.gui-btn} to start the condition playing on the screen, or *Cancel*{:.gui-btn} to cancel.
+Give the system a minute. At this point, the software will be running `connectHost` to open up the arena software and connect to the screens. This may take several seconds or even up to a minute. When everything is connected and the system is ready to play your condition on the screens, you will be prompted with a box saying it is ready. You may hit _Start_{:.gui-btn} to start the condition playing on the screen, or _Cancel_{:.gui-btn} to cancel.
 
 The dry run feature allows you to see exactly how your condition will look on the arena. If something is amiss, you can go back and edit your experiment until you get things the way you want. Just don't forget that if you want to do another Dry Run after making changes, you will have to save the experiment again, especially if your imported files come from multiple locations.
 
@@ -219,7 +219,7 @@ Congratulations! You've made your first condition and run it on the screen.
 
 There are a few other fields in a condition that we didn't discuss. They are used in certain modes, and you can find a full explanation in the mode descriptions, which is coming soon.
 
-In short, the *Frame Rate* is used in mode 2. In this case, there is no position function and a pattern simply plays through its frames sequentially at a particular frame rate. This is in frames/second.
+In short, the _Frame Rate_ is used in mode 2. In this case, there is no position function and a pattern simply plays through its frames sequentially at a particular frame rate. This is in frames/second.
 
 The gain and offset affect the appearance of the pattern on the screen and are used in Mode 5.
 
