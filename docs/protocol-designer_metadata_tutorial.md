@@ -76,7 +76,7 @@ With all of this in mind, go through each tab and enter a starting set of values
 
 # Required Permissions for the Google Sheet
 
-Your metadata googlesheet must be accessible by anyone who has the link to it. This is not the default permission setting, so you may need to adjust this. To do so, open the google sheet and click the green button in the top right hand corner labeled "Share." At the bottom of the window that opens, you should see a section called "Get link." It may say "Restricted: Only people added can open with this link." Below this will be blue text that says "Change to anyone with the link." Click on this blue text to make sure that anyone (or in this case, any software) with the link to this document can open it. 
+Your metadata Google Sheet must be accessible by anyone who has the link to it. This is not the default permission setting, so you may need to adjust this. To do so, open the google sheet and click the green button in the top right hand corner labeled "Share." At the bottom of the window that opens, you should see a section called "Get link." It may say "Restricted: Only people added can open with this link." Below this will be blue text that says "Change to anyone with the link." Click on this blue text to make sure that anyone (or in this case, any software) with the link to this document can open it.
 
 If it already says that anyone with the link can access the document, then you are good to go!
 

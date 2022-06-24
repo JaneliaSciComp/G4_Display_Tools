@@ -19,7 +19,7 @@ Before you begin, make sure that you have [installed the Display tools](software
 - Position Functions, at a minimum, must be a struct named pfnparam with fields `pfnparam.gs_val`, `pfnparam.func`, and `pfnparam.size`
 - Ao Functions must be a struct named afnparam with fields `afnparam.func`, `afnparam.size`, and `afnparam.ID`
 
-If you use the Pattern and Function generators to create them, you don't need to worry about confirming these requirements. 
+If you use the Pattern and Function generators to create them, you don't need to worry about confirming these requirements.
 
 # Tutorials
 
@@ -52,7 +52,7 @@ The first field in the settings panel reads _Configuration file location:_{:.gui
 Note: that if your configuration file location was incorrect, the Designer may have failed to open, and you may have gotten a matlab error indicating it could not find the configuration file. If this is the case, open the file `G4_Display_Tools\G4_Protocol_Designer_Settings.m` and replace the current configuration file path manually with the correct one. Please note that this file is set up like a text file - you are not setting a variable. Simply replace the actual path text with the new path, without changing any spaces or other characters in the file.
 {:.warning}
 
-Note too that the Designer will make changes to the configuration file based on your selections when creating an experiment. Depending on where your configuration file is saved, you may need admin priveleges on the computer to make these edits. If you get an error along the lines of `Error using fileread. Could not open file HHMI Panels Configuration.ini`, please make sure your account is able to make changes to the configuration file. An easy way to test this is to open the configuration file separately in a text editor and try to save a change.
+Note too that the Designer will make changes to the configuration file based on your selections when creating an experiment. Depending on where your configuration file is saved, you may need admin privileges on the computer to make these edits. If you get an error along the lines of `Error using fileread. Could not open file HHMI Panels Configuration.ini`, please make sure your account is able to make changes to the configuration file. An easy way to test this is to open the configuration file separately in a text editor and try to save a change.
 {:.info}
 
 ## Run, Plotting, and Processing

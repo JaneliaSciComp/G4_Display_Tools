@@ -132,9 +132,9 @@ Next is the _Run Trials_{:.gui-btn}. You can always open the G4 Conductor direct
 - You must have saved the experiment in the Designer before you click this button.
 - If you make changes in the Designer after you have clicked this button, those changes will NOT be reflected in the Conductor. You must close the Conductor, re-save the experiment in the Designer, and then click this button again to open a new instance of the Conductor with the updated experiment loaded.
 
-The next panel allows you to set the sample rates of any Analog Input Channels you might be using. When you run an experiment, you have the option to run with a streaming run protocol. What this means is that data will be collected from your fly via these AI channels and plotted at the end of each trial. This allows you to monitor your fly as the experiment runs - whether it stops flying too much, is centered properly, etc. The other feature this allows is that, at the end of an experiment, any conditions where the fly was not flying, and therefore the data is no good, can be re-attempted. 
+The next panel allows you to set the sample rates of any Analog Input Channels you might be using. When you run an experiment, you have the option to run with a streaming run protocol. What this means is that data will be collected from your fly via these AI channels and plotted at the end of each trial. This allows you to monitor your fly as the experiment runs - whether it stops flying too much, is centered properly, etc. The other feature this allows is that, at the end of an experiment, any conditions where the fly was not flying, and therefore the data is no good, can be re-attempted.
 
-To use this feature, your Analog Input Channels (as seen in the picture below) must have non-zero sample rates. Default is 1000 hz. However, it's important to note that having non-zero sample rates here does not mean you MUST use the streaming feature described above - only that you will be able to. 
+To use this feature, your Analog Input Channels (as seen in the picture below) must have non-zero sample rates. Default is 1000 hz. However, it's important to note that having non-zero sample rates here does not mean you MUST use the streaming feature described above - only that you will be able to.
 
 ![Analog Input Channels](assets/p-d_d-e_t_analog-input-channels.png){:.ifr .pop}
 

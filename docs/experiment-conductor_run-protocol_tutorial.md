@@ -18,7 +18,7 @@ You may have seen references to a __run protocol__ throughout the documentation.
 
 What you might not know is that you can also write your own run protocol. The potential benefits of doing this will become clear throughout this tutorial, though for most use cases, you won't need one other than the defaults. In this tutorial, we will use `G4_default_run_protocol.m` as our example, so streaming features are not covered here.
 
-- Please note that the run protocol `G4_run_protocol_combinedCommand.m` should not currently be used. It utilizes a new Panel_com command which still has unresolved bugs. 
+- Please note that the run protocol `G4_run_protocol_combinedCommand.m` should not currently be used. It utilizes a new Panel_com command which still has unresolved bugs.
 
 By definition, this tutorial will also show you how to send specific commands to the panels using none of the provided GUIs. This might be useful if you want to display a single pattern on the panels or try running a condition without using the [G4 Designer](protocol-designer.md).
 
@@ -767,6 +767,7 @@ disconnectHost;
 pause(1);
 success = 1;
 ```
+
 </details>
 
 Notice that in the line starting with `stop_log_response`, instead of using the `stop_log` command, the default run protocol uses `send_tcp` directly. This is because a common problem has been that the `stop_log` command does not go through due to some back-up with the panels, and then the Conductor can not do its job of moving the data files to where they need to go, because the log is still running. We've done this so that if the stop log command fails, we can allow the user to stop the log manually before moving on.
