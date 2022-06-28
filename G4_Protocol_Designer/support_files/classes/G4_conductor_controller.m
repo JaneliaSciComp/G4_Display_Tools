@@ -423,13 +423,16 @@ classdef G4_conductor_controller < handle
 
         end
 
-        function update_gui_progress(prog_bar_vars, trial_params, stream_params)
+        function update_gui_progress(gui_data)
             
             %Inputs defined in the run protocol as experiment runs. Each is
             %a cell array of parameters. 
 
             %Update the progress bar-------------------------
-             
+            prog_bar_vars = gui_data.prog_bar_vars;
+            trial_params = gui_data.trial_params;
+            stream_params = gui_data.stream_params;
+
             self.update_progress(prog_bar_vars{1}, prog_bar_vars{2:end});
 
             %Update status panel to show current parameters
@@ -725,14 +728,28 @@ classdef G4_conductor_controller < handle
 
             %Get function name of the script which will run the experiment
             [~, run_name, ~] = fileparts(self.model.run_protocol_file);
-            
+
+            % Create parallel worker to run the run protocol
+            P = parpool(1);
+
+            % create a data queue over which the worker can send data back
+            % from the run protocol
+
+            Q = parallel.pool.DataQueue;
+            %afterEach(Q, @(params) self.update_progress(params));
+            afterEach(Q, @update_gui_progress);
+
             %Create the full command
-            run_command = "success = " + run_name + "(self, parameters);";
+            %run_command = run_name + "(self, parameters, Q);";
+            run_command = "parfeval_test(self,parameters,Q);";
+ 
             
             %run script
-            eval(run_command);
-            pause(3);
+           
+            success = parfeval(P, @evaluate_run_command, 0, self, run_command, parameters, Q);
+            fetchOutputs(success);
             
+            delete(gcp('nocreate'));
             
             if self.check_if_aborted()
                 %experiment has been aborted
@@ -741,6 +758,7 @@ classdef G4_conductor_controller < handle
                 aborted_results_folder = fullfile(experiment_folder, 'Aborted_Experiments');
                 [logs_removed, logs_msg] = movefile(fullfile(experiment_folder,'Log Files','*'),fullfile(aborted_results_folder,aborted_filename));
                 pause(.5);
+                
                 
                 self.create_metadata_file();
                 
@@ -774,7 +792,7 @@ classdef G4_conductor_controller < handle
                 return;
             end
             
-            if success == 0 
+            if ~isempty(success.Error) 
                 if isempty(self.view)
                     disp('Experiment failed for unknown reason.');
                 else
@@ -1823,6 +1841,15 @@ classdef G4_conductor_controller < handle
 
             
         end
+
+        function evaluate_run_command(self, run_command, parameters, Q)
+           
+            
+            eval(run_command);
+            
+
+        end
+        
 
         function ts = get_timestamp(self)
 
