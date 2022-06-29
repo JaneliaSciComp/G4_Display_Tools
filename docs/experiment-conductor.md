@@ -19,7 +19,7 @@ If the Designer is not open, there is no need to open it. You can open the file 
 
 The window that opens should look something like this:
 
-![Experiment Conductor](assets/conductor-empty.png)
+![Experiment Conductor](assets/conductor-empty.png){:.pop}
 
 The top left section contains settings for your experiment. The Metadata section at the top-middle is where you can fill in some basic experiment metadata. The center displays a progress bar, or will once an experiment begins running. Once you begin running an experiment, data relating to the current trial will display along the bottom. The right side panel, titled Data Monitoring, will display some basic data as it is collected, assuming you are using the streaming run protocol, and your experiment has streaming enabled, meaning the sample rates for the analog input channels are not set to 0 (this can be checked in the Designer). To the right of the first two axes in Data Monitoring are text boxes labeled "Custom Analysis." Advanced users may want to take the data being streamed back and run their own algorithm on the data before it is plotted. If so, they should provide the path to the function they want run on the data in these boxes. There are restrictions on custom data streaming functions, as described later on.
 

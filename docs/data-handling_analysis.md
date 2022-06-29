@@ -16,7 +16,7 @@ nav_order: 2
 
 This github repository has a suite of data analysis tools. Have a look at the [software installation guide](software_setup.md) on how to set it up.
 
-There are two versions of the data analysis tool that you can use - a simplified version, and a full version. Both require you to update variables in an .m file, which will then be saved as a settings file, exactly the way that the data processing works. Here are some details about each version.
+There are two versions of the data analysis tool that you can use – a simplified version, and a full version. Both require you to update variables in an `.m` file, which will then be saved as a settings file, exactly the way that the data processing works. Here are some details about each version.
 
 ## Simplified Data Analysis
 

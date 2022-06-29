@@ -70,6 +70,10 @@ Switch to the _Panel_Host_{:.gui-txt} window and try to send an _all on_{:.gui-b
 
 The second test will verify that the connection between MATLAB and the _Panel_Host_{:.gui-txt} software is working. Switch back to the MATLAB PControl_G4 GUI and click on the _arena_{:.gui-txt} tab and then _all on_{:.gui-btn}. If all LEDs on the arena turn on, then the system has been set up successfully -- and you can turn it off the same way as before. Otherwise and most likely you will need to [trouble shoot your system]({{site.baseurl}}/docs/g4_troubleshooting.html) or [get in contact]({{site.baseurl}}/Contact).
 
+## Configure data analysis
+
+Once you have configured the arena, make sure to configure the automated data analysis, as described in [G4 Data Analysis](data-handling_analysis.md).
+
 ---
 
 [^1]: In November 2021, the NI R RIO Driver and most other software packages are available in version 21.3 (previously in July 2020: v20.0).
