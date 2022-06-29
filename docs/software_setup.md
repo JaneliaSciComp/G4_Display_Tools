@@ -70,10 +70,6 @@ Switch to the _Panel_Host_{:.gui-txt} window and try to send an _all on_{:.gui-b
 
 The second test will verify that the connection between MATLAB and the _Panel_Host_{:.gui-txt} software is working. Switch back to the MATLAB PControl_G4 GUI and click on the _arena_{:.gui-txt} tab and then _all on_{:.gui-btn}. If all LEDs on the arena turn on, then the system has been set up successfully -- and you can turn it off the same way as before. Otherwise and most likely you will need to [trouble shoot your system]({{site.baseurl}}/docs/g4_troubleshooting.html) or [get in contact]({{site.baseurl}}/Contact).
 
-## Configure data analysis
-
-Once you have configured the arena, make sure to configure the automated data analysis, as described in [G4 Data Analysis](data-handling_analysis.md).
-
 ## Configure Data Processing
 
 Once you have created your first experimental protocol, it will be time to configure your settings for how the collected data should be processed. Processing happens automatically at the end of an experiment unless you disable this feature before running the experiment. Open the file `G4_Display_Tools\G4_Data_Analysis\new_data_processing\create_processing_settings.m`. This file contains a list of variables, each one affecting how your raw collected data will be turned into easily read datasets. See a full description of each setting and what it means at [G4 Data Processing](data-handling_processing.md). In summary, you will update the variables in this file to match your preferences, and then you will save the file and run it. This will generate a `.mat` file containing all your settings for data processing. When you run an experiment on the Conductor, you will provide the path to this `.mat` file, and the Conductor will then automatically take the raw data and process it into datasets once the experiment is finished according to your settings. You will also be able to manually process data collected from previous experiments this way.
