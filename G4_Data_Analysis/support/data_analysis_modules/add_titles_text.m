@@ -8,7 +8,7 @@ function [ts_set, tc_set] = add_titles_text(text, ts_set, tc_set)
     
     if ~isempty(ts_set.faLmR_figure_names)
         for faName = 1:length(ts_set.faLmR_figure_names)
-           ts_set.faLmR_figure_names(name) = ts_set.faLmR_figure_names(faName) + text;
+           ts_set.faLmR_figure_names(faName) = ts_set.faLmR_figure_names(faName) + text;
         end
     end
     
