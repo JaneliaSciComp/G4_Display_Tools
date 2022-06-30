@@ -144,7 +144,11 @@ function plot_basic_histograms(model, timeseries_data, interhistogram_data, ...
                 
                 ind_lines = squeeze(nanmean(interhistogram_data(g,:,:,:),3));
                 avg_line = squeeze(nanmean(nanmean(interhistogram_data(g,:,:,:),3),2));
-                total_points = nansum(interhistogram_data(1,1,1,:),4);
+                total_points_array = [];
+                for trs = 1:size(interhistogram_data,3)
+                    total_points_array(trs) = nansum(interhistogram_data(1,1,trs,:),4);
+                end
+                total_points = nanmean(mean(nonzeros(total_points_array)));
                 ind_lines = ind_lines/total_points;
                 avg_line = avg_line/total_points;
                 
@@ -201,7 +205,12 @@ function plot_basic_histograms(model, timeseries_data, interhistogram_data, ...
             elseif trial_options(2) == 1 && single == 1
                
                 fly_line = squeeze(nanmean(interhistogram_data(g,:,:,:),3));
-                total_points = nansum(interhistogram_data(1,1,1,:),4);
+                total_points_array = [];
+                for trs = 1:size(interhistogram_data,3)
+                    total_points_array(trs) = nansum(interhistogram_data(1,1,trs,:),4);
+                end
+                total_points = nanmean(mean(nonzeros(total_points_array)));
+
                 fly_line = fly_line/total_points;
                 if plot_in_degrees == 1
                     
