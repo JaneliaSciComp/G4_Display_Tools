@@ -673,25 +673,7 @@ classdef G4_conductor_controller < handle
                 return;
             end
             
-            %Check if the date folder exists - if not, create it.            
-            if ~exist(fullfile(experiment_folder, self.model.date_folder),'dir')
-                self.create_folder(experiment_folder, self.model.date_folder);
-                self.create_folder(fullfile(experiment_folder, self.model.date_folder), self.model.fly_save_name);
-                
-            else
-                %if so, check if the fly folder exists. if not, create it.
-                if ~exist(fullfile(experiment_folder, self.model.date_folder, self.model.fly_save_name),'dir')
-                    self.create_folder(fullfile(experiment_folder, self.model.date_folder), self.model.fly_save_name);
-                else
-                    %if so, make sure there are not already results in it.
-                    if self.check_for_files(fullfile(experiment_folder, self.model.date_folder, self.model.fly_save_name))
-
-                        %experimental data already exists in this fly folder
-                        return;
-                    end
-                end
-                
-            end
+            
             
             
             
@@ -719,9 +701,7 @@ classdef G4_conductor_controller < handle
             parameters.experiment_folder = experiment_folder;
             parameters.fly_results_folder = fly_results_folder;
             
-            %save the experiment order
-            exp_order = parameters.exp_order;
-            save(fullfile(experiment_folder,'Log Files','exp_order.mat'),'exp_order')
+           
 
             % Update gui
             self.update_view_if_exists();
@@ -742,144 +722,187 @@ classdef G4_conductor_controller < handle
             %Create the full command
             %run_command = run_name + "(self, parameters, Q);";
             run_command = "parfeval_test(self,parameters,Q);";
+            
+            %% confirm start experiment
+            if ~isempty(self.view)
+                start = questdlg('Start Experiment?','Confirm Start','Start','Cancel','Start');
+            else
+                start = 'Start';
+            end
+
+            switch start
+
+                 case 'Cancel'
+                     
+                     
+                     delete(gcp('nocreate'));
+                     return;
+                     
+                 case 'Start' 
+                     
+                     %Check if the date folder exists - if not, create it.            
+                    if ~exist(fullfile(experiment_folder, self.model.date_folder),'dir')
+                        self.create_folder(experiment_folder, self.model.date_folder);
+                        self.create_folder(fullfile(experiment_folder, self.model.date_folder), self.model.fly_save_name);
+
+                    else
+                        %if so, check if the fly folder exists. if not, create it.
+                        if ~exist(fullfile(experiment_folder, self.model.date_folder, self.model.fly_save_name),'dir')
+                            self.create_folder(fullfile(experiment_folder, self.model.date_folder), self.model.fly_save_name);
+                        else
+                            %if so, make sure there are not already results in it.
+                            if self.check_for_files(fullfile(experiment_folder, self.model.date_folder, self.model.fly_save_name))
+
+                                %experimental data already exists in this fly folder
+                                return;
+                            end
+                        end
+
+                    end
+                     
+                      %save the experiment order
+                    exp_order = parameters.exp_order;
+                    save(fullfile(experiment_folder,'Log Files','exp_order.mat'),'exp_order')
  
             
-            %run script
-           
-            success = parfeval(P, @evaluate_run_command, 0, self, run_command, parameters, Q);
-            fetchOutputs(success);
+                    %run script
+
+                    success = parfeval(P, @evaluate_run_command, 0, self, run_command, parameters, Q);
+                    fetchOutputs(success);
+
+                    delete(gcp('nocreate'));
             
-            delete(gcp('nocreate'));
             
-            if self.check_if_aborted()
-                %experiment has been aborted
-                self.model.aborted_count = self.model.aborted_count + 1;
-                aborted_filename = ['Aborted_exp_data',self.get_timestamp()];
-                aborted_results_folder = fullfile(experiment_folder, 'Aborted_Experiments');
-                [logs_removed, logs_msg] = movefile(fullfile(experiment_folder,'Log Files','*'),fullfile(aborted_results_folder,aborted_filename));
+                if self.check_if_aborted()
+                    %experiment has been aborted
+                    self.model.aborted_count = self.model.aborted_count + 1;
+                    aborted_filename = ['Aborted_exp_data',self.get_timestamp()];
+                    aborted_results_folder = fullfile(experiment_folder, 'Aborted_Experiments');
+                    [logs_removed, logs_msg] = movefile(fullfile(experiment_folder,'Log Files','*'),fullfile(aborted_results_folder,aborted_filename));
+                    pause(.5);
+
+
+                    self.create_metadata_file();
+
+                     %Clear out live feedback panel
+                    self.fb_model = feedback_model(self.doc);
+                    self.fb_view.clear_view(self.fb_model);
+
+    %                 [logs_removed, msg] = rmdir(fullfile(experiment_folder, 'Log Files'), 's');
+    %                 pause(1);
+                    if logs_removed == 0
+                        if ~isempty(self.view)
+
+                            self.create_error_box("Matlab was unable to move the log files. Please move manually.");
+                        else
+                            disp('Failed to move the log files from the Log Files folder when aborting experiment. Please move them manually.');
+                        end
+                        disp(logs_msg);
+                    else
+                        if ~isempty(self.view)
+                            self.view.set_progress_title("Experiment aborted successfully.");
+                            drawnow;
+                        else
+                            disp('Experiment aborted succesfully');
+                        end
+
+                    end
+
+                    self.is_aborted = 0;
+
+
+                    return;
+                end
+
+                if ~isempty(success.Error) 
+                    if isempty(self.view)
+                        disp('Experiment failed for unknown reason.');
+                    else
+                        self.create_error_box("Experiment failed for unknown reason.");
+                    end
+                    movefile(fullfile(experiment_folder,'Log Files','*'),fullfile(fly_results_folder,'Failed_exp_data'));                
+                    pause(.5);
+                    return;
+                end
+
+                %Move the log files to the results file under the fly name
+                movefile(fullfile(experiment_folder,'Log Files','*'),fly_results_folder);
                 pause(.5);
-                
-                
+
+                %create .mat file of metadata
                 self.create_metadata_file();
-                
+
                  %Clear out live feedback panel
                 self.fb_model = feedback_model(self.doc);
                 self.fb_view.clear_view(self.fb_model);
-                
-%                 [logs_removed, msg] = rmdir(fullfile(experiment_folder, 'Log Files'), 's');
-%                 pause(1);
-                if logs_removed == 0
+
+                if self.model.do_processing == 1 || self.model.do_plotting == 1
                     if ~isempty(self.view)
-    
-                        self.create_error_box("Matlab was unable to move the log files. Please move manually.");
-                    else
-                        disp('Failed to move the log files from the Log Files folder when aborting experiment. Please move them manually.');
-                    end
-                    disp(logs_msg);
-                else
-                    if ~isempty(self.view)
-                        self.view.set_progress_title("Experiment aborted successfully.");
+                        self.view.set_progress_title("Experiment Completed. Running post-processing.");
                         drawnow;
-                    else
-                        disp('Experiment aborted succesfully');
                     end
-                    
-                end
-                
-                self.is_aborted = 0;
-
-                    
-                return;
-            end
-            
-            if ~isempty(success.Error) 
-                if isempty(self.view)
-                    disp('Experiment failed for unknown reason.');
                 else
-                    self.create_error_box("Experiment failed for unknown reason.");
-                end
-                movefile(fullfile(experiment_folder,'Log Files','*'),fullfile(fly_results_folder,'Failed_exp_data'));                
-                pause(.5);
-                return;
-            end
-            
-            %Move the log files to the results file under the fly name
-            movefile(fullfile(experiment_folder,'Log Files','*'),fly_results_folder);
-            pause(.5);
-            
-            %create .mat file of metadata
-            self.create_metadata_file();
-            
-             %Clear out live feedback panel
-            self.fb_model = feedback_model(self.doc);
-            self.fb_view.clear_view(self.fb_model);
-                        
-            if self.model.do_processing == 1 || self.model.do_plotting == 1
-                if ~isempty(self.view)
-                    self.view.set_progress_title("Experiment Completed. Running post-processing.");
-                    drawnow;
-                end
-            else
-                if ~isempty(self.view)
-                    self.view.set_progress_title("Skipping post-processing.");
-                    drawnow;
-                end
-            end
-            
-            %Always run the post processing script that converts the TDMS
-            %files into mat files.
-
-            G4_TDMS_folder2struct(fly_results_folder);
-            
-            %Get array indicating the presence of pretrial, intertrial, and
-            %posttrial
-            trial_options = self.get_trial_options();
-            
-            %Run post processing and data analysis if selected
-            if self.model.do_processing == 1 && (strcmp(self.model.processing_file,'') || ~isfile(self.model.processing_file))
-                %the processing file provided is empty or doesn't exist.
-                if ~isempty(self.view)
-                    self.create_error_box("Processing script was not run because the processing file could not be found. Please run manually.");
-                else
-                    disp('Processing file could not be found. Please run manually.');
-                end
-     
-            elseif self.model.do_processing == 1 && isfile(self.model.processing_file)
-                [proc_path, proc_name, proc_ext] = fileparts(self.model.processing_file);
-                
-                processing_command = "process_data(fly_results_folder, self.model.processing_file)";
-
-                eval(processing_command);
-                
-                if self.model.do_plotting == 1 && (strcmp(self.model.plotting_file,'') || ~isfile(self.model.plotting_file))
-                    %The settings file for data analysis is empty or
-                    %doesn't exist.
                     if ~isempty(self.view)
-                        self.create_error_box("data analysis was not run because the settings file could not be found. Please run manually.");
-                    else
-                        disp('data analysis settings file could not be found. Please run manually.');
+                        self.view.set_progress_title("Skipping post-processing.");
+                        drawnow;
                     end
-                elseif self.model.do_plotting == 1 && isfile(self.model.plotting_file)
-                    
-                    [plot_path, plot_comm, ext] = fileparts(self.model.plotting_file);
-                    if strcmp(ext,'.mat')
-
-                        self.run_single_fly_DA(self.model.plotting_file, fly_results_folder, trial_options, experiment_folder);
-                    else
-                        
-                        %Do old analysis.
-                        self.run_pdf_report(fly_results_folder, trial_options, processed_filename);
-                        
-                    end
-                
                 end
 
-            end
-            
-            if ~isempty(self.view)
-                self.view.set_progress_title('Finished.');
-                
-                drawnow;
+                %Always run the post processing script that converts the TDMS
+                %files into mat files.
+
+                G4_TDMS_folder2struct(fly_results_folder);
+
+                %Get array indicating the presence of pretrial, intertrial, and
+                %posttrial
+                trial_options = self.get_trial_options();
+
+                %Run post processing and data analysis if selected
+                if self.model.do_processing == 1 && (strcmp(self.model.processing_file,'') || ~isfile(self.model.processing_file))
+                    %the processing file provided is empty or doesn't exist.
+                    if ~isempty(self.view)
+                        self.create_error_box("Processing script was not run because the processing file could not be found. Please run manually.");
+                    else
+                        disp('Processing file could not be found. Please run manually.');
+                    end
+
+                elseif self.model.do_processing == 1 && isfile(self.model.processing_file)
+                    [proc_path, proc_name, proc_ext] = fileparts(self.model.processing_file);
+
+                    processing_command = "process_data(fly_results_folder, self.model.processing_file)";
+
+                    eval(processing_command);
+
+                    if self.model.do_plotting == 1 && (strcmp(self.model.plotting_file,'') || ~isfile(self.model.plotting_file))
+                        %The settings file for data analysis is empty or
+                        %doesn't exist.
+                        if ~isempty(self.view)
+                            self.create_error_box("data analysis was not run because the settings file could not be found. Please run manually.");
+                        else
+                            disp('data analysis settings file could not be found. Please run manually.');
+                        end
+                    elseif self.model.do_plotting == 1 && isfile(self.model.plotting_file)
+
+                        [plot_path, plot_comm, ext] = fileparts(self.model.plotting_file);
+                        if strcmp(ext,'.mat')
+
+                            self.run_single_fly_DA(self.model.plotting_file, fly_results_folder, trial_options, experiment_folder);
+                        else
+
+                            %Do old analysis.
+                            self.run_pdf_report(fly_results_folder, trial_options, processed_filename);
+
+                        end
+
+                    end
+
+                end
+
+                if ~isempty(self.view)
+                    self.view.set_progress_title('Finished.');
+
+                    drawnow;
+                end
             end
 
         end
