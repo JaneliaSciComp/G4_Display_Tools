@@ -423,7 +423,7 @@ classdef G4_conductor_controller < handle
 
         end
 
-        function update_gui_progress(gui_data)
+        function update_gui_progress(self, gui_data)
             
             %Inputs defined in the run protocol as experiment runs. Each is
             %a cell array of parameters. 
@@ -717,11 +717,11 @@ classdef G4_conductor_controller < handle
 
             Q = parallel.pool.DataQueue;
             %afterEach(Q, @(params) self.update_progress(params));
-            afterEach(Q, @update_gui_progress);
+            afterEach(Q, @self.update_gui_progress);
 
             %Create the full command
             %run_command = run_name + "(self, parameters, Q);";
-            run_command = "parfeval_test(self,parameters,Q);";
+            run_command = "Controller_Direct_Run_Protocol(self,parameters,Q);";
             
             %% confirm start experiment
             if ~isempty(self.view)
@@ -897,6 +897,8 @@ classdef G4_conductor_controller < handle
                     end
 
                 end
+                
+                delete(gcp('nocreate'));
 
                 if ~isempty(self.view)
                     self.view.set_progress_title('Finished.');
