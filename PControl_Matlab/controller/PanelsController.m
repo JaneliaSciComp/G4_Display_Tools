@@ -51,7 +51,7 @@ classdef PanelsController < handle
         end
 
         function open(self, startHost)
-            % open Establish a connection to "Main Host"
+            %% open Establish a connection to "Main Host"
             %
             % Connect to the webserver started by `G4 Host.exe`. If
             % startHost is true then make stop all running G4 Host
@@ -93,7 +93,7 @@ classdef PanelsController < handle
 
 
         function close(self, stopHost)
-            % close Disconnect from Main Host
+            %% close Disconnect from Main Host
             % 
             % Disconnect the connection established in
             % PanelsController.open. If stopHost is true then also stop the
@@ -120,7 +120,7 @@ classdef PanelsController < handle
 
 
         function isOpen = get.isOpen(self)
-            % isOpen Confirms a working connection
+            %% isOpen Confirms a working connection
             %
             % returns true if the TCP connection to the webserver behind G4
             % Host.exe is active.
@@ -136,7 +136,7 @@ classdef PanelsController < handle
         end
 
         function setHostName(self,hostName)
-            % setHostName update the host name
+            %% setHostName update the host name
             if ~self.isOpen
                 self.hostName = hostName;
             else
@@ -146,7 +146,7 @@ classdef PanelsController < handle
 
 
         function setPort(self,port)
-            % setPort Update the host port
+            %% setPort Update the host port
             if ~self.isOpen
                 self.port = port
             else
@@ -155,7 +155,7 @@ classdef PanelsController < handle
         end
 
         function rtn = stopDisplay(self)
-            % stopDisplay send 'stop_display' command
+            %% stopDisplay send 'stop_display' command
             %
             % Triggers the 'stop display' TCP command on the G4 Main Host
             % and checks for the response.
@@ -174,7 +174,7 @@ classdef PanelsController < handle
         end
 
         function rtn = allOn(self)
-            % allOn Send 'all on' command
+            %% allOn Send 'all on' command
             %
             % Triggers the 'all on' TCP command on the G4 Main Host and
             % checks for the response.
@@ -195,7 +195,7 @@ classdef PanelsController < handle
 
 
         function rtn = allOff(self)
-            % allOff Send 'all off' command
+            %% allOff Send 'all off' command
             %
             % Triggers the 'all off' TCP command on the G4 Main Host and
             % checks for the response.
@@ -216,7 +216,7 @@ classdef PanelsController < handle
         end
         
         function rtn = setRootDirectory(self, dirName, createDir)
-            % setRootDirectory Set Root directory
+            %% setRootDirectory Set Root directory
             %
             % Triggers the 'Change Root Directory' TCP command on the G4
             % Main Host and checks for the correct response.
@@ -253,7 +253,7 @@ classdef PanelsController < handle
         end
         
         function rtn = setActiveAOChannels(self, activeOutputChannels)
-            % setActiveAOChannels Set active analoge output channels
+            %% setActiveAOChannels Set active analog output channels
             %
             % Triggers the 'Set Active Analog Output Channels' TCP command
             % on the G4 Main Host and checks for the correct response.
@@ -280,7 +280,7 @@ classdef PanelsController < handle
         end
 
         function rtn = setActiveAIChannels(self, activeInputChannels)
-            % setActiveAIChannels Set active analoge input channels
+            %% setActiveAIChannels Set active analog input channels
             %
             % Triggers the 'Set Active Analog Input Channels For TCP
             % Stream' TCP command on the G4 Main Host and checks for the
@@ -308,7 +308,7 @@ classdef PanelsController < handle
         end
         
         function rtn = startLog(self)
-            % startLog Start logging on the the Main Host
+            %% startLog Start logging on the the Main Host
             %
             % Triggers the 'Start Log' TCP command if the log is not
             % already running. Returns true if logging started or is
@@ -335,7 +335,7 @@ classdef PanelsController < handle
         end
         
         function rtn = stopLog(self)
-            % stopLog Stop logging on the the Main Host
+            %% stopLog Stop logging on the the Main Host
             %
             % Triggers the 'Stop Log' TCP command if the log is still 
             % running. Returns true if logging stopped or has already 
@@ -358,7 +358,7 @@ classdef PanelsController < handle
         end
 
         function rtn = setControlMode(self, controlMode)
-            % setControlMode Set control mode on Main Host
+            %% setControlMode Set control mode on Main Host
             %
             % Modes:
             %   0-Stream
@@ -466,6 +466,9 @@ classdef PanelsController < handle
         end
         
         function setGain(self, gain, bias)
+            %% Send a `Set-Gain` command to the controller.
+            %
+            %  
             arguments
                 self (1,1) PanelsController
                 gain (1,1) {mustBeInteger,...
@@ -534,6 +537,25 @@ classdef PanelsController < handle
             self.write([cmdData chn, dec2char(aoFunctionID, 2)]);
             resp = self.expectResponse([0 1], 49, [], 0.1);
             if ~isempty(resp) && resp(2) == 0
+                rtn = true;
+            end
+        end
+        
+        function rtn = sendSyncLog(self, msgClass, msg)
+            %%
+            arguments
+                self (1,1) PanelsController
+                msgClass (1,1) {mustBeInteger, ...
+                    mustBeGreaterThanOrEqual(msgClass, 0), ...
+                    mustBeLessThanOrEqual(msgClass, 255)}
+                msg (1,1) {mustBeInteger}
+            end
+            rtn = false;
+            cmdData = char([10 71]); % 0x0A 0x47
+            alltogethernow = [cmdData dec2char(msgClass, 1) fliplr(dec2char(msg, 8))];
+            self.write(alltogethernow);
+            resp = self.expectResponse(0, 71, [], 0.1);
+            if ~isempty(resp)
                 rtn = true;
             end
         end

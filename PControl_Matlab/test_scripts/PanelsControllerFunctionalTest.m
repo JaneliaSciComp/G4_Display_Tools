@@ -255,10 +255,10 @@ classdef PanelsControllerFunctionalTest < matlab.unittest.TestCase
                 startTime = tic;
                 rsp = testCase.panelsController.startDisplay(23);
                 seqComplete = toc(startTime);
+                testCase.panelsController.stopLog();
                 rsps = [rsps; rsp];
                 runTime = [runTime; 23];
                 seqTime = [seqTime; seqComplete];
-                testCase.panelsController.stopLog();
             end
             T = table(rsps, runTime, seqTime);
             writetable(T, "gapsInLog.xlsx", "Sheet", "gaps")
@@ -299,6 +299,24 @@ classdef PanelsControllerFunctionalTest < matlab.unittest.TestCase
                 onOff = padarray(onOff, [0 4-length(onOff)], 0, 'pre');
                 testCase.verifyTrue(testCase.panelsController.setAOFunctionID(onOff, 1));
             end
+        end
+        
+        function testSyncLog(testCase)
+            testCase.panelsController.setRootDirectory("C:\matlabroot\G4");
+            testCase.panelsController.setControlMode(1);
+            testCase.panelsController.startLog();
+            % Min and Max
+            testCase.panelsController.sendSyncLog(0, 0);
+            testCase.panelsController.sendSyncLog(255, intmax('int64'));
+            for i = randi([0 255], 1, 50)
+                for j = int64(randi([0 2^32], 1, 20)) .* int64(randi([0 2^32], 1, 20))
+                    testCase.panelsController.sendSyncLog(i, j);
+                    testCase.panelsController.sendSyncLog(i, j+1);
+                    testCase.panelsController.sendSyncLog(i, j+2);
+                    testCase.panelsController.sendSyncLog(i, j+3);
+                end
+            end
+            testCase.panelsController.stopLog();
         end
 
     end
