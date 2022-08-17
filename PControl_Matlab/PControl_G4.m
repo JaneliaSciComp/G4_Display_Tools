@@ -273,7 +273,7 @@ selection = questdlg('Close Panel Controller?','Close Request Function', 'Yes','
 switch selection,
     case 'Yes',
         %         save([controller_path, '\currentExp.mat'], 'currentExp');
-        if exist('ctlr')
+        if exist('ctlr', 'var') && ~isempty(ctlr)
             %fclose(ctlr);
             ctlr.close();
             clear ctlr;
