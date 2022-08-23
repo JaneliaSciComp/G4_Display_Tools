@@ -231,7 +231,7 @@ classdef PanelsController < handle
             end
             cmdData = char([67]);   % Command 0x43
             rtn = false;
-            if 7~=exist(dirName, 'dir') % doesn't exist
+            if ~exist(dirName, 'dir') % doesn't exist
                 if createDir
                     mkdir(dirName);
                 else
@@ -361,7 +361,7 @@ classdef PanelsController < handle
             %% setControlMode Set control mode on Main Host
             %
             % Modes:
-            %   0-Stream
+            %   0 - Stream
             %   1 - Fixed Rate Position Function
             %   2 - Constant Rate Playback
             %   3 - Stream Pattern Position
@@ -432,7 +432,7 @@ classdef PanelsController < handle
             self.write([cmdData dec2char(position, 2)]);
         end
         
-        function setPositionAndFunctionID(self, positionID, functionID)
+        function setPatternAndPositionIDs(self, positionID, functionID)
             arguments
                 self (1,1) PanelsController
                 positionID (1,1) ...
@@ -522,6 +522,7 @@ classdef PanelsController < handle
         end
         
         function rtn = setAOFunctionID(self, aoChannels, aoFunctionID)
+            %% setAOFunctionID set the function ID for channels.
             arguments
                 self (1,1) PanelsController
                 aoChannels (1,4) logical
@@ -541,14 +542,47 @@ classdef PanelsController < handle
             end
         end
         
+        function rtn = setAO(self, aoChannel, voltage)
+            %% setAO sets the voltage on AO6 or AO7
+            arguments
+                self (1,1) PanelsController
+                aoChannel (1,1) {mustBeMember(aoChannel, {'6', '7'})}
+                voltage (1,1) {mustBeNumeric, mustBeFinite, ...
+                    mustBeGreaterThanOrEqual(voltage, -10), ...
+                    mustBeLessThanOrEqual(voltage, 10)}
+            end
+            rtn = false;
+            cmdData = char([4 50]); % 0x04 0x32
+            
+            switch aoChannel
+                case '6'
+                    chnl = 1;
+                case '7'
+                    chnl = 2;
+            end
+            volVar = voltage/10 * intmax('int16');
+            volTrans = mod(int32(intmax('uint16')) + int32(volVar), int32(intmax('uint16')))
+
+            self.write([cmdData dec2char(chnl, 1) dec2char(volTrans, 2)]);
+            resp = self.expectResponse(0, 50, [], 0.1);
+            if ~isempty(resp)
+                rtn = true;
+            end
+        end
+        
         function rtn = sendSyncLog(self, msgClass, msg)
-            %%
+            %% sendSyncLog Log information to TDMS file.
+            %
+            %  Triggers the 'Sync Log' TCP command. Returns true if the two
+            %  values 'msgClass' and 'msg' were successfully stored in the 
+            %  TDMS log files.
             arguments
                 self (1,1) PanelsController
                 msgClass (1,1) {mustBeInteger, ...
                     mustBeGreaterThanOrEqual(msgClass, 0), ...
                     mustBeLessThanOrEqual(msgClass, 255)}
-                msg (1,1) {mustBeInteger}
+                msg (1,1) {mustBeInteger, ...
+                    mustBeLessThanOrEqual(msg, 9223372036854775807)}
             end
             rtn = false;
             cmdData = char([10 71]); % 0x0A 0x47
@@ -559,30 +593,126 @@ classdef PanelsController < handle
                 rtn = true;
             end
         end
-
-        function setGrayScaleLevel16(self)
-            cmdData = char([2,4,16]);
-            self.write(cmdData);
+        
+        function rtn = sendDisplayReset(self)
+            %% sendDisplayReset Reset the displays
+            %
+            %  Triggers the 'Display Reset' TCP command. Returns true if
+            %  the reset command returns the expected TCP response.
+            rtn = false;
+            cmdData = char([1 1]); % 0x01 0x01
+            self.write([cmdData]);
+            resp = self.expectResponse(0, 1, "Reset Command Sent to FPGA", 0.1);
+            if ~isempty(resp)
+                rtn = true;
+            end
+        end
+        
+        function version = getVersion(self)
+            %% getVersion Retrieve current version of G4 Host
+            %
+            %  Triggers the 'Get Version' TCP command. T
+            version = [0];
+            cmdData = char([1 70]); % 0x01 0x46
+            self.write([cmdData]);
+            resp = self.expectResponse(0, 70, [], 0.1);
+            if length(resp) > 4
+                version = str2double(split(resp(4:end), ".", 2));
+            end
+        end
+        
+        function rtn = getTreadmillData(self)
+            rtn = false; 
+            cmdData = char([1 69]); % 0x01 0x45
+            self.write([cmdData]);
+            resp = self.expectResponse(0, 69, [], 0.1); % TODO: This is untested a and broken
+            if ~isempty(resp)
+                rtn = true;
+            end
+        end
+        
+        function rtn = resetCounter(self)
+            %% resetCounter
+            %
+            %  Trigger 'Reset Counter' TCP command.
+            rtn = false;
+            cmdData = char([1 66]); % 0x01 0x42
+            self.write([cmdData]);
+            resp = self.expectResponse(0, 66, "Counter has been reset", 0.1);
+            if ~isempty(resp)
+                rtn = true;
+            end
+        end
+        
+        function rtn = setSPIDebug(self, enable, column)
+            %% setSPIDebug enable SPI debugging
+            %
+            %  MOSI commands for specified COLUMN get logged into TDMS
+            %  files when ENABLE is true. Send this before logging started.
+            %
+            %  see also startLog, stopLog
+            arguments
+                self   (1,1) PanelsController
+                enable (1,1) {mustBeNumericOrLogical}
+                column (1,1) {mustBeInteger, ...
+                    mustBeGreaterThanOrEqual(column, 0), ...
+                    mustBeLessThanOrEqual(column, 12)}
+            end
+            rtn = false;
+            if self.isLogRunning
+                ME = MException('PanelsController:WrongOrder', ...
+                    'Cannot start SPI debugging after logging.');
+                throw(ME);
+            end
+            cmdData = char([3 80]); % 0x03 0x50
+            onoff = 0;
+            if enable
+                onoff = 1;
+            end
+            self.write([cmdData dec2char(onoff, 1) dec2char(column, 1)]);
+            resp = self.expectResponse(0, 80, [], 0.1);
+            if ~isempty(resp)
+                rtn = true;
+            end
+        end
+        
+        function rtn = setColorDepth(self, depth)
+            %% setColorDepth Set the panel either to 2 or 16 colors
+            arguments
+                self (1,1) PanelsController
+                depth (1,1) {mustBeMember(depth, {'2', '16'})}
+            end
+            rtn = false;
+            cmdData = char([2 6]); % 0x02 0x06
+            depthBit = 0;
+            if str2double(depth) == 16
+                depthBit = 1;
+            end
+            self.write([cmdData dec2char(depthBit, 1)]);
+            resp = self.expectResponse(0, 6, "Switch grayscale", 2);  % This takes very long
+            if ~isempty(resp)
+                rtn = true;
+            end
+        end
+        
+        function success = write(self, data)
+            %% write Send data via TCP
+            %
+            % Note: for historic reasons success is defined as follows:
+            % success: 1 means unsuccessful and 0 means successful
+            success = 1;
+            if self.isOpen
+                pnet(self.tcpConn, 'write', data);
+                success = 0;
+            end
         end
 
-
-        function setGrayScaleLevel2(self)
-            cmdData = char([2,4,2]);
-            self.write(cmdData)
-        end
-
-
+        %% Deprecated?
+        
         function startStreamingMode(self)
             cmdData = char([2, hex2dec('10'), 0]);
             self.write(cmdData);
         end
-
-
-        function startPatternMode(self)
-            cmdData = char([1, hex2dec('21')]);
-            self.write(cmdData);
-        end
-
 
         function streamFrame16(self,frame)
             frameCmd = self.getFrameCmd16(frame);
@@ -724,14 +854,7 @@ classdef PanelsController < handle
 
         end        
         
-        function success = write(self,data)
-            %success: 1 means unsuccessful and 0 means successful
-            success = 1;
-            if self.isOpen
-                pnet(self.tcpConn, 'write', data);
-                success = 0;
-            end
-        end
+        
         
     end
 
@@ -776,6 +899,10 @@ classdef PanelsController < handle
         end
 
         function pullResponse(self)
+            %% pullResponse Read response from TCP and put it in buffer iBuf
+            %
+            %  iBuf is a FIFO buffer which only contains as many chars as
+            %  defined in iBufSz
             self.iBuf = [self.iBuf pnet(self.tcpConn, 'read', 65536, 'uint8', 'noblock')];            
             if length(self.iBuf) > self.iBufSz
                 self.iBuf(1, length(self.iBuf) - self.iBufSz) = [];
@@ -783,6 +910,7 @@ classdef PanelsController < handle
         end
 
         function response = expectResponse(self, rsp, cmd, rspString, timeout)
+            %% expectResponse Check TCP response for certain features
             arguments
                 self (1,1) PanelsController
                 rsp (1,:) uint8 
