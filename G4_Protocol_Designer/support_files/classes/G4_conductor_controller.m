@@ -723,9 +723,9 @@ classdef G4_conductor_controller < handle
 
             %Create the full command
             %run_command = run_name + "(self, parameters, Q);";
-            run_command = "Controller_Direct_Run_Protocol(self,parameters,Q);";
+            %run_command = "Controller_Direct_Run_Protocol(self,parameters,Q);";
 
-            
+            execute_run_protocol = str2func(run_name);
             %% confirm start experiment
             if ~isempty(self.view)
                 start = questdlg('Start Experiment?','Confirm Start','Start','Cancel','Start');
@@ -770,7 +770,7 @@ classdef G4_conductor_controller < handle
             
                     %run script
 
-                    success = parfeval(P, @evaluate_run_command, 0, self, run_command, parameters, Q);
+                    success = parfeval(P, @execute_run_protocol, 0, self, parameters, Q);
                     fetchOutputs(success);
 
                     delete(gcp('nocreate'));
