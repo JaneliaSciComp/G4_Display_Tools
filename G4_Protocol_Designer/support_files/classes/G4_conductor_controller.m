@@ -665,7 +665,7 @@ classdef G4_conductor_controller < handle
             
             
             %Go through and replace all the greyed out parameters with
-            %appropriate values to be sent to panel_com       
+            %appropriate values to be sent to the controller       
             self.doc.replace_greyed_cell_values();
             
             %If the user has provided processing settings, set the wing
@@ -1349,7 +1349,7 @@ classdef G4_conductor_controller < handle
             
             
             %create an array of active ao channels which is formatted
-            %correctly to be passed to the panel_com function.
+            %correctly to be passed to the controller
             j = 1;
             active_ao_channels = [];
             for channel = 1:4

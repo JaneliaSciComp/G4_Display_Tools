@@ -50,7 +50,7 @@
 function [success] = G4_run_protocol_combinedCommand(runcon, p)%input should always be 1 or 2 items
 
 %% Get access to the figure and progress bar in the run gui IF it was passed in.
-global ctrl;
+global ctlr;
 
 %        fig = runcon.fig;
 if ~isempty(runcon.view)
@@ -157,26 +157,41 @@ end
      
  
  %% Start host and switch to correct directory
-    if ~isempty(ctrl)
-        if ctrl.isOpen() == 1
-           ctrl.close()
+    if ~isempty(ctlr)
+        if ctlr.isOpen() == 1
+           ctlr.close()
         end
     end
-    connectHost;
-    pause(10);
-    Panel_com('change_root_directory', p.experiment_folder);
- 
-        
-     
-     
- 
+
+    %% Open new Panels controller instance
+    ctlr = PanelsController();
+    ctlr.mode = 0;
+    ctlr.open(true);
+
+%% Check tcp connection was successful.
+    if ctlr.tcpConn == -1
+        system('"C:\Program Files (x86)\HHMI G4\G4 Host" &');
+        status = 1;
+        while status~=0
+            [status, ~] = system('tasklist | find /I "G4 Host.exe"');
+            pause(0.1);
+        end
+        ctlr = PanelsController();
+        ctlr.mode = 0;
+        ctlr.open();
+    end
+
+    %% Set root directory to the experiment folder
+    ctlr.setRootDirectory(p.experiment_folder);
+
+
  %% set active ao channels
      if ~isempty(p.active_ao_channels)
          aobits = 0;
         for bit = p.active_ao_channels
             aobits = bitset(aobits,bit+1); %plus 1 bc aochans are 0-3
         end
-        Panel_com('set_active_ao_channels', dec2bin(aobits,4));
+        ctlr.setActiveAOChannels(dec2bin(aobits,4));
       
      end
      
@@ -190,7 +205,10 @@ end
      switch start
      
          case 'Cancel'
-             disconnectHost;
+              if isa(ctlr, 'PanelsController')
+                ctlr.close();
+             end
+             clear global;
              success = 0;
              return;
          case 'Start' 
@@ -246,8 +264,25 @@ end
 
 %% Start log---------------------------------------------------------
 
-             Panel_com('start_log');
-             pause(1);
+            log_started = ctlr.startLog();
+             if ~log_started
+                 disp("Log failed to start, retrying...");
+                 log_started = ctlr.startLog();
+                 if ~log_started
+                     disp("Log failed a second time, aborting experiment.");
+                     runcon.abort_experiment();
+                 end
+             end
+             if runcon.check_if_aborted()
+                
+                if isa(ctlr, 'PanelsController')
+                    ctlr.close();
+                end
+                clear global;
+                success = 0;
+                return;
+             
+             end
 
 %% run pretrial if it exists----------------------------------------
              tic;
@@ -268,13 +303,10 @@ end
 
                  pause(0.01);
                  
-                 Panel_com('set_position_x',pre_frame_ind);
-                 if pre_mode == 3
-                     pause(.1);
-                 end
-                 
+                 ctlr.setPositionX(pre_frame_ind);
+
                  if ~isempty(pre_gain) %this assumes you'll never have gain without offset
-                     Panel_com('set_gain_bias', [pre_gain, pre_offset]);
+                     ctlr.setGain(pre_gain, pre_offset);
                      
                  end
                  

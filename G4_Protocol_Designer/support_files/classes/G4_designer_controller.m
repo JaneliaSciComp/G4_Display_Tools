@@ -1518,7 +1518,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
              if self.preview_on_arena == 1
                  self.preview_on_arena = 0;
                  if self.model.screen_on == 1
-                     Panel_com('stop_display');
+                     ctlr.stopDisplay();
                         self.model.screen_on = 0;
                  end
                  if self.model.host_connected
@@ -1591,7 +1591,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
             elseif self.model.screen_on == 1
                 
                  
-                    Panel_com('stop_display');
+                    ctlr.stopDisplay();
                     self.model.screen_on = 0;
                
             end
@@ -1889,13 +1889,11 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                 self.model.host_connected = 1;
             end
 
-            Panel_com('change_root_directory', experiment_folder)
+            ctlr.setRootDirectory(experiment_folder)
             start = questdlg('Start Dry Run?','Confirm Start','Start','Cancel','Start');
             switch start
                 case 'Cancel'
                     
-%                     Panel_com('stop_display')
-%                     disconnectHost;
                     return;
                     
                 case 'Start'
@@ -1903,39 +1901,39 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                     pattern_index = self.doc.get_pattern_index(trial{2});
                     func_index = self.doc.get_posfunc_index(trial{3});
                     
-                    Panel_com('set_control_mode', trial_mode);
-                    Panel_com('set_pattern_id', pattern_index); 
+                    ctlr.setControlMode(trial_mode);
+                    ctlr.setPatternID(pattern_index); 
                     
                    if func_index ~= 0
-                        Panel_com('set_pattern_func_id', func_index);
+                        ctlr.setPatternFunctionID(func_index);
    
                    end
                     
                     if ~isempty(trial{10})
-                        Panel_com('set_gain_bias',[LmR_gain LmR_offset]);
+                        ctlr.setGain(LmR_gain, LmR_offset);
                        
                     end
                     
                     if trial_mode == 2
-                        Panel_com('set_frame_rate', trial_fr_rate);
+                        ctlr.setFrameRate(trial_fr_rate);
                         
                     end
                     
-                    Panel_com('set_position_x', trial_frame_index);
+                    ctlr.setPositionX(trial_frame_index);
                     
                     if trial_duration ~= 0
   
-                        Panel_com('start_display', (trial_duration)); %duration expected in 100ms units
-                        pause(trial_duration + 0.01)
+                        ctlr.startDisplay(trial_duration*10); %duration expected in 100ms units
+                        
                         self.model.screen_on = 0;
                         
                     else
                         
-                        Panel_com('start_display', 2000);
+                        ctlr.startDisplay(2000, false);
                         w = waitforbuttonpress; %If pretrial duration is set to zero, this
                         %causes it to loop until a button is press or
                         %mouse clicked
-                        Panel_com('stop_display');
+                        ctlr.stopDisplay();
                         self.model.screen_on = 0;
 
                     end
@@ -2464,7 +2462,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
             elseif strcmp(file_type, 'pos') && ~strcmp(funcfield,'')
                 
                 if self.model.screen_on
-                    Panel_com('stop_display');
+                    ctlr.stopDisplay();
                     self.model.screen_on = 0;
                 end
                 
@@ -2519,7 +2517,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
             elseif strcmp(file_type, 'ao') && ~strcmp(aofield,'')
                 
                 if self.model.screen_on
-                    Panel_com('stop_display');
+                    ctlr.stopDisplay();
                     self.model.screen_on = 0;
                 end
 
@@ -2691,13 +2689,13 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                 pause(5);
             end
             
-            Panel_com('change_root_directory', self.doc.top_export_path);
-            pause(.05);
-            Panel_com('set_pattern_id', patindex);
-            pause(.05);
-            Panel_com('set_control_mode', 3);
-            pause(.05);
-            Panel_com('set_position_x', self.model.auto_preview_index);
+            ctlr.setRootDirectory(self.doc.top_export_path);
+            
+            ctlr.setPatternID(patindex);
+            
+            ctlr.setControlMode(3);
+            
+            ctlr.setPositionX(self.model.auto_preview_index);
 
             self.model.screen_on = 1;
 
@@ -2712,7 +2710,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
         function check_and_disconnect_host(self)
             
             if self.model.host_connected
-                Panel_com('stop_display');
+                ctlr.stopDisplay();
                 disconnectHost();
                 self.model.host_connected = 0;
             end
@@ -2723,7 +2721,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
            
             if self.model.host_connected
                 
-                Panel_com('set_position_x',self.model.auto_preview_index);
+                ctlr.setPositionX(self.model.auto_preview_index);
    
             end
             
