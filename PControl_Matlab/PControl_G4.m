@@ -124,7 +124,7 @@ handles.PC = PControl_init;
 
 userSettings;
 load(fullfile(default_exp_path,'currentExp.mat'));
-Panel_com('change_root_directory',default_exp_path);
+ctlr.setRootDirectory(default_exp_path);
 
 movegui(gcf, 'center');
 set(handles.gain_slider, 'max', handles.PC.gain_max ,'min', ...
@@ -235,7 +235,7 @@ set(handles.tab2panel,'Visible','on')
 set(handles.tab1panel,'Visible','off')
 set(handles.Start_button, 'enable', 'off')
 set(handles.trial_duration, 'enable', 'off')
-Panel_com('set_control_mode',0);
+handles.ctlr.setControlMode(0);
 
 
 % Axes object 1 callback (tab 1)
@@ -262,7 +262,7 @@ set(handles.tab2panel,'Visible','on')
 set(handles.tab1panel,'Visible','off')
 set(handles.Start_button, 'enable', 'off')
 set(handles.trial_duration, 'enable', 'off')
-Panel_com('set_control_mode',0);
+handles.ctlr.setControlMode(0);
 
 % --- Executes when user attempts to close figure1.
 function figure1_CloseRequestFcn(hObject, eventdata, handles)
@@ -500,11 +500,11 @@ end
 
 % --------------------------------------------------------------------
 function menu_all_off_Callback(hObject, eventdata, handles)
-Panel_com('all_off');
+handles.ctlr.allOff();
 
 % --------------------------------------------------------------------
 function menu_all_on_Callback(hObject, eventdata, handles)
-Panel_com('all_on');
+handles.ctlr.allOn();
 
 % --------------------------------------------------------------------
 function menu_configuration_Callback(hObject, eventdata, handles)
@@ -513,8 +513,8 @@ function menu_configuration_Callback(hObject, eventdata, handles)
 % --- Executes on button press in Start_button.
 function Start_button_Callback(hObject, eventdata, handles)
 if (handles.Running == 0 && handles.trialDuration>0)   %if not currently running
-    Panel_com('set_control_mode', handles.PC.x_mode);
-    Panel_com('start_display', round(handles.trialDuration));     %send start command to the controller
+    handles.ctlr.setControlMode(handles.PC.x_mode);
+    handles.ctlr.startDisplay(round(handles.trialDuration));     %send start command to the controller
     handles.Running = 1;    % set running flag to 1
     guidata(hObject, handles);%update the data
     set(hObject, 'string', 'STOP');         % make button say STOP
@@ -523,7 +523,7 @@ if (handles.Running == 0 && handles.trialDuration>0)   %if not currently running
     set(hObject, 'string', 'START');    % turn button to START
     set(hObject, 'backgroundcolor', [0 0.5 0]);
 else
-    Panel_com('stop_display');     %send stop command to the controller
+    handles.ctlr.stopDisplay();     %send stop command to the controller
     set(hObject, 'string', 'START');    % turn button to START
     set(hObject, 'backgroundcolor', [0 0.5 0]);
 end
@@ -561,7 +561,7 @@ handles.PC.x_mode = get(hObject,'Value')-1;
 guidata(hObject, handles);
 
 if handles.PC.x_mode
-    Panel_com('set_control_mode', handles.PC.x_mode);
+    handles.ctlr.setControlMode(handles.PC.x_mode);
 end
 
 switch handles.PC.x_mode
@@ -660,7 +660,7 @@ function y_loop_menu_Callback(hObject, eventdata, handles)
 % mode value is the menu index minus 1, so 0, 1, or 2
 handles.PC.y_mode = get(hObject,'Value') - 1;
 guidata(hObject, handles);
-Panel_com('set_control_mode', [handles.PC.x_mode handles.PC.y_mode]);
+handles.ctlr.setControlMode([handles.PC.x_mode handles.PC.y_mode]);
 
 
 % --------------------------------------------------------------------
@@ -691,13 +691,13 @@ guidata(gcf, handles);
 
 function Send_Gain_Bias(handles)
 % this function sends out the new gain and bias values to the controller
-%Panel_com('stop_display')
+%handles.ctlr.stopDisplay();
 gain = round(10*handles.PC.gain_val/(handles.PC.gain_max));
 bias = round(5*handles.PC.offset_val/(handles.PC.offset_max));
-Panel_com('set_gain_bias', [gain, bias]);
+handles.ctlr.setGain(gain, bias);
 %update_status_display(['Sending: gain = ' num2str(gain) ', bias = ' num2str(bias)]);
 % if handles.Running == true
-%     Panel_com('start_display');
+%     handles.ctlr.startDisplay();
 % end
 
 % --------------------------------------------------------------------
@@ -932,7 +932,7 @@ currentState.pattName = contents{currentState.pattID+1};
 
 if currentExp.pattern.num_patterns ~=0 && pattID >0
     Update_current_patterns(handles, pattID);
-    Panel_com('set_pattern_id', pattID);
+    handles.ctlr.setPatternID(pattID);
 end
 
 % --- Executes during object creation, after setting all properties.
@@ -961,7 +961,7 @@ contents = get(hObject,'String');
 currentState.funcXID = get(hObject,'Value');
 currentState.funcXName = contents{currentState.funcXID};
 if currentState.funcXID ~= 1
-    Panel_com('set_pattern_func_id', currentState.funcXID-1);
+    handles.ctlr.setPatternFunctionID(currentState.funcXID-1);
 end
 
 % --- Executes during object creation, after setting all properties.
@@ -1017,9 +1017,9 @@ function log_enable_Callback(hObject, eventdata, handles)
 % Hint: get(hObject,'Value') returns toggle state of log_enable
 logEnable = get(hObject,'Value');
 if logEnable
-    Panel_com('start_log');
+    handles.ctlr.startLog();
 else
-    Panel_com('stop_log');
+    handles.ctlr.stopLog();
 end
 
 % --- Executes during object creation, after setting all properties.
@@ -1048,7 +1048,7 @@ end
 
 tempArg = dec2bin(currentState.dac4Channels,4);
 
-Panel_com('set_active_ao_channels', tempArg);
+handles.ctlr.setActiveAOChannels(tempArg);
 
 % --- Executes on selection change in dac2_ao_func_list.
 function dac2_ao_func_list_Callback(hObject, eventdata, handles)
@@ -1065,7 +1065,7 @@ currentState.dac2FuncID = get(hObject,'Value')-1;
 currentState.dac2FuncName = contents{currentState.dac2FuncID+1};
 dac2FuncID = currentState.dac2FuncID;
 if dac2FuncID ~= 0
-    Panel_com('set_ao_function_id', [0, dac2FuncID]);
+    handles.ctlr.setAOFunctionID([0, dac2FuncID]);
 end
 
 
@@ -1097,7 +1097,7 @@ currentState.dac3FuncName = contents{currentState.dac3FuncID+1};
 dac3FuncID = currentState.dac3FuncID;
 if dac3FuncID~=0
     %Update_current_patterns(handles, pattID);
-    Panel_com('set_ao_function_id', [1, dac3FuncID]);
+    handles.ctlr.setAOFunctionID([1, dac3FuncID]);
 end
 
 
@@ -1129,7 +1129,7 @@ currentState.dac4FuncName = contents{currentState.dac4FuncID+1};
 dac4FuncID = currentState.dac4FuncID;
 if dac4FuncID~=0
     %Update_current_patterns(handles, pattID);
-    Panel_com('set_ao_function_id', [2, dac4FuncID]);
+    handles.ctlr.setAOFunctionID([2, dac4FuncID]);
 end
 
 % --- Executes during object creation, after setting all properties.
@@ -1161,7 +1161,7 @@ currentState.dac5FuncName = contents{currentState.dac5FuncID+1};
 dac5FuncID = currentState.dac5FuncID;
 if dac5FuncID ~=0
     %Update_current_patterns(handles, pattID);
-    Panel_com('set_ao_function_id', [2, dac5FuncID]);
+    handles.ctlr.setAOFunctionID([2, dac5FuncID]);
 end
 
 % --- Executes during object creation, after setting all properties.
@@ -1196,7 +1196,7 @@ end
 
 tempArg = dec2bin(currentState.dac4Channels,4);
 
-Panel_com('set_active_ao_channels', tempArg);
+handles.ctlr.setActiveAOChannels(tempArg);
 
 % --- Executes on button press in dac4_active.
 function dac4_active_Callback(hObject, eventdata, handles)
@@ -1217,7 +1217,7 @@ end
 
 tempArg = dec2bin(currentState.dac4Channels,4);
 
-Panel_com('set_active_ao_channels', tempArg);
+handles.ctlr.setActiveAOChannels(tempArg);
 
 % --- Executes on button press in dac5_active.
 function dac5_active_Callback(hObject, eventdata, handles)
@@ -1238,7 +1238,7 @@ end
 
 tempArg = dec2bin(currentState.dac4Channels,4);
 
-Panel_com('set_active_ao_channels', tempArg);
+handles.ctlr.setActiveAOChannels(tempArg);
 
 
 
@@ -1280,7 +1280,7 @@ else
         return;
     end
     set(handles.current_dir, 'string', dirName);
-    Panel_com('change_root_directory', dirName);
+    handles.ctlr.setRootDirectory(dirName);
     handles.expDir = dirName;
     try
         load(fullfile(dirName, 'currentExp.mat'));
@@ -1415,7 +1415,7 @@ function frame_rate_Callback(hObject, eventdata, handles)
 %        str2double(get(hObject,'String')) returns contents of frame_rate as a double
 handles.frameRate = str2double(get(hObject,'String'));
 guidata(hObject, handles);
-Panel_com('set_frame_rate', handles.frameRate);
+handles.ctlr.setFrameRate(handles.frameRate);
 
 
 % --- Executes during object creation, after setting all properties.
@@ -1651,7 +1651,7 @@ end
 handles.x_pos = temp_pos;
 set(handles.x_pos_val, 'string', num2str(temp_pos));
 guidata(hObject, handles);
-Panel_com('set_position_x', handles.x_pos);
+handles.ctlr.setPositionX(handles.x_pos);
 
 % --- Executes on button press in x_pos_minus.
 function x_pos_minus_Callback(hObject, eventdata, handles)
@@ -1665,4 +1665,4 @@ end
 handles.x_pos = temp_pos;
 set(handles.x_pos_val, 'string', num2str(temp_pos));
 guidata(hObject, handles);
-Panel_com('set_position_x', handles.x_pos);
+handles.ctlr.setPositionX(handles.x_pos);
