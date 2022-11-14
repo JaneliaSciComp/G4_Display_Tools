@@ -1,5 +1,10 @@
 %create a TCP/IP connection with the Host
-if (connectHost==0) 
+%% Open new Panels controller instance
+    ctlr = PanelsController();
+    ctlr.mode = 0;
+    ctlr.open(true);
+
+if ~ctlr.isOpen 
     return; 
 end
     
@@ -7,7 +12,7 @@ end
 frameN = 16*3;
 frameM = 16*12;
 
-Panel_com('set_control_mode', 0);
+ctlr.setControlMode(0);
 
 for i = 1:6*16
     fprintf('creating frame %d\n',i);
@@ -24,7 +29,7 @@ for i=1:numel(frameCmd)
 end
 
 pause(0.5)
-Panel_com('All_OFF');
+ctlr.allOff();
 
 %disconnect with Host
 disconnectHost;
