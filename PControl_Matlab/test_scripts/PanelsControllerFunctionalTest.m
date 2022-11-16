@@ -313,6 +313,31 @@ classdef PanelsControllerFunctionalTest < matlab.unittest.TestCase
             end
         end
         
+        function sendCombinedCommandSync(testCase)
+            testCase.panelsController.setRootDirectory("C:\matlabroot\G4");
+            for waitDecSec = randi([1, 50], 1, 3)
+                controlMode = 2;
+                patternID = 1;
+                functionID = 1;
+                ao0FunctionID = 1;
+                ao1FunctionID = 1;
+                ao2FunctionID = 1;
+                ao3FunctionID = 1;
+                fps = 500;
+                startTime = tic;
+                rsp = testCase.panelsController.combinedCommand(...
+                    controlMode, ...
+                    patternID, functionID,...
+                    ao0FunctionID, ao1FunctionID, ao2FunctionID, ao3FunctionID,...
+                    fps,...
+                    waitDecSec);
+                testCase.verifyTrue(rsp, "startDisplay didn't return true as expected");
+                seqComplete = toc(startTime);
+                testCase.verifyEqual(seqComplete, waitDecSec*1.0/10, "AbsTol", 0.2, ...
+                    sprintf("Wait %d deciseconds didn't work, it was %.2f seconds instead", waitDecSec, seqComplete));
+            end
+        end
+        
         function testSyncLog(testCase)
             testCase.panelsController.setRootDirectory("C:\matlabroot\G4");
             testCase.panelsController.startLog();
@@ -412,10 +437,10 @@ classdef PanelsControllerFunctionalTest < matlab.unittest.TestCase
             testCase.verifyError(@()testCase.panelsController.setColorDepth("5"), 'MATLAB:validators:mustBeMember');
         end
         
-        function ttt(testCase)
-            %testCase.panelsController.startStreamingMode();
-            % testCase.panelsController.startPatternMode();
-        end
+%         function ttt(testCase)
+%             %testCase.panelsController.startStreamingMode();
+%             % testCase.panelsController.startPatternMode();
+%         end
         
         function testSetAOExtreme(testCase)
             testCase.verifyTrue(testCase.panelsController.setAO('6', -10));
@@ -437,7 +462,41 @@ classdef PanelsControllerFunctionalTest < matlab.unittest.TestCase
             end
             testCase.panelsController.stopLog();
         end
-
+        
+% TODO: Fix this
+%         function streamFullFrame(testCase)
+%             %frame = ones(1, 32*12*4) * 255;
+%             %frame = uint8([1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1]);
+%             frame = uint8([]);
+%             for a = 1:4
+%                 for x = 1:4
+%                     frame = [frame a 1 1 1 1 1 1 1 1 1 1 1 1];
+%                     %frame = [frame a 15 15 15 15 15 15 15 15 15 15 15 15];
+%                     for y = 1:8
+%                         frame = [frame ones(1, 2)*0];
+%                         frame = [frame ones(1, 2)*255];
+%                         frame = [frame ones(1, 2)*63];
+%                         frame = [frame ones(1, 2)*255];
+%                         frame = [frame ones(1, 4)*0];
+%                         frame = [frame ones(1, 4)*255];
+%                         frame = [frame ones(1, 4)*0];
+%                         frame = [frame ones(1, 4)*255];
+%                     end
+%                     for y = 1:8
+%                         frame = [frame ones(1, 24)*255];
+%                     end
+%                 end
+%             end
+% %             for i = 120:48:6352
+% %                 frame(i) = 240;
+% %             end
+%             
+%             testCase.panelsController.setRootDirectory("C:\matlabroot\G4");
+%             testCase.panelsController.startLog();
+%             testCase.panelsController.setControlMode(0);
+%             testCase.panelsController.streamFrame(0, 0, frame);
+%             testCase.panelsController.stopLog();
+%         end
 
     end
      

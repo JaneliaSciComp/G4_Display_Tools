@@ -695,6 +695,102 @@ classdef PanelsController < handle
             end
         end
         
+%         % TODO: not fully working yet.
+%         function rtn = streamFrame(self, aox, aoy, frame)
+%             rtn = false;
+%             cmdData = char([50]); % 0x32
+%             frLength = length(frame);
+%             fullCmd = [cmdData dec2char(frLength, 2) dec2char(aox, 2) dec2char(aoy, 2) frame];
+%             self.write([fullCmd]);
+%             resp = self.expectResponse(0, 50, [], 0.1); 
+%             if ~isempty(resp)
+%                 rtn = true;
+%             end
+%         end
+        
+        function rtn = combinedCommand(self, ...
+                controlMode, patternID, functionID,...
+                ao0FunctionID, ao1FunctionID, ao2FunctionID, ao3FunctionID,...
+                fps, deciSeconds,...
+                waitForEnd)
+            %% combinedCommand Send many updates in a single command
+            %
+            % Triggers the 'Set control mode, pattern id, pattern function 
+            % id, ao function id, frame rate, run-time(ms)' TCP command 
+            % on the G4 Main Host and checks for the correct response.
+            %
+            % Return true if the command was successful and false if either
+            % sending the command received a time out after 0.2 sec or, 
+            % when waitForEnd is true, the display did not return a 
+            % successful "Sequence completed" after the time specified 
+            % deciSeconds.
+            %
+            % TODO: At some point we weren't sure about the timing of this
+            % command, so this might still be off.
+            %
+            % see also startDisplay, setControlMode, setPatternID,
+            % setPatternFunctionID, setAOFunctionID, setFrameRate
+            arguments
+                self (1,1) PanelsController
+                controlMode (1,1) ...
+                    {mustBeInteger, ...
+                     mustBeGreaterThanOrEqual(controlMode, 0), ...
+                     mustBeLessThanOrEqual(controlMode, 7)}
+                patternID (1,1) ...
+                    {mustBeInteger, ...
+                     mustBeGreaterThanOrEqual(patternID, 0), ...
+                     mustBeLessThanOrEqual(patternID, 65535)}
+                functionID (1,1) ...
+                    {mustBeInteger,...
+                    mustBeGreaterThanOrEqual(functionID, 0),...
+                    mustBeLessThanOrEqual(functionID, 65535)}
+                ao0FunctionID (1,1) {mustBeInteger,...
+                    mustBeGreaterThanOrEqual(ao0FunctionID, 0),...
+                    mustBeLessThanOrEqual(ao0FunctionID, 65535)}
+                ao1FunctionID (1,1) {mustBeInteger,...
+                    mustBeGreaterThanOrEqual(ao1FunctionID, 0),...
+                    mustBeLessThanOrEqual(ao1FunctionID, 65535)}
+                ao2FunctionID (1,1) {mustBeInteger,...
+                    mustBeGreaterThanOrEqual(ao2FunctionID, 0),...
+                    mustBeLessThanOrEqual(ao2FunctionID, 65535)}
+                ao3FunctionID (1,1) {mustBeInteger,...
+                    mustBeGreaterThanOrEqual(ao3FunctionID, 0),...
+                    mustBeLessThanOrEqual(ao3FunctionID, 65535)}
+                fps (1,1) {mustBeInteger,...
+                     mustBeGreaterThanOrEqual(fps, -32768),...
+                     mustBeLessThanOrEqual(fps, 32767)}
+                deciSeconds (1,1) {mustBeInteger,...
+                    mustBeGreaterThan(deciSeconds, 0),...   % the G4 Host doesn't accept 0
+                    mustBeLessThanOrEqual(deciSeconds, 65535)}
+                waitForEnd (1,1) logical = true
+            end
+            rtn = false;
+            cmdData = uint8([18 07]); % Command 0x12, 0x07
+            cmd = cmdData;
+            cmd = [cmd controlMode];
+            cmd = [cmd dec2char(patternID, 2)];
+            cmd = [cmd dec2char(functionID, 2)];
+            cmd = [cmd dec2char(ao0FunctionID, 2)];
+            cmd = [cmd dec2char(ao1FunctionID, 2)];
+            cmd = [cmd dec2char(ao2FunctionID, 2)];
+            cmd = [cmd dec2char(ao3FunctionID, 2)];
+            cmd = [cmd signed16BitToChar(fps)];
+            cmd = [cmd dec2char(deciSeconds, 2)];
+            
+            self.write(cmd);
+            resp = self.expectResponse([0 1], 07, [], 0.2);
+            
+            if waitForEnd == true && ~isempty(resp) && resp(2) == 0
+                resp2 = self.expectResponse(0, 33, sprintf("Sequence completed in %d ms", deciSeconds*100), deciSeconds*1.0/10 + 1);
+                % disp(sprintf("Waitfor was %d and response was '%s'.",  deciSeconds, resp2));
+                if ~isempty(resp2)
+                    rtn = true;
+                end
+            elseif waitForEnd == false && ~isempty(resp) && resp(2) == 0
+                rtn = true;
+            end
+        end
+        
         function success = write(self, data)
             %% write Send data via TCP
             %
