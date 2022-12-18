@@ -2,6 +2,8 @@
 % updated to the latest pre-release (144) but it's still happening. Ask
 % Frank about it.
 
+% Need to test on actual arena
+
 global ctlr;
 
  if ~isempty(ctlr)
@@ -23,9 +25,9 @@ set(fig, 'Position', fig_size);
 
 
 all_on_button = uicontrol(fig,'Style','pushbutton', 'String', 'All On', 'units', ...
-    'pixels', 'Position', [15, 15, .8*fig_size(3), .3*fig_size(4)],'Callback', ctlr.allOn());
+    'pixels', 'Position',[.1*fig_size(3), .65*fig_size(4), .8*fig_size(3), .3*fig_size(4)] ,'Callback', @ctlr.allOn);
 
 all_off_button = uicontrol(fig, 'Style', 'pushbutton', 'String', 'All Off', 'units', ...
-    'pixels', 'Position', [15, .3*fig_size(4) + 30, .8*fig_size(3), .3*fig_size(4)], ...
-    'Callback', ctlr.allOff());
+    'pixels', 'Position', [.1*fig_size(3), .35*fig_size(4), .8*fig_size(3), .3*fig_size(4)], ...
+    'Callback', @ctlr.allOff);
 
