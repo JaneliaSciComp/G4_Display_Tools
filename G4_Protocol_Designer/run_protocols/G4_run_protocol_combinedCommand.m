@@ -80,6 +80,9 @@ end
          end
 
          pre_frame_rate = p.pretrial{9};
+         if isempty(pre_frame_rate)
+             pre_frame_rate = 0;
+         end
          pre_gain = p.pretrial{10};
          pre_offset = p.pretrial{11};
          pre_dur = p.pretrial{12};
@@ -109,6 +112,9 @@ end
          end
 
          inter_frame_rate = p.intertrial{9};
+         if isempty(inter_frame_rate)
+             inter_frame_rate = 0;
+         end
          inter_gain = p.intertrial{10};
          inter_offset = p.intertrial{11};
          inter_dur = p.intertrial{12};
@@ -137,6 +143,9 @@ end
          end
 
          post_frame_rate = p.posttrial{9};
+         if isempty(post_frame_rate)
+             post_frame_rate = 0;
+         end
          post_gain = p.posttrial{10};
          post_offset = p.posttrial{11};
          post_dur = p.posttrial{12};
@@ -371,6 +380,9 @@ end
                     end
                      
                     frame_rate = block_trials{cond, 9};
+                    if isempty(frame_rate)
+                        frame_rate = 0;
+                    end
                     gain = block_trials{cond, 10};
                     offset = block_trials{cond, 11};
                     dur = block_trials{cond, 12};
