@@ -83,9 +83,7 @@ end
          pre_gain = p.pretrial{10};
          pre_offset = p.pretrial{11};
          pre_dur = p.pretrial{12};
-         if pre_dur == 0
-             pre_dur = 2000;
-         end
+        
          if isempty(pre_frame_rate)
              pre_frame_rate = 0;
          end
@@ -285,7 +283,7 @@ end
              end
 
 %% run pretrial if it exists----------------------------------------
-             tic;
+             startTime = tic;
              if pre_start == 1
                  %First update the progress bar to show pretrial is running----
                  runcon.update_progress('pre');
@@ -309,29 +307,37 @@ end
                      ctlr.setGain(pre_gain, pre_offset);
                      
                  end
-                 
-                 Panel_com('combined_command',[pre_mode, pre_pat, pre_pos, pre_ao_ind(1), pre_ao_ind(2), pre_ao_ind(3), pre_ao_ind(4),pre_frame_rate, pre_dur]);
-                 if pre_dur == 2000
-                     w = waitforbuttonpress; %If pretrial duration is set to zero, this
+                
+                 if pre_dur ~= 0
+                     ctlr.combinedCommand(pre_mode, pre_pat, pre_pos, pre_ao_ind(1), pre_ao_ind(2), pre_ao_ind(3), pre_ao_ind(4), pre_frame_rate, pre_dur*10);
                  else
-                     pause(pre_dur + .01);
+                     ctlr.combinedCommand(pre_mode, pre_pat, pre_pos, pre_ao_ind(1), pre_ao_ind(2), pre_ao_ind(3), pre_ao_ind(4), pre_frame_rate, 2000, false);
+                     w = waitforbuttonpress;
                  end
                  
 
              end
              
              if runcon.check_if_aborted()
-                 Panel_com('stop_display');
-                 pause(.1);
-                Panel_com('stop_log');
-                pause(1);
-                disconnectHost;
+                ctlr.stopDisplay();
+                log_stopped = ctlr.stopLog();
+                if ~log_stopped
+                    disp("Log failed to stop. Retrying...");
+                    log_stopped = ctlr.stopLog();
+                    if ~log_stopped
+                        disp("Log failed to stop. Please stop manually.");
+                    end
+                end
+                if isa(ctlr, 'PanelsController')
+                    ctlr.close();
+                end
+                clear global;
                 success = 0;
                 return;
              
              end
              
-             runcon.update_elapsed_time(round(toc,2));
+             runcon.update_elapsed_time(round(toc(startTime),2));
              
 
 %% Loop to run the block/inter trials --------------------------------------
@@ -368,22 +374,19 @@ end
                     gain = block_trials{cond, 10};
                     offset = block_trials{cond, 11};
                     dur = block_trials{cond, 12};
-                    if isempty(frame_rate)
-                        frame_rate = 0;
-                    end
                      
-                    %Update panel_com-----------------------------
+                    %Update controller-----------------------------
 
                     
                     if ~isempty(block_trials{cond,10})
-                        Panel_com('set_gain_bias', [gain, offset]);
+                        ctlr.setGain(gain, offset);
                     end
 
                     if frame_ind == 0
                         frame_ind = randperm(p.num_block_frames(c),1);
                     end
 
-                    Panel_com('set_position_x', frame_ind);
+                    ctlr.setPositionX(frame_ind);
                    
                     
                     %Update status panel to show current parameters
@@ -391,26 +394,32 @@ end
                       trial_ao_indices, frame_ind, frame_rate, gain, offset, dur);
             
  
-                    pause(0.01)
                     
                     %Run block trial--------------------------------------
-                    Panel_com('combined_command',[trial_mode, pat_id, pos_id, trial_ao_indices(1), trial_ao_indices(2), trial_ao_indices(3), trial_ao_indices(4),frame_rate, dur]);
+                    ctlr.combinedCommand(trial_mode, pat_id, pos_id, trial_ao_indices(1), trial_ao_indices(2), trial_ao_indices(3), trial_ao_indices(4),frame_rate, dur*10);
 
-                    
-%                     Panel_com('start_display', dur); %duration expected in 100ms units
-                    pause(dur + .01)
+                    runcon.update_progress('block', r, reps, c, num_cond, cond, num_trial_of_total);
 
                     isAborted = runcon.check_if_aborted();
                     if isAborted == 1
-                        Panel_com('stop_display');
-                        Panel_com('stop_log');
-                        pause(1);
-                        disconnectHost;
+                       ctlr.stopDisplay();
+                        log_stopped = ctlr.stopLog();
+                        if ~log_stopped
+                            disp("Log failed to stop. Retrying...");
+                            log_stopped = ctlr.stopLog();
+                            if ~log_stopped
+                                disp("Log failed to stop. Please stop manually.");
+                            end
+                        end
+                        if isa(ctlr, 'PanelsController')
+                            ctlr.close();
+                        end
+                        clear global;
                         success = 0;
                         return;
                   
                     end
-                    runcon.update_elapsed_time(round(toc,2));
+                    runcon.update_elapsed_time(round(toc(startTime),2));
                     
                     %Tells loop to skip the intertrial if this is the last iteration of the last rep
                     if r == reps && c == num_cond
@@ -435,10 +444,10 @@ end
                         if inter_frame_ind == 0
                             inter_frame_ind = randperm(p.num_intertrial_frames, 1);
                         end
-                        Panel_com('set_position_x',inter_frame_ind);
+                        ctlr.setPositionX(inter_frame_ind);
 
                          if ~isempty(inter_gain) %this assumes you'll never have gain without offset
-                             Panel_com('set_gain_bias', [inter_gain, inter_offset]);
+                             ctlr.setGain(inter_gain, inter_offset);
                          end
                          
                           %Update status panel to show current parameters
@@ -447,23 +456,29 @@ end
                         
                          pause(0.01);
                          
-                         Panel_com('combined_command',[inter_mode, inter_pat, inter_pos, inter_ao_ind(1), inter_ao_ind(2), inter_ao_ind(3), inter_ao_ind(4),inter_frame_rate, inter_dur]);
+                         ctlr.combinedCommand(inter_mode, inter_pat, inter_pos, inter_ao_ind(1), inter_ao_ind(2), inter_ao_ind(3), inter_ao_ind(4),inter_frame_rate, inter_dur*10);
                     
-                         %Panel_com('start_display', inter_dur);
-                         pause(inter_dur + .01);
 
                          if runcon.check_if_aborted() == 1
-                             Panel_com('stop_display');
-                             pause(.1);
-                            Panel_com('stop_log');
-                            pause(1);
-                            disconnectHost;
+                            ctlr.stopDisplay();
+                            log_stopped = ctlr.stopLog();
+                            if ~log_stopped
+                                disp("Log failed to stop. Retrying...");
+                                log_stopped = ctlr.stopLog();
+                                if ~log_stopped
+                                    disp("Log failed to stop. Please stop manually.");
+                                end
+                            end
+                            if isa(ctlr, 'PanelsController')
+                                ctlr.close();
+                            end
+                            clear global;
                             success = 0;
                             return;
                          
                          end
                          
-                         runcon.update_elapsed_time(round(toc,2));
+                         runcon.update_elapsed_time(round(toc(startTime),2));
                          
                     end 
                  end
@@ -478,50 +493,59 @@ end
                 runcon.update_progress('post', num_trial_of_total);
 
                  if ~isempty(post_gain)
-                     Panel_com('set_gain_bias', [post_gain, post_offset]);
+                     ctlr.setGain(post_gain, post_offset);
                  end
 
                  if post_frame_ind == 0
                      post_frame_ind = randperm(p.num_posttrial_frames, 1);
                  end
                      
-                 Panel_com('set_position_x',post_frame_ind);
+                 ctlr.setPositionX(post_frame_ind);
                  
                   %Update status panel to show current parameters
                  runcon.update_current_trial_parameters(post_mode, post_pat, post_pos, p.active_ao_channels, ...
                      post_ao_ind, post_frame_ind, post_frame_rate, post_gain, post_offset, post_dur);
   
-                 Panel_com('combined_command',[post_mode, post_pat, post_pos, post_ao_ind(1), post_ao_ind(2), post_ao_ind(3), post_ao_ind(4),post_frame_rate, post_dur]);
+                 ctlr.combinedCommand(post_mode, post_pat, post_pos, post_ao_ind(1), post_ao_ind(2), post_ao_ind(3), post_ao_ind(4),post_frame_rate, post_dur*10);
 
                  pause(post_dur+.01);
 
                  
                  if runcon.check_if_aborted() == 1
-                     Panel_com('stop_display');
-                     pause(.1);
-                    Panel_com('stop_log');
-                    pause(1);
-                    disconnectHost;
+                    ctlr.stopDisplay();
+                    log_stopped = ctlr.stopLog();
+                    if ~log_stopped
+                        disp("Log failed to stop. Retrying...");
+                        log_stopped = ctlr.stopLog();
+                        if ~log_stopped
+                            disp("Log failed to stop. Please stop manually.");
+                        end
+                    end
+                    if isa(ctlr, 'PanelsController')
+                        ctlr.close();
+                    end
+                    clear global;
                     success = 0;
                     return;
                  
                  end
-                 runcon.update_elapsed_time(round(toc,2));
+                 runcon.update_elapsed_time(round(toc(startTime),2));
                  
             end
 
-            %Panel_com('stop_log');
-            stop_log_response = send_tcp( char([1 hex2dec('40')]), 1);
-            if stop_log_response.success == 1
+            ctlr.stopDisplay();
+             log_stopped = ctlr.stopLog();
+            if ~log_stopped
                 waitfor(errordlg("Stop Log command failed, please stop log manually then hit a key"));
                 waitforbuttonpress;
-            end
-            Panel_com('stop_display');
-            pause(1);          
+            end         
+ 
 
-            disconnectHost;
-            
-            pause(1);
+             if isa(ctlr, 'PanelsController')
+                ctlr.close();
+            end
+            clear global;
+
             success = 1;
 
      end
