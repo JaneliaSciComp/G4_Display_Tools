@@ -47,7 +47,7 @@
  %p.active_ao_channels lists the channels that are active - [0 2 3] for
  %example means channels 1, 3, and 4 are active.
 
-function [success] = G4_run_protocol_combinedCommand(runcon, p)%input should always be 1 or 2 items
+ function [success] = G4_run_protocol_CC_streaming(runcon, p)%input should always be 1 or 2 items
 
 %% Get access to the figure and progress bar in the run gui IF it was passed in.
 global ctlr;
