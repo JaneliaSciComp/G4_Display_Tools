@@ -24,7 +24,8 @@ classdef G4_conductor_view < handle
         plotting_textbox_
         processing_checkbox_
         processing_textbox_
-        run_textbox_
+%         run_textbox_
+        run_dropDown_
         num_attempts_textbox_
         current_running_trial_
         browse_button_plotting_
@@ -80,7 +81,8 @@ classdef G4_conductor_view < handle
         plotting_textbox
         processing_checkbox
         processing_textbox
-        run_textbox
+       % run_textbox
+        run_dropDown
         num_attempts_textbox
         current_running_trial
         browse_button_plotting
@@ -419,10 +421,10 @@ classdef G4_conductor_view < handle
             
             run_filename_label = uicontrol(settings_pan, 'Style', 'text', 'String', 'Run Protocol:', ...
                 'HorizontalAlignment', 'left', 'units', 'pixels', 'Position', [10, 45, 105, 15]);
-            self.run_textbox = uicontrol(settings_pan, 'Style', 'edit', 'units', 'pixels', ...
-                'String', self.con.model.run_protocol_file, 'Position', [80, 45, 200, 18]);
-            self.browse_button_run = uicontrol(settings_pan, 'Style', 'pushbutton', 'units', 'pixels', ...
-                'String', 'Browse', 'Position', [285, 45, 65, 18], 'Callback', @self.run_browse);
+            self.run_dropDown = uicontrol(settings_pan, 'Style', 'popupmenu', 'String', ...
+                self.con.model.run_protocol_file_list, 'Position', [80, 45, 200, 18], ...
+                'Callback', @self.select_run);
+
 
             num_attempts_label = uicontrol(settings_pan, 'Style', 'text', 'String', ...
                 'Number times to re-attempt bad trials:', 'HorizontalAlignment','left', ...
@@ -457,7 +459,7 @@ classdef G4_conductor_view < handle
             self.processing_textbox.String = self.con.model.processing_file;
             self.num_attempts_textbox.String = self.con.get_num_attempts();
             self.exp_type_menu.Value = self.con.model.experiment_type;
-            self.run_textbox.String = self.con.model.run_protocol_file;
+            self.run_dropDown.Value = self.con.model.run_protocol_num;
             self.set_expected_time();
             self.set_elapsed_time();
             self.set_remaining_time();
@@ -653,6 +655,12 @@ classdef G4_conductor_view < handle
             
         end
 
+        function select_run(self, src, ~)
+            
+            self.con.update_run_file(src.Value);
+
+        end
+
         
         function update_progress_bar(self, trial_type, data, varargin)
 
@@ -837,8 +845,8 @@ classdef G4_conductor_view < handle
             value = self.axes_label_;
         end
         
-        function value = get.run_textbox(self)
-            value = self.run_textbox_;
+        function value = get.run_dropDown(self)
+            value = self.run_dropDown_;
         end
         
         function value = get.current_running_trial(self)
@@ -952,6 +960,8 @@ classdef G4_conductor_view < handle
         function value = get.num_attempts_textbox(self)
             value = self.num_attempts_textbox_;
         end
+
+      
         
         %% Setters
         
@@ -1033,8 +1043,8 @@ classdef G4_conductor_view < handle
             self.axes_label_ = value;
         end
         
-        function set.run_textbox(self, value)
-            self.run_textbox_ = value;
+        function set.run_dropDown(self, value)
+            self.run_dropDown_ = value;
         end
         
         function set.current_running_trial(self, value)

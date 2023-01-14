@@ -198,6 +198,12 @@ classdef G4_conductor_controller < handle
             end
 
         end
+
+        function update_run_file(self, dd_index)
+            
+            self.model.set_run_file(dd_index);
+
+        end
         
         function update_experiment_type(self, new_val)
             
@@ -632,15 +638,15 @@ classdef G4_conductor_controller < handle
                 return;
             end
             
-            %Make sure the run file entered exists
-            if ~isfile(self.model.run_protocol_file)
-                if ~isempty(self.view)
-                    self.create_error_box("Please make sure you've entered a valid .m file to run the experiment.");
-                else
-                    disp('Failed: The run protocol is not a valid .m file.');
-                end
-                return;
-            end
+%             %Make sure the run file entered exists
+%             if ~isfile(self.model.run_protocol_file)
+%                 if ~isempty(self.view)
+%                     self.create_error_box("Please make sure you've entered a valid .m file to run the experiment.");
+%                 else
+%                     disp('Failed: The run protocol is not a valid .m file.');
+%                 end
+%                 return;
+%             end
             
             %Check if the date folder exists - if not, create it.            
             if ~exist(fullfile(experiment_folder, self.model.date_folder),'dir')

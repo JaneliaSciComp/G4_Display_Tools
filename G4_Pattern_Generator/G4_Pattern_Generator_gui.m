@@ -1123,7 +1123,8 @@ function pushbutton10_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 [filename, handles.save_dir] = uigetfile('*.mat');
-load(fullfile(handles.save_dir,filename));
+loaded_vars = load(fullfile(handles.save_dir,filename));
+pattern = loaded_vars.pattern;
 
 handles.param.ID = str2double(filename(end-10:end-7)); %get ID
 handles.patName = filename(1:end-11); %remove ID and filetype from name

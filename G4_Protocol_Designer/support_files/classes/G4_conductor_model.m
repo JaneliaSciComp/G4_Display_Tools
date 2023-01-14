@@ -18,6 +18,9 @@ classdef G4_conductor_model < handle
         plotting_file_;
         processing_file_;
         run_protocol_file_;
+        run_protocol_file_desc_
+        run_protocol_file_list_
+        run_protocol_num_
         google_sheet_key_;
         list_of_gids_;
         metadata_array_
@@ -54,6 +57,9 @@ classdef G4_conductor_model < handle
         plotting_file;
         processing_file;
         run_protocol_file;
+        run_protocol_file_desc
+        run_protocol_file_list
+        run_protocol_num
         google_sheet_key;
         list_of_gids
         metadata_array
@@ -102,6 +108,10 @@ classdef G4_conductor_model < handle
                 self.list_of_gids{i} = strtrim(settings_data{path}(index:end));
             end
 
+            %The list of available run protocols to display
+            self.run_protocol_file_list = {'Simple', 'Combined Command', 'Streaming', 'Log Reps Separately', 'CC + Streaming', ...
+                'CC + Log Reps', 'Streaming + Log Reps', 'CC + Streaming + Log Reps'};
+
             %%run functions to 1)read the metadata options from the google
             %%sheet and 2) create a metadata_lists cell array with the list
             %%of options for each metadata field. 
@@ -128,6 +138,8 @@ classdef G4_conductor_model < handle
             self.date_folder = datestr(now, 'mm_dd_yyyy');
             self.timestamp = datestr(now, 'mm-dd-yyyyHH_MM_SS');
             self.num_attempts_bad_conds = 1;
+            self.run_protocol_num = 1;
+            
 
             self.postTrialTimes = [];
  
@@ -196,6 +208,51 @@ classdef G4_conductor_model < handle
                 end
             end  
         end
+
+        function filename = get_run_filename(self)
+            
+            switch self.run_protocol_num
+
+                case 1
+
+                    filename = 'G4_default_run_protocol.m';
+
+                case 2 
+
+                    filename = 'G4_run_protocol_combinedCommand.m';
+
+                case 3
+
+                    filename = 'G4_default_run_protocol_streaming.m';
+
+                case 4
+
+                    filename = '';
+                    disp("This run protocol coming soon");
+
+                case 5
+
+                    filename = 'G4_run_protocol_CC_streaming.m';
+
+                case 6
+
+                    filename = 'G4_run_protocol_CC_blockLogging.m';
+
+                case 7
+
+                    filename = '';
+                    disp("This run protocol coming soon");
+
+                case 8
+
+                    filename = '';
+                    disp("This run protocol coming soon");
+
+                otherwise
+                    disp("Invalid run protocol selected.");
+            end
+
+        end
         
         %% Functions to update model values
         
@@ -237,8 +294,11 @@ classdef G4_conductor_model < handle
             self.processing_file = filepath;
         end
         
-        function set_run_file(self, filepath)
-            self.run_protocol_file = filepath;
+        function set_run_file(self, list_index)
+            self.run_protocol_num = list_index;
+            self.run_protocol_file_desc = self.run_protocol_file_list{list_index};
+            filename = self.get_run_filename();
+            self.run_protocol_file = filename;
         end
         
         function set_experiment_type(self, new_val)
@@ -293,7 +353,6 @@ classdef G4_conductor_model < handle
         function set_postTrialTimes(self, new_val)
             self.postTrialTimes = new_val;
         end
-       
         
         function value = get_num_attempts_bad_conds(self)
             value = self.num_attempts_bad_conds;
@@ -341,6 +400,18 @@ classdef G4_conductor_model < handle
         
         function value = get.run_protocol_file(self)
             value = self.run_protocol_file_;
+        end
+
+        function value = get.run_protocol_file_list(self)
+            value = self.run_protocol_file_list_;
+        end
+
+        function value = get.run_protocol_file_desc(self)
+            value = self.run_protocol_file_desc_;
+        end
+
+        function value = get.run_protocol_num(self)
+            value = self.run_protocol_num_;
         end
         
         function value = get.fly_age(self)
@@ -450,6 +521,19 @@ classdef G4_conductor_model < handle
         function set.run_protocol_file(self, value)
             self.run_protocol_file_ = value;
         end
+
+        function set.run_protocol_file_list(self, value)
+            self.run_protocol_file_list_ = value;
+        end
+
+        function set.run_protocol_file_desc(self, value)
+            self.run_protocol_file_desc_ = value;
+        end
+
+        function set.run_protocol_num(self, value)
+            self.run_protocol_num_ = value;
+        end
+
         function set.fly_age(self, value)
             self.fly_age_ = value;
         end
