@@ -28,6 +28,10 @@ function create_processing_settings()
     
     %% Wing Beat Frequency Settings
     
+    settings.remove_nonflying_trials = 1; %1 if you want trials where the fly 
+    %                                       didn't fly to be marked as bad and removed.
+                                            % 0 if you don't want this
+                                            % feature turned on.
     settings.wbf_range = [160 260]; %Minimum and maximum acceptable wing beat frequencies
     settings.wbf_cutoff = .2; %Maximum acceptable portion of a condition where the fly is not flying
     settings.wbf_end_percent = .8; %If a fly is not flying for more than the above acceptable portion of a condition,

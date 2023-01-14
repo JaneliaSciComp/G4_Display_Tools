@@ -58,6 +58,12 @@ function process_data(exp_folder, processing_settings_file)
     wbf_cutoff = s.settings.wbf_cutoff;
     wbf_end_percent = s.settings.wbf_end_percent;
 
+    if isfield(s.settings, 'remove_nonflying_trials')
+        remove_nonflying_trials = s.settings.remove_nonflying_trials;
+    else
+        remove_nonflying_trials = 1;
+    end
+
     if isfield(s.settings, 'duration_diff_limit')
         duration_diff_limit = s.settings.duration_diff_limit;
     else
@@ -168,8 +174,13 @@ function process_data(exp_folder, processing_settings_file)
     [bad_duration_conds, bad_duration_intertrials] = check_condition_durations(cond_dur, intertrial_durs, path_to_protocol, duration_diff_limit);
     [bad_slope_conds] = check_flat_conditions(trial_start_times, trial_stop_times, Log, num_reps, num_conds, exp_order);
     [bad_crossCorr_conds] = check_correlation(trial_start_times, trial_stop_times, exp_order, Log, cond_modes);
-    [bad_WBF_conds, wbf_data] = find_bad_wbf_trials(Log, ts_data, wbf_range, wbf_cutoff, ...
-    wbf_end_percent, trial_start_times, trial_stop_times, num_conds, num_reps, exp_order);
+
+    if remove_nonflying_trials
+        [bad_WBF_conds, wbf_data] = find_bad_wbf_trials(Log, ts_data, wbf_range, wbf_cutoff, ...
+        wbf_end_percent, trial_start_times, trial_stop_times, num_conds, num_reps, exp_order);
+    else
+        bad_WBF_conds = [];
+    end
 
 
     %check condition durations and control modes for experiment errors
