@@ -61,86 +61,9 @@ end
 
 
  %% Set up parameters 
- %pretrial params-----------------------------------------------------
-     if isempty(p.pretrial{1}) %no need to set up pretrial params
-         pre_start = 0;
-     else %set up pretrial params here
-         pre_start = 1;
-         pre_mode = p.pretrial{1};
-         pre_pat = p.pretrial_pat_index;
-         pre_pos = p.pretrial_pos_index;
-         pre_ao_ind = p.pretrial_ao_indices;
+ params = assign_parameters(p);
 
-         if isempty(p.pretrial{8})
-             pre_frame_ind = 1;
-         elseif strcmp(p.pretrial{8},'r')
-             pre_frame_ind = 0; %use this later to randomize
-         else
-             pre_frame_ind = str2num(p.pretrial{8});
-         end
 
-         pre_frame_rate = p.pretrial{9};
-         pre_gain = p.pretrial{10};
-         pre_offset = p.pretrial{11};
-         pre_dur = p.pretrial{12};
-     end
- 
- %intertrial params---------------------------------------------------
- 
-     if isempty(p.intertrial{1})
-         inter_type = 0;%indicates whether or not there is an intertrial
-     else
-         inter_type = 1;
-         inter_mode = p.intertrial{1};
-         inter_pat = p.intertrial_pat_index;
-         inter_pos = p.intertrial_pos_index;
-         inter_ao_ind = p.intertrial_ao_indices;
-
-         if isempty(p.intertrial{8})
-             inter_frame_ind = 1;
-         elseif strcmp(p.intertrial{8},'r')
-             inter_frame_ind = 0; %use this later to randomize
-         else
-             inter_frame_ind = str2num(p.intertrial{8});
-         end
-
-         inter_frame_rate = p.intertrial{9};
-         inter_gain = p.intertrial{10};
-         inter_offset = p.intertrial{11};
-         inter_dur = p.intertrial{12};
-     end
- 
- %posttrial params------------------------------------------------------
-     if isempty(p.posttrial{1})
-         post_type = 0;%indicates whether or not there is a posttrial
-     else
-         post_type = 1;
-         post_mode = p.posttrial{1};
-         post_pat = p.posttrial_pat_index;
-         post_pos = p.posttrial_pos_index;
-         post_ao_ind = p.posttrial_ao_indices;
-
-         if isempty(p.posttrial{8})
-             post_frame_ind = 1;
-         elseif strcmp(p.posttrial{8},'r')
-             post_frame_ind = 0; %use this later to randomize
-         else
-             post_frame_ind = str2num(p.posttrial{8});
-         end
-
-         post_frame_rate = p.posttrial{9};
-         post_gain = p.posttrial{10};
-         post_offset = p.posttrial{11};
-         post_dur = p.posttrial{12};
-     end
- 
- %define static block trial params (will define the ones that change every
- %loop later)--------------------------------------------------------------
-     block_trials = p.block_trials; 
-     block_ao_indices = p.block_ao_indices;
-     reps = p.repetitions;
-     num_cond = length(block_trials(:,1)); %number of conditions
-     
  
  %% Start host and switch to correct directory
     if ~isempty(ctrl)
@@ -172,11 +95,8 @@ end
 
 %% set active ao channels
      if ~isempty(p.active_ao_channels)
-         aobits = 0;
-        for bit = p.active_ao_channels
-            aobits = bitset(aobits,bit+1); %plus 1 bc aochans are 0-3
-        end
-        ctlr.setActiveAOChannels(dec2bin(aobits,4));
+        
+        ctlr.setActiveAOChannels(dec2bin(params.aobits,4));
      end
 
 %% confirm start experiment
@@ -200,43 +120,12 @@ end
          
 %% Determine the total number of trials in order to define in what increments 
 %the progress bar will progress.-------------------------------------------
-            total_num_steps = 0; 
-            if pre_start == 1
-                total_num_steps = total_num_steps + 1;
-            end
-            if inter_type == 1
-                total_num_steps = total_num_steps + (reps*num_cond) - 1;
-                %Minus 1 because there is no intertrial before the first
-                %block trial OR after the last block trial.
-
-            end
-            if post_type == 1
-                total_num_steps = total_num_steps + 1;
-            end
-            total_num_steps = total_num_steps + (reps*num_cond);
-            %adds total number of block trials (not including intertrials)
+            total_num_steps = get_total_num_trials(params);
+            
 
 %% Determine how long the experiment will take and update the title of the 
 %progress bar to reflect it------------------------------------------------
-            total_time = 0; 
-            if inter_type == 1
-                for i = 1:num_cond
-                    total_time = total_time + p.block_trials{i,12} + inter_dur;
-                end
-                total_time = (total_time * reps) - inter_dur; %bc no intertrial before first rep OR after last rep of the block.
-            else %meaning no intertrial
-                for i = 1:num_cond
-                    total_time = total_time + p.block_trials{i,12};
-                end
-                total_time = total_time * reps;
-            end
-
-            if pre_start == 1
-                total_time = total_time + pre_dur;
-            end
-            if post_type == 1
-                total_time = total_time + post_dur;
-            end
+            total_time = get_total_experiment_length(params);
             
             %Update the progress bar's label to reflect the expected
             %duration.
@@ -271,48 +160,45 @@ end
 %% run pretrial if it exists----------------------------------------
 
              startTime = tic;
-             if pre_start == 1
+             if params.pre_start == 1
                  %First update the progress bar to show pretrial is running----
                  runcon.update_progress('pre');
                  num_trial_of_total = num_trial_of_total + 1;
 
                  %Set the panel values appropriately----------------
-                 ctlr.setControlMode(pre_mode);
-                 ctlr.setPatternID(pre_pat);
+                 ctlr.setControlMode(params.pre_mode);
+                 ctlr.setPatternID(params.pre_pat);
                     
-                 %randomize frame index if indicated
-                 if pre_frame_ind == 0
-                     pre_frame_ind = randperm(p.num_pretrial_frames, 1);  
-                 end
-                 
-                 ctlr.setPositionX(pre_frame_ind);
-                 if pre_pos ~= 0
-                     ctlr.setPatternFunctionID(pre_pos); 
+                 ctlr.setPositionX(params.pre_frame_ind);
+                 if params.pre_pos ~= 0
+                     ctlr.setPatternFunctionID(params.pre_pos); 
                  end
 
-                 if ~isempty(pre_gain) %this assumes you'll never have gain without offset
-                     ctlr.setGain(pre_gain, pre_offset);                     
+                 if ~isempty(params.pre_gain) %this assumes you'll never have gain without offset
+                     ctlr.setGain(params.pre_gain, params.pre_offset);                     
                  end
 
-                 if pre_mode == 2
-                     ctlr.setFrameRate(pre_frame_rate);         
+                 if params.pre_mode == 2
+                     ctlr.setFrameRate(params.pre_frame_rate);         
                  end
 
-                 for i = 1:length(pre_ao_ind)
-                     if pre_ao_ind(i) ~= 0 %if it is zero, there was no ao function for this channel
-                         ctlr.setAOFunctionID(p.active_ao_channels(i), pre_ao_ind(i));%[channel number, index of ao func]                    
+                 for i = 1:length(params.pre_ao_ind)
+                     if params.pre_ao_ind(i) ~= 0 %if it is zero, there was no ao function for this channel
+                         ctlr.setAOFunctionID(p.active_ao_channels(i), params.pre_ao_ind(i));%[channel number, index of ao func]                    
                      end
                  end
                  
                  %Update status panel to show current parameters
-                 runcon.update_current_trial_parameters(pre_mode, pre_pat, pre_pos, p.active_ao_channels, ...
-                    pre_ao_ind, pre_frame_ind, pre_frame_rate, pre_gain, pre_offset, pre_dur);
+                 runcon.update_current_trial_parameters(params.pre_mode, params.pre_pat, ...
+                     params.pre_pos, p.active_ao_channels, params.pre_ao_ind, ...
+                     params.pre_frame_ind, params.pre_frame_rate, params.pre_gain, ...
+                     params.pre_offset, params.pre_dur);
 
                  pause(0.01);
                  
                  %Run pretrial on screen
-                 if pre_dur ~= 0
-                    ctlr.startDisplay(pre_dur*10); %Panelcom usually did the *10 for us. Controller expects time in deciseconds
+                 if params.pre_dur ~= 0
+                    ctlr.startDisplay(params.pre_dur*10); %Panelcom usually did the *10 for us. Controller expects time in deciseconds
                  else
                      ctlr.startDisplay(2000, false); %second input, waitForEnd, equals false so code will continue executing
                      w = waitforbuttonpress; %If pretrial duration is set to zero, this
@@ -355,67 +241,45 @@ end
 
                     
                     %define parameters for this trial----------------
-                    trial_mode = block_trials{cond,1};
-                    pat_id = p.block_pat_indices(cond);
-                    pos_id = p.block_pos_indices(cond);
-                    if length(block_ao_indices) >= cond
-                        trial_ao_indices = block_ao_indices(cond,:);
-                    else
-                        trial_ao_indices = [];
-                    end
-                    %Set frame index
-                    if isempty(block_trials{cond,8})
-                        frame_ind = 1;
-                    elseif strcmp(block_trials{cond,8},'r')
-                        frame_ind = 0; %use this later to randomize
-                    else
-                       frame_ind = str2num(block_trials{cond,8});
-                    end
-                     
-                    frame_rate = block_trials{cond, 9};
-                    gain = block_trials{cond, 10};
-                    offset = block_trials{cond, 11};
-                    dur = block_trials{cond, 12};
+                    tparams = assign_block_trial_parameters(params, p, c);
                      
                      %Update controller-----------------------------
 
-                    ctlr.setControlMode(trial_mode);
-                    ctlr.setPatternID(pat_id);
+                    ctlr.setControlMode(tparams.trial_mode);
+                    ctlr.setPatternID(tparams.pat_id);
                     
-                    if ~isempty(block_trials{cond,10})
-                        ctlr.setGain(gain, offset);
+                    if ~isempty(params.block_trials{cond,10})
+                        ctlr.setGain(tparams.gain, tparams.offset);
                     end
-                    if pos_id ~= 0
+                    if tparams.pos_id ~= 0
 
-                       ctlr.setPatternFunctionID(pos_id);
+                       ctlr.setPatternFunctionID(tparams.pos_id);
                         
                     end
-                    if trial_mode == 2
-                        ctlr.setFrameRate(frame_rate);
+                    if tparams.trial_mode == 2
+                        ctlr.setFrameRate(tparams.frame_rate);
                     end
-                    
-                    if frame_ind == 0
-                        frame_ind = randperm(p.num_block_frames(c),1);
-                    end
-
-                    ctlr.setPositionX(frame_ind);
+                   
+                    ctlr.setPositionX(tparams.frame_ind);
                     
                     for i = 1:length(p.active_ao_channels)
-                        ctlr.setAOFunctionID(p.active_ao_channels(i), trial_ao_indices(i));  
+                        ctlr.setAOFunctionID(p.active_ao_channels(i), tparams.trial_ao_indices(i));  
                     end                                      
  
                     pause(0.01)
 
                     %Update status panel to show current parameters
-                    runcon.update_current_trial_parameters(trial_mode, pat_id, pos_id, p.active_ao_channels, ...
-                      trial_ao_indices, frame_ind, frame_rate, gain, offset, dur);
+                    runcon.update_current_trial_parameters(tparams.trial_mode, ...
+                        tparams.pat_id, tparams.pos_id, p.active_ao_channels, ...
+                      tparams.trial_ao_indices, tparams.frame_ind, tparams.frame_rate, ...
+                      tparams.gain, tparams.offset, tparams.dur);
                     
                     %Run block trial--------------------------------------
 
-                    ctlr.startDisplay((dur + .5)*10); %duration expected in 100ms units
+                    ctlr.startDisplay((tparams.dur + .5)*10); %duration expected in 100ms units
                     
                     %Update the progress bar--------------------------
-                    runcon.update_progress('block', r, reps, c, num_cond, cond, num_trial_of_total);
+                    runcon.update_progress('block', r, params.reps, c, params.num_cond, cond, num_trial_of_total);
  
                     isAborted = runcon.check_if_aborted();
                     if isAborted == 1
@@ -439,47 +303,47 @@ end
                     runcon.update_elapsed_time(round(toc(startTime),2));
                     
                     %Tells loop to skip the intertrial if this is the last iteration of the last rep
-                    if r == reps && c == num_cond
+                    if r == params.reps && c == params.num_cond
    
                         continue 
                     end
                     
         %Run inter-trial assuming there is one-------------------------
-                    if inter_type == 1
+                    if params.inter_type == 1
                     
                         %Update progress bar to indicate start of inter-trial
                         num_trial_of_total = num_trial_of_total + 1;
-                        runcon.update_progress('inter', r, reps, c, num_cond, num_trial_of_total)
-                        progress_axes.Title.String = "Rep " + r + " of " + reps +...
-                            ", Trial " + c + " of " + num_cond + ". Inter-trial running...";
+                        runcon.update_progress('inter', r, params.reps, c, params.num_cond, num_trial_of_total)
+                        progress_axes.Title.String = "Rep " + r + " of " + params.reps +...
+                            ", Trial " + c + " of " + params.num_cond + ". Inter-trial running...";
                         progress_bar.YData = num_trial_of_total/total_num_steps;
                         drawnow;
 
                         %Run intertrial-------------------------
-                        ctlr.setControlMode(inter_mode);
-                        ctlr.setPatternID(inter_pat);
+                        ctlr.setControlMode(params.inter_mode);
+                        ctlr.setPatternID(params.inter_pat);
                        
                         %randomize frame index if indicated
-                        if inter_frame_ind == 0
-                            inter_frame_ind = randperm(p.num_intertrial_frames, 1);
+                        if params.inter_frame_ind == 0
+                            params.inter_frame_ind = randperm(p.num_intertrial_frames, 1);
                         end
-                        ctlr.setPositionX(inter_frame_ind);
+                        ctlr.setPositionX(params.inter_frame_ind);
 
-                        if inter_pos ~= 0
-                            ctlr.setPatternFunctionID(inter_pos);
+                        if params.inter_pos ~= 0
+                            ctlr.setPatternFunctionID(params.inter_pos);
                         end
 
-                         if ~isempty(inter_gain) %this assumes you'll never have gain without offset
-                             ctlr.setGain(inter_gain, inter_offset);
+                         if ~isempty(params.inter_gain) %this assumes you'll never have gain without offset
+                             ctlr.setGain(params.inter_gain, params.inter_offset);
                          end
 
-                         if inter_mode == 2
-                             ctlr.setFrameRate(inter_frame_rate);
+                         if params.inter_mode == 2
+                             ctlr.setFrameRate(params.inter_frame_rate);
                          end
 
-                         for i = 1:length(inter_ao_ind)
-                             if inter_ao_ind(i) ~= 0 %if it is zero, there was no ao function for this channel
-                                 ctlr.setAOFunctionID(p.active_ao_channels(i), inter_ao_ind(i));%[channel number, index of ao func]
+                         for i = 1:length(params.inter_ao_ind)
+                             if params.inter_ao_ind(i) ~= 0 %if it is zero, there was no ao function for this channel
+                                 ctlr.setAOFunctionID(p.active_ao_channels(i), params.inter_ao_ind(i));%[channel number, index of ao func]
                                  
                              end
                          end
@@ -487,11 +351,13 @@ end
                          
                          
                           %Update status panel to show current parameters
-                        runcon.update_current_trial_parameters(inter_mode, inter_pat, inter_pos, p.active_ao_channels, ...
-                            inter_ao_ind, inter_frame_ind, inter_frame_rate, inter_gain, inter_offset, inter_dur);
+                        runcon.update_current_trial_parameters(params.inter_mode, ...
+                            params.inter_pat, params.inter_pos, p.active_ao_channels, ...
+                            params.inter_ao_ind, params.inter_frame_ind, params.inter_frame_rate,...
+                            params.inter_gain, params.inter_offset, params.inter_dur);
                         
                          pause(0.01);
-                         ctlr.startDisplay((inter_dur + .5)*10);
+                         ctlr.startDisplay((params.inter_dur + .5)*10);
                          
                          if runcon.check_if_aborted() == 1
                             ctlr.stopDisplay();
@@ -520,46 +386,46 @@ end
              
 %% Run post-trial if there is one--------------------------------------------
 
-            if post_type == 1
+            if params.post_type == 1
                 
                 %Update progress bar--------------------------
                 num_trial_of_total = num_trial_of_total + 1;
                 runcon.update_progress('post', num_trial_of_total);
 
 
-                 ctlr.setControlMode(post_mode);
+                 ctlr.setControlMode(params.post_mode);
                  
-                 ctlr.setPatternID(post_pat);
+                 ctlr.setPatternID(params.post_pat);
                  
-                 if ~isempty(post_gain)
-                     ctlr.setGain(post_gain, post_offset);
+                 if ~isempty(params.post_gain)
+                     ctlr.setGain(params.post_gain, params.post_offset);
                  end
-                 if post_pos ~= 0
-                     ctlr.setPatternFunctionID(post_pos);
+                 if params.post_pos ~= 0
+                     ctlr.setPatternFunctionID(params.post_pos);
                      
                  end
-                 if post_mode == 2
-                      ctlr.setFrameRate(post_frame_rate);
+                 if params.post_mode == 2
+                      ctlr.setFrameRate(params.post_frame_rate);
                  end
-                 if post_frame_ind == 0
-                     post_frame_ind = randperm(p.num_posttrial_frames, 1);
-                 end
+                
                      
-                 ctlr.setPositionX(post_frame_ind);
+                 ctlr.setPositionX(params.post_frame_ind);
                  
-                 for i = 1:length(post_ao_ind)
-                     if post_ao_ind(i) ~= 0 %if it is zero, there was no ao function for this channel
-                         ctlr.setAOFunctionID(p.active_ao_channels(i), post_ao_ind(i));%[channel number, index of ao func]
+                 for i = 1:length(params.post_ao_ind)
+                     if params.post_ao_ind(i) ~= 0 %if it is zero, there was no ao function for this channel
+                         ctlr.setAOFunctionID(p.active_ao_channels(i), params.post_ao_ind(i));%[channel number, index of ao func]
                          
                      end
                  end
                  
                   %Update status panel to show current parameters
-                 runcon.update_current_trial_parameters(post_mode, post_pat, post_pos, p.active_ao_channels, ...
-                     post_ao_ind, post_frame_ind, post_frame_rate, post_gain, post_offset, post_dur);
+                 runcon.update_current_trial_parameters(params.post_mode, ...
+                     params.post_pat, params.post_pos, p.active_ao_channels, ...
+                     params.post_ao_ind, params.post_frame_ind, params.post_frame_rate, ...
+                     params.post_gain, params.post_offset, params.post_dur);
                 
 
-                 ctlr.startDisplay((post_dur + .5)*10);
+                 ctlr.startDisplay((params.post_dur + .5)*10);
                  
                 if runcon.check_if_aborted() == 1
                     ctlr.stopDisplay();
