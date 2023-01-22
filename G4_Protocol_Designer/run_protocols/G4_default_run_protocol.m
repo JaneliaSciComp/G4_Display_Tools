@@ -50,7 +50,7 @@
 function [success] = G4_default_run_protocol(runcon, p)%input should always be 1 or 2 items
 
 %% Get access to the figure and progress bar in the run gui IF it was passed in.
-global ctrl;
+global ctlr;
 
 %        fig = runcon.fig;
 if ~isempty(runcon.view)
@@ -62,11 +62,14 @@ end
 
  %% Set up parameters 
  params = assign_parameters(p);
+ ctlr_parameters_intertrial = {params.inter_mode, params.inter_pat, params.inter_gain, ...
+                            params.inter_offset, params.inter_pos, params.inter_frame_rate, params.inter_frame_ind, ...
+                            p.active_ao_channels, params.inter_ao_ind};
 
  %% Start host and switch to correct directory
-    if ~isempty(ctrl)
-        if ctrl.isOpen() == 1
-           ctrl.close()
+    if ~isempty(ctlr)
+        if ctlr.isOpen() == 1
+           ctlr.close()
         end
     end
 
@@ -264,9 +267,10 @@ end
                         progress_bar.YData = num_trial_of_total/total_num_steps;
                         drawnow;
 
-                        ctlr_parameters_intertrial = {params.inter_mode, params.inter_pat, params.inter_gain, ...
-                            params.inter_offset, params.inter_pos, params.inter_frame_rate, params.inter_frame_ind, ...
-                            p.active_ao_channels, params.inter_ao_ind};
+                        if params.inter_frame_ind == 0
+                            inter_frame_ind = randperm(p.num_intertrial_frames,1);
+                            ctlr_parameters_intertrial{7} = inter_frame_ind;
+                        end
 
                         set_controller_parameters(ctlr_parameters_intertrial);
 

@@ -104,8 +104,16 @@ end
  block_ao_indices = params.block_ao_indices;
  reps = params.reps;
  num_cond = params.num_cond;
+ active_ao_channels = params.active_ao_channels;
 
  aobits = params.aobits;
+
+ ctlr_parameters_pretrial = {pre_mode, pre_pat, pre_gain, pre_offset, ...
+     pre_pos, pre_frame_rate, pre_frame_ind, active_ao_channels, pre_ao_ind};
+ ctlr_parameters_intertrial = {inter_mode, inter_pat, inter_gain, inter_offset, ...
+     inter_pos, inter_frame_rate, inter_frame_ind, active_ao_channels, inter_ao_ind};
+ ctlr_parameters_posttrial = {post_mode, post_pat, post_gain, post_offset, ...
+      post_pos, post_frame_rate, post_frame_ind, active_ao_channels, post_ao_ind};
 
 % Get input channels that are active for streaming
     
@@ -125,17 +133,7 @@ end
     ctlr.open(true);
 
     %% Check tcp connection was successful.
-    if ctlr.tcpConn == -1
-        system('"C:\Program Files (x86)\HHMI G4\G4 Host" &');
-        status = 1;
-        while status~=0
-            [status, ~] = system('tasklist | find /I "G4 Host.exe"');
-            pause(0.1);
-        end
-        ctlr = PanelsController();
-        ctlr.mode = 0;
-        ctlr.open();
-    end
+    check_successful_tcp();
 
     %% Set root directory to the experiment folder
     ctlr.setRootDirectory(p.experiment_folder);
@@ -194,12 +192,7 @@ end
 
              log_started = ctlr.startLog();
              if ~log_started
-                 disp("Log failed to start, retrying...");
-                 log_started = ctlr.startLog();
-                 if ~log_started
-                     disp("Log failed a second time, aborting experiment.");
-                     runcon.abort_experiment();
-                 end
+                log_started = log_start_fail(runcon);
              end
              if runcon.check_if_aborted()
                 
@@ -222,53 +215,9 @@ end
                  runcon.update_progress('pre');
                  num_trial_of_total = num_trial_of_total + 1;
 
-                %Set the panel values appropriately----------------
-                 
-                 %Set the panel values appropriately----------------
-                 ctlr.setControlMode(pre_mode);
-                
-                 if pre_mode == 3 %For some reason, mode 3 specifically screws up the run, making subsequent trials glitch. 
-                     pause(.1); %A pause is unnecessary with other modes but seems necessary with mode 3. Will investigate further.
-                 end
-                 
-                 ctlr.setPatternID(pre_pat);
-                 if pre_mode == 3
-                     pause(.1);
-                 end
-                    
-                 %randomize frame index if indicated
-                 if pre_frame_ind == 0
-                     pre_frame_ind = randperm(p.num_pretrial_frames, 1);
-                     
-                 end
-                 
-                 ctlr.setPositionX(pre_frame_ind);
-                 if pre_mode == 3
-                     pause(.1);
-                 end
-                 
+                %Set the controller values appropriately----------------
 
-                 if pre_pos ~= 0
-                     ctlr.setPatternFunctionID(pre_pos);  
-                     
-                 end
-
-                 if ~isempty(pre_gain) %this assumes you'll never have gain without offset
-                     ctlr.setGain(pre_gain, pre_offset); 
-                     
-                 end
-
-                 if pre_mode == 2
-                     ctlr.setFrameRate(pre_frame_rate);  
-                     
-                 end
-
-                 for i = 1:length(pre_ao_ind)
-                     if pre_ao_ind(i) ~= 0 %if it is zero, there was no ao function for this channel
-                         ctlr.setAOFunctionID(p.active_ao_channels(i), pre_ao_ind(i));%[channel number, index of ao func]
-                        
-                     end
-                 end
+                 set_controller_parameters(ctlr_parameters_pretrial);
                  
                  %Update status panel to show current parameters
                  runcon.update_current_trial_parameters(pre_mode, pre_pat, pre_pos, p.active_ao_channels, ...
@@ -296,11 +245,7 @@ end
                 ctlr.stopDisplay();
                 log_stopped = ctlr.stopLog();
                 if ~log_stopped
-                    disp("Log failed to stop. Retrying...");
-                    log_stopped = ctlr.stopLog();
-                    if ~log_stopped
-                        disp("Log failed to stop. Please stop manually.");
-                    end
+                    log_stopped = log_stop_fail();
                 end
                 if isa(ctlr, 'PanelsController')
                     ctlr.close();
@@ -321,75 +266,35 @@ end
                  for c = 1:num_cond
                     %define which condition we're using
                     cond = p.exp_order(r,c);
-                    
-                    
                     num_trial_of_total = num_trial_of_total + 1;
                     
-
-                    
                     %define parameters for this trial----------------
-                    trial_mode = block_trials{cond,1};
-                    pat_id = p.block_pat_indices(cond);
-                    pos_id = p.block_pos_indices(cond);
-                    if length(block_ao_indices) >= cond
-                        trial_ao_indices = block_ao_indices(cond,:);
-                    else
-                        trial_ao_indices = [];
-                    end
-                    %Set frame index
-                    if isempty(block_trials{cond,8})
-                        frame_ind = 1;
-                    elseif strcmp(block_trials{cond,8},'r')
-                        frame_ind = 0; %use this later to randomize
-                    else
-                       frame_ind = str2num(block_trials{cond,8});
-                    end
-                     
-                    frame_rate = block_trials{cond, 9};
-                    gain = block_trials{cond, 10};
-                    offset = block_trials{cond, 11};
-                    dur = block_trials{cond, 12};
+                    tparams = assign_block_trial_parameters(params, p, c);
                      
                      %Update controller-----------------------------
 
-                    ctlr.setControlMode(trial_mode);
-                    ctlr.setPatternID(pat_id);
-                    
-                    if ~isempty(block_trials{cond,10})
-                        ctlr.setGain(gain, offset);
-                    end
-                    if pos_id ~= 0
+                    ctlr_parameters = {tparams.trial_mode, tparams.pat_id, tparams.gain, ...
+                        tparams.offset, tparams.pos_id, tparams.frame_rate, tparams.frame_ind...
+                        tparams.active_ao_channels, tparams.trial_ao_indices};
 
-                       ctlr.setPatternFunctionID(pos_id);
-                        
-                    end
-                    if trial_mode == 2
-                        ctlr.setFrameRate(frame_rate);
-                    end
+                    set_controller_parameters(ctlr_parameters);
                     
-                    if frame_ind == 0
-                        frame_ind = randperm(p.num_block_frames(c),1);
-                    end
-
-                    ctlr.setPositionX(frame_ind);
-                    
-                    for i = 1:length(p.active_ao_channels)
-                        ctlr.setAOFunctionID(p.active_ao_channels(i), trial_ao_indices(i));  
-                    end                                      
-
-                    tcpread_cache = pnet(ctlr.tcpConn, 'read', 'noblock'); % clear cache
-                                        
+                    tcpread_cache = pnet(ctlr.tcpConn, 'read', 'noblock'); % clear cache                              
 
                     %Run block trial--------------------------------------
 
-                    ctlr.startDisplay((dur + .5)*10, false); %duration expected in 100ms units
+                    ctlr.startDisplay((tparams.dur + .5)*10, false); %duration expected in 100ms units
                     timeSinceTrial = tic;
                     
                     %Update the progress bar--------------------------
                     runcon.update_progress('block', r, reps, c, num_cond, cond, num_trial_of_total);
+
                     %Update status panel to show current parameters
-                    runcon.update_current_trial_parameters(trial_mode, pat_id, pos_id, p.active_ao_channels, ...
-                      trial_ao_indices, frame_ind, frame_rate, gain, offset, dur);
+                    runcon.update_current_trial_parameters(tparams.trial_mode, ...
+                        tparams.pat_id, tparams.pos_id, p.active_ao_channels, ...
+                      tparams.trial_ao_indices, tparams.frame_ind, tparams.frame_rate, ...
+                      tparams.gain, tparams.offset, tparams.dur);
+
                    % Update plots showing previous trials data-----------
                     if r ~= 1 || c ~= 1
                         if inter_type
@@ -399,7 +304,7 @@ end
                         end
                     end
                     %pause for however much time is left after doing updates
-                    pause(dur - toc(timeSinceTrial));
+                    pause(tparams.dur - toc(timeSinceTrial));
 
 
                     tcpread{end+1} = pnet(ctlr.tcpConn, 'read', 'noblock');
@@ -415,11 +320,7 @@ end
                         ctlr.stopDisplay();
                         log_stopped = ctlr.stopLog();
                          if ~log_stopped
-                            disp("Log failed to stop. Retrying...");
-                            log_stopped = ctlr.stopLog();
-                            if ~log_stopped
-                                disp("Log failed to stop. Please stop manually.");
-                            end
+                            log_stopped = log_stop_fail();
                         end
                         if isa(ctlr, 'PanelsController')
                             ctlr.close();
@@ -438,51 +339,20 @@ end
                     end
                     
         %Run inter-trial assuming there is one-------------------------
-                    if inter_type == 1
-                        
+                    if inter_type == 1 
                         
                         %Update progress bar to indicate start of inter-trial
                         num_trial_of_total = num_trial_of_total + 1;
                         
-                       
-
                         %Run intertrial-------------------------
-                        ctlr.setControlMode(inter_mode);
-                        ctlr.setPatternID(inter_pat);
-                       
-                        %randomize frame index if indicated
-                        if inter_frame_ind == 0
-                            inter_frame_ind = randperm(p.num_intertrial_frames, 1);
-                        end
-                        ctlr.setPositionX(inter_frame_ind);
-                        
-
-                        if inter_pos ~= 0
-                            ctlr.setPatternFunctionID(inter_pos);
-                            
+                         if params.inter_frame_ind == 0
+                            inter_frame_ind = randperm(p.num_intertrial_frames,1);
+                            ctlr_parameters_intertrial{7} = inter_frame_ind;
                         end
 
-                         if ~isempty(inter_gain) %this assumes you'll never have gain without offset
-                             ctlr.setGain(inter_gain, inter_offset);
-                         end
+                        set_controller_parameters(ctlr_parameters_intertrial);
 
-                         if inter_mode == 2
-                             ctlr.setFrameRate(inter_frame_rate);
-                         end
-
-                         for i = 1:length(inter_ao_ind)
-                             if inter_ao_ind(i) ~= 0 %if it is zero, there was no ao function for this channel
-                                 ctlr.setAOFunctionID(p.active_ao_channels(i), inter_ao_ind(i));%[channel number, index of ao func]
-                                 
-                             end
-                         end
-                         
-                         
-                        
                          tcpread_cache = pnet(ctlr.tcpConn, 'read', 'noblock'); % clear cache
-                         %pause(0.01);
-                         
-                
 
                          ctlr.startDisplay((inter_dur + .5)*10, false);
                          timeSinceInter = tic;
@@ -504,11 +374,7 @@ end
                             ctlr.stopDisplay();
                             log_stopped = ctlr.stopLog();
                             if ~log_stopped
-                                disp("Log failed to stop. Retrying...");
-                                log_stopped = ctlr.stopLog();
-                                if ~log_stopped
-                                    disp("Log failed to stop. Please stop manually.");
-                                end
+                                log_stopped = log_stop_fail();
                             end
                             if isa(ctlr, 'PanelsController')
                                 ctlr.close();
@@ -557,37 +423,9 @@ end
                     num_trial_including_rescheduled = num_trial_including_rescheduled + 1;
 
                     %Run intertrial-------------------------
-                    ctlr.setControlMode(inter_mode);
 
-                    ctlr.setPatternID(inter_pat);
-
-                    %randomize frame index if indicated
-                    if inter_frame_ind == 0
-                        inter_frame_ind = randperm(p.num_intertrial_frames, 1);
-                    end
-                    ctlr.setPositionX(inter_frame_ind);
+                    set_controller_parameters(ctlr_parameters_intertrial);
                     
-
-                    if inter_pos ~= 0
-                        ctlr.setPatternFunctionID(inter_pos);
-                        
-                    end
-
-                     if ~isempty(inter_gain) %this assumes you'll never have gain without offset
-                         ctlr.setGain(inter_gain, inter_offset);
-                     end
-
-                     if inter_mode == 2
-                         ctlr.setFrameRate(inter_frame_rate);
-                     end
-
-                     for i = 1:length(inter_ao_ind)
-                         if inter_ao_ind(i) ~= 0 %if it is zero, there was no ao function for this channel
-                             ctlr.setAOFunctionID(p.active_ao_channels(i), inter_ao_ind(i));%[channel number, index of ao func]
-                             
-                         end
-                     end
-
                      tcpread_cache = pnet(ctlr.tcpConn, 'read', 'noblock'); % clear cache
                      %pause(0.01);
 
@@ -610,11 +448,7 @@ end
                         ctlr.stopDisplay();
                         log_stopped = ctlr.stopLog();
                         if ~log_stopped
-                            disp("Log failed to stop. Retrying...");
-                            log_stopped = ctlr.stopLog();
-                            if ~log_stopped
-                                disp("Log failed to stop. Please stop manually.");
-                            end
+                           log_stopped = log_stop_fail();
                         end
                         if isa(ctlr, 'PanelsController')
                             ctlr.close();
@@ -640,58 +474,16 @@ end
                     % run that condition
                     
                     %define parameters for this trial----------------
-                    trial_mode = block_trials{cond,1};
-                    pat_id = p.block_pat_indices(cond);
-                    pos_id = p.block_pos_indices(cond);
-                    if length(block_ao_indices) >= cond
-                        trial_ao_indices = block_ao_indices(cond,:);
-                    else
-                        trial_ao_indices = [];
-                    end
-                    %Set frame index
-                    if isempty(block_trials{cond,8})
-                        frame_ind = 1;
-                    elseif strcmp(block_trials{cond,8},'r')
-                        frame_ind = 0; %use this later to randomize
-                    else
-                       frame_ind = str2num(block_trials{cond,8});
-                    end
-                     
-                    frame_rate = block_trials{cond, 9};
-                    gain = block_trials{cond, 10};
-                    offset = block_trials{cond, 11};
-                    dur = block_trials{cond, 12};
-                     
-                    %Update panel_com-----------------------------
-                    ctlr.setControlMode(trial_mode);
-                    ctlr.setPatternID(pat_id);
-                    
-                    if ~isempty(block_trials{cond,10})
-                        ctlr.setGain(gain, offset);
-                    end
-                    if pos_id ~= 0
 
-                       ctlr.setPatternFunctionID(pos_id);
-                        
-                    end
-                    if trial_mode == 2
-                        ctlr.setFrameRate(frame_rate);
-                    end
-                    
-                    if frame_ind == 0
-                        frame_ind = randperm(p.num_block_frames(c),1);
-                    end
+                    tparams = assign_block_trial_parameters(params, p, cond);
 
-                    ctlr.setPositionX(frame_ind);
-                    
-                    for i = 1:length(p.active_ao_channels)
-                        ctlr.setAOFunctionID(p.active_ao_channels(i), trial_ao_indices(i));  
-                    end                                      
+                    ctlr_parameters = {tparams.trial_mode, tparams.pat_id, tparams.gain, ...
+                        tparams.offset, tparams.pos_id, tparams.frame_rate, tparams.frame_ind...
+                        tparams.active_ao_channels, tparams.trial_ao_indices};
 
-                    pause(0.01)
+                    set_controller_parameters(ctlr_parameters);
                     
-                    tcpread_cache = pnet(ctlr.tcpConn, 'read', 'noblock'); % clear cache
-                    
+                    tcpread_cache = pnet(ctlr.tcpConn, 'read', 'noblock'); % clear cache      
                     
                     %Run block trial--------------------------------------
                     ctlr.startDisplay((dur + .5)*10, false); %duration expected in 100ms units
@@ -699,33 +491,32 @@ end
                     timeSinceRes = tic;
                     
                     runcon.update_progress('rescheduled', cond, num_trial_of_total);
+
                     %Update status panel to show current parameters
-                   runcon.update_current_trial_parameters(trial_mode, pat_id, pos_id, p.active_ao_channels, ...
-                      trial_ao_indices, frame_ind, frame_rate, gain, offset, dur);
+                   runcon.update_current_trial_parameters(tparams.trial_mode, ...
+                        tparams.pat_id, tparams.pos_id, p.active_ao_channels, ...
+                      tparams.trial_ao_indices, tparams.frame_ind, tparams.frame_rate, ...
+                      tparams.gain, tparams.offset, tparams.dur);
+
                     if inter_type
                         runcon.update_streamed_data(tcpread{end}, 'inter', prev_r, prev_c, prev_num_trials);
                     else
                         runcon.update_streamed_data(tcpread{end}, 'rescheduled', prev_r, prev_c, prev_num_trials);
                     end
                     
-                    pause(dur - toc(timeSinceRes));
+                    pause(tparams.dur - toc(timeSinceRes));
                    
                     
                     tcpread{end+1} = pnet(ctlr.tcpConn, 'read', 'noblock');
                     prev_r = rep;
                     prev_c = cond;
                     prev_num_trials = num_trial_including_rescheduled;
-                    
-                    
+               
                      if runcon.check_if_aborted() == 1
                         ctlr.stopDisplay();
                         log_stopped = ctlr.stopLog();
                         if ~log_stopped
-                            disp("Log failed to stop. Retrying...");
-                            log_stopped = ctlr.stopLog();
-                            if ~log_stopped
-                                disp("Log failed to stop. Please stop manually.");
-                            end
+                            log_stopped = log_stop_fail();
                         end
                         if isa(ctlr, 'PanelsController')
                             ctlr.close();
@@ -743,45 +534,19 @@ end
                     %run intertrial if there is one
                     
                     if inter_type == 1
-                        
-                    
-                        %Update progress bar to indicate start of inter-trial
+
+                        %Update total trial number
                         num_trial_including_rescheduled = num_trial_including_rescheduled + 1;
-                        %runcon.update_progress('inter', r, reps, c, num_cond, num_trial_of_total)
-                       
 
                         %Run intertrial-------------------------
-                        ctlr.setControlMode(inter_mode);
-    
-                        ctlr.setPatternID(inter_pat);
-    
-                        %randomize frame index if indicated
-                        if inter_frame_ind == 0
-                            inter_frame_ind = randperm(p.num_intertrial_frames, 1);
-                        end
-                        ctlr.setPositionX(inter_frame_ind);
-                        
-    
-                        if inter_pos ~= 0
-                            ctlr.setPatternFunctionID(inter_pos);
-                            
-                        end
-    
-                         if ~isempty(inter_gain) %this assumes you'll never have gain without offset
-                             ctlr.setGain(inter_gain, inter_offset);
-                         end
-    
-                         if inter_mode == 2
-                             ctlr.setFrameRate(inter_frame_rate);
-                         end
-    
-                         for i = 1:length(inter_ao_ind)
-                             if inter_ao_ind(i) ~= 0 %if it is zero, there was no ao function for this channel
-                                 ctlr.setAOFunctionID(p.active_ao_channels(i), inter_ao_ind(i));%[channel number, index of ao func]
-                                 
-                             end
-                         end
 
+                        if params.inter_frame_ind == 0
+                            inter_frame_ind = randperm(p.num_intertrial_frames,1);
+                            ctlr_parameters_intertrial{7} = inter_frame_ind;
+                        end
+                        
+                        set_controller_parameters(ctlr_parameters_intertrial);
+  
                          tcpread_cache = pnet(ctlr.tcpConn, 'read', 'noblock'); % clear cache
                          
                          ctlr.startDisplay((inter_dur + .5)*10, false);
@@ -802,11 +567,7 @@ end
                             ctlr.stopDisplay();
                             log_stopped = ctlr.stopLog();
                             if ~log_stopped
-                                disp("Log failed to stop. Retrying...");
-                                log_stopped = ctlr.stopLog();
-                                if ~log_stopped
-                                    disp("Log failed to stop. Please stop manually.");
-                                end
+                                log_stopped = log_stop_fail();
                             end
                             if isa(ctlr, 'PanelsController')
                                 ctlr.close();
@@ -839,33 +600,8 @@ end
                 num_trial_including_rescheduled = num_trial_including_rescheduled + 1;
                 num_trial_of_total = num_trial_of_total + 1;
                 
-                
-                 ctlr.setControlMode(post_mode);
-                 
-                 ctlr.setPatternID(post_pat);
-                 
-                 if ~isempty(post_gain)
-                     ctlr.setGain(post_gain, post_offset);
-                 end
-                 if post_pos ~= 0
-                     ctlr.setPatternFunctionID(post_pos);
-                     
-                 end
-                 if post_mode == 2
-                      ctlr.setFrameRate(post_frame_rate);
-                 end
-                 if post_frame_ind == 0
-                     post_frame_ind = randperm(p.num_posttrial_frames, 1);
-                 end
-                     
-                 ctlr.setPositionX(post_frame_ind);
-                 
-                 for i = 1:length(post_ao_ind)
-                     if post_ao_ind(i) ~= 0 %if it is zero, there was no ao function for this channel
-                         ctlr.setAOFunctionID(p.active_ao_channels(i), post_ao_ind(i));%[channel number, index of ao func]
-                         
-                     end
-                 end
+
+                set_controller_parameters(ctlr_parameters_posttrial);
 
                  tcpread_cache = pnet(ctlr.tcpConn, 'read', 'noblock'); % clear cache
                  
@@ -896,11 +632,7 @@ end
                     ctlr.stopDisplay();
                     log_stopped = ctlr.stopLog();
                     if ~log_stopped
-                        disp("Log failed to stop. Retrying...");
-                        log_stopped = ctlr.stopLog();
-                        if ~log_stopped
-                            disp("Log failed to stop. Please stop manually.");
-                        end
+                        log_stopped = log_stop_fail();
                     end
                     if isa(ctlr, 'PanelsController')
                         ctlr.close();

@@ -15,7 +15,7 @@ function params = assign_parameters(p)
          if isempty(p.pretrial{8})
              params.pre_frame_ind = 1;
          elseif strcmp(p.pretrial{8},'r')
-             params.pre_frame_ind = randperm(p.num_pretrial_frames, 1); %use this later to randomize
+             params.pre_frame_ind = randperm(p.num_pretrial_frames, 1);
          else
              params.pre_frame_ind = str2num(p.pretrial{8});
          end
