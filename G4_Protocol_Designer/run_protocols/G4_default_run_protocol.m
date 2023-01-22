@@ -63,8 +63,6 @@ end
  %% Set up parameters 
  params = assign_parameters(p);
 
-
- 
  %% Start host and switch to correct directory
     if ~isempty(ctrl)
         if ctrl.isOpen() == 1
@@ -78,17 +76,7 @@ end
     ctlr.open(true);
 
 %% Check tcp connection was successful.
-    if ctlr.tcpConn == -1
-        system('"C:\Program Files (x86)\HHMI G4\G4 Host" &');
-        status = 1;
-        while status~=0
-            [status, ~] = system('tasklist | find /I "G4 Host.exe"');
-            pause(0.1);
-        end
-        ctlr = PanelsController();
-        ctlr.mode = 0;
-        ctlr.open();
-    end
+   check_successful_tcp();
 
     %% Set root directory to the experiment folder
     ctlr.setRootDirectory(p.experiment_folder);
@@ -115,8 +103,7 @@ end
              clear global;
              success = 0;
              return;
-         case 'Start' 
-%The rest of the code to run the experiment goes under this case
+         case 'Start' %The rest of the code to run the experiment goes under this case
          
 %% Determine the total number of trials in order to define in what increments 
 %the progress bar will progress.-------------------------------------------
@@ -139,12 +126,7 @@ end
 
              log_started = ctlr.startLog();
              if ~log_started
-                 disp("Log failed to start, retrying...");
-                 log_started = ctlr.startLog();
-                 if ~log_started
-                     disp("Log failed a second time, aborting experiment.");
-                     runcon.abort_experiment();
-                 end
+                log_started = log_start_fail(runcon);
              end
              if runcon.check_if_aborted()
                 
@@ -166,28 +148,13 @@ end
                  num_trial_of_total = num_trial_of_total + 1;
 
                  %Set the panel values appropriately----------------
-                 ctlr.setControlMode(params.pre_mode);
-                 ctlr.setPatternID(params.pre_pat);
-                    
-                 ctlr.setPositionX(params.pre_frame_ind);
-                 if params.pre_pos ~= 0
-                     ctlr.setPatternFunctionID(params.pre_pos); 
-                 end
 
-                 if ~isempty(params.pre_gain) %this assumes you'll never have gain without offset
-                     ctlr.setGain(params.pre_gain, params.pre_offset);                     
-                 end
+                 ctlr_parameters_pretrial = {params.pre_mode, params.pre_pat, params.pre_gain, ...
+                     params.pre_offset, params.pre_pos, params.pre_frame_rate, params.pre_frame_ind, ...
+                     p.active_ao_channels, params.pre_ao_ind};
 
-                 if params.pre_mode == 2
-                     ctlr.setFrameRate(params.pre_frame_rate);         
-                 end
+                 set_controller_parameters(ctlr_parameters_pretrial);
 
-                 for i = 1:length(params.pre_ao_ind)
-                     if params.pre_ao_ind(i) ~= 0 %if it is zero, there was no ao function for this channel
-                         ctlr.setAOFunctionID(p.active_ao_channels(i), params.pre_ao_ind(i));%[channel number, index of ao func]                    
-                     end
-                 end
-                 
                  %Update status panel to show current parameters
                  runcon.update_current_trial_parameters(params.pre_mode, params.pre_pat, ...
                      params.pre_pos, p.active_ao_channels, params.pre_ao_ind, ...
@@ -210,11 +177,7 @@ end
                 ctlr.stopDisplay();
                 log_stopped = ctlr.stopLog();
                 if ~log_stopped
-                    disp("Log failed to stop. Retrying...");
-                    log_stopped = ctlr.stopLog();
-                    if ~log_stopped
-                        disp("Log failed to stop. Please stop manually.");
-                    end
+                    log_stopped = log_stop_fail();
                 end
                 if isa(ctlr, 'PanelsController')
                     ctlr.close();
@@ -245,27 +208,13 @@ end
                      
                      %Update controller-----------------------------
 
-                    ctlr.setControlMode(tparams.trial_mode);
-                    ctlr.setPatternID(tparams.pat_id);
-                    
-                    if ~isempty(params.block_trials{cond,10})
-                        ctlr.setGain(tparams.gain, tparams.offset);
-                    end
-                    if tparams.pos_id ~= 0
+                    ctlr_parameters = {tparams.trial_mode, tparams.pat_id, tparams.gain, ...
+                        tparams.offset, tparams.pos_id, tparams.frame_rate, tparams.frame_ind...
+                        tparams.active_ao_channels, tparams.trial_ao_indices};
 
-                       ctlr.setPatternFunctionID(tparams.pos_id);
-                        
-                    end
-                    if tparams.trial_mode == 2
-                        ctlr.setFrameRate(tparams.frame_rate);
-                    end
-                   
-                    ctlr.setPositionX(tparams.frame_ind);
-                    
-                    for i = 1:length(p.active_ao_channels)
-                        ctlr.setAOFunctionID(p.active_ao_channels(i), tparams.trial_ao_indices(i));  
-                    end                                      
- 
+                     
+                    set_controller_parameters(ctlr_parameters);
+
                     pause(0.01)
 
                     %Update status panel to show current parameters
@@ -286,11 +235,7 @@ end
                         ctlr.stopDisplay();
                         log_stopped = ctlr.stopLog();
                         if ~log_stopped
-                            disp("Log failed to stop. Retrying...");
-                            log_stopped = ctlr.stopLog();
-                            if ~log_stopped
-                                disp("Log failed to stop. Please stop manually.");
-                            end
+                            log_stopped = log_stop_fail();
                         end
                         if isa(ctlr, 'PanelsController')
                             ctlr.close();
@@ -319,37 +264,12 @@ end
                         progress_bar.YData = num_trial_of_total/total_num_steps;
                         drawnow;
 
-                        %Run intertrial-------------------------
-                        ctlr.setControlMode(params.inter_mode);
-                        ctlr.setPatternID(params.inter_pat);
-                       
-                        %randomize frame index if indicated
-                        if params.inter_frame_ind == 0
-                            params.inter_frame_ind = randperm(p.num_intertrial_frames, 1);
-                        end
-                        ctlr.setPositionX(params.inter_frame_ind);
+                        ctlr_parameters_intertrial = {params.inter_mode, params.inter_pat, params.inter_gain, ...
+                            params.inter_offset, params.inter_pos, params.inter_frame_rate, params.inter_frame_ind, ...
+                            p.active_ao_channels, params.inter_ao_ind};
 
-                        if params.inter_pos ~= 0
-                            ctlr.setPatternFunctionID(params.inter_pos);
-                        end
+                        set_controller_parameters(ctlr_parameters_intertrial);
 
-                         if ~isempty(params.inter_gain) %this assumes you'll never have gain without offset
-                             ctlr.setGain(params.inter_gain, params.inter_offset);
-                         end
-
-                         if params.inter_mode == 2
-                             ctlr.setFrameRate(params.inter_frame_rate);
-                         end
-
-                         for i = 1:length(params.inter_ao_ind)
-                             if params.inter_ao_ind(i) ~= 0 %if it is zero, there was no ao function for this channel
-                                 ctlr.setAOFunctionID(p.active_ao_channels(i), params.inter_ao_ind(i));%[channel number, index of ao func]
-                                 
-                             end
-                         end
-
-                         
-                         
                           %Update status panel to show current parameters
                         runcon.update_current_trial_parameters(params.inter_mode, ...
                             params.inter_pat, params.inter_pos, p.active_ao_channels, ...
@@ -357,17 +277,15 @@ end
                             params.inter_gain, params.inter_offset, params.inter_dur);
                         
                          pause(0.01);
+
+               %Run intertrial-------------------------
                          ctlr.startDisplay((params.inter_dur + .5)*10);
                          
                          if runcon.check_if_aborted() == 1
                             ctlr.stopDisplay();
                             log_stopped = ctlr.stopLog();
                             if ~log_stopped
-                                disp("Log failed to stop. Retrying...");
-                                log_stopped = ctlr.stopLog();
-                                if ~log_stopped
-                                    disp("Log failed to stop. Please stop manually.");
-                                end
+                               log_stopped = log_stop_fail();
                             end
                             if isa(ctlr, 'PanelsController')
                                 ctlr.close();
@@ -393,30 +311,11 @@ end
                 runcon.update_progress('post', num_trial_of_total);
 
 
-                 ctlr.setControlMode(params.post_mode);
-                 
-                 ctlr.setPatternID(params.post_pat);
-                 
-                 if ~isempty(params.post_gain)
-                     ctlr.setGain(params.post_gain, params.post_offset);
-                 end
-                 if params.post_pos ~= 0
-                     ctlr.setPatternFunctionID(params.post_pos);
-                     
-                 end
-                 if params.post_mode == 2
-                      ctlr.setFrameRate(params.post_frame_rate);
-                 end
-                
-                     
-                 ctlr.setPositionX(params.post_frame_ind);
-                 
-                 for i = 1:length(params.post_ao_ind)
-                     if params.post_ao_ind(i) ~= 0 %if it is zero, there was no ao function for this channel
-                         ctlr.setAOFunctionID(p.active_ao_channels(i), params.post_ao_ind(i));%[channel number, index of ao func]
-                         
-                     end
-                 end
+                 ctlr_parameters_posttrial = {params.post_mode, params.post_pat, params.post_gain, ...
+                       params.post_offset, params.post_pos, params.post_frame_rate, params.post_frame_ind, ...
+                       p.active_ao_channels, params.post_ao_ind};
+
+                 set_controller_parameters(ctlr_parameters_posttrial);
                  
                   %Update status panel to show current parameters
                  runcon.update_current_trial_parameters(params.post_mode, ...
@@ -431,11 +330,7 @@ end
                     ctlr.stopDisplay();
                     log_stopped = ctlr.stopLog();
                     if ~log_stopped
-                        disp("Log failed to stop. Retrying...");
-                        log_stopped = ctlr.stopLog();
-                        if ~log_stopped
-                            disp("Log failed to stop. Please stop manually.");
-                        end
+                        log_stopped = log_stop_fail();
                     end
                     if isa(ctlr, 'PanelsController')
                         ctlr.close();

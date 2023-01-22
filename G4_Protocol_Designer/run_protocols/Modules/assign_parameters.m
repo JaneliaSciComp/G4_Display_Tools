@@ -1,5 +1,7 @@
 function params = assign_parameters(p)
-
+    % Assigns all parameters that don't change (all but the parameters for
+    % the block trials)
+    
     %pretrial params-----------------------------------------------------
      if isempty(p.pretrial{1}) %no need to set up pretrial params
          params.pre_start = 0;
@@ -79,6 +81,7 @@ function params = assign_parameters(p)
      params.block_ao_indices = p.block_ao_indices;
      params.reps = p.repetitions;
      params.num_cond = length(params.block_trials(:,1)); %number of conditions
+     params.active_ao_channels = p.active_ao_channels;
 
      if ~isempty(p.active_ao_channels)
          params.aobits = 0;
