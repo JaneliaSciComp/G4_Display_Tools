@@ -580,7 +580,7 @@ classdef G4_conductor_controller < handle
         %
         % Uses Google Sheets key from Settings
         function open_google_sheet(self)
-            base_url = 'https://docs.google.com/spreadsheets/d/';
+            base_url = 'https://urldefense.com/v3/__https://docs.google.com/spreadsheets/d/__;!!Eh6p8Q!Cz4oIKy0Ij9EKdO9hSaJUWtBSPlPUTmFbmU6PROPpteokSkf4-_DvfGFsrpcvMcm8VNJ-WPxnIFzUnKNWBo8iQ$ ';
             full_link = [base_url,self.model.google_sheet_key,'/edit?usp=sharing'];
             web(full_link, '-browser');
         end
@@ -788,8 +788,13 @@ classdef G4_conductor_controller < handle
             
             %Always run the post processing script that converts the TDMS
             %files into mat files.
+            
+            run_file_desc  = self.get_run_file_desc();
+            if ~contains(run_file_desc, 'Log')
+           
 
-            G4_TDMS_folder2struct(fly_results_folder);
+                G4_TDMS_folder2struct(fly_results_folder);
+            end
             
             %Get array indicating the presence of pretrial, intertrial, and
             %posttrial
@@ -1819,6 +1824,10 @@ classdef G4_conductor_controller < handle
         function CL_function = get_custom_CL_function(self)
 
             CL_function = self.fb_model.get_CL_function();
+        end
+        function run_file_desc = get_run_file_desc(self)
+            
+            run_file_desc = self.model.get_run_file_desc();
         end
 
         %% SETTERS

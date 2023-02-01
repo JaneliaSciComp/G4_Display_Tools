@@ -146,11 +146,7 @@ end
       
      end
      
-%% set active ai channels for streaming
-    %set aibits for later telling panel_com which analog input channels are
-    %streaming
-    
-    ctlr.setActiveAIChannels(aibits);
+
     
      
 %% confirm start experiment
@@ -204,10 +200,17 @@ end
                 return;
              
              end
+             
+             %% set active ai channels for streaming
+    %set aibits for later telling panel_com which analog input channels are
+    %streaming
+    
+            ctlr.setActiveAIChannels(aibits);
 
              
 
 %% run pretrial if it exists----------------------------------------
+
              startTime = tic;
              
              if pre_start == 1
@@ -275,7 +278,7 @@ end
 
                     ctlr_parameters = {tparams.trial_mode, tparams.pat_id, tparams.gain, ...
                         tparams.offset, tparams.pos_id, tparams.frame_rate, tparams.frame_ind...
-                        tparams.active_ao_channels, tparams.trial_ao_indices};
+                        params.active_ao_channels, tparams.trial_ao_indices};
 
                     set_controller_parameters(ctlr_parameters);
                     

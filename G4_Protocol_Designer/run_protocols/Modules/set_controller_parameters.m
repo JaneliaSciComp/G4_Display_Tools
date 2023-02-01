@@ -25,7 +25,7 @@ function set_controller_parameters(p)
    
     ctlr.setPositionX(p{7});
     
-    for i = 1:length(p{9})
+    for i = 1:length(p{8})
         ctlr.setAOFunctionID(p{8}(i), p{9}(i));  
     end                                    
 

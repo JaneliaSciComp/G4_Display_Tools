@@ -362,6 +362,10 @@ classdef G4_conductor_model < handle
             value = self.timestamp;
         end
         
+        function value = get_run_file_desc(self)
+            value =  self.run_protocol_file_desc;
+        end
+        
         
         
 %GETTERS------------------------------------------------------------------

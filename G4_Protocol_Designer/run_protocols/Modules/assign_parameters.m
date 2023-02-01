@@ -88,6 +88,10 @@ function params = assign_parameters(p)
         for bit = p.active_ao_channels
             params.aobits = bitset(aobits,bit+1); %plus 1 bc aochans are 0-3
         end
+        
+     else
+         
+         params.aobits = [];
 
      end
 

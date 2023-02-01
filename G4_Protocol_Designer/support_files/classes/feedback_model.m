@@ -534,7 +534,10 @@ classdef feedback_model < handle
                 
             else
                 
-                data = raw;
+                data{1} = raw;
+                data{2} = raw;
+                data{3} = raw;
+                data{4} = raw;
             end
 
             
