@@ -1025,7 +1025,7 @@ classdef PanelsController < handle
                     pat.start = [pat.start strfind(self.iBuf, [rsp_i cmd])-1];
                 end
                 if ~isempty(pat.start)
-                    pat.end = pat.start + self.iBuf(pat.start);
+                    pat.end = pat.start + uint64(self.iBuf(pat.start));
                     pat.start = pat.start(pat.end <= length(self.iBuf));
                     pat.end = pat.end(pat.end <= length(self.iBuf));
                     for i = 1:length(pat.start)

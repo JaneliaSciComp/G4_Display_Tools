@@ -109,6 +109,25 @@ classdef PanelsControllerFunctionalTest < matlab.unittest.TestCase
             end
         end
         
+        function errorIssue68(testCase)
+            %% Replicate error https://github.com/JaneliaSciComp/G4_Display_Tools/issues/68
+            %  The issues seems to be that the length of the buffer became
+            %  bigger than the data type used to calculate the buffer size.
+            %  This test is not 100%, but shows the error reliably.
+            newDir = tempname;
+            testCase.panelsController.setRootDirectory(newDir);
+            for i = 0:15
+                onOff = str2num(char(num2cell(dec2bin(i))))';
+                onOff = padarray(onOff, [0 4-length(onOff)], 0, 'pre');
+                testCase.verifyTrue(testCase.panelsController.setActiveAIChannels(onOff), ...
+                    sprintf("PanelsController.setActiveAIChannels wasn't successfully completed for %d", i));
+                testCase.verifyTrue(testCase.panelsController.startLog(), ...
+                    sprintf("Starting the log didn't work in iteration %d", i));
+                testCase.verifyTrue(testCase.panelsController.stopLog(), ...
+                    sprintf("Stopping the log didn't work in iteration %d", i));
+            end
+        end
+        
         function testLoggingRepeatedOn(testCase)
             newDir = tempname;
             testCase.panelsController.setRootDirectory(newDir);
