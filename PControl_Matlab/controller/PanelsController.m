@@ -1,5 +1,4 @@
 
-
 classdef PanelsController < handle
     % PanelsController Mapping of `G4 Host.exe` TCP functions to object
     % oriented MATLAB interface
@@ -1023,7 +1022,7 @@ classdef PanelsController < handle
                 pat.start = [];                
                 self.pullResponse();
                 for rsp_i = rsp
-                    pat.start = [pat.start strfind(self.iBuf, [rsp_i cmd])-1];
+                    pat.start = [pat.start uint64(strfind(self.iBuf, [rsp_i cmd])-1)];
                 end
                 if ~isempty(pat.start)
                     pat.end = pat.start + uint64(self.iBuf(pat.start));
