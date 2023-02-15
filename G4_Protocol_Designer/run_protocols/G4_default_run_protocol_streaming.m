@@ -489,7 +489,7 @@ end
                     tcpread_cache = pnet(ctlr.tcpConn, 'read', 'noblock'); % clear cache      
                     
                     %Run block trial--------------------------------------
-                    ctlr.startDisplay((dur + .5)*10, false); %duration expected in 100ms units
+                    ctlr.startDisplay((tparams.dur + .5)*10, false); %duration expected in 100ms units
 
                     timeSinceRes = tic;
                     
