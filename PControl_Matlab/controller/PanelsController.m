@@ -19,7 +19,7 @@ classdef PanelsController < handle
     properties
         hostName = PanelsController.defaultHostName;
         port = PanelsController.defaultPort;
-        tcpConn = [];
+        tcpConn = -10;
         %add property mode to distinguish between the GUI and Script modes
         %mode = 0 means creating a TCP/IP connection from a script
         %mode = 1 means creating a TCP/IP connection from PControl
@@ -68,7 +68,7 @@ classdef PanelsController < handle
                 status = 0;
                 while status == 0
                     [status, ~] = system('tasklist | find /I "G4 Host.exe"');
-                    pause(0.01);
+                    pause(0.1);
                 end
                 system(sprintf('"%s" &', self.defaultHostExec));
                 isRunning = false;
@@ -80,15 +80,17 @@ classdef PanelsController < handle
                     end
                 end
             end
-            if ~self.isOpen
+            
+            while ~self.isOpen
                 self.tcpConn = pnet('tcpconnect', self.hostName, self.port);
-                while ~self.isOpen
-                    disp("WAIT");
-                    pause(0.01);
+                pause(0.3);
+                if self.isOpen
+                    break;
+                else
+                    fprintf("couldn't open tcp connection to G4 Host, trying again (handle %d)\n", self.tcpConn);
                 end
-            else
-                warning('tcp connection already open');
             end
+            fprintf("tcp connection opened (handle %d)\n", self.tcpConn);
         end
 
 
@@ -106,13 +108,13 @@ classdef PanelsController < handle
             end
             if self.isOpen
                 pnet(self.tcpConn, 'close');
-                self.tcpConn = [];
+                self.tcpConn = -5;
                 if stopHost
                     [~,~] = system('taskkill /IM "G4 Host.exe"');
                     status = 0;
                     while status == 0
                         [status, ~] = system('tasklist | find /I "G4 Host.exe"');
-                        pause(0.01);
+                        pause(0.1);
                     end
                 end
             end
@@ -125,7 +127,7 @@ classdef PanelsController < handle
             % returns true if the TCP connection to the webserver behind G4
             % Host.exe is active.
             isOpen = true;
-            if isempty(self.tcpConn)
+            if self.tcpConn < 0
                 isOpen = false;
             else
                 rval = pnet(self.tcpConn, 'status');
@@ -1101,3 +1103,4 @@ function char_val = signed16BitToChar(B)
         char_val(2*cnt-1:2*cnt) = dec2char(temp_val(cnt),2);
     end
 end
+

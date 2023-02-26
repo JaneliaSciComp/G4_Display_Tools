@@ -1,4 +1,5 @@
-%% Default protocol by which to run a flight experiment. 
+%% Run protocol using the combined command and logging each repetition separately
+% No streaming
 
 %Notice that the inputs can be variable. In fact, there should only ever be
 %one or two inputs. The first should always be a struct of the experiment
@@ -269,27 +270,6 @@ end
             %in the experiment we are
             num_trial_of_total = 0;
 
-%% Start log---------------------------------------------------------
-
-%             log_started = ctlr.startLog();
-%              if ~log_started
-%                  disp("Log failed to start, retrying...");
-%                  log_started = ctlr.startLog();
-%                  if ~log_started
-%                      disp("Log failed a second time, aborting experiment.");
-%                      runcon.abort_experiment();
-%                  end
-%              end
-%              if runcon.check_if_aborted()
-%                 
-%                 if isa(ctlr, 'PanelsController')
-%                     ctlr.close();
-%                 end
-%                 clear global;
-%                 success = 0;
-%                 return;
-%              
-%              end
 
 %% run pretrial if it exists----------------------------------------
              startTime = tic;
@@ -520,7 +500,7 @@ end
                  ctlr.combinedCommand(post_mode, post_pat, post_pos, post_ao_ind(1), post_ao_ind(2), post_ao_ind(3), post_ao_ind(4),post_frame_rate, post_dur*10);
                  log_stopped = ctlr.stopLog();
 
-                 pause(post_dur+.01);
+                 %pause(post_dur+.01);
 
                  
                  if runcon.check_if_aborted() == 1
