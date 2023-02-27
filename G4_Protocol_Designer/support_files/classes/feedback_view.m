@@ -1,13 +1,6 @@
 classdef feedback_view < handle
     
-%% NOTE: I Have mixed up open loop and closed loop in my variable names in this code.
-% Everything that has to do with the intertrial axis is labeled as "Open
-% loop" and everything that has to do with the conditiosn axis is labeled
-% "Closed loop" when it should be the opposite! This does not affect what
-% data is actually displayed, the correct data is displayed in the correct
-% axis. But this may be very confusing to anyone who opens this code and
-% tries to update it. TO BE FIXED SOON
-    
+
     properties
         
         panel
