@@ -156,7 +156,7 @@ end
                      params.pre_offset, params.pre_pos, params.pre_frame_rate, params.pre_frame_ind, ...
                      p.active_ao_channels, params.pre_ao_ind};
 
-                 set_controller_parameters(ctlr_parameters_pretrial);
+                 ctlr.setControllerParameters(ctlr_parameters_pretrial);
 
                  %Update status panel to show current parameters
                  runcon.update_current_trial_parameters(params.pre_mode, params.pre_pat, ...
@@ -216,7 +216,7 @@ end
                         tparams.active_ao_channels, tparams.trial_ao_indices};
 
                      
-                    set_controller_parameters(ctlr_parameters);
+                    ctlr.setControllerParameters(ctlr_parameters);
 
                     pause(0.01)
 
@@ -272,7 +272,7 @@ end
                             ctlr_parameters_intertrial{7} = inter_frame_ind;
                         end
 
-                        set_controller_parameters(ctlr_parameters_intertrial);
+                        ctlr.setControllerParameters(ctlr_parameters_intertrial);
 
                           %Update status panel to show current parameters
                         runcon.update_current_trial_parameters(params.inter_mode, ...
@@ -319,7 +319,7 @@ end
                        params.post_offset, params.post_pos, params.post_frame_rate, params.post_frame_ind, ...
                        p.active_ao_channels, params.post_ao_ind};
 
-                 set_controller_parameters(ctlr_parameters_posttrial);
+                 ctlr.setControllerParameters(ctlr_parameters_posttrial);
                  
                   %Update status panel to show current parameters
                  runcon.update_current_trial_parameters(params.post_mode, ...

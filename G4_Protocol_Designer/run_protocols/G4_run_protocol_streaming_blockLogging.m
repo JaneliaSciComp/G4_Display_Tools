@@ -206,7 +206,7 @@ end
 
                 %Set the controller values appropriately----------------
 
-                 set_controller_parameters(ctlr_parameters_pretrial);
+                 ctlr.setControllerParameters(ctlr_parameters_pretrial);
                  
                  %Update status panel to show current parameters
                  runcon.update_current_trial_parameters(pre_mode, pre_pat, pre_pos, p.active_ao_channels, ...
@@ -271,7 +271,7 @@ end
                         tparams.offset, tparams.pos_id, tparams.frame_rate, tparams.frame_ind...
                         params.active_ao_channels, tparams.trial_ao_indices};
 
-                    set_controller_parameters(ctlr_parameters);
+                    ctlr.setControllerParameters(ctlr_parameters);
                     
                     tcpread_cache = pnet(ctlr.tcpConn, 'read', 'noblock'); % clear cache                              
 
@@ -344,7 +344,7 @@ end
                             ctlr_parameters_intertrial{7} = inter_frame_ind;
                         end
 
-                        set_controller_parameters(ctlr_parameters_intertrial);
+                        ctlr.setControllerParameters(ctlr_parameters_intertrial);
 
                          tcpread_cache = pnet(ctlr.tcpConn, 'read', 'noblock'); % clear cache
 
@@ -420,7 +420,7 @@ end
 
                     %Run intertrial-------------------------
 
-                    set_controller_parameters(ctlr_parameters_intertrial);
+                    ctlr.setControllerParameters(ctlr_parameters_intertrial);
                     
                      tcpread_cache = pnet(ctlr.tcpConn, 'read', 'noblock'); % clear cache
                      %pause(0.01);
@@ -477,7 +477,7 @@ end
                         tparams.offset, tparams.pos_id, tparams.frame_rate, tparams.frame_ind...
                         params.active_ao_channels, tparams.trial_ao_indices};
 
-                    set_controller_parameters(ctlr_parameters);
+                    ctlr.setControllerParameters(ctlr_parameters);
                     
                     tcpread_cache = pnet(ctlr.tcpConn, 'read', 'noblock'); % clear cache      
                     
@@ -541,7 +541,7 @@ end
                             ctlr_parameters_intertrial{7} = inter_frame_ind;
                         end
                         
-                        set_controller_parameters(ctlr_parameters_intertrial);
+                        ctlr.setControllerParameters(ctlr_parameters_intertrial);
   
                          tcpread_cache = pnet(ctlr.tcpConn, 'read', 'noblock'); % clear cache
                          
@@ -599,7 +599,7 @@ end
                 num_trial_of_total = num_trial_of_total + 1;
                 
 
-                set_controller_parameters(ctlr_parameters_posttrial);
+                ctlr.setControllerParameters(ctlr_parameters_posttrial);
 
                  tcpread_cache = pnet(ctlr.tcpConn, 'read', 'noblock'); % clear cache
 
