@@ -105,7 +105,7 @@ function create_plot_figure(data, gen_settings, plot_settings, save_settings, ..
                             %Get data in final form
                             if strcmp(plot_type, 'TS')
                                 tmpdata = squeeze(data(g,:,d,cond,:));
-                                meandata = nanmean(tmpdata);
+                                meandata = mean(tmpdata,'omitnan');
                                 nanidx = isnan(meandata);
                                 stddata = nanstd(tmpdata);
                                 semdata = stddata./sqrt(sum(max(~isnan(tmpdata),[],2)));
@@ -114,7 +114,7 @@ function create_plot_figure(data, gen_settings, plot_settings, save_settings, ..
                                 semdata(nanidx) = []; 
                                 
                             elseif strcmp(plot_type, 'TC')
-                                tmpdata = squeeze(nanmean(data(g,:,d,conds,:),5));
+                                tmpdata = squeeze(mean(data(g,:,d,conds,:),5,'omitnan'));
                                 
                             elseif strcmp(plot_type, 'MP')
                                 M = data.M;

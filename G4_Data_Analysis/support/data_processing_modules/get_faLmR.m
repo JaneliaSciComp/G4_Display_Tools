@@ -24,13 +24,13 @@ function [faLmR_data, faLmR_data_norm] = get_faLmR(ts_data, ts_norm, LmR_ind, co
 %             tmp(1, :,:,:,:) = -ts_data(LmR_ind, condition_pairs{new}(2), :, :);
 %             tmp(2, :,:,:,:) = ts_data(LmR_ind, condition_pairs{new}(1), :, :);
 %             
-%             new_condition = nanmean(tmp,1);
+%             new_condition = mean(tmp,1, 'omitnan');
 %             faLmR_data(new,:,:) = squeeze(new_condition);
 %             
 %             tmpNorm(1,:,:,:,:) = -ts_norm(LmR_ind, condition_pairs{new}(2), :, :);
 %             tmpNorm(2, :, :, :, :) = ts_norm(LmR_ind, condition_pairs{new}(1), :, :);
 %             
-%             new_condition_norm = nanmean(tmpNorm,1);
+%             new_condition_norm = mean(tmpNorm,1,'omitnan');
 %             faLmR_data_norm(new, :, :) = squeeze(new_condition_norm);
 %         end
 %         
@@ -41,13 +41,13 @@ function [faLmR_data, faLmR_data_norm] = get_faLmR(ts_data, ts_norm, LmR_ind, co
             tmp_data(1, :, :, :, :) = -ts_data(LmR_ind, condition_pairs{newc}(2), :, :);
             tmp_data(2,  :, :, :, :) = ts_data(LmR_ind, condition_pairs{newc}(1), :, :);
 
-            new_cond = nanmean(tmp_data,1);
+            new_cond = mean(tmp_data,1, 'omitnan');
             faLmR_data(newc,:,:) = squeeze(new_cond);
 
             tmp_norm(1, :, :, :, :) = -ts_norm(LmR_ind, condition_pairs{newc}(2), :, :);
             tmp_norm(2, :, :, :, :) = ts_norm(LmR_ind, condition_pairs{newc}(1), :, :);
 
-            new_cond_norm = nanmean(tmp_norm,1);
+            new_cond_norm = mean(tmp_norm,1, 'omitnan');
             faLmR_data_norm(newc, :, :) = squeeze(new_cond_norm);
 
 

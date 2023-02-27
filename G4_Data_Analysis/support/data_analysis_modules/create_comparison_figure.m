@@ -120,7 +120,7 @@ function create_comparison_figure(CombData, gen_settings, comp_settings, ts_sett
 
                              for g = 1:num_groups
                                 tmpdata = squeeze(timeseries_data(g,:,d,cond,:));
-                                meandata = nanmean(tmpdata);
+                                meandata = mean(tmpdata, 'omitnan');
                                 nanidx = isnan(meandata);
                                 stddata = nanstd(tmpdata);
                                 semdata = stddata./sqrt(sum(max(~isnan(tmpdata),[],2)));
@@ -148,7 +148,7 @@ function create_comparison_figure(CombData, gen_settings, comp_settings, ts_sett
                                 if plot_both_dir_ts
 
                                     tmpdata = squeeze(timeseries_data(g,:,d,cond+1,:));
-                                    meandata = nanmean(tmpdata);
+                                    meandata = mean(tmpdata,'omitnan');
                                     nanidx = isnan(meandata);
                                     stddata = nanstd(tmpdata);
                                     semdata = stddata./sqrt(sum(max(~isnan(tmpdata),[],2)));
@@ -221,7 +221,7 @@ function create_comparison_figure(CombData, gen_settings, comp_settings, ts_sett
                             for g = 1:num_groups
 
                                 tmpdata = squeeze(CombData.mean_pos_series(g,:,cond,:));
-                                meandata = nanmean(tmpdata);
+                                meandata = mean(tmpdata,'omitnan');
                                 nanidx = isnan(meandata);
                                 stddata = nanstd(tmpdata);
                                 semdata = stddata./sqrt(sum(max(~isnan(tmpdata),[],2)));
@@ -261,7 +261,7 @@ function create_comparison_figure(CombData, gen_settings, comp_settings, ts_sett
                                  if plot_both_dir_pos
 
                                      tmpdata = squeeze(CombData.mean_pos_series(g,:,cond+1,:));
-                                     meandata = nanmean(tmpdata);
+                                     meandata = mean(tmpdata,'omitnan');
                                      nanidx = isnan(meandata);
                                      stddata = nanstd(tmpdata);
                                      semdata = stddata./sqrt(sum(max(~isnan(tmpdata),[],2)));

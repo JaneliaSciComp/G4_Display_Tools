@@ -36,11 +36,11 @@ function plot_CL_histograms(CL_conds, CL_inds, histogram_data, num_groups, ...
                             x = circshift(1:num_positions,[1 floor(num_positions/2)]);
                             x(x>x(end)) = x(x>x(end))-num_positions;
                             for g = 1:num_groups
-                                tmpdata = circshift(squeeze(nanmean(histogram_data(g,:,d,cond,:,:),5)),[1 num_positions/2]);
+                                tmpdata = circshift(squeeze(mean(histogram_data(g,:,d,cond,:,:),5,'omitnan')),[1 num_positions/2]);
                                 if num_groups==1 && overlap==0 %plot individual trials only if plotting one data group (otherwise it's too messy)
                                     plot(repmat(x',[1 num_exps]),tmpdata','Color',rep_Colors(g,:),'LineWidth',rep_LineWidth);
                                 end
-                                plot(x,nanmean(tmpdata),'Color',mean_Colors(g,:),'LineWidth',mean_LineWidth)
+                                plot(x,mean(tmpdata,'omitnan'),'Color',mean_Colors(g,:),'LineWidth',mean_LineWidth)
                             end
                             ylim(histogram_ylimits(d,:));
                             titlestr = ['\fontsize{' num2str(subtitle_FontSize) '} Condition #{\color[rgb]{' num2str(mean_Colors(g,:)) '}' num2str(cond)]; 
@@ -49,8 +49,8 @@ function plot_CL_histograms(CL_conds, CL_inds, histogram_data, num_groups, ...
                                 if cond>0
                                     titlestr = [titlestr ' \color[rgb]{' num2str(rep_Colors(g,:)) '}(' num2str(cond) ')'];
                                     for g = 1:num_groups
-                                        tmpdata = circshift(squeeze(nanmean(histogram_data(g,:,d,cond,:,:),5)),[1 num_positions/2]);
-                                        plot(x,nanmean(tmpdata),'Color',rep_Colors(g,:),'LineWidth',mean_LineWidth)
+                                        tmpdata = circshift(squeeze(mean(histogram_data(g,:,d,cond,:,:),5,'omitnan')),[1 num_positions/2]);
+                                        plot(x,mean(tmpdata,'omitnan'),'Color',rep_Colors(g,:),'LineWidth',mean_LineWidth)
                                     end
                                 end
                             end

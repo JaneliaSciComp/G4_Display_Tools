@@ -93,7 +93,7 @@ function [pos_series, mean_pos_series] = get_position_series(ts_data, Frame_ind,
                     step_range_abs = analysis_inds(step_range_rel) + sm_delay ; % sm_delay is offset in time (response lags stim appearance)
 
                     if size(step_range_abs) > 0 
-                         pos_series(cond_ind, rep_ind, mean_step_val) = squeeze(nanmean(ts_pos_data(LmR_ind,cond_ind,rep_ind, step_range_abs), 4)); 
+                         pos_series(cond_ind, rep_ind, mean_step_val) = squeeze(mean(ts_pos_data(LmR_ind,cond_ind,rep_ind, step_range_abs), 4, 'omitnan')); 
 
                     else
                         warning('step length error')
@@ -108,7 +108,7 @@ function [pos_series, mean_pos_series] = get_position_series(ts_data, Frame_ind,
         end
     end
 
-    mean_pos_series = squeeze(nanmean(pos_series, 2));
+    mean_pos_series = squeeze(mean(pos_series, 2, 'omitnan'));
 
     
 

@@ -34,10 +34,10 @@ aligned_data(sub2ind(array_size,row_inds,col_inds)) = unaligned_data;
 %% downscale data if data rate is higher than set rate
 switch lower(downscaling)
     case 'mean'
-        aligned_data = nanmean(aligned_data,1);
+        aligned_data = mean(aligned_data,1,'omitnan');
         
     case 'median'
-        aligned_data = round(nanmedian(aligned_data,1));
+        aligned_data = round(median(aligned_data,1,'omitnan'));
         
     case 'mode'
         aligned_data = mode(aligned_data,1);

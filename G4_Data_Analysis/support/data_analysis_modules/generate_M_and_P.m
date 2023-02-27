@@ -24,14 +24,14 @@ function [P, M, P_flies, M_flies] = generate_M_and_P(mean_pos_series, MP_conds, 
                         tmp = squeeze(mean_pos_series(g, :,cond,:));
                         tmp2 = squeeze(mean_pos_series(g, :,cond+1,:));
                         if size(mean_pos_series,2) > 1
-                            tmp = nanmean(tmp,1);
-                            tmp2 = nanmean(tmp2,1);
+                            tmp = mean(tmp,1,'omitnan');
+                            tmp2 = mean(tmp2,1,'omitnan');
                         else
                             tmp = permute(tmp,[2 1]);
                             tmp2 = permute(tmp2, [2 1]);
                         end
-                        P(g, count, :) = nanmean([tmp; tmp2],1);
-                        M(g, count, :) = nanmean([tmp; -tmp2],1);
+                        P(g, count, :) = mean([tmp; tmp2],1,'omitnan');
+                        M(g, count, :) = mean([tmp; -tmp2],1,'omitnan');
                         
                         
                     end
@@ -57,8 +57,8 @@ function [P, M, P_flies, M_flies] = generate_M_and_P(mean_pos_series, MP_conds, 
                                     tmp2 = permute(tmp2,[2 1]);
                                 end
                                 
-                                P_flies(g, fly, count, :) = nanmean([tmp; tmp2],1);
-                                M_flies(g,  fly, count,  :) = nanmean([tmp; -tmp2],1);
+                                P_flies(g, fly, count, :) = mean([tmp; tmp2],1,'omitnan');
+                                M_flies(g,  fly, count,  :) = mean([tmp; -tmp2],1,'omitnan');
                                 
 
                             end

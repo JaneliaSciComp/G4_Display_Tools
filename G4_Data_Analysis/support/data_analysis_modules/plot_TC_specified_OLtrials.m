@@ -51,29 +51,29 @@ function plot_TC_specified_OLtrials(TC_plot_settings, gen_settings, TC_conds, pl
                     better_subplot(num_plot_rows, num_plot_cols, placement, gap_x, gap_y)
                     hold on
                     for g = 1:num_groups
-                        tmpdata = squeeze(nanmean(summaries(g,:,d,conds,:),5));
+                        tmpdata = squeeze(mean(summaries(g,:,d,conds,:),5,'omitnan'));
 
                         if single == 1 
                             plot(tmpdata','Color',mean_Colors(g,:),'LineWidth',rep_LineWidth, 'Marker', marker_type);
 
                         elseif g == control_genotype
-                            plot(nanmean(tmpdata),'Color',control_color,'LineWidth',mean_LineWidth, 'Marker', marker_type);
+                            plot(mean(tmpdata,'omitnan'),'Color',control_color,'LineWidth',mean_LineWidth, 'Marker', marker_type);
                         else
 
-                            plot(nanmean(tmpdata),'Color',mean_Colors(g,:),'LineWidth',mean_LineWidth, 'Marker', marker_type);
+                            plot(mean(tmpdata,'omitnan'),'Color',mean_Colors(g,:),'LineWidth',mean_LineWidth, 'Marker', marker_type);
                         end
                         if plot_opposing_directions == 1
                             for l = 1:length(conds)
                                 conds(l) = conds(l) + 1;
                             end
-                            tmpdata = squeeze(nanmean(summaries(g,:,d,conds,:),5));
+                            tmpdata = squeeze(mean(summaries(g,:,d,conds,:),5,'omitnan'));
                             if single == 1
                                 plot(tmpdata','Color', mean_Colors(g+1,:), 'LineWidth', mean_LineWidth, 'Marker', marker_type);
                             elseif num_groups == 1
-                                plot(nanmean(tmpdata),'Color',mean_Colors(g+1,:),'LineWidth',mean_LineWidth, 'Marker', marker_type);
+                                plot(mean(tmpdata,'omitnan'),'Color',mean_Colors(g+1,:),'LineWidth',mean_LineWidth, 'Marker', marker_type);
                             else
                                 if g == control_genotype
-                                    plot(nanmean(tmpdata),'Color',control_color + .5,'LineWidth',mean_LineWidth, 'Marker', marker_type);
+                                    plot(mean(tmpdata,'omitnan'),'Color',control_color + .5,'LineWidth',mean_LineWidth, 'Marker', marker_type);
                                 else
                                     for rgb = 1:length(mean_Colors(g,:))
                                         if mean_Colors(g,rgb) > .75
@@ -87,7 +87,7 @@ function plot_TC_specified_OLtrials(TC_plot_settings, gen_settings, TC_conds, pl
 
                                         end
                                     end
-                                    plot(nanmean(tmpdata),'Color',mean_Colors(g,:) + color_adjust,'LineWidth',mean_LineWidth, 'Marker', marker_type);
+                                    plot(mean(tmpdata,'omitnan'),'Color',mean_Colors(g,:) + color_adjust,'LineWidth',mean_LineWidth, 'Marker', marker_type);
                                 end
                             end
                             for i = 1:length(conds)

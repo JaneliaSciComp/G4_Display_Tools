@@ -290,11 +290,11 @@ function process_data(exp_folder, processing_settings_file)
     end
 
 
-    ts_avg_reps = squeeze(nanmean(da_data, 3));
+    ts_avg_reps = squeeze(mean(da_data, 3, 'omitnan'));
     LmR_avg_over_reps = squeeze(ts_avg_reps(LmR_ind,:,:));
     LpR_avg_over_reps = squeeze(ts_avg_reps(LpR_ind,:,:));
     
-    ts_avg_reps_norm = squeeze(nanmean(da_data_norm, 3));
+    ts_avg_reps_norm = squeeze(mean(da_data_norm, 3, 'omitnan'));
     LmR_avg_reps_norm = squeeze(ts_avg_reps_norm(LmR_ind,:,:));   
     LpR_avg_reps_norm = squeeze(ts_avg_reps_norm(LpR_ind,:,:));
 
@@ -302,8 +302,8 @@ function process_data(exp_folder, processing_settings_file)
        
     if faLmR == 1
         [faLmR_data, faLmR_data_norm] = get_faLmR(da_data, da_data_norm, LmR_ind, condition_pairs);
-        faLmR_avg_over_reps = squeeze(nanmean(faLmR_data(:,:,:),2));
-        faLmR_avg_reps_norm = squeeze(nanmean(faLmR_data_norm(:,:,:),2));
+        faLmR_avg_over_reps = squeeze(mean(faLmR_data(:,:,:),2, 'omitnan'));
+        faLmR_avg_reps_norm = squeeze(mean(faLmR_data_norm(:,:,:),2, 'omitnan'));
     else
         faLmR_data = [];
         faLmR_data_norm = [];
@@ -312,8 +312,8 @@ function process_data(exp_folder, processing_settings_file)
     end
 
 %calculate values for tuning curves
-    tc_data = nanmean(da_data,4);
-    tc_data_norm = nanmean(da_data_norm,4);
+    tc_data = mean(da_data,4, 'omitnan');
+    tc_data_norm = mean(da_data_norm,4, 'omitnan');
     
     %calculate histograms of/by pattern position - normalized and
     %unnormalized
@@ -372,7 +372,7 @@ function process_data(exp_folder, processing_settings_file)
     summaries = tc_data; %[datatype, condition, repition]
     summaries_normalized = tc_data_norm;
     conditionModes = cond_modes(:,1); %[condition]
-    pattern_movement_time_avg = squeeze(nanmean(cond_frame_move_time,2));
+    pattern_movement_time_avg = squeeze(mean(cond_frame_move_time,2, 'omitnan'));
 %    LmR_normalization_max = maxs(LmR_ind,1,1)
 
     

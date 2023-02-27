@@ -2,7 +2,7 @@ function ts_data = search_for_misaligned_data(ts_data, dev_limit, num_conds, num
     indices = nan(num_conds, num_reps);
     for  cond = 1:num_conds
         for rep = 1:num_reps
-            if isnan(nanmean(ts_data(Frame_ind, cond, rep, :)))
+            if isnan(mean(ts_data(Frame_ind, cond, rep, :), 'omitnan'))
                 indices(cond, rep) = NaN;
             else
                 l = 1;
@@ -28,7 +28,7 @@ function ts_data = search_for_misaligned_data(ts_data, dev_limit, num_conds, num
                 
             end
         end
-        mean_idx = nanmean(indices(cond,:));
+        mean_idx = mean(indices(cond,:), 'omitnan');
         if isnan(mean_idx)
             rep_needs_aligned(cond) = NaN;
             continue;
@@ -77,7 +77,7 @@ function ts_data = search_for_misaligned_data(ts_data, dev_limit, num_conds, num
         if ~isnan(rep_needs_aligned(con))
             inds = indices(con,:);
             inds(rep_needs_aligned(con)) = [];            
-            mean_good_reps = nanmean(inds);
+            mean_good_reps = mean(inds, 'omitnan');
             idx = indices(con, rep_needs_aligned(con));
             shift_amt = floor(abs(idx - mean_good_reps));
             pad = nan(shift_amt,1);

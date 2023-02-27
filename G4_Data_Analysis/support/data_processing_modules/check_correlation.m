@@ -51,8 +51,8 @@ function [bad_conds] = check_correlation(start_times, stop_times, exp_order, Log
             end
 
             if exist('peaks', 'var') == 1
-                peaks(cond, comp+1) = nanmean(peaks(cond, 1:comp));
-                percent_off_zero(cond, comp+1) = nanmean(percent_off_zero(cond, 1:comp));
+                peaks(cond, comp+1) = mean(peaks(cond, 1:comp), 'omitnan');
+                percent_off_zero(cond, comp+1) = mean(percent_off_zero(cond, 1:comp), 'omitnan');
             end
             index = 1;
             for c = 1:num_comparisons

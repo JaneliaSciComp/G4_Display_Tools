@@ -70,7 +70,7 @@ function plot_unedited_position_series(settings, gen_settings, mean_pos_series, 
                         for g = 1:num_groups
 
                             tmpdata = squeeze(mean_pos_series(g,:,cond,:));
-                            meandata = nanmean(tmpdata);
+                            meandata = mean(tmpdata,'omitnan');
                             nanidx = isnan(meandata);
                             stddata = nanstd(tmpdata);
                             semdata = stddata./sqrt(sum(max(~isnan(tmpdata),[],2)));
@@ -110,7 +110,7 @@ function plot_unedited_position_series(settings, gen_settings, mean_pos_series, 
                              if plot_opposing_directions
 
                                  tmpdata = squeeze(mean_pos_series(g,:,cond+1,:));
-                                 meandata = nanmean(tmpdata);
+                                 meandata = mean(tmpdata,'omitnan');
                                  nanidx = isnan(meandata);
                                  stddata = nanstd(tmpdata);
                                  semdata = stddata./sqrt(sum(max(~isnan(tmpdata),[],2)));

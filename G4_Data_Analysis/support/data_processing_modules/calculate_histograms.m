@@ -19,7 +19,7 @@ function [hist_data] = calculate_histograms(da_data, hist_datatypes, Frame_ind, 
     tmpdata = repmat(da_data([LmR_ind, LpR_ind],:,:,:),[1 1 1 1 max_pos]);
     p_idx = repmat(permute(p_idx,[5 1 2 3 4]),[2 1 1 1 1]);
     tmpdata(~p_idx) = nan;
-    hist_data(2:3,:,:,:) = nanmean(tmpdata,4); %LmR and LpR by pattern position
+    hist_data(2:3,:,:,:) = mean(tmpdata,4, 'omitnan'); %LmR and LpR by pattern position
     
     % At this point, for any conditions that have been thrown out (meaning
     % all the data in them is NaNs), the frame position data has been

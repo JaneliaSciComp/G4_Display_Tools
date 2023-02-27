@@ -62,22 +62,22 @@ function convert_processed_file(varargin)
         %Want to normalize data before averaging it? 
         %Take average of timeseries data
         %average ts_data over number of reps
-        timeseries_avg_over_reps = squeeze(nanmean(Data.timeseries, 3));
+        timeseries_avg_over_reps = squeeze(mean(Data.timeseries, 3,'omitnan'));
 
         %average LmR data over number of reps
-        LmR_avg_over_reps = squeeze(nanmean(Data.timeseries(LmR_ind,:,:,:),3));
+        LmR_avg_over_reps = squeeze(mean(Data.timeseries(LmR_ind,:,:,:),3,'omitnan'));
 
         %average LpR data over number of reps
-        LpR_avg_over_reps = squeeze(nanmean(Data.timeseries(LpR_ind,:,:,:),3));
+        LpR_avg_over_reps = squeeze(mean(Data.timeseries(LpR_ind,:,:,:),3,'omitnan'));
 
         %average ts_data over all trials
-        timeseries_avg_all_trials = squeeze(nanmean(timeseries_avg_over_reps,2));
+        timeseries_avg_all_trials = squeeze(mean(timeseries_avg_over_reps,2,'omitnan'));
 
         %average LmR data over all trials
-        LmR_avg_all_trials = squeeze(nanmean(LmR_avg_over_reps,1));
+        LmR_avg_all_trials = squeeze(mean(LmR_avg_over_reps,1,'omitnan'));
 
         %average LpR data over all trials
-        LpR_avg_all_trials = squeeze(nanmean(LpR_avg_over_reps,1));
+        LpR_avg_all_trials = squeeze(mean(LpR_avg_over_reps,1,'omitnan'));
 
 
 

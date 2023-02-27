@@ -88,14 +88,14 @@ function plot_falmr_timeseries(falmr_data, timestampsIN, plot_settings, exp_sett
                                 tmpdata = squeeze(falmr_data(g,:,cond,:));
                                 
                             end
-                            meandata = nanmean(tmpdata);
+                            meandata = mean(tmpdata,'omitnan');
                             nanidx = isnan(meandata);
                             stddata = nanstd(tmpdata);
                             semdata = stddata./sqrt(sum(max(~isnan(tmpdata),[],2)));
                             timestamps = timestampsIN(~nanidx);
                             meandata(nanidx) = []; 
                             semdata(nanidx) = [];
-                            ms_to_move = nanmean(squeeze(pat_move_time(g,:,cond,:)))/1000;
+                            ms_to_move = mean(squeeze(pat_move_time(g,:,cond,:)),'omitnan')/1000;
                             move_line(g) = timestamps(1) + ms_to_move;
                             if cutoff_time > 0
                                 cutoff_ind = find(timestamps>cutoff_time);
@@ -141,7 +141,7 @@ function plot_falmr_timeseries(falmr_data, timestampsIN, plot_settings, exp_sett
                                 else
                                     tmpdata = squeeze(falmr_data(g,:,opp_cond,:));
                                 end
-                                meandata = nanmean(tmpdata);
+                                meandata = mean(tmpdata,'omitnan');
                                 nanidx = isnan(meandata);
                                 stddata = nanstd(tmpdata);
                                 semdata = stddata./sqrt(sum(max(~isnan(tmpdata),[],2)));

@@ -99,7 +99,7 @@ function plot_basic_histograms(model, timeseries_data, interhistogram_data, ...
                         
                     end
                 end
-                text(0.6, 1.25-0.3*(d+1), ['Mean ' TC_datatypes{d} ' = ' num2str(nanmean(data_vec))], 'FontSize', 8);
+                text(0.6, 1.25-0.3*(d+1), ['Mean ' TC_datatypes{d} ' = ' num2str(mean(data_vec,'omitnan'))], 'FontSize', 8);
                 
                 axis off
                 hold on
@@ -142,13 +142,13 @@ function plot_basic_histograms(model, timeseries_data, interhistogram_data, ...
 
             if trial_options(2)==1 && single == 0
                 
-                ind_lines = squeeze(nanmean(interhistogram_data(g,:,:,:),3));
-                avg_line = squeeze(nanmean(nanmean(interhistogram_data(g,:,:,:),3),2));
+                ind_lines = squeeze(mean(interhistogram_data(g,:,:,:),3,'omitnan'));
+                avg_line = squeeze(mean(mean(interhistogram_data(g,:,:,:),3,'omitnan'),2,'omitnan'));
                 total_points_array = [];
                 for trs = 1:size(interhistogram_data,3)
                     total_points_array(trs) = nansum(interhistogram_data(1,1,trs,:),4);
                 end
-                total_points = nanmean(mean(nonzeros(total_points_array)));
+                total_points = mean(mean(nonzeros(total_points_array)),'omitnan');
                 ind_lines = ind_lines/total_points;
                 avg_line = avg_line/total_points;
                 
@@ -204,12 +204,12 @@ function plot_basic_histograms(model, timeseries_data, interhistogram_data, ...
             
             elseif trial_options(2) == 1 && single == 1
                
-                fly_line = squeeze(nanmean(interhistogram_data(g,:,:,:),3));
+                fly_line = squeeze(mean(interhistogram_data(g,:,:,:),3,'omitnan'));
                 total_points_array = [];
                 for trs = 1:size(interhistogram_data,3)
                     total_points_array(trs) = nansum(interhistogram_data(1,1,trs,:),4);
                 end
-                total_points = nanmean(mean(nonzeros(total_points_array)));
+                total_points = mean(mean(nonzeros(total_points_array)),'omitnan');
 
                 fly_line = fly_line/total_points;
                 if plot_in_degrees == 1

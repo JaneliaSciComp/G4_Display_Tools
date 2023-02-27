@@ -98,14 +98,14 @@ function plot_OL_timeseries(timeseries_data, timestampsIN, model, plot_settings,
                                 tmpdata = squeeze(timeseries_data(g,:,d,cond,:));
                                 
                             end
-                            meandata = nanmean(tmpdata);
+                            meandata = mean(tmpdata,'omitnan');
                             nanidx = isnan(meandata);
                             stddata = nanstd(tmpdata);
                             semdata = stddata./sqrt(sum(max(~isnan(tmpdata),[],2)));
                             timestamps = timestampsIN(~nanidx);
                             meandata(nanidx) = []; 
                             semdata(nanidx) = [];
-                            ms_to_move = nanmean(squeeze(pat_move_time(g,:,cond,:)))/1000;
+                            ms_to_move = mean(squeeze(pat_move_time(g,:,cond,:),'omitnan'))/1000;
                             if ~isempty(timestamps)
                                 move_line(g) = timestamps(1) + ms_to_move;
                             else
@@ -127,7 +127,7 @@ function plot_OL_timeseries(timeseries_data, timestampsIN, model, plot_settings,
                                 else
                                     tmpdataOpp = squeeze(timeseries_data(g,:,d,opp_cond,:));
                                 end
-                                meandataOpp = nanmean(tmpdataOpp);
+                                meandataOpp = mean(tmpdataOpp,'omitnan');
                                 nanidxOpp = isnan(meandataOpp);
                                 stddataOpp = nanstd(tmpdataOpp);
                                 semdataOpp = stddataOpp./sqrt(sum(max(~isnan(tmpdataOpp),[],2)));
