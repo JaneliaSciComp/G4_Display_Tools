@@ -227,8 +227,7 @@ classdef G4_conductor_model < handle
 
                 case 4
 
-                    filename = '';
-                    disp("This run protocol coming soon");
+                    filename = 'G4_run_protocol_blockLogging.m';
 
                 case 5
 
@@ -240,13 +239,11 @@ classdef G4_conductor_model < handle
 
                 case 7
 
-                    filename = '';
-                    disp("This run protocol coming soon");
+                    filename = 'G4_run_protocol_streaming_blockLogging.m';
 
                 case 8
 
-                    filename = '';
-                    disp("This run protocol coming soon");
+                    filename = 'G4_run_protocol_CC_streaming_blockLogging.m';
 
                 otherwise
                     disp("Invalid run protocol selected.");
