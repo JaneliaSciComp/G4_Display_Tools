@@ -1,32 +1,8 @@
-classdef G4_designer_model
+classdef G4_designer_model < handle
     %MAIN MODEL with trial data (in the form of cell arrays) and other
     %parameters for submitting a run. 
-
-    properties
-
-%tracking which cell in each table is currently selected
-        pre_selected_index_
-        inter_selected_index_
-        post_selected_index_
-        block_selected_index_
-        
-%tracking which file is in the current preview window
-        current_preview_file_
-        current_selected_cell_
-        
-%Tracking position in in-window preview
-        auto_preview_index_
-        is_paused_
-        
-%Other values to keep track of
-
-        isSelect_all_
-        host_connected_
-        screen_on_
-        
-    end
     
-    properties (Dependent)
+    properties
         
 %tracking which cell in each table is currently selected
         pre_selected_index
@@ -54,114 +30,120 @@ classdef G4_designer_model
 %CONSTRUCTOR (Set defaults here except trial defaults - set those in model_trial)
         function self = G4_designer_model()
             
-            self.isSelect_all = false;
-            self.is_paused = false;
-            self.current_selected_cell = struct('table', "", 'index', [0,0]);
-            self.auto_preview_index = 1;
-            self.current_preview_file = '';
-            self.host_connected = 0;
-            self.screen_on = 0;
- 
+            self.set_isSelect_all(false);
+            self.set_is_paused(false);
+            self.set_current_selected_cell(struct('table', "", 'index', [0,0]));
+            self.set_auto_preview_index(1);
+            self.set_current_preview_file('');
+            self.set_host_connected(0);
+            self.set_screen_on(0);
      
         end
-        
-
-        
 
 %SETTERS
-        
-        
-        function self = set.pre_selected_index(self, value)
-            self.pre_selected_index_ = value;
-        end
-        
-        function self = set.inter_selected_index(self, value)
-            self.inter_selected_index_ = value;
-        end
-        
-        function self = set.post_selected_index(self, value)
-            self.post_selected_index_ = value;
-        end
-        
-        function self = set.block_selected_index(self, value)
-            self.block_selected_index_ = value;
-        end
-        
-        function self = set.current_preview_file(self, value)
-            self.current_preview_file_ = value;
-        end
-        
-        function self = set.current_selected_cell(self, value)
-            self.current_selected_cell_ = value;
-        end
-        
-        function self = set.auto_preview_index(self, value)
-            self.auto_preview_index_ = value;
-        end
-        
-        function self = set.is_paused(self, value)
-            self.is_paused_ = value;
-        end
-        
-        function self = set.isSelect_all(self, value)
-            self.isSelect_all_ = value;
-        end
-        
-        function self = set.host_connected(self, value)
-            self.host_connected_ = value;
-        end
-        
-        function self = set.screen_on(self, value)
-            self.screen_on_ = value;
+        function set_pre_selected_index(self, input)
+            self.pre_selected_index = input;
         end
 
-        
-%GETTERS        
+        function set_inter_selected_index(self, input)
+            self.inter_selected_index = input;
+        end
 
-        function value = get.pre_selected_index(self)
-            value = self.pre_selected_index_;
+        function set_post_selected_index(self, input)
+            self.post_selected_index = input;
         end
-        
-        function value = get.inter_selected_index(self)
-            value = self.inter_selected_index_;
+
+        function set_block_selected_index(self, input)
+            self.block_selected_index = input;
         end
-        
-        function value = get.post_selected_index(self)
-            value = self.post_selected_index_;
+
+        function set_current_preview_file(self, input)
+            self.current_preview_file = input;
         end
-        
-        function value = get.block_selected_index(self)
-            value = self.block_selected_index_;
+
+        function set_current_selected_cell(self, input)
+            self.current_selected_cell = input;
         end
-        
-        function value = get.current_preview_file(self)
-            value = self.current_preview_file_;
+
+        function set_auto_preview_index(self, input)
+            self.auto_preview_index = input;
         end
-        
-        function value = get.current_selected_cell(self)
-            value = self.current_selected_cell_;
+
+        function set_is_paused(self, input)
+            if input == 0 || input == 1
+                self.is_paused = input;
+            else
+                disp("Error with the pause function");
+            end
         end
-        
-        function value = get.auto_preview_index(self)
-            value = self.auto_preview_index_;
+
+        function set_isSelect_all(self, input)
+            if input == 0 || input == 1
+                self.isSelect_all = input;
+            else
+                disp("Error with the select all function");
+            end
         end
-        
-        function value = get.is_paused(self)
-            value = self.is_paused_;
+
+        function set_host_connected(self, input)
+            self.host_connected = input;
         end
-        
-        function value = get.isSelect_all(self)
-            value = self.isSelect_all_;
+
+        function set_screen_on(self, input)
+            if input == 1 || input == 0
+                self.screen_on = input;
+            else
+                disp("Error with the Screen On/Off function");
+            end
         end
-        
-        function value = get.host_connected(self)
-            value = self.host_connected_;
+
+%GETTERS
+
+        function output = get_pre_selected_index(self)
+            output = self.pre_selected_index;
         end
-        
-        function value = get.screen_on(self)
-            value = self.screen_on_;
+
+        function output = get_inter_selected_index(self)
+            output = self.inter_selected_index;
         end
-        
+
+        function output = get_post_selected_index(self)
+            output = self.post_selected_index;
+        end
+
+        function output = get_block_selected_index(self)
+            output = self.block_selected_index;
+        end
+
+        function output = get_current_preview_file(self)
+            output = self.current_preview_file;
+        end
+
+        function output = get_current_selected_cell(self)
+            output = self.current_selected_cell;
+        end
+
+        function output = get_auto_preview_index(self)
+            output = self.auto_preview_index;
+        end
+
+        function output = get_is_paused(self)
+            output = self.is_paused;
+        end
+
+        function output = get_isSelect_all(self)
+            output = self.isSelect_all;
+        end
+
+        function output = get_host_connected(self)
+            output = self.host_connected;
+        end
+           
+
+        function output = get_screen_on(self)
+            output = self.screen_on;
+        end
+
 
     end
 end
