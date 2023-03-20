@@ -186,15 +186,15 @@ end
 
 %% Loop to run the block/inter trials --------------------------------------
 
-             for r = 1:reps
+             for r = 1:params.reps
                  log_started = ctlr.startLog();
-                 for c = 1:num_cond
+                 for c = 1:params.num_cond
                     %define which condition we're using
                     cond = p.exp_order(r,c);
                     
                     %Update the progress bar--------------------------
                     num_trial_of_total = num_trial_of_total + 1;
-                    runcon.update_progress('block', r, reps, c, num_cond, cond, num_trial_of_total);
+                    runcon.update_progress('block', r, params.reps, c, params.num_cond, cond, num_trial_of_total);
 
                     
                     %define parameters for this trial----------------
@@ -204,7 +204,7 @@ end
 
                     ctlr_parameters = {tparams.trial_mode, tparams.pat_id, tparams.gain, ...
                         tparams.offset, tparams.pos_id, tparams.frame_rate, tparams.frame_ind...
-                        tparams.active_ao_channels, tparams.trial_ao_indices};
+                        params.active_ao_channels, tparams.trial_ao_indices};
 
                      
                     ctlr.setControllerParameters(ctlr_parameters);

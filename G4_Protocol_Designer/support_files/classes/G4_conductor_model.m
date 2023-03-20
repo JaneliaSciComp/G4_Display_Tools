@@ -138,7 +138,8 @@ classdef G4_conductor_model < handle
             self.date_folder = datestr(now, 'mm_dd_yyyy');
             self.timestamp = datestr(now, 'mm-dd-yyyyHH_MM_SS');
             self.num_attempts_bad_conds = 1;
-            self.run_protocol_num = 1;
+            self.set_run_file(1);
+            
             
 
             self.postTrialTimes = [];
