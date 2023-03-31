@@ -1,21 +1,7 @@
 classdef G4_preview_view < handle
+
     
-    
-    properties
-        con_
-        fig_
-        im_
-        pat_axes_
-        pos_line_
-        ao_lines_
-        dummy_line_
-        fr_increment_box_
-        frame_rate_box_
-        
-    end
-    
-    
-    properties (Dependent)
+    properties 
         con
         fig
         im
@@ -452,75 +438,7 @@ classdef G4_preview_view < handle
             ao4_pos = [ao_x, ao4_y, aoChart_width, aoChart_height];
         
         end
-        
-        
-        %% Setters
-        
-        function set.con(self, value)
-            self.con_ = value;
-        end
-        function set.fr_increment_box(self, value)
-            self.fr_increment_box_ = value;
-        end
-        function set.ao_lines(self, value)
-            self.ao_lines_ = value;
-        end
-        function set.fig(self, value)
-            self.fig_ = value;
-        end
-        
-        function set.im(self, value)
-            self.im_ = value;
-        end
-        function set.pat_axes(self, value)
-            self.pat_axes_ = value;
-        end
-        function set.pos_line(self, value)
-            self.pos_line_ = value;
-        end
 
-        function set.dummy_line(self, value)
-            self.dummy_line_ = value;
-        end
-        
-        function set.frame_rate_box(self, value)
-            self.frame_rate_box_ = value;
-        end
-        
-        %% Getters
-        
-        function value = get.con(self)
-            value = self.con_;
-        end
-        
-        function value = get.fr_increment_box(self)
-            value = self.fr_increment_box_;
-        end
-        function value = get.ao_lines(self)
-            value = self.ao_lines_;
-        end
-        function value = get.fig(self)
-            value = self.fig_;
-        end
-        
-        function value = get.im(self)
-            value = self.im_;
-        end
-        function value = get.pat_axes(self)
-            value = self.pat_axes_;
-        end
-        function value = get.pos_line(self)
-            value = self.pos_line_;
-        end
-
-        function value = get.dummy_line(self)
-            value = self.dummy_line_;
-        end
-        
-        function value = get.frame_rate_box(self)
-            value = self.frame_rate_box_;
-        end
-        
         
     end
     

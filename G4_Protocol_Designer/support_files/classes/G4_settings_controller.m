@@ -1,13 +1,7 @@
 classdef G4_settings_controller < handle
     
-    properties
-        
-        model_
-        view_
-
-    end
   
-    properties (Dependent)
+    properties
         
         model
         view
@@ -243,35 +237,8 @@ classdef G4_settings_controller < handle
                 new_file = fullfile(path,file);
             end
     
-        end
-
-
-        
-        %% Setters
-        
-        function set.model(self, value)
-            self.model_ = value;
-        end
-        function set.view(self, value)
-            self.view_ = value;
-        end
-        
-        %% Getters
-        
-        function value = get.model(self)
-            value = self.model_;
-        end
-        function value = get.view(self)
-            value = self.view_;
-        end
-        
-        
-        
-        
+        end   
         
     end
-    
-    
-    
-    
+
 end

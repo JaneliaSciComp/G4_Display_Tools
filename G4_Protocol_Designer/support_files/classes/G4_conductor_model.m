@@ -2,65 +2,26 @@ classdef G4_conductor_model < handle
     
     properties
         
-        fly_name_;
-        fly_save_name_;
-        fly_genotype_;
-        experimenter_;
-        fly_age_;
-        fly_sex_;
-        experiment_temp_;
-        experiment_type_;
-        rearing_protocol_
-        light_cycle_
-        metadata_comments_
-        do_plotting_;
-        do_processing_;
-        plotting_file_;
-        processing_file_;
-        run_protocol_file_;
-        run_protocol_file_desc_
-        run_protocol_file_list_
-        run_protocol_num_
-        google_sheet_key_;
-        list_of_gids_;
-        metadata_array_
-        metadata_options_
-       num_tests_conducted_
-       expected_time_
-       timestamp_
-       aborted_count_
-       date_folder_
-
-       num_attempts_bad_conds_
-
-       postTrialTimes_
-
-       
-        
-    end
-    
-    properties (Dependent)
-        
-        fly_name;
-        fly_save_name;
-        fly_genotype;
-        fly_age;
-        fly_sex;
-        experiment_temp;
-        experimenter;
+        fly_name
+        fly_save_name
+        fly_genotype
+        fly_age
+        fly_sex
+        experiment_temp
+        experimenter
         rearing_protocol
         light_cycle
         metadata_comments
-        experiment_type;
-        do_plotting;
-        do_processing;
-        plotting_file;
-        processing_file;
-        run_protocol_file;
+        experiment_type
+        do_plotting
+        do_processing
+        plotting_file
+        processing_file
+        run_protocol_file
         run_protocol_file_desc
         run_protocol_file_list
         run_protocol_num
-        google_sheet_key;
+        google_sheet_key
         list_of_gids
         metadata_array
         metadata_options
@@ -82,7 +43,7 @@ classdef G4_conductor_model < handle
 
         function self = G4_conductor_model()
             
-            %%User adjusted lists based on settings file and metadata Google Sheets
+            %% User adjusted lists based on settings file and metadata Google Sheets
             list_of_setting_strings = {'Default run protocol file: ', 'Default processing file: ', ...
                 'Default plotting file: ', 'Metadata Google Sheet key: '}; %These strings must match the string
             %preceding the corresponding value in the settings file -
@@ -112,13 +73,13 @@ classdef G4_conductor_model < handle
             self.run_protocol_file_list = {'Simple', 'Combined Command', 'Streaming', 'Log Reps Separately', 'CC + Streaming', ...
                 'CC + Log Reps', 'Streaming + Log Reps', 'CC + Streaming + Log Reps'};
 
-            %%run functions to 1)read the metadata options from the google
+            %% run functions to 1)read the metadata options from the google
             %%sheet and 2) create a metadata_lists cell array with the list
             %%of options for each metadata field. 
             self.get_metadata_array();
             self.create_metadata_options(list_of_metadata_fields);
             
-            %%Set initial values of properties - default to first item on
+            %% Set initial values of properties - default to first item on
             %%each metadata list.
             self.fly_name = '';
             self.metadata_comments = '';
@@ -350,6 +311,8 @@ classdef G4_conductor_model < handle
         function set_postTrialTimes(self, new_val)
             self.postTrialTimes = new_val;
         end
+
+        %% Getters
         
         function value = get_num_attempts_bad_conds(self)
             value = self.num_attempts_bad_conds;
@@ -363,247 +326,7 @@ classdef G4_conductor_model < handle
             value =  self.run_protocol_file_desc;
         end
         
-        
-        
-%GETTERS------------------------------------------------------------------
-        
-        function value = get.fly_name(self)
-            value = self.fly_name_;
-        end
-        
-        function value = get.fly_genotype(self)
-            value = self.fly_genotype_;
-        end
-        
-        function value = get.experimenter(self)
-            value = self.experimenter_;
-        end
-        
-        function value = get.experiment_type(self)
-            value = self.experiment_type_;
-        end
-        
-        function value = get.do_plotting(self)
-            value = self.do_plotting_;
-        end
-        
-        function value = get.do_processing(self)
-            value = self.do_processing_;
-        end
-        
-        function value = get.plotting_file(self)
-            value = self.plotting_file_;
-        end
-        
-        function value = get.processing_file(self)
-            value = self.processing_file_;
-        end
-        
-        function value = get.run_protocol_file(self)
-            value = self.run_protocol_file_;
-        end
 
-        function value = get.run_protocol_file_list(self)
-            value = self.run_protocol_file_list_;
-        end
-
-        function value = get.run_protocol_file_desc(self)
-            value = self.run_protocol_file_desc_;
-        end
-
-        function value = get.run_protocol_num(self)
-            value = self.run_protocol_num_;
-        end
-        
-        function value = get.fly_age(self)
-            value = self.fly_age_;
-        end
-        
-        function value = get.fly_sex(self)
-            value = self.fly_sex_;
-        end
-        function value = get.experiment_temp(self)
-            value = self.experiment_temp_;
-        end
-        function output = get.metadata_array(self)
-            output = self.metadata_array_;
-        end
-        
-   
-        function value = get.google_sheet_key(self)
-            value = self.google_sheet_key_;
-        end
-        
-        function output = get.num_tests_conducted(self)
-            output = self.num_tests_conducted_;
-        end
-        
-        function output = get.list_of_gids(self)
-            output = self.list_of_gids_;
-        end
-        function output = get.metadata_options(self)
-            output = self.metadata_options_;
-        end
-        function output = get.rearing_protocol(self)
-            output = self.rearing_protocol_;
-        end
-        
-        function output = get.metadata_comments(self)
-            output = self.metadata_comments_;
-        end
-        
-        function output = get.light_cycle(self)
-            output = self.light_cycle_;
-        end
-        
-        function value = get.expected_time(self)
-            value = self.expected_time_;
-        end
-        
-        function value = get.timestamp(self)
-            value = self.timestamp_;
-        end
-        
-        function value = get.aborted_count(self)
-            value = self.aborted_count_;
-        end
-        
-        function value = get.fly_save_name(self)
-            value = self.fly_save_name_;
-        end
-        
-        function value = get.date_folder(self)
-            value = self.date_folder_;
-        end
-        
-        function value = get.num_attempts_bad_conds(self)
-            value = self.num_attempts_bad_conds_;
-        end
-        function value = get.postTrialTimes(self)
-            value = self.postTrialTimes_;
-        end
-            
-
-
-%SETTERS------------------------------------------------------------------
-
-        function set.fly_name(self, value)
-            self.fly_name_ = value;
-        end
-        
-        function set.fly_genotype(self, value)
-            self.fly_genotype_ = value;
-        end
-        
-        function set.experimenter(self, value)
-            self.experimenter_ = value;
-        end
-        
-        function set.experiment_type(self, value)
-            self.experiment_type_ = value;
-        end
-        
-        function set.do_plotting(self, value)
-            self.do_plotting_ = value;
-        end
-        
-        function set.do_processing(self, value)
-            self.do_processing_ = value;
-        end
-        
-        function set.plotting_file(self, value)
-            self.plotting_file_ = value;
-        end
-        
-        function set.processing_file(self, value)
-            self.processing_file_ = value;
-        end
-        
-        function set.run_protocol_file(self, value)
-            self.run_protocol_file_ = value;
-        end
-
-        function set.run_protocol_file_list(self, value)
-            self.run_protocol_file_list_ = value;
-        end
-
-        function set.run_protocol_file_desc(self, value)
-            self.run_protocol_file_desc_ = value;
-        end
-
-        function set.run_protocol_num(self, value)
-            self.run_protocol_num_ = value;
-        end
-
-        function set.fly_age(self, value)
-            self.fly_age_ = value;
-        end
-        function set.fly_sex(self, value)
-            self.fly_sex_ = value;
-        end
-        function set.experiment_temp(self, value)
-            self.experiment_temp_ = value;
-        end
-        function set.metadata_array(self, value)
-            self.metadata_array_ = value;
-        end
-
-        
-        function set.google_sheet_key(self, value)
-            self.google_sheet_key_ = value;
-        end
-        
-        function set.num_tests_conducted(self, value)
-            self.num_tests_conducted_ = value;
-        end
-        
-        function set.list_of_gids(self, value)
-            self.list_of_gids_ = value;
-        end
-
-        function set.metadata_options(self, value)
-            self.metadata_options_ = value;
-        end
-        
-        function set.rearing_protocol(self, value)
-            self.rearing_protocol_ = value;
-        end
-        
-        function set.metadata_comments(self, value)
-            self.metadata_comments_ = value;
-        end
-        
-        function set.light_cycle(self, value)
-            self.light_cycle_ = value;
-        end
-        
-        function set.expected_time(self, value)
-            self.expected_time_ = value;
-        end
-        
-        function set.timestamp(self, value)
-            self.timestamp_ = value;
-        end
-        
-        function set.aborted_count(self, value)
-            self.aborted_count_ = value;
-        end
-        
-        function set.fly_save_name(self, value)
-            self.fly_save_name_ = value;
-        end
-        
-        function set.date_folder(self, value)
-            self.date_folder_ = value;
-        end
-        
-        function set.num_attempts_bad_conds(self, value)
-            self.num_attempts_bad_conds_ = value;
-        end
-
-        function set.postTrialTimes(self, value)
-            self.postTrialTimes_ = value;
-        end
         
         
 

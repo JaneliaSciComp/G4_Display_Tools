@@ -1,77 +1,23 @@
 classdef G4_designer_controller < handle %Made this handle class because was having trouble getting setters to work, especially with struct properties. 
 
 %% Properties
+
+
     properties
-        model_ %contains all data that does not persist with saving
-        doc_ %contains all data that is stored in the saved file
-        preview_con_ %controller for the fullscreen preview
-        run_con_ %controller for the run window - can be opened independently
-        settings_con_ %controller (containing the view and model) for the settings panel
-        
+        model %contains all data that does not persist with saving
+        preview_con %controller for the fullscreen preview
+        run_con %controller for the run window - can be opened independently
+        doc %contains all data that is stored in the saved file
+        settings_con %controller (containing the view and model) for the settings panel
+
 %tables that show the trial data        
-        pretrial_table_
-        intertrial_table_
-        block_table_
-        posttrial_table_
-        
-%structs in which to load files as they are entered
-        pre_files_
-        block_files_
-        inter_files_
-        post_files_
-
-        %GUI parts
-        f_
-        preview_panel_
-        hAxes_
-        second_axes_
-        inscreen_plot_
-        
-        %channel gui objects
-        chan1_
-        chan1_rate_box_
-        chan2_
-        chan2_rate_box_
-        chan3_
-        chan3_rate_box_
-        chan4_
-        chan4_rate_box_
-        
-        %Settings GUI objects
-        num_rows_buttonGrp_
-        num_rows_3_
-        num_rows_4_
-        randomize_buttonGrp_
-        isRandomized_radio_
-        isSequential_radio_        
-        repetitions_box_
-        exp_name_box_
-        
-        %GUI Manipulation
-        isSelect_all_box_
-        pageUp_button_
-        pageDown_button_
-        exp_length_display_       
-        listbox_imported_files_
-        recent_g4p_files_
-        recent_files_filepath_
-        recent_file_menu_items_
-        menu_open_
-        preview_on_arena_
-    end
-
-    properties(Dependent)
-        model
-        preview_con
-        run_con
-        doc
-        settings_con
 
         pretrial_table
         intertrial_table
         posttrial_table
         block_table
-        
+
+%structs in which to load files as they are entered
         pre_files
         inter_files
         block_files
@@ -90,6 +36,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
         auto_preview_index
         is_paused
        
+        %channel gui objects
         chan1
         chan1_rate_box
         chan2
@@ -98,6 +45,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
         chan3_rate_box
         chan4
         chan4_rate_box
+%Settings GUI objects
         num_rows_buttonGrp
         num_rows_3
         num_rows_4
@@ -107,6 +55,8 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
         randomize_buttonGrp
         repetitions_box
         isSelect_all_box
+
+        %GUI parts
         f
         preview_panel
         hAxes
@@ -3653,353 +3603,6 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                 self.block_files.ao4(x) = new_value;
             end
          end
-         
-         
-
-%% SETTERS
-        
-         function set.model(self, value)
-            self.model_ = value;
-        end
-        
-        function set.preview_con(self, value)
-            self.preview_con_ = value;
-        end
-        
-        function set.run_con(self, value)
-            self.run_con_ = value;
-        end
-        
-         function set.pretrial_table(self, value)
-            self.pretrial_table_ = value;
-         end
-
-         function set.intertrial_table(self, value)
-            self.intertrial_table_ = value;
-         end
-
-         function set.posttrial_table(self, value)
-            self.posttrial_table_ = value;
-         end
-
-         function set.block_table(self, value)
-            self.block_table_ = value;
-         end
-         
-         function set.pre_files(self, value)
-             self.pre_files_ = value;
-         end
-         
-         function set.block_files(self, value)
-             self.block_files_ = value;
-         end
-         
-         function set.inter_files(self, value)
-             self.inter_files_ = value;
-         end
-         
-         function set.post_files(self, value)
-             self.post_files_ = value;
-         end
-
-         function set.chan1(self, value)
-            self.chan1_ = value;
-         end
-
-         function set.chan2(self, value)
-            self.chan2_ = value;
-         end
-
-         function set.chan3(self, value)
-            self.chan3_ = value;
-         end
-         
-         function set.chan4(self, value)
-            self.chan4_ = value;
-         end
-         
-         function set.chan1_rate_box(self, value)
-            self.chan1_rate_box_ = value;
-         end
-         
-         function set.chan2_rate_box(self, value)
-            self.chan2_rate_box_ = value;
-         end
-         
-         function set.chan3_rate_box(self, value)
-            self.chan3_rate_box_ = value;
-         end
-         
-         function set.chan4_rate_box(self, value)
-            self.chan4_rate_box_ = value;
-         end
-
-         
-         function set.isRandomized_radio(self, value)
-            self.isRandomized_radio_ = value;
-         end
-         
-         function set.isSequential_radio(self, value)
-             self.isSequential_radio_ = value;
-         end
-         
-         function set.repetitions_box(self, value)
-            self.repetitions_box_ = value;
-         end
-         
-         function set.num_rows_buttonGrp(self, value)
-             self.num_rows_buttonGrp_ = value;
-         end
-         
-         function set.num_rows_3(self, value)
-             self.num_rows_3_ = value;
-         end
-         
-         function set.num_rows_4(self, value)
-             self.num_rows_4_ = value;
-         end
-         
-         function set.randomize_buttonGrp(self, value)
-             self.randomize_buttonGrp_ = value;
-         end
-         
-         function set.isSelect_all_box(self, value)
-             self.isSelect_all_box_ = value;
-         end
-         
-         function set.f(self, value)
-             self.f_ = value;
-         end
-         
-         function set.preview_panel(self, value)
-             self.preview_panel_ = value;
-         end
-         
-         function set.hAxes(self, value)
-             self.hAxes_ = value;
-         end
-         
-         function set.exp_name_box(self, value)
-             self.exp_name_box_ = value;
-         end
-         
-         function set.doc(self, value)
-            self.doc_ = value;
-         end
-         
-         function set.second_axes(self, value)
-             self.second_axes_ = value;
-         end
-         
-         function set.pageUp_button(self, value)
-             self.pageUp_button_ = value;
-         end
-         
-         function set.pageDown_button(self, value)
-             self.pageDown_button_ = value;
-         end
-
-         function set.listbox_imported_files(self, value)
-             self.listbox_imported_files_ = value;
-         end
-
-         function set.recent_file_menu_items(self, value)
-             self.recent_file_menu_items_ = value;
-         end
-         
-         function set.menu_open(self, value)
-             self.menu_open_ = value;
-         end
-         
-         function set.exp_length_display(self, value)
-             self.exp_length_display_ = value;
-         end
-         
-         function set.inscreen_plot(self, value)
-             self.inscreen_plot_ = value;
-         end
-         
-         function set.settings_con(self, value)
-             self.settings_con_ = value;
-         end
-         
-         function set.preview_on_arena(self, value)
-             self.preview_on_arena_ = value;
-         end
-
-%% GETTERS
-
-        function output = get.model(self)
-            output = self.model_;
-        end
-        
-        function output = get.preview_con(self)
-            output = self.preview_con_;
-        end
-        
-        function output = get.run_con(self)
-            output = self.run_con_;
-        end
-        
-         function output = get.pretrial_table(self)
-            output = self.pretrial_table_;
-         end
-
-         function output = get.intertrial_table(self)
-            output = self.intertrial_table_;
-         end
-
-         function output = get.posttrial_table(self)
-            output = self.posttrial_table_;
-         end
-
-         function output = get.block_table(self)
-            output = self.block_table_;
-         end
-         
-         function output = get.pre_files(self)
-             output = self.pre_files_;
-         end
-         
-         function output = get.block_files(self)
-             output = self.block_files_;
-         end
-         
-         function output = get.inter_files(self)
-             output = self.inter_files_;
-         end
-         
-         function output = get.post_files(self)
-             output = self.post_files_;
-         end
-
-         function output = get.chan1(self)
-            output = self.chan1_;
-         end
-
-         function output = get.chan2(self)
-            output = self.chan2_;
-         end
-
-         function output = get.chan3(self)
-            output = self.chan3_;
-         end
-         
-         function output = get.chan4(self)
-            output = self.chan4_;
-         end
-         
-         function output = get.chan1_rate_box(self)
-            output = self.chan1_rate_box_;
-         end
-         
-         function output = get.chan2_rate_box(self)
-            output = self.chan2_rate_box_;
-         end
-         
-         function output = get.chan3_rate_box(self)
-            output = self.chan3_rate_box_;
-         end
-         
-         function output = get.chan4_rate_box(self)
-            output = self.chan4_rate_box_;
-         end
-
-         function output = get.isRandomized_radio(self)
-            output = self.isRandomized_radio_;
-         end
-         
-         function output = get.isSequential_radio(self)
-             output = self.isSequential_radio_;
-         end
-         
-         function output = get.repetitions_box(self)
-            output = self.repetitions_box_;
-         end
-         
-         function output = get.num_rows_buttonGrp(self)
-             output = self.num_rows_buttonGrp_;
-         end
-         
-         function output = get.num_rows_3(self)
-             output = self.num_rows_3_;
-         end
-         
-         function output = get.num_rows_4(self)
-             output = self.num_rows_4_;
-         end
-         
-         function output = get.randomize_buttonGrp(self)
-             output = self.randomize_buttonGrp_;
-         end
-         
-         function output = get.isSelect_all_box(self)
-             output = self.isSelect_all_box_;
-         end
-         
-         function output = get.f(self)
-             output = self.f_;
-         end
-         
-         function output = get.preview_panel(self)
-             output = self.preview_panel_;
-         end
-         
-         function output = get.hAxes(self)
-             output = self.hAxes_;
-         end
-         
-         function output = get.exp_name_box(self)
-             output = self.exp_name_box_;
-         end
-         
-         function output = get.doc(self)
-            output = self.doc_;
-         end
-         
-         function output = get.second_axes(self)
-             output = self.second_axes_;
-         end
-         
-         function output = get.pageUp_button(self)
-             output = self.pageUp_button_;
-         end
-         
-         function output = get.pageDown_button(self)
-             output = self.pageDown_button_;
-         end
-
-         function output = get.listbox_imported_files(self)
-             output = self.listbox_imported_files_;
-         end
-
-         function output = get.recent_file_menu_items(self)
-             output = self.recent_file_menu_items_;
-         end
-         
-         function output = get.menu_open(self)
-             output = self.menu_open_;
-         end
-         
-         function output = get.exp_length_display(self)
-             output = self.exp_length_display_;
-         end
-         
-         function output = get.inscreen_plot(self)
-             output = self.inscreen_plot_;
-         end
-         
-         function output = get.settings_con(self)
-             output = self.settings_con_;
-         end
-         
-         function output = get.preview_on_arena(self)
-             output = self.preview_on_arena_;
-         end
-
-         
-
-
 
      end
 

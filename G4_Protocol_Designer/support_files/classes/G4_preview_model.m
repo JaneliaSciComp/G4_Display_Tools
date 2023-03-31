@@ -1,26 +1,6 @@
 classdef G4_preview_model < handle
     
     properties
-        doc_
-        data_
-        dummy_data_
-        preview_index_
-        is_paused_
-        is_realtime_
-        slow_frRate_
-        rt_frRate_
-        pattern_data_
-        mode_
-        dur_
-        pos_data_
-        ao_data_
-        fr_increment_
-        ao_increment_
-        
-    end
-    
-    
-    properties (Dependent)
         
         doc
         data
@@ -138,106 +118,6 @@ classdef G4_preview_model < handle
         
         end
         
-%GETTERS
-
-        function value = get.dummy_data(self)
-            value = self.dummy_data_;
-        end
-        function value = get.preview_index(self)
-            value = self.preview_index_;
-        end
-        function value = get.is_paused(self)
-            value = self.is_paused_;
-        end
-        function value = get.is_realtime(self)
-            value = self.is_realtime_;
-        end
-        function value = get.slow_frRate(self)
-            value = self.slow_frRate_;
-        end
-        function value = get.rt_frRate(self)
-            value = self.rt_frRate_;
-        end
-        function value = get.pattern_data(self)
-            value = self.pattern_data_;
-        end
-        function value = get.mode(self)
-            value = self.mode_;
-        end
-        function value = get.dur(self)
-            value = self.dur_;
-        end
-        function value = get.pos_data(self)
-            value = self.pos_data_;
-        end
-        function value = get.ao_data(self)
-            value = self.ao_data_;
-        end
-       
-        function value = get.doc(self)
-            value = self.doc_;
-        end
-        function value = get.data(self)
-            value = self.data_;
-        end
-        function value = get.fr_increment(self)
-            value = self.fr_increment_;
-        end
-        function value = get.ao_increment(self)
-            value = self.ao_increment_;
-        end
-
-        
-        
-        
-%SETTERS        
-        function set.data(self, value)
-            self.data_ = value;
-        end
-        
-        function set.dummy_data(self, value)
-            self.dummy_data_ = value;
-        end
-        function set.preview_index(self, value)
-            self.preview_index_ = value;
-        end
-        function set.is_paused(self, value)
-            self.is_paused_ = value;
-        end
-        function set.is_realtime(self, value)
-            self.is_realtime_ = value;
-        end
-        function set.slow_frRate(self, value)
-            self.slow_frRate_ = value;
-        end
-        function set.rt_frRate(self, value)
-            self.rt_frRate_ = value;
-        end
-        function set.pattern_data(self, value)
-            self.pattern_data_ = value;
-        end
-        function set.mode(self, value)
-            self.mode_ = value;
-        end
-        function set.dur(self, value)
-            self.dur_ = value;
-        end
-        function set.pos_data(self, value)
-            self.pos_data_ = value;
-        end
-        function set.ao_data(self, value)
-            self.ao_data_ = value;
-        end
-        
-        function set.doc(self, value)
-            self.doc_ = value;
-        end
-        function set.fr_increment(self, value)
-            self.fr_increment_ = value;
-        end
-        function set.ao_increment(self, value)
-            self.ao_increment_ = value;
-        end
         
     end
     

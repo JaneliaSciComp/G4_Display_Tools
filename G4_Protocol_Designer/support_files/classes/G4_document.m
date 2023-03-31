@@ -1,57 +1,9 @@
 classdef G4_document < handle
     %UNTITLED Summary of this class goes here
     %   Detailed explanation goes here
+
     
-    properties
-        top_folder_path_
-        top_export_path_
-        Patterns_
-        Pos_funcs_
-        Ao_funcs_
-        imported_pattern_names_
-        imported_posfunc_names_
-        imported_aofunc_names_
-        binary_files_
-        save_filename_
-        currentExp_
-        experiment_name_
-        est_exp_length_
-      
-        
-        %Variables saved to .g4p files
-        pretrial_
-        block_trials_
-        intertrial_
-        posttrial_
-        repetitions_
-        is_randomized_
-        num_rows_
-        is_chan1_
-        chan1_rate_
-        is_chan2_
-        chan2_rate_
-        is_chan3_
-        chan3_rate_
-        is_chan4_
-        chan4_rate_
-        trial_data
-        
-        %Data to save to configuration file
-        configData_
-        
-        %Shared data on recently opened .g4p files
-        recent_g4p_files_
-        recent_files_filepath_
-        
-        %filler for disabled cells
-        uneditable_cell_color_
-        uneditable_cell_text_
-        
-        
-    end
-    
-    
-    properties (Dependent)
+    properties 
         top_folder_path
         top_export_path
         Patterns
@@ -81,7 +33,7 @@ classdef G4_document < handle
         chan3_rate
         is_chan4
         chan4_rate
-        
+        trial_model
         configData
         
          %Shared data on recently opened .g4p files
@@ -120,15 +72,15 @@ classdef G4_document < handle
             self.save_filename = '';
             self.currentExp = struct;
             self.experiment_name = '';
-            self.trial_data = G4_trial_model();
+            self.trial_model = G4_trial_model();
             self.est_exp_length = 0;
             
 %Make table parameters into a cell array so they work with the tables more easily
 
-            self.pretrial = self.trial_data.trial_array;
-            self.intertrial = self.trial_data.trial_array;
-            self.block_trials = self.trial_data.trial_array;
-            self.posttrial = self.trial_data.trial_array;
+            self.pretrial = self.trial_model.trial_array;
+            self.intertrial = self.trial_model.trial_array;
+            self.block_trials = self.trial_model.trial_array;
+            self.posttrial = self.trial_model.trial_array;
             
 %Get the path to the configuration file from settings and set the config data to the data within the configuration file
             
@@ -2332,275 +2284,6 @@ classdef G4_document < handle
                 end
             end
         end
-        
-        
-        %% Setters
-        
-        function set.top_folder_path(self, value)
-            self.top_folder_path_ = value;
-        end
-        
-        function set.top_export_path(self, value)
-            self.top_export_path_ = value;
-        end
-        
-        function set.Patterns(self, value)
-            self.Patterns_ = value;
-        end
-        
-        function set.Pos_funcs(self, value)
-            self.Pos_funcs_ = value;
-        end
-        
-        function set.Ao_funcs(self, value)
-            self.Ao_funcs_ = value;
-        end
-        
-        function set.save_filename(self, value)
-            self.save_filename_ = value;
-        end
-        
-        function set.currentExp(self, value)
-            self.currentExp_ = value;
-        end
-        
-        function set.experiment_name(self, value)
-            self.experiment_name_ = value;
-        end
-        
-        function set.pretrial(self, value)
-            self.pretrial_ = value;
-        end
-        
-        function set.intertrial(self, value)
-            self.intertrial_ = value;
-        end
-        
-        function set.block_trials(self, value)
-            self.block_trials_ = value;
-        end
-        
-        function set.posttrial(self, value)
-            self.posttrial_ = value;
-        end
-        
-        function set.repetitions(self, value)
-            self.repetitions_ = value;
-        end
-        
-        function set.is_randomized(self, value)
-            self.is_randomized_ = value;
-        end
-        
-        function set.num_rows(self, value)
-            self.num_rows_ = value;
-        end
-        
-         function set.is_chan1(self, value)
-            self.is_chan1_ = value;
-        end
-        
-        function set.is_chan2(self, value)
-            self.is_chan2_ = value;
-        end
-        
-        function set.is_chan3(self, value)
-            self.is_chan3_ = value;
-        end
-        
-        function set.is_chan4(self, value)
-            self.is_chan4_ = value;
-        end
-        
-        function set.chan1_rate(self, value)
-            self.chan1_rate_ = value;
-        end
-        
-        function set.chan2_rate(self, value)
-            self.chan2_rate_ = value;
-        end
-        
-        function set.chan3_rate(self, value)
-            self.chan3_rate_ = value;
-        end
-        
-        function set.chan4_rate(self, value)
-            self.chan4_rate_ = value;
-        end
-        
-        function set.configData(self, value)
-            self.configData_ = value;
-        end
-        
-        function set.binary_files(self, value)
-            self.binary_files_ = value;
-        end
-        
-        function set.imported_pattern_names(self,value)
-            self.imported_pattern_names_ = value;
-        end
-        
-        function set.imported_posfunc_names(self, value)
-            self.imported_posfunc_names_ = value;
-        end
-        
-        function set.imported_aofunc_names(self, value)
-            self.imported_aofunc_names_ = value;
-        end
-        
-        function set.recent_g4p_files(self, value)
-             self.recent_g4p_files_ = value;
-         end
-         
-         function set.recent_files_filepath(self, value)
-             self.recent_files_filepath_ = value;
-         end
-         
-         function set.uneditable_cell_color(self, value)
-             self.uneditable_cell_color_ = value;
-         end
-         
-         function set.uneditable_cell_text(self, value)
-             self.uneditable_cell_text_ = value;
-         end
-         
-         function set.est_exp_length(self, value)
-             self.est_exp_length_ = value;
-         end
-        %Getters
-        
-        
-        function value = get.top_folder_path(self)
-            value = self.top_folder_path_;
-        end
-        
-        function value = get.top_export_path(self)
-            value = self.top_export_path_;
-        end
-        
-        function value = get.Patterns(self)
-            value = self.Patterns_;
-        end
-        
-        function value = get.Pos_funcs(self)
-            value = self.Pos_funcs_;
-        end
-        
-        function value = get.Ao_funcs(self)
-            value = self.Ao_funcs_;
-        end
-        
-        function value = get.save_filename(self)
-            value = self.save_filename_;
-        end
-        
-        function value = get.currentExp(self)
-            value = self.currentExp_;
-        end
-        
-        function value = get.experiment_name(self)
-            value = self.experiment_name_;
-        end
-        
-        function output = get.pretrial(self)
-            output = self.pretrial_;
-        end
-        
-        function output = get.block_trials(self)
-            output = self.block_trials_;
-        end
-        
-        function output = get.intertrial(self)
-            output = self.intertrial_;
-        end
-        
-        function output = get.posttrial(self)
-            output = self.posttrial_;
-        end
-        
-        function output = get.repetitions(self)
-            output = self.repetitions_;
-        end
-        
-        function output = get.is_randomized(self)
-            output = self.is_randomized_;
-        end
-        
-        function output = get.is_chan1(self)
-            output = self.is_chan1_;
-        end
-        
-        function output = get.chan1_rate(self)
-            output = self.chan1_rate_;
-        end
-        
-        function output = get.is_chan2(self)
-            output = self.is_chan2_;
-        end
-        
-        function output = get.chan2_rate(self)
-            output = self.chan2_rate_;
-        end
-        
-        function output = get.is_chan3(self)
-            output = self.is_chan3_;
-        end
-        
-        function output = get.chan3_rate(self)
-            output = self.chan3_rate_;
-        end
-        
-        function output = get.is_chan4(self)
-            output = self.is_chan4_;
-        end
-        
-        function output = get.chan4_rate(self)
-           output = self.chan4_rate_;
-        end
-        
-        function output = get.num_rows(self)
-            output = self.num_rows_;
-        end
-        
-        function output = get.configData(self)
-            output = self.configData_;
-        end
-        
-        function output = get.binary_files(self)
-            output = self.binary_files_;
-        end
-        
-        function output = get.imported_pattern_names(self)
-            output = self.imported_pattern_names_;
-        end
-        
-        function output = get.imported_posfunc_names(self)
-            output = self.imported_posfunc_names_;
-        end
-        
-        function output = get.imported_aofunc_names(self)
-            output = self.imported_aofunc_names_;
-        end
-        
-        function output = get.recent_g4p_files(self)
-            output = self.recent_g4p_files_;
-        end
-         
-        function output = get.recent_files_filepath(self)
-            output = self.recent_files_filepath_;
-        end
-        
-        function output = get.uneditable_cell_color(self)
-             output = self.uneditable_cell_color_;
-         end
-         
-         function output = get.uneditable_cell_text(self)
-             output = self.uneditable_cell_text_;
-         end
-         
-         function output = get.est_exp_length(self)
-             output = self.est_exp_length_;
-         end
         
 
     end

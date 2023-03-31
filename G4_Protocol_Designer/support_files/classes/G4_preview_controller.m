@@ -1,15 +1,6 @@
 classdef G4_preview_controller < handle
 
     properties
-        model_
-        view_
-        frames_
-        making_video_
-        pattern_only_
-         
-    end
-    
-    properties (Dependent)
         model
         view
         frames        
@@ -710,55 +701,6 @@ classdef G4_preview_controller < handle
         end
 
         
-
-        
-        %GETTERS
-
-        
-        function value = get.model(self)
-            value = self.model_;
-        end
-        
-        function value = get.view(self)
-            value = self.view_;
-        end
-        
-        function value = get.frames(self)
-            value = self.frames_;
-        end
-        
-        function value = get.making_video(self)
-            value = self.making_video_;
-        end
-        
-        function value = get.pattern_only(self)
-            value = self.pattern_only_;
-        end
-        
-            
-        
-        
-        %SETTERS
-        
-        function set.model(self, value)
-            self.model_ = value;
-        end
-        
-        function set.view(self, value)
-            self.view_ = value;
-        end
-
-        function set.frames(self, value)
-            self.frames_ = value;
-        end
-        
-        function set.making_video(self, value)
-            self.making_video_ = value;
-        end
-        
-        function set.pattern_only(self, value)
-            self.pattern_only_ = value;
-        end
         
         
     
