@@ -141,6 +141,8 @@ classdef G4_conductor_view < handle
                 'units', 'pixels', 'Position', [15, self.fig_size(4)- 305, 115, 85],'Callback', @self.run_exp);
             abort_button = uicontrol(self.fig,'Style','pushbutton', 'String', 'Abort Experiment',...
                 'units', 'pixels', 'Position', [140, self.fig_size(4) - 305, 115, 85], 'Callback', @self.abort);
+            pause_button = uicontrol(self.fig, 'Style', 'pushbutton', 'String', 'Pause', ...
+                'units','pixels', 'Position', [265, self.fig_size(4) - 305, 115, 85], 'Callback', @self.pause);
             settings_pan = uipanel(self.fig, 'Title', 'Settings', 'FontSize', 13, 'units', 'pixels', ...
                 'Position', [15, self.fig_size(4) - 215, 370, 200]);
             metadata_pan = uipanel(self.fig, 'Title', 'Metadata', 'units', 'pixels', ...
@@ -615,6 +617,10 @@ classdef G4_conductor_view < handle
         
         function abort(self, ~, ~)
             self.con.abort_experiment();
+        end
+
+        function pause(self, ~, ~)
+            self.con.pause_experiment();
         end
         
         function run_exp(self, ~, ~)

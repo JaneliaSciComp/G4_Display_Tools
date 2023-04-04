@@ -28,6 +28,7 @@ classdef G4_conductor_controller < handle
         current_gain_
         current_offset_
         current_duration_
+        is_paused
         
 
     end
@@ -61,6 +62,7 @@ classdef G4_conductor_controller < handle
         remaining_time
         
         is_aborted
+        
 
         
         
@@ -96,6 +98,7 @@ classdef G4_conductor_controller < handle
             exp_time = self.doc.calc_exp_length();
             self.model.set_expected_time(exp_time);
             self.remaining_time = self.model.expected_time;
+            self.is_paused = 0;
             
             self.current_mode = '';
             self.current_pat = '';
@@ -592,6 +595,28 @@ classdef G4_conductor_controller < handle
         function abort_experiment(self)
         
             self.is_aborted = 1;
+
+        end
+
+        function pause_experiment(self)
+
+            if self.is_paused == 0
+                self.is_paused = 1;
+            elseif self.is_paused == 1
+                self.is_paused = 0;
+            else
+                self.is_paused = 0;
+                disp("There was an error with the pause feature");
+            end
+        end
+
+        function check_if_paused(self)
+            
+            if self.is_paused == 1
+                disp("Experiment is paused. Please press pause button again to continue.");
+                waitfor(self, 'is_paused');
+                
+            end
 
         end
 

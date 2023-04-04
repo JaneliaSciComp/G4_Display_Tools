@@ -125,6 +125,10 @@ end
             %in the experiment we are
             num_trial_of_total = 0;
 
+%% Make sure the pause button hasn't been pressed
+
+            runcon.check_if_paused();
+
 %% Start log, if fails twice, abort------------------------------------
 
              log_started = ctlr.startLog();
@@ -143,7 +147,7 @@ end
              end
 
 %% run pretrial if it exists----------------------------------------
-
+            
              startTime = tic;
              if params.pre_start == 1
                  %First update the progress bar to show pretrial is running----
@@ -190,6 +194,8 @@ end
                 return;
              
              end
+
+             runcon.check_if_paused();
              
              runcon.update_elapsed_time(round(toc(startTime),2));
              
@@ -248,6 +254,9 @@ end
                         return;
                   
                     end
+
+                    runcon.check_if_paused();
+                    
                     runcon.update_elapsed_time(round(toc(startTime),2));
                     
                     %Tells loop to skip the intertrial if this is the last iteration of the last rep
