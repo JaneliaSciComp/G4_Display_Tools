@@ -128,6 +128,34 @@ classdef PanelsControllerFunctionalTest < matlab.unittest.TestCase
             end
         end
         
+        function errorSetControllerParameter(testCase)
+            newDir = tempname;
+            testCase.panelsController.setRootDirectory(newDir);
+            testCase.panelsController.startLog();
+            
+            for iter = 1:20
+                testCase.panelsController.setControlMode(3);
+                testCase.panelsController.setPatternID(1);
+               
+                testCase.panelsController.setGain(20593,-14517);
+                testCase.panelsController.setPatternFunctionID(1);
+                testCase.panelsController.setFrameRate(500);
+                testCase.panelsController.setPositionX(22542);
+    
+                for i = 1:4
+                    testCase.panelsController.setAOFunctionID([0 0 0 101], 1);  
+                end            
+                for i = 1:15
+                    onOff = str2num(char(num2cell(dec2bin(i))))';
+                    onOff = padarray(onOff, [0 4-length(onOff)], 0, 'pre');
+                    testCase.verifyTrue(testCase.panelsController.setActiveAIChannels(onOff), ...
+                        sprintf("PanelsController.setActiveAIChannels wasn't successfully completed for %d", i));
+                end
+            end
+            testCase.panelsController.stopLog();
+        end
+        
+
         function testLoggingRepeatedOn(testCase)
             newDir = tempname;
             testCase.panelsController.setRootDirectory(newDir);
