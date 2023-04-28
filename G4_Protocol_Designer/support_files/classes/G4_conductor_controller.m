@@ -812,15 +812,28 @@ classdef G4_conductor_controller < handle
             end
             
             %Always run the post processing script that converts the TDMS
-            %files into mat files.
-            
-            run_file_desc  = self.get_run_file_desc();
-            if ~contains(run_file_desc, 'Log')
-           
+            %files into mat files.'
 
+            % Check how many tdms folders are in the fly folder
+            num_logs = self.check_number_logs(fly_results_folder);
+
+            % If there's one, convert like normal. if there's more than
+            % one, convert all Logs to matlab structs separately. Display
+            % message to user if there are no logs found. 
+
+            if num_logs == 1
                 G4_TDMS_folder2struct(fly_results_folder);
-            end
-            
+
+            elseif num_logs > 1
+                self.convert_multiple_logs(fly_results_folder);
+
+                %consolidate multiple resulting structs into one struct
+
+            else
+
+                disp("No tdms folders could be found from this experiment.");
+            end            
+
             %Get array indicating the presence of pretrial, intertrial, and
             %posttrial
             trial_options = self.get_trial_options();
@@ -874,7 +887,76 @@ classdef G4_conductor_controller < handle
 
         end
 
+        function num_logs = check_number_logs(self, fly_folder)
 
+            files = dir(fly_folder);
+            files = files(~ismember({files.name},{'.','..'}));
+            subdir_idx = [files.isdir]; %look for subfolders
+            num_logs = length(subdir_idx);
+
+        end
+
+        function convert_multiple_logs(fly_folder)
+            
+            files = dir(fly_folder);
+            files = files(~ismember({files.name},{'.','..'}));
+            subdir_idx = [files.isdir]; %look for subfolders
+            folders = files(subdir_idx);
+            for fold = 1:length(folders)
+                tdms_folder_path = fullfile(fly_folder, folders(fold).name);
+                G4_TDMS_folder2struct(tdms_folder_path);
+            end
+
+        end
+
+        function consolidate_log_structs(fly_folder)
+            
+            files = dir(fly_folder);
+            files = files(~ismember({files.name},{'.','..'}));
+            file_idx = ~[files.isdir];
+            files = files(file_idx);
+            tdms_idx = [];
+            for f = 1:length(files)
+                if contains(files(f).name, "TDMS")
+                    tdms_idx(end +1) = f;
+                end
+            end
+            log_files = files(tdms_idx);
+
+            % make sure the log files are sorted by timestamp
+            log_files_sorted = self.sort_logs_timestamp(log_files);
+
+            % take data from each log file and smush it all together in one
+            % big struct that follows the exact same layout as the smaller
+            % ones. 
+            
+
+
+
+        end
+
+        function [sorted_log_files] = sort_logs_timestamp(self, log_files)
+             %This function assumes log_files has already had non-log files
+             %removed. It also assumes the log file names follow the
+             %pattern 'G4_TDMS_Logs_mm_dd_yyyy_hh-hh-mm-ss' and it only
+             %sorts by time (it assumes all log files are from the same
+             %day) The first hh is military time (15 for 3 pm), the second
+             %hh is converted (so 03 for 3 pm) so we only use the first hh,
+             %mm, and ss for sorting.
+
+             timestamps = {};
+
+            for fi = 1:length(log_files)
+                timestamps{fi} = log_files(fi).name(end-14:end-4);
+                nums_to_sort(fi, 1:3) = [str2num(timestamps{fi}(1:2)), str2num(timestamps{fi}(7:8)), str2num(timestamps{fi}(10:11))];
+
+            end
+            [~, sorted_idx] = sortrows(nums_to_sort);
+            sorted_log_files = log_files(sorted_idx);
+
+        end
+        
+        
         function update_flyName_reminder(self)
             
            if ~isempty(self.view)
