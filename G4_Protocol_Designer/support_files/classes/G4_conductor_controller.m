@@ -828,6 +828,9 @@ classdef G4_conductor_controller < handle
                 self.convert_multiple_logs(fly_results_folder);
 
                 %consolidate multiple resulting structs into one struct
+                Log = consolidate_log_structs(fly_results_folder);
+                LogFinalName = 'G4_TDMS_Logs_Final.mat';
+                save(fullfile(fly_results_folder, LogFinalName),'Log');
 
             else
 
@@ -909,7 +912,7 @@ classdef G4_conductor_controller < handle
 
         end
 
-        function consolidate_log_structs(fly_folder)
+        function Log = consolidate_log_structs(fly_folder)
             
             files = dir(fly_folder);
             files = files(~ismember({files.name},{'.','..'}));
@@ -929,11 +932,60 @@ classdef G4_conductor_controller < handle
             % take data from each log file and smush it all together in one
             % big struct that follows the exact same layout as the smaller
             % ones. 
-            
-
-
+            Log1 = load(fullfile(fly_folder,log_files_sorted(1).name));
+            LogFinal = Log1;
+            clear('Log1');
+            for logfile = 2:length(log_files_sorted)
+                LogTemp = load(fullfile(fly_folder,log_files_sorted(logfile).name));
+                LogFinal = stitch_log(LogFinal, LogTemp.Log);
+                clear('LogTemp');
+            end
+            Log = LogFinal.Log;
 
         end
+
+        function finLog = stitch_log(finLog, tempLog)
+            
+            % ADC
+            finLog.Log.ADC.Time = [finLog.Log.ADC.Time(1,:), tempLog.ADC.Time(1,:); finLog.Log.ADC.Time(2,:), tempLog.ADC.Time(2,:); finLog.Log.ADC.Time(3,:), tempLog.ADC.Time(3,:); finLog.Log.ADC.Time(4,:), tempLog.ADC.Time(4,:)];
+            finLog.Log.ADC.Volts = [finLog.Log.ADC.Volts(1,:), tempLog.ADC.Volts(1,:); finLog.Log.ADC.Volts(2,:), tempLog.ADC.Volts(2,:); finLog.Log.ADC.Volts(3,:), tempLog.ADC.Volts(3,:); finLog.Log.ADC.Volts(4,:), tempLog.ADC.Volts(4,:)];
+
+            % AO 
+            if ~isempty(tempLog.Log.AO.Time)
+                switch size(tempLog.Log.AO.Time,1)
+                    case 1
+                        finLog.Log.AO.Time = [finLog.Log.AO.Time(1,:), tempLog.AO.Time(1,:)];
+                        finLog.Log.AO.Volts = [finLog.Log.AO.Volts(1,:), tempLog.AO.Volts(1,:)];
+
+                    case 2
+                        finLog.Log.AO.Time = [finLog.Log.AO.Time(1,:), tempLog.AO.Time(1,:); finLog.Log.AO.Time(2,:), tempLog.AO.Time(2,:)];
+                        finLog.Log.AO.Volts = [finLog.Log.AO.Volts(1,:), tempLog.AO.Volts(1,:); finLog.Log.AO.Volts(2,:), tempLog.AO.Volts(2,:)];
+
+
+                    case 3
+                        finLog.Log.AO.Time = [finLog.Log.AO.Time(1,:), tempLog.AO.Time(1,:); finLog.Log.AO.Time(2,:), tempLog.AO.Time(2,:); finLog.Log.AO.Time(3,:), tempLog.AO.Time(3,:)];
+                        finLog.Log.AO.Voltes = [finLog.Log.AO.Volts(1,:), tempLog.AO.Volts(1,:); finLog.Log.AO.Volts(2,:), tempLog.AO.Volts(2,:); finLog.Log.AO.Volts(3,:), tempLog.AO.Volts(3,:)];
+
+
+                    case 4
+                        finLog.Log.AO.Time = [finLog.Log.AO.Time(1,:), tempLog.AO.Time(1,:); finLog.Log.AO.Time(2,:), tempLog.AO.Time(2,:); finLog.Log.AO.Time(3,:), tempLog.AO.Time(3,:); finLog.Log.AO.Time(4,:), tempLog.AO.Time(4,:)];
+                        finLog.Log.AO.Volts = [finLog.Log.AO.Volts(1,:), tempLog.AO.Volts(1,:); finLog.Log.AO.Volts(2,:), tempLog.AO.Volts(2,:); finLog.Log.AO.Volts(3,:), tempLog.AO.Volts(3,:); finLog.Log.AO.Volts(4,:), tempLog.AO.Volts(4,:)];
+
+                end
+            end
+
+            % Frames
+            finLog.Log.Frames.Time = [finLog.Log.Frames.Time(1,:), tempLog.Frames.Time(1,:)];
+            finLog.Log.Frames.Position = [finLog.Log.Frames.Position(1,:), tempLog.Frames.Position(1,:)];
+
+            % Commands
+            finLog.Log.Commands.Time = [finLog.Log.Commands.Time(1,:), tempLog.Commands.Time(1,:)];
+            finLog.Log.Commands.Name = {finLog.Log.Commands.Name{1,:}, tempLog.Commands.Name{1,:}};
+            finLog.Log.Commands.Data = {finLog.Log.Commands.Data{1,:}, tempLog.Commands.Data{1,:}};
+
+        end
+
+
 
         function [sorted_log_files] = sort_logs_timestamp(self, log_files)
              %This function assumes log_files has already had non-log files
