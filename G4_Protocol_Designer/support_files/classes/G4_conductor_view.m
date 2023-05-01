@@ -54,6 +54,9 @@ classdef G4_conductor_view < handle
         alignment_alert_text_
         fly_position_line_
         bad_trial_markers_
+
+        combine_tdms_checkbox
+        
         
     end
     
@@ -394,46 +397,54 @@ classdef G4_conductor_view < handle
             % Experiment settings items
             
             exp_type_label = uicontrol(settings_pan, 'Style', 'text', 'String', 'Experiment Type:', ...
-                'HorizontalAlignment', 'left', 'units', 'pixels', 'Position', [10, 150, 100, 15]);
+                'HorizontalAlignment', 'left', 'units', 'pixels', 'Position', [10, 153, 100, 15]);
             self.exp_type_menu = uicontrol(settings_pan, 'Style', 'popupmenu', 'String', {'Flight','Camera walk', 'Chip walk'}, ...
-                'units', 'pixels', 'Position', [115, 150, 150, 18], 'Callback', @self.new_experiment_type);
+                'units', 'pixels', 'Position', [115, 153, 150, 18], 'Callback', @self.new_experiment_type);
             test_button = uicontrol(settings_pan, 'Style', 'pushbutton', 'String', 'Run Test Protocol', ...
-                'units', 'pixels', 'Position', [210, 120, 150, 20], 'Callback', @self.run_test_exp);
+                'units', 'pixels', 'Position', [210, 123, 150, 20], 'Callback', @self.run_test_exp);
             plotting_checkbox_label = uicontrol(settings_pan, 'Style', 'text', 'String', 'Plotting?', ...
-                'HorizontalAlignment', 'left', 'units', 'pixels', 'Position', [10, 120, 45, 15]);
+                'HorizontalAlignment', 'left', 'units', 'pixels', 'Position', [10, 123, 45, 15]);
             self.plotting_checkbox = uicontrol(settings_pan, 'Style', 'checkbox', 'Value', self.con.model.do_plotting, ...
-                'units', 'pixels', 'Position', [60, 120, 15, 15], 'Callback', @self.new_do_plotting);
+                'units', 'pixels', 'Position', [60, 123, 15, 15], 'Callback', @self.new_do_plotting);
             plotting_filename_label = uicontrol(settings_pan, 'Style', 'text', 'String', 'Plotting Protocol:', ...
-                'HorizontalAlignment', 'left', 'units', 'pixels', 'Position', [10, 95, 105, 15]);
+                'HorizontalAlignment', 'left', 'units', 'pixels', 'Position', [10, 98, 105, 15]);
             self.plotting_textbox = uicontrol(settings_pan, 'Style', 'edit', 'units', 'pixels', ...
-                'String', self.con.model.plotting_file, 'Position', [120, 95, 160, 18], 'Callback', @self.new_plotting_file);
+                'String', self.con.model.plotting_file, 'Position', [120, 98, 160, 18], 'Callback', @self.new_plotting_file);
             self.browse_button_plotting = uicontrol(settings_pan, 'Style', 'pushbutton', 'units', 'pixels', ...
-                'String', 'Browse', 'Position', [285, 95, 65, 18], 'Callback', @self.plot_browse);
+                'String', 'Browse', 'Position', [285, 98, 65, 18], 'Callback', @self.plot_browse);
             
             processing_checkbox_label = uicontrol(settings_pan, 'Style', 'text', 'String', 'Processing?', ...
-                'HorizontalAlignment', 'left', 'units', 'pixels', 'Position', [90, 120, 65, 15]);
+                'HorizontalAlignment', 'left', 'units', 'pixels', 'Position', [90, 123, 65, 15]);
             self.processing_checkbox = uicontrol(settings_pan, 'Style', 'checkbox', 'Value', self.con.model.do_processing, ...
-                'units', 'pixels', 'Position', [160, 120, 15, 15], 'Callback', @self.new_do_processing);
+                'units', 'pixels', 'Position', [160, 123, 15, 15], 'Callback', @self.new_do_processing);
             processing_filename_label = uicontrol(settings_pan, 'Style', 'text', 'String', 'Processing Protocol:', ...
-                'HorizontalAlignment', 'left', 'units', 'pixels', 'Position', [10, 70, 105, 15]);
+                'HorizontalAlignment', 'left', 'units', 'pixels', 'Position', [10, 73, 105, 15]);
             self.processing_textbox = uicontrol(settings_pan, 'Style', 'edit', 'units', 'pixels', ...
-                'String', self.con.model.processing_file, 'Position', [120, 70, 160, 18], 'Callback', @self.new_processing_file);
+                'String', self.con.model.processing_file, 'Position', [120, 73, 160, 18], 'Callback', @self.new_processing_file);
             self.browse_button_processing = uicontrol(settings_pan, 'Style', 'pushbutton', 'units', 'pixels', ...
-                'String', 'Browse', 'Position', [285, 70, 65, 18], 'Callback', @self.proc_browse);
+                'String', 'Browse', 'Position', [285, 73, 65, 18], 'Callback', @self.proc_browse);
             
             run_filename_label = uicontrol(settings_pan, 'Style', 'text', 'String', 'Run Protocol:', ...
-                'HorizontalAlignment', 'left', 'units', 'pixels', 'Position', [10, 45, 105, 15]);
+                'HorizontalAlignment', 'left', 'units', 'pixels', 'Position', [10, 48, 105, 15]);
             self.run_dropDown = uicontrol(settings_pan, 'Style', 'popupmenu', 'String', ...
-                self.con.model.run_protocol_file_list, 'Position', [80, 45, 200, 18], ...
+                self.con.model.run_protocol_file_list, 'Position', [80, 48, 200, 18], ...
                 'Callback', @self.select_run);
 
 
             num_attempts_label = uicontrol(settings_pan, 'Style', 'text', 'String', ...
                 'Number times to re-attempt bad trials:', 'HorizontalAlignment','left', ...
-                'units', 'pixels', 'Position', [10, 20, 200, 15]);
+                'units', 'pixels', 'Position', [10, 23, 200, 15]);
             self.num_attempts_textbox = uicontrol(settings_pan, 'Style', 'edit', 'units', 'pixels',...
-                'String', self.con.model.num_attempts_bad_conds, 'Position', [210, 20, 50, 15], ...
+                'String', self.con.model.num_attempts_bad_conds, 'Position', [210, 23, 50, 15], ...
                 'Callback', @self.new_num_attempts);
+
+            combine_tdms_label = uicontrol(settings_pan, 'Style', 'text', 'String', ...
+                'Combine multiple TDMS files into one?', 'HorizontalAlignment','left', ...
+                'units', 'pixels', 'Position', [10, 3, 200, 15]);
+
+            self.combine_tdms_checkbox = uicontrol(settings_pan, 'Style', 'checkbox', 'Value', ...
+                self.con.get_combine_tdms(), 'units', 'pixels', 'Position', [215, 3, 15, 15], ...
+               'Callback', @self.new_combine_tdms);
             
             self.bad_trial_markers = [];
            
@@ -478,6 +489,7 @@ classdef G4_conductor_view < handle
             self.current_offset_text.String = self.con.current_offset;
             self.current_duration_text.String = self.con.current_duration;
             self.set_recent_file_menu_items();
+            self.combine_tdms_checkbox.Value = self.con.get_combine_tdms();
             
         end
         
@@ -598,6 +610,13 @@ classdef G4_conductor_view < handle
             
             self.con.update_comments(src.String);
             self.update_run_gui();
+        end
+
+        function new_combine_tdms(self, src, ~)
+
+            self.con.update_combine_tdms(src.Value);
+            self.update_run_gui();
+
         end
         
         function open(self, ~, ~, varargin)

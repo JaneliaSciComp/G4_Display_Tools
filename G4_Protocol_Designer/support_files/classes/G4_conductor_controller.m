@@ -825,12 +825,16 @@ classdef G4_conductor_controller < handle
                 G4_TDMS_folder2struct(fly_results_folder);
 
             elseif num_logs > 1
-                self.convert_multiple_logs(fly_results_folder);
-
-                %consolidate multiple resulting structs into one struct
-                Log = consolidate_log_structs(fly_results_folder);
-                LogFinalName = 'G4_TDMS_Logs_Final.mat';
-                save(fullfile(fly_results_folder, LogFinalName),'Log');
+                if self.get_combine_tdms == 1
+                    self.convert_multiple_logs(fly_results_folder);
+    
+                    %consolidate multiple resulting structs into one struct
+                    Log = consolidate_log_structs(fly_results_folder);
+                    LogFinalName = 'G4_TDMS_Logs_Final.mat';
+                    save(fullfile(fly_results_folder, LogFinalName),'Log');
+                else
+                    disp('TDMS files were not converted to a .mat struct because there were multiple.');
+                end
 
             else
 
@@ -851,11 +855,15 @@ classdef G4_conductor_controller < handle
                 end
      
             elseif self.model.do_processing == 1 && isfile(self.model.processing_file)
-                [proc_path, proc_name, proc_ext] = fileparts(self.model.processing_file);
+                if num_logs > 1 && self.get_combine_tdms == 0
+                    disp('There are multiple TDMS logs that were not consolidated, so data processing cannot run');
+                else
+                    [proc_path, proc_name, proc_ext] = fileparts(self.model.processing_file);
                 
-                processing_command = "process_data(fly_results_folder, self.model.processing_file)";
+                    processing_command = "process_data(fly_results_folder, self.model.processing_file)";
 
-                eval(processing_command);
+                    eval(processing_command);
+                end
                 
                 if self.model.do_plotting == 1 && (strcmp(self.model.plotting_file,'') || ~isfile(self.model.plotting_file))
                     %The settings file for data analysis is empty or
@@ -1987,6 +1995,17 @@ classdef G4_conductor_controller < handle
         function run_file_desc = get_run_file_desc(self)
             
             run_file_desc = self.model.get_run_file_desc();
+        end
+
+        function value = get_combine_tdms(self)
+
+            value = self.model.get_combine_tdms();
+
+        end
+
+        function update_combine_tdms(self, value)
+
+            self.model.set_combine_tdms(value);
         end
 
         %% SETTERS
