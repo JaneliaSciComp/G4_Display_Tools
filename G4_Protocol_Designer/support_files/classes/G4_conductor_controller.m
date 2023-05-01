@@ -825,15 +825,16 @@ classdef G4_conductor_controller < handle
                 G4_TDMS_folder2struct(fly_results_folder);
 
             elseif num_logs > 1
+                
+                self.convert_multiple_logs(fly_results_folder);
                 if self.get_combine_tdms == 1
-                    self.convert_multiple_logs(fly_results_folder);
     
                     %consolidate multiple resulting structs into one struct
                     Log = consolidate_log_structs(fly_results_folder);
                     LogFinalName = 'G4_TDMS_Logs_Final.mat';
                     save(fullfile(fly_results_folder, LogFinalName),'Log');
                 else
-                    disp('TDMS files were not converted to a .mat struct because there were multiple.');
+                    disp('TDMS files were not combined into one.');
                 end
 
             else
