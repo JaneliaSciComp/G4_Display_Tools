@@ -10,9 +10,15 @@ function save_function_G4(func, param, save_dir, filename)
 % param: full parameters of the input function to be stored in .mat file
 % save_dir: directory to store the function files
 % filename: desired name of the .mat function file
+%
+% 5/1/2023 FL add argument check
 
-
-assert(isvector(func), 'input should be a vector')
+arguments
+    func (1,:) %{mustBeA(func, ["vector"])} % activate this when >MATLAB2020 is requirement
+    param (1,1) %{mustBeA(param, ["struct"])}
+    save_dir (1,:)
+    filename (1,:)
+end
 
 param.func = func; %save full function in param structure
 
@@ -30,11 +36,11 @@ end
 
 %create file name
 funcname = [prefix num2str(param.ID, '%04d')];
-    
+
 %save header in the first block
 block_size = 512; % all data must be in units of block size
 Header_block = zeros(1, block_size);
-    
+
 Header_block(1:4) = dec2char(length(func)*2, 4);     %each function datum is stored in two bytes in the currentFunc card
 Header_block(5) = length(funcname);
 Header_block(6: 6 + length(funcname) -1) = funcname;
@@ -47,7 +53,7 @@ param.size = length(Data);
 %save .mat file
 matFileName = fullfile(save_dir, [num2str(param.ID,'%04d') '_' filename '_G4.mat']);
 if exist(matFileName,'file')
-    error('function .mat file already exists in save folder with that name')
+    error('function .mat file already exists in save folder with that name');
 end
 if strcmp(param.type,'pfn')==1
     pfnparam = param;
@@ -59,7 +65,7 @@ end
 
 %save function file
 if exist(fullfile(save_dir, [funcname '.' param.type]),'file')
-    error('function file already exists with that name')
+    error('function file already exists with that name');
 end
 fid = fopen(fullfile(save_dir, [funcname '.' param.type]), 'w');
 fwrite(fid, Data_to_write(:),'uchar');
