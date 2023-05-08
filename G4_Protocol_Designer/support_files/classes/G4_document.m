@@ -1797,7 +1797,8 @@ classdef G4_document < handle
             isub = [all(:).isdir];
             folder_names = {all(isub).name};
             folder_names(ismember(folder_names,{'.','..'})) = [];
-            folder_names(ismember(folder_names,{'Results','Log Files'})) = [];
+            %folder_names(ismember(folder_names,{'Results','Log Files'})) = [];
+            folder_names = folder_names(ismember(folder_names,{'Analog Output Functions', 'Functions', 'Patterns'}));
             for i = 1:length(isub)
                 if isub(i) == 1
                     isub(i) = 0;
