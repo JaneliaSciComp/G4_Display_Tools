@@ -610,14 +610,21 @@ classdef G4_conductor_controller < handle
             end
         end
 
-        function check_if_paused(self)
+        function yes = check_if_paused(self)
             
             if self.is_paused == 1
-                disp("Experiment is paused. Please press pause button again to continue.");
-                waitfor(self, 'is_paused');
+                yes = 1;
+                
+
+            else
+                yes = 0;
                 
             end
 
+        end
+
+        function pause(self)
+            waitfor(self, 'is_paused');
         end
 
         function run(self)
@@ -899,7 +906,7 @@ classdef G4_conductor_controller < handle
 
         end
 
-        function num_logs = check_number_logs(self, fly_folder)
+        function num_logs = check_number_logs(~, fly_folder)
 
             files = dir(fly_folder);
             files = files(~ismember({files.name},{'.','..'}));
@@ -908,7 +915,7 @@ classdef G4_conductor_controller < handle
 
         end
 
-        function convert_multiple_logs(fly_folder)
+        function convert_multiple_logs(~, fly_folder)
             
             files = dir(fly_folder);
             files = files(~ismember({files.name},{'.','..'}));
@@ -921,7 +928,7 @@ classdef G4_conductor_controller < handle
 
         end
 
-        function Log = consolidate_log_structs(fly_folder)
+        function Log = consolidate_log_structs(self, fly_folder)
             
             files = dir(fly_folder);
             files = files(~ismember({files.name},{'.','..'}));
@@ -953,7 +960,7 @@ classdef G4_conductor_controller < handle
 
         end
 
-        function finLog = stitch_log(finLog, tempLog)
+        function finLog = stitch_log(~, finLog, tempLog)
             
             % ADC
             finLog.Log.ADC.Time = [finLog.Log.ADC.Time(1,:), tempLog.ADC.Time(1,:); finLog.Log.ADC.Time(2,:), tempLog.ADC.Time(2,:); finLog.Log.ADC.Time(3,:), tempLog.ADC.Time(3,:); finLog.Log.ADC.Time(4,:), tempLog.ADC.Time(4,:)];

@@ -127,7 +127,12 @@ end
 
 %% Make sure the pause button hasn't been pressed
 
-            runcon.check_if_paused();
+            is_paused = runcon.check_if_paused();
+            if is_paused
+                 disp("Experiment is paused. Please press pause button again to continue.");
+                 runcon.pause();
+                 
+             end
 
 %% Start log, if fails twice, abort------------------------------------
 
@@ -195,7 +200,14 @@ end
              
              end
 
-             runcon.check_if_paused();
+             is_paused = runcon.check_if_paused();
+             if is_paused
+                 ctlr.stopLog();
+                 disp("Experiment is paused. Please press pause button again to continue.");
+                 runcon.pause()
+                 ctlr.startLog();
+             end
+
              
              runcon.update_elapsed_time(round(toc(startTime),2));
              
@@ -255,7 +267,14 @@ end
                   
                     end
 
-                    runcon.check_if_paused();
+                    is_paused = runcon.check_if_paused();
+                    if is_paused
+                        ctlr.stopLog();
+                        disp("Experiment is paused. Please press pause button again to continue.");
+                        runcon.pause()
+                        ctlr.startLog();
+                     end
+
                     
                     runcon.update_elapsed_time(round(toc(startTime),2));
                     
