@@ -580,7 +580,7 @@ classdef G4_conductor_controller < handle
         %
         % Uses Google Sheets key from Settings
         function open_google_sheet(self)
-            base_url = 'https://urldefense.com/v3/__https://docs.google.com/spreadsheets/d/__;!!Eh6p8Q!Cz4oIKy0Ij9EKdO9hSaJUWtBSPlPUTmFbmU6PROPpteokSkf4-_DvfGFsrpcvMcm8VNJ-WPxnIFzUnKNWBo8iQ$ ';
+            base_url = 'https://docs.google.com/spreadsheets/d/';
             full_link = [base_url,self.model.google_sheet_key,'/edit?usp=sharing'];
             web(full_link, '-browser');
         end
