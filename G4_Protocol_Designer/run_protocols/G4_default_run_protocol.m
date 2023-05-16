@@ -62,9 +62,13 @@ end
 
  %% Set up parameters 
  params = assign_parameters(p);
- ctlr_parameters_intertrial = {params.inter_mode, params.inter_pat, params.inter_gain, ...
+ if params.inter_type == 1
+    ctlr_parameters_intertrial = {params.inter_mode, params.inter_pat, params.inter_gain, ...
                             params.inter_offset, params.inter_pos, params.inter_frame_rate, params.inter_frame_ind, ...
                             p.active_ao_channels, params.inter_ao_ind};
+ else
+     ctlr_parameters_intertrial = {};
+ end
 
  %% Start host and switch to correct directory
     if ~isempty(ctlr)

@@ -69,37 +69,43 @@ end
  params = assign_parameters(p);
 
  pre_start = params.pre_start;
- pre_mode = params.pre_mode;
- pre_pat = params.pre_pat;
- pre_pos = params.pre_pos;
- pre_ao_ind = params.pre_ao_ind;
- pre_frame_ind = params.pre_frame_ind;
- pre_frame_rate = params.pre_frame_rate;
- pre_gain = params.pre_gain;
- pre_offset = params.pre_offset;
- pre_dur = params.pre_dur;
+ if pre_start == 1
+     pre_mode = params.pre_mode;
+     pre_pat = params.pre_pat;
+     pre_pos = params.pre_pos;
+     pre_ao_ind = params.pre_ao_ind;
+     pre_frame_ind = params.pre_frame_ind;
+     pre_frame_rate = params.pre_frame_rate;
+     pre_gain = params.pre_gain;
+     pre_offset = params.pre_offset;
+     pre_dur = params.pre_dur;
+ end
 
  inter_type = params.inter_type;
- inter_mode = params.inter_mode;
- inter_pat = params.inter_pat;
- inter_pos = params.inter_pos;
- inter_ao_ind = params.inter_ao_ind;
- inter_frame_ind = params.inter_frame_ind;
- inter_frame_rate = params.inter_frame_rate;
- inter_gain = params.inter_gain;
- inter_offset = params.inter_offset;
- inter_dur = params.inter_dur;
+ if inter_type == 1
+     inter_mode = params.inter_mode;
+     inter_pat = params.inter_pat;
+     inter_pos = params.inter_pos;
+     inter_ao_ind = params.inter_ao_ind;
+     inter_frame_ind = params.inter_frame_ind;
+     inter_frame_rate = params.inter_frame_rate;
+     inter_gain = params.inter_gain;
+     inter_offset = params.inter_offset;
+     inter_dur = params.inter_dur;
+ end
        
  post_type = params.post_type;
- post_mode = params.post_mode;
- post_pat =params.post_pat;
- post_pos = params.post_pos;
- post_ao_ind = params.post_ao_ind;
- post_frame_ind = params.post_frame_ind;
- post_frame_rate = params.post_frame_rate;
- post_gain = params.post_gain;
- post_offset = params.post_offset;
- post_dur = params.post_dur;
+ if post_type == 1
+     post_mode = params.post_mode;
+     post_pat =params.post_pat;
+     post_pos = params.post_pos;
+     post_ao_ind = params.post_ao_ind;
+     post_frame_ind = params.post_frame_ind;
+     post_frame_rate = params.post_frame_rate;
+     post_gain = params.post_gain;
+     post_offset = params.post_offset;
+     post_dur = params.post_dur;
+ end
 
  block_trials = params.block_trials;
  block_ao_indices = params.block_ao_indices;
@@ -108,13 +114,24 @@ end
  active_ao_channels = params.active_ao_channels;
 
  aobits = params.aobits;
-
- ctlr_parameters_pretrial = {pre_mode, pre_pat, pre_gain, pre_offset, ...
+if pre_start == 1
+    ctlr_parameters_pretrial = {pre_mode, pre_pat, pre_gain, pre_offset, ...
      pre_pos, pre_frame_rate, pre_frame_ind, active_ao_channels, pre_ao_ind};
- ctlr_parameters_intertrial = {inter_mode, inter_pat, inter_gain, inter_offset, ...
+else
+    ctlr_parameters_pretrial = {};
+end
+if inter_type == 1
+     ctlr_parameters_intertrial = {inter_mode, inter_pat, inter_gain, inter_offset, ...
      inter_pos, inter_frame_rate, inter_frame_ind, active_ao_channels, inter_ao_ind};
- ctlr_parameters_posttrial = {post_mode, post_pat, post_gain, post_offset, ...
+else
+    ctlr_parameters_intertrial = {};
+end
+if post_type == 1
+     ctlr_parameters_posttrial = {post_mode, post_pat, post_gain, post_offset, ...
       post_pos, post_frame_rate, post_frame_ind, active_ao_channels, post_ao_ind};
+else
+    ctlr_parameters_posttrial = {};
+end
 
 % Get input channels that are active for streaming
     
