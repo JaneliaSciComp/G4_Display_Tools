@@ -321,26 +321,27 @@ end
 
                  log_started = ctlr.startLog();
                  ctlr.startDisplay((params.post_dur + .5)*10);
-                 log_stopped = ctlr.stopLog();
                  
-                if runcon.check_if_aborted() == 1
-                    ctlr.stopDisplay();
-                    %log_stopped = ctlr.stopLog();
-                    if ~log_stopped
-                        log_stopped = log_stop_fail();
-                    end
-                    if isa(ctlr, 'PanelsController')
-                        ctlr.close();
-                    end
-                    clear global;
-                    success = 0;
-                    return;
                  
-                end
+%                 if runcon.check_if_aborted() == 1
+%                     ctlr.stopDisplay();
+%                     %log_stopped = ctlr.stopLog();
+%                     if ~log_stopped
+%                         log_stopped = log_stop_fail();
+%                     end
+%                     if isa(ctlr, 'PanelsController')
+%                         ctlr.close();
+%                     end
+%                     clear global;
+%                     success = 0;
+%                     return;
+%                  
+%                 end
                 runcon.update_elapsed_time(round(toc(startTime),2));                 
             end
 
             ctlr.stopDisplay();
+            log_stopped = ctlr.stopLog();
 
             
             if ~log_stopped
