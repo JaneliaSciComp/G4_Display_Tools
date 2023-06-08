@@ -114,8 +114,7 @@ parfor i = 1:num_TDMSfiles
             [channelData, ~] = TDMS_readChannelOrGroup(fullfile(TDMS_folder,TDMS_names{i}),group);
             CommandTime(i,:) = channelData{1}; %timestampes
             CommandName{i} = channelData{2}; %names of commands
-            CommandData{i} = channelData{3}; %class of commands?? Newly added field to TDMS files
-            CommandData{i} = channelData{4}; %data accompanying commands
+            CommandData{i} = channelData{3}; %data accompanying commands
             Command_inds(i) = 1;
         catch
             error(['Unexpected file in TDMS folder: ' TDMS_names{i} '. Could not find the "Commands Received" group in this file']);
