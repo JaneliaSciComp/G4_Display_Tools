@@ -25,7 +25,7 @@ function create_processing_settings()
     settings.combined_command = 0; %Set to 1 if using the combined command
     settings.percent_to_shift = .015;
     settings.duration_diff_limit = .15; %If a trial takes longer than its intended duration by more than this percentage, throw it out
-    
+    settings.flying = 1; %If this is a flying experiment, set to 1. If not, set to 0.
     %% Wing Beat Frequency Settings
     
     settings.remove_nonflying_trials = 1; %1 if you want trials where the fly 

@@ -837,7 +837,7 @@ classdef G4_conductor_controller < handle
                 if self.get_combine_tdms == 1
     
                     %consolidate multiple resulting structs into one struct
-                    Log = consolidate_log_structs(fly_results_folder);
+                    Log = self.consolidate_log_structs(fly_results_folder);
                     LogFinalName = 'G4_TDMS_Logs_Final.mat';
                     save(fullfile(fly_results_folder, LogFinalName),'Log');
                 else
@@ -1014,7 +1014,7 @@ classdef G4_conductor_controller < handle
             finLog.Log.Commands.Time = [finLog.Log.Commands.Time(1,:), tempLog.Commands.Time(1,:)];
             finLog.Log.Commands.Name = {finLog.Log.Commands.Name{1,:}, tempLog.Commands.Name{1,:}};
             if ~isempty(tempLog.Commands.Data)
-                finLog.Log.Commands.Data = {finLog.Log.Commands.Data(1,:), tempLog.Commands.Data(1,:)};
+                finLog.Log.Commands.Data = [finLog.Log.Commands.Data(1,:), tempLog.Commands.Data(1,:)];
             else
                 finLog.Log.Commands.Data = [];
             end
