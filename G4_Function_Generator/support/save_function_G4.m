@@ -40,7 +40,7 @@ Header_block(5) = length(funcname);
 Header_block(6: 6 + length(funcname) -1) = funcname;
 
 %concatenate the header data with function data
-Data = signed_16Bit_to_char(func);     
+Data = signed_16Bit_to_char(func);
 Data_to_write = [Header_block Data];
 param.size = length(Data);
 
