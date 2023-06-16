@@ -35,6 +35,8 @@ classdef G4_conductor_model < handle
 
        postTrialTimes_
 
+       combine_tdms
+
        
         
     end
@@ -139,6 +141,7 @@ classdef G4_conductor_model < handle
             self.timestamp = datestr(now, 'mm-dd-yyyyHH_MM_SS');
             self.num_attempts_bad_conds = 1;
             self.set_run_file(1);
+            self.combine_tdms = 1;
             
             
 
@@ -351,6 +354,10 @@ classdef G4_conductor_model < handle
         function set_postTrialTimes(self, new_val)
             self.postTrialTimes = new_val;
         end
+
+        function set_combine_tdms(self, new_val)
+            self.combine_tdms = new_val;
+        end
         
         function value = get_num_attempts_bad_conds(self)
             value = self.num_attempts_bad_conds;
@@ -362,6 +369,10 @@ classdef G4_conductor_model < handle
         
         function value = get_run_file_desc(self)
             value =  self.run_protocol_file_desc;
+        end
+
+        function value = get_combine_tdms(self)
+            value = self.combine_tdms;
         end
         
         
