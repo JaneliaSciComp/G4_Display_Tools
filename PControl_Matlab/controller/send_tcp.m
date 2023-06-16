@@ -43,7 +43,7 @@ if ~ctlr.isOpen
     
     %change the default folder
     userSettings;
-    ctlr.setRootDirectory(default_exp_path);
+    Panel_com('change_root_directory',default_exp_path);
 end
 
 % step 3: send commands and receive feedback if it is GUI mode
@@ -93,6 +93,5 @@ reply.responseData = '';
 
 
     
-
 
 
