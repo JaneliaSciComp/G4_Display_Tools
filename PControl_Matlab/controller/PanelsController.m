@@ -618,6 +618,39 @@ classdef PanelsController < handle
                 rtn = true;
             end
         end
+
+         function setControllerParameters(self, p)
+
+            % Used by Conductor to set all the controller values before
+            % running a trial (when not using the combined command)
+           
+            % p should be a cell array as follows: 
+            % {trial_mode, pat_id, gain, offset, pos_id, frame_rate, frame_ind, ...
+            % active_ao_channels, trial_ao_indices};
+
+            self.setControlMode(p{1});
+            self.setPatternID(p{2});
+            
+            if ~isempty(p{3})
+                self.setGain(p{3}, p{4});
+            end
+               
+            if p{5} ~= 0
+        
+               self.setPatternFunctionID(p{5});
+                
+            end
+            if p{1} == 2
+                self.setFrameRate(p{6});
+            end
+           
+            self.setPositionX(p{7});
+            
+            for i = 1:length(p{8})
+                self.setAOFunctionID(p{8}(i), p{9}(i));  
+            end                                    
+
+        end
         
         function rtn = sendSyncLog(self, msgClass, msg)
             %% sendSyncLog Log information to TDMS file.

@@ -188,7 +188,12 @@ end
                      %causes it to loop until you press a button.
                  end
              end
-             
+
+             %Turn off AO functions if there are any
+%              for i = 1:length(p.active_ao_channels)
+%                 self.setAOFunctionID(p.active_ao_channels(i), 0);  
+%             end            
+%              
              if runcon.check_if_aborted()
                 ctlr.stopDisplay();
                 log_stopped = ctlr.stopLog();
