@@ -16,7 +16,7 @@ Running `G4_Function_Generator_gui` opens a window where functions can be quickl
 
 ## Creating functions using scripts
 
-The G4 Function Generator GUI is recommended for learning about the parameters of functions, testing out new functions, and debugging previously generated functions. For creating many functions at once, it is recommended to use the MATLAB script form of this tool. In addition, while the GUI only supports functions with a maximum of 5 waveform sections, the script version can accommodate any number of sections. The `create_experiment_G4_example` script located in `G4_Display_Tools\G4_Example_Experiment_Scripts` shows one example of creating many functions in a single script, and clicking *create script*{: .gui-btn} in the G4 Function Generator GUI will generate and open a script in MATLAB based on the current GUI parameters so that you can see how the current function was generated.
+The G4 Function Generator GUI is recommended for learning about the parameters of functions, testing out new functions, and debugging previously generated functions. For creating many functions at once, it is recommended to use the MATLAB script form of this tool. In addition, while the GUI only supports functions with a maximum of 5 waveform sections, the script version can accommodate any number of sections. The `create_experiment_G4_example` script located in `G4_Display_Tools\G4_Example_Experiment_Scripts` shows one example of creating many functions in a single script, and clicking _create script_{: .gui-btn} in the G4 Function Generator GUI will generate and open a script in MATLAB based on the current GUI parameters so that you can see how the current function was generated.
 
 ## Using functions in an experiment
 

@@ -18,7 +18,7 @@ You may have seen references to a __run protocol__ throughout the documentation.
 
 What you might not know is that you can also write your own run protocol. The potential benefits of doing this will become clear throughout this tutorial, though for most use cases, you won't need one other than the defaults. In this tutorial, we will use `G4_default_run_protocol.m` as our example, so streaming features are not covered here.
 
-- Please note that the run protocol `G4_run_protocol_combinedCommand.m` should not currently be used. It utilizes a new Panel_com command which still has unresolved bugs. 
+- Please note that the run protocol `G4_run_protocol_combinedCommand.m` should not currently be used. It utilizes a new Panel_com command which still has unresolved bugs.
 
 By definition, this tutorial will also show you how to send specific commands to the panels using none of the provided GUIs. This might be useful if you want to display a single pattern on the panels or try running a condition without using the [G4 Designer](protocol-designer.md).
 
@@ -33,9 +33,9 @@ Open the file called `Panel_com.m` in MATLAB, which contains a function with a l
 
 While the file `Panel_com.m` contains the most comprehensive reference list of commands, we also have [documentation on the available commands](pcontrol.md). If you refer to the source file make sure __not to edit any code in `Panel_com.m`__. The file contains several `case` statements, each of which represents a command the panels can interpret. For example, the first few commands in this file are [`stop_display`](pcontrol.md#stop_display), [`all_off`](pcontrol.md#all_off), [`all_on`](pcontrol.md#all_on), etc.
 
-Remember in the [software setup](software_setup.md#verify), to verify everything was working correctly, you clicked a button called *All On*{:.gui-txt} in the *Panel Host*{:.gui-txt} GUI? When you clicked it, it used the `all_on` command you see in `Panel_com.m` to send that command to the panels. You can do this same test without the GUI:
+Remember in the [software setup](software_setup.md#verify), to verify everything was working correctly, you clicked a button called _All On_{:.gui-txt} in the _Panel Host_{:.gui-txt} GUI? When you clicked it, it used the `all_on` command you see in `Panel_com.m` to send that command to the panels. You can do this same test without the GUI:
 
-In your MATLAB command window, type `connectHost` and hit enter. Assuming your setup is working, the Panel Host GUI should open after a few seconds. Ignore the application and instead, in the MATLAB command window, type `Panel_com('all_on')` and hit *enter*{:.kbd}. You should see all the LEDs in your arena come on, just like they did when you [tested this](software_setup.md#verify) through the Panel Host application. Now type `Panel_com('all_off')` in the MATLAB command window and hit *enter*{:.kbd}. This should turn the LEDs back off.
+In your MATLAB command window, type `connectHost` and hit enter. Assuming your setup is working, the Panel Host GUI should open after a few seconds. Ignore the application and instead, in the MATLAB command window, type `Panel_com('all_on')` and hit _enter_{:.kbd}. You should see all the LEDs in your arena come on, just like they did when you [tested this](software_setup.md#verify) through the Panel Host application. Now type `Panel_com('all_off')` in the MATLAB command window and hit _enter_{:.kbd}. This should turn the LEDs back off.
 
 As you can see, you send commands to the panels generally by typing `Panel_com(command name[, arguments…])` into the MATLAB command window, with the list of argument being optional. If you look in `Panel_com.m` at line 28, you will see that when you submit the `all_on` command, a particular hexadecimal string `FF` is converted to its byte value 255 and sent to the panels via TCP:
 
@@ -80,7 +80,7 @@ Panel_com('change_root_directory', 'C:\Users\taylorl\Desktop\test_protocol') % o
 Panel_com('start_log')
 ```
 
-You may have noticed on the Panel Host there is a virtual LED labeled *Log running*{:.gui-txt} which is green when a condition or experiment is running and which is dark when it is not. You should always start the log running before running an experiment and only stop the log running when the entire experiment is over. In the [data analysis section](data-handling.md), you'll see that your raw data is contained in the log file. Data is only collected when the log is running. It's good habit to always run the log, even if you are just testing something.
+You may have noticed on the Panel Host there is a virtual LED labeled _Log running_{:.gui-txt} which is green when a condition or experiment is running and which is dark when it is not. You should always start the log running before running an experiment and only stop the log running when the entire experiment is over. In the [data analysis section](data-handling.md), you'll see that your raw data is contained in the log file. Data is only collected when the log is running. It's good habit to always run the log, even if you are just testing something.
 
 ### Set the Display mode
 
@@ -501,7 +501,7 @@ Notice that after a `start_display` command is sent to `Panel_com`, we then put 
 
 ## Interactions with G4 Experiment Conductor
 
-Another two functions from our [G4 Experiment Conductor](experiment-conductor.md) are called at lines 307 and 318. The first, called `check_if_aborted`, must be included in any of your run protocols if you want the *Abort*{:.gui-btn} button the G4 Experiment Conductor to work. In our run protocol, it checks if the *Abort*{:.gui-btn} button has been clicked at the end of every trial.
+Another two functions from our [G4 Experiment Conductor](experiment-conductor.md) are called at lines 307 and 318. The first, called `check_if_aborted`, must be included in any of your run protocols if you want the _Abort_{:.gui-btn} button the G4 Experiment Conductor to work. In our run protocol, it checks if the _Abort_{:.gui-btn} button has been clicked at the end of every trial.
 
 At line 318, the elapsed time displayed on the Conductor is updated. This also is done at the end of every trial.
 
@@ -767,6 +767,7 @@ disconnectHost;
 pause(1);
 success = 1;
 ```
+
 </details>
 
 Notice that in the line starting with `stop_log_response`, instead of using the `stop_log` command, the default run protocol uses `send_tcp` directly. This is because a common problem has been that the `stop_log` command does not go through due to some back-up with the panels, and then the Conductor can not do its job of moving the data files to where they need to go, because the log is still running. We've done this so that if the stop log command fails, we can allow the user to stop the log manually before moving on.
@@ -781,5 +782,5 @@ So now that you've seen how our run protocol is structured, you can probably tel
   - `update_elapsed_time` - updates the elapsed time shown on the Conductor. Takes in one argument, a number.
   - `update_progress` - updates text above the progress bar. Takes in several variables, see line 417 for an example. Note the lines following this function (lines 417-421) must all be run to display this update on the Conductor.
   - `update_current_trial_parameters` - The conductor shows the parameters (pattern id, function id, mode, etc) of any given trial as it runs. This updates the conductor to show the current trial. You must pass in all the parameters for that condtion. (See line 456 for an example)
-  - `check_if_aborted` - checks if the *Abort*{:.gui-btn} button has been clicked, returns 0 for no, 1 for yes.
+  - `check_if_aborted` - checks if the _Abort_{:.gui-btn} button has been clicked, returns 0 for no, 1 for yes.
 - You must remember to `stop_display`, `stop_log`, and `disconnectHost` at the end of the file.
