@@ -25,9 +25,13 @@ function create_processing_settings()
     settings.combined_command = 0; %Set to 1 if using the combined command
     settings.percent_to_shift = .015;
     settings.duration_diff_limit = .15; %If a trial takes longer than its intended duration by more than this percentage, throw it out
-    
+    settings.flying = 1; %If this is a flying experiment, set to 1. If not, set to 0.
     %% Wing Beat Frequency Settings
     
+    settings.remove_nonflying_trials = 1; %1 if you want trials where the fly 
+    %                                       didn't fly to be marked as bad and removed.
+                                            % 0 if you don't want this
+                                            % feature turned on.
     settings.wbf_range = [160 260]; %Minimum and maximum acceptable wing beat frequencies
     settings.wbf_cutoff = .2; %Maximum acceptable portion of a condition where the fly is not flying
     settings.wbf_end_percent = .8; %If a fly is not flying for more than the above acceptable portion of a condition,
