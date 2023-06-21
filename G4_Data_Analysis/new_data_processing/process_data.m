@@ -57,7 +57,11 @@ function process_data(exp_folder, processing_settings_file)
     wbf_range = s.settings.wbf_range;
     wbf_cutoff = s.settings.wbf_cutoff;
     wbf_end_percent = s.settings.wbf_end_percent;
-    flying = s.settings.flying;
+    if isfield(s.settings, 'flying')
+        flying = s.settings.flying;
+    else
+        flying = 1;
+    end
 
     if isfield(s.settings, 'remove_nonflying_trials')
         remove_nonflying_trials = s.settings.remove_nonflying_trials;
@@ -100,6 +104,8 @@ function process_data(exp_folder, processing_settings_file)
     L_chan_idx = find(strcmpi(channel_order,'L_chan'));
     R_chan_idx = find(strcmpi(channel_order,'R_chan'));
     F_chan_idx = find(strcmpi(channel_order,'F_chan'));
+    Current_idx = find(strcmpi(channel_order, 'current'));
+    Volt_idx = find(strcmpi(channel_order, 'voltage'));
 %    faLmR_ind = find(strcmpi(channel_order,'faLmR'));
     num_ts_datatypes = length(channel_order);
     num_ADC_chans = length(Log.ADC.Channels);
@@ -241,118 +247,178 @@ function process_data(exp_folder, processing_settings_file)
     
     ts_data = search_for_misaligned_data(ts_data, percent_to_shift, num_conds, num_reps, Frame_ind);
     
-     %% Normalize LmR timeseries data
-
-    %Get maxs (do not normalize to baselines by default)    
-
-    num_datapoints = size(ts_data, 4);
+    if flying
+         %% Normalize LmR timeseries data
     
-    maxs = get_max_process_normalization(max_prctile, ts_data,...
-        num_conds, num_datapoints, num_ts_datatypes, num_reps);
-
-    %Normalize all timeseries data  
+        %Get maxs (do not normalize to baselines by default)    
     
-    [ts_data_normalized, normalization_max] = normalize_ts_data(L_chan_idx, R_chan_idx, ts_data, maxs);
-
-
-    %Get timeseries avg over reps - normalized and
-    %unnormalized. 
-    %% process data into meaningful datasets
-    %calculate LmR (Left - Right) and LpR (Left + Right)
+        num_datapoints = size(ts_data, 4);
+        
+        maxs = get_max_process_normalization(max_prctile, ts_data,...
+            num_conds, num_datapoints, num_ts_datatypes, num_reps);
     
-     
-    
-    %Unnormalized datasets
-    ts_data(LmR_ind,:,:,:) = ts_data(L_chan_idx,:,:,:) - ts_data(R_chan_idx,:,:,:); % + = right turns, - = left turns
-    ts_data(LpR_ind,:,:,:) = ts_data(L_chan_idx,:,:,:) + ts_data(R_chan_idx,:,:,:); % + = increased amplitude, - = decreased
+        %Normalize all timeseries data  
+        
+        [ts_data_normalized, normalization_max] = normalize_ts_data(L_chan_idx, R_chan_idx, ts_data, maxs);
     
     
+        %Get timeseries avg over reps - normalized and
+        %unnormalized. 
+        %% process data into meaningful datasets
+        %calculate LmR (Left - Right) and LpR (Left + Right)
+        
+         
+        
+        %Unnormalized datasets
+        ts_data(LmR_ind,:,:,:) = ts_data(L_chan_idx,:,:,:) - ts_data(R_chan_idx,:,:,:); % + = right turns, - = left turns
+        ts_data(LpR_ind,:,:,:) = ts_data(L_chan_idx,:,:,:) + ts_data(R_chan_idx,:,:,:); % + = increased amplitude, - = decreased
+        
+        
+        
+        %Normalized datasets
+        ts_data_normalized(LmR_ind,:,:,:) = ts_data_normalized(L_chan_idx,:,:,:) - ts_data_normalized(R_chan_idx,:,:,:); % + = right turns, - = left turns   
+        ts_data_normalized(LpR_ind,:,:,:) = ts_data_normalized(L_chan_idx,:,:,:) + ts_data_normalized(R_chan_idx,:,:,:); % + = increased amplitude, - = decreased    
+        
     
-    %Normalized datasets
-    ts_data_normalized(LmR_ind,:,:,:) = ts_data_normalized(L_chan_idx,:,:,:) - ts_data_normalized(R_chan_idx,:,:,:); % + = right turns, - = left turns   
-    ts_data_normalized(LpR_ind,:,:,:) = ts_data_normalized(L_chan_idx,:,:,:) + ts_data_normalized(R_chan_idx,:,:,:); % + = increased amplitude, - = decreased    
+         %duplicate ts_data and exclude all datapoints outside data analysis
+         %window. Shorten condition data to actual analysis window set. 
+        da_data = ts_data;
     
-
-     %duplicate ts_data and exclude all datapoints outside data analysis
-     %window. Shorten condition data to actual analysis window set. 
-    da_data = ts_data;
-
-    da_data_norm = ts_data_normalized;
-    da_start_ind = find(ts_time>=da_start,1);
-    da_data(:,:,:,1:da_start_ind) = nan; %omit data before trial start
-    for con = 1:num_conds
-        if ~isempty(find(con==bad_conds))
-            continue;
+        da_data_norm = ts_data_normalized;
+        da_start_ind = find(ts_time>=da_start,1);
+        da_data(:,:,:,1:da_start_ind) = nan; %omit data before trial start
+        for con = 1:num_conds
+            if ~isempty(find(con==bad_conds))
+                continue;
+            end
+            da_stop_ind = find(ts_time<=(cond_dur(con,1)-da_stop),1,'last');
+            assert(~isempty(da_stop_ind),'data analysis window extends past trial end')
+            da_data(:,con,:,da_stop_ind:end) = nan; %omit data after trial end
+            da_data_norm(:,con,:,da_stop_ind:end) = nan;
         end
-        da_stop_ind = find(ts_time<=(cond_dur(con,1)-da_stop),1,'last');
-        assert(~isempty(da_stop_ind),'data analysis window extends past trial end')
-        da_data(:,con,:,da_stop_ind:end) = nan; %omit data after trial end
-        da_data_norm(:,con,:,da_stop_ind:end) = nan;
-    end
-
-
-    ts_avg_reps = squeeze(mean(da_data, 3, 'omitnan'));
-    LmR_avg_over_reps = squeeze(ts_avg_reps(LmR_ind,:,:));
-    LpR_avg_over_reps = squeeze(ts_avg_reps(LpR_ind,:,:));
     
-    ts_avg_reps_norm = squeeze(mean(da_data_norm, 3, 'omitnan'));
-    LmR_avg_reps_norm = squeeze(ts_avg_reps_norm(LmR_ind,:,:));   
-    LpR_avg_reps_norm = squeeze(ts_avg_reps_norm(LpR_ind,:,:));
+    
+        ts_avg_reps = squeeze(mean(da_data, 3, 'omitnan'));
+        LmR_avg_over_reps = squeeze(ts_avg_reps(LmR_ind,:,:));
+        LpR_avg_over_reps = squeeze(ts_avg_reps(LpR_ind,:,:));
+        
+        ts_avg_reps_norm = squeeze(mean(da_data_norm, 3, 'omitnan'));
+        LmR_avg_reps_norm = squeeze(ts_avg_reps_norm(LmR_ind,:,:));   
+        LpR_avg_reps_norm = squeeze(ts_avg_reps_norm(LpR_ind,:,:));
+    
+        %Generate flipped and averaged datasets if requested
+           
+        if faLmR == 1
+            [faLmR_data, faLmR_data_norm] = get_faLmR(da_data, da_data_norm, LmR_ind, condition_pairs);
+            faLmR_avg_over_reps = squeeze(mean(faLmR_data(:,:,:),2, 'omitnan'));
+            faLmR_avg_reps_norm = squeeze(mean(faLmR_data_norm(:,:,:),2, 'omitnan'));
+        else
+            faLmR_data = [];
+            faLmR_data_norm = [];
+            faLmR_avg_over_reps = [];
+            faLmR_avg_reps_norm = [];
+        end
+    
+    %calculate values for tuning curves
+        tc_data = mean(da_data,4, 'omitnan');
+        tc_data_norm = mean(da_data_norm,4, 'omitnan');
+        
+        %calculate histograms of/by pattern position - normalized and
+        %unnormalized
+        if ~isempty(hist_datatypes)
+            hist_data = calculate_histograms(da_data, hist_datatypes, Frame_ind, num_conds, num_reps,...
+            LmR_ind, LpR_ind);
+        else
+            hist_data = [];
+        end
+        
+        %get histogram of intertrial pattern position
+        %get histogram of intertrial pattern position
+        if trial_options(2) %if intertrials were run
+            inter_hist_data = calculate_intertrial_histograms(inter_ts_data);
+        else
+            inter_hist_data = [];
+        end
+    
+        
+        %If included in settings, get the position series data from timeseries
+        %data - normalized and unnormalized.
+        if enable_pos_series
+                
+            [pos_series, mean_pos_series] = get_position_series(da_data_norm, ...
+                Frame_ind, num_positions, data_pad, LmR_ind, sm_delay, pos_conditions);
+    
+    %         [pos_series, mean_pos_series] = get_position_series_a(ts_data, ...
+    %             Frame_ind, num_positions, data_pad, LmR_ind, sm_delay, pos_conditions);
+    
+        else
+            pos_series = [];
+            mean_pos_series = [];
+    
+        end
 
-    %Generate flipped and averaged datasets if requested
-       
-    if faLmR == 1
-        [faLmR_data, faLmR_data_norm] = get_faLmR(da_data, da_data_norm, LmR_ind, condition_pairs);
-        faLmR_avg_over_reps = squeeze(mean(faLmR_data(:,:,:),2, 'omitnan'));
-        faLmR_avg_reps_norm = squeeze(mean(faLmR_data_norm(:,:,:),2, 'omitnan'));
+        channelNames.timeseries = channel_order; %cell array of channel names for timeseries data
+        channelNames.histograms = hist_datatypes; %cell array of channel names for histograms
+        histograms_CL = hist_data; %[datatype, condition, repetition, pattern-position]
+        interhistogram = inter_hist_data; %[repetition, pattern-position]
+        timestamps = ts_time; %[1 timestamp]
+        timeseries = da_data; %[datatype, condition, repition, datapoint]
+        timeseries_normalized = da_data_norm;
+        faLmR_timeseries = faLmR_data;
+        faLmR_timeseries_normalized = faLmR_data_norm;
+        summaries = tc_data; %[datatype, condition, repition]
+        summaries_normalized = tc_data_norm;
+        conditionModes = cond_modes(:,1); %[condition]
+        pattern_movement_time_avg = squeeze(mean(cond_frame_move_time,2, 'omitnan'));
+%       LmR_normalization_max = maxs(LmR_ind,1,1)
+
+    
+        save(fullfile(exp_folder,processed_file_name), 'timeseries', 'timeseries_normalized', ...
+            'faLmR_timeseries', 'faLmR_timeseries_normalized', 'ts_avg_reps', 'ts_avg_reps_norm', ...
+        'LmR_avg_over_reps', 'LmR_avg_reps_norm','LpR_avg_over_reps', 'LpR_avg_reps_norm',...
+        'faLmR_avg_over_reps', 'faLmR_avg_reps_norm','channelNames', 'histograms_CL', ...
+        'summaries', 'summaries_normalized','conditionModes', 'interhistogram', 'timestamps', ...
+        'pos_series', 'mean_pos_series', 'pos_conditions', 'normalization_max', ...
+        'bad_duration_conds', 'bad_duration_intertrials','bad_slope_conds', 'bad_crossCorr_conds',...
+        'bad_WBF_conds','cond_frame_move_time', 'pattern_movement_time_avg');
     else
-        faLmR_data = [];
-        faLmR_data_norm = [];
-        faLmR_avg_over_reps = [];
-        faLmR_avg_reps_norm = [];
-    end
+        da_data = ts_data;
+        da_start_ind = find(ts_time>=da_start,1);
+        da_data(:,:,:,1:da_start_ind) = nan; %omit data before trial start
+        for con = 1:num_conds
+            if ~isempty(find(con==bad_conds))
+                continue;
+            end
+            da_stop_ind = find(ts_time<=(cond_dur(con,1)-da_stop),1,'last');
+            assert(~isempty(da_stop_ind),'data analysis window extends past trial end')
+            da_data(:,con,:,da_stop_ind:end) = nan; %omit data after trial end
+        end
 
-%calculate values for tuning curves
-    tc_data = mean(da_data,4, 'omitnan');
-    tc_data_norm = mean(da_data_norm,4, 'omitnan');
-    
-    %calculate histograms of/by pattern position - normalized and
-    %unnormalized
-    if ~isempty(hist_datatypes)
-        hist_data = calculate_histograms(da_data, hist_datatypes, Frame_ind, num_conds, num_reps,...
-        LmR_ind, LpR_ind);
-    else
-        hist_data = [];
-    end
-    
-    %get histogram of intertrial pattern position
-    %get histogram of intertrial pattern position
-    if trial_options(2) %if intertrials were run
-        inter_hist_data = calculate_intertrial_histograms(inter_ts_data);
-    else
-        inter_hist_data = [];
-    end
+        ts_avg_reps = squeeze(mean(da_data, 3, 'omitnan'));
+        tc_data = mean(da_data,4, 'omitnan');
+        %get histogram of intertrial pattern position
+        if trial_options(2) %if intertrials were run
+            inter_hist_data = calculate_intertrial_histograms(inter_ts_data);
+        else
+            inter_hist_data = [];
+        end
 
-    
-    %If included in settings, get the position series data from timeseries
-    %data - normalized and unnormalized.
-    if enable_pos_series
-            
-        [pos_series, mean_pos_series] = get_position_series(da_data_norm, ...
-            Frame_ind, num_positions, data_pad, LmR_ind, sm_delay, pos_conditions);
+        channelNames.timeseries = channel_order; %cell array of channel names for timeseries data
+        channelNames.histograms = hist_datatypes; %cell array of channel names for histogram
+        interhistogram = inter_hist_data; %[repetition, pattern-position]
+        timestamps = ts_time; %[1 timestamp]
+        timeseries = da_data; %[datatype, condition, repition, datapoint]
+        summaries = tc_data; %[datatype, condition, repition]
+        conditionModes = cond_modes(:,1); %[condition]
+        pattern_movement_time_avg = squeeze(mean(cond_frame_move_time,2, 'omitnan'));
 
-%         [pos_series, mean_pos_series] = get_position_series_a(ts_data, ...
-%             Frame_ind, num_positions, data_pad, LmR_ind, sm_delay, pos_conditions);
-
-    else
-        pos_series = [];
-        mean_pos_series = [];
+        save(fullfile(exp_folder,processed_file_name), 'timeseries', 'ts_avg_reps',...
+            'channelNames',  'summaries', 'conditionModes', 'interhistogram', ...
+            'timestamps', 'bad_duration_conds', 'bad_duration_intertrials',...
+            'bad_slope_conds', 'bad_crossCorr_conds', 'cond_frame_move_time', 'pattern_movement_time_avg');
 
     end
 
-
-    
-    
     %% save data
     fileId = fopen(fullfile(summary_save_path,summary_filename), 'wt');
     for line = 1:length(bad_conds_summary)
@@ -360,31 +426,5 @@ function process_data(exp_folder, processing_settings_file)
     end
     fclose(fileId);
     
-
-    channelNames.timeseries = channel_order; %cell array of channel names for timeseries data
-    channelNames.histograms = hist_datatypes; %cell array of channel names for histograms
-    histograms_CL = hist_data; %[datatype, condition, repetition, pattern-position]
-    interhistogram = inter_hist_data; %[repetition, pattern-position]
-    timestamps = ts_time; %[1 timestamp]
-    timeseries = da_data; %[datatype, condition, repition, datapoint]
-    timeseries_normalized = da_data_norm;
-    faLmR_timeseries = faLmR_data;
-    faLmR_timeseries_normalized = faLmR_data_norm;
-    summaries = tc_data; %[datatype, condition, repition]
-    summaries_normalized = tc_data_norm;
-    conditionModes = cond_modes(:,1); %[condition]
-    pattern_movement_time_avg = squeeze(mean(cond_frame_move_time,2, 'omitnan'));
-%    LmR_normalization_max = maxs(LmR_ind,1,1)
-
-    
-    save(fullfile(exp_folder,processed_file_name), 'timeseries', 'timeseries_normalized', ...
-        'faLmR_timeseries', 'faLmR_timeseries_normalized', 'ts_avg_reps', 'ts_avg_reps_norm', ...
-    'LmR_avg_over_reps', 'LmR_avg_reps_norm','LpR_avg_over_reps', 'LpR_avg_reps_norm',...
-    'faLmR_avg_over_reps', 'faLmR_avg_reps_norm','channelNames', 'histograms_CL', ...
-    'summaries', 'summaries_normalized','conditionModes', 'interhistogram', 'timestamps', ...
-    'pos_series', 'mean_pos_series', 'pos_conditions', 'normalization_max', ...
-    'bad_duration_conds', 'bad_duration_intertrials','bad_slope_conds', 'bad_crossCorr_conds',...
-    'bad_WBF_conds','cond_frame_move_time', 'pattern_movement_time_avg');
-
 
 end
