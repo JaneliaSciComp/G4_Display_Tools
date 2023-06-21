@@ -1,4 +1,5 @@
-%% Default protocol by which to run a flight experiment.
+%% Run protocol which logs after every repetition instead of creating one log for the entire experiment
+% No streaming or combined command.
 
 %Notice that the inputs can be variable. In fact, there should only ever be
 %one or two inputs. The first should always be a struct of the experiment
@@ -7,7 +8,7 @@
 %the command line, leave the second input out, but when running from the
 %GUI, it is needed to access the progress bar and other GUI items.
 
-% PARAMETERS BELONGING TO EACH TRIAL
+%PARAMETERS BELONGING TO EACH TRIAL
 
     %p.pretrial - cell array with all table values
     %p.pretrial_pat_index - index of the pattern in the pretrial
@@ -17,7 +18,7 @@
     %p.intertrial - same as above, replacing "pretrial" with "intertrial"
     %p.posttrial - same as above, replacing "pretrial" with "posttrial"
     %p.block_trials - naming is slightly different. p.block_pat_indices,
-        %p.block_pos_indices, etc.
+    %p.block_pos_indices, etc.
 
     %p.num_pretrial_frames gives the number of frames in the pretrial pattern
         %in case it needs to be randomized.
@@ -30,7 +31,7 @@
         %library.
 
 
-% PARAMETERS NOT SPECIFIC TO A TRIAL
+%PARAMETERS NOT SPECIFIC TO A TRIAL
 
     %p.active_ao_channels - [0 1 2 3]
     %p.repetitions
@@ -41,17 +42,17 @@
     %p.experiment_folder - path to experiment folder
 
 
-% NOTES
+%NOTES
 
     %The arrays of block indices are m x n where m is number of conditions and
     %n is 1 in the case of pat/pos, or the number of active
     %channels in the case of ao. In any position where there was no pos/ao
     %function, the value is a 0.
 
-    %p.active_ao_channels lists the channels that are active - [0 2 3] for
-    %example means channels 1, 3, and 4 are active.
+ %p.active_ao_channels lists the channels that are active - [0 2 3] for
+ %example means channels 1, 3, and 4 are active.
 
-function [success] = G4_default_run_protocol(runcon, p)%input should always be 1 or 2 items
+function [success] = G4_run_protocol_blockLogging(runcon, p) %input should always be 1 or 2 items
 
     %% Get access to the figure and progress bar in the run gui IF it was passed in.
     global ctlr;
@@ -65,6 +66,7 @@ function [success] = G4_default_run_protocol(runcon, p)%input should always be 1
 
     %% Set up parameters
     params = assign_parameters(p);
+
     if params.inter_type == 1
         ctlr_parameters_intertrial = {params.inter_mode, params.inter_pat, params.inter_gain, ...
             params.inter_offset, params.inter_pos, params.inter_frame_rate, params.inter_frame_ind, ...
@@ -93,7 +95,6 @@ function [success] = G4_default_run_protocol(runcon, p)%input should always be 1
     end
 
     switch start
-
         case 'Cancel'
             if isa(ctlr, 'PanelsController')
                 ctlr.close();
@@ -103,10 +104,10 @@ function [success] = G4_default_run_protocol(runcon, p)%input should always be 1
             return;
 
         case 'Start' %The rest of the code to run the experiment goes under this case
-
             %% Determine the total number of trials in order to define in what increments
             %the progress bar will progress.-------------------------------------------
             total_num_steps = get_total_num_trials(params);
+
 
             %% Determine how long the experiment will take and update the title of the
             %progress bar to reflect it------------------------------------------------
@@ -120,28 +121,8 @@ function [success] = G4_default_run_protocol(runcon, p)%input should always be 1
             %in the experiment we are
             num_trial_of_total = 0;
 
-            %% Make sure the pause button hasn't been pressed
-            is_paused = runcon.check_if_paused();
-            if is_paused
-                disp("Experiment is paused. Please press pause button again to continue.");
-                runcon.pause();
-            end
-
-            %% Start log, if fails twice, abort------------------------------------
-            log_started = ctlr.startLog();
-            if ~log_started
-                runcon.abort_experiment();
-            end
-            if runcon.check_if_aborted()
-                if isa(ctlr, 'PanelsController')
-                    ctlr.close();
-                end
-                clear global;
-                success = 0;
-                return;
-            end
-
             %% run pretrial if it exists----------------------------------------
+
             startTime = tic;
             if params.pre_start == 1
                 %First update the progress bar to show pretrial is running----
@@ -149,9 +130,11 @@ function [success] = G4_default_run_protocol(runcon, p)%input should always be 1
                 num_trial_of_total = num_trial_of_total + 1;
 
                 %Set the panel values appropriately----------------
+
                 ctlr_parameters_pretrial = {params.pre_mode, params.pre_pat, params.pre_gain, ...
                     params.pre_offset, params.pre_pos, params.pre_frame_rate, params.pre_frame_ind, ...
                     p.active_ao_channels, params.pre_ao_ind};
+
                 ctlr.setControllerParameters(ctlr_parameters_pretrial);
 
                 %Update status panel to show current parameters
@@ -159,9 +142,11 @@ function [success] = G4_default_run_protocol(runcon, p)%input should always be 1
                     params.pre_pos, p.active_ao_channels, params.pre_ao_ind, ...
                     params.pre_frame_ind, params.pre_frame_rate, params.pre_gain, ...
                     params.pre_offset, params.pre_dur);
+
                 pause(0.01);
 
                 %Run pretrial on screen
+                ctlr.startLog();
                 if params.pre_dur ~= 0
                     ctlr.startDisplay(params.pre_dur*10); %Panelcom usually did the *10 for us. Controller expects time in deciseconds
                 else
@@ -169,35 +154,24 @@ function [success] = G4_default_run_protocol(runcon, p)%input should always be 1
                     w = waitforbuttonpress; %If pretrial duration is set to zero, this
                     %causes it to loop until you press a button.
                 end
+                ctlr.stopLog(showTimeoutMessage=true);
+                if runcon.check_if_aborted()
+                    ctlr.stopDisplay();
+                    if isa(ctlr, 'PanelsController')
+                        ctlr.close();
+                    end
+                    clear global;
+                    success = 0;
+                    return;
+                end
             end
 
-            % Turn off AO functions if there are any
-            % for i = 1:length(p.active_ao_channels)
-            %     self.setAOFunctionID(p.active_ao_channels(i), 0);
-            % end
-
-            if runcon.check_if_aborted()
-               ctlr.stopDisplay();
-               ctlr.stopLog(showTimeoutMessage=true);
-               if isa(ctlr, 'PanelsController')
-                   ctlr.close();
-               end
-               clear global;
-               success = 0;
-               return;
-            end
-
-            is_paused = runcon.check_if_paused();
-            if is_paused
-                ctlr.stopLog();
-                disp("Experiment is paused. Please press pause button again to continue.");
-                runcon.pause()
-                ctlr.startLog();
-            end
             runcon.update_elapsed_time(round(toc(startTime),2));
 
             %% Loop to run the block/inter trials --------------------------------------
+
             for r = 1:params.reps
+                ctlr.startLog();
                 for c = 1:params.num_cond
                     %define which condition we're using
                     cond = p.exp_order(r,c);
@@ -210,6 +184,7 @@ function [success] = G4_default_run_protocol(runcon, p)%input should always be 1
                     tparams = assign_block_trial_parameters(params, p, c);
 
                     %Update controller-----------------------------
+
                     ctlr_parameters = {tparams.trial_mode, tparams.pat_id, tparams.gain, ...
                         tparams.offset, tparams.pos_id, tparams.frame_rate, tparams.frame_ind...
                         params.active_ao_channels, tparams.trial_ao_indices};
@@ -240,17 +215,7 @@ function [success] = G4_default_run_protocol(runcon, p)%input should always be 1
                         clear global;
                         success = 0;
                         return;
-
                     end
-
-                    is_paused = runcon.check_if_paused();
-                    if is_paused
-                        ctlr.stopLog();
-                        disp("Experiment is paused. Please press pause button again to continue.");
-                        runcon.pause()
-                        ctlr.startLog();
-                    end
-
                     runcon.update_elapsed_time(round(toc(startTime),2));
 
                     %Tells loop to skip the intertrial if this is the last iteration of the last rep
@@ -267,6 +232,7 @@ function [success] = G4_default_run_protocol(runcon, p)%input should always be 1
                             ", Trial " + c + " of " + params.num_cond + ". Inter-trial running...";
                         progress_bar.YData = num_trial_of_total/total_num_steps;
                         drawnow;
+
                         if params.inter_frame_ind == 0
                             inter_frame_ind = randperm(p.num_intertrial_frames,1);
                             ctlr_parameters_intertrial{7} = inter_frame_ind;
@@ -298,9 +264,11 @@ function [success] = G4_default_run_protocol(runcon, p)%input should always be 1
                         runcon.update_elapsed_time(round(toc(startTime),2));
                     end
                 end
+                ctlr.stopLog();
             end
 
             %% Run post-trial if there is one--------------------------------------------
+
             if params.post_type == 1
                 %Update progress bar--------------------------
                 num_trial_of_total = num_trial_of_total + 1;
@@ -318,23 +286,25 @@ function [success] = G4_default_run_protocol(runcon, p)%input should always be 1
                     params.post_ao_ind, params.post_frame_ind, params.post_frame_rate, ...
                     params.post_gain, params.post_offset, params.post_dur);
 
+                ctlr.startLog();
                 ctlr.startDisplay((params.post_dur + .5)*10);
 
-                if runcon.check_if_aborted() == 1
-                    ctlr.stopDisplay();
-                    ctlr.stopLog(showTimeoutMessage=true);
-                    if isa(ctlr, 'PanelsController')
-                        ctlr.close();
-                    end
-                    clear global;
-                    success = 0;
-                    return;
-                end
+
+%                 if runcon.check_if_aborted() == 1
+%                     ctlr.stopDisplay();
+%                     % ctlr.stopLog(showTimeoutMessage=true);
+%                     if isa(ctlr, 'PanelsController')
+%                         ctlr.close();
+%                     end
+%                     clear global;
+%                     success = 0;
+%                     return;
+%
+%                 end
                 runcon.update_elapsed_time(round(toc(startTime),2));
             end
 
             ctlr.stopDisplay();
-
             ctlr.stopLog(timeout=60.0, showTimeoutMessage=true);
 
             if isa(ctlr, 'PanelsController')

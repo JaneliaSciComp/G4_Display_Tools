@@ -376,7 +376,14 @@ classdef PanelsController < handle
             end
         end
         
-        function rtn = stopLog(self)
+        function rtn = stopLog(self, timeout, showTimeoutMessage, showTimeoutDialog, timeoutMessage)
+            arguments
+                self (1,1) PanelsController
+                timeout (1,1) double {mustBeGreaterThan(timeout, 0)} = 30.0
+                showTimeoutMessage (1,1) logical = false
+                showTimeoutDialog (1,1) logcial = false
+                timeoutMessage (1,1) str = "Log failed to stop. Please stop manually."
+            end
             %% stopLog Stop logging on the the Main Host
             %
             % Triggers the 'Stop Log' TCP command if the log is still 
@@ -392,10 +399,15 @@ classdef PanelsController < handle
             rtn = false;
             cmdData = char([1 64]); % Command 0x01 0x40
             self.write(cmdData);
-            resp = self.expectResponse(0, 64, [], 30);
+            resp = self.expectResponse(0, 64, [], timeout);
             if ~isempty(resp)
                 rtn = true;
                 self.isLogRunning = false;
+            elseif showTimeoutDialog
+                waitfor(errordlg(strcat(timeoutMessage, " Then hit a key.")));
+                waitforbuttonpress;
+            elseif showTimeoutmessage
+                disp(timeoutMessage)
             end
         end
 
@@ -521,7 +533,7 @@ classdef PanelsController < handle
                      mustBeLessThanOrEqual(bias, 32767)}
             end
             cmdData = char([5 1]); % Command 0x05 0x01
-            self.write([cmdData signed16BitToChar(gain) signed16BitToChar(bias)]);
+            self.write([cmdData signed_16Bit_to_char(gain) signed_16Bit_to_char(bias)]);
         end
         
         function rtn = setFrameRate(self, fps)
@@ -533,7 +545,7 @@ classdef PanelsController < handle
             end
             rtn = false;
             cmdData = char([3 18]); % Command 0x03 0x12
-            self.write([cmdData signed16BitToChar(fps)]);
+            self.write([cmdData signed_16Bit_to_char(fps)]);
             resp = self.expectResponse([0 1], 18, [], 0.1);
             if ~isempty(resp) && uint8(resp(2)) == 0
                 rtn = true;
@@ -744,6 +756,31 @@ classdef PanelsController < handle
             end
         end
         
+        function setControllerParameters(self, p)
+            % Used by Conductor to set all the controller values before
+            % running a trial (when not using the combined command)
+           
+            % p should be a cell array as follows: 
+            % {trial_mode, pat_id, gain, offset, pos_id, frame_rate, frame_ind, ...
+            % active_ao_channels, trial_ao_indices};
+
+            self.setControlMode(p{1});
+            self.setPatternID(p{2});
+            if ~isempty(p{3})
+                self.setGain(p{3}, p{4});
+            end
+            if p{5} ~= 0
+               self.setPatternFunctionID(p{5});
+            end
+            if p{1} == 2
+                self.setFrameRate(p{6});
+            end
+            self.setPositionX(p{7});
+            for i = 1:length(p{8})
+                self.setAOFunctionID(p{8}(i), p{9}(i));  
+            end                                    
+        end
+        
 %         % TODO: not fully working yet.
 %         function rtn = streamFrame(self, aox, aoy, frame)
 %             rtn = false;
@@ -823,7 +860,7 @@ classdef PanelsController < handle
             cmd = [cmd dec2char(ao1FunctionID, 2)];
             cmd = [cmd dec2char(ao2FunctionID, 2)];
             cmd = [cmd dec2char(ao3FunctionID, 2)];
-            cmd = [cmd signed16BitToChar(fps)];
+            cmd = [cmd signed_16Bit_to_char(fps)];
             cmd = [cmd dec2char(deciSeconds, 2)];
             
             self.write(cmd);
@@ -922,8 +959,8 @@ classdef PanelsController < handle
                 end
             end
      
-            frameCmd = [ 50, signed16BitToChar(length(frameOut)), ... 
-                signed16BitToChar(0), signed16BitToChar(0), frameOut];
+            frameCmd = [ 50, signed_16Bit_to_char(length(frameOut)), ... 
+                signed_16Bit_to_char(0), signed_16Bit_to_char(0), frameOut];
 
             frameCmd = char(frameCmd);
 
@@ -933,8 +970,8 @@ classdef PanelsController < handle
         function frameCmd = getFrameCmd16Mex(self,frame)
             stretchF = min(self.stretch, 20);
             frameOut = make_framevector_gs16(frame,stretchF);
-            frameCmd = [ 50, signed16BitToChar(length(frameOut)), ... 
-                signed16BitToChar(0), signed16BitToChar(0), frameOut];
+            frameCmd = [ 50, signed_16Bit_to_char(length(frameOut)), ... 
+                signed_16Bit_to_char(0), signed_16Bit_to_char(0), frameOut];
 
             frameCmd = char(frameCmd);
         end        
@@ -981,28 +1018,22 @@ classdef PanelsController < handle
                 end
             end
             
-            frameCmd = [ 50, signed16BitToChar(length(frameOut)), ... 
-                signed16BitToChar(0), signed16BitToChar(0), frameOut];
+            frameCmd = [ 50, signed_16Bit_to_char(length(frameOut)), ... 
+                signed_16Bit_to_char(0), signed_16Bit_to_char(0), frameOut];
 
             frameCmd = char(frameCmd);
-
         end
         
         %use mex function to speed up the Matlab version getFrameCmd2
         function frameCmd = getFrameCmd2Mex(self,frame)
             stretchF = min(self.stretch, 107);
             frameOut = make_framevector_gs2(frame, stretchF);
-            frameCmd = [ 50, signed16BitToChar(length(frameOut)), ... 
-                signed16BitToChar(0), signed16BitToChar(0), frameOut];
+            frameCmd = [ 50, signed_16Bit_to_char(length(frameOut)), ... 
+                signed_16Bit_to_char(0), signed_16Bit_to_char(0), frameOut];
 
             frameCmd = char(frameCmd);
-
         end        
-        
-        
-        
     end
-
     
     methods (Access=protected)
 
@@ -1095,9 +1126,7 @@ classdef PanelsController < handle
                 end
             end
         end
-
     end 
-
 end % PanelsController
 
 
@@ -1136,19 +1165,3 @@ function [n1,n2,m1,m2] = subPanelNumToInd(i,j,panelNum)
     m1 = m1 + (j-1)*16;
     m2 = m2 + (j-1)*16;
 end
-
-
-function char_val = signed16BitToChar(B)
-    % This functions makes two char value (0-255) from a signed 16bit valued 
-    % number in the range of -32767 ~ 32767
-    if ((any(B > 32767)) || (any(B < -32767)))
-        error('this number is out of range - need a function to handle multi-byte values' );
-    end
-    % this does both pos and neg in one line
-    temp_val = mod(65536 + B, 65536);
-    for cnt =1 : length(temp_val)
-        char_val(2*cnt-1:2*cnt) = dec2char(temp_val(cnt),2);
-    end
-end
-
-

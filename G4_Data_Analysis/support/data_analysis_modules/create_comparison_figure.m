@@ -18,8 +18,6 @@ function create_comparison_figure(CombData, gen_settings, comp_settings, ts_sett
     num_rows = comp_settings.rows_per_fig;
     num_groups = size(M,1);
     
-   
-    
     if ~isempty(plot_order)
         plot_order = {'LmR', 'pos', 'M', 'P'};
     end
@@ -83,9 +81,6 @@ function create_comparison_figure(CombData, gen_settings, comp_settings, ts_sett
         left_col_places(r) = r;
     end
     
-        
-    
-    
     if ~isempty(conditions)
         for fig = 1:num_figs
             figure('Position',[100 100 1540 1540*(num_rows/num_cols)])
@@ -99,28 +94,22 @@ function create_comparison_figure(CombData, gen_settings, comp_settings, ts_sett
                 end
                 cond = conditions((fig-1)*num_rows + row);
                 for col = 1:num_cols
-                    
                     place = row+num_rows*(col-1);
                     placement = col+num_cols*(row-1);
                     if cond ~= 0
-                        
-                         %subplot
+                        %subplot
+                        better_subplot(num_rows, num_cols, placement, 40, 120)
+                        hold on
+                        yline(0, 'k--');
+                        hold on
                          
-                         better_subplot(num_rows, num_cols, placement, 40, 120)
-                         hold on
-                         yline(0, 'k--');
-                         hold on
-                         
-                         %Get type of plot
-                         plot_type  = plot_order{col};
-                         
-                         if strcmp(plot_type,'LmR') || strcmp(plot_type,'LpR') || strcmp(plot_type, 'faLmR')
-                             
-                             d = find(strcmpi(CombData.channelNames.timeseries, plot_type));
-
-                             for g = 1:num_groups
+                        %Get type of plot
+                        plot_type  = plot_order{col};
+                        if strcmp(plot_type,'LmR') || strcmp(plot_type,'LpR') || strcmp(plot_type, 'faLmR')
+                            d = find(strcmpi(CombData.channelNames.timeseries, plot_type));
+                            for g = 1:num_groups
                                 tmpdata = squeeze(timeseries_data(g,:,d,cond,:));
-                                meandata = nanmean(tmpdata);
+                                meandata = mean(tmpdata, 'omitnan');
                                 nanidx = isnan(meandata);
                                 stddata = nanstd(tmpdata);
                                 semdata = stddata./sqrt(sum(max(~isnan(tmpdata),[],2)));
@@ -133,7 +122,6 @@ function create_comparison_figure(CombData, gen_settings, comp_settings, ts_sett
                                     for exp = 1:num_exps
                                         plot(repmat(timestampsIN',[1 exp]),tmpdata(exp,:)','Color',fly_colors(exp,:),'LineWidth',rep_LineWidth);
                                     end
-
                                     plot(timestamps, meandata, 'Color', .75*mean_colors(g,:),'LineWidth', mean_LineWidth);
                                 else
                                     if g == control_genotype
@@ -146,9 +134,8 @@ function create_comparison_figure(CombData, gen_settings, comp_settings, ts_sett
                                 end
 
                                 if plot_both_dir_ts
-
                                     tmpdata = squeeze(timeseries_data(g,:,d,cond+1,:));
-                                    meandata = nanmean(tmpdata);
+                                    meandata = mean(tmpdata,'omitnan');
                                     nanidx = isnan(meandata);
                                     stddata = nanstd(tmpdata);
                                     semdata = stddata./sqrt(sum(max(~isnan(tmpdata),[],2)));
@@ -167,9 +154,7 @@ function create_comparison_figure(CombData, gen_settings, comp_settings, ts_sett
                                         if g == control_genotype
                                             plot(timestamps,meandata,'Color',control_color + .75,'LineWidth',mean_LineWidth);
                                             patch([timestamps fliplr(timestamps)],[meandata+semdata fliplr(meandata-semdata)],'k','FaceColor',control_color,'EdgeColor',EdgeColor,'FaceAlpha',patch_alpha)
-
                                         else
-
                                             for rgb = 1:length(mean_colors(g,:))
                                                 if mean_colors(g,rgb) > .75
                                                     color_adjust(rgb) = 0;
@@ -179,125 +164,24 @@ function create_comparison_figure(CombData, gen_settings, comp_settings, ts_sett
                                                     color_adjust(rgb) = .5;
                                                 elseif mean_colors(g,rgb) >= 0
                                                     color_adjust(rgb) = .75;
-
                                                 end
                                             end
-
                                             plot(timestamps,meandata,'Color',mean_colors(g,:) + color_adjust,'LineWidth',mean_LineWidth);
                                             patch([timestamps fliplr(timestamps)],[meandata+semdata fliplr(meandata-semdata)],'k','FaceColor',mean_colors(g,:),'EdgeColor',EdgeColor,'FaceAlpha',patch_alpha)
-
-
                                         end
                                     end
-
-                                end
-                             end
-                             
-                             if isempty(ts_settings.axis_labels)
-                                 axis_labels = ["Time(sec", plot_type];
-                             else
-                                 if length(plot_order) <= 4
-                                     axis_labels = ts_settings.axis_labels{1};
-                                 else
-                                     num_ts_plot = strcmp(plot_order, plot_type);
-                                     axis_labels = ts_settings.axis_labels{num_ts_plot};
-                                 end
-                             end
-
-                             if ylimits ~= 0
-                                ylim(ylimits);
-                            else
-                                lines = findobj(gca, 'Type', 'line');
-                                for l = 1:length(lines)
-                                    curr_ydata = lines(l).YData;
-                                    mm = [min(curr_ydata), max(curr_ydata)];
-                                    ydata = [ydata, mm];
-
                                 end
                             end
-                             
-                         elseif strcmp(plot_type, 'pos')
-
-                            for g = 1:num_groups
-
-                                tmpdata = squeeze(CombData.mean_pos_series(g,:,cond,:));
-                                meandata = nanmean(tmpdata);
-                                nanidx = isnan(meandata);
-                                stddata = nanstd(tmpdata);
-                                semdata = stddata./sqrt(sum(max(~isnan(tmpdata),[],2)));
-    %                             meandata(nanidx) = []; 
-    %                             semdata(nanidx) = [];
-
-                                if single
-                                    plot(pos_xaxis, tmpdata', 'Color',mean_colors(g,:),'LineWidth',rep_LineWidth);
-                                elseif num_groups == 1 && show_ind_flies_pos == 1
-
-                                    %Plot each fly
-                                    for exp = 1:num_exps
-
-                                        plot(pos_xaxis, tmpdata(exp,:),'Color',fly_colors(exp,:),'LineWidth',rep_LineWidth);
-                                        hold on;
-
-                                    end
-                                    %Plot average of the flies
-
-                                    plot(pos_xaxis, meandata,'Color', .75*mean_colors(g,:),'LineWidth', mean_LineWidth);
-
+                            if isempty(ts_settings.axis_labels)
+                                axis_labels = ["Time(sec", plot_type];
+                            else
+                                if length(plot_order) <= 4
+                                    axis_labels = ts_settings.axis_labels{1};
                                 else
-
-
-                                    if g == control_genotype
-
-                                        plot(pos_xaxis, meandata,'Color',control_color,'LineWidth',mean_LineWidth);
-
-
-                                    else
-
-                                        plot(pos_xaxis, meandata,'Color',mean_colors(g,:),'LineWidth',mean_LineWidth);
-
-                                    end
+                                    num_ts_plot = strcmp(plot_order, plot_type);
+                                    axis_labels = ts_settings.axis_labels{num_ts_plot};
                                 end
-
-                                 if plot_both_dir_pos
-
-                                     tmpdata = squeeze(CombData.mean_pos_series(g,:,cond+1,:));
-                                     meandata = nanmean(tmpdata);
-                                     nanidx = isnan(meandata);
-                                     stddata = nanstd(tmpdata);
-                                     semdata = stddata./sqrt(sum(max(~isnan(tmpdata),[],2)));
-    %                                  meandata(nanidx) = []; 
-    %                                  semdata(nanidx) = [];
-                                        %adjust color to make opposing direction
-                                        %lighter
-                                     if single
-                                         plot(pos_xaxis, tmpdata','Color',mean_colors(g+1,:),'LineWidth',rep_LineWidth);
-                                     elseif g == control_genotype
-                                         plot(pos_xaxis, meandata,'Color',control_color + .75,'LineWidth',mean_LineWidth);
-                                     else
-
-                                         for rgb = 1:length(mean_colors(g,:))
-                                             if mean_colors(g,rgb) > .75
-                                                 color_adjust(rgb) = 0;
-                                             elseif mean_colors(g,rgb) > .5
-                                                 color_adjust(rgb) = .15;
-                                             elseif mean_colors(g, rgb) > .25
-                                                 color_adjust(rgb) = .35;
-                                             elseif mean_colors(g,rgb) >= 0
-                                                 color_adjust(rgb) = .55;
-                                             end
-                                          end
-
-                                          plot(pos_xaxis, meandata,'Color',mean_colors(g,:) + color_adjust,'LineWidth',mean_LineWidth);
-                                     end
-                                 end
                             end
-                            
-                            if isempty(pos_settings.axis_labels)
-                                axis_labels = ["Frame Position", "Position"];
-                            else
-                                axis_labels = pos_settings.axis_labels;
-                            end
-                            
                             if ylimits ~= 0
                                 ylim(ylimits);
                             else
@@ -309,7 +193,77 @@ function create_comparison_figure(CombData, gen_settings, comp_settings, ts_sett
 
                                 end
                             end
-                            
+                        elseif strcmp(plot_type, 'pos')
+                            for g = 1:num_groups
+                                tmpdata = squeeze(CombData.mean_pos_series(g,:,cond,:));
+                                meandata = mean(tmpdata,'omitnan');
+                                nanidx = isnan(meandata);
+                                stddata = nanstd(tmpdata);
+                                semdata = stddata./sqrt(sum(max(~isnan(tmpdata),[],2)));
+    %                             meandata(nanidx) = []; 
+    %                             semdata(nanidx) = [];
+                                if single
+                                    plot(pos_xaxis, tmpdata', 'Color',mean_colors(g,:),'LineWidth',rep_LineWidth);
+                                elseif num_groups == 1 && show_ind_flies_pos == 1
+                                    %Plot each fly
+                                    for exp = 1:num_exps
+                                        plot(pos_xaxis, tmpdata(exp,:),'Color',fly_colors(exp,:),'LineWidth',rep_LineWidth);
+                                        hold on;
+                                    end
+                                    %Plot average of the flies
+                                    plot(pos_xaxis, meandata,'Color', .75*mean_colors(g,:),'LineWidth', mean_LineWidth);
+                                else
+                                    if g == control_genotype
+                                        plot(pos_xaxis, meandata,'Color',control_color,'LineWidth',mean_LineWidth);
+                                    else
+                                        plot(pos_xaxis, meandata,'Color',mean_colors(g,:),'LineWidth',mean_LineWidth);
+                                    end
+                                end
+                                 if plot_both_dir_pos
+                                    tmpdata = squeeze(CombData.mean_pos_series(g,:,cond+1,:));
+                                    meandata = mean(tmpdata,'omitnan');
+                                    nanidx = isnan(meandata);
+                                    stddata = nanstd(tmpdata);
+                                    semdata = stddata./sqrt(sum(max(~isnan(tmpdata),[],2)));
+    %                                  meandata(nanidx) = []; 
+    %                                  semdata(nanidx) = [];
+                                        %adjust color to make opposing direction
+                                        %lighter
+                                    if single
+                                        plot(pos_xaxis, tmpdata','Color',mean_colors(g+1,:),'LineWidth',rep_LineWidth);
+                                    elseif g == control_genotype
+                                        plot(pos_xaxis, meandata,'Color',control_color + .75,'LineWidth',mean_LineWidth);
+                                    else
+                                        for rgb = 1:length(mean_colors(g,:))
+                                            if mean_colors(g,rgb) > .75
+                                                color_adjust(rgb) = 0;
+                                            elseif mean_colors(g,rgb) > .5
+                                                color_adjust(rgb) = .15;
+                                            elseif mean_colors(g, rgb) > .25
+                                                color_adjust(rgb) = .35;
+                                            elseif mean_colors(g,rgb) >= 0
+                                                color_adjust(rgb) = .55;
+                                            end
+                                        end
+                                        plot(pos_xaxis, meandata,'Color',mean_colors(g,:) + color_adjust,'LineWidth',mean_LineWidth);
+                                    end
+                                end
+                            end
+                            if isempty(pos_settings.axis_labels)
+                                axis_labels = ["Frame Position", "Position"];
+                            else
+                                axis_labels = pos_settings.axis_labels;
+                            end
+                            if ylimits ~= 0
+                                ylim(ylimits);
+                            else
+                                lines = findobj(gca, 'Type', 'line');
+                                for l = 1:length(lines)
+                                    curr_ydata = lines(l).YData;
+                                    mm = [min(curr_ydata), max(curr_ydata)];
+                                    ydata = [ydata, mm];
+                                end
+                            end
 %                             lines_pos = findobj(gca, 'Type', 'line');
 %                             for l = 1:length(lines_pos)
 %                                 curr_ydata_pos = lines_pos(l).YData;
@@ -317,49 +271,33 @@ function create_comparison_figure(CombData, gen_settings, comp_settings, ts_sett
 %                                 ydata_pos = [ydata_pos, mm_pos];
 % 
 %                             end
-
-                             
-                         elseif strcmp(plot_type, 'M')
-                             
-                   
+                        elseif strcmp(plot_type, 'M')
                             if size(M,2) < (fig-1)*num_rows + row
                                 continue;
                             end
-                            
                             if num_groups == 1 && show_ind_flies_mp == 1
                                 for fly = 1:size(M_flies,2)
                                     datatoplot = squeeze(M_flies(1, fly, ceil(cond/2), :));
                                     %datatoplot = datatoplot(xaxis_inds);
                                     plot(pos_xaxis, datatoplot,'Color',fly_colors(fly,:),'LineWidth',rep_LineWidth);
                                     hold on;
-
                                 end
                                 datatoplot = squeeze(M(1, ceil(cond/2), :));
     %                            datatoplot = datatoplot(xaxis_inds);
                                 plot(pos_xaxis, datatoplot,'Color',mean_colors(1,:),'LineWidth',mean_LineWidth);
-
-                             else
-
+                            else
                                 for g = 1:num_groups
-
                                     if g == control_genotype
-
                                         datatoplot = squeeze(M(g, ceil(cond/2), :));
                                         %datatoplot = datatoplot(xaxis_inds);
                                         plot(pos_xaxis, datatoplot,'Color',control_color,'LineWidth',mean_LineWidth);
-
-
                                     else
-
-                                       datatoplot = squeeze(M(g, ceil(cond/2), :));
-                                       % datatoplot = datatoplot(xaxis_inds);
+                                        datatoplot = squeeze(M(g, ceil(cond/2), :));
+                                        % datatoplot = datatoplot(xaxis_inds);
                                         plot(pos_xaxis, datatoplot,'Color',mean_colors(g,:),'LineWidth',mean_LineWidth);
-
-
                                     end
                                 end
                             end
-                            
                             if isempty(mp_settings.axis_labels)
                                 axis_labels = ["Frame Position", "Motion-Dependent Response"];
                             else
@@ -374,22 +312,13 @@ function create_comparison_figure(CombData, gen_settings, comp_settings, ts_sett
                                     curr_ydata = lines(l).YData;
                                     mm = [min(curr_ydata), max(curr_ydata)];
                                     ydata = [ydata, mm];
-
                                 end
                             end
-                                
-                             
-                             
-                         elseif strcmp(plot_type, 'P')
-                             
-                             %plot P data
-                             
-                             
-                            
+                        elseif strcmp(plot_type, 'P')
+                            %plot P data
                             if size(P,2) < (fig-1)*num_rows + row
                                 continue;
                             end
-                            
                             if num_groups == 1 && show_ind_flies_mp == 1
                                 for fly = 1:size(P_flies,2)
                                     datatoplot = squeeze(P_flies(1, fly, ceil(cond/2), :));
@@ -401,29 +330,20 @@ function create_comparison_figure(CombData, gen_settings, comp_settings, ts_sett
                                 datatoplot = squeeze(P(1, ceil(cond/2), :));
     %                            datatoplot = datatoplot(xaxis_inds);
                                 plot(pos_xaxis, datatoplot,'Color',mean_colors(1,:),'LineWidth',mean_LineWidth);
-
-                             else
-
+                            else
                                 for g = 1:num_groups
-
                                     if g == control_genotype
-
                                         datatoplot = squeeze(P(g, ceil(cond/2), :));
                                         %datatoplot = datatoplot(xaxis_inds);
                                         plot(pos_xaxis, datatoplot,'Color',control_color,'LineWidth',mean_LineWidth);
-
-
                                     else
-
-                                       datatoplot = squeeze(P(g, ceil(cond/2), :));
-                                       % datatoplot = datatoplot(xaxis_inds);
+                                        datatoplot = squeeze(P(g, ceil(cond/2), :));
+                                        % datatoplot = datatoplot(xaxis_inds);
                                         plot(pos_xaxis, datatoplot,'Color',mean_colors(g,:),'LineWidth',mean_LineWidth);
-
-
                                     end
                                 end
                             end
-                            
+
                             if isempty(mp_settings.axis_labels)
                                 axis_labels = ["Frame Position", "Position-Dependent Response"];
                             else
@@ -441,23 +361,17 @@ function create_comparison_figure(CombData, gen_settings, comp_settings, ts_sett
 
                                 end
                             end
-                                
-                             
-                         else
-                             
-                             disp('Unrecognized plot type in your plot order. Check settings.');
-                         end
-                        
+                        else
+                            disp('Unrecognized plot type in your plot order. Check settings.');
+                        end
                     end
-                    
                     set(gca, 'FontSize', axis_num_fontSize);
                     xlabel('')
                     ylabel('')
+
                     if sum(place==bottom_places)
-                        
                         xlabel(axis_labels(1), 'FontSize', y_fontsize);
                         set(gca,'XTick');
-                        
                     elseif sum(place==top_places)
                         ylabel(axis_labels(2), 'FontSize', y_fontsize)
                         set(gca,'YTick');
@@ -476,9 +390,6 @@ function create_comparison_figure(CombData, gen_settings, comp_settings, ts_sett
                     if ~isempty(cond_name(1+(row-1),col))
                         title(cond_name(1+(row-1),col),'FontSize',subtitle_FontSize)
                     end
-                    
-                    
-                        
                     %Add x and y axis labels if int he correct position
                 end
             end
@@ -489,32 +400,24 @@ function create_comparison_figure(CombData, gen_settings, comp_settings, ts_sett
                 for ax = allax
                     ylim(ax, [ymin, ymax]);
                 end
-
             end
             
-           if ~isempty(subplot_figure_titles)
-               sgtitle(subplot_figure_titles{1,fig}, 'FontSize', figTitle_fontSize);
-           end
+            if ~isempty(subplot_figure_titles)
+                sgtitle(subplot_figure_titles{1,fig}, 'FontSize', figTitle_fontSize);
+            end
             
             h = findobj(gcf,'Type','line');
             if num_groups == 1
                 if plot_both_dir_ts == 0
-
                     legend1 = legend(genotype, 'FontSize', legend_FontSize);
                 else
                     legend1 = legend(h(end), genotype);
-                    
                 end
             else
-                
                 if plot_both_dir_ts == 0
-                    
                     legend1 = legend(h(end:-1:end-(num_groups-1)), genotype{1:end},'Orientation','horizontal');
-                    
                 else
-
                     legend1 = legend(h(end:-2:end - (num_groups*2-1)),genotype{1:end},'Orientation','horizontal');%prints warnings in orange but ignore
-                    
                 end
             end
             
@@ -523,24 +426,20 @@ function create_comparison_figure(CombData, gen_settings, comp_settings, ts_sett
             legend1.ItemTokenSize = [10,7];
             set(legend1,'Position', newPosition,'FontSize',legend_FontSize, 'Units', newUnits, 'Interpreter', 'none','Box','off');
             
-            
             %Add legend, plot title
             set(gcf, 'Name', figure_names{1,fig});
-             figH = gcf;
+            figH = gcf;
             fig_title = figH.Name(~isspace(figH.Name));
             if fig == num_figs
                 save_figure(save_settings, fig_title);
             else
-
                 save_figure(save_settings, fig_title);
             end
             
             clear('allax');
             clear('lines');
             clear('curr_ydata');
-
-                
-                % Save figure here
+            % Save figure here
         end
     end
 end

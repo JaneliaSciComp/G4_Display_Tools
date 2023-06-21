@@ -32,7 +32,6 @@ The code above establishes a tcp connection similar to what the MATLAB code `con
 
 ```matlab
 ctlr = PanelsController();
-ctlr.mode = 0;
 ctlr.open();
 ```
 

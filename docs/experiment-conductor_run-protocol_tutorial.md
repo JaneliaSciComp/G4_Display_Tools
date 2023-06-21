@@ -40,6 +40,7 @@ In your MATLAB command window, type `connectHost` and hit enter. Assuming your s
 As you can see, you send commands to the panels generally by typing `Panel_com(command name[, arguments…])` into the MATLAB command window, with the list of argument being optional. If you look in `Panel_com.m` at line 28, you will see that when you submit the `all_on` command, a particular hexadecimal string `FF` is converted to its byte value 255 and sent to the panels via TCP:
 
 ```matlab
+    % FIXME: old code example. Not working anymore
     case 'all_on'      % set all panels to 0;
         reply = send_tcp( char([1 hex2dec('FF')]));
         % … handling of the return value
@@ -694,6 +695,8 @@ Click to expand default run protocol around lines 481…554.
 </summary>
 
 ```matlab
+
+% FIXME: old code example, not working anymore.
 if post_type == 1
     
     %Update progress bar--------------------------
