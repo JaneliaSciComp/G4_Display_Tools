@@ -63,6 +63,7 @@ end
 
  %% Set up parameters 
  params = assign_parameters(p);
+
  if params.inter_type == 1
     ctlr_parameters_intertrial = {params.inter_mode, params.inter_pat, params.inter_gain, ...
                             params.inter_offset, params.inter_pos, params.inter_frame_rate, params.inter_frame_ind, ...
@@ -325,26 +326,27 @@ end
 
                  log_started = ctlr.startLog();
                  ctlr.startDisplay((params.post_dur + .5)*10);
-                 log_stopped = ctlr.stopLog();
                  
-                if runcon.check_if_aborted() == 1
-                    ctlr.stopDisplay();
-                    %log_stopped = ctlr.stopLog();
-                    if ~log_stopped
-                        log_stopped = log_stop_fail();
-                    end
-                    if isa(ctlr, 'PanelsController')
-                        ctlr.close();
-                    end
-                    clear global;
-                    success = 0;
-                    return;
                  
-                end
+%                 if runcon.check_if_aborted() == 1
+%                     ctlr.stopDisplay();
+%                     %log_stopped = ctlr.stopLog();
+%                     if ~log_stopped
+%                         log_stopped = log_stop_fail();
+%                     end
+%                     if isa(ctlr, 'PanelsController')
+%                         ctlr.close();
+%                     end
+%                     clear global;
+%                     success = 0;
+%                     return;
+%                  
+%                 end
                 runcon.update_elapsed_time(round(toc(startTime),2));                 
             end
 
             ctlr.stopDisplay();
+            log_stopped = ctlr.stopLog();
 
             
             if ~log_stopped

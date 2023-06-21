@@ -57,6 +57,7 @@ function process_data(exp_folder, processing_settings_file)
     wbf_range = s.settings.wbf_range;
     wbf_cutoff = s.settings.wbf_cutoff;
     wbf_end_percent = s.settings.wbf_end_percent;
+    flying = s.settings.flying;
 
     if isfield(s.settings, 'remove_nonflying_trials')
         remove_nonflying_trials = s.settings.remove_nonflying_trials;
@@ -175,7 +176,7 @@ function process_data(exp_folder, processing_settings_file)
     [bad_slope_conds] = check_flat_conditions(trial_start_times, trial_stop_times, Log, num_reps, num_conds, exp_order);
     [bad_crossCorr_conds] = check_correlation(trial_start_times, trial_stop_times, exp_order, Log, cond_modes);
 
-    if remove_nonflying_trials
+    if remove_nonflying_trials && flying
         [bad_WBF_conds, wbf_data] = find_bad_wbf_trials(Log, ts_data, wbf_range, wbf_cutoff, ...
         wbf_end_percent, trial_start_times, trial_stop_times, num_conds, num_reps, exp_order);
     else

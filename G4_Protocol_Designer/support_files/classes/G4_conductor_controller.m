@@ -28,6 +28,7 @@ classdef G4_conductor_controller < handle
         current_gain_
         current_offset_
         current_duration_
+        is_paused
         
 
     end
@@ -61,6 +62,7 @@ classdef G4_conductor_controller < handle
         remaining_time
         
         is_aborted
+        
 
         
         
@@ -96,6 +98,7 @@ classdef G4_conductor_controller < handle
             exp_time = self.doc.calc_exp_length();
             self.model.set_expected_time(exp_time);
             self.remaining_time = self.model.expected_time;
+            self.is_paused = 0;
             
             self.current_mode = '';
             self.current_pat = '';
@@ -595,6 +598,35 @@ classdef G4_conductor_controller < handle
 
         end
 
+        function pause_experiment(self)
+
+            if self.is_paused == 0
+                self.is_paused = 1;
+            elseif self.is_paused == 1
+                self.is_paused = 0;
+            else
+                self.is_paused = 0;
+                disp("There was an error with the pause feature");
+            end
+        end
+
+        function yes = check_if_paused(self)
+            
+            if self.is_paused == 1
+                yes = 1;
+                
+
+            else
+                yes = 0;
+                
+            end
+
+        end
+
+        function pause(self)
+            waitfor(self, 'is_paused');
+        end
+
         function run(self)
             
             self.is_aborted = false; %change aborted back to zero in case the experiment was aborted earlier. 
@@ -787,15 +819,36 @@ classdef G4_conductor_controller < handle
             end
             
             %Always run the post processing script that converts the TDMS
-            %files into mat files.
-            
-            run_file_desc  = self.get_run_file_desc();
-            if ~contains(run_file_desc, 'Log')
-           
+            %files into mat files.'
 
+            % Check how many tdms folders are in the fly folder
+            num_logs = self.check_number_logs(fly_results_folder);
+
+            % If there's one, convert like normal. if there's more than
+            % one, convert all Logs to matlab structs separately. Display
+            % message to user if there are no logs found. 
+
+            if num_logs == 1
                 G4_TDMS_folder2struct(fly_results_folder);
-            end
-            
+
+            elseif num_logs > 1
+                
+                self.convert_multiple_logs(fly_results_folder);
+                if self.get_combine_tdms == 1
+    
+                    %consolidate multiple resulting structs into one struct
+                    Log = self.consolidate_log_structs(fly_results_folder);
+                    LogFinalName = 'G4_TDMS_Logs_Final.mat';
+                    save(fullfile(fly_results_folder, LogFinalName),'Log');
+                else
+                    disp('TDMS files were not combined into one.');
+                end
+
+            else
+
+                disp("No tdms folders could be found from this experiment.");
+            end            
+
             %Get array indicating the presence of pretrial, intertrial, and
             %posttrial
             trial_options = self.get_trial_options();
@@ -810,11 +863,15 @@ classdef G4_conductor_controller < handle
                 end
      
             elseif self.model.do_processing == 1 && isfile(self.model.processing_file)
-                [proc_path, proc_name, proc_ext] = fileparts(self.model.processing_file);
+                if num_logs > 1 && self.get_combine_tdms == 0
+                    disp('There are multiple TDMS logs that were not consolidated, so data processing cannot run');
+                else
+                    [proc_path, proc_name, proc_ext] = fileparts(self.model.processing_file);
                 
-                processing_command = "process_data(fly_results_folder, self.model.processing_file)";
+                    processing_command = "process_data(fly_results_folder, self.model.processing_file)";
 
-                eval(processing_command);
+                    eval(processing_command);
+                end
                 
                 if self.model.do_plotting == 1 && (strcmp(self.model.plotting_file,'') || ~isfile(self.model.plotting_file))
                     %The settings file for data analysis is empty or
@@ -849,7 +906,144 @@ classdef G4_conductor_controller < handle
 
         end
 
+        function num_logs = check_number_logs(~, fly_folder)
 
+            files = dir(fly_folder);
+            files = files(~ismember({files.name},{'.','..'}));
+            subdir_idx = [files.isdir]; %look for subfolders
+            num_logs = sum(subdir_idx);
+
+        end
+
+        function convert_multiple_logs(~, fly_folder)
+            
+            files = dir(fly_folder);
+            files = files(~ismember({files.name},{'.','..'}));
+            subdir_idx = [files.isdir]; %look for subfolders
+            folders = files(subdir_idx);
+            for fold = 1:length(folders)
+                tdms_folder_path = fullfile(fly_folder, folders(fold).name);
+                G4_TDMS_folder2struct(tdms_folder_path);
+            end
+
+        end
+
+        function Log = consolidate_log_structs(self, fly_folder)
+            
+            files = dir(fly_folder);
+            files = files(~ismember({files.name},{'.','..'}));
+            file_idx = ~[files.isdir];
+            files = files(file_idx);
+            tdms_idx = [];
+            for f = 1:length(files)
+                if contains(files(f).name, "TDMS")
+                    tdms_idx(end +1) = f;
+                end
+            end
+            log_files = files(tdms_idx);
+
+            % make sure the log files are sorted by timestamp
+            log_files_sorted = self.sort_logs_timestamp(log_files);
+
+            % take data from each log file and smush it all together in one
+            % big struct that follows the exact same layout as the smaller
+            % ones. 
+            Log1 = load(fullfile(fly_folder,log_files_sorted(1).name));
+            LogFinal = Log1;
+            clear('Log1');
+            for logfile = 2:length(log_files_sorted)
+                LogTemp = load(fullfile(fly_folder,log_files_sorted(logfile).name));
+                LogFinal = stitch_log(self, LogFinal, LogTemp.Log);
+                clear('LogTemp');
+            end
+            Log = LogFinal.Log;
+
+        end
+
+        function finLog = stitch_log(~, finLog, tempLog)
+            
+            % ADC
+            switch size(tempLog.ADC.Time,1)
+                case 1
+                    finLog.Log.ADC.Time = [finLog.Log.ADC.Time(1,:), tempLog.ADC.Time(1,:)];
+                    finLog.Log.ADC.Volts = [finLog.Log.ADC.Volts(1,:), tempLog.ADC.Volts(1,:)];
+
+                case 2 
+                    finLog.Log.ADC.Time = [finLog.Log.ADC.Time(1,:), tempLog.ADC.Time(1,:); finLog.Log.ADC.Time(2,:), tempLog.ADC.Time(2,:)];
+                    finLog.Log.ADC.Volts = [finLog.Log.ADC.Volts(1,:), tempLog.ADC.Volts(1,:); finLog.Log.ADC.Volts(2,:), tempLog.ADC.Volts(2,:)];
+
+                case 3
+                    finLog.Log.ADC.Time = [finLog.Log.ADC.Time(1,:), tempLog.ADC.Time(1,:); finLog.Log.ADC.Time(2,:), tempLog.ADC.Time(2,:); finLog.Log.ADC.Time(3,:), tempLog.ADC.Time(3,:)];
+                    finLog.Log.ADC.Volts = [finLog.Log.ADC.Volts(1,:), tempLog.ADC.Volts(1,:); finLog.Log.ADC.Volts(2,:), tempLog.ADC.Volts(2,:); finLog.Log.ADC.Volts(3,:), tempLog.ADC.Volts(3,:)];
+
+                case 4
+                    finLog.Log.ADC.Time = [finLog.Log.ADC.Time(1,:), tempLog.ADC.Time(1,:); finLog.Log.ADC.Time(2,:), tempLog.ADC.Time(2,:); finLog.Log.ADC.Time(3,:), tempLog.ADC.Time(3,:); finLog.Log.ADC.Time(4,:), tempLog.ADC.Time(4,:)];
+                    finLog.Log.ADC.Volts = [finLog.Log.ADC.Volts(1,:), tempLog.ADC.Volts(1,:); finLog.Log.ADC.Volts(2,:), tempLog.ADC.Volts(2,:); finLog.Log.ADC.Volts(3,:), tempLog.ADC.Volts(3,:); finLog.Log.ADC.Volts(4,:), tempLog.ADC.Volts(4,:)];
+
+            end
+
+            % AO 
+            if ~isempty(tempLog.AO.Time)
+                switch size(tempLog.AO.Time,1)
+                    case 1
+                        finLog.Log.AO.Time = [finLog.Log.AO.Time(1,:), tempLog.AO.Time(1,:)];
+                        finLog.Log.AO.Volts = [finLog.Log.AO.Volts(1,:), tempLog.AO.Volts(1,:)];
+
+                    case 2
+                        finLog.Log.AO.Time = [finLog.Log.AO.Time(1,:), tempLog.AO.Time(1,:); finLog.Log.AO.Time(2,:), tempLog.AO.Time(2,:)];
+                        finLog.Log.AO.Volts = [finLog.Log.AO.Volts(1,:), tempLog.AO.Volts(1,:); finLog.Log.AO.Volts(2,:), tempLog.AO.Volts(2,:)];
+
+
+                    case 3
+                        finLog.Log.AO.Time = [finLog.Log.AO.Time(1,:), tempLog.AO.Time(1,:); finLog.Log.AO.Time(2,:), tempLog.AO.Time(2,:); finLog.Log.AO.Time(3,:), tempLog.AO.Time(3,:)];
+                        finLog.Log.AO.Voltes = [finLog.Log.AO.Volts(1,:), tempLog.AO.Volts(1,:); finLog.Log.AO.Volts(2,:), tempLog.AO.Volts(2,:); finLog.Log.AO.Volts(3,:), tempLog.AO.Volts(3,:)];
+
+
+                    case 4
+                        finLog.Log.AO.Time = [finLog.Log.AO.Time(1,:), tempLog.AO.Time(1,:); finLog.Log.AO.Time(2,:), tempLog.AO.Time(2,:); finLog.Log.AO.Time(3,:), tempLog.AO.Time(3,:); finLog.Log.AO.Time(4,:), tempLog.AO.Time(4,:)];
+                        finLog.Log.AO.Volts = [finLog.Log.AO.Volts(1,:), tempLog.AO.Volts(1,:); finLog.Log.AO.Volts(2,:), tempLog.AO.Volts(2,:); finLog.Log.AO.Volts(3,:), tempLog.AO.Volts(3,:); finLog.Log.AO.Volts(4,:), tempLog.AO.Volts(4,:)];
+
+                end
+            end
+
+            % Frames
+            finLog.Log.Frames.Time = [finLog.Log.Frames.Time(1,:), tempLog.Frames.Time(1,:)];
+            finLog.Log.Frames.Position = [finLog.Log.Frames.Position(1,:), tempLog.Frames.Position(1,:)];
+
+            % Commands
+            finLog.Log.Commands.Time = [finLog.Log.Commands.Time(1,:), tempLog.Commands.Time(1,:)];
+            finLog.Log.Commands.Name = {finLog.Log.Commands.Name{1,:}, tempLog.Commands.Name{1,:}};
+            if ~isempty(tempLog.Commands.Data)
+                finLog.Log.Commands.Data = [finLog.Log.Commands.Data(1,:), tempLog.Commands.Data(1,:)];
+            else
+                finLog.Log.Commands.Data = [];
+            end
+        end
+
+
+
+        function [sorted_log_files] = sort_logs_timestamp(self, log_files)
+             %This function assumes log_files has already had non-log files
+             %removed. It also assumes the log file names follow the
+             %pattern 'G4_TDMS_Logs_mm_dd_yyyy_hh-hh-mm-ss' and it only
+             %sorts by time (it assumes all log files are from the same
+             %day) The first hh is military time (15 for 3 pm), the second
+             %hh is converted (so 03 for 3 pm) so we only use the first hh,
+             %mm, and ss for sorting.
+
+             timestamps = {};
+
+            for fi = 1:length(log_files)
+                timestamps{fi} = log_files(fi).name(end-14:end-4);
+                nums_to_sort(fi, 1:3) = [str2num(timestamps{fi}(1:2)), str2num(timestamps{fi}(7:8)), str2num(timestamps{fi}(10:11))];
+
+            end
+            [~, sorted_idx] = sortrows(nums_to_sort);
+            sorted_log_files = log_files(sorted_idx);
+
+        end
+        
+        
         function update_flyName_reminder(self)
             
            if ~isempty(self.view)
@@ -1828,6 +2022,17 @@ classdef G4_conductor_controller < handle
         function run_file_desc = get_run_file_desc(self)
             
             run_file_desc = self.model.get_run_file_desc();
+        end
+
+        function value = get_combine_tdms(self)
+
+            value = self.model.get_combine_tdms();
+
+        end
+
+        function update_combine_tdms(self, value)
+
+            self.model.set_combine_tdms(value);
         end
 
         %% SETTERS

@@ -113,7 +113,8 @@ parfor i = 1:num_TDMSfiles
         try
             [channelData, ~] = TDMS_readChannelOrGroup(fullfile(TDMS_folder,TDMS_names{i}),group);
             CommandTime(i,:) = channelData{1}; %timestampes
-            CommandName{i} = channelData{2}; %names of commands
+            CommandName{i} = channelData{2}; %names of command
+
             CommandData{i} = channelData{3}; %class of commands?? Newly added field to TDMS files
             CommandData{i} = channelData{4}; %data accompanying commands
             Command_inds(i) = 1;

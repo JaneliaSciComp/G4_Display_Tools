@@ -264,16 +264,39 @@ classdef PanelsController < handle
             % unexpected response was received or the response timed out
             % after 100ms.
             %
+            % activeOutputChannels can be a single number between 2 and 5
+            % or an array of numbers between 2 and 5. Only Analog output 
+            % channels 2, 3, 4, and 5 can be turned on and off.
+            % The channel numbers can be a source of confusion. Here we
+            % define activeOutputChannel 2 as the AO2 (or ADC2) on the
+            % breakout box. Most versions of G4 Host might report it as
+            % "Channel 0". Similarly activeOutputChannel 3 is "Channel 1",
+            % 4 maps on "Channel 2" and 5 maps on "Channel 3".
+            %
             % see also setActiveAIChannels
             arguments
                 self (1,1) PanelsController
-                activeOutputChannels (1,4) logical = [false false false false]
+                activeOutputChannels (1,:) {mustBeInteger,...
+                     mustBeGreaterThanOrEqual(activeOutputChannels , 2),...
+                     mustBeLessThanOrEqual(activeOutputChannels , 5)}...
+                    = [2 3 4 5]
             end
+            %TODO implement output channels
             rtn = false;
             cmdData = char([2 17]);  % Command 0x02 0x11            
-            chn = uint8(...
-                activeOutputChannels(1)*8+activeOutputChannels(2)*4+ ...
-                activeOutputChannels(3)*2+activeOutputChannels(4));
+            chn = uint8(0);
+            if ~isempty(find(activeOutputChannels == 2, 1))
+                chn = chn + 1;
+            end
+            if ~isempty(find(activeOutputChannels == 3, 1))
+                chn = chn + 2;
+            end
+            if ~isempty(find(activeOutputChannels == 4, 1))
+                chn = chn + 4;
+            end
+            if ~isempty(find(activeOutputChannels == 5, 1))
+                chn = chn + 8;
+            end
             self.write([cmdData chn]);
             resp = self.expectResponse(0, 17, "Active Analog Output Channel Value", 0.1);
             if ~isempty(resp)
@@ -291,17 +314,34 @@ classdef PanelsController < handle
             % Return true if the active input channels were set correctly
             % and false if an unexpected response was received or the
             % response timed out after 100ms.
+            % 
+            % activeInputChannels can either be a number from 0 to 3 or an
+            % array with several values from 0 to 3. The default is [0 1 2
+            % 3], which means all channels are active.
             %
             % see also setActiveAOChannel
             arguments
                 self (1,1) PanelsController
-                activeInputChannels (1,4) logical = [false false false false]
+                activeInputChannels (1,:) {mustBeInteger,...
+                     mustBeGreaterThanOrEqual(activeInputChannels , 0),...
+                     mustBeLessThanOrEqual(activeInputChannels , 3)}...
+                    = [0 1 2 3] 
             end
             rtn = false;
             cmdData = char([2 19]); % Command 0x02 0x13
-            chn = uint8(...
-                activeInputChannels(1)*8+activeInputChannels(2)*4+ ...
-                activeInputChannels(3)*2+activeInputChannels(4));
+            chn = uint8(0);
+            if ~isempty(find(activeInputChannels == 0, 1))
+                chn = chn + 1;
+            end
+            if ~isempty(find(activeInputChannels == 1, 1))
+                chn = chn + 2;
+            end
+            if ~isempty(find(activeInputChannels == 2, 1))
+                chn = chn + 4;
+            end
+            if ~isempty(find(activeInputChannels == 3, 1))
+                chn = chn + 8;
+            end
             self.write([cmdData chn]);
             resp = self.expectResponse(0, 19, "Active Analog Input Channel For TCP Stream Value", 0.1);
             if ~isempty(resp)
@@ -523,21 +563,33 @@ classdef PanelsController < handle
             end
         end
         
-        function rtn = setAOFunctionID(self, aoChannels, aoFunctionID)
-            %% setAOFunctionID set the function ID for channels.
+        function rtn = setAOFunctionID(self, aoChannel, aoFunctionID)
+            %% setAOFunctionID assign an AO channel a function by ID
+            %
+            % aoChannel can be a single number between 2 and 5. Only 
+            % Analog output channels 2, 3, 4, and 5 can associated with a
+            % function. Channels 6 and 7 can be set to a static voltage
+            % (see setAO). 
+            % The channel numbers can be a source of confusion. Here we
+            % define aoChannel 2 as the AO2 (or ADC2) on the
+            % breakout box. Most versions of G4 Host might report it as
+            % "Channel 0". Similarly activeOutputChannel 3 is "Channel 1",
+            % 4 maps on "Channel 2" and 5 maps on "Channel 3".
+            %
+            % see setAO
             arguments
                 self (1,1) PanelsController
-                aoChannels (1,4) logical
+                aoChannel (1,1) {mustBeInteger,...
+                    mustBeGreaterThanOrEqual(aoChannel, 2),...
+                    mustBeLessThanOrEqual(aoChannel, 5)}
                 aoFunctionID (1,1) {mustBeInteger,...
                     mustBeGreaterThanOrEqual(aoFunctionID, 0),...
                     mustBeLessThanOrEqual(aoFunctionID, 65535)}
             end
             rtn = false;
             cmdData = char([4 49]); % 0x04 0x31
-            chn = uint8(...
-                aoChannels(1)*8+aoChannels(2)*4+ ...
-                aoChannels(3)*2+aoChannels(4));
-            self.write([cmdData chn, dec2char(aoFunctionID, 2)]);
+            chn = cast(aoChannel-2, "uint8");
+            self.write([cmdData chn dec2char(aoFunctionID, 2)]);
             resp = self.expectResponse([0 1], 49, [], 0.1);
             if ~isempty(resp) && resp(2) == 0
                 rtn = true;
@@ -548,23 +600,18 @@ classdef PanelsController < handle
             %% setAO sets the voltage on AO6 or AO7
             arguments
                 self (1,1) PanelsController
-                aoChannel (1,1) {mustBeMember(aoChannel, {'6', '7'})}
+                aoChannel (1,1) {mustBeInteger,...
+                    mustBeGreaterThanOrEqual(aoChannel, 6),...
+                    mustBeLessThanOrEqual(aoChannel, 7)}
                 voltage (1,1) {mustBeNumeric, mustBeFinite, ...
                     mustBeGreaterThanOrEqual(voltage, -10), ...
                     mustBeLessThanOrEqual(voltage, 10)}
             end
             rtn = false;
             cmdData = char([4 50]); % 0x04 0x32
-            
-            switch aoChannel
-                case '6'
-                    chnl = 1;
-                case '7'
-                    chnl = 2;
-            end
-            volVar = voltage/10 * intmax('int16');
-            volTrans = mod(int32(intmax('uint16')) + int32(volVar), int32(intmax('uint16')))
-
+            chnl = aoChannel - 5;
+            volVar = voltage/10 * intmax('int16'); % TODO use ADConvert?
+            volTrans = mod(int32(intmax('uint16')) + int32(volVar), int32(intmax('uint16')));
             self.write([cmdData dec2char(chnl, 1) dec2char(volTrans, 2)]);
             resp = self.expectResponse(0, 50, [], 0.1);
             if ~isempty(resp)
@@ -572,7 +619,7 @@ classdef PanelsController < handle
             end
         end
 
-        function setControllerParameters(self, p)
+         function setControllerParameters(self, p)
 
             % Used by Conductor to set all the controller values before
             % running a trial (when not using the combined command)
