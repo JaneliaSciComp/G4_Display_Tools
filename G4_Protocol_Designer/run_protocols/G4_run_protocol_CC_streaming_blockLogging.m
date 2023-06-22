@@ -152,21 +152,6 @@ reps = p.repetitions;
 num_cond = length(block_trials(:,1)); %number of conditions
     
 % Get input channels that are active for streaming
-    
-active_ai_streaming_channels = [];
-if p.chan1_rate ~= 0
-    active_ai_streaming_channels(end+1) = 1;
-end
-if p.chan2_rate ~= 0
-    active_ai_streaming_channels(end+1) = 2;
-end
-if p.chan3_rate ~= 0
-    active_ai_streaming_channels(end+1) = 3;
-    
-end
-if p.chan4_rate ~= 0
-    active_ai_streaming_channels(end+1) = 4;
-end
 
 %% Open new Panels controller instance
 ctlr = PanelsController();
@@ -179,13 +164,8 @@ ctlr.setRootDirectory(p.experiment_folder);
 ctlr.setActiveAOChannels(p.active_ao_channels+2); % FIXME: Quick fix. find better solution
      
 %% set active ai channels for streaming
-%set aibits for later telling panel_com which analog input channels are
-%streaming
-aibits = 0;
-for bit = active_ai_streaming_channels
-    aibits = bitset(aibits, bit);
-end 
-ctlr.setActiveAIChannels(aibits);
+active_ai_channels = nonzeros([p.chan1_rate>0 p.chan2_rate>0 p.chan3_rate>0 p.chan4_rate>0] .* [1 2 3 4])';
+ctlr.setActiveAIChannels(active_ai_channels);
 
 %% confirm start experiment
 if ~isempty(runcon.view)

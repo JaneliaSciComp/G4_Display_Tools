@@ -129,9 +129,6 @@ function [success] = G4_default_run_protocol_streaming(runcon, p) %input should 
         ctlr_parameters_posttrial = {};
     end
 
-    % Get input channels that are active for streaming
-    aibits = get_active_streaming_channels(p);
-
     %% Open new Panels controller instance
     ctlr = PanelsController();
     ctlr.open(true);
@@ -194,9 +191,8 @@ function [success] = G4_default_run_protocol_streaming(runcon, p) %input should 
             end
 
             %% set active ai channels for streaming
-            %set aibits for later telling panel_com which analog input channels are
-            %streaming
-            ctlr.setActiveAIChannels(aibits);
+            active_ai_channels = nonzeros([p.chan1_rate>0 p.chan2_rate>0 p.chan3_rate>0 p.chan4_rate>0] .* [1 2 3 4])';
+            ctlr.setActiveAIChannels(active_ai_channels);
 
             %% run pretrial if it exists----------------------------------------
 
