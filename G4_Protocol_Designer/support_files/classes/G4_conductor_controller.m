@@ -1202,7 +1202,10 @@ classdef G4_conductor_controller < handle
             for i = 1:length(metadata_names)
                 metadata.(metadata_names{i}) = model_metadata{i};
             end
-
+            
+            if not(isfolder(fly_folder))
+                mkdir(fly_folder);
+            end
             metadata_save_filename = fullfile(fly_folder, 'metadata.mat');
             save(metadata_save_filename, 'metadata');
         end
@@ -1253,7 +1256,7 @@ classdef G4_conductor_controller < handle
             posttrial = self.doc.posttrial;
 
             %make cell arrays for each ao channel listing all the
-                %functions called for that channel across all trials.
+            %functions called for that channel across all trials.
             ao1_funcs = {};
             ao1_funcs{1} = pretrial{4};
             for c = 1:length(block_trials(:,1))
@@ -1446,7 +1449,7 @@ classdef G4_conductor_controller < handle
                     block(k,m) = self.doc.get_ao_index(self.doc.block_trials{k, channel_num + 4});
                 end
             end
-            %Fill in zeros for the ao indices for inactive channels
+            %Fill in zeros for the ao indices for inactive channels            
             [pre, inter, block, post] = self.fill_inactive_ao_indices(active_ao_channels, pre, inter, block, post);
         end
 
