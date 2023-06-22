@@ -81,14 +81,5 @@ function params = assign_parameters(p)
     params.block_ao_indices = p.block_ao_indices;
     params.reps = p.repetitions;
     params.num_cond = length(params.block_trials(:,1)); %number of conditions
-    params.active_ao_channels = p.active_ao_channels;
-
-    if ~isempty(p.active_ao_channels)
-        params.aobits = 0;
-        for bit = p.active_ao_channels
-            params.aobits = bitset(aobits,bit+1); %plus 1 bc aochans are 0-3
-        end
-    else
-        params.aobits = [];
-    end
+    params.active_ao_channels = p.active_ao_channels + 2; %FIXME: maybe do the addition earlier?
 end

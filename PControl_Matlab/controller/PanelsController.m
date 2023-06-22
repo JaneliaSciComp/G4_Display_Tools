@@ -376,13 +376,13 @@ classdef PanelsController < handle
             end
         end
         
-        function rtn = stopLog(self, timeout, showTimeoutMessage, showTimeoutDialog, timeoutMessage)
+        function rtn = stopLog(self, options)
             arguments
                 self (1,1) PanelsController
-                timeout (1,1) double {mustBeGreaterThan(timeout, 0)} = 30.0
-                showTimeoutMessage (1,1) logical = false
-                showTimeoutDialog (1,1) logcial = false
-                timeoutMessage (1,1) str = "Log failed to stop. Please stop manually."
+                options.timeout (1,1) double {mustBeGreaterThan(options.timeout, 0)} = 30.0
+                options.showTimeoutMessage (1,1) logical = false
+                options.showTimeoutDialog (1,1) logical = false
+                options.timeoutMessage (1,1) string = "Log failed to stop. Please stop manually."
             end
             %% stopLog Stop logging on the the Main Host
             %
@@ -399,15 +399,15 @@ classdef PanelsController < handle
             rtn = false;
             cmdData = char([1 64]); % Command 0x01 0x40
             self.write(cmdData);
-            resp = self.expectResponse(0, 64, [], timeout);
+            resp = self.expectResponse(0, 64, [], options.timeout);
             if ~isempty(resp)
                 rtn = true;
                 self.isLogRunning = false;
-            elseif showTimeoutDialog
-                waitfor(errordlg(strcat(timeoutMessage, " Then hit a key.")));
+            elseif options.showTimeoutDialog
+                waitfor(errordlg(strcat(options.timeoutMessage, " Then hit a key.")));
                 waitforbuttonpress;
-            elseif showTimeoutmessage
-                disp(timeoutMessage)
+            elseif options.showTimeoutMessage
+                disp(options.timeoutMessage)
             end
         end
 
@@ -777,7 +777,8 @@ classdef PanelsController < handle
             end
             self.setPositionX(p{7});
             for i = 1:length(p{8})
-                self.setAOFunctionID(p{8}(i), p{9}(i));  
+                tmppos = p{8}(i)-1; % TODO: This seems to be needed because of the 0 padding in `G4_conductor_controller.fill_inactive_ao_indices`. Not clear why that padding is needed, though. It only seems to complicate things.
+                self.setAOFunctionID(p{8}(i), p{9}(tmppos));  
             end                                    
         end
         

@@ -50,10 +50,8 @@
 function [success] = G4_run_protocol_CC_streaming_blockLogging(runcon, p)%input should always be 1 or 2 items
 
 %% Get access to the figure and progress bar in the run gui IF it was passed in.
-global ctlr;
 tcpread = {};
 
-%        fig = runcon.fig;
 if ~isempty(runcon.view)
     axes_label = runcon.view.axes_label;
 end
@@ -178,13 +176,7 @@ ctlr.open(true);
 ctlr.setRootDirectory(p.experiment_folder);
 
 %% set active ao channels
-if ~isempty(p.active_ao_channels)
-    aobits = 0;
-   for bit = p.active_ao_channels
-       aobits = bitset(aobits,bit+1); %plus 1 bc aochans are 0-3
-   end
-   ctlr.setActiveAOChannels(dec2bin(aobits,4));
-end
+ctlr.setActiveAOChannels(p.active_ao_channels+2); % FIXME: Quick fix. find better solution
      
 %% set active ai channels for streaming
 %set aibits for later telling panel_com which analog input channels are
@@ -294,7 +286,7 @@ switch start
                 w = waitforbuttonpress;
             end
   
-            ctlr.stopLog(showTimeoutMessage=true); 
+            ctlr.stopLog('showTimeoutMessage', true); 
 
             if runcon.check_if_aborted()
                 ctlr.stopDisplay();
@@ -393,7 +385,7 @@ switch start
                     
                 if runcon.check_if_aborted()
                     ctlr.stopDisplay();
-                    ctlr.stopLog(showTimeoutMessage=true);
+                    ctlr.stopLog('showTimeoutMessage', true);
                     if isa(ctlr, 'PanelsController')
                         ctlr.close();
                     end
@@ -446,7 +438,7 @@ switch start
 
                     if runcon.check_if_aborted() == 1
                        ctlr.stopDisplay();
-                       ctlr.stopLog(showTimeoutMessage=true);
+                       ctlr.stopLog('showTimeoutMessage', true);
                        if isa(ctlr, 'PanelsController')
                            ctlr.close();
                        end
@@ -520,7 +512,7 @@ switch start
 
                 if runcon.check_if_aborted() == 1
                     ctlr.stopDisplay();
-                    ctlr.stopLog(showTimeoutMessage=true);
+                    ctlr.stopLog('showTimeoutMessage', true);
                     if isa(ctlr, 'PanelsController')
                         ctlr.close();
                     end
@@ -602,7 +594,7 @@ switch start
                     
                 if runcon.check_if_aborted() == 1
                     ctlr.stopDisplay();
-                    ctlr.stopLog(showTimeoutMessage=true);
+                    ctlr.stopLog('showTimeoutMessage', true);
                     if isa(ctlr, 'PanelsController')
                         ctlr.close();
                     end
@@ -650,7 +642,7 @@ switch start
                          
                     if runcon.check_if_aborted() == 1
                        ctlr.stopDisplay();
-                       ctlr.stopLog(showTimeoutMessage=true);
+                       ctlr.stopLog('showTimeoutMessage', true);
                        if isa(ctlr, 'PanelsController')
                            ctlr.close();
                        end
@@ -703,7 +695,7 @@ switch start
             end
                      
             pause(post_dur - toc(timeSincePost));
-            ctlr.stopLog(showTimeoutMessage=true); % TODO check if stopping log before stopping display is OK?
+            ctlr.stopLog('showTimeoutMessage', true); % TODO check if stopping log before stopping display is OK?
             pause(1);
                  
             if runcon.check_if_aborted() == 1

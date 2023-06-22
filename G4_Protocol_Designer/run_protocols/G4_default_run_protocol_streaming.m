@@ -33,7 +33,7 @@
 
 %PARAMETERS NOT SPECIFIC TO A TRIAL
 
-    %p.active_ao_channels - [0 1 2 3]
+    %p.active_ao_channels - [2 3 4 5]
     %p.repetitions
     %p.is_randomized
     %p.fly_name
@@ -58,10 +58,8 @@
 function [success] = G4_default_run_protocol_streaming(runcon, p) %input should always be 1 or 2 items
 
     %% Get access to the figure and progress bar in the run gui IF it was passed in.
-    global ctlr;
     tcpread = {};
 
-    %        fig = runcon.fig;
     if ~isempty(runcon.view)
         axes_label = runcon.view.axes_label;
     end
@@ -108,13 +106,10 @@ function [success] = G4_default_run_protocol_streaming(runcon, p) %input should 
         post_dur = params.post_dur;
     end
 
-    block_trials = params.block_trials;
-    block_ao_indices = params.block_ao_indices;
     reps = params.reps;
     num_cond = params.num_cond;
     active_ao_channels = params.active_ao_channels;
 
-    aobits = params.aobits;
     if pre_start == 1
         ctlr_parameters_pretrial = {pre_mode, pre_pat, pre_gain, pre_offset, ...
         pre_pos, pre_frame_rate, pre_frame_ind, active_ao_channels, pre_ao_ind};
@@ -146,9 +141,7 @@ function [success] = G4_default_run_protocol_streaming(runcon, p) %input should 
 
 
      %% set active ao channels
-    if ~isempty(p.active_ao_channels)
-        ctlr.setActiveAOChannels(dec2bin(aobits,4));
-    end
+    ctlr.setActiveAOChannels(params.active_ao_channels);
 
     %% confirm start experiment
     if ~isempty(runcon.view)
@@ -234,7 +227,7 @@ function [success] = G4_default_run_protocol_streaming(runcon, p) %input should 
 
             if runcon.check_if_aborted()
                 ctlr.stopDisplay();
-                ctlr.stopLog(showTimeoutMessage=true);
+                ctlr.stopLog('showTimeoutMessage', true);
                 if isa(ctlr, 'PanelsController')
                     ctlr.close();
                 end
@@ -298,7 +291,7 @@ function [success] = G4_default_run_protocol_streaming(runcon, p) %input should 
 
                     if runcon.check_if_aborted()
                         ctlr.stopDisplay();
-                        ctlr.stopLog(showTimeoutMessage=true);
+                        ctlr.stopLog('showTimeoutMessage', true);
                         if isa(ctlr, 'PanelsController')
                             ctlr.close();
                         end
@@ -340,7 +333,7 @@ function [success] = G4_default_run_protocol_streaming(runcon, p) %input should 
 
                         if runcon.check_if_aborted() == 1
                             ctlr.stopDisplay();
-                            ctlr.stopLog(showTimeoutMessage=true);
+                            ctlr.stopLog('showTimeoutMessage', true);
                             if isa(ctlr, 'PanelsController')
                                 ctlr.close();
                             end
@@ -400,7 +393,7 @@ function [success] = G4_default_run_protocol_streaming(runcon, p) %input should 
                     prev_num_trials = num_trial_including_rescheduled;
                     if runcon.check_if_aborted() == 1
                         ctlr.stopDisplay();
-                        ctlr.stopLog(showTimeoutMessage=true);
+                        ctlr.stopLog('showTimeoutMessage', true);
                         if isa(ctlr, 'PanelsController')
                             ctlr.close();
                         end
@@ -454,7 +447,7 @@ function [success] = G4_default_run_protocol_streaming(runcon, p) %input should 
 
                     if runcon.check_if_aborted() == 1
                         ctlr.stopDisplay();
-                        ctlr.stopLog(showTimeoutMessage=true);
+                        ctlr.stopLog('showTimeoutMessage', true);
                         if isa(ctlr, 'PanelsController')
                             ctlr.close();
                         end
@@ -497,7 +490,7 @@ function [success] = G4_default_run_protocol_streaming(runcon, p) %input should 
 
                         if runcon.check_if_aborted() == 1
                             ctlr.stopDisplay();
-                            ctlr.stopLog(showTimeoutMessage=true);
+                            ctlr.stopLog('showTimeoutMessage', true);
                             if isa(ctlr, 'PanelsController')
                                 ctlr.close();
                             end
@@ -544,7 +537,7 @@ function [success] = G4_default_run_protocol_streaming(runcon, p) %input should 
 
                 if runcon.check_if_aborted() == 1
                     ctlr.stopDisplay();
-                    ctlr.stopLog(showTimeoutMessage=true);
+                    ctlr.stopLog('showTimeoutMessage', true);
                     if isa(ctlr, 'PanelsController')
                         ctlr.close();
                     end
@@ -555,7 +548,7 @@ function [success] = G4_default_run_protocol_streaming(runcon, p) %input should 
             end
 
             ctlr.stopDisplay();
-            ctlr.stopLog(timeout=60.0, showTimeoutMessage=true);
+            ctlr.stopLog('timeout', 60.0, 'showTimeoutMessage', true);
             if isa(ctlr, 'PanelsController')
                 ctlr.close();
             end

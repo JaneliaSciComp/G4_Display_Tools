@@ -123,6 +123,8 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
         menu_open
         inscreen_plot
         preview_on_arena
+
+        ctlr
     end
 
 %% Methods
@@ -1353,11 +1355,11 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
             if self.preview_on_arena == 1
                 self.preview_on_arena = 0;
                 if self.model.screen_on == 1
-                    ctlr.stopDisplay();
+                    self.ctlr.stopDisplay();
                     self.model.screen_on = 0;
                 end
                 if self.model.host_connected
-                    disconnectHost();
+                    self.ctlr.close();
                     self.model.host_connected = 0;
                 end
             else
@@ -1413,7 +1415,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
             %selected
                 self.display_inscreen_preview(frame_rate, dur, patfield, posfield, aofield, file_type);
             elseif self.model.screen_on == 1
-                ctlr.stopDisplay();
+                self.ctlr.stopDisplay();
                 self.model.screen_on = 0;
             end
         end
@@ -1665,12 +1667,13 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
             end
 
             if ~self.model.host_connected
-                connectHost();
+                self.ctlr = PanelsController();
+                self.ctlr.open(true);
                 pause(10);
                 self.model.host_connected = 1;
             end
 
-            ctlr.setRootDirectory(experiment_folder)
+            self.ctlr.setRootDirectory(experiment_folder)
             start = questdlg('Start Dry Run?','Confirm Start','Start','Cancel','Start');
             switch start
             case 'Cancel'
@@ -1681,32 +1684,32 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                 pattern_index = self.doc.get_pattern_index(trial{2});
                 func_index = self.doc.get_posfunc_index(trial{3});
 
-                ctlr.setControlMode(trial_mode);
-                ctlr.setPatternID(pattern_index);
+                self.ctlr.setControlMode(trial_mode);
+                self.ctlr.setPatternID(pattern_index);
 
                 if func_index ~= 0
-                    ctlr.setPatternFunctionID(func_index);
+                    self.ctlr.setPatternFunctionID(func_index);
                 end
 
                 if ~isempty(trial{10})
-                    ctlr.setGain(LmR_gain, LmR_offset);
+                    self.ctlr.setGain(LmR_gain, LmR_offset);
                 end
 
                 if trial_mode == 2
-                    ctlr.setFrameRate(trial_fr_rate);
+                    self.ctlr.setFrameRate(trial_fr_rate);
                 end
 
-                ctlr.setPositionX(trial_frame_index);
+                self.ctlr.setPositionX(trial_frame_index);
 
                 if trial_duration ~= 0
-                    ctlr.startDisplay(trial_duration*10); %duration expected in 100ms units
+                    self.ctlr.startDisplay(trial_duration*10); %duration expected in 100ms units
                     self.model.screen_on = 0;
                 else
-                    ctlr.startDisplay(2000, false);
+                    self.ctlr.startDisplay(2000, false);
                     w = waitforbuttonpress; %If pretrial duration is set to zero, this
                     %causes it to loop until a button is press or
                     %mouse clicked
-                    ctlr.stopDisplay();
+                    self.ctlr.stopDisplay();
                     self.model.screen_on = 0;
                 end
             end
@@ -2179,7 +2182,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                 self.inscreen_pattern_preview(patfield);
             elseif strcmp(file_type, 'pos') && ~strcmp(funcfield,'')
                 if self.model.screen_on
-                    ctlr.stopDisplay();
+                    self.ctlr.stopDisplay();
                     self.model.screen_on = 0;
                 end
 
@@ -2226,7 +2229,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                 datacursormode on;
             elseif strcmp(file_type, 'ao') && ~strcmp(aofield,'')
                 if self.model.screen_on
-                    ctlr.stopDisplay();
+                    self.ctlr.stopDisplay();
                     self.model.screen_on = 0;
                 end
 
@@ -2382,13 +2385,15 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
             disp(patindex);
 
             if ~self.model.host_connected
-                self.model.host_connected = connectHost();
+                self.ctlr = PanelsController();
+                self.ctlr.open(true);
+                self.model.host_connected = self.ctlr.isOpen;
             end
 
-            ctlr.setRootDirectory(self.doc.top_export_path);
-            ctlr.setPatternID(patindex);
-            ctlr.setControlMode(3);
-            ctlr.setPositionX(self.model.auto_preview_index);
+            self.ctlr.setRootDirectory(self.doc.top_export_path);
+            self.ctlr.setPatternID(patindex);
+            self.ctlr.setControlMode(3);
+            self.ctlr.setPositionX(self.model.auto_preview_index);
 
             self.model.screen_on = 1;
 
@@ -2400,15 +2405,15 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
 
         function check_and_disconnect_host(self)
             if self.model.host_connected
-                ctlr.stopDisplay();
-                disconnectHost();
+                self.ctlr.stopDisplay();
+                self.ctlr.close();
                 self.model.host_connected = 0;
             end
         end
 
         function update_arena_pattern_index(self)
             if self.model.host_connected
-                ctlr.setPositionX(self.model.auto_preview_index);
+                self.ctlr.setPositionX(self.model.auto_preview_index);
             end
         end
 

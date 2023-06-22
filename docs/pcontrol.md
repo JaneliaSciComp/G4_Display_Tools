@@ -38,6 +38,7 @@ ctlr.open();
 The `PanelController` is a class that handles the connection on the TCP/IP level. In your own code, it's good enough to use the following to initiate the connection:
 
 ```matlab
+% FIXME: deprecated
 connectHost;
 % … commands follow here
 ```

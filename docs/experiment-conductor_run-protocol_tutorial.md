@@ -132,6 +132,7 @@ It's very important to send the `stop_log` command. Were you to run a real condi
 ### Disconnect from the G4 Panel Host
 
 ```matlab
+% FIXME: deprecated
 disconnectHost
 ```
 
@@ -261,11 +262,13 @@ if ~isempty(ctrl)
        ctrl.close()
     end
 end
+% FIXME: deprecated
 connectHost;
 pause(10);
 Panel_com('change_root_directory', p.experiment_folder);
 
 %% set active ao channels
+% FIXME: this is outdated code
 if ~isempty(p.active_ao_channels)
     aobits = 0;
    for bit = p.active_ao_channels
@@ -295,12 +298,13 @@ if ~isempty(runcon.view)
 else
     start = 'Start';
 end
- switch start
-     case 'Cancel'
-         disconnectHost;
-         success = 0;
-         return;
-     case 'Start' 
+switch start
+    case 'Cancel'
+        %FIXME: deprecated
+        disconnectHost;
+        success = 0;
+        return;
+    case 'Start' 
 ```
 
 </details>
@@ -517,6 +521,7 @@ if runcon.check_if_aborted()
    pause(.1);
    Panel_com('stop_log');
    pause(1);
+   % FIXME: deprecated
    disconnectHost;
    success = 0;
    return;
@@ -607,6 +612,7 @@ for r = 1:reps
            Panel_com('stop_display');
            Panel_com('stop_log');
            pause(1);
+           % FIXME: deprecated
            disconnectHost;
            success = 0;
            return;
@@ -672,6 +678,7 @@ for r = 1:reps
                pause(.1);
                Panel_com('stop_log');
                pause(1);
+               % FIXME: deprecated
                disconnectHost;
                success = 0;
                return;
@@ -747,6 +754,7 @@ if post_type == 1
         pause(.1);
         Panel_com('stop_log');
         pause(1);
+        % FIXME: deprecated
         disconnectHost;
         success = 0;
         return;
@@ -764,7 +772,8 @@ if stop_log_response.success == 1
     waitfor(errordlg("Stop Log command failed, please stop log manually then hit a key"));
     waitforbuttonpress;
 end
-pause(1);          
+pause(1);     
+% FIXME: deprecated     
 disconnectHost;
 
 pause(1);

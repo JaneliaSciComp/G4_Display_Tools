@@ -54,10 +54,6 @@
 
 function [success] = G4_run_protocol_CC_blockLogging(runcon, p) %input should always be 1 or 2 items
 
-    %% Get access to the figure and progress bar in the run gui IF it was passed in.
-    global ctlr;
-
-    %        fig = runcon.fig;
     if ~isempty(runcon.view)
         progress_bar = runcon.view.progress_bar;
         progress_axes = runcon.view.progress_axes;
@@ -174,13 +170,7 @@ function [success] = G4_run_protocol_CC_blockLogging(runcon, p) %input should al
     ctlr.setRootDirectory(p.experiment_folder);
 
     %% set active ao channels
-    if ~isempty(p.active_ao_channels)
-        aobits = 0;
-        for bit = p.active_ao_channels
-           aobits = bitset(aobits,bit+1); %plus 1 bc aochans are 0-3
-        end
-        ctlr.setActiveAOChannels(dec2bin(aobits,4));
-    end
+    ctlr.setActiveAOChannels(p.active_ao_channels+2);
 
     %% confirm start experiment
     if ~isempty(runcon.view)
@@ -359,7 +349,7 @@ function [success] = G4_run_protocol_CC_blockLogging(runcon, p) %input should al
                     isAborted = runcon.check_if_aborted();
                     if isAborted == 1
                         ctlr.stopDisplay();
-                        ctlr.stopLog(timeout=60.0, showTimeoutMessage=true);
+                        ctlr.stopLog('timeout', 60.0, 'showTimeoutMessage', true);
                         if isa(ctlr, 'PanelsController')
                             ctlr.close();
                         end
@@ -406,7 +396,7 @@ function [success] = G4_run_protocol_CC_blockLogging(runcon, p) %input should al
 
                         if runcon.check_if_aborted() == 1
                             ctlr.stopDisplay();
-                            ctlr.stopLog(timeout=60.0, showTimeoutMessage=true);
+                            ctlr.stopLog('timeout', 60.0, 'showTimeoutMessage', true);
                             if isa(ctlr, 'PanelsController')
                                 ctlr.close();
                             end
@@ -444,7 +434,7 @@ function [success] = G4_run_protocol_CC_blockLogging(runcon, p) %input should al
                 ctlr.startLog();
 
                 ctlr.combinedCommand(post_mode, post_pat, post_pos, post_ao_ind(1), post_ao_ind(2), post_ao_ind(3), post_ao_ind(4),post_frame_rate, post_dur*10);
-                ctlr.stopLog(timeout=60);
+                ctlr.stopLog('timeout', 60, 'showTimeoutDialog', true);
 
                 if runcon.check_if_aborted() == 1
                     ctlr.stopDisplay();
