@@ -33,7 +33,7 @@
 
 %PARAMETERS NOT SPECIFIC TO A TRIAL
 
-    %p.active_ao_channels - [0 1 2 3]
+    %p.active_ao_channels - [2 3 4 5]
     %p.repetitions
     %p.is_randomized
     %p.fly_name
@@ -49,8 +49,8 @@
     %channels in the case of ao. In any position where there was no pos/ao
     %function, the value is a 0.
 
- %p.active_ao_channels lists the channels that are active - [0 2 3] for
- %example means channels 1, 3, and 4 are active.
+ %p.active_ao_channels lists the channels that are active - [2 4 5] for
+ %example means channels 2, 4, and 5 are active.
 
 function [success] = G4_run_protocol_blockLogging(runcon, p) %input should always be 1 or 2 items
 

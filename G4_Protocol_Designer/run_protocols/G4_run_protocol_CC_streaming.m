@@ -49,13 +49,13 @@
     %channels in the case of ao. In any position where there was no pos/ao
     %function, the value is a 0.
 
-    %p.active_ao_channels lists the channels that are active - [0 2 3] for
-    %example means channels 1, 3, and 4 are active.
+    %p.active_ao_channels lists the channels that are active - [2 4 5] for
+    %example means channels 2, 4, and 5 are active.
 
 function [success] = G4_run_protocol_CC_streaming(runcon, p) %input should always be 1 or 2 items
 
     tcpread = {};
-    
+
     if ~isempty(runcon.view)
         axes_label = runcon.view.axes_label;
     end
