@@ -9,12 +9,13 @@ function G4_TDMS_folder2struct(exp_folder)
     % Inputs:
     % exp_folder: folder containing G4 TDMS log files (or containing subfolder
     %             of G4 TDMS log files)
-
+    
+    
     %% configure data importing
     if nargin==0
         exp_folder = uigetdir('C:/','Select a folder containing .TDMS files');
     end
-
+    
     %get/validate directories of exp_folder and TDMS_folder
     if strcmpi(exp_folder(end),'\')==1
         exp_folder = exp_folder(1:end-1);
@@ -32,7 +33,7 @@ function G4_TDMS_folder2struct(exp_folder)
         exp_folder = TDMS_folder(1:out(end)-1);
         filename = TDMS_folder(out(end)+1:end);
     end
-
+    
     %get list of .tdms files
     files = dir(TDMS_folder);
     files = files(~ismember({files.name},{'.','..'}));
@@ -44,9 +45,10 @@ function G4_TDMS_folder2struct(exp_folder)
         end
     end
     assert(num_TDMSfiles>0,'cannot find any .tdms files')
-
+    
+    
     %% import TDMS files using sliced variables (in parallel, if possible)
-
+    
     % set filename indices to all zeros for different log file types;
     % when each log file type is identified, that filename index will be set to 1
     ADCT_inds = zeros(1,num_TDMSfiles);
@@ -56,10 +58,10 @@ function G4_TDMS_folder2struct(exp_folder)
     FrameT_inds = zeros(1,num_TDMSfiles);
     FrameP_inds = zeros(1,num_TDMSfiles);
     Command_inds = zeros(1,num_TDMSfiles);
-
+    
     %loop for each TDMS file
     parfor i = 1:num_TDMSfiles    
-        % for ADC log files, either the logged timeseries of Volts or Timestamps
+        %for ADC log files, either the logged timeseries of Volts or Timestamps
         if contains(TDMS_names{i},'ADC')
             chan = str2double(TDMS_names{i}(strfind(TDMS_names{i},'ADC')+3));
             group = ['ADC' num2str(chan)];
@@ -74,7 +76,7 @@ function G4_TDMS_folder2struct(exp_folder)
             else
                 error('unexpected TDMS file: neither volts nor time');
             end
-
+            
         %for AO log files
         elseif contains(TDMS_names{i},'AO')
             chan = str2double(TDMS_names{i}(strfind(TDMS_names{i},'AO')+2));
@@ -90,6 +92,7 @@ function G4_TDMS_folder2struct(exp_folder)
             else
                 error('unexpected TDMS file: neither volts nor time');
             end
+            
         %for Frame Time and Position log files
         elseif contains(TDMS_names{i},'Frame')
             group = 'Pattern Position';
@@ -103,16 +106,16 @@ function G4_TDMS_folder2struct(exp_folder)
             else
                 error('unexpected TDMS file: neither pattern position nor time');
             end
+           
         %for the unnamed log file containing the list of commands recieved
         else
             group = 'Commands Received';
             try
                 [channelData, ~] = TDMS_readChannelOrGroup(fullfile(TDMS_folder,TDMS_names{i}),group);
                 CommandTime(i,:) = channelData{1}; %timestampes
-                CommandName{i} = channelData{2}; %names of commands
-
+                CommandName{i} = channelData{2}; %names of command
+    
                 CommandData{i} = channelData{3}; %class of commands?? Newly added field to TDMS files
-
                 CommandData{i} = channelData{4}; %data accompanying commands
                 Command_inds(i) = 1;
             catch
@@ -120,11 +123,11 @@ function G4_TDMS_folder2struct(exp_folder)
             end
         end
     end
-
+    
     %% process imported data
     %to accommodate the parfor loop, sliced variables had to be used. The
     %following section reoganizes this data into a cleaner structure
-
+    
     %create empty variables for any datatype that was not found/imported
     missing_variables = [];
     if ~exist('ADCTime','var')
@@ -174,7 +177,7 @@ function G4_TDMS_folder2struct(exp_folder)
     if ~isempty(missing_variables)
         fprintf(['variables not found/imported: ' missing_variables '\n'])
     end
-
+    
     %remove empty fields
     ADCTime = ADCTime(logical(ADCT_inds),:);
     ADCVolts = ADCVolts(logical(ADCV_inds),:);
@@ -187,7 +190,7 @@ function G4_TDMS_folder2struct(exp_folder)
     CommandTime = CommandTime(logical(Command_inds),:);
     CommandName = CommandName(logical(Command_inds));
     CommandData = CommandData(logical(Command_inds));
-
+    
     %reorganize data into struct
     Log.ADC.Time = ADCTime;
     Log.ADC.Volts = ADCVolts;
@@ -200,7 +203,8 @@ function G4_TDMS_folder2struct(exp_folder)
     Log.Commands.Time = CommandTime;
     Log.Commands.Name = CommandName{1}; %{1} un-nests cell array
     Log.Commands.Data = CommandData{1}; %{1} un-nests cell array
-
+    
     %save the new .mat struct in parent folder
     save([exp_folder '\G4_TDMS_Logs_' filename '.mat'],'Log');
-end
+    
+    
