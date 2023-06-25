@@ -8,6 +8,7 @@ function trial = assign_block_trial_parameters(params, p, c)
     else
         trial.trial_ao_indices = [];
     end
+
     %Set frame index
     if isempty(params.block_trials{c,8})
         trial.frame_ind = 1;
@@ -21,5 +22,4 @@ function trial = assign_block_trial_parameters(params, p, c)
     trial.gain = params.block_trials{c, 10};
     trial.offset = params.block_trials{c, 11};
     trial.dur = params.block_trials{c, 12};
-
 end

@@ -4,30 +4,42 @@
 
 % Need to test on actual arena
 
-global ctlr;
+% 2023-06-21 FL: Make it work on MATLAB2019
 
- if ~isempty(ctlr)
-    if ctlr.isOpen() == 1
-       ctlr.close()
-    end
+function testArena
+    %% Open new Panels controller instance
+    ctlr = PanelsController();
+    ctlr.open(true);
+
+    fig = figure('Name', 'Test Setup', 'NumberTitle', 'off', 'units','pixels','MenuBar', 'none', ...
+        'ToolBar', 'none', 'Resize', 'off');
+    pix = get(0, 'screensize');
+    fig_size = [.4*pix(3), .4*pix(4), .2*pix(3), .2*pix(4)];
+    set(fig, 'Position', fig_size);
+
+    uicontrol(fig...
+        ,'Style','pushbutton'...
+        ,'String', 'All On'...
+        ,'units','pixels'...
+        ,'Position', [.1*fig_size(3), .65*fig_size(4), .8*fig_size(3), .3*fig_size(4)]...
+        ,'Callback', {@allLEDOn, ctlr});
+
+    uicontrol(fig...
+        ,'Style', 'pushbutton'...
+        ,'String', 'All Off'...
+        ,'units', 'pixels'...
+        ,'Position', [.1*fig_size(3), .35*fig_size(4), .8*fig_size(3), .3*fig_size(4)]...
+        ,'Callback', {@allLEDOff ,ctlr});
 end
 
-%% Open new Panels controller instance
-ctlr = PanelsController();
-ctlr.mode = 0;
-ctlr.open(true);
+function allLEDOn(src,event,ctrl)
+%% Callback wrapper function to gain access to the ctrl
+%  Turning on all LEDs
+    ctrl.allOn();
+end
 
-fig = figure('Name', 'Test Setup', 'NumberTitle', 'off', 'units','pixels','MenuBar', 'none', ...
-                'ToolBar', 'none', 'Resize', 'off');
-pix = get(0, 'screensize');
-fig_size = [.4*pix(3), .4*pix(4), .2*pix(3), .2*pix(4)];
-set(fig, 'Position', fig_size);
-
-
-all_on_button = uicontrol(fig,'Style','pushbutton', 'String', 'All On', 'units', ...
-    'pixels', 'Position',[.1*fig_size(3), .65*fig_size(4), .8*fig_size(3), .3*fig_size(4)] ,'Callback', @ctlr.allOn);
-
-all_off_button = uicontrol(fig, 'Style', 'pushbutton', 'String', 'All Off', 'units', ...
-    'pixels', 'Position', [.1*fig_size(3), .35*fig_size(4), .8*fig_size(3), .3*fig_size(4)], ...
-    'Callback', @ctlr.allOff);
-
+function allLEDOff(src,event,ctrl)
+%% Callback wrapper function to gain access to the ctrl
+%  Turning off all LEDs
+    ctrl.allOff();
+end

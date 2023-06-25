@@ -132,8 +132,6 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
     set(hObject,'BackgroundColor','white');
 end
 
-
-
 function edit2_Callback(hObject, eventdata, handles)
 % hObject    handle to edit2 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
@@ -156,8 +154,6 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
     set(hObject,'BackgroundColor','white');
 end
 
-
-
 function edit3_Callback(hObject, eventdata, handles)
 % hObject    handle to edit3 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
@@ -166,7 +162,6 @@ function edit3_Callback(hObject, eventdata, handles)
 % Hints: get(hObject,'String') returns contents of edit3 as text
 %        str2double(get(hObject,'String')) returns contents of edit3 as a double
 pushbutton2_Callback(hObject, eventdata, handles);
-
 
 % --- Executes during object creation, after setting all properties.
 function edit3_CreateFcn(hObject, eventdata, handles)
@@ -179,8 +174,6 @@ function edit3_CreateFcn(hObject, eventdata, handles)
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
-
-
 
 function edit4_Callback(hObject, eventdata, handles)
 % hObject    handle to edit4 (see GCBO)
@@ -204,7 +197,6 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
     set(hObject,'BackgroundColor','white');
 end
 
-
 % --- Executes on button press in checkbox2.
 function checkbox2_Callback(hObject, eventdata, handles)
 % hObject    handle to checkbox2 (see GCBO)
@@ -214,8 +206,6 @@ function checkbox2_Callback(hObject, eventdata, handles)
 % Hint: get(hObject,'Value') returns toggle state of checkbox2
 pushbutton2_Callback(hObject, eventdata, handles);
 
-
-
 function edit5_Callback(hObject, eventdata, handles)
 % hObject    handle to edit5 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
@@ -224,7 +214,6 @@ function edit5_Callback(hObject, eventdata, handles)
 % Hints: get(hObject,'String') returns contents of edit5 as text
 %        str2double(get(hObject,'String')) returns contents of edit5 as a double
 pushbutton2_Callback(hObject, eventdata, handles);
-
 
 % --- Executes during object creation, after setting all properties.
 function edit5_CreateFcn(hObject, eventdata, handles)
@@ -238,14 +227,12 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
     set(hObject,'BackgroundColor','white');
 end
 
-
 % --- Executes on button press in pushbutton1.
 function pushbutton1_Callback(hObject, eventdata, handles)
 % hObject    handle to pushbutton1 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 FGgui2script_G4(handles.param);
-
 
 % --- Executes on button press in checkbox3.
 function checkbox3_Callback(hObject, eventdata, handles)
@@ -256,7 +243,6 @@ function checkbox3_Callback(hObject, eventdata, handles)
 % Hint: get(hObject,'Value') returns toggle state of checkbox3
 pushbutton2_Callback(hObject, eventdata, handles);
 
-
 % --- Executes on selection change in popupmenu2.
 function popupmenu2_Callback(hObject, eventdata, handles)
 % hObject    handle to popupmenu2 (see GCBO)
@@ -266,7 +252,6 @@ function popupmenu2_Callback(hObject, eventdata, handles)
 % Hints: contents = cellstr(get(hObject,'String')) returns popupmenu2 contents as cell array
 %        contents{get(hObject,'Value')} returns selected item from popupmenu2
 pushbutton2_Callback(hObject, eventdata, handles);
-
 
 % --- Executes during object creation, after setting all properties.
 function popupmenu2_CreateFcn(hObject, eventdata, handles)
@@ -281,8 +266,6 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
 end
 set(hObject, 'String', {'static', 'sawtooth', 'triangle', 'sine', 'cosine', 'square', 'loom'});
 
-
-
 function edit6_Callback(hObject, eventdata, handles)
 % hObject    handle to edit6 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
@@ -291,7 +274,6 @@ function edit6_Callback(hObject, eventdata, handles)
 % Hints: get(hObject,'String') returns contents of edit6 as text
 %        str2double(get(hObject,'String')) returns contents of edit6 as a double
 pushbutton2_Callback(hObject, eventdata, handles);
-
 
 % --- Executes during object creation, after setting all properties.
 function edit6_CreateFcn(hObject, eventdata, handles)
@@ -305,7 +287,6 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
     set(hObject,'BackgroundColor','white');
 end
 
-
 function edit7_Callback(hObject, eventdata, handles)
 % hObject    handle to edit7 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
@@ -314,7 +295,6 @@ function edit7_Callback(hObject, eventdata, handles)
 % Hints: get(hObject,'String') returns contents of edit7 as text
 %        str2double(get(hObject,'String')) returns contents of edit7 as a double
 pushbutton2_Callback(hObject, eventdata, handles);
-
 
 % --- Executes during object creation, after setting all properties.
 function edit7_CreateFcn(hObject, eventdata, handles)
@@ -328,8 +308,6 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
     set(hObject,'BackgroundColor','white');
 end
 
-
-
 function edit8_Callback(hObject, eventdata, handles)
 % hObject    handle to edit8 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
@@ -338,7 +316,6 @@ function edit8_Callback(hObject, eventdata, handles)
 % Hints: get(hObject,'String') returns contents of edit8 as text
 %        str2double(get(hObject,'String')) returns contents of edit8 as a double
 pushbutton2_Callback(hObject, eventdata, handles);
-
 
 % --- Executes during object creation, after setting all properties.
 function edit8_CreateFcn(hObject, eventdata, handles)
@@ -351,8 +328,6 @@ function edit8_CreateFcn(hObject, eventdata, handles)
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
-
-
 
 function edit9_Callback(hObject, eventdata, handles)
 % hObject    handle to edit9 (see GCBO)
@@ -376,7 +351,6 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
     set(hObject,'BackgroundColor','white');
 end
 
-
 % --- Executes on button press in checkbox4.
 function checkbox4_Callback(hObject, eventdata, handles)
 % hObject    handle to checkbox4 (see GCBO)
@@ -386,8 +360,6 @@ function checkbox4_Callback(hObject, eventdata, handles)
 % Hint: get(hObject,'Value') returns toggle state of checkbox4
 pushbutton2_Callback(hObject, eventdata, handles);
 
-
-
 function edit10_Callback(hObject, eventdata, handles)
 % hObject    handle to edit10 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
@@ -396,7 +368,6 @@ function edit10_Callback(hObject, eventdata, handles)
 % Hints: get(hObject,'String') returns contents of edit10 as text
 %        str2double(get(hObject,'String')) returns contents of edit10 as a double
 pushbutton2_Callback(hObject, eventdata, handles);
-
 
 % --- Executes during object creation, after setting all properties.
 function edit10_CreateFcn(hObject, eventdata, handles)
@@ -409,7 +380,6 @@ function edit10_CreateFcn(hObject, eventdata, handles)
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
-
 
 % --- Executes on button press in checkbox5.
 function checkbox5_Callback(hObject, eventdata, handles)
@@ -446,7 +416,6 @@ end
 set(hObject, 'String', {'static', 'sawtooth', 'triangle', 'sine', 'cosine', 'square', 'loom'});
 
 
-
 function edit11_Callback(hObject, eventdata, handles)
 % hObject    handle to edit11 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
@@ -468,8 +437,6 @@ function edit11_CreateFcn(hObject, eventdata, handles)
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
-
-
 
 function edit12_Callback(hObject, eventdata, handles)
 % hObject    handle to edit12 (see GCBO)
@@ -493,8 +460,6 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
     set(hObject,'BackgroundColor','white');
 end
 
-
-
 function edit13_Callback(hObject, eventdata, handles)
 % hObject    handle to edit13 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
@@ -516,8 +481,6 @@ function edit13_CreateFcn(hObject, eventdata, handles)
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
-
-
 
 function edit14_Callback(hObject, eventdata, handles)
 % hObject    handle to edit14 (see GCBO)
@@ -541,7 +504,6 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
     set(hObject,'BackgroundColor','white');
 end
 
-
 % --- Executes on button press in checkbox6.
 function checkbox6_Callback(hObject, eventdata, handles)
 % hObject    handle to checkbox6 (see GCBO)
@@ -550,8 +512,6 @@ function checkbox6_Callback(hObject, eventdata, handles)
 
 % Hint: get(hObject,'Value') returns toggle state of checkbox6
 pushbutton2_Callback(hObject, eventdata, handles);
-
-
 
 function edit15_Callback(hObject, eventdata, handles)
 % hObject    handle to edit15 (see GCBO)
@@ -611,7 +571,6 @@ end
 set(hObject, 'String', {'static', 'sawtooth', 'triangle', 'sine', 'cosine', 'square', 'loom'});
 
 
-
 function edit16_Callback(hObject, eventdata, handles)
 % hObject    handle to edit16 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
@@ -633,8 +592,6 @@ function edit16_CreateFcn(hObject, eventdata, handles)
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
-
-
 
 function edit17_Callback(hObject, eventdata, handles)
 % hObject    handle to edit17 (see GCBO)
@@ -682,8 +639,6 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
     set(hObject,'BackgroundColor','white');
 end
 
-
-
 function edit19_Callback(hObject, eventdata, handles)
 % hObject    handle to edit19 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
@@ -692,7 +647,6 @@ function edit19_Callback(hObject, eventdata, handles)
 % Hints: get(hObject,'String') returns contents of edit19 as text
 %        str2double(get(hObject,'String')) returns contents of edit19 as a double
 pushbutton2_Callback(hObject, eventdata, handles);
-
 
 % --- Executes during object creation, after setting all properties.
 function edit19_CreateFcn(hObject, eventdata, handles)
@@ -706,7 +660,6 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
     set(hObject,'BackgroundColor','white');
 end
 
-
 % --- Executes on button press in checkbox8.
 function checkbox8_Callback(hObject, eventdata, handles)
 % hObject    handle to checkbox8 (see GCBO)
@@ -716,8 +669,6 @@ function checkbox8_Callback(hObject, eventdata, handles)
 % Hint: get(hObject,'Value') returns toggle state of checkbox8
 pushbutton2_Callback(hObject, eventdata, handles);
 
-
-
 function edit20_Callback(hObject, eventdata, handles)
 % hObject    handle to edit20 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
@@ -726,7 +677,6 @@ function edit20_Callback(hObject, eventdata, handles)
 % Hints: get(hObject,'String') returns contents of edit20 as text
 %        str2double(get(hObject,'String')) returns contents of edit20 as a double
 pushbutton2_Callback(hObject, eventdata, handles);
-
 
 % --- Executes during object creation, after setting all properties.
 function edit20_CreateFcn(hObject, eventdata, handles)
@@ -1340,7 +1290,7 @@ end
 set(handles.text22,'String',title);
 
 %set function name
-pfn_dir = 'C:\matlabroot\G4\Position Functions\';
+pfn_dir = 'C:\matlabroot\G4\Functions\';
 afn_dir = 'C:\matlabroot\G4\Analog Output Functions\';
 save_dir = get(handles.text8,'String');
 if strcmp(save_dir,pfn_dir)==0 && strcmp(save_dir,afn_dir)==0

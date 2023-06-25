@@ -2,7 +2,7 @@
 
 %Variables needed for this function: TC_Conds, TC_inds,
 %num_groups, CombData, rep_Colors, rep_LineWidth, mean_Colors,
-%mean_LineWidth, timeseries_ylimits, subtitle_FontSize, 
+%mean_LineWidth, timeseries_ylimits, subtitle_FontSize,
 function plot_TC_specified_OLtrials(TC_plot_settings, gen_settings, TC_conds, plot_names, TC_inds, genotype, control_genotype, ...
     num_groups, summaries, single, save_settings, fig_num)
 
@@ -28,10 +28,8 @@ function plot_TC_specified_OLtrials(TC_plot_settings, gen_settings, TC_conds, pl
         subplot_figure_titles = [];
     end
     figTitle_fontSize = gen_settings.figTitle_fontSize;
-    
-    
+
     if ~isempty(TC_conds)
-        
         %loop for different data types
         for d = TC_inds
             ydata = [];
@@ -46,20 +44,17 @@ function plot_TC_specified_OLtrials(TC_plot_settings, gen_settings, TC_conds, pl
                         continue;
                     end
                     placement = col+num_plot_cols*(row-1);
-                    
+
                     [gap_x, gap_y] = get_plot_spacing(num_plot_rows, num_plot_cols);
                     better_subplot(num_plot_rows, num_plot_cols, placement, gap_x, gap_y)
                     hold on
                     for g = 1:num_groups
                         tmpdata = squeeze(mean(summaries(g,:,d,conds,:),5,'omitnan'));
-
-                        if single == 1 
+                        if single == 1
                             plot(tmpdata','Color',mean_Colors(g,:),'LineWidth',rep_LineWidth, 'Marker', marker_type);
-
                         elseif g == control_genotype
                             plot(mean(tmpdata,'omitnan'),'Color',control_color,'LineWidth',mean_LineWidth, 'Marker', marker_type);
                         else
-
                             plot(mean(tmpdata,'omitnan'),'Color',mean_Colors(g,:),'LineWidth',mean_LineWidth, 'Marker', marker_type);
                         end
                         if plot_opposing_directions == 1
@@ -84,7 +79,6 @@ function plot_TC_specified_OLtrials(TC_plot_settings, gen_settings, TC_conds, pl
                                             color_adjust(rgb) = .5;
                                         elseif mean_Colors(g,rgb) >= 0
                                             color_adjust(rgb) = .75;
-
                                         end
                                     end
                                     plot(mean(tmpdata,'omitnan'),'Color',mean_Colors(g,:) + color_adjust,'LineWidth',mean_LineWidth, 'Marker', marker_type);
@@ -94,8 +88,6 @@ function plot_TC_specified_OLtrials(TC_plot_settings, gen_settings, TC_conds, pl
                                 conds(i) = conds(i) - 1;
                             end
                         end
-
-                            
                     end
                     if timeseries_ylimits(d,:) ~= 0
                         ylim(timeseries_ylimits(d,:));
@@ -106,38 +98,31 @@ function plot_TC_specified_OLtrials(TC_plot_settings, gen_settings, TC_conds, pl
                             mm = [min(curr_ydata), max(curr_ydata)];
                             ydata = [ydata, mm];
                         end
-                        
                        % timeseries_ylimits(d,:) = ylim;
                     end
-                   % titlestr = ['\fontsize{' num2str(subtitle_FontSize) '} Condition #{\color[rgb]{' num2str(mean_Colors(g,:)) '}' num2str(conds)];
+                    % titlestr = ['\fontsize{' num2str(subtitle_FontSize) '} Condition #{\color[rgb]{' num2str(mean_Colors(g,:)) '}' num2str(conds)];
                     %titlestr = "Datatype: " + CombData.channelNames.timeseries(d) + newline + " Condition # " + num2str(conds);
                     if row == num_plot_rows && col == 1
                         xlabel(axis_labels{TC_inds==d}(1), 'FontSize', axis_FontSize);
                         xticks(1:length(TC_conds{row}));
                         xticklabels(xaxis_values);
                     else
-                         xlabel('');
-                         xticks(1:length(TC_conds{row}));
-                         xticklabels(xaxis_values);
+                        xlabel('');
+                        xticks(1:length(TC_conds{row}));
+                        xticklabels(xaxis_values);
                     end
-                    
                     a = get(gca, 'XTickLabel');
                     set(gca, 'XTickLabel',a,'fontsize',xtick_fontSize);
-                    
                     if row == 1 && col == 1
                         yaxis_label = axis_labels{TC_inds==d}(2);
                         ylabel(yaxis_label, 'FontSize', axis_FontSize);
                     else
                         ylabel('');
                     end
-                    
                     if col~=1
-
-                      currGraph = gca; 
+                      currGraph = gca;
                       currGraph.YAxis.Visible = 'off';
-                    end 
-                       
-                    
+                    end
                     title(plot_names(row,col), 'FontSize', subtitle_FontSize)
                 end
             end
@@ -147,7 +132,7 @@ function plot_TC_specified_OLtrials(TC_plot_settings, gen_settings, TC_conds, pl
                 end
             end
             h = findobj(gcf,'Type','line');
-%             if control_genotype ~= 0 
+%             if control_genotype ~= 0
 %                 genotype{control_genotype} = genotype{control_genotype} + " (control)";
 %             end
             if num_groups == 1
@@ -174,7 +159,6 @@ function plot_TC_specified_OLtrials(TC_plot_settings, gen_settings, TC_conds, pl
                 ymin = min(ydata);
                 ymax = max(ydata);
                 for ax = allax
-                
                     ylim(ax, [ymin, ymax]);
                 end
             end
@@ -182,13 +166,11 @@ function plot_TC_specified_OLtrials(TC_plot_settings, gen_settings, TC_conds, pl
             newUnits = 'normalized';
             legend1.ItemTokenSize = [10,7];
             set(legend1,'Position', newPosition,'FontSize',legend_FontSize, 'Units', newUnits, 'Interpreter', 'none','Box','off');
-            
+
             figH = gcf;
             fig_title = figH.Name(~isspace(figH.Name));
 
             save_figure(save_settings, fig_title, genotype{1:end}, 'TC', num2str(fig_num));
-
-           
-        end   
+        end
     end
 end

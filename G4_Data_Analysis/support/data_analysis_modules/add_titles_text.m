@@ -22,9 +22,7 @@ function [ts_set, tc_set] = add_titles_text(text, ts_set, tc_set)
     
     if ~isempty(ts_set.faLmR_subplot_figure_titles)
         for fasubname = 1:length(ts_set.faLmR_subplot_figure_titles)
-
             ts_set.faLmR_subplot_figure_titles(fasubname) = ts_set.faLmR_subplot_figure_titles(fasubname) + text;
-
         end
     end
     
@@ -41,5 +39,4 @@ function [ts_set, tc_set] = add_titles_text(text, ts_set, tc_set)
             end
         end
     end
-
 end

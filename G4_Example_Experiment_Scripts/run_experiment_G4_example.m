@@ -1,4 +1,3 @@
-global ctlr;
 
 %% User-defined experiment conditions
 experiment_name = 'Motion1'; %name of experiment folder (expected to be located in 'C:\matlabroot\G4\Experiments\')
@@ -9,8 +8,7 @@ inter_type = 1; %0=no intertrial, 1=static 1st frame of current pattern, 2=inter
 fly_name = 'testfly1';
 trial_duration = 4; %duration (in seconds) of each trial
 inter_trial_duration = 2; %duration (in seconds) of period in between trials
-AOchannel = 1; %AO channel for analog output function (e.g. to trigger camera start with 5V pulse)
-
+AOchannel = 2; %AO channel for analog output function (e.g. to trigger camera start with 5V pulse)
 
 %% set up for experiment
 %Load configuration and start G4 Host
@@ -22,30 +20,9 @@ if ~exist(fullfile(experiment_folder,'Log Files'),'dir')
     mkdir(experiment_folder,'Log Files');
 end
 
-%% Check if Panels Controller is already open - if it is, close it
-if ~isempty(ctlr)
-    if ctlr.isOpen() == 1
-       ctlr.close()
-    end
-end
-
 %% Open new Panels controller instance
 ctlr = PanelsController();
-ctlr.mode = 0;
 ctlr.open(true);
-
-%% Check tcp connection was successful.
-if ctlr.tcpConn == -1
-    system('"C:\Program Files (x86)\HHMI G4\G4 Host" &');
-    status = 1;
-    while status~=0
-        [status, ~] = system('tasklist | find /I "G4 Host.exe"');
-        pause(0.1);
-    end
-    ctlr = PanelsController();
-    ctlr.mode = 0;
-    ctlr.open();
-end
 
 %% Change to root directory
 ctlr.setRootDirectory(experiment_folder);
@@ -68,8 +45,7 @@ end
 exp_seconds = num_reps*num_conditions*(trial_duration+inter_trial_duration*(ceil(inter_type/10)));
 fprintf(['Estimated experiment duration: ' num2str(exp_seconds/60) ' minutes\n']);
 save([experiment_folder '\Log Files\exp_order.mat'],'exp_order')
-ctlr.setActiveAOChannels(dec2bin(bitset(0,AOchannel+1,1),4));
-
+ctlr.setActiveAOChannels([AOchannel]);
 
 %% start experiment
 ctlr.startLog(); %starts logging data in .tdms files
@@ -84,27 +60,25 @@ for r = 1:num_reps
         ctlr.setAOFunctionID(AOchannel, exp_order(r,c));
         fprintf(['Rep ' num2str(r) ' of ' num2str(num_reps) ', cond ' num2str(c) ' of ' num2str(num_conditions) ': ' strjoin(currentExp.pattern.pattNames(exp_order(r,c))) '\n']);
         ctlr.startDisplay((trial_duration*10)-1); %duration expected in 100ms units
-        
+
         %intertrial portion
         if inter_type == 1
             ctlr.setControlMode(3);
             ctlr.setPatternID(exp_order(r,c));
             ctlr.setPositionX(1);
             ctlr.startDisplay((inter_trial_duration*10)-1);
-            
         elseif inter_type == 2
             ctlr.setControlMode(4);
             ctlr.setGain(CL_gain, CL_offset);
             ctlr.setPatternID(1);
             ctlr.startDisplay(inter_trial_duration*10);
-            
         end
     end
 end
 
 %rename/move results folder
-
-ctlr.stopLog();
+ctlr.stopLog('showTimeoutMessage', true);
 movefile([experiment_folder '\Log Files\*'],fullfile(experiment_folder,'Results',fly_name));
+ctlr.close()
 
 disp('finished');

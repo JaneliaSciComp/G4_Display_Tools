@@ -27,7 +27,7 @@ This page constitutes the main user manual for the G4 Protocol Designer, but the
 
 # The Designer: Start-up
 
-If you already have a .g4p file saved and ready to run, you can open The Experiment Conductor directly instead of using the designer.
+If you already have a .g4p file saved and ready to run, you can open The [Experiment Conductor](experiment-conductor.md) directly instead of using the designer.
 
 ## Start the protocol designer
 

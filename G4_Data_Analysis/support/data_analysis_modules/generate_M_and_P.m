@@ -7,20 +7,16 @@ function [P, M, P_flies, M_flies] = generate_M_and_P(mean_pos_series, MP_conds, 
     count = 1;
     num_frames = size(mean_pos_series,4);
     num_conds = size(mean_pos_series,3);
-    
+
     P = nan([num_groups, num_conds/2, num_frames]);
     M = nan([num_groups, num_conds/2, num_frames]);
-    
+
     for fig = 1:num_figs
         for row = 1:num_rows
             for col = 1:num_cols
-                
                 cond = MP_conds{fig}(row,col);
                 if cond>0
-                    
                     for g = 1:num_groups
-
-    
                         tmp = squeeze(mean_pos_series(g, :,cond,:));
                         tmp2 = squeeze(mean_pos_series(g, :,cond+1,:));
                         if size(mean_pos_series,2) > 1
@@ -32,15 +28,12 @@ function [P, M, P_flies, M_flies] = generate_M_and_P(mean_pos_series, MP_conds, 
                         end
                         P(g, count, :) = mean([tmp; tmp2],1,'omitnan');
                         M(g, count, :) = mean([tmp; -tmp2],1,'omitnan');
-                        
-                        
                     end
                     count = count+1;
                 end
             end
         end
     end
-    
     if MP_settings.show_individual_flies == 1
         count = 1;
         for fig = 1:num_figs
@@ -56,11 +49,9 @@ function [P, M, P_flies, M_flies] = generate_M_and_P(mean_pos_series, MP_conds, 
                                     tmp = permute(tmp,[2 1]);
                                     tmp2 = permute(tmp2,[2 1]);
                                 end
-                                
+
                                 P_flies(g, fly, count, :) = mean([tmp; tmp2],1,'omitnan');
                                 M_flies(g,  fly, count,  :) = mean([tmp; -tmp2],1,'omitnan');
-                                
-
                             end
                         end
                         count = count + 1;
@@ -68,14 +59,8 @@ function [P, M, P_flies, M_flies] = generate_M_and_P(mean_pos_series, MP_conds, 
                 end
             end
         end
-        
     else
         P_flies = [];
         M_flies = [];
     end
-        
-        
-        
-        
-
 end

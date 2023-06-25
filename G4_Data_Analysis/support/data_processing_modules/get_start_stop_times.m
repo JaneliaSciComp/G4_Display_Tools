@@ -19,12 +19,10 @@ function [start_idx, stop_idx, start_times, stop_times] = get_start_stop_times(L
             for extra = 1:sum(last_stop_idx)-1
                 last_stop_idx(find(last_stop_idx,1)) = 0;
             end
-
         end
     end
     stop_times(end+1) = Log.Commands.Time(last_stop_idx);
     if manual_first_start==1
         start_times = [min(Log.ADC.Time(:,1)) start_times];
     end
-
 end

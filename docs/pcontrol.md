@@ -32,13 +32,13 @@ The code above establishes a tcp connection similar to what the MATLAB code `con
 
 ```matlab
 ctlr = PanelsController();
-ctlr.mode = 0;
 ctlr.open();
 ```
 
 The `PanelController` is a class that handles the connection on the TCP/IP level. In your own code, it's good enough to use the following to initiate the connection:
 
 ```matlab
+% FIXME: deprecated
 connectHost;
 % … commands follow here
 ```
