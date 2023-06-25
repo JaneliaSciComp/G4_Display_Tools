@@ -13,12 +13,12 @@ Light Cycle Sheet GID: 1154672887
 
 
 Default run protocol file: C:\Users\labadmin\src\Modular-LED-Display\Generation 4\Display_Tools\G4_Protocol_Designer\run_protocols\G4_default_run_protocol.m
-Default processing file: C:\Users\labadmin\src\Modular-LED-Display\Generation 4\Display_Tools\G4_Data_Analysis\data processing\G4_Process_Data_flyingdetector.m
-Default plotting file: C:\Users\labadmin\src\Modular-LED-Display\Generation 4\Display_Tools\G4_Protocol_Designer\plotting_files\G4_Plot_Data_flyingdetector_pdf.m
+Default processing file: path\to\processing\settings
+Default plotting file: path\to\plotting\settings
 
 Default test run protocol file: C:\Users\labadmin\src\Modular-LED-Display\Generation 4\Display_Tools\G4_Protocol_Designer\run_protocols\G4_default_run_protocol.m
-Default test processing file: C:\Users\labadmin\src\Modular-LED-Display\Generation 4\Display_Tools\G4_Data_Analysis\data processing\G4_Process_Data_flyingdetector.m
-Default test plotting file: C:\Users\labadmin\src\Modular-LED-Display\Generation 4\Display_Tools\G4_Protocol_Designer\plotting_files\G4_Plot_Data_flyingdetector_pdf.m
+Default test processing file: path\to\processing\settings
+Default test plotting file: path\to\plotting\settings
 
 Flight test protocol file: C:\Users\labadmin\src\Modular-LED-Display\Generation 4\Display_Tools\G4_Protocol_Designer\test_protocols\test_protocol1\test_protocol1.g4p
 Camera walk test protocol file: insert walking test protocol here
