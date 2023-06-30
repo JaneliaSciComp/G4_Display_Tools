@@ -248,7 +248,7 @@ function [success] = G4_run_protocol_streaming_blockLogging(runcon, p)%input sho
                     
                     %Run block trial--------------------------------------
                     
-                    ctlr.startDisplay((tparams.dur + .5)*10, false); %duration expected in 100ms units
+                    ctlr.startDisplay(tparams.dur*10, false); %duration expected in 100ms units
                     timeSinceTrial = tic;
                     
                     %Update the progress bar--------------------------
@@ -312,7 +312,7 @@ function [success] = G4_run_protocol_streaming_blockLogging(runcon, p)%input sho
                         
                         tcpread_cache = pnet(ctlr.tcpConn, 'read', 'noblock'); % clear cache
                         
-                        ctlr.startDisplay((inter_dur + .5)*10, false);
+                        ctlr.startDisplay(inter_dur*10, false);
                         timeSinceInter = tic;
                         
                         runcon.update_progress('inter', r, reps, c, num_cond, num_trial_of_total);

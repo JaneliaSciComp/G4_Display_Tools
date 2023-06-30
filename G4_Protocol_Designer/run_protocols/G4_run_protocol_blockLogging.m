@@ -194,7 +194,7 @@ function [success] = G4_run_protocol_blockLogging(runcon, p) %input should alway
                         tparams.gain, tparams.offset, tparams.dur);
 
                     %Run block trial--------------------------------------
-                    ctlr.startDisplay((tparams.dur + .5)*10); %duration expected in 100ms units
+                    ctlr.startDisplay(tparams.dur*10); %duration expected in 100ms units
 
                     %Update the progress bar--------------------------
                     runcon.update_progress('block', r, params.reps, c, params.num_cond, cond, num_trial_of_total);
@@ -243,7 +243,7 @@ function [success] = G4_run_protocol_blockLogging(runcon, p) %input should alway
                         pause(0.01);
 
                         %Run intertrial-------------------------
-                        ctlr.startDisplay((params.inter_dur + .5)*10);
+                        ctlr.startDisplay(params.inter_dur*10);
 
                         if runcon.check_if_aborted() == 1
                             ctlr.stopDisplay();
