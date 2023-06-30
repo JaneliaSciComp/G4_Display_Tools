@@ -175,7 +175,7 @@ function [success] = G4_run_protocol_blockLogging(runcon, p) %input should alway
                     runcon.update_progress('block', r, params.reps, c, params.num_cond, cond, num_trial_of_total);
 
                     %define parameters for this trial----------------
-                    tparams = assign_block_trial_parameters(params, p, c);
+                    tparams = assign_block_trial_parameters(params, p, cond);
 
                     %Update controller-----------------------------
 

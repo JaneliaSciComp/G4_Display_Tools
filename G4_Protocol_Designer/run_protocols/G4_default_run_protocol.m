@@ -201,7 +201,7 @@ function [success] = G4_default_run_protocol(runcon, p)%input should always be 1
                     runcon.update_progress('block', r, params.reps, c, params.num_cond, cond, num_trial_of_total);
 
                     %define parameters for this trial----------------
-                    tparams = assign_block_trial_parameters(params, p, c);
+                    tparams = assign_block_trial_parameters(params, p, cond);
 
                     %Update controller-----------------------------
                     ctlr_parameters = {tparams.trial_mode, tparams.pat_id, tparams.gain, ...

@@ -234,7 +234,7 @@ function [success] = G4_run_protocol_streaming_blockLogging(runcon, p)%input sho
                     num_trial_of_total = num_trial_of_total + 1;
                     
                     %define parameters for this trial----------------
-                    tparams = assign_block_trial_parameters(params, p, c);
+                    tparams = assign_block_trial_parameters(params, p, cond);
                     
                     %Update controller-----------------------------
                     

@@ -241,7 +241,7 @@ function [success] = G4_default_run_protocol_streaming(runcon, p) %input should 
                     num_trial_of_total = num_trial_of_total + 1;
 
                     %define parameters for this trial----------------
-                    tparams = assign_block_trial_parameters(params, p, c);
+                    tparams = assign_block_trial_parameters(params, p, cond);
 
                     %Update controller-----------------------------
                     ctlr_parameters = {tparams.trial_mode, tparams.pat_id, tparams.gain, ...
