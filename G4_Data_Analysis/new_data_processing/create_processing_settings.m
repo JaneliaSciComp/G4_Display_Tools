@@ -22,6 +22,7 @@ function create_processing_settings()
     settings.combined_command = 0; %Set to 1 if using the combined command
     settings.percent_to_shift = .015;
     settings.duration_diff_limit = .15; %If a trial takes longer than its intended duration by more than this percentage, throw it out
+    settings.cross_correlation_tolerance = .02; %when a cross correlation is taken of all reps of a trial, any reps that are off zero by more than this percentage will be marked bad. Default 2%
     settings.flying = 1; %If this is a flying experiment, set to 1. If not, set to 0.
     %% Wing Beat Frequency Settings
 

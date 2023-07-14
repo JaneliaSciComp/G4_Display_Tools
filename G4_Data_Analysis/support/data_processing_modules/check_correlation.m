@@ -1,4 +1,5 @@
-function [bad_conds] = check_correlation(start_times, stop_times, exp_order, Log, condModes)
+function [bad_conds] = check_correlation(start_times, stop_times, exp_order, ...
+    Log, condModes, corrTolerance)
 
     num_conds = size(exp_order,1);
     num_reps = size(exp_order,2);
@@ -54,7 +55,7 @@ function [bad_conds] = check_correlation(start_times, stop_times, exp_order, Log
             end
             index = 1;
             for c = 1:num_comparisons
-                if abs(percent_off_zero(cond, c)) > .02
+                if abs(percent_off_zero(cond, c)) > corrTolerance
                     bad_comps(index) = c;
                     index = index + 1;
                 end
