@@ -26,7 +26,11 @@ function [frame_movement_start_times] = get_pattern_movement_times(start_times, 
                                    % actually being displayed - so skip them.
         if movetime < length(Log.Frames.Position)
             while double(Log.Frames.Position(movetime + 1)) - double(Log.Frames.Position(movetime)) == 0
-                movetime = movetime + 1;
+                if movetime < length(Log.Frames.Position)-1
+                    movetime = movetime + 1;
+                else
+                    break;
+                end
             end
             frame_movement_start_times(idx) = Log.Frames.Time(movetime);
         else
