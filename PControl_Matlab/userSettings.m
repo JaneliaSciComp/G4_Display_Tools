@@ -1,16 +1,16 @@
 mfile_path = mfilename('fullpath');
 [root_path, ~, ~] = fileparts(mfile_path);
 
-
-controller_path = fullfile(root_path, 'controller' );
-function_path = fullfile(root_path, 'functions','MyFunctions'); 
-aofunction_path = fullfile(root_path, 'ao_functions\','MyAO');
-pattern_path =  fullfile(root_path, 'Patterns');   
+controller_path = fullfile(root_path, 'controller');
+function_path = fullfile(root_path, 'functions', 'MyFunctions');
+aofunction_path = fullfile(root_path, 'ao_functions\', 'MyAO');
+pattern_path =  fullfile(root_path, 'Patterns');
 default_exp_path = fullfile(root_path, 'Experiment');
 exp_path = default_exp_path;
-%pattern_path =  fullfile(root_path, 'temp'); 
+%pattern_path =  fullfile(root_path, 'temp');
 
 %Arena Config
+% see also https://reiserlab.github.io/Modular-LED-Display/Generation%204/Display_Tools/docs/software_setup.html
 NumofColumns = 12;
 NumofRows = 4;
 

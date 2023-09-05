@@ -1,5 +1,6 @@
-function [bad_conds] = check_correlation(start_times, stop_times, exp_order, Log, condModes)
-    
+function [bad_conds] = check_correlation(start_times, stop_times, exp_order, ...
+    Log, condModes, corrTolerance)
+
     num_conds = size(exp_order,1);
     num_reps = size(exp_order,2);
     num_comparisons = ((num_reps-1)/2)*(num_reps);
@@ -10,13 +11,12 @@ function [bad_conds] = check_correlation(start_times, stop_times, exp_order, Log
             i = i + 1;
         end
     end
-    bad_conds = [];    
+    bad_conds = [];
     bad_idx = 1;
-    
 
     for cond = 1:num_conds
         if condModes(cond) == 1 || condModes(cond) == 2 || condModes(cond) == 3
-            
+
             bad_comps = [];
             corrs = {};
             lags = {};
@@ -25,11 +25,10 @@ function [bad_conds] = check_correlation(start_times, stop_times, exp_order, Log
                 trial = find(exp_order(:,rep)==cond);
                 trialind = num_conds*(rep-1) + trial;
                 start_ind = find(Log.Frames.Time(1,:)>=(start_times(trialind)),1);
-                stop_ind = find(Log.Frames.Time(1,:)<=(stop_times(trialind)),1,'last');              
+                stop_ind = find(Log.Frames.Time(1,:)<=(stop_times(trialind)),1,'last');
                 reps{rep,:} = Log.Frames.Position(start_ind:stop_ind);
 
             end
-
 
             ind = 1;
             for first = 1:num_reps - 1
@@ -51,12 +50,12 @@ function [bad_conds] = check_correlation(start_times, stop_times, exp_order, Log
             end
 
             if exist('peaks', 'var') == 1
-                peaks(cond, comp+1) = nanmean(peaks(cond, 1:comp));
-                percent_off_zero(cond, comp+1) = nanmean(percent_off_zero(cond, 1:comp));
+                peaks(cond, comp+1) = mean(peaks(cond, 1:comp), 'omitnan');
+                percent_off_zero(cond, comp+1) = mean(percent_off_zero(cond, 1:comp), 'omitnan');
             end
             index = 1;
             for c = 1:num_comparisons
-                if abs(percent_off_zero(cond, c)) > .02
+                if abs(percent_off_zero(cond, c)) > corrTolerance
                     bad_comps(index) = c;
                     index = index + 1;
                 end
@@ -95,8 +94,6 @@ function [bad_conds] = check_correlation(start_times, stop_times, exp_order, Log
                 disp("Please manually check all reps of cond # " + num2str(cond) + ...
                         ". One cross correlation was off but the deviation could not be tied to any specific repetiton.");
             end
-
         end
-        
     end
 end

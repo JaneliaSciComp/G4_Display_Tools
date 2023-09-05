@@ -4,6 +4,7 @@ function char_val = signed_16Bit_to_char(B)
 % dec2char cannot handle negative numbers
 % FL 5/1/2023 add argument check
 
+
 arguments % simple argument verification
     B (1,:) {mustBeInteger, mustBeGreaterThanOrEqual(B, -32768), mustBeLessThanOrEqual(B, 32767)}
 end

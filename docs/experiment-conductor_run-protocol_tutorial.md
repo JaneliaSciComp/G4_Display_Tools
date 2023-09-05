@@ -40,6 +40,7 @@ In your MATLAB command window, type `connectHost` and hit enter. Assuming your s
 As you can see, you send commands to the panels generally by typing `Panel_com(command name[, arguments…])` into the MATLAB command window, with the list of argument being optional. If you look in `Panel_com.m` at line 28, you will see that when you submit the `all_on` command, a particular hexadecimal string `FF` is converted to its byte value 255 and sent to the panels via TCP:
 
 ```matlab
+    % FIXME: old code example. Not working anymore
     case 'all_on'      % set all panels to 0;
         reply = send_tcp( char([1 hex2dec('FF')]));
         % … handling of the return value
@@ -131,6 +132,7 @@ It's very important to send the `stop_log` command. Were you to run a real condi
 ### Disconnect from the G4 Panel Host
 
 ```matlab
+% FIXME: deprecated
 disconnectHost
 ```
 
@@ -260,11 +262,13 @@ if ~isempty(ctrl)
        ctrl.close()
     end
 end
+% FIXME: deprecated
 connectHost;
 pause(10);
 Panel_com('change_root_directory', p.experiment_folder);
 
 %% set active ao channels
+% FIXME: this is outdated code
 if ~isempty(p.active_ao_channels)
     aobits = 0;
    for bit = p.active_ao_channels
@@ -294,12 +298,13 @@ if ~isempty(runcon.view)
 else
     start = 'Start';
 end
- switch start
-     case 'Cancel'
-         disconnectHost;
-         success = 0;
-         return;
-     case 'Start' 
+switch start
+    case 'Cancel'
+        %FIXME: deprecated
+        disconnectHost;
+        success = 0;
+        return;
+    case 'Start' 
 ```
 
 </details>
@@ -516,6 +521,7 @@ if runcon.check_if_aborted()
    pause(.1);
    Panel_com('stop_log');
    pause(1);
+   % FIXME: deprecated
    disconnectHost;
    success = 0;
    return;
@@ -606,6 +612,7 @@ for r = 1:reps
            Panel_com('stop_display');
            Panel_com('stop_log');
            pause(1);
+           % FIXME: deprecated
            disconnectHost;
            success = 0;
            return;
@@ -671,6 +678,7 @@ for r = 1:reps
                pause(.1);
                Panel_com('stop_log');
                pause(1);
+               % FIXME: deprecated
                disconnectHost;
                success = 0;
                return;
@@ -694,6 +702,8 @@ Click to expand default run protocol around lines 481…554.
 </summary>
 
 ```matlab
+
+% FIXME: old code example, not working anymore.
 if post_type == 1
     
     %Update progress bar--------------------------
@@ -744,6 +754,7 @@ if post_type == 1
         pause(.1);
         Panel_com('stop_log');
         pause(1);
+        % FIXME: deprecated
         disconnectHost;
         success = 0;
         return;
@@ -761,7 +772,8 @@ if stop_log_response.success == 1
     waitfor(errordlg("Stop Log command failed, please stop log manually then hit a key"));
     waitforbuttonpress;
 end
-pause(1);          
+pause(1);     
+% FIXME: deprecated     
 disconnectHost;
 
 pause(1);

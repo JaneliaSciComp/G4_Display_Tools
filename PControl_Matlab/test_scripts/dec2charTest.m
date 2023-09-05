@@ -74,5 +74,4 @@ classdef dec2charTest < matlab.unittest.TestCase
         end
                 
     end
-
 end
