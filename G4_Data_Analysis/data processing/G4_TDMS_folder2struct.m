@@ -115,8 +115,16 @@ parfor i = 1:num_TDMSfiles
             CommandTime(i,:) = channelData{1}; %timestampes
             CommandName{i} = channelData{2}; %names of command
 
-            CommandData{i} = channelData{3}; %class of commands?? Newly added field to TDMS files
-            CommandData{i} = channelData{4}; %data accompanying commands
+% THIS FIX ONLY WORKS IF THE NEW CHANNEL IN THE TDMS FILES (class) IS
+% ALWAYS EMPTY. IT HAS ALWAYS BEEN EMPTY SO FAR IN EVERY FLY I'VE SEEN BUT
+% I DON'T KNOW WHAT IT IS AND SO CANNOT BE SURE IT WILL ALWAYS BE EMPTY.
+% NEEDS MORE LOOKING INTO. - LF 9/5/23
+            if isempty(channelData{3})
+                CommandData{i} = channelData{3}; %class of commands?? Newly added field to TDMS files
+                CommandData{i} = channelData{4}; %data accompanying commands
+            else
+                CommandData{i} = channelData{3};
+            end
             Command_inds(i) = 1;
         catch
             error(['Unexpected file in TDMS folder: ' TDMS_names{i} '. Could not find the "Commands Received" group in this file']);
