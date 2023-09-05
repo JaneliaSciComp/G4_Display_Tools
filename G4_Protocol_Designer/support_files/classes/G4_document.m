@@ -1070,15 +1070,18 @@ classdef G4_document < handle
             start_filepath_index = startIndex + 6;
             config_filepath = settings_data{filepath_line}(start_filepath_index:end);
 
-            try
-                fid = fopen(config_filepath,'wt');
-                fprintf(fid, '%s\n', config{:});
-                fclose(fid);
-            catch
-                error("There was a problem updating the configuration file. Please take the following steps: " ...
-                    + newline + "1. Check that the configuration file path in 'G4_Protocol_Designer_settings.m' or in the settings window is accurate." ...
-                    + newline + "2. Check that you have permission to edit the configuration file. You may need to give your user account admin priveleges.");
+            if ~isfile(config_filepath)
+                error("The configuration file " + config_filepath + " does not exist. Double check your settings.");
             end
+            
+            fid = fopen(config_filepath,'wt');
+            
+            if fid < 0
+                error("You don't have the required writing permissions to '" + config_filepath + "'. Change file permission and try again.");
+            end
+
+            fprintf(fid, '%s\n', config{:});
+            fclose(fid);
         end
 
 %EXPORT--------------------------------------------------------------------
