@@ -45,6 +45,7 @@ function create_processing_settings()
                                             % matter where the bad wbf readings are,
                                             % set this to 1.
 
+
     %% Normalization settings
     % settings.normalize_to_baseline = {'LpR'};%datatypes to normalize by setting the baseline value to 1
     % settings.baseline_startstop = [0 1]; %start and stop times to use for baseline normalization

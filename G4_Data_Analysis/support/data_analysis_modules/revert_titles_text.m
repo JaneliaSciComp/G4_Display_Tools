@@ -2,7 +2,9 @@ function [ts_set, tc_set] = revert_titles_text(text_to_remove, ts_set, tc_set)
 
     for revert_name = 1:length(ts_set.figure_names)
         ts_set.figure_names(revert_name) = erase(ts_set.figure_names(revert_name), text_to_remove);
-        ts_set.faLmR_figure_names(revert_name) = erase(ts_set.faLmR_figure_names(revert_name), text_to_remove);
+    end
+    for revert_fa = 1:length(ts_set.faLmR_figure_names)
+        ts_set.faLmR_figure_names(revert_fa) = erase(ts_set.faLmR_figure_names(revert_fa),text_to_remove);
     end
     for revert_subname = 1:length(ts_set.subplot_figure_title)
         for revert_datasubname = 1:length(ts_set.subplot_figure_title{revert_subname})

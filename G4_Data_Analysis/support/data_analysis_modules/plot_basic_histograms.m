@@ -136,7 +136,12 @@ function plot_basic_histograms(model, timeseries_data, interhistogram_data, ...
                 for trs = 1:size(interhistogram_data,3)
                     total_points_array(trs) = nansum(interhistogram_data(1,1,trs,:),4);
                 end
+
                 total_points = mean(mean(nonzeros(total_points_array)),'omitnan');
+                if total_points == 0
+                    disp("Your inter-trials may not have displayed properly. Your Strip Fixation histogram may not plot properly as a result.");
+                end
+
                 ind_lines = ind_lines/total_points;
                 avg_line = avg_line/total_points;
 
@@ -193,6 +198,9 @@ function plot_basic_histograms(model, timeseries_data, interhistogram_data, ...
                     total_points_array(trs) = nansum(interhistogram_data(1,1,trs,:),4);
                 end
                 total_points = mean(mean(nonzeros(total_points_array)),'omitnan');
+                if total_points == 0
+                    disp("Your inter-trials may not have displayed properly. Your Strip Fixation histogram may not plot properly as a result.");
+                end
 
                 fly_line = fly_line/total_points;
                 if plot_in_degrees == 1

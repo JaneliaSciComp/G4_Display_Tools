@@ -309,6 +309,7 @@ classdef G4_conductor_view < handle
 
             self.exp_name_box = uicontrol(metadata_pan, 'Style', 'edit', 'String', self.con.doc.experiment_name, 'units', 'pixels', 'Position', ...
                 metadata_box_position, 'Callback', @self.new_experiment_name);
+            set(self.exp_name_box, 'enable', 'off');
 
             metadata_label_position(2) = metadata_label_position(2) - 25;
             metadata_box_position(2) = metadata_box_position(2) - 25;
