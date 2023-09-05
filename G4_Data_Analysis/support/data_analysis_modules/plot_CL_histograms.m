@@ -1,13 +1,12 @@
 %plot histograms for closed-loop trials
 
-
 %variables i need for this:  CL_conds, CL_inds, (optional num_figs,
 %num_plot_rows, num_plot_cols?), overlap, CombData.histograms, num_groups,
 %rep_Colors, rep_lineWidth, mean_colors, mean_lineWidth, histogram_ylimits,
-%subtitle_FontSize, 
+%subtitle_FontSize,
 function plot_CL_histograms(CL_conds, CL_inds, histogram_data, num_groups, ...
     plot_settings, gen_settings, save_settings)
-    
+
     overlap = plot_settings.overlap;
     rep_Colors = gen_settings.rep_colors;
     rep_LineWidth = gen_settings.rep_lineWidth;
@@ -16,8 +15,8 @@ function plot_CL_histograms(CL_conds, CL_inds, histogram_data, num_groups, ...
     histogram_ylimits = plot_settings.histogram_ylimits;
     subtitle_FontSize = gen_settings.subtitle_fontSize;
     figure_titles = plot_settings.figure_names;
-   
-    
+
+
     if ~isempty(CL_conds)
         num_figs = size(CL_conds,3);
         for d = CL_inds
@@ -36,21 +35,21 @@ function plot_CL_histograms(CL_conds, CL_inds, histogram_data, num_groups, ...
                             x = circshift(1:num_positions,[1 floor(num_positions/2)]);
                             x(x>x(end)) = x(x>x(end))-num_positions;
                             for g = 1:num_groups
-                                tmpdata = circshift(squeeze(nanmean(histogram_data(g,:,d,cond,:,:),5)),[1 num_positions/2]);
+                                tmpdata = circshift(squeeze(mean(histogram_data(g,:,d,cond,:,:),5,'omitnan')),[1 num_positions/2]);
                                 if num_groups==1 && overlap==0 %plot individual trials only if plotting one data group (otherwise it's too messy)
                                     plot(repmat(x',[1 num_exps]),tmpdata','Color',rep_Colors(g,:),'LineWidth',rep_LineWidth);
                                 end
-                                plot(x,nanmean(tmpdata),'Color',mean_Colors(g,:),'LineWidth',mean_LineWidth)
+                                plot(x,mean(tmpdata,'omitnan'),'Color',mean_Colors(g,:),'LineWidth',mean_LineWidth)
                             end
                             ylim(histogram_ylimits(d,:));
-                            titlestr = ['\fontsize{' num2str(subtitle_FontSize) '} Condition #{\color[rgb]{' num2str(mean_Colors(g,:)) '}' num2str(cond)]; 
+                            titlestr = ['\fontsize{' num2str(subtitle_FontSize) '} Condition #{\color[rgb]{' num2str(mean_Colors(g,:)) '}' num2str(cond)];
                             if overlap==1
                                 cond = CL_conds(row*2,col,fig);
                                 if cond>0
                                     titlestr = [titlestr ' \color[rgb]{' num2str(rep_Colors(g,:)) '}(' num2str(cond) ')'];
                                     for g = 1:num_groups
-                                        tmpdata = circshift(squeeze(nanmean(histogram_data(g,:,d,cond,:,:),5)),[1 num_positions/2]);
-                                        plot(x,nanmean(tmpdata),'Color',rep_Colors(g,:),'LineWidth',mean_LineWidth)
+                                        tmpdata = circshift(squeeze(mean(histogram_data(g,:,d,cond,:,:),5,'omitnan')),[1 num_positions/2]);
+                                        plot(x,mean(tmpdata,'omitnan'),'Color',rep_Colors(g,:),'LineWidth',mean_LineWidth)
                                     end
                                 end
                             end
@@ -67,7 +66,6 @@ function plot_CL_histograms(CL_conds, CL_inds, histogram_data, num_groups, ...
         end
         figH = gcf;
         fig_title = figH.Name(~isspace(figH.Name));
-
         save_figure(save_settings, fig_title, 'CLhistogram', num2str(fig));
     end
 end

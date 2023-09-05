@@ -232,8 +232,6 @@ popupmenu6_Callback(handles.popupmenu6, eventdata, handles);
 
 guidata(hObject, handles);
 
-
-
 % --------------------------------------------------------------------
 function FileMenu_Callback(hObject, eventdata, handles)
 % hObject    handle to FileMenu (see GCBO)

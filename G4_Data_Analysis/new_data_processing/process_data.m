@@ -57,6 +57,13 @@ function process_data(exp_folder, processing_settings_file)
     wbf_range = s.settings.wbf_range;
     wbf_cutoff = s.settings.wbf_cutoff;
     wbf_end_percent = s.settings.wbf_end_percent;
+
+    if isfield(s.settings, 'cross_correlation_tolerance')
+        corrTolerance = s.settings.cross_correlation_tolerance;
+    else
+        corrTolerance = .02;
+    end
+
     if isfield(s.settings, 'flying')
         flying = s.settings.flying;
     else
@@ -166,7 +173,7 @@ function process_data(exp_folder, processing_settings_file)
     times, modeID_order, time_conv, trials_rerun);
 
     %organize trial duration and control mode by condition/repetition
-    [cond_dur, cond_modes,  cond_frame_move_time] = organize_durations_modes(num_conds, num_reps, ...
+    [cond_dur, cond_modes,  cond_frame_move_time, cond_start_times, cond_gaps] = organize_durations_modes(num_conds, num_reps, ...
     num_trials, exp_order, trial_stop_times, trial_start_times,  ...
     trial_move_start_times, trial_modes, time_conv);
 
@@ -180,7 +187,9 @@ function process_data(exp_folder, processing_settings_file)
 %%%%%the indices for the actual condition???
     [bad_duration_conds, bad_duration_intertrials] = check_condition_durations(cond_dur, intertrial_durs, path_to_protocol, duration_diff_limit);
     [bad_slope_conds] = check_flat_conditions(trial_start_times, trial_stop_times, Log, num_reps, num_conds, exp_order);
-    [bad_crossCorr_conds] = check_correlation(trial_start_times, trial_stop_times, exp_order, Log, cond_modes);
+
+    [bad_crossCorr_conds] = check_correlation(trial_start_times, trial_stop_times, exp_order, Log, cond_modes, corrTolerance);
+
 
     if remove_nonflying_trials && flying
         [bad_WBF_conds, wbf_data] = find_bad_wbf_trials(Log, ts_data, wbf_range, wbf_cutoff, ...
@@ -380,7 +389,8 @@ function process_data(exp_folder, processing_settings_file)
         'summaries', 'summaries_normalized','conditionModes', 'interhistogram', 'timestamps', ...
         'pos_series', 'mean_pos_series', 'pos_conditions', 'normalization_max', ...
         'bad_duration_conds', 'bad_duration_intertrials','bad_slope_conds', 'bad_crossCorr_conds',...
-        'bad_WBF_conds','cond_frame_move_time', 'pattern_movement_time_avg');
+        'bad_WBF_conds','cond_frame_move_time', 'pattern_movement_time_avg', 'cond_start_times', 'cond_gaps');
+
     else
         da_data = ts_data;
         da_start_ind = find(ts_time>=da_start,1);
@@ -415,7 +425,9 @@ function process_data(exp_folder, processing_settings_file)
         save(fullfile(exp_folder,processed_file_name), 'timeseries', 'ts_avg_reps',...
             'channelNames',  'summaries', 'conditionModes', 'interhistogram', ...
             'timestamps', 'bad_duration_conds', 'bad_duration_intertrials',...
-            'bad_slope_conds', 'bad_crossCorr_conds', 'cond_frame_move_time', 'pattern_movement_time_avg');
+            'bad_slope_conds', 'bad_crossCorr_conds', 'cond_frame_move_time',...
+            'pattern_movement_time_avg', 'cond_start_times', 'cond_gaps');
+
 
     end
 

@@ -59,7 +59,7 @@ function [num_trials, trial_start_times, trial_stop_times,trial_move_start_times
     else
         %get start times/modes of trials
         trial_start_times = start_times(trial_start_ind:trial_end_ind);
-        trial_stop_times = start_times(trial_start_ind+1:trial_end_ind+1);
+        trial_stop_times = stop_times(trial_start_ind:trial_end_ind);
         trial_move_start_times = frame_movement_start_times(trial_start_ind:trial_end_ind);
         trial_modes = modeID_order(trial_start_ind:trial_end_ind);
         intertrial_start_times = [];
