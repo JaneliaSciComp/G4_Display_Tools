@@ -115,12 +115,13 @@ parfor i = 1:num_TDMSfiles
             CommandTime(i,:) = channelData{1}; %timestampes
             CommandName{i} = channelData{2}; %names of command
 
-% THIS FIX ONLY WORKS IF THE NEW CHANNEL IN THE TDMS FILES (class) IS
-% ALWAYS EMPTY. IT HAS ALWAYS BEEN EMPTY SO FAR IN EVERY FLY I'VE SEEN BUT
-% I DON'T KNOW WHAT IT IS AND SO CANNOT BE SURE IT WILL ALWAYS BE EMPTY.
-% NEEDS MORE LOOKING INTO. - LF 9/5/23
-            if isempty(channelData{3})
-                CommandData{i} = channelData{3}; %class of commands?? Newly added field to TDMS files
+% In older versions of the host, there is only three channels of data,
+% Time, Name, and Data. But in newer versions, Class has been added as the
+% third channel and Data is fourth. This checks for the presence of Class
+% (which is a double array, usually empty) so that if the newer version was used, the data will
+% still be processed correctly. - LF 9/6/23
+            if isa(channelData{3}, 'double')
+                CommandClass{i} = channelData{3}; %class of commands?? Newly added field to TDMS files
                 CommandData{i} = channelData{4}; %data accompanying commands
             else
                 CommandData{i} = channelData{3};
