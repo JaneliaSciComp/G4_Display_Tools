@@ -115,8 +115,17 @@ parfor i = 1:num_TDMSfiles
             CommandTime(i,:) = channelData{1}; %timestampes
             CommandName{i} = channelData{2}; %names of command
 
-            CommandData{i} = channelData{3}; %class of commands?? Newly added field to TDMS files
-            CommandData{i} = channelData{4}; %data accompanying commands
+% In older versions of the host, there is only three channels of data,
+% Time, Name, and Data. But in newer versions, Class has been added as the
+% third channel and Data is fourth. This checks for the presence of Class
+% (which is a double array, usually empty) so that if the newer version was used, the data will
+% still be processed correctly. - LF 9/6/23
+            if isa(channelData{3}, 'double')
+                CommandClass{i} = channelData{3}; %class of commands?? Newly added field to TDMS files
+                CommandData{i} = channelData{4}; %data accompanying commands
+            else
+                CommandData{i} = channelData{3};
+            end
             Command_inds(i) = 1;
         catch
             error(['Unexpected file in TDMS folder: ' TDMS_names{i} '. Could not find the "Commands Received" group in this file']);
