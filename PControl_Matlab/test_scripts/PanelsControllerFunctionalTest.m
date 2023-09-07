@@ -142,6 +142,22 @@ classdef PanelsControllerFunctionalTest < matlab.unittest.TestCase
             end
             testCase.panelsController.stopLog();
         end
+
+        function errorIssue87v2(testCase)
+            newDir = "C:\G4Protocols\test\";
+            disp(newDir);
+            testCase.panelsController.setRootDirectory(newDir);
+            testCase.panelsController.startLog();
+            delays = [300 20];
+            for i = 0:50
+                testCase.panelsController.setControlMode(4);
+                testCase.panelsController.setPatternID(1);
+                testCase.panelsController.setGain(-15, 0);
+                testCase.panelsController.setPositionX(1);
+                testCase.panelsController.startDisplay(delays(mod(i, 2)+1));
+            end
+            testCase.panelsController.stopLog();
+        end
         
         function errorSetControllerParameter(testCase)
             newDir = tempname;
