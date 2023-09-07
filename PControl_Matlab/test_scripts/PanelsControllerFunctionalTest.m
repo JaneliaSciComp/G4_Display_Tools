@@ -127,6 +127,21 @@ classdef PanelsControllerFunctionalTest < matlab.unittest.TestCase
 %                     sprintf("Stopping the log didn't work in iteration %d", i));
 %             end
 %         end
+
+        function errorIssue87(testCase)
+            newDir = "C:\G4Protocols\test\";
+            disp(newDir);
+            testCase.panelsController.setRootDirectory(newDir);
+            testCase.panelsController.startLog();
+            for i = 0:2
+                testCase.panelsController.setControlMode(1);
+                testCase.panelsController.setPatternID(1);
+                testCase.panelsController.setPatternFunctionID(1);
+                testCase.panelsController.setPositionX(1);
+                testCase.panelsController.startDisplay(300);
+            end
+            testCase.panelsController.stopLog();
+        end
         
         function errorSetControllerParameter(testCase)
             newDir = tempname;
