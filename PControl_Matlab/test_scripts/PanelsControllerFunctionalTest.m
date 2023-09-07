@@ -138,7 +138,7 @@ classdef PanelsControllerFunctionalTest < matlab.unittest.TestCase
                 testCase.panelsController.setPatternID(1);
                 testCase.panelsController.setPatternFunctionID(1);
                 testCase.panelsController.setPositionX(1);
-                testCase.panelsController.startDisplay(300);
+                testCase.panelsController.startDisplay(30);
             end
             testCase.panelsController.stopLog();
         end
