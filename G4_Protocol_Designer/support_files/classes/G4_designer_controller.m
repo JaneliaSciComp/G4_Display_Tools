@@ -1617,11 +1617,24 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
         %display on the designer
 
         function calculate_experiment_length(self, ~, ~)
-            total_dur = self.doc.pretrial{12} + self.doc.posttrial{12};
-            for i = 1:length(self.doc.block_trials(:,1))
-                total_dur = total_dur + (self.doc.block_trials{i,12} + self.doc.intertrial{12})*self.doc.repetitions;
+            total_dur = 0;
+            if ~ischar(self.doc.pretrial{12})
+                total_dur = total_dur + self.doc.pretrial{12};
             end
-            total_dur = total_dur - self.doc.intertrial{12};
+            if ~ischar(self.doc.posttrial{12})
+                total_dur = total_dur + self.doc.posttrial{12};
+            end
+            if ~ischar(self.doc.intertrial{12})
+                for i = 1:length(self.doc.block_trials(:,1))
+                    total_dur = total_dur + (self.doc.block_trials{i,12} + self.doc.intertrial{12})*self.doc.repetitions;
+                end
+                total_dur = total_dur - self.doc.intertrial{12};
+            else
+                for i = 1:length(self.doc.block_trials(:,1))
+                    total_dur = total_dur + (self.doc.block_trials{i,12}*self.doc.repetitions);
+                end
+            end
+            
             self.update_exp_length(total_dur);
         end
 
