@@ -1919,11 +1919,23 @@ classdef G4_document < handle
         end
 
         function [total_dur] = calc_exp_length(self)
-            total_dur = self.pretrial{12} + self.posttrial{12};
-            for i = 1:length(self.block_trials(:,1))
-                total_dur = total_dur + (self.block_trials{i,12} + self.intertrial{12})*self.repetitions;
+            total_dur = 0;
+            if ~isempty(self.pretrial{12})
+                total_dur = total_dur + self.pretrial{12};
             end
-            total_dur = total_dur - self.intertrial{12};
+            if ~isempty(self.posttrial{12})
+                total_dur = total_dur + self.posttrial{12};
+            end
+            if ~isempty(self.intertrial{12})
+                for i = 1:length(self.block_trials(:,1))
+                    total_dur = total_dur + (self.block_trials{i,12} + self.intertrial{12})*self.repetitions;
+                end
+                total_dur = total_dur - self.intertrial{12};
+            else
+                for i = 1:length(self.block_trials(:,1))
+                    total_dur = total_dur + (self.block_trials{i,12}*self.repetitions);
+                end
+            end
         end
 
 
