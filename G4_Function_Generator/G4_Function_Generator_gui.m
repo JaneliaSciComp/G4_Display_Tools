@@ -1605,14 +1605,15 @@ function pushbutton7_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 [filename, pathname] = uigetfile('*.mat', 'Select a pattern file');
-
-try
-    load(fullfile(pathname,filename),'pattern');
-    handles.step_size = rad2deg(pattern.param.true_step_size);
-    set(handles.edit34,'String',num2str(handles.step_size));
-    set(handles.edit27,'String',num2str(pattern.x_num));
-    set(handles.popupmenu7,'Value',round(sqrt(pattern.gs_val)));
-    pushbutton2_Callback(hObject, eventdata, handles);
-catch
-    error('Expected pattern metadata not found in selected file')
+if filename
+    try
+        load(fullfile(pathname,filename),'pattern');
+        handles.step_size = rad2deg(pattern.param.true_step_size);
+        set(handles.edit34,'String',num2str(handles.step_size));
+        set(handles.edit27,'String',num2str(pattern.x_num));
+        set(handles.popupmenu7,'Value',round(sqrt(pattern.gs_val)));
+        pushbutton2_Callback(hObject, eventdata, handles);
+    catch
+        error('Expected pattern metadata not found in selected file')
+    end
 end
