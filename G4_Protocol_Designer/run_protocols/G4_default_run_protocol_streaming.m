@@ -191,7 +191,7 @@ function [success] = G4_default_run_protocol_streaming(runcon, p) %input should 
             end
 
             %% set active ai channels for streaming
-            active_ai_channels = nonzeros([p.chan1_rate>0 p.chan2_rate>0 p.chan3_rate>0 p.chan4_rate>0] .* [1 2 3 4])';
+            active_ai_channels = nonzeros([p.chan1_rate>0 p.chan2_rate>0 p.chan3_rate>0 p.chan4_rate>0] .* [1 2 3 4])' - 1;
             ctlr.setActiveAIChannels(active_ai_channels);
 
             %% run pretrial if it exists----------------------------------------

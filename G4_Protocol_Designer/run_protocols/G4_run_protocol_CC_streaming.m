@@ -171,8 +171,8 @@ function [success] = G4_run_protocol_CC_streaming(runcon, p) %input should alway
     ctlr.setActiveAOChannels(p.active_ao_channels+2); % FIXME: quick fix, find better solution
     
     %% set active ai channels for streaming
-    active_ai_channels = nonzeros([p.chan1_rate>0 p.chan2_rate>0 p.chan3_rate>0 p.chan4_rate>0] .* [1 2 3 4])';
-    ctlr.setActiveAIChannels(active_ai_streaming_channels);  % FIXME: temporary solution. Find a better way 
+    active_ai_channels = nonzeros([p.chan1_rate>0 p.chan2_rate>0 p.chan3_rate>0 p.chan4_rate>0] .* [1 2 3 4])' - 1;
+    ctlr.setActiveAIChannels(active_ai_channels);  % FIXME: temporary solution. Find a better way 
 
     %% confirm start experiment
     if ~isempty(runcon.view)
