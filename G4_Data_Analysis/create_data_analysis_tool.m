@@ -243,8 +243,13 @@
                 %Figure out which conditions need to be plotted.
                 [conds_vec_cl] = get_conds_to_plot('cl_hist', conditionModes);
                 
+                if isempty(conds_vec_cl)
+                    disp("No closed loop conditions were found, so closed loop histograms will not be plotted.");
+                    self.CL_histogram_plot_option = 0;
+                else
                  %Create default layout for given condition vector
-                self.CL_hist_plot_settings.CL_hist_conds = create_default_plot_layout(conds_vec_cl);
+                    self.CL_hist_plot_settings.CL_hist_conds = create_default_plot_layout(conds_vec_cl);
+                end
             end
             
             % Position series plots
