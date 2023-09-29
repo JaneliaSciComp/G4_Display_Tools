@@ -446,6 +446,7 @@ classdef G4_conductor_view < handle
         function update_run_gui(self)
             self.experimenter_box.Value = find(strcmp(self.con.model.metadata_options.experimenter,self.con.model.experimenter));
             self.exp_name_box.String = self.con.doc.experiment_name;
+            set(self.fig,'name',['Fly Experiment Conductor - ',self.con.doc.experiment_name]);
             self.fly_name_box.String = self.con.model.fly_name;
             self.fly_genotype_box.Value = find(strcmp(self.con.model.metadata_options.fly_geno,self.con.model.fly_genotype));
             self.date_and_time_box.String = self.con.get_timestamp();
