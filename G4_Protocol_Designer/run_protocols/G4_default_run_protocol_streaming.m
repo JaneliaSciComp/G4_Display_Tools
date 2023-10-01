@@ -138,7 +138,7 @@ function [success] = G4_default_run_protocol_streaming(runcon, p) %input should 
 
 
      %% set active ao channels
-    ctlr.setActiveAOChannels(params.active_ao_channels);
+    ctlr.setActiveAOChannels(active_ao_channels);
 
     %% confirm start experiment
     if ~isempty(runcon.view)

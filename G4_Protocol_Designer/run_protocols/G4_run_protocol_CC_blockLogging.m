@@ -162,6 +162,8 @@ function [success] = G4_run_protocol_CC_blockLogging(runcon, p) %input should al
     reps = p.repetitions;
     num_cond = length(block_trials(:,1)); %number of conditions
 
+    active_ao_channels = p.active_ao_channels+2; % FIXME: quick fix, find better solution 
+
     %% Open new Panels controller instance
     ctlr = PanelsController();
     ctlr.open(true);
@@ -170,7 +172,7 @@ function [success] = G4_run_protocol_CC_blockLogging(runcon, p) %input should al
     ctlr.setRootDirectory(p.experiment_folder);
 
     %% set active ao channels
-    ctlr.setActiveAOChannels(p.active_ao_channels+2);
+    ctlr.setActiveAOChannels(active_ao_channels);
 
     %% confirm start experiment
     if ~isempty(runcon.view)

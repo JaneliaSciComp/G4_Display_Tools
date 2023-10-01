@@ -150,6 +150,8 @@ block_trials = p.block_trials;
 block_ao_indices = p.block_ao_indices;
 reps = p.repetitions;
 num_cond = length(block_trials(:,1)); %number of conditions
+
+active_ao_channels = p.active_ao_channels + 2; % FIXME: Quick fix. find better solution
     
 % Get input channels that are active for streaming
 
@@ -161,7 +163,7 @@ ctlr.open(true);
 ctlr.setRootDirectory(p.experiment_folder);
 
 %% set active ao channels
-ctlr.setActiveAOChannels(p.active_ao_channels+2); % FIXME: Quick fix. find better solution
+ctlr.setActiveAOChannels(active_ao_channels); 
      
 %% set active ai channels for streaming
 active_ai_channels = nonzeros([p.chan1_rate>0 p.chan2_rate>0 p.chan3_rate>0 p.chan4_rate>0] .* [1 2 3 4])' - 1;

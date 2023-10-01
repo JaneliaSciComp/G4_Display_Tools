@@ -194,7 +194,7 @@ function [success] = G4_run_protocol_streaming_blockLogging(runcon, p)%input sho
                 ctlr.setControllerParameters(ctlr_parameters_pretrial);
                 
                 %Update status panel to show current parameters
-                runcon.update_current_trial_parameters(pre_mode, pre_pat, pre_pos, p.active_ao_channels, ...
+                runcon.update_current_trial_parameters(pre_mode, pre_pat, pre_pos, active_ao_channels, ...
                     pre_ao_ind, pre_frame_ind, pre_frame_rate, pre_gain, pre_offset, pre_dur);
                 pause(0.01);
                 
@@ -256,7 +256,7 @@ function [success] = G4_run_protocol_streaming_blockLogging(runcon, p)%input sho
                     
                     %Update status panel to show current parameters
                     runcon.update_current_trial_parameters(tparams.trial_mode, ...
-                        tparams.pat_id, tparams.pos_id, p.active_ao_channels, ...
+                        tparams.pat_id, tparams.pos_id, active_ao_channels, ...
                         tparams.trial_ao_indices, tparams.frame_ind, tparams.frame_rate, ...
                         tparams.gain, tparams.offset, tparams.dur);
                     
@@ -422,7 +422,7 @@ function [success] = G4_run_protocol_streaming_blockLogging(runcon, p)%input sho
                     
                     ctlr_parameters = {tparams.trial_mode, tparams.pat_id, tparams.gain, ...
                         tparams.offset, tparams.pos_id, tparams.frame_rate, tparams.frame_ind...
-                        params.active_ao_channels, tparams.trial_ao_indices};
+                        active_ao_channels, tparams.trial_ao_indices};
                     
                     ctlr.setControllerParameters(ctlr_parameters);
                     
