@@ -475,6 +475,7 @@ classdef G4_conductor_controller < handle
                 self.model.fly_name = self.model.create_fly_name(top_folder_path);
                 self.update_expected_time();
                 self.update_elapsed_time(0);
+                self.view.set_repetition_lines();
 
                 self.update_view_if_exists();
             end

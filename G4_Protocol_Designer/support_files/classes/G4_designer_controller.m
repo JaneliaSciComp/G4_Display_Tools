@@ -144,7 +144,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
 
             %create figure
             self.f = figure('Name', 'Fly Experiment Designer', 'NumberTitle', 'off','units', 'normalized', 'MenuBar', 'none', ...
-                'ToolBar', 'none', 'outerposition', [.05 .05, .9, .9]);
+                'ToolBar', 'none', 'outerposition', [.05 .05, .9, .9], 'closeRequestFcn', @self.close_application);
 
             %, 'Resize', 'off'
 
@@ -1731,8 +1731,15 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
         %Open the conductor to run an experiment
         function open_run_gui(self, ~, ~)
             self.check_and_disconnect_host();
-            self.run_con = G4_conductor_controller(self.doc, self.settings_con);
-            self.run_con.layout();
+            %self.run_con = G4_conductor_controller(self.doc, self.settings_con);
+            %self.run_con.layout();
+            if ~isempty(self.doc.save_filename)
+                evalin('base', 'G4_Experiment_Conductor()');
+                evalin('base', 'run_con.open_g4p_file(con.doc.save_filename)');
+            else
+                warndlg("Please save your experiment before running.");
+            end
+
         end
 
 %% Additional Table Manipulation Functions
@@ -2693,6 +2700,14 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                     start_index = 0;
                 end
             end
+        end
+
+        function close_application(self, src, event)
+            
+            clear('con');
+            delete(src);
+            evalin('base', 'clear con');
+
         end
 
 %% Error handling Functions
