@@ -720,12 +720,25 @@ classdef G4_conductor_view < handle
         end
 
         function set_repetition_lines(self)
-            cla(self.progress_axes);
+            %cla(self.progress_axes);
             reps = self.con.doc.repetitions;
             for i = 1:reps
                 x = (i/reps);% + 1/total_steps;
                 line(self.progress_axes, 'XData', [x, x], 'YDATA', [0,2]);
             end
+
+        end
+
+        function reset_progress_bar(self)
+            
+            cla(self.progress_axes);
+            self.progress_bar = barh(0, 'Parent', self.progress_axes,'BaseValue', 0);
+            self.progress_axes.XAxis.Limits = [0 1];
+            self.progress_axes.YTickLabel = [];
+            self.progress_axes.XTickLabel = [];
+            self.progress_axes.XTick = [];
+            self.progress_axes.YTick = [];
+            self.set_repetition_lines();
 
         end
 
