@@ -999,9 +999,9 @@ classdef G4_conductor_controller < handle
 
         function prepare_test_exp(self)
             line_to_match = 'Default test run protocol file: ';
-            %Get default run protocol file for tests
-            [settingsData, linePath, idx] = self.model.get_setting(line_to_match);
-            path_to_run_protocol = strtrim(settingsData{linePath}(idx:end));
+            %Use run protocol currently selected in drop down menu
+            % [settingsData, linePath, idx] = self.model.get_setting(line_to_match);
+            % path_to_run_protocol = strtrim(settingsData{linePath}(idx:end));
 
             line_to_match = 'Default test processing file: ';
 
@@ -1015,7 +1015,7 @@ classdef G4_conductor_controller < handle
             [settingsData, linePath, idx] = self.model.get_setting(line_to_match);
             path_to_plot_protocol = strtrim(settingsData{linePath}(idx:end));
 
-            self.model.set_run_file(path_to_run_protocol);
+            % self.model.set_run_file(path_to_run_protocol);
             self.model.set_plot_file(path_to_plot_protocol);
             self.model.set_proc_file(path_to_proc_protocol);
         end
@@ -1100,8 +1100,8 @@ classdef G4_conductor_controller < handle
         function reopen_original_experiment(self, filepath, fly_name)
             line_to_match = 'Default run protocol file: ';
             %Get default run protocol file for tests
-            [settingsData, linePath, idx] = self.model.get_setting(line_to_match);
-            path_to_run_protocol = strtrim(settingsData{linePath}(idx:end));
+            % [settingsData, linePath, idx] = self.model.get_setting(line_to_match);
+            % path_to_run_protocol = strtrim(settingsData{linePath}(idx:end));
 
             line_to_match = 'Default processing file: ';
 
@@ -1115,7 +1115,7 @@ classdef G4_conductor_controller < handle
             [settingsData, linePath, idx] = self.model.get_setting(line_to_match);
             path_to_plot_protocol = strtrim(settingsData{linePath}(idx:end));
 
-            self.model.set_run_file(path_to_run_protocol);
+            %self.model.set_run_file(path_to_run_protocol);
             self.model.set_plot_file(path_to_plot_protocol);
             self.model.set_proc_file(path_to_proc_protocol);
 
@@ -1216,9 +1216,9 @@ classdef G4_conductor_controller < handle
              if strcmp(self.doc.save_filename,'') == 1
                  saved = 0;
                 if ~isempty(self.view)
-                    self.create_error_box("You didn't save this experiment. Please go back and save then run the experiment again.", "Please save.");
+                    self.create_error_box("Please load an experiment before running.");
                 else
-                    disp('Failed: Experiment has not been saved.');
+                    disp('Failed: No saved experiment is loaded.');
                 end
             end
         end
