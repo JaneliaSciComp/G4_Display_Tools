@@ -1180,8 +1180,8 @@ classdef G4_conductor_controller < handle
                 "experiment_type", "rearing_protocol", "light_cycle", "do_plotting", "do_processing", "plotting_file", "processing_file", "run_protocol_file", ...
                 "comments", "fly_results_folder", "trials_rerun"};
             if ~isempty(self.view)
-                waitfor(errordlg("Please add any final comments, then click OK to continue." ...
-                    + newline + newline + " Reminder: if you're changing flies for the next experiment, don't forget to update the fly name."));
+                waitfor(msgbox("Please add any final comments, then click OK to continue. Anything you change in the metadata after clicking OK will not be saved." ...
+                    + newline + newline + " If you're changing flies for the next experiment, don't forget to update the fly name after clicking OK.", "Reminder"));
                 self.model.set_metadata_comments(self.view.comments_box.String);
             end
 
