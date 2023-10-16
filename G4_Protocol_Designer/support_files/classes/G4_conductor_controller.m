@@ -475,6 +475,7 @@ classdef G4_conductor_controller < handle
                 self.model.fly_name = self.model.create_fly_name(top_folder_path);
                 self.update_expected_time();
                 self.update_elapsed_time(0);
+                self.view.reset_progress_bar();
 
                 self.update_view_if_exists();
             end
@@ -998,9 +999,9 @@ classdef G4_conductor_controller < handle
 
         function prepare_test_exp(self)
             line_to_match = 'Default test run protocol file: ';
-            %Get default run protocol file for tests
-            [settingsData, linePath, idx] = self.model.get_setting(line_to_match);
-            path_to_run_protocol = strtrim(settingsData{linePath}(idx:end));
+            %Use run protocol currently selected in drop down menu
+            % [settingsData, linePath, idx] = self.model.get_setting(line_to_match);
+            % path_to_run_protocol = strtrim(settingsData{linePath}(idx:end));
 
             line_to_match = 'Default test processing file: ';
 
@@ -1014,7 +1015,7 @@ classdef G4_conductor_controller < handle
             [settingsData, linePath, idx] = self.model.get_setting(line_to_match);
             path_to_plot_protocol = strtrim(settingsData{linePath}(idx:end));
 
-            self.model.set_run_file(path_to_run_protocol);
+            % self.model.set_run_file(path_to_run_protocol);
             self.model.set_plot_file(path_to_plot_protocol);
             self.model.set_proc_file(path_to_proc_protocol);
         end
@@ -1099,8 +1100,8 @@ classdef G4_conductor_controller < handle
         function reopen_original_experiment(self, filepath, fly_name)
             line_to_match = 'Default run protocol file: ';
             %Get default run protocol file for tests
-            [settingsData, linePath, idx] = self.model.get_setting(line_to_match);
-            path_to_run_protocol = strtrim(settingsData{linePath}(idx:end));
+            % [settingsData, linePath, idx] = self.model.get_setting(line_to_match);
+            % path_to_run_protocol = strtrim(settingsData{linePath}(idx:end));
 
             line_to_match = 'Default processing file: ';
 
@@ -1114,7 +1115,7 @@ classdef G4_conductor_controller < handle
             [settingsData, linePath, idx] = self.model.get_setting(line_to_match);
             path_to_plot_protocol = strtrim(settingsData{linePath}(idx:end));
 
-            self.model.set_run_file(path_to_run_protocol);
+            %self.model.set_run_file(path_to_run_protocol);
             self.model.set_plot_file(path_to_plot_protocol);
             self.model.set_proc_file(path_to_proc_protocol);
 
@@ -1179,8 +1180,8 @@ classdef G4_conductor_controller < handle
                 "experiment_type", "rearing_protocol", "light_cycle", "do_plotting", "do_processing", "plotting_file", "processing_file", "run_protocol_file", ...
                 "comments", "fly_results_folder", "trials_rerun"};
             if ~isempty(self.view)
-                waitfor(errordlg("Please add any final comments, then click OK to continue." ...
-                    + newline + newline + " Reminder: if you're changing flies for the next experiment, don't forget to update the fly name."));
+                waitfor(msgbox("Please add any final comments, then click OK to continue. Anything you change in the metadata after clicking OK will not be saved." ...
+                    + newline + newline + " If you're changing flies for the next experiment, don't forget to update the fly name after clicking OK.", "Reminder"));
                 self.model.set_metadata_comments(self.view.comments_box.String);
             end
 
@@ -1215,9 +1216,9 @@ classdef G4_conductor_controller < handle
              if strcmp(self.doc.save_filename,'') == 1
                  saved = 0;
                 if ~isempty(self.view)
-                    self.create_error_box("You didn't save this experiment. Please go back and save then run the experiment again.", "Please save.");
+                    self.create_error_box("Please load an experiment before running.");
                 else
-                    disp('Failed: Experiment has not been saved.');
+                    disp('Failed: No saved experiment is loaded.');
                 end
             end
         end

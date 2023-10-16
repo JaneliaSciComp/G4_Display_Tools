@@ -160,6 +160,8 @@ function [success] = G4_run_protocol_CC_streaming(runcon, p) %input should alway
     reps = p.repetitions;
     num_cond = length(block_trials(:,1)); %number of conditions
 
+    active_ao_channels = p.active_ao_channels + 2; % FIXME: quick fix, find better solution
+
     %% Open new Panels controller instance
     ctlr = PanelsController();
     ctlr.open(true);
@@ -168,11 +170,11 @@ function [success] = G4_run_protocol_CC_streaming(runcon, p) %input should alway
     ctlr.setRootDirectory(p.experiment_folder);
 
     %% set active ao channels
-    ctlr.setActiveAOChannels(p.active_ao_channels+2); % FIXME: quick fix, find better solution
+    ctlr.setActiveAOChannels(active_ao_channels); 
     
     %% set active ai channels for streaming
-    active_ai_channels = nonzeros([p.chan1_rate>0 p.chan2_rate>0 p.chan3_rate>0 p.chan4_rate>0] .* [1 2 3 4])';
-    ctlr.setActiveAIChannels(active_ai_streaming_channels);  % FIXME: temporary solution. Find a better way 
+    active_ai_channels = nonzeros([p.chan1_rate>0 p.chan2_rate>0 p.chan3_rate>0 p.chan4_rate>0] .* [1 2 3 4])' - 1;
+    ctlr.setActiveAIChannels(active_ai_channels);  % FIXME: temporary solution. Find a better way 
 
     %% confirm start experiment
     if ~isempty(runcon.view)

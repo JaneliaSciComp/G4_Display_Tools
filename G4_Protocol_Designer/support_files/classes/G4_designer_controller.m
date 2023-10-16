@@ -144,7 +144,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
 
             %create figure
             self.f = figure('Name', 'Fly Experiment Designer', 'NumberTitle', 'off','units', 'normalized', 'MenuBar', 'none', ...
-                'ToolBar', 'none', 'outerposition', [.05 .05, .9, .9]);
+                'ToolBar', 'none', 'outerposition', [.05 .05, .9, .9], 'closeRequestFcn', @self.close_application);
 
             %, 'Resize', 'off'
 
@@ -207,6 +207,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
             self.pretrial_table = uitable(self.f, 'data', self.doc.pretrial, 'columnname', column_names, ...
             'units', 'normalized', 'Position', positions.pre, 'ColumnEditable', columns_editable, 'ColumnFormat', column_format, ...
             'ColumnWidth', column_widths, 'CellEditCallback', @self.update_model_pretrial, 'CellSelectionCallback', {@self.preview_selection, positions});
+            
 
             % intertrial_label
             uicontrol(self.f, 'Style', 'text', 'String', 'Inter-Trial', ...
@@ -510,6 +511,10 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
             mode_7_label = uicontrol(key_pan, 'Style', 'text', 'String', 'Mode 7: Closed-loop sets frame index', 'BackgroundColor', [.75,.75,.75], ...
                 'HorizontalAlignment', 'left','FontSize', 11, 'units', 'normalized', 'Position', ...
                 [chan_label_margin, mode_6_label_cont.Position(2) - chan_label_height, chan_label_width, chan_label_height]);
+            
+            self.reset_defaults();
+        
+        
         end
 
 %% CALLBACK FUNCTIONS------------------------------------------------------
@@ -753,6 +758,27 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
             end
         end
 
+        % Set pre, inter, and post trial to default values
+        function reset_defaults(self)
+
+            % Make default be that there is no pretrial
+            extra_input = [];
+            event.EditData = '';
+            event.Indices = [1,1];
+            self.model.current_selected_cell.table = "pre";
+            self.model.current_selected_cell.index = [1,1];
+            self.update_model_pretrial(extra_input, event);
+
+            % Make default be that there is no intertrial
+            self.model.current_selected_cell.table = "inter";
+            self.update_model_intertrial(extra_input, event);
+
+            % Make default be that there is no posttrial
+            self.model.current_selected_cell.table = "post";
+            self.update_model_posttrial(extra_input, event);
+
+        end
+
 
         %% Table manipulation callback functions
 
@@ -863,7 +889,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
             pat_indices = []; %A record of all pattern indices that match the screen size.
 
             d = self.doc;
-
+            default_mode = 1;
             pat_fields = fieldnames(d.Patterns);
             %Create an array of ID values from each pattern field
             for i = 1:length(pat_fields)
@@ -964,7 +990,8 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
             else
                 ao1 = '';
             end
-
+            
+            d.set_pretrial_property(1, default_mode);
             d.set_pretrial_property(2, pat1);
             d.set_pretrial_property(3, pos1);
             d.set_pretrial_property(4, ao1);
@@ -974,6 +1001,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
             d.set_pretrial_property(10, self.doc.colorgen());
             d.set_pretrial_property(11, self.doc.colorgen());
 
+            d.set_intertrial_property(1, default_mode);
             d.set_intertrial_property(2, pat1);
             d.set_intertrial_property(3, pos1);
             d.set_intertrial_property(4, ao1);
@@ -983,6 +1011,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
             d.set_intertrial_property(10, self.doc.colorgen());
             d.set_intertrial_property(11, self.doc.colorgen());
 
+            d.set_posttrial_property(1, default_mode);
             d.set_posttrial_property(2, pat1);
             d.set_posttrial_property(3, pos1);
             d.set_posttrial_property(4, ao1);
@@ -1000,6 +1029,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                 end
                 d.set_block_trial_property([1,12], block_dur);
             end
+            d.set_block_trial_property([1,1], default_mode);
             d.set_block_trial_property([1,2], pat1);
             d.set_block_trial_property([1,3], pos1);
             d.set_block_trial_property([1,4], ao1);
@@ -1609,6 +1639,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                 self.doc = G4_document();
                 self.settings_con = G4_settings_controller();
                 self.preview_con = G4_preview_controller(self.doc);
+                self.reset_defaults();
                 self.update_gui();
             end
         end
@@ -1731,8 +1762,15 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
         %Open the conductor to run an experiment
         function open_run_gui(self, ~, ~)
             self.check_and_disconnect_host();
-            self.run_con = G4_conductor_controller(self.doc, self.settings_con);
-            self.run_con.layout();
+            %self.run_con = G4_conductor_controller(self.doc, self.settings_con);
+            %self.run_con.layout();
+            if ~isempty(self.doc.save_filename)
+                evalin('base', 'G4_Experiment_Conductor()');
+                evalin('base', 'run_con.open_g4p_file(con.doc.save_filename)');
+            else
+                warndlg("Please save your experiment before running.");
+            end
+
         end
 
 %% Additional Table Manipulation Functions
@@ -2695,6 +2733,14 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
             end
         end
 
+        function close_application(self, src, event)
+            
+            clear('con');
+            delete(src);
+            evalin('base', 'clear con');
+
+        end
+
 %% Error handling Functions
 
         %display an error box to the user
@@ -3049,6 +3095,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
 
         % Update the GUI to reflect the up to date model values
         function update_gui(self)
+            
             self.set_pretrial_table_data();
             self.set_intertrial_table_data();
             self.set_block_table_data();

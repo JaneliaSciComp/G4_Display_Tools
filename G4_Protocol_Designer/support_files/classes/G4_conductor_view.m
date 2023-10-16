@@ -119,7 +119,7 @@ classdef G4_conductor_view < handle
         %% Constructor
         function self = G4_conductor_view(con)
             self.fig = figure('Name', 'Fly Experiment Conductor', 'NumberTitle', 'off', 'units','pixels','MenuBar', 'none', ...
-                'ToolBar', 'none', 'Resize', 'off');
+                'ToolBar', 'none', 'Resize', 'off', 'CloseRequestFcn', @self.close_application);
             self.con = con;
             % Layout the window
             pix = get(0, 'screensize');
@@ -138,6 +138,7 @@ classdef G4_conductor_view < handle
 
             start_button = uicontrol(self.fig,'Style','pushbutton', 'String', 'Run', ...
                 'units', 'pixels', 'Position', [15, self.fig_size(4)- 305, 115, 85],'Callback', @self.run_exp);
+            
             abort_button = uicontrol(self.fig,'Style','pushbutton', 'String', 'Abort Experiment',...
                 'units', 'pixels', 'Position', [140, self.fig_size(4) - 305, 115, 85], 'Callback', @self.abort);
             pause_button = uicontrol(self.fig, 'Style', 'pushbutton', 'String', 'Pause', ...
@@ -274,22 +275,23 @@ classdef G4_conductor_view < handle
             self.progress_axes.XTickLabel = [];
             self.progress_axes.XTick = [];
             self.progress_axes.YTick = [];
-            reps = self.con.doc.repetitions;
-            total_steps = self.con.doc.repetitions * length(self.con.doc.block_trials(:,1));
-            if ~isempty(self.con.doc.intertrial{1})
-                total_steps = total_steps + ((length(self.con.doc.block_trials(:,1)) - 1)*reps);
-            end
-
-            if ~isempty(self.con.doc.pretrial{1})
-                total_steps = total_steps + 1;
-            end
-            if ~isempty(self.con.doc.posttrial{1})
-                total_steps = total_steps + 1;
-            end
-            for i = 1:reps
-                x = (i/reps);% + 1/total_steps;
-                line('XData', [x, x], 'YDATA', [0,2]);
-            end
+            self.set_repetition_lines();
+            % reps = self.con.doc.repetitions;
+            % total_steps = self.con.doc.repetitions * length(self.con.doc.block_trials(:,1));
+            % if ~isempty(self.con.doc.intertrial{1})
+            %     total_steps = total_steps + ((length(self.con.doc.block_trials(:,1)) - 1)*reps);
+            % end
+            % 
+            % if ~isempty(self.con.doc.pretrial{1})
+            %     total_steps = total_steps + 1;
+            % end
+            % if ~isempty(self.con.doc.posttrial{1})
+            %     total_steps = total_steps + 1;
+            % end
+            % for i = 1:reps
+            %     x = (i/reps);% + 1/total_steps;
+            %     line('XData', [x, x], 'YDATA', [0,2]);
+            % end
 
             %Metadata
             metadata_label_position = [10, metadata_pan.Position(4) - 45, 100, 15];
@@ -446,6 +448,7 @@ classdef G4_conductor_view < handle
         function update_run_gui(self)
             self.experimenter_box.Value = find(strcmp(self.con.model.metadata_options.experimenter,self.con.model.experimenter));
             self.exp_name_box.String = self.con.doc.experiment_name;
+            set(self.fig,'name',['Fly Experiment Conductor - ',self.con.doc.experiment_name]);
             self.fly_name_box.String = self.con.model.fly_name;
             self.fly_genotype_box.Value = find(strcmp(self.con.model.metadata_options.fly_geno,self.con.model.fly_genotype));
             self.date_and_time_box.String = self.con.get_timestamp();
@@ -479,6 +482,7 @@ classdef G4_conductor_view < handle
             self.current_duration_text.String = self.con.current_duration;
             self.set_recent_file_menu_items();
             self.combine_tdms_checkbox.Value = self.con.get_combine_tdms();
+            
         end
 
         %% Callbacks
@@ -714,6 +718,39 @@ classdef G4_conductor_view < handle
         function set_remaining_time(self)
             text = self.convert_time_format(self.con.remaining_time);
             self.remaining_time_text.String = text;
+        end
+
+        function set_repetition_lines(self)
+            %cla(self.progress_axes);
+            reps = self.con.doc.repetitions;
+            for i = 1:reps
+                x = (i/reps);% + 1/total_steps;
+                line(self.progress_axes, 'XData', [x, x], 'YDATA', [0,2]);
+            end
+
+        end
+
+        function reset_progress_bar(self)
+            
+            cla(self.progress_axes);
+            self.progress_bar = barh(0, 'Parent', self.progress_axes,'BaseValue', 0);
+            self.progress_axes.XAxis.Limits = [0 1];
+            self.progress_axes.YTickLabel = [];
+            self.progress_axes.XTickLabel = [];
+            self.progress_axes.XTick = [];
+            self.progress_axes.YTick = [];
+            self.set_repetition_lines();
+
+        end
+
+        function close_application(self, src, event)
+
+            clear('run_con');
+            delete(src);
+            evalin('base', 'clear run_con');
+            
+            
+
         end
 
         %% Getters

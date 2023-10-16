@@ -149,6 +149,8 @@ function [success] = G4_run_protocol_combinedCommand(runcon, p)%input should alw
     block_ao_indices = p.block_ao_indices;
     reps = p.repetitions;
     num_cond = length(block_trials(:,1)); %number of conditions
+
+    active_ao_channels = p.active_ao_channels + 2; % FIXME: quick fix, find better solution
     
     %% Open new Panels controller instance
     ctlr = PanelsController();
@@ -159,7 +161,7 @@ function [success] = G4_run_protocol_combinedCommand(runcon, p)%input should alw
     
     
     %% set active ao channels
-    ctlr.setActiveAOChannels(p.active_ao_channels + 2); % FIXME: quick fix, find better solution
+    ctlr.setActiveAOChannels(active_ao_channels); 
     
     
     %% confirm start experiment

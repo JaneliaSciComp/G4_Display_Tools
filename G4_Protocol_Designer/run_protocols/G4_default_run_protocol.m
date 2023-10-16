@@ -64,7 +64,7 @@ function [success] = G4_default_run_protocol(runcon, p)%input should always be 1
     if params.inter_type == 1
         ctlr_parameters_intertrial = {params.inter_mode, params.inter_pat, params.inter_gain, ...
             params.inter_offset, params.inter_pos, params.inter_frame_rate, params.inter_frame_ind, ...
-            p.active_ao_channels, params.inter_ao_ind};
+            params.active_ao_channels, params.inter_ao_ind};
     else
         ctlr_parameters_intertrial = {};
     end
@@ -145,7 +145,7 @@ function [success] = G4_default_run_protocol(runcon, p)%input should always be 1
                 %Set the panel values appropriately----------------
                 ctlr_parameters_pretrial = {params.pre_mode, params.pre_pat, params.pre_gain, ...
                     params.pre_offset, params.pre_pos, params.pre_frame_rate, params.pre_frame_ind, ...
-                    p.active_ao_channels, params.pre_ao_ind};
+                    params.active_ao_channels, params.pre_ao_ind};
                 ctlr.setControllerParameters(ctlr_parameters_pretrial);
 
                 %Update status panel to show current parameters
@@ -302,7 +302,7 @@ function [success] = G4_default_run_protocol(runcon, p)%input should always be 1
 
                 ctlr_parameters_posttrial = {params.post_mode, params.post_pat, params.post_gain, ...
                     params.post_offset, params.post_pos, params.post_frame_rate, params.post_frame_ind, ...
-                    p.active_ao_channels, params.post_ao_ind};
+                    params.active_ao_channels, params.post_ao_ind};
 
                 ctlr.setControllerParameters(ctlr_parameters_posttrial);
 
