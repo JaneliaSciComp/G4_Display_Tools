@@ -701,6 +701,9 @@ classdef G4_conductor_view < handle
 
         function [text] = convert_time_format(self, time_in_s)
             mins = floor(time_in_s/60);
+            if time_in_s < 0
+                mins = mins + 1;
+            end
             secs = rem(time_in_s, 60);
             text = mins + "m " + secs + "s ";
         end
