@@ -417,6 +417,12 @@ classdef G4_conductor_controller < handle
 %                     waitfor(msgbox(import_success, 'Import successful!'));
 %                 end
                 disp(import_success);
+
+                if isempty(fieldnames(self.doc.Patterns))
+                    %no patterns were successfully imported, so don't autofill
+                    return;
+                end
+                
                 [~, exp_name, ~] = fileparts(filepath);
                 self.doc.experiment_name = exp_name;
                 self.doc.save_filename = top_folder_path;
