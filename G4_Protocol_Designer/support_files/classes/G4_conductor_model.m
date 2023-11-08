@@ -35,6 +35,7 @@ classdef G4_conductor_model < handle
         postTrialTimes_
 
         combine_tdms
+        convert_tdms
     end
 
     properties (Dependent)
@@ -133,6 +134,7 @@ classdef G4_conductor_model < handle
             self.num_attempts_bad_conds = 1;
             self.set_run_file(1);
             self.combine_tdms = 1;
+            self.convert_tdms = 1;
 
             self.postTrialTimes = [];
         end
@@ -237,10 +239,27 @@ classdef G4_conductor_model < handle
 
         function set_do_plotting(self, new_val)
             self.do_plotting = new_val;
+            if self.do_plotting
+                self.set_do_processing(1);
+            end
         end
 
         function set_do_processing(self, new_val)
             self.do_processing = new_val;
+            if self.do_processing == 0
+                self.set_do_plotting(0);
+            else
+                self.set_convert_tdms(1);
+            
+            end
+        end
+
+        function set_convert_tdms(self, new_val)
+            self.convert_tdms = new_val;
+            if self.convert_tdms == 0
+                self.set_do_processing(0);
+                
+            end
         end
 
         function set_plot_file(self, filepath)
@@ -328,6 +347,10 @@ classdef G4_conductor_model < handle
 
         function value = get_combine_tdms(self)
             value = self.combine_tdms;
+        end
+
+        function value = get_convert_tdms(self)
+            value = self.convert_tdms;
         end
 
 %GETTERS------------------------------------------------------------------

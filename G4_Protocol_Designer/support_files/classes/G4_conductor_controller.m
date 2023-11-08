@@ -141,6 +141,10 @@ classdef G4_conductor_controller < handle
             self.engage_processing_textbox();
         end
 
+        function update_convert_tdms(self, new_val)
+            self.model.set_convert_tdms(new_val);
+        end
+
         function update_plotting_file(self, filepath)
             %check to make sure file exists
             if isfile(filepath)
@@ -713,28 +717,36 @@ classdef G4_conductor_controller < handle
             %Always run the post processing script that converts the TDMS
             %files into mat files.'
 
-            % Check how many tdms folders are in the fly folder
-            num_logs = self.check_number_logs(fly_results_folder);
+            % Convert TDMS files to matlab only if the option is selected
+            % on the Conductor
+            if self.get_convert_tdms()
 
-            % If there's one, convert like normal. if there's more than
-            % one, convert all Logs to matlab structs separately. Display
-            % message to user if there are no logs found.
-
-            if num_logs == 1
-                G4_TDMS_folder2struct(fly_results_folder);
-            elseif num_logs > 1
-                self.convert_multiple_logs(fly_results_folder);
-                if self.get_combine_tdms == 1
-
-                    %consolidate multiple resulting structs into one struct
-                    Log = self.consolidate_log_structs(fly_results_folder);
-                    LogFinalName = 'G4_TDMS_Logs_Final.mat';
-                    save(fullfile(fly_results_folder, LogFinalName),'Log');
+                % Check how many tdms folders are in the fly folder
+                num_logs = self.check_number_logs(fly_results_folder);
+    
+                % If there's one, convert like normal. if there's more than
+                % one, convert all Logs to matlab structs separately. Display
+                % message to user if there are no logs found.
+    
+                if num_logs == 1
+                    G4_TDMS_folder2struct(fly_results_folder);
+                elseif num_logs > 1
+                    self.convert_multiple_logs(fly_results_folder);
+                    if self.get_combine_tdms == 1
+    
+                        %consolidate multiple resulting structs into one struct
+                        Log = self.consolidate_log_structs(fly_results_folder);
+                        LogFinalName = 'G4_TDMS_Logs_Final.mat';
+                        save(fullfile(fly_results_folder, LogFinalName),'Log');
+                    else
+                        disp('TDMS files were not combined into one.');
+                    end
                 else
-                    disp('TDMS files were not combined into one.');
+                    disp("No tdms folders could be found from this experiment.");
                 end
+
             else
-                disp("No tdms folders could be found from this experiment.");
+                disp("TDMS files were not converted to a matlab struct. Please do this manually later.");
             end
 
             %Get array indicating the presence of pretrial, intertrial, and
@@ -1750,6 +1762,12 @@ classdef G4_conductor_controller < handle
         function update_combine_tdms(self, value)
             self.model.set_combine_tdms(value);
         end
+
+        function value = get_convert_tdms(self)
+            value = self.model.get_convert_tdms();
+        end
+
+       
 
         %% SETTERS
         function set.model(self, value)
