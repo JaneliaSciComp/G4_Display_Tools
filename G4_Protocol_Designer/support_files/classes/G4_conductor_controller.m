@@ -133,12 +133,12 @@ classdef G4_conductor_controller < handle
         function update_do_plotting(self, new_val)
             % no error checking
             self.model.set_do_plotting(new_val);
-            self.engage_plotting_textbox();
+            
         end
 
         function update_do_processing(self, new_val)
             self.model.set_do_processing(new_val);
-            self.engage_processing_textbox();
+            
         end
 
         function update_convert_tdms(self, new_val)

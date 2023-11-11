@@ -471,9 +471,15 @@ classdef G4_conductor_view < handle
             self.light_cycle_box.Value = find(strcmp(self.con.model.metadata_options.light_cycle, self.con.model.light_cycle));
             self.comments_box.String = self.con.model.metadata_comments;
             self.plotting_checkbox.Value = self.con.model.do_plotting;
-            self.plotting_textbox.String = self.con.model.plotting_file;
+            self.con.engage_plotting_textbox();
+            if self.con.model.do_plotting == 1
+                self.plotting_textbox.String = self.con.model.plotting_file;
+            end
             self.processing_checkbox.Value = self.con.model.do_processing;
-            self.processing_textbox.String = self.con.model.processing_file;
+            self.con.engage_processing_textbox();
+            if self.con.model.do_processing == 1
+                self.processing_textbox.String = self.con.model.processing_file;
+            end
             self.convert_tdms_checkbox.Value = self.con.model.convert_tdms;
             self.num_attempts_textbox.String = self.con.get_num_attempts();
             self.exp_type_menu.Value = self.con.model.experiment_type;

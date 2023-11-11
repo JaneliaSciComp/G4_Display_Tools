@@ -35,7 +35,7 @@ disp("Running. Please do not close matlab...");
 
 for fold = 1:length(folder_names)
 
-    fly_results_folder = folder_names{fold};
+    fly_results_folder = fullfile(date_folder, folder_names{fold});
 
     % Check how many tdms folders are in the fly folder
     num_logs = run_con.check_number_logs(fly_results_folder);
