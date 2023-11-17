@@ -1,7 +1,5 @@
 ---
 title:  Tutorial - Design your own run protocol
-parent: G4 Experiment Conductor
-grand_parent: Generation 4
 nav_order: 1
 ---
 
