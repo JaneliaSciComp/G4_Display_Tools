@@ -18,7 +18,9 @@
 %           do_plotting - 1 or 0
 %           plotting_file_path - char. Can be left out if default
 %           processing_file_path - char. Can be left out if default
-%           run_protocol_path - char. Can be left out if default
+%           run_protocol_index - should be a number 1-8 corresponding to
+%                   the drop down list of run protocols in the Conductor.
+%                   Will default to 1.
 %           experimenter - char OR index 
 %           genotype - char OR index
 %           fly_age - char OR index
@@ -27,6 +29,16 @@
 %           rearing_protocol - char OR index
 %           light_cycle - char OR index
 %           comment_text - char. Can be empty or left out
+
+% Possible run protocol indices are: 
+% 1 - Simple run protocol
+% 2 - Combined Command
+% 3 - Streaming
+% 4 - Log Reps Separately
+% 5 - CC + Streaming
+% 6 - CC + Log Reps
+% 7 - Streaming + Log Reps
+% 8 - CC + Streaming + Log Reps
 
 % This method of running an experiment has gotten rid of all the pop-ups
 % and user inputs other than one instance - when it asks the user if they
@@ -112,8 +124,13 @@ function run_experiment_woGUI(filepath, metadataIn, run_test)
         if isfield(metadataIn, 'processing_file_path')
             con.update_processing_file(metadataIn.processing_file_path); %Filepath to processing file
         end
-        if isfield(metadataIn, 'run_protocol_path')
-            con.model.set_run_file(metadataIn.run_protocol_path); %Filepath to run protocol
+        if isfield(metadataIn, 'run_protocol_index')
+            if metadataIn.run_protocol_index > 0 && metadataIn.run_protocol_index < 9
+                con.model.set_run_file(metadataIn.run_protocol_path); %Filepath to run protocol
+            else
+                disp("Run protocol defaulted to 1 because provided number fell outside of the boundaries.");
+                con.model.set_run_file(1);
+            end
         end
     end
 
