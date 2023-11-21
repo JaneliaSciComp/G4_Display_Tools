@@ -57,7 +57,7 @@ function run_experiment_woGUI(filepath, metadataIn, run_test)
     end
     if ~exist('metadataIn','var')
         disp("No metadata was provided for this experiment.");
-        metadataIn = 0;
+        metadataIn = [];
     end
     if ~exist('filepath', 'var')
         disp("No experiment filepath was provided so the experiment could not be run.");
@@ -78,7 +78,7 @@ function run_experiment_woGUI(filepath, metadataIn, run_test)
     %Check all metadata values that should be indices. If they are char or
     %string, call get_metadata_index to get the googlesheet index for them
     %and update the metadata struct.
-    if metadataIN 
+    if ~isempty(metadataIn)
         if ischar(metadataIn.experimenter) || isstring(metadataIn.experimenter)
             metadataIn.experimenter = get_metadata_index(con, 'experimenter',metadataIn.experimenter);
         end
@@ -112,7 +112,7 @@ function run_experiment_woGUI(filepath, metadataIn, run_test)
         con.update_temp(metadataIn.experiment_temp);% index of googlesheet list
         con.update_rearing(metadataIn.rearing_protocol);% index of googlesheet list
         con.update_light_cycle(metadataIn.light_cycle);% index of googlesheet list
-        con.update_timestamp(datestr(now, 'mm-dd-yyyy HH:MM:SS')); %Get current timestamp
+        con.update_timestamp(); %Get current timestamp
         
         %update any optional metadata
         if isfield(metadataIn, 'comment_text')
@@ -126,7 +126,7 @@ function run_experiment_woGUI(filepath, metadataIn, run_test)
         end
         if isfield(metadataIn, 'run_protocol_index')
             if metadataIn.run_protocol_index > 0 && metadataIn.run_protocol_index < 9
-                con.model.set_run_file(metadataIn.run_protocol_path); %Filepath to run protocol
+                con.model.set_run_file(metadataIn.run_protocol_index); %Filepath to run protocol
             else
                 disp("Run protocol defaulted to 1 because provided number fell outside of the boundaries.");
                 con.model.set_run_file(1);

@@ -486,7 +486,9 @@ classdef G4_conductor_controller < handle
                 self.model.fly_name = self.model.create_fly_name(top_folder_path);
                 self.update_expected_time();
                 self.update_elapsed_time(0);
-                self.view.reset_progress_bar();
+                if ~isempty(self.view)
+                    self.view.reset_progress_bar();
+                end
 
                 self.update_view_if_exists();
             end
@@ -700,7 +702,9 @@ classdef G4_conductor_controller < handle
 
              %Clear out live feedback panel
             self.fb_model = feedback_model(self.doc);
-            self.fb_view.clear_view(self.fb_model);
+            if ~isempty(self.fb_view)
+                self.fb_view.clear_view(self.fb_model);
+            end
 
             if self.model.do_processing == 1 || self.model.do_plotting == 1
                 if ~isempty(self.view)
@@ -713,9 +717,6 @@ classdef G4_conductor_controller < handle
                     drawnow;
                 end
             end
-
-            %Always run the post processing script that converts the TDMS
-            %files into mat files.'
 
             % Convert TDMS files to matlab only if the option is selected
             % on the Conductor
