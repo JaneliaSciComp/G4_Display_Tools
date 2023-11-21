@@ -7,7 +7,7 @@
 %INPUTS:
 %   - filepath is the filepath to the experiment .g4p file
 %   - run_test is a 1 or 0 indicating whether a test experiment should
-%   be run. This is optional, will default to 1
+%   be run. This is optional, will default to 0 (no test).
 %   - metadata would be a struct with all the correct metadata values in
 %   it. These can be strings, which can be passed into get_metadata_index
 %   to get the index value later, but they must match a string in the
@@ -41,7 +41,15 @@ function run_experiment_woGUI(filepath, metadataIn, run_test)
     
     %Set default run_test if not passed in
     if ~exist('run_test','var')
-        run_test = 1;
+        run_test = 0;
+    end
+    if ~exist('metadataIn','var')
+        disp("No metadata was provided for this experiment.");
+        metadataIn = 0;
+    end
+    if ~exist('filepath', 'var')
+        disp("No experiment filepath was provided so the experiment could not be run.");
+        return;
     end
     
     %Open the conductor controller without the gui
@@ -58,54 +66,55 @@ function run_experiment_woGUI(filepath, metadataIn, run_test)
     %Check all metadata values that should be indices. If they are char or
     %string, call get_metadata_index to get the googlesheet index for them
     %and update the metadata struct.
-
-    if ischar(metadataIn.experimenter) || isstring(metadataIn.experimenter)
-        metadataIn.experimenter = get_metadata_index(con, 'experimenter',metadataIn.experimenter);
-    end
-    if ischar(metadataIn.genotype) || isstring(metadataIn.genotype)
-        metadataIn.genotype = get_metadata_index(con, 'fly_geno',metadataIn.genotype);
-    end
-    if ischar(metadataIn.fly_age) || isstring(metadataIn.fly_age)
-        metadataIn.fly_age = get_metadata_index(con, 'fly_age',metadataIn.fly_age);
-    end
-    if ischar(metadataIn.fly_sex) || isstring(metadataIn.fly_sex)
-        metadataIn.fly_sex = get_metadata_index(con, 'fly_sex',metadataIn.fly_sex);
-    end
-    if ischar(metadataIn.experiment_temp) || isstring(metadataIn.experiment_temp)
-        metadataIn.experiment_temp = get_metadata_index(con, 'exp_temp',metadataIn.experiment_temp);
-    end
-    if ischar(metadataIn.rearing_protocol) || isstring(metadataIn.rearing_protocol)
-        metadataIn.rearing_protocol = get_metadata_index(con, 'rearing',metadataIn.rearing_protocol);
-    end
-    if ischar(metadataIn.light_cycle) || isstring(metadataIn.light_cycle)
-        metadataIn.light_cycle = get_metadata_index(con, 'light_cycle',metadataIn.light_cycle);
-    end
-
-    %Update metadata of experiment
-    con.update_experiment_type(metadataIn.experiment_type); %1 - flight 2 - Cam walk 3 - Chip walk
-    con.update_do_processing(metadataIn.do_processing); % 1 or 0
-    con.update_do_plotting(metadataIn.do_plotting); % 1 or 0
-    con.update_experimenter(metadataIn.experimenter); % index of googlesheet list
-    con.update_genotype(metadataIn.genotype);% index of googlesheet list
-    con.update_age(metadataIn.fly_age);% index of googlesheet list
-    con.update_sex(metadataIn.fly_sex);% index of googlesheet list
-    con.update_temp(metadataIn.experiment_temp);% index of googlesheet list
-    con.update_rearing(metadataIn.rearing_protocol);% index of googlesheet list
-    con.update_light_cycle(metadataIn.light_cycle);% index of googlesheet list
-    con.update_timestamp(datestr(now, 'mm-dd-yyyy HH:MM:SS')); %Get current timestamp
+    if metadataIN 
+        if ischar(metadataIn.experimenter) || isstring(metadataIn.experimenter)
+            metadataIn.experimenter = get_metadata_index(con, 'experimenter',metadataIn.experimenter);
+        end
+        if ischar(metadataIn.genotype) || isstring(metadataIn.genotype)
+            metadataIn.genotype = get_metadata_index(con, 'fly_geno',metadataIn.genotype);
+        end
+        if ischar(metadataIn.fly_age) || isstring(metadataIn.fly_age)
+            metadataIn.fly_age = get_metadata_index(con, 'fly_age',metadataIn.fly_age);
+        end
+        if ischar(metadataIn.fly_sex) || isstring(metadataIn.fly_sex)
+            metadataIn.fly_sex = get_metadata_index(con, 'fly_sex',metadataIn.fly_sex);
+        end
+        if ischar(metadataIn.experiment_temp) || isstring(metadataIn.experiment_temp)
+            metadataIn.experiment_temp = get_metadata_index(con, 'exp_temp',metadataIn.experiment_temp);
+        end
+        if ischar(metadataIn.rearing_protocol) || isstring(metadataIn.rearing_protocol)
+            metadataIn.rearing_protocol = get_metadata_index(con, 'rearing',metadataIn.rearing_protocol);
+        end
+        if ischar(metadataIn.light_cycle) || isstring(metadataIn.light_cycle)
+            metadataIn.light_cycle = get_metadata_index(con, 'light_cycle',metadataIn.light_cycle);
+        end
     
-    %update any optional metadata
-    if isfield(metadataIn, 'comment_text')
-        con.update_comments(metadataIn.comment_text);% char/string
-    end
-    if isfield(metadataIn,'plotting_file_path')
-        con.update_plotting_file(metadataIn.plotting_file_path); %Filepath to plotting file
-    end
-    if isfield(metadataIn, 'processing_file_path')
-        con.update_processing_file(metadataIn.processing_file_path); %Filepath to processing file
-    end
-    if isfield(metadataIn, 'run_protocol_path')
-        con.model.set_run_file(metadataIn.run_protocol_path); %Filepath to run protocol
+        %Update metadata of experiment
+        con.update_experiment_type(metadataIn.experiment_type); %1 - flight 2 - Cam walk 3 - Chip walk
+        con.update_do_processing(metadataIn.do_processing); % 1 or 0
+        con.update_do_plotting(metadataIn.do_plotting); % 1 or 0
+        con.update_experimenter(metadataIn.experimenter); % index of googlesheet list
+        con.update_genotype(metadataIn.genotype);% index of googlesheet list
+        con.update_age(metadataIn.fly_age);% index of googlesheet list
+        con.update_sex(metadataIn.fly_sex);% index of googlesheet list
+        con.update_temp(metadataIn.experiment_temp);% index of googlesheet list
+        con.update_rearing(metadataIn.rearing_protocol);% index of googlesheet list
+        con.update_light_cycle(metadataIn.light_cycle);% index of googlesheet list
+        con.update_timestamp(datestr(now, 'mm-dd-yyyy HH:MM:SS')); %Get current timestamp
+        
+        %update any optional metadata
+        if isfield(metadataIn, 'comment_text')
+            con.update_comments(metadataIn.comment_text);% char/string
+        end
+        if isfield(metadataIn,'plotting_file_path')
+            con.update_plotting_file(metadataIn.plotting_file_path); %Filepath to plotting file
+        end
+        if isfield(metadataIn, 'processing_file_path')
+            con.update_processing_file(metadataIn.processing_file_path); %Filepath to processing file
+        end
+        if isfield(metadataIn, 'run_protocol_path')
+            con.model.set_run_file(metadataIn.run_protocol_path); %Filepath to run protocol
+        end
     end
 
     
