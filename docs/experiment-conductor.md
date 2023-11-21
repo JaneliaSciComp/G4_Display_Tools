@@ -96,11 +96,11 @@ Notice the next line in the Conductor asking how many times bad conditions shoul
 
 The last line in the Settings panel asks if you'd like to combine multiple TDMS files into one. This refers to the .mat files (named G4_TDMS_Logs_timestamp.mat) that the original TDMS files are converted into. If you have de-selected the `Convert TDMS?` option above, then you should de-select this option as well. Otherwise, it is recommended that you leave this box selected.
 
-You will end up with multiple TDMS files if you are using the run protocol that creates separate logs for each repetition, OR if you use the Pause button anytime during your experiment. If you're using the protocol for separate logging, you'll end up with TDMS files for each repetition. If you use the pause button, all data collected after unpausing the experiment will be saved in a new log, since the pause button automatically halts logging. The Conductor can automatically take the converted TDMS files and stitch them together into one file called G4_TDMS_Logs_Final.mat. This file does not replace the separate log files, they'll still be accessible as well. This must be done if you want to use the automatic data processing and analysis tools, but if you are using your own code to process the raw data, then you could de-select this option and skip the step of combining your separate log files into one. 
+You will end up with multiple TDMS .mat files if you are using the run protocol that creates separate logs for each repetition, OR if you use the Pause button anytime during your experiment. If you're using the protocol for separate logging, you'll end up with TDMS files for each repetition. If you use the pause button, all data collected after unpausing the experiment will be saved in a new log, since the pause button automatically halts logging. The Conductor can automatically take the converted TDMS .mat files and stitch them together into one file called G4_TDMS_Logs_Final.mat. This file does not replace the separate log files, they'll still be accessible as well. This must be done if you want to use the automatic data processing and analysis tools, but if you are using your own code to process the raw data, then you could de-select this option and skip the step of combining your separate log files into one. 
 
 ## Run a test protocol (optional)
 
-The _Run Test Protocol_{:.gui-btn} button will run the protocol listed in the settings file as the test protocol for that type. This will allow you to see a test run on the screens and make sure it looks right. If you need to adjust these settings, you cannot presently do it from the conductor. Close the conductor, adjust the settings through _File_{:.gui-btn} → _Settings_{:.gui-btn} on the Designer, then return the conductor when finished.
+The _Run Test Protocol_{:.gui-btn} button will run the protocol listed in the settings file as the test protocol for that type. This will allow you to see a test run on the screens and make sure it looks right. If you need to adjust these settings, you cannot presently do it from the conductor. Close the conductor, adjust the settings through _File_{:.gui-btn} → _Settings_{:.gui-btn} on the Designer, then return to the conductor when finished.
 
 # The progress bar
 
@@ -166,14 +166,16 @@ If for any reason you'd like to pause your experiment for a short time without l
 
 ## Open a subsequent experiment
 
-If you are done with the experiment currently loaded in the conductor and wish to run another, no need to close the application. Just go to _File_{:.gui-btn} – _open_{:.gui-btn} and open the new experiment. It will automatically replace the old one.
+If you are done with the experiment currently loaded in the conductor and wish to run another, no need to close the application. Just go to _File_{:.gui-btn} – _open_{:.gui-btn} and open the new experiment. It will automatically replace the old one. If you want to run the same protocol again, but on a new fly, there is no need to open the protocol again, but do remember to change the fly name and any other necessary information in the metadata before starting the next run. 
 
 ## Using the conductor without the designer
 
-The conductor can also be opened on its own, without going through the experiment designer. To open the conductor directly, run the `G4_Experiment_Conductor.m` file in `G4_Display_Tools\G4_Protocol_Designer`. If you open the conductor this way, then you will need to go to _File_{:.gui-btn} – _Open_{:.gui-btn} to open the .g4p file you want to run. Other than that, it operates exactly the same as described above.
+The conductor can also be opened on its own, without going through the experiment designer. To open the conductor directly, run the `G4_Experiment_Conductor.m` file in `G4_Display_Tools\G4_Protocol_Designer`, or type `G4_Experiment_Conductor` in the matlab command window and hit enter. If you open the conductor this way, then you will need to go to _File_{:.gui-btn} – _Open_{:.gui-btn} to open the .g4p file you want to run. Other than that, it operates exactly the same as described above.
 
 # Post-experiment data analysis
 
+Once the experiment finishes running, you'll find a folder inside your experiment folder with the current date as its name (ie 11_21_2023). In this folder will be a subfolder for every fly that has been run on that date. Each fly folder will, at a minimum, have one or more TDMS files, and .mat files containing your metadata for that fly and the order in which conditions were run. 
+
 ## Data analysis
 
-If you elected to run them, data processing and analysis scripts will run when the experiment is complete. This will create a folder in your experiment folder named by the current date. This date folder will contain a folder for each fly that has been run through that particular experimental protocol on that particular date. In each fly folder will be TDMS log files, a processed data file, as well as some .mat files containing your metadata and experiment information. If you chose to do automatic data plotting, those plots and a pdf report will be saved wherever your analysis settings indicate.
+If you elected to run them, TDMS conversion, data processing, and plotting scripts will run when the experiment is complete. These will leave additional files in the fly folder described above, including the converted TDMS .mat file(s), a processed data file containing multiple named datasets generated from your raw data, and plots with a final .pdf report containing all generated plots.

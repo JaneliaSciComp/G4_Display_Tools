@@ -120,6 +120,18 @@ It's not uncommon for the trial data and the timestamp data to be slightly misal
 
 It's not uncommon for the data collected for a trial to be slightly longer than the intended duration of the trial. This is because data is collected the entire time that the experiment is running, so any code that executes in between trials (like code that updates the progress bar on the Conductor) adds time between trials where the log is collecting data, but nothing is happening in the arena. This amount of extraneous time should generally be very small and negligible. However, sometimes if the computer freezes or arena has a glitch, you'll end up with more time than expected where nothing is happening but data is still being collected. In this case, a trial may have much more data than it should. This value, `duration_diff_limit`, is given as a decimal representing a percentage. By default, it is set to .15, or 15%. This means if the data collected for a given trial is more than 15% larger or smaller than it should be, then the data should be left out of the analysis, assuming too much of it is erroneous.
 
+### Cross correlation tolerance
+
+All repetitions of the same condition undergo a cross correlation during data processing to determine if any of them are too anomolous to be included in the final data. When the cross correlation is calculated, this tolerance determines how much the result can deviate from zero before deciding it is a bad trial. It is set by default to .02, or 2%, but can be adjusted.
+
+### Is this a flying experiment? 
+
+Some experiments involve a tethered fly which is flying, others involve a fly which is walking. If this is a flying experiment, set this variable to 1. Otherwise, set it to 0. 
+
+### Do you want to remove trials where the fly wasn't flying? 
+
+The processing can automatically remove trials where the fly was not flying in order to prevent bad data from affecting your averages. Set this variable to 1 if you'd like trials where the fly did not fly to be marked as bad and removed. If you'd like this feature turned off, set it to 0. A record is kept of all trials which are marked bad or removed and the reason, so you will be able to see how many and which trials you lost due to a fly refusing to fly. Settings in thew Wing Beat Frequency section will determine how much a fly needs to fly during a trial in order for it to be considered acceptable.
+
 ## Wing Beat Frequency Settings
 
 ### Acceptable Wing Beat Frequency Range
