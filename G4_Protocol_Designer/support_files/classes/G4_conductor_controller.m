@@ -252,6 +252,13 @@ classdef G4_conductor_controller < handle
             self.model.set_num_attempts_bad_conds(str2num(new_val));
         end
 
+        function update_config_file(self)
+            clear(self.doc);
+            self.doc = G4_document();
+            self.fb_model.update_model_channels(self.doc)
+
+        end
+
         function add_bad_trial_marker_progress(self, trialNum)
             num_trials = self.get_num_trials();
             if ~isempty(self.view)
