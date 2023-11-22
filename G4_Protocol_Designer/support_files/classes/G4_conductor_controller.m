@@ -253,7 +253,7 @@ classdef G4_conductor_controller < handle
         end
 
         function update_config_file(self)
-            clear(self.doc);
+            clear('self.doc');
             self.doc = G4_document();
             self.fb_model.update_model_channels(self.doc)
 

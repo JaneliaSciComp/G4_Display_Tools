@@ -132,7 +132,7 @@ classdef G4_conductor_view < handle
             self.menu_open = uimenu(menu, 'Text', 'Open');
             menu_recent_files = uimenu(self.menu_open, 'Text', '.g4p file', 'Callback', @self.open);
             %menu_settings = uimenu(menu, 'Text', 'Settings', 'Callback', @self.open_settings);
-            self.menu_config = uimenu(men, 'Text', 'Update Config File', 'Callback', @self.update_config_file);
+            self.menu_config = uimenu(menu, 'Text', 'Update Config File', 'Callback', @self.update_config_file);
 
             for i = 1:length(self.con.doc.recent_g4p_files)
                 [~, filename] = fileparts(self.con.doc.recent_g4p_files{i});
@@ -772,7 +772,7 @@ classdef G4_conductor_view < handle
 
         end
 
-        function update_config_file(self)
+        function update_config_file(self, ~, ~)
             
             self.con.update_config_file();
             self.update_run_gui();
