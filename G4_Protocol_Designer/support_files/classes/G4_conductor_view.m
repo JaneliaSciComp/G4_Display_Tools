@@ -125,7 +125,7 @@ classdef G4_conductor_view < handle
             self.con = con;
             % Layout the window
             pix = get(0, 'screensize');
-            self.fig_size = [.15*pix(3), .15*pix(4), .85*pix(3), .6*pix(4)];
+            self.fig_size = [.15*pix(3), .15*pix(4), .8*pix(3), .6*pix(4)];
             set(self.fig,'Position',self.fig_size);
 
             menu = uimenu(self.fig, 'Text', 'File');
@@ -149,7 +149,7 @@ classdef G4_conductor_view < handle
             settings_pan = uipanel(self.fig, 'Title', 'Settings', 'FontSize', 13, 'units', 'pixels', ...
                 'Position', [15, self.fig_size(4) - 215, 405, 200]);
             metadata_pan = uipanel(self.fig, 'Title', 'Metadata', 'units', 'pixels', ...
-                'FontSize', 13, 'Position', [settings_pan.Position(1) + settings_pan.Position(3) + 200, self.fig_size(4) - 305, 275, 305]);
+                'FontSize', 13, 'Position', [settings_pan.Position(1) + settings_pan.Position(3) + 180, self.fig_size(4) - 305, 275, 305]);
             status_pan = uipanel(self.fig, 'Title', 'Status', 'FontSize', 13, 'units', 'pixels', ...
                 'Position', [settings_pan.Position(1), self.fig_size(4)*.05, metadata_pan.Position(1) + metadata_pan.Position(3), self.fig_size(4)*.2]);
             open_google_sheet_button = uicontrol(self.fig, 'Style', 'pushbutton', 'String', 'Open Metadata Google Sheet', ...
