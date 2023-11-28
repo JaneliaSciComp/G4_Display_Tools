@@ -1743,6 +1743,17 @@ classdef G4_conductor_controller < handle
             movefile(pdf_path, new_pdf_path);
         end
 
+        function update_progbar_rescheduled_conditions(self)
+            
+            % This function considers the conditions that have been
+            % rescheduled for the end of the protocol and readjusts the
+            % experiment length and progress bar so the user can see when
+            % the experiment will actually end. It does nothing if
+            % streaming is not being used or if the number of times to
+            % repeat bad conditions is set to 0.
+
+        end
+
         function ts = get_timestamp(self)
             ts = self.model.get_timestamp();
         end
