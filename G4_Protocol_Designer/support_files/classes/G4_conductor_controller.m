@@ -1750,7 +1750,26 @@ classdef G4_conductor_controller < handle
             % experiment length and progress bar so the user can see when
             % the experiment will actually end. It does nothing if
             % streaming is not being used or if the number of times to
-            % repeat bad conditions is set to 0.
+            % repeat bad conditions is set to 0 or if the GUI was never opened.
+
+            if ~isempty(self.view)
+                if contains(self.model.run_protocol_file_desc, 'Streaming')
+                    if self.model.num_attempts_bad_conds ~= 0
+                        
+                        bad_trials = self.fb_model.get_bad_trials();
+                        bad_trial_conds = [];
+                        bad_trial_durs = [];
+                        for trial = 1:length(bad_trials)
+                            bad_trial_conds(trial) = bad_trials{trial}(1);
+                            bad_trial_durs(trial) = self.doc.block_trials{bad_trial_conds(trial),12};
+                            
+                        end
+                        total_rescheduled_duration = sum(bad_trial_durs);
+
+
+                    end
+                end
+            end
 
         end
 
