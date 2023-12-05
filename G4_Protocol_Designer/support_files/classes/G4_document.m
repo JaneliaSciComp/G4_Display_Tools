@@ -1808,7 +1808,10 @@ classdef G4_document < handle
                 %waitbar(1,prog,'Finishing...');
                 %close(prog);
             end
-                success_statement = "Import Successful!" + newline;
+            if [imported_patterns imported_functions imported_aos currentExp_replaced] == 0
+                success_statement = "Nothing was imported.";
+            else
+                success_statement = "Import Successful!" + newline;    
                 if imported_patterns ~= 0
                     patterns_imported_statement = imported_patterns + " patterns imported and " + skipped_patterns + " patterns skipped.";
                     success_statement = success_statement + patterns_imported_statement + newline;
@@ -1841,7 +1844,8 @@ classdef G4_document < handle
                     aos_imported_statement = skipped_aos + " AO functions skipped.";
                     success_statement = success_statement + aos_imported_statement + newline;
                 end
-%               waitfor(msgbox(success_statement, 'Import Successful'));
+            end
+
 %
         end
 

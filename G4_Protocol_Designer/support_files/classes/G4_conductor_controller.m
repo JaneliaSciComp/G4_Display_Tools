@@ -98,7 +98,7 @@ classdef G4_conductor_controller < handle
 
         function layout(self)
             self.view = G4_conductor_view(self);
-            self.fb_view = feedback_view(self, [890 17]);
+            self.fb_view = feedback_view(self, [910 17]);
         end
 
         function update_timestamp(self)
@@ -133,12 +133,16 @@ classdef G4_conductor_controller < handle
         function update_do_plotting(self, new_val)
             % no error checking
             self.model.set_do_plotting(new_val);
-            self.engage_plotting_textbox();
+            
         end
 
         function update_do_processing(self, new_val)
             self.model.set_do_processing(new_val);
-            self.engage_processing_textbox();
+            
+        end
+
+        function update_convert_tdms(self, new_val)
+            self.model.set_convert_tdms(new_val);
         end
 
         function update_plotting_file(self, filepath)
@@ -246,6 +250,13 @@ classdef G4_conductor_controller < handle
 
         function update_num_attempts(self, new_val)
             self.model.set_num_attempts_bad_conds(str2num(new_val));
+        end
+
+        function update_config_file(self)
+            clear('self.doc');
+            self.doc = G4_document();
+            self.fb_model.update_model_channels(self.doc)
+
         end
 
         function add_bad_trial_marker_progress(self, trialNum)
@@ -417,6 +428,13 @@ classdef G4_conductor_controller < handle
 %                     waitfor(msgbox(import_success, 'Import successful!'));
 %                 end
                 disp(import_success);
+
+                if isempty(fieldnames(self.doc.Patterns))
+                    %no patterns were successfully imported, so don't load
+                    %experiment. 
+                    return;
+                end
+
                 [~, exp_name, ~] = fileparts(filepath);
                 self.doc.experiment_name = exp_name;
                 self.doc.save_filename = top_folder_path;
@@ -475,7 +493,9 @@ classdef G4_conductor_controller < handle
                 self.model.fly_name = self.model.create_fly_name(top_folder_path);
                 self.update_expected_time();
                 self.update_elapsed_time(0);
-                self.view.reset_progress_bar();
+                if ~isempty(self.view)
+                    self.view.reset_progress_bar();
+                end
 
                 self.update_view_if_exists();
             end
@@ -689,7 +709,9 @@ classdef G4_conductor_controller < handle
 
              %Clear out live feedback panel
             self.fb_model = feedback_model(self.doc);
-            self.fb_view.clear_view(self.fb_model);
+            if ~isempty(self.fb_view)
+                self.fb_view.clear_view(self.fb_model);
+            end
 
             if self.model.do_processing == 1 || self.model.do_plotting == 1
                 if ~isempty(self.view)
@@ -703,31 +725,36 @@ classdef G4_conductor_controller < handle
                 end
             end
 
-            %Always run the post processing script that converts the TDMS
-            %files into mat files.'
+            % Convert TDMS files to matlab only if the option is selected
+            % on the Conductor
+            if self.get_convert_tdms()
 
-            % Check how many tdms folders are in the fly folder
-            num_logs = self.check_number_logs(fly_results_folder);
-
-            % If there's one, convert like normal. if there's more than
-            % one, convert all Logs to matlab structs separately. Display
-            % message to user if there are no logs found.
-
-            if num_logs == 1
-                G4_TDMS_folder2struct(fly_results_folder);
-            elseif num_logs > 1
-                self.convert_multiple_logs(fly_results_folder);
-                if self.get_combine_tdms == 1
-
-                    %consolidate multiple resulting structs into one struct
-                    Log = self.consolidate_log_structs(fly_results_folder);
-                    LogFinalName = 'G4_TDMS_Logs_Final.mat';
-                    save(fullfile(fly_results_folder, LogFinalName),'Log');
+                % Check how many tdms folders are in the fly folder
+                num_logs = self.check_number_logs(fly_results_folder);
+    
+                % If there's one, convert like normal. if there's more than
+                % one, convert all Logs to matlab structs separately. Display
+                % message to user if there are no logs found.
+    
+                if num_logs == 1
+                    G4_TDMS_folder2struct(fly_results_folder);
+                elseif num_logs > 1
+                    self.convert_multiple_logs(fly_results_folder);
+                    if self.get_combine_tdms == 1
+    
+                        %consolidate multiple resulting structs into one struct
+                        Log = self.consolidate_log_structs(fly_results_folder);
+                        LogFinalName = 'G4_TDMS_Logs_Final.mat';
+                        save(fullfile(fly_results_folder, LogFinalName),'Log');
+                    else
+                        disp('TDMS files were not combined into one.');
+                    end
                 else
-                    disp('TDMS files were not combined into one.');
+                    disp("No tdms folders could be found from this experiment.");
                 end
+
             else
-                disp("No tdms folders could be found from this experiment.");
+                disp("TDMS files were not converted to a matlab struct. Please do this manually later.");
             end
 
             %Get array indicating the presence of pretrial, intertrial, and
@@ -1177,7 +1204,7 @@ classdef G4_conductor_controller < handle
 
         function create_metadata_file(self)
             metadata_names = {"experimenter", "experiment_name", "timestamp", "fly_name", "fly_genotype", "fly_age", "fly_sex", "experiment_temp", ...
-                "experiment_type", "rearing_protocol", "light_cycle", "do_plotting", "do_processing", "plotting_file", "processing_file", "run_protocol_file", ...
+                "experiment_type", "rearing_protocol", "light_cycle", "convert_tdms", "do_plotting", "do_processing", "plotting_file", "processing_file", "run_protocol_file", ...
                 "comments", "fly_results_folder", "trials_rerun"};
             if ~isempty(self.view)
                 waitfor(msgbox("Please add any final comments, then click OK to continue. Anything you change in the metadata after clicking OK will not be saved." ...
@@ -1195,7 +1222,7 @@ classdef G4_conductor_controller < handle
 
             model_metadata = {self.model.experimenter, self.doc.experiment_name, self.model.timestamp, self.model.fly_name, self.model.fly_genotype, ...
                 self.model.fly_age, self.model.fly_sex, self.model.experiment_temp, ...
-                self.model.experiment_type, self.model.rearing_protocol, self.model.light_cycle, self.model.do_plotting, self.model.do_processing, ...
+                self.model.experiment_type, self.model.rearing_protocol, self.model.light_cycle, self.model.convert_tdms, self.model.do_plotting, self.model.do_processing, ...
                 self.model.plotting_file, self.model.processing_file, self.model.run_protocol_file, self.model.metadata_comments, fly_folder, ...
                 self.fb_model.bad_trials_before_reruns};
 
@@ -1743,6 +1770,12 @@ classdef G4_conductor_controller < handle
         function update_combine_tdms(self, value)
             self.model.set_combine_tdms(value);
         end
+
+        function value = get_convert_tdms(self)
+            value = self.model.get_convert_tdms();
+        end
+
+       
 
         %% SETTERS
         function set.model(self, value)

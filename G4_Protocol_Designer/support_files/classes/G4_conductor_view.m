@@ -56,6 +56,8 @@ classdef G4_conductor_view < handle
         bad_trial_markers_
 
         combine_tdms_checkbox
+        convert_tdms_checkbox
+        menu_config
     end
 
     properties (Dependent)
@@ -123,13 +125,14 @@ classdef G4_conductor_view < handle
             self.con = con;
             % Layout the window
             pix = get(0, 'screensize');
-            self.fig_size = [.15*pix(3), .15*pix(4), .85*pix(3), .6*pix(4)];
+            self.fig_size = [.15*pix(3), .15*pix(4), .8*pix(3), .6*pix(4)];
             set(self.fig,'Position',self.fig_size);
 
             menu = uimenu(self.fig, 'Text', 'File');
             self.menu_open = uimenu(menu, 'Text', 'Open');
             menu_recent_files = uimenu(self.menu_open, 'Text', '.g4p file', 'Callback', @self.open);
             %menu_settings = uimenu(menu, 'Text', 'Settings', 'Callback', @self.open_settings);
+            self.menu_config = uimenu(menu, 'Text', 'Update Config File', 'Callback', @self.update_config_file);
 
             for i = 1:length(self.con.doc.recent_g4p_files)
                 [~, filename] = fileparts(self.con.doc.recent_g4p_files{i});
@@ -144,9 +147,9 @@ classdef G4_conductor_view < handle
             pause_button = uicontrol(self.fig, 'Style', 'pushbutton', 'String', 'Pause', ...
                 'units','pixels', 'Position', [265, self.fig_size(4) - 305, 115, 85], 'Callback', @self.pause);
             settings_pan = uipanel(self.fig, 'Title', 'Settings', 'FontSize', 13, 'units', 'pixels', ...
-                'Position', [15, self.fig_size(4) - 215, 370, 200]);
+                'Position', [15, self.fig_size(4) - 215, 405, 200]);
             metadata_pan = uipanel(self.fig, 'Title', 'Metadata', 'units', 'pixels', ...
-                'FontSize', 13, 'Position', [settings_pan.Position(1) + settings_pan.Position(3) + 200, self.fig_size(4) - 305, 275, 305]);
+                'FontSize', 13, 'Position', [settings_pan.Position(1) + settings_pan.Position(3) + 180, self.fig_size(4) - 305, 275, 305]);
             status_pan = uipanel(self.fig, 'Title', 'Status', 'FontSize', 13, 'units', 'pixels', ...
                 'Position', [settings_pan.Position(1), self.fig_size(4)*.05, metadata_pan.Position(1) + metadata_pan.Position(3), self.fig_size(4)*.2]);
             open_google_sheet_button = uicontrol(self.fig, 'Style', 'pushbutton', 'String', 'Open Metadata Google Sheet', ...
@@ -396,11 +399,31 @@ classdef G4_conductor_view < handle
             self.exp_type_menu = uicontrol(settings_pan, 'Style', 'popupmenu', 'String', {'Flight','Camera walk', 'Chip walk'}, ...
                 'units', 'pixels', 'Position', [115, 153, 150, 18], 'Callback', @self.new_experiment_type);
             test_button = uicontrol(settings_pan, 'Style', 'pushbutton', 'String', 'Run Test Protocol', ...
-                'units', 'pixels', 'Position', [210, 123, 150, 20], 'Callback', @self.run_test_exp);
+                'units', 'pixels', 'Position', [278, 123, 120, 20], 'Callback', @self.run_test_exp);
+            
+            tdms_checkbox_label = uicontrol(settings_pan, 'Style', 'text', 'String', 'Convert TDMS?', ...
+                'HorizontalAlignment', 'left', 'units', 'pixels', 'Position', [10, 123, 80, 15]);
+            self.convert_tdms_checkbox = uicontrol(settings_pan, 'Style', 'checkbox', 'Value', self.con.model.convert_tdms, ...
+                'units', 'pixels', 'Position', [91, 123, 15, 15], 'Callback', @self.new_convert_tdms);
+            
+            processing_checkbox_label = uicontrol(settings_pan, 'Style', 'text', 'String', 'Processing?', ...
+                'HorizontalAlignment', 'left', 'units', 'pixels', 'Position', [116, 123, 65, 15]);
+            self.processing_checkbox = uicontrol(settings_pan, 'Style', 'checkbox', 'Value', self.con.model.do_processing, ...
+                'units', 'pixels', 'Position', [182, 123, 15, 15], 'Callback', @self.new_do_processing);
+            
+            processing_filename_label = uicontrol(settings_pan, 'Style', 'text', 'String', 'Processing Protocol:', ...
+                'HorizontalAlignment', 'left', 'units', 'pixels', 'Position', [10, 73, 105, 15]);
+            self.processing_textbox = uicontrol(settings_pan, 'Style', 'edit', 'units', 'pixels', ...
+                'String', self.con.model.processing_file, 'Position', [120, 73, 160, 18], 'Callback', @self.new_processing_file);
+            self.browse_button_processing = uicontrol(settings_pan, 'Style', 'pushbutton', 'units', 'pixels', ...
+                'String', 'Browse', 'Position', [285, 73, 65, 18], 'Callback', @self.proc_browse);
+            
+            
             plotting_checkbox_label = uicontrol(settings_pan, 'Style', 'text', 'String', 'Plotting?', ...
-                'HorizontalAlignment', 'left', 'units', 'pixels', 'Position', [10, 123, 45, 15]);
+                'HorizontalAlignment', 'left', 'units', 'pixels', 'Position', [207, 123, 45, 15]);
             self.plotting_checkbox = uicontrol(settings_pan, 'Style', 'checkbox', 'Value', self.con.model.do_plotting, ...
-                'units', 'pixels', 'Position', [60, 123, 15, 15], 'Callback', @self.new_do_plotting);
+                'units', 'pixels', 'Position', [253, 123, 15, 15], 'Callback', @self.new_do_plotting);
+            
             plotting_filename_label = uicontrol(settings_pan, 'Style', 'text', 'String', 'Plotting Protocol:', ...
                 'HorizontalAlignment', 'left', 'units', 'pixels', 'Position', [10, 98, 105, 15]);
             self.plotting_textbox = uicontrol(settings_pan, 'Style', 'edit', 'units', 'pixels', ...
@@ -408,16 +431,7 @@ classdef G4_conductor_view < handle
             self.browse_button_plotting = uicontrol(settings_pan, 'Style', 'pushbutton', 'units', 'pixels', ...
                 'String', 'Browse', 'Position', [285, 98, 65, 18], 'Callback', @self.plot_browse);
 
-            processing_checkbox_label = uicontrol(settings_pan, 'Style', 'text', 'String', 'Processing?', ...
-                'HorizontalAlignment', 'left', 'units', 'pixels', 'Position', [90, 123, 65, 15]);
-            self.processing_checkbox = uicontrol(settings_pan, 'Style', 'checkbox', 'Value', self.con.model.do_processing, ...
-                'units', 'pixels', 'Position', [160, 123, 15, 15], 'Callback', @self.new_do_processing);
-            processing_filename_label = uicontrol(settings_pan, 'Style', 'text', 'String', 'Processing Protocol:', ...
-                'HorizontalAlignment', 'left', 'units', 'pixels', 'Position', [10, 73, 105, 15]);
-            self.processing_textbox = uicontrol(settings_pan, 'Style', 'edit', 'units', 'pixels', ...
-                'String', self.con.model.processing_file, 'Position', [120, 73, 160, 18], 'Callback', @self.new_processing_file);
-            self.browse_button_processing = uicontrol(settings_pan, 'Style', 'pushbutton', 'units', 'pixels', ...
-                'String', 'Browse', 'Position', [285, 73, 65, 18], 'Callback', @self.proc_browse);
+            
 
             run_filename_label = uicontrol(settings_pan, 'Style', 'text', 'String', 'Run Protocol:', ...
                 'HorizontalAlignment', 'left', 'units', 'pixels', 'Position', [10, 48, 105, 15]);
@@ -459,9 +473,16 @@ classdef G4_conductor_view < handle
             self.light_cycle_box.Value = find(strcmp(self.con.model.metadata_options.light_cycle, self.con.model.light_cycle));
             self.comments_box.String = self.con.model.metadata_comments;
             self.plotting_checkbox.Value = self.con.model.do_plotting;
-            self.plotting_textbox.String = self.con.model.plotting_file;
+            self.con.engage_plotting_textbox();
+            if self.con.model.do_plotting == 1
+                self.plotting_textbox.String = self.con.model.plotting_file;
+            end
             self.processing_checkbox.Value = self.con.model.do_processing;
-            self.processing_textbox.String = self.con.model.processing_file;
+            self.con.engage_processing_textbox();
+            if self.con.model.do_processing == 1
+                self.processing_textbox.String = self.con.model.processing_file;
+            end
+            self.convert_tdms_checkbox.Value = self.con.model.convert_tdms;
             self.num_attempts_textbox.String = self.con.get_num_attempts();
             self.exp_type_menu.Value = self.con.model.experiment_type;
             self.run_dropDown.Value = self.con.model.run_protocol_num;
@@ -518,6 +539,11 @@ classdef G4_conductor_view < handle
 
         function new_do_processing(self, src, ~)
             self.con.update_do_processing(src.Value);
+            self.update_run_gui();
+        end
+
+        function new_convert_tdms(self, src, ~)
+            self.con.update_convert_tdms(src.Value);
             self.update_run_gui();
         end
 
@@ -701,6 +727,9 @@ classdef G4_conductor_view < handle
 
         function [text] = convert_time_format(self, time_in_s)
             mins = floor(time_in_s/60);
+            if time_in_s < 0
+                mins = mins + 1;
+            end
             secs = rem(time_in_s, 60);
             text = mins + "m " + secs + "s ";
         end
@@ -741,6 +770,13 @@ classdef G4_conductor_view < handle
             self.progress_axes.YTick = [];
             self.set_repetition_lines();
 
+        end
+
+        function update_config_file(self, ~, ~)
+            
+            self.con.update_config_file();
+            self.update_run_gui();
+    
         end
 
         function close_application(self, src, event)
