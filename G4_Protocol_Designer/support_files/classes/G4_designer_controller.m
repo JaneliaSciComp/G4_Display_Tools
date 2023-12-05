@@ -1678,6 +1678,8 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
             trial_mode = trial{1};
             trial_duration = trial{12};
             pat_field = self.doc.get_pattern_field_name(trial{2});
+            
+            
             if isempty(trial{8})
                 trial_frame_index = 1;
             elseif strcmp(trial{8},'r')
@@ -1699,9 +1701,22 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
             end
             %pre_start = 0;
             if strcmp(self.doc.top_export_path,'')
-                self.create_error_box("You must save the experiment before you can test it on the screens.");
-                return;
+                pat_location = self.doc.pattern_locations.(pat_field);
+                if ~isemtpy(trial{3}) && ~contains(trial{3}, '<html>')
+                    func_field = self.doc.get_posfunc_field_name(trial{3});
+                    func_location = self.doc.function_locations(func_field);
+                else
+                    func_field = [];
+                    func_location = [];
+                end
+            else
+                pat_location = self.doc.top_export_path;
+                func_location = self.doc.top_export_path;
             end
+
+                % self.create_error_box("You must save the experiment before you can test it on the screens.");
+                % return;
+           
             experiment_folder = self.doc.top_export_path;
             answer = questdlg("If you have imported from multiple locations, you must save your experiment" + ...
                 " before you can test it on the screens.", 'Confirm Save', 'Continue', 'Go back', 'Continue');
@@ -1717,7 +1732,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                 self.model.host_connected = 1;
             end
 
-            self.ctlr.setRootDirectory(experiment_folder)
+            self.ctlr.setRootDirectory(pat_location)
             start = questdlg('Start Dry Run?','Confirm Start','Start','Cancel','Start');
             switch start
             case 'Cancel'

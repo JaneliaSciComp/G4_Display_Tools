@@ -45,6 +45,10 @@ classdef G4_document < handle
         %filler for disabled cells
         uneditable_cell_color_
         uneditable_cell_text_
+
+        pattern_locations
+        function_locations
+        aoFunc_locations
     end
 
     properties (Dependent)
@@ -1346,6 +1350,14 @@ classdef G4_document < handle
         function import_single_file(self, file, path)
             file_full = fullfile(path, file);
             [filepath, name, ext] = fileparts(file_full);
+
+        % To send a pattern to the screens, the root directory must be set
+        % to a path that contains a folder of patterns which contains the
+        % pattern in question. So the import location, which we would use
+        % to set the root directory if the user wants to preview this
+        % pattern on the screen, needs to be the path two levels up from
+        % the actual pattern file, import_loc
+            [import_loc, ~] = fileparts(filepath);
             if strcmp(ext, '.mat') == 0
                 waitfor(errordlg("Please make sure you are importing a .mat file"));
                 return;
@@ -1377,6 +1389,7 @@ classdef G4_document < handle
                     fieldname = "Pattern" + length(self.imported_pattern_names);
                     fileData.filename = name;
                     self.Patterns.(fieldname) = fileData;
+                    self.pattern_locations.(fieldname) = import_loc;
                     success_message = "One Pattern file imported successfully.";
 
                     %If they are importing an individual file, we must try
@@ -1409,6 +1422,7 @@ classdef G4_document < handle
                     fieldname = "Function" + length(self.imported_posfunc_names);
                     fileData.filename = name;
                     self.Pos_funcs.(fieldname) = fileData;
+                    self.function_locations.(fieldname) = import_loc;
                     success_message = "One Position Function imported successfully.";
 
                     %create binary file name
@@ -1439,6 +1453,7 @@ classdef G4_document < handle
                     fieldname = "AOFunction" + length(self.imported_aofunc_names);
                     fileData.filename = name;
                     self.Ao_funcs.(fieldname) = fileData;
+                    self.aoFunc_locations.(fieldname) = import_loc;
                     success_message = "One AO Function imorted successfully.";
 
                     %create binary file name
@@ -1631,6 +1646,7 @@ classdef G4_document < handle
                 for i = 1:length(file_names)
                     full_file_path = fullfile(path, file_names{i});
                     [filepath, name, ext] = fileparts(full_file_path);
+                    [file_loc, ~] = fileparts(filepath);
                     if strcmp(ext, '.pat') == 1
                         fullname = strcat(name,ext);
                         pat = fopen(full_file_path);
@@ -1688,6 +1704,7 @@ classdef G4_document < handle
                                 patfield = "Pattern" + length(self.imported_pattern_names);
                                 patData.filename = name;
                                 self.Patterns.(patfield) = patData;
+                                self.pattern_locations.(patfield) = file_loc;
                                 imported_patterns = imported_patterns + 1;
                             end
                         elseif strcmp(type{1},'pfnparam') == 1
@@ -1700,6 +1717,7 @@ classdef G4_document < handle
                                 posfield = "Function" + length(self.imported_posfunc_names);
                                 posData.filename = name;
                                 self.Pos_funcs.(posfield) = posData;
+                                self.function_locations.(posfield) = file_loc;
                                 imported_functions = imported_functions + 1;
                             end
                         elseif strcmp(type{1},'afnparam') == 1
@@ -1712,6 +1730,7 @@ classdef G4_document < handle
                                 aofield = "AOFunction" + length(self.imported_aofunc_names);
                                 aoData.filename = name;
                                 self.Ao_funcs.(aofield) = aoData;
+                                self.aoFunc_locations.(aofield) = file_loc;
                                 imported_aos = imported_aos + 1;
                             end
                         elseif strcmp(type{1},'currentExp') == 1
