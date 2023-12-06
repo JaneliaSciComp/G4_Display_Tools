@@ -1971,11 +1971,38 @@ classdef G4_document < handle
             if strcmp(pat_name,'') == 1
                 index = 0;
             else
-                pat_name = strcat(pat_name,'.mat');
-                currentExp_file = fullfile(self.top_export_path, 'currentExp.mat');
-                saved_currentExp = load(currentExp_file);
-                fields = saved_currentExp.currentExp.pattern.pattNames;
-                index = find(strcmp(fields, pat_name));
+                
+                if ~isempty(self.top_export_path)
+                    pat_name = strcat(pat_name,'.mat');
+                    currentExp_file = fullfile(self.top_export_path, 'currentExp.mat');
+                    saved_currentExp = load(currentExp_file);
+                    fields = saved_currentExp.currentExp.pattern.pattNames;
+                    index = find(strcmp(fields, pat_name));
+                else
+                     pat_field = self.get_pattern_field_name(pat_name);
+                     pat_location = self.pattern_locations.(pat_field);
+                    % pat_number = str2num(erase(pat_field, 'Pattern'));
+                    % for num = 1:pat_number
+                    %     loc_list{num} = self.pattern_locations.(strcat('Pattern', num2str(pat_number)));
+                    % end
+                    % index = sum(contains(loc_list, pat_location));
+
+                    %Get file names of patterns in location
+                    all = dir(pat_location);
+                    isub = [all(:).isdir];
+                    for i = 1:length(isub)
+                        if isub(i) == 1
+                            isub(i) = 0;
+                        else
+                            isub(i) = 1;
+                        end
+                    end
+                    file_names = {all(isub).name};
+                    file_names(ismember(file_names,{'.','..'})) = [];
+                    index = find(contains(file_names, strcat(pat_name, '.mat')));
+
+
+                end
             end
         end
 
@@ -1983,11 +2010,28 @@ classdef G4_document < handle
             if strcmp(pos_name,'') == 1
                 index = 0;
             else
-                pos_name = strcat(pos_name,'.mat');
-                currentExp_file = fullfile(self.top_export_path, 'currentExp.mat');
-                saved_currentExp = load(currentExp_file);
-                fields = saved_currentExp.currentExp.function.functionName;
-                index = find(strcmp(fields, pos_name));
+                if ~isempty(self.top_export_path)
+                    pos_name = strcat(pos_name,'.mat');
+                    currentExp_file = fullfile(self.top_export_path, 'currentExp.mat');
+                    saved_currentExp = load(currentExp_file);
+                    fields = saved_currentExp.currentExp.function.functionName;
+                    index = find(strcmp(fields, pos_name));
+                else
+                    pos_field = self.get_posfunc_field_name(pos_name);
+                    pos_location = self.function_locations.(pos_field);
+                    all = dir(pos_location);
+                    isub = [all(:).isdir];
+                    for i = 1:length(isub)
+                        if isub(i) == 1
+                            isub(i) = 0;
+                        else
+                            isub(i) = 1;
+                        end
+                    end
+                    file_names = {all(isub).name};
+                    file_names(ismember(file_names,{'.','..'})) = [];
+                    index = find(contains(file_names, strcat(pos_name, '.mat')));
+                end
             end
         end
 
@@ -1995,11 +2039,14 @@ classdef G4_document < handle
             if strcmp(ao_name,'') == 1
                 index = 0;
             else
+               
                 ao_name = strcat(ao_name, '.mat');
                 currentExp_file = fullfile(self.top_export_path, 'currentExp.mat');
                 saved_currentExp = load(currentExp_file);
                 fields = saved_currentExp.currentExp.aoFunction.aoFunctionName;
                 index = find(strcmp(fields, ao_name));
+            
+
             end
         end
 
