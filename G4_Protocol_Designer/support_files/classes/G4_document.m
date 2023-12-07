@@ -1646,7 +1646,7 @@ classdef G4_document < handle
                 for i = 1:length(file_names)
                     full_file_path = fullfile(path, file_names{i});
                     [filepath, name, ext] = fileparts(full_file_path);
-                    [file_loc, ~] = fileparts(filepath);
+                    %[file_loc, ~] = fileparts(filepath);
                     if strcmp(ext, '.pat') == 1
                         fullname = strcat(name,ext);
                         pat = fopen(full_file_path);
@@ -1704,7 +1704,7 @@ classdef G4_document < handle
                                 patfield = "Pattern" + length(self.imported_pattern_names);
                                 patData.filename = name;
                                 self.Patterns.(patfield) = patData;
-                                self.pattern_locations.(patfield) = file_loc;
+                                self.pattern_locations.(patfield) = filepath;
                                 imported_patterns = imported_patterns + 1;
                             end
                         elseif strcmp(type{1},'pfnparam') == 1
@@ -1717,7 +1717,7 @@ classdef G4_document < handle
                                 posfield = "Function" + length(self.imported_posfunc_names);
                                 posData.filename = name;
                                 self.Pos_funcs.(posfield) = posData;
-                                self.function_locations.(posfield) = file_loc;
+                                self.function_locations.(posfield) = filepath;
                                 imported_functions = imported_functions + 1;
                             end
                         elseif strcmp(type{1},'afnparam') == 1
@@ -1730,7 +1730,7 @@ classdef G4_document < handle
                                 aofield = "AOFunction" + length(self.imported_aofunc_names);
                                 aoData.filename = name;
                                 self.Ao_funcs.(aofield) = aoData;
-                                self.aoFunc_locations.(aofield) = file_loc;
+                                self.aoFunc_locations.(aofield) = filepath;
                                 imported_aos = imported_aos + 1;
                             end
                         elseif strcmp(type{1},'currentExp') == 1
