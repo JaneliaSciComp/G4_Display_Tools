@@ -1780,6 +1780,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                     self.model.screen_on = 0;
                 end
             end
+            self.ctlr.close(true);
         end
 
         %Open the conductor to run an experiment
