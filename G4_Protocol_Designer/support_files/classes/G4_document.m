@@ -1350,14 +1350,6 @@ classdef G4_document < handle
         function import_single_file(self, file, path)
             file_full = fullfile(path, file);
             [filepath, name, ext] = fileparts(file_full);
-
-        % To send a pattern to the screens, the root directory must be set
-        % to a path that contains a folder of patterns which contains the
-        % pattern in question. So the import location, which we would use
-        % to set the root directory if the user wants to preview this
-        % pattern on the screen, needs to be the path two levels up from
-        % the actual pattern file, import_loc
-            [import_loc, ~] = fileparts(filepath);
             if strcmp(ext, '.mat') == 0
                 waitfor(errordlg("Please make sure you are importing a .mat file"));
                 return;
@@ -1389,7 +1381,7 @@ classdef G4_document < handle
                     fieldname = "Pattern" + length(self.imported_pattern_names);
                     fileData.filename = name;
                     self.Patterns.(fieldname) = fileData;
-                    self.pattern_locations.(fieldname) = import_loc;
+                    self.pattern_locations.(fieldname) = filepath;
                     success_message = "One Pattern file imported successfully.";
 
                     %If they are importing an individual file, we must try
@@ -1422,7 +1414,7 @@ classdef G4_document < handle
                     fieldname = "Function" + length(self.imported_posfunc_names);
                     fileData.filename = name;
                     self.Pos_funcs.(fieldname) = fileData;
-                    self.function_locations.(fieldname) = import_loc;
+                    self.function_locations.(fieldname) = filepath;
                     success_message = "One Position Function imported successfully.";
 
                     %create binary file name
