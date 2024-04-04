@@ -244,8 +244,13 @@ classdef G4_conductor_controller < handle
         end
 
         function update_expected_time(self)
-            new_val = self.doc.calc_exp_length();
-            self.model.set_expected_time(new_val);
+            if isempty(self.fb_model.bad_trials)
+                new_val = self.doc.calc_exp_length();
+                self.model.set_expected_time(new_val);
+            else
+                new_val = self.calc_rescheduled_time();
+                self.model.set_expected_time(new_val);
+            end
         end
 
         function update_num_attempts(self, new_val)
@@ -264,6 +269,23 @@ classdef G4_conductor_controller < handle
             if ~isempty(self.view)
                 self.view.add_bad_trial_marker(num_trials, trialNum);
             end
+        end
+
+        function new_exp_length = calc_rescheduled_time(self)
+
+            orig_exp_length = self.model.expected_time;
+            add_time = 0;
+            for trial = 1:length(self.fb_model.bad_trials)
+                cond = self.fb_model.bad_trials{trial}(1);
+                add_time = add_time + self.doc.block_trials{cond,12};
+            end
+            if ~isempty(self.doc.intertrial{1})
+                add_time = add_time + self.doc.intertrial{12}*(length(self.fb_model.bad_trials)-1);
+            end
+
+            new_exp_length = orig_exp_length + add_time;
+
+
         end
 
 
@@ -505,7 +527,7 @@ classdef G4_conductor_controller < handle
         %
         % Uses Google Sheets key from Settings
         function open_google_sheet(self)
-            base_url = 'https://docs.google.com/spreadsheets/d/';
+            base_url = 'https://urldefense.com/v3/__https://docs.google.com/spreadsheets/d/__;!!Eh6p8Q!EXK_mCBTDtN5rHLw11EVnkP4ic03xv1V6cRmunrWCY1Y1cSp3J3g_hmKnqHAh_J6341UCMKmpGlhotDhEdTqXw$ ';
             full_link = [base_url,self.model.google_sheet_key,'/edit?usp=sharing'];
             web(full_link, '-browser');
         end
