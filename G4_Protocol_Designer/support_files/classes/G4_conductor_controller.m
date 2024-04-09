@@ -247,6 +247,7 @@ classdef G4_conductor_controller < handle
             if isempty(self.fb_model.bad_trials)
                 new_val = self.doc.calc_exp_length();
                 self.model.set_expected_time(new_val);
+                self.model.set_orig_expected_time(new_val);
             else
                 new_val = self.calc_rescheduled_time();
                 self.model.set_expected_time(new_val);
@@ -286,6 +287,16 @@ classdef G4_conductor_controller < handle
             new_exp_length = orig_exp_length + add_time;
 
 
+        end
+
+        function add_to_exp_length(self, cond)
+
+            curr_exp_length = self.model.expected_time;
+            add_time = self.doc.block_trials{cond,12};
+            if ~isempty(self.doc.intertrial{1})
+                add_time = add_time + self.doc.intertrial{12};
+            end
+            self.model.set_expected_time(curr_exp_length + add_time);
         end
 
 
@@ -1183,6 +1194,10 @@ classdef G4_conductor_controller < handle
                 if bad_slope == 0 && bad_flier == 0
                     self.fb_model.remove_bad_condition(rep, cond);
                 end
+            else
+                if bad_slope == 1 || bad_flier == 1
+                    self.add_to_exp_length(cond);
+                end    
             end
             if ~isempty(self.view)
                 self.fb_view.update_feedback_view(self.fb_model, trialType, [trialnum cond rep], bad_slope, bad_flier);
