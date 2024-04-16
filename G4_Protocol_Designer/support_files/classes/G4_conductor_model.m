@@ -36,6 +36,7 @@ classdef G4_conductor_model < handle
 
         combine_tdms
         convert_tdms
+        orig_expected_time
     end
 
     properties (Dependent)
@@ -63,7 +64,7 @@ classdef G4_conductor_model < handle
         metadata_array
         metadata_options
         num_tests_conducted
-        orig_expected_time
+        
         expected_time
         timestamp
         aborted_count
