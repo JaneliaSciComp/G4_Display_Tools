@@ -221,6 +221,7 @@ function [success] = G4_default_run_protocol(runcon, p)%input should always be 1
                     %Run block trial--------------------------------------
                     ctlr.startDisplay(tparams.dur*10); %duration expected in 100ms units
 
+%% TODO: Why is this done a second time here? Test to  make sure it's unnecessary, then remove. 
                     %Update the progress bar--------------------------
                     runcon.update_progress('block', r, params.reps, c, params.num_cond, cond, num_trial_of_total);
 

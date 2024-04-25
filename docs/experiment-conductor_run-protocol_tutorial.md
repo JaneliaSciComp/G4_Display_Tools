@@ -5,48 +5,79 @@ grand_parent: Generation 4
 nav_order: 2
 ---
 
+# This tutorial is only for advanced users. Multiple run protocols are provided for the user to choose between. It's only recommended to design your own if you are thoroughly familiar with all tools involved and have a particular need.
+
 # Prerequisites
 
 - [G4 Setup](software_setup.md)
 - have designed at least one pattern using the [Pattern Maker](pattern-generator.md)
 - have designed at least one position function using the [Function Generator](function-generator.md)
-- Have some basic knowledge of programming in MATLAB
+- Basic MATLAB skills
 
 # Introduction
 
-You may have seen references to a __run protocol__ throughout the documentation. This is an `.m` file which sends [the experiment you design](protocol-designer.md) to the panels. It provides a structure and defines details regarding how the experiment is run like, for example, whether to run inter-trials before the first condition. There are three run protocols included with the G4 Display Tools at `G4_Display_Tools/G4_Protocol_Designer/run_protocols`: `G4_default_run_protocol.m`, `G4_default_run_protocol_streaming.m`, and `G4_run_protocol_combinedCommand.m`. The last of these is not ready for use, as it still has uncorrected bugs. The first in the list runs an experiment without streaming back any fly data. The second will return data throughout the experiment to help you monitor your fly. It will also re-schedule any conditions that failed due to your fly not flying at the end of the experiment. You can read about these features in more detail in the [Conductor documentation](experiment-conductor.md).
+You may have seen references to a __run protocol__ throughout the documentation. This is an `.m` file which sends [the experiment you design](protocol-designer.md) to the panels. It provides a structure and defines details regarding how the experiment is run like, for example, whether to run inter-trials before the first condition. There are eight run protocols included with the G4 Display Tools at `G4_Display_Tools/G4_Protocol_Designer/run_protocols`. In almost all cases, you should choose between one of these. When you run an experiment using the Conductor, a drop down list containing these eight run protocols is provided and you must choose one for your experiment. If you have a need to design your own, you will also need to update the Conductor to display your new run protocol in this drop down list. We will cover how to do that in this tutorial. This extra step helps re-iterate that this should only be done when truly necessary. 
 
-What you might not know is that you can also write your own run protocol. The potential benefits of doing this will become clear throughout this tutorial, though for most use cases, you won't need one other than the defaults. In this tutorial, we will use `G4_default_run_protocol.m` as our example, so streaming features are not covered here.
+There are three optional features in these run protocols. There is a run protocol for every possible combination of the three features, resulting in eight protocols total. The filenames indicate which features are present in each protocol. The three features with a brief summary are listed below. To read about the features in more detail, see the [Conductor documentation](experiment-conductor.md).
 
-- Please note that the run protocol `G4_run_protocol_combinedCommand.m` should not currently be used. It utilizes a new Panel_com command which still has unresolved bugs.
+- The __streaming feature__. In these protocols, data being collected is displayed in real time in plots to the side of the screen,  so you can tell if the data you're collecting looks correct. In addition, trials which are marked as bad, due to something like the fly not flying during it, can be automatically rescheduled to run again at the end of the protocol in an attempt to get more robust data from any given experiment. 
 
-By definition, this tutorial will also show you how to send specific commands to the panels using none of the provided GUIs. This might be useful if you want to display a single pattern on the panels or try running a condition without using the [G4 Designer](protocol-designer.md).
+- The __Block Logging__ feature. This tells the host to create a different log for each repetition of the experiment in order to keep the size of any given log file down. The log files can be combined into one data file at the end, or not. Without this feature, the data for the entire experiment is continuously logged into one file. 
 
-# The Panel_com Wrapper
+- The __Combined Command__ feature. By default, parameters are sent to the screens individually, one by one, in sequence. However, there is a panel command which sends all parameters to the screen at once, hopefully reducing the opportunity for errors or hangups. These protocols utilize this command instead. In previous years, the data collected with this command had some issues. We believe these have been corrected, but this is pending confirmation, so as of April 2024, we do not recommend using these protocols. 
 
-In the folder `G4_Display_Tools/PControl_Matlab/controller` you'll find a set of `.m` files. Some of these function names may be familiar from the [setup section]({{site.baseurl}}/docs/g4_assembly.html#install-software) in this documentation.
+The default run protocol does not use any of these features. Each other protocol lists which features it utilizes in its file name. The protocols all function the same way aside from these features. 
 
-You should not edit any of the files in `G4_Display_Tools/PControl_Matlab/controller`. Changes to any of these files could prevent the G4 system from working properly so please open the files carefully.
-{:.error}
+If you have the need to run an experiment differently than the current run protocols, or for a feature we do not provide, you can write your own and add it to the list of options. Before we go into the details of how to do this, let's go over exactly how the current run protocols operate so you can decide if this is something you need to do.
 
-Open the file called `Panel_com.m` in MATLAB, which contains a function with a large `switch` statement and many `case` conditions. The TCP connection provided by the [G4 Host LabView Software](software_setup.md) running on the Multi I/O card is wrapped in this function. This means, `Panel_com.m` accepts human readable commands and converts it into the correct TCP code before sending them to the panels. This way, you never have to get into the other files in this folder, and you never have to worry about creating hexadecimal strings or other code the panels will recognize.
+By definition, this tutorial will also show you how to send specific commands to the panels manually. This might be useful if you want to display a single pattern on the panels or try running conditions without using the [G4 Designer](protocol-designer.md).
 
-While the file `Panel_com.m` contains the most comprehensive reference list of commands, we also have [documentation on the available commands](pcontrol.md). If you refer to the source file make sure __not to edit any code in `Panel_com.m`__. The file contains several `case` statements, each of which represents a command the panels can interpret. For example, the first few commands in this file are [`stop_display`](pcontrol.md#stop_display), [`all_off`](pcontrol.md#all_off), [`all_on`](pcontrol.md#all_on), etc.
+# How the current run protocols run an experiment, step by step
 
-Remember in the [software setup](software_setup.md#verify), to verify everything was working correctly, you clicked a button called _All On_{:.gui-txt} in the _Panel Host_{:.gui-txt} GUI? When you clicked it, it used the `all_on` command you see in `Panel_com.m` to send that command to the panels. You can do this same test without the GUI:
+When you press "Run" on the Conductor to run your experiment, this is what happens when using any of the provided run protocols.
 
-In your MATLAB command window, type `connectHost` and hit enter. Assuming your setup is working, the Panel Host GUI should open after a few seconds. Ignore the application and instead, in the MATLAB command window, type `Panel_com('all_on')` and hit _enter_{:.kbd}. You should see all the LEDs in your arena come on, just like they did when you [tested this](software_setup.md#verify) through the Panel Host application. Now type `Panel_com('all_off')` in the MATLAB command window and hit _enter_{:.kbd}. This should turn the LEDs back off.
+1. The protocol checks whether the GUI is present, to know whether graphics need to be updated or not.
+2. Parameters are collected from your experiment and compiled into variables easy to pass along to the controller. 
+3. It opens the Host.
+4. The root directory and active AO channels, if any, are set.
+5. At this point a dialog box pops up asking the user if they'd like to start the experiment or cancel.
+6. Assuming they  start the experiment, some calculations are then done to get the estimated experiment duration and keep track of the remaining time throughout the experiment.
+7. The log is started. If it fails to start twice, the experiment aborts.
+8. If there is a pre-trial, the protocol updates the GUI progress, sends the pre-trial parameters to the screens, and then starts the display. 
+9. After each condition completes throughout the experiment, the protocol checks if the user has pressed the "Abort" or "Pause" button. If the experiment has been aborted, it stops the display, stops the log, and closes the Host in that order. If the pause button has been pushed, it stops the log and then runs a pause function which waits for the pause button to be pressed again.
+10. The elapsed time and remaining time are updated.
+11. A loop begins to run each condition and inter-trial (if present) in the experiment. This is nested in an outer loop which does this for each repetition. In pseudo-code it looks like this:
 
-As you can see, you send commands to the panels generally by typing `Panel_com(command name[, arguments…])` into the MATLAB command window, with the list of argument being optional. If you look in `Panel_com.m` at line 28, you will see that when you submit the `all_on` command, a particular hexadecimal string `FF` is converted to its byte value 255 and sent to the panels via TCP:
+		pre-trial runs (if present)
+		for each repetition
+			for each condition
+				run condition
+				if intertrial
+					if it's the last conditon and last rep, skip inter-trial
+					run inter-trial
+		post-trial runs (if present)
+					
+This means that no inter-trial runs between the pre-trial and first condition. An inter-trial does run in between the last trial of one repetition and the first trial of the next repetition. And an inter-trial does not run after the last condition of the last repetition. 
 
-```matlab
-    % FIXME: old code example. Not working anymore
-    case 'all_on'      % set all panels to 0;
-        reply = send_tcp( char([1 hex2dec('FF')]));
-        % … handling of the return value
-```
+12. Inside the loop that runs each condition, this is the order of operations:
 
-The benefit of the `Panel_com` wrapper is that you do not have to write this hexadecimal string -- the wrapper does it for you. If the G4 Panel Host implements a new command on the IO card, then this should lead to a new command within the `Panel_com`. In theory, a single `Panel_com` command can also map to several G4 Panel Host commands, as the [`set_ao`](pcontrol.md#set_ao) command demonstrates. In addition to the translation from human-readable commands to TCP/IP byte commands, `Panel_com`  commands also do additional checking. It is therefore strongly encouraged to rely on the `Panel_com` wrapper for your run protocols instead of sending your own TCP/IP commands.
+	Determine the condition to play next if randomized
+	Send parameters to the controller
+	Start the display
+	Update the progress bar and GUI text while condition runs
+	If streaming is enabled, update the graphs with the previous condition's collected data while current condition runs.
+	After the condition ends, collect streamed data if streaming is enabled. 
+	Update loop parameters.
+	If its time to move to the next repetition, the log will be stopped and re-started if block logging is enabled. 
+	If it is the last repetition and last condition, the inter-trial is skipped.
+	Update the elapsed and expected time.
+
+13. After all repetitions have been run, it then runs any rescheduled conditions if this feature is enabled. Information for all bad trials (repetition and condition number) are collected. An inter-trial, if present, is run before the first rescheduled condition. The rescheduled conditions are run in the exact same manner as they were in the main experiment.  If you have set the protocol to attempt these bad conditions more than once, then after they've all been attempted, any that were bad a second time are attempted again, up to the number of attempts set by the user. 
+
+14. After all conditions have been run, the post-trial is run in the same manner as the pre-trial, if present. If block logging is enabled, the pre-trial and post-trial data are saved in their own log. The log is started directly before the display, and stopped directly after the display, to minimize junk data before or after the condition.
+
+This is the general flow of the experiment. If something about the order of operations here would be harmful to your experiment, you may need to write your own run protocol. So let's talk about how to do that.
+
 
 ## Running a condition via command window
 
