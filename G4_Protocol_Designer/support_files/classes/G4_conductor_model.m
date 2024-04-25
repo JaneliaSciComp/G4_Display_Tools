@@ -36,6 +36,7 @@ classdef G4_conductor_model < handle
 
         combine_tdms
         convert_tdms
+        orig_expected_time
     end
 
     properties (Dependent)
@@ -63,6 +64,7 @@ classdef G4_conductor_model < handle
         metadata_array
         metadata_options
         num_tests_conducted
+        
         expected_time
         timestamp
         aborted_count
@@ -307,6 +309,10 @@ classdef G4_conductor_model < handle
 
         function set_expected_time(self, new_val)
             self.expected_time = new_val;
+        end
+
+        function set_orig_expected_time(self, new_val)
+            self.orig_expected_time = new_val;
         end
 
         function set_timestamp(self)

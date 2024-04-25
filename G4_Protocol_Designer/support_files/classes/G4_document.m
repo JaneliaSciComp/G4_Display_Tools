@@ -45,6 +45,10 @@ classdef G4_document < handle
         %filler for disabled cells
         uneditable_cell_color_
         uneditable_cell_text_
+
+        pattern_locations
+        function_locations
+        aoFunc_locations
     end
 
     properties (Dependent)
@@ -1377,6 +1381,7 @@ classdef G4_document < handle
                     fieldname = "Pattern" + length(self.imported_pattern_names);
                     fileData.filename = name;
                     self.Patterns.(fieldname) = fileData;
+                    self.pattern_locations.(fieldname) = filepath;
                     success_message = "One Pattern file imported successfully.";
 
                     %If they are importing an individual file, we must try
@@ -1409,6 +1414,7 @@ classdef G4_document < handle
                     fieldname = "Function" + length(self.imported_posfunc_names);
                     fileData.filename = name;
                     self.Pos_funcs.(fieldname) = fileData;
+                    self.function_locations.(fieldname) = filepath;
                     success_message = "One Position Function imported successfully.";
 
                     %create binary file name
@@ -1439,6 +1445,7 @@ classdef G4_document < handle
                     fieldname = "AOFunction" + length(self.imported_aofunc_names);
                     fileData.filename = name;
                     self.Ao_funcs.(fieldname) = fileData;
+                    self.aoFunc_locations.(fieldname) = import_loc;
                     success_message = "One AO Function imorted successfully.";
 
                     %create binary file name
@@ -1631,6 +1638,7 @@ classdef G4_document < handle
                 for i = 1:length(file_names)
                     full_file_path = fullfile(path, file_names{i});
                     [filepath, name, ext] = fileparts(full_file_path);
+                    %[file_loc, ~] = fileparts(filepath);
                     if strcmp(ext, '.pat') == 1
                         fullname = strcat(name,ext);
                         pat = fopen(full_file_path);
@@ -1688,6 +1696,7 @@ classdef G4_document < handle
                                 patfield = "Pattern" + length(self.imported_pattern_names);
                                 patData.filename = name;
                                 self.Patterns.(patfield) = patData;
+                                self.pattern_locations.(patfield) = filepath;
                                 imported_patterns = imported_patterns + 1;
                             end
                         elseif strcmp(type{1},'pfnparam') == 1
@@ -1700,6 +1709,7 @@ classdef G4_document < handle
                                 posfield = "Function" + length(self.imported_posfunc_names);
                                 posData.filename = name;
                                 self.Pos_funcs.(posfield) = posData;
+                                self.function_locations.(posfield) = filepath;
                                 imported_functions = imported_functions + 1;
                             end
                         elseif strcmp(type{1},'afnparam') == 1
@@ -1712,6 +1722,7 @@ classdef G4_document < handle
                                 aofield = "AOFunction" + length(self.imported_aofunc_names);
                                 aoData.filename = name;
                                 self.Ao_funcs.(aofield) = aoData;
+                                self.aoFunc_locations.(aofield) = filepath;
                                 imported_aos = imported_aos + 1;
                             end
                         elseif strcmp(type{1},'currentExp') == 1
@@ -1952,11 +1963,38 @@ classdef G4_document < handle
             if strcmp(pat_name,'') == 1
                 index = 0;
             else
-                pat_name = strcat(pat_name,'.mat');
-                currentExp_file = fullfile(self.top_export_path, 'currentExp.mat');
-                saved_currentExp = load(currentExp_file);
-                fields = saved_currentExp.currentExp.pattern.pattNames;
-                index = find(strcmp(fields, pat_name));
+                
+                if ~isempty(self.top_export_path)
+                    pat_name = strcat(pat_name,'.mat');
+                    currentExp_file = fullfile(self.top_export_path, 'currentExp.mat');
+                    saved_currentExp = load(currentExp_file);
+                    fields = saved_currentExp.currentExp.pattern.pattNames;
+                    index = find(strcmp(fields, pat_name));
+                else
+                     pat_field = self.get_pattern_field_name(pat_name);
+                     pat_location = self.pattern_locations.(pat_field);
+                    % pat_number = str2num(erase(pat_field, 'Pattern'));
+                    % for num = 1:pat_number
+                    %     loc_list{num} = self.pattern_locations.(strcat('Pattern', num2str(pat_number)));
+                    % end
+                    % index = sum(contains(loc_list, pat_location));
+
+                    %Get file names of patterns in location
+                    all = dir(pat_location);
+                    isub = [all(:).isdir];
+                    for i = 1:length(isub)
+                        if isub(i) == 1
+                            isub(i) = 0;
+                        else
+                            isub(i) = 1;
+                        end
+                    end
+                    file_names = {all(isub).name};
+                    file_names(ismember(file_names,{'.','..'})) = [];
+                    index = find(contains(file_names, strcat(pat_name, '.mat')));
+
+
+                end
             end
         end
 
@@ -1964,11 +2002,28 @@ classdef G4_document < handle
             if strcmp(pos_name,'') == 1
                 index = 0;
             else
-                pos_name = strcat(pos_name,'.mat');
-                currentExp_file = fullfile(self.top_export_path, 'currentExp.mat');
-                saved_currentExp = load(currentExp_file);
-                fields = saved_currentExp.currentExp.function.functionName;
-                index = find(strcmp(fields, pos_name));
+                if ~isempty(self.top_export_path)
+                    pos_name = strcat(pos_name,'.mat');
+                    currentExp_file = fullfile(self.top_export_path, 'currentExp.mat');
+                    saved_currentExp = load(currentExp_file);
+                    fields = saved_currentExp.currentExp.function.functionName;
+                    index = find(strcmp(fields, pos_name));
+                else
+                    pos_field = self.get_posfunc_field_name(pos_name);
+                    pos_location = self.function_locations.(pos_field);
+                    all = dir(pos_location);
+                    isub = [all(:).isdir];
+                    for i = 1:length(isub)
+                        if isub(i) == 1
+                            isub(i) = 0;
+                        else
+                            isub(i) = 1;
+                        end
+                    end
+                    file_names = {all(isub).name};
+                    file_names(ismember(file_names,{'.','..'})) = [];
+                    index = find(contains(file_names, strcat(pos_name, '.mat')));
+                end
             end
         end
 
@@ -1976,11 +2031,14 @@ classdef G4_document < handle
             if strcmp(ao_name,'') == 1
                 index = 0;
             else
+               
                 ao_name = strcat(ao_name, '.mat');
                 currentExp_file = fullfile(self.top_export_path, 'currentExp.mat');
                 saved_currentExp = load(currentExp_file);
                 fields = saved_currentExp.currentExp.aoFunction.aoFunctionName;
                 index = find(strcmp(fields, ao_name));
+            
+
             end
         end
 

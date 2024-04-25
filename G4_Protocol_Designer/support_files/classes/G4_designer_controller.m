@@ -58,6 +58,8 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
         recent_file_menu_items_
         menu_open_
         preview_on_arena_
+
+        ctlr
     end
 
     properties(Dependent)
@@ -124,7 +126,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
         inscreen_plot
         preview_on_arena
 
-        ctlr
+        
     end
 
 %% Methods
@@ -1678,6 +1680,8 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
             trial_mode = trial{1};
             trial_duration = trial{12};
             pat_field = self.doc.get_pattern_field_name(trial{2});
+            
+            
             if isempty(trial{8})
                 trial_frame_index = 1;
             elseif strcmp(trial{8},'r')
@@ -1699,25 +1703,39 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
             end
             %pre_start = 0;
             if strcmp(self.doc.top_export_path,'')
-                self.create_error_box("You must save the experiment before you can test it on the screens.");
-                return;
+                pat_location = self.doc.pattern_locations.(pat_field);
+                if ~isempty(trial{3}) && ~contains(trial{3}, '<html>')
+                    func_field = self.doc.get_posfunc_field_name(trial{3});
+                    func_location = self.doc.function_locations.(func_field);
+                else
+                    func_field = [];
+                    func_location = [];
+                end
+            else
+                pat_location = self.doc.top_export_path;
+                func_location = self.doc.top_export_path;
             end
-            experiment_folder = self.doc.top_export_path;
-            answer = questdlg("If you have imported from multiple locations, you must save your experiment" + ...
-                " before you can test it on the screens.", 'Confirm Save', 'Continue', 'Go back', 'Continue');
 
-            if strcmp(answer, 'Go back')
-                return;
-            end
+                % self.create_error_box("You must save the experiment before you can test it on the screens.");
+                % return;
+           
+            %experiment_folder = self.doc.top_export_path;
+            % answer = questdlg("If you have imported from multiple locations, you must save your experiment" + ...
+            %     " before you can test it on the screens.", 'Confirm Save', 'Continue', 'Go back', 'Continue');
 
-            if ~self.model.host_connected
+            % if strcmp(answer, 'Go back')
+            %     return;
+            % end
+
+            if isempty(self.ctlr)
                 self.ctlr = PanelsController();
-                self.ctlr.open(true);
-                pause(10);
-                self.model.host_connected = 1;
             end
+            self.ctlr.open(true);
+            pause(10);
+            self.model.host_connected = 1;
+           
 
-            self.ctlr.setRootDirectory(experiment_folder)
+            
             start = questdlg('Start Dry Run?','Confirm Start','Start','Cancel','Start');
             switch start
             case 'Cancel'
@@ -1727,11 +1745,16 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                 self.model.screen_on = 1;
                 pattern_index = self.doc.get_pattern_index(trial{2});
                 func_index = self.doc.get_posfunc_index(trial{3});
+                
+                [patRootDir, ~] = fileparts(pat_location);
+                self.ctlr.setRootDirectory(patRootDir)
 
                 self.ctlr.setControlMode(trial_mode);
                 self.ctlr.setPatternID(pattern_index);
 
                 if func_index ~= 0
+                    [funcRootDir, ~] = fileparts(func_location);
+                    self.ctlr.setRootDirectory(funcRootDir);
                     self.ctlr.setPatternFunctionID(func_index);
                 end
 
@@ -1757,6 +1780,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                     self.model.screen_on = 0;
                 end
             end
+            self.ctlr.close(true);
         end
 
         %Open the conductor to run an experiment
