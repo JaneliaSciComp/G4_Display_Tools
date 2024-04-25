@@ -1,7 +1,8 @@
 ---
 title: Running an experiment
-parent: Getting Started
-nav_order: 4
+parent: G4 Experiment Conductor
+grand_parent: Generation 4
+nav_order: 1
 ---
 
 # How to run an experiment - an overview
