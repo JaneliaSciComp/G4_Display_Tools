@@ -146,8 +146,6 @@ function [success] = G4_default_run_protocol(runcon, p)%input should always be 1
                 ctlr_parameters_pretrial = {params.pre_mode, params.pre_pat, params.pre_gain, ...
                     params.pre_offset, params.pre_pos, params.pre_frame_rate, params.pre_frame_ind, ...
                     params.active_ao_channels, params.pre_ao_ind};
-                ctlr.setControllerParameters(ctlr_parameters_pretrial);
-
                 %Update status panel to show current parameters
                 runcon.update_current_trial_parameters(params.pre_mode, params.pre_pat, ...
                     params.pre_pos, p.active_ao_channels, params.pre_ao_ind, ...
@@ -155,13 +153,24 @@ function [success] = G4_default_run_protocol(runcon, p)%input should always be 1
                     params.pre_offset, params.pre_dur);
                 pause(0.01);
 
-                %Run pretrial on screen
-                if params.pre_dur ~= 0
-                    ctlr.startDisplay(params.pre_dur*10); %Panelcom usually did the *10 for us. Controller expects time in deciseconds
+                ctlr.setControllerParameters(ctlr_parameters_pretrial);
+                if params.pre_mode == 3
+                    if params.pre_dur ~= 0
+                        pause(params.pre_dur);
+                        ctlr.stopDisplay();
+                    else
+                        w = waitforbuttonpress;
+                    end
                 else
-                    ctlr.startDisplay(2000, false); %second input, waitForEnd, equals false so code will continue executing
-                    w = waitforbuttonpress; %If pretrial duration is set to zero, this
-                    %causes it to loop until you press a button.
+               
+                    %Run pretrial on screen
+                    if params.pre_dur ~= 0
+                        ctlr.startDisplay(params.pre_dur*10); %Panelcom usually did the *10 for us. Controller expects time in deciseconds
+                    else
+                        ctlr.startDisplay(2000, false); %second input, waitForEnd, equals false so code will continue executing
+                        w = waitforbuttonpress; %If pretrial duration is set to zero, this
+                        %causes it to loop until you press a button.
+                    end
                 end
             end
 
@@ -208,18 +217,21 @@ function [success] = G4_default_run_protocol(runcon, p)%input should always be 1
                         tparams.offset, tparams.pos_id, tparams.frame_rate, tparams.frame_ind...
                         params.active_ao_channels, tparams.trial_ao_indices};
 
-                    ctlr.setControllerParameters(ctlr_parameters);
-
-                    pause(0.01)
-
                     %Update status panel to show current parameters
                     runcon.update_current_trial_parameters(tparams.trial_mode, ...
                         tparams.pat_id, tparams.pos_id, p.active_ao_channels, ...
                         tparams.trial_ao_indices, tparams.frame_ind, tparams.frame_rate, ...
                         tparams.gain, tparams.offset, tparams.dur);
 
+                    ctlr.setControllerParameters(ctlr_parameters);
+
                     %Run block trial--------------------------------------
-                    ctlr.startDisplay(tparams.dur*10); %duration expected in 100ms units
+                    if tparams.trial_mode ~= 3
+                        ctlr.startDisplay(tparams.dur*10); %duration expected in 100ms units
+                    else
+                        pause(tparams.dur)
+                        ctlr.stopDisplay()
+                    end
 
                     %Update the progress bar--------------------------
                     runcon.update_progress('block', r, params.reps, c, params.num_cond, cond, num_trial_of_total);
@@ -266,19 +278,22 @@ function [success] = G4_default_run_protocol(runcon, p)%input should always be 1
                             ctlr_parameters_intertrial{7} = inter_frame_ind;
                         end
 
-                        ctlr.setControllerParameters(ctlr_parameters_intertrial);
-
-                        %Update status panel to show current parameters
+                         %Update status panel to show current parameters
                         runcon.update_current_trial_parameters(params.inter_mode, ...
                             params.inter_pat, params.inter_pos, p.active_ao_channels, ...
                             params.inter_ao_ind, params.inter_frame_ind, params.inter_frame_rate,...
                             params.inter_gain, params.inter_offset, params.inter_dur);
 
-                        pause(0.01);
+                        ctlr.setControllerParameters(ctlr_parameters_intertrial);
 
                         %Run intertrial-------------------------
-                        ctlr.startDisplay(params.inter_dur*10);
-
+                        if params.inter_mode ~= 3
+                            ctlr.startDisplay(params.inter_dur*10); %duration expected in 100ms units
+                        else
+                            pause(params.inter_dur)
+                            ctlr.stopDisplay()
+                        end
+                        
                         if runcon.check_if_aborted() == 1
                             ctlr.stopDisplay();
                             ctlr.stopLog('showTimeoutMessage', true);
@@ -304,15 +319,20 @@ function [success] = G4_default_run_protocol(runcon, p)%input should always be 1
                     params.post_offset, params.post_pos, params.post_frame_rate, params.post_frame_ind, ...
                     params.active_ao_channels, params.post_ao_ind};
 
-                ctlr.setControllerParameters(ctlr_parameters_posttrial);
-
                 %Update status panel to show current parameters
                 runcon.update_current_trial_parameters(params.post_mode, ...
                     params.post_pat, params.post_pos, p.active_ao_channels, ...
                     params.post_ao_ind, params.post_frame_ind, params.post_frame_rate, ...
                     params.post_gain, params.post_offset, params.post_dur);
 
-                ctlr.startDisplay((params.post_dur + .5)*10);
+                ctlr.setControllerParameters(ctlr_parameters_posttrial);
+
+                if params.post_mode ~= 3
+                    ctlr.startDisplay(params.post_dur*10); %duration expected in 100ms units
+                else
+                    pause(params.post_dur)
+                    ctlr.stopDisplay()
+                end
 
                 if runcon.check_if_aborted() == 1
                     ctlr.stopDisplay();
