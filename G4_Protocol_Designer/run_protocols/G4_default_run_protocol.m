@@ -346,8 +346,21 @@ function [success] = G4_default_run_protocol(runcon, p)%input should always be 1
                 end
                 runcon.update_elapsed_time(round(toc(startTime),2));
             end
+            if params.post_type
+                if params.post_mode ~= 3
+                    ctlr.stopDisplay();
+                end
+            else
+                %If there was no post trial, the last condition played was
+                %the final block condition. Check if it was mode 3 - if it
+                %was, we don't want a second stopDisplay command.
+                last_cond = p.exp_order(params.reps,params.num_cond);
+                last_params = assign_block_trial_parameters(params, p, last_cond);
+                if last_params.trial_mode ~= 3
+                    ctlr.stopDisplay();
+                end
 
-            ctlr.stopDisplay();
+            end
 
             ctlr.stopLog('timeout', 60.0, 'showTimeoutDialog', true);
 
