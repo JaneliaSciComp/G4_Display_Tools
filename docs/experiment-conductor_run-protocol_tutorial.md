@@ -28,11 +28,11 @@ There are three optional features in these run protocols. There is a run protoco
 
 The default run protocol does not use any of these features. Each other protocol lists which features it utilizes in its file name. The protocols all function the same way aside from these features. 
 
-If you have the need to run an experiment differently than the current run protocols, or for a feature we do not provide, you can write your own and add it to the list of options. Before we go into the details of how to do this, let's go over exactly how the current run protocols operate so you can decide if this is something you need to do.
+If you need to run an experiment differently than the current run protocols, or need a feature we do not provide, you can write your own and add it to the list of options. Before we go into the details of how to do this, let's go over exactly how the current run protocols operate so you can decide if this is something you need to do.
 
 By definition, this tutorial will also show you how to send specific commands to the panels manually. This might be useful if you want to display a single pattern on the panels or try running conditions without using the [G4 Designer](protocol-designer.md).
 
-# How the current run protocols run an experiment, step by step
+## How the current run protocols run an experiment, step by step
 
 When you press "Run" on the Conductor to run your experiment, this is what happens when using any of the provided run protocols.
 
@@ -78,96 +78,115 @@ This means that no inter-trial runs between the pre-trial and first condition. A
 
 This is the general flow of the experiment. If something about the order of operations here would be harmful to your experiment, you may need to write your own run protocol. So let's talk about how to do that.
 
+# Communicating with the arena
+
+## How to send a command to the screens
+
+At `G4_Display_Tools\PControl_Matlab\controller` you'll find a file called `PanelsController.m`. This file should __not__ be edited. However, you'll need to be familiar with it, as it contains all the functions used to send information to the arena. 
+
+At this point, you must have the G4 Panel Host application installed and ready to run in order to follow this tutorial. To create an instance of the controller, open matlab and in the command window and type the following:
+
+```matlab
+ctlr = PanelsController();
+ctlr.open(true);
+```
+This will open the host and give you access to all the functions in `PanelsController.m`.  Now type
+
+```matlab
+ctlr.allOn()
+```
+The screens should light up. Next enter the following command.
+
+```matlab
+ctlr.allOff()
+```
+The screens should turn back off. This is the general idea of how information is sent to the arena.
 
 ## Running a condition via command window
 
-Now that you know how to send commands to the panels using the MATLAB command window, it becomes clear that you could run a complete experimental condition this way if you knew which commands to use. I'll walk you through this process now. It will be much easier to understand the role of the run protocol once you have run a condition via MATLAB command window.
+Now that you know how to send a command to the panels using the MATLAB command window, it becomes clear that you could run a complete experimental condition this way if you knew which commands to use. I'll walk you through this process now. 
 
 ### Set up experiment folder
 
 You will need an experiment folder containing a pattern and function to follow along. You should have one if you've already completed the [tutorial on how to design a condition](protocol-designer_create-condition_tutorial.md). If you have not done this or cannot find the experiment folder -- [don't panic](https://en.wikipedia.org/wiki/Phrases_from_The_Hitchhiker%27s_Guide_to_the_Galaxy#Don't_Panic), here is a quick reminder how to create a mock experiment folder. Create a new folder with a descriptive name of your choice wherever you can find it. Inside this folder should be two folders -- one called `Patterns` and one called `Functions`. Each of these folders should contain at least one pattern and one function. You can create them by using the [Pattern Generator](pattern-generator.md) and the [Function Generator](function-generator.md). Both files associated with the pattern (`*.pat`) or function (`*.mat`) should be within the respective folder. This next section will not work if you don't have a pattern and a function inside the file structure to send to the panels.
 
-### Connect to the Panel Host
+### Set the Root Directory
 
-Send a `connectHost` command via the MATLAB command window. This requires the G4 Panel Host application to run and the command connects to the G4 Panel Host -- which is required before sending any other commands via `Panel_com`.
-
-Type the following commands into your MATLAB command window. It is better to send them one at a time rather than to send them all at once. This is because if one of the commands takes some extra time as short as 50ms to run, it can cause the following commands to get queued up and cause unpredictable side effects. Inside our example run protocols we place strategic pauses and checks to avoid the panels commands queueing up, as this can cause the panels to glitch.
-
-### Set root directory
+If you have closed the PanelsController instance that we created before, re-enter the folowing code. Otherwise, skip this step. 
 
 ```matlab
-Panel_com('change_root_directory', <path to your experiment folder here as a string>)
+ctlr = PanelsController();
+ctlr.open(true);
 ```
 
-This command tells the panels where it should be looking for whatever files you send it from now on. This is why your functions and patterns must be contained in the same experiment folder. You should pass in the absolute path to your experiment folder as a string. An example from my computer could be:
+Next, save a variable called expFolder as the path to your experiment folder, and pass it into the controller command setRootDirectory. For example:
 
 ```matlab
-Panel_com('change_root_directory', '/Users/taylorl/Desktop/test_protocol') % on a Mac or:
-Panel_com('change_root_directory', 'C:\Users\taylorl\Desktop\test_protocol') % on Windows
+expFolder = 'mypath\experiment_folder';
+ctlr.setRootDirectory(expFolder);
 ```
 
 ### Start data logging
 
 ```matlab
-Panel_com('start_log')
+log_started = ctlr.startLog();
 ```
 
-You may have noticed on the Panel Host there is a virtual LED labeled _Log running_{:.gui-txt} which is green when a condition or experiment is running and which is dark when it is not. You should always start the log running before running an experiment and only stop the log running when the entire experiment is over. In the [data analysis section](data-handling.md), you'll see that your raw data is contained in the log file. Data is only collected when the log is running. It's good habit to always run the log, even if you are just testing something.
+You may have noticed on the Panel Host there is a virtual LED labeled _Log running_{:.gui-txt} which is green when a condition or experiment is running and which is dark when it is not. You should start the log before anything begins running and only stop the log when you are finished collecting data. You can stop the log, and then restart it, in order to create a new data file and save further data in that new file. In the [data analysis section](data-handling.md), you'll see that your raw data is contained in the log file. Data is only collected when the log is running. It's good habit to always run the log, even if you are just testing something.
 
-### Set the Display mode
+### Set the parameters for your condition
+
+All parameters for a condition are sent to the PanelsController at the same time. It then sends each item individually to the screens, unless you are using the combined command, in which case it sends all parameters simultaneously to the screens. All parameters must exist, even if they are empty and not being used, and they should be saved in a cell array in the order the controller expects. We are going to run a simple condition in mode 1 using a pattern and a position function. 
 
 ```matlab
-Panel_com('set_control_mode',1)
+mode = 1; 
+pat = 1; #The pattern ID
+posFunc = 1; #The position function ID
+frameInd = 1; #The frame index to display in constant mode
+frameRate = []; #The frame rate to use in streaming mode
+gain = []; #The gain to use in certain modes
+offset = []; #The offset used in certain modes
+AOchans = []; #Which Analog Output Channels are active
+AOind = []; #The function IDs of any Analog Output functions being used
+
+params = {mode, pat, gain, offset, posFunc, frameRate, frameInd, AOchans, AOind};
+
+ctlr.setControllerParameters(params);
 ```
 
-This command sets your [display mode](protocol-designer_display-modes.md) and is always required. Remember the panels are capable of running seven different modes. This tutorial uses the first mode as it is simple and often used. In this mode the position function defines the order in which the patterns are displayed. For example, a y-value of 10 for the position function will tell the panels to show the 10th frame of the pattern.
+Remember that different parameters are required for different modes. We are using mode 1 which requires a pattern and a position function. AO functions are optional. You can review what is needed for what mode [here](protocol-designer_display-modes.md). Regardless of which mode you use, all parameters must be defined and passed to the controller. 
 
-### Set Pattern
-
-```matlab
-Panel_com('set_pattern_id',1)
-```
-
-This command tells the panels which pattern to use. This command is required for all display modes. Notice that the argument is a number, not a file path. This relies on the the experimental folder set up in a defined way, in this case that there is a file `Patterns/Pattern_0001.pat` inside your root folder. All the software we provide knows and follows this file structure, so if you followed the documentation for the [Pattern Generator](pattern-generator.md) the file will be at the correct location.
+Notice that the arguments for pattern and position function are numbers, not a file path. This relies on the the experimental folder set up in a defined way, in this case that there is a file `Patterns/Pattern_0001.pat` inside your root folder. All the software we provide knows and follows this file structure, so if you followed the documentation for the [Pattern Generator](pattern-generator.md) the file will be at the correct location.
 
 It is good practice to name your patterns with their ID number in the name so that they will be ordered correctly in the folder and you don't have to remember the ID for every pattern. For example, when we make a set of patterns for an experiment, they each have a unique ID of 1 through the number of patterns we are making. Their filenames, then, are `Pattern_0001`, `Pattern_0002`, etc with the number in the filename matching the ID number. This way, it is easy to remember which ID number you should be sending to the panels in order to get the pattern that you want.
 
-The arena uses the `.pat` file, which is not human-readable, but if you do not know the ID of your pattern, you can open the `.mat` file associated with that pattern in MATLAB. The structure it contains has an ID field with the ID number.
-
-### Set Function
-
-```matlab
-Panel_com('set_pattern_func_id',1)
-```
-
-This command works similar to the previous command, but with regard to the position functions instead of patterns. The same naming convention is suggested. This command is not necessary in some display modes, but it is necessary for [mode 1](protocol-designer_display-modes.md#mode-1).
+The arena uses the `.pat` or `.pfn` file, which is not human-readable, but if you do not know the ID of your pattern or function, you can open the `.mat` file associated with that pattern in MATLAB. The structure it contains has an ID field with the ID number.
 
 ### Start the Display
 
 ```matlab
-Panel_com('start_display', 3)
+dur = 5; #This is the duration you want the condition to run for in seconds
+ctlr.startDisplay(dur*10);
 ```
 
-This command tells the panels to start showing the previously sent information, specifically the mode, pattern, and function. Before you send this command, you must at least set the mode and the pattern id. Other commands are required, or not, depending on which mode you are using. The 3, in this command, is a duration. This tells the panels to display this pattern and function combination for 3 seconds. After that amount of time, it will automatically stop displaying the pattern.
+This command tells the panels to start showing the previously sent information; in this case, display the pattern and function provided in mode 1. This command requires a duration be passed into it, so it knows how long to display the condition for. Ideally, the duration is the length of your position function, or a multiple of it if you want it to repeat. We only use 5 seconds as an example. Notice the duration is multipled by 10. The controller expects duration in deciseconds, not seconds. We generally enter the duration in seconds, so as to be more readable to the user, and convert to deciseconds only when sending it to the controller. You could, however, save the duration variable as 50 and remove the multiplication.
 
 Once your pattern has run and the panels have gone dark again, submit the final command:
 
 ### Stop data logging
 
 ```matlab
-Panel_com('stop_log')
+ctlr.stopLog('showTimeoutMessage', true);
 ```
 
-It's very important to send the `stop_log` command. Were you to run a real condition this way and forget to stop the log, it would continue running and could disrupt other functions of the Panel Host, not to mention giving you lots of useless extra data and filling up your storage.
+It's very important to send the `stopLog` command. Were you to run a real condition this way and forget to stop the log, it would continue running and could disrupt other functions of the Panel Host, not to mention giving you lots of useless extra data and filling up your storage. 'showTimeoutMessage' is an optional input. There are times when the log has collected a very large amount of data, that it might take a while for the stopLog command to complete. Enabling this option will tell it to provide you with a message if the stopLog command times out. You can then stop it manually through the Host GUI by selecting Stop Log from the drop down menu of commands and hitting the Send button.
 
 ### Disconnect from the G4 Panel Host
 
 ```matlab
-% FIXME: deprecated
-disconnectHost
+ctlr.close();
 ```
-
-When you are done working with the panels, it is important to stop the connection.
+When you are done working with the panels, it is important to stop the connection and close out the controller.
 
 # What does this all mean
 
@@ -184,19 +203,19 @@ __Warning__: Please do not alter the default run protocol file. If you would lik
 
 Open `G4_Display_Tools/G4_Protocol_Designer/run_protocols/G4_default_run_protocol.m` in MATLAB.
 
-The run protocol is a MATLAB function which, unlike most of the G4 Display Tools code, can be replaced with your own function if you so choose. Any run protocol, whether it is our default one or custom made, must accept two variables as inputs, and return one variable as an output. The first input `runcon` is a structure containing all of the experiment parameters you are running. The second input `p` will be the handle to the [G4 Experiment Conductor's](experiment-conductor.md) GUI object to update update the progress bar and other GUI elements. The return variable `success` is a status variable which the Conductor will use to determine if the experiment was successful or if it was interrupted. Scroll down to line 50 in the file to see what these inputs and outputs look like:
+The run protocol is a MATLAB function which, unlike most of the G4 Display Tools code, can be replaced with your own function if you so choose. Any run protocol, whether it is a provided one or custom made, must accept two variables as inputs, and return one variable as an output. The first input `runcon` will be the handle to the [G4 Experiment Conductor's](experiment-conductor.md) GUI object to update the progress bar and other GUI elements. The second input `p` is a structure containing all of the experiment parameters you are running. The return variable `success` is a status variable which the Conductor will use to determine if the experiment was successful or if it was interrupted. Scroll down to line 54 in the file to see what these inputs and outputs look like:
 
 ```matlab
 function [success] = G4_default_run_protocol(runcon, p)  % input should always be 1 or 2 items
 ```
 
-__Note__: The code shown in this documentation was copied in November 2021 and might not represent the current state of the protocol. For improved readability on the website, some reformatting was applied. If in doubt, refer to the the code in the MATLAB file itself.
+__Note__: The code shown in this documentation was copied in April 2024 and might not represent the current state of the protocol. For improved readability on the website, some reformatting was applied. If in doubt, refer to the the code in the MATLAB file itself.
 {:.info}
 
-__Reminder__: It is strongly suggested that, if you want to make a custom run protocol, you make a copy of our default protocol and edit it however you choose, rather than writing a new file from scratch. That's because much of the code from our default protocol must be included for the default protocol to work.
+__Reminder__: It is strongly suggested that, if you want to make a custom run protocol, you make a copy of our default protocol and edit it however you choose, rather than writing a new file from scratch. That's because much of the code from our default protocol must be included for the protocol to work.
 {:.warning}
 
-For example, lines 53-60 in the `G4_default_run_protocol.m` are necessary code to give the run protocol access to the application items like the progress bar and labels. Lines 63-142 take the structure that was passed in and pull out all the experiment parameters it needs to run. You will not want to cut any of this out, as any given experiment may need all of these parameters.
+For example, lines 56-60 in the `G4_default_run_protocol.m` are necessary code to give the run protocol access to the application items like the progress bar and labels. Lines 63-142 take the structure that was passed in and pull out all the experiment parameters it needs to run. You will not want to cut any of this out, as any given experiment may need all of these parameters.
 
 <details closed markdown="block">
 <summary>
