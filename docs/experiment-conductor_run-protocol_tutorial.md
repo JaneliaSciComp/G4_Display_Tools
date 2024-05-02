@@ -436,6 +436,14 @@ Next we update the progress bar as we did before the pre-trial, and iterate the 
 
 Unlike the pre-trial, the parameters will change with each iteration of our loop, so next we define the parameters for this particular condition. We use the function, found in Modules, called `assign_block_trial_parameters` and it takes three inputs - `params`, `p`, and `cond`. It returns a struct called `tparams` containing this condition's parameters. These are then put into a cell array as expected by the controller, and passed to the controller. The Conductor's display is then updated with the current parameters. 
 
+Next we use the startDisplay command to run the condition, and then, as usual, check to see if the experiment has been aborted or paused, and update the elapsed time. 
+
+The next lines tell the loop to continue, or skip the rest of the loop, if it is the last trial of the last repetition. This way, there is no inter-trial between the last condition and the post-trial. If you wanted an inter-trial here, you could remove this if statement.
+
+The next line is a new if statement which runs an inter-trial assuming the experiment contains an inter-trial. The inter-trial progresses much the same as the block condition did. One difference can be found at line 262, after the progress bar update. One feature of the intertrial is that the user can set the frame index to 0. If it is set to 0, this means the frame index will be randomized each time the inter-trial is run. So we have an if statement which chooses a random frame from the intertrial's pattern and setting the index frame parameter accordingly. 
+
+After that, the controller and display parameters are update as usual  and the startDisplay command is sent. We then, again, check for abort or pause button presses and update the elapsed time.  
+
 <details closed markdown="block">
 <summary>
 Click to expand default run protocol around lines 194...296.
@@ -506,10 +514,6 @@ for r = 1:params.reps
             %Update progress bar to indicate start of inter-trial
             num_trial_of_total = num_trial_of_total + 1;
             runcon.update_progress('inter', r, params.reps, c, params.num_cond, num_trial_of_total)
-            progress_axes.Title.String = "Rep " + r + " of " + params.reps +...
-                ", Trial " + c + " of " + params.num_cond + ". Inter-trial running...";
-            progress_bar.YData = num_trial_of_total/total_num_steps;
-            drawnow;
             if params.inter_frame_ind == 0
                 inter_frame_ind = randperm(p.num_intertrial_frames,1);
                 ctlr_parameters_intertrial{7} = inter_frame_ind;

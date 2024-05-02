@@ -258,10 +258,7 @@ function [success] = G4_default_run_protocol(runcon, p)%input should always be 1
                         %Update progress bar to indicate start of inter-trial
                         num_trial_of_total = num_trial_of_total + 1;
                         runcon.update_progress('inter', r, params.reps, c, params.num_cond, num_trial_of_total)
-                        progress_axes.Title.String = "Rep " + r + " of " + params.reps +...
-                            ", Trial " + c + " of " + params.num_cond + ". Inter-trial running...";
-                        progress_bar.YData = num_trial_of_total/total_num_steps;
-                        drawnow;
+                        
                         if params.inter_frame_ind == 0
                             inter_frame_ind = randperm(p.num_intertrial_frames,1);
                             ctlr_parameters_intertrial{7} = inter_frame_ind;
