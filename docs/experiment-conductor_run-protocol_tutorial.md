@@ -552,7 +552,9 @@ end
 
 ## Run Post-Trial
 
-Lines 481-536 run the post-trial if there is one.
+Lines 295-326 run the post-trial if there is one. Follow along below or in the file. 
+
+The post-trial is run much like the others. In an if statement, we iterate the number of trials run, update the progress bar, and compile the post-trial parameters in a cell array. Then we update the controller and the display panel and start the condition. Notice after the condition runs this time, we only check if the experiment has been aborted, but not paused. Since at this point there are no more conditions to run, pausing wouldn't make sense. Finally we update the elapsed time. 
 
 <details closed markdown="block">
 <summary>
@@ -560,97 +562,84 @@ Click to expand default run protocol around lines 481…554.
 </summary>
 
 ```matlab
-
-% FIXME: old code example, not working anymore.
-if post_type == 1
-    
+%% Run post-trial if there is one--------------------------------------------
+if params.post_type == 1
     %Update progress bar--------------------------
     num_trial_of_total = num_trial_of_total + 1;
     runcon.update_progress('post', num_trial_of_total);
-     Panel_com('set_control_mode', post_mode);
-     
-     Panel_com('set_pattern_id', post_pat);
-     
-     if ~isempty(post_gain)
-         Panel_com('set_gain_bias', [post_gain, post_offset]);
-     end
-     if post_pos ~= 0
-         Panel_com('set_pattern_func_id', post_pos);
-         
-     end
-     if post_mode == 2
-         Panel_com('set_frame_rate', post_frame_rate);
-     end
-     if post_frame_ind == 0
-         post_frame_ind = randperm(p.num_posttrial_frames, 1);
-     end
-         
-     Panel_com('set_position_x',post_frame_ind);
-     
-     for i = 1:length(post_ao_ind)
-         if post_ao_ind(i) ~= 0 %if it is zero, there was no ao function for this channel
-             Panel_com('set_ao_function_id',...
-               [p.active_ao_channels(i), post_ao_ind(i)]);
-               %[channel number, index of ao func]
-             
-         end
-     end
-     
-     %Update status panel to show current parameters
-     runcon.update_current_trial_parameters(post_mode, ...
-        post_pat, post_pos, ...
-        p.active_ao_channels, ...
-        post_ao_ind, post_frame_ind, ...
-        post_frame_rate, ...
-        post_gain, post_offset, post_dur);
-    
-     Panel_com('start_display',post_dur+2);
-     pause(post_dur);
-     
-     if runcon.check_if_aborted() == 1
-        Panel_com('stop_display');
-        pause(.1);
-        Panel_com('stop_log');
-        pause(1);
-        % FIXME: deprecated
-        disconnectHost;
+
+    ctlr_parameters_posttrial = {params.post_mode, params.post_pat, params.post_gain, ...
+        params.post_offset, params.post_pos, params.post_frame_rate, params.post_frame_ind, ...
+        params.active_ao_channels, params.post_ao_ind};
+
+    ctlr.setControllerParameters(ctlr_parameters_posttrial);
+
+    %Update status panel to show current parameters
+    runcon.update_current_trial_parameters(params.post_mode, ...
+        params.post_pat, params.post_pos, p.active_ao_channels, ...
+        params.post_ao_ind, params.post_frame_ind, params.post_frame_rate, ...
+        params.post_gain, params.post_offset, params.post_dur);
+
+    ctlr.startDisplay((params.post_dur + .5)*10);
+
+    if runcon.check_if_aborted() == 1
+        ctlr.stopDisplay();
+        ctlr.stopLog('showTimeoutMessage', true);
+        if isa(ctlr, 'PanelsController')
+            ctlr.close();
+        end
+        clear global;
         success = 0;
         return;
-     
-     end
-     runcon.update_elapsed_time(round(toc,2));
-     
+    end
+    runcon.update_elapsed_time(round(toc(startTime),2));
 end
-Panel_com('stop_display');
-
-pause(1);
-%Panel_com('stop_log');
-stop_log_response = send_tcp( char([1 hex2dec('40')]), 1);
-if stop_log_response.success == 1
-    waitfor(errordlg("Stop Log command failed, please stop log manually then hit a key"));
-    waitforbuttonpress;
-end
-pause(1);     
-% FIXME: deprecated     
-disconnectHost;
-
-pause(1);
-success = 1;
 ```
-
 </details>
 
-Notice that in the line starting with `stop_log_response`, instead of using the `stop_log` command, the default run protocol uses `send_tcp` directly. This is because a common problem has been that the `stop_log` command does not go through due to some back-up with the panels, and then the Conductor can not do its job of moving the data files to where they need to go, because the log is still running. We've done this so that if the stop log command fails, we can allow the user to stop the log manually before moving on.
+## Closing code
+
+After the post-trial has run, there are just a few more lines of code to close everything down, shown below. We send the stopDisplay command, a command you haven't seen yet. Usually, when conditions are being run in sequence, the previous condition starts displaying when the screens receive a new one. There is no need to stop the display in between. But after the last condition has displayed, there will be no more commands coming, so you need to instruct the screens to turn off using `ctlr.stopDisplay()`. 
+
+The next line is where we stop the log running. Notice we pass in two variables, `timeout` set to 60.0 and `showTimeoutDialog` set to true. These tell the controller to give the command 60 seconds to complete, and if it takes longer than that, to display a timeout message which instructs the user to stop the log manually. We do this because, on occasion, a large amount of data or some glitch in the host will cause the `stopLog` command to stall. This ensures it doesn't disrupt the rest of the code if it happens. 
+
+Next we check to see if the controller still exists, and if it does we close it. We clear any global variables, and set the `success` variable to 1, so the Conductor knows the experiment was run successfully.
+
+<details closed markdown="block">
+<summary>
+Click to expand default run protocol around lines 328-336.
+</summary>
+
+```matlab
+ctlr.stopDisplay();
+
+ctlr.stopLog('timeout', 60.0, 'showTimeoutDialog', true);
+
+if isa(ctlr, 'PanelsController')
+    ctlr.close();
+end
+clear global;
+success = 1;
+```
+</details>
 
 # Run Protocol Requirements
 
 So now that you've seen how our run protocol is structured, you can probably tell where, if anywhere, you might want to make changes. But whatever changes you make, remember that these things MUST be done in the run protocol:
 
-- It must take in two variables, and assign its parameters from those variables as happens in the first 160 lines or so of this file.
-- You must include a pause after `connectHost`, `start_log`, `start_display`, `stop_display`, `stop_log`, and `disconnectHost` commands. The pause after `start_display` must equal or be slightly longer than the duration of the trial. The rest should just be a small pause as these commands sometimes take a few hundred milliseconds to carry out. We use 1 second as default.
-- If you want the conductor to be updated, you must use its built in functions the same way they are used in this file. Some require variables be passed in. These functions include:
+- It must take in two variables, and assign its parameters from those variables. It must also return one variable.
+- If you want the conductor to be updated, you must give it access to the necessary handles and use its built in functions the same way they are used in this file. Some require variables be passed in. These functions include:
   - `update_elapsed_time` - updates the elapsed time shown on the Conductor. Takes in one argument, a number.
-  - `update_progress` - updates text above the progress bar. Takes in several variables, see line 417 for an example. Note the lines following this function (lines 417-421) must all be run to display this update on the Conductor.
-  - `update_current_trial_parameters` - The conductor shows the parameters (pattern id, function id, mode, etc) of any given trial as it runs. This updates the conductor to show the current trial. You must pass in all the parameters for that condtion. (See line 456 for an example)
+  - `update_progress` - updates text above the progress bar. Takes in several variables, see line 201 for an example.
+  - `update_current_trial_parameters` - The conductor shows the parameters (pattern id, function id, mode, etc) of any given trial as it runs. This updates the conductor to show the current trial. You must pass in all the parameters for that condtion. (See line 216 for an example)
   - `check_if_aborted` - checks if the _Abort_{:.gui-btn} button has been clicked, returns 0 for no, 1 for yes.
-- You must remember to `stop_display`, `stop_log`, and `disconnectHost` at the end of the file.
+  - `check_if_paused` - checks if the _Pause_{:.gui-btn} button has been clicked, returns 0 for no, 1 for yes. 
+  - `pause` - actually pauses the experiment in the case `check_if_paused` returns a 1.
+- You must remember to `stopDisplay`, `stopLog`, close the host, and set `success=1` at the end of the file.
+- All required functions must have their inputs in the correct format and order.
+
+It is not required that you use the functions found in the Modules folder, but it is recommended that you look at the code in them to see how they work. You could use them, if they'll serve you, or you can write code to serve their functions in the run protocol yourself. 
+
+# The other run protocols
+
+Here we went through the simplest run protocol. Others that include features like streaming, have additional code and commands in them. They are well commented and you can read through them to see what extra steps are taken if you would like to implement their features in your own code. If you have any questions about them, you can contact [Lisa (Taylor) Ferguson](mailto:taylorl@janelia.hhmi.org).
