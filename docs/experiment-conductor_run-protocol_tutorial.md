@@ -640,6 +640,101 @@ So now that you've seen how our run protocol is structured, you can probably tel
 
 It is not required that you use the functions found in the Modules folder, but it is recommended that you look at the code in them to see how they work. You could use them, if they'll serve you, or you can write code to serve their functions in the run protocol yourself. 
 
+# Adding your custom protocol to the Conductor
+
+If you create a custom run protocol, you must add it to the drop down list of run protocols in the Conductor in order to be able to use it from the GUI. This will require you to slightly alter some of the underlying Conductor code. 
+
+Please note: This code is crucial for the Conductor to run. DO NOT edit any code outside of the specific changes detailed below.
+{:.error}
+
+Once you've created your run protocol, save it in the folder `G4_Display_Tools\G4_Protocol_Designer\run_protocols`. Then browse to `G4_Display_Tools\G4_Protocol_Designer\support_files\classes` and open the file called `G4_conductor_model.m`. 
+
+At line 108, you will see this line of code: 
+
+```matlab
+self.run_protocol_file_list = {'Simple', 'Combined Command', 'Streaming', 'Log Reps Separately', 'CC + Streaming', 'CC + Log Reps', 'Streaming + Log Reps', 'CC + Streaming + Log Reps'};
+```
+
+You will add a string to the end of this cell array. The string should be whatever you want displayed in the drop down list to represent your run protocol, a human readable but short descriptor. For example, after your edit, this line might look like this: 
+
+```matlab
+self.run_protocol_file_list = {'Simple', 'Combined Command', 'Streaming', 'Log Reps Separately', 'CC + Streaming', 'CC + Log Reps', 'Streaming + Log Reps', 'CC + Streaming + Log Reps', 'My Custom Protocol'};
+```
+
+Next scroll to line 199. There is a function called `get_run_filename`. This switch statement gives the file associated with each descriptor in the cell array you just edited. The function looks like this: 
+
+<details closed markdown="block">
+<summary>
+Click to expand get_run_filename function
+</summary>
+
+```matlab
+
+function filename = get_run_filename(self)
+    switch self.run_protocol_num
+        case 1
+            filename = 'G4_default_run_protocol.m';
+        case 2
+            filename = 'G4_run_protocol_combinedCommand.m';
+        case 3
+            filename = 'G4_default_run_protocol_streaming.m';
+        case 4
+            filename = 'G4_run_protocol_blockLogging.m';
+        case 5
+            filename = 'G4_run_protocol_CC_streaming.m';
+        case 6
+            filename = 'G4_run_protocol_CC_blockLogging.m';
+        case 7
+            filename = 'G4_run_protocol_streaming_blockLogging.m';
+        case 8
+            filename = 'G4_run_protocol_CC_streaming_blockLogging.m';
+        otherwise
+            disp("Invalid run protocol selected.");
+    end
+end
+
+```
+</details>
+
+You will add a 9th case to this switch statement with the filename of your run protocol. So it should now look like this: 
+
+<details closed markdown="block">
+<summary>
+Click to expand edited get_run_filename function
+</summary>
+
+```matlab
+
+function filename = get_run_filename(self)
+            switch self.run_protocol_num
+                case 1
+                    filename = 'G4_default_run_protocol.m';
+                case 2
+                    filename = 'G4_run_protocol_combinedCommand.m';
+                case 3
+                    filename = 'G4_default_run_protocol_streaming.m';
+                case 4
+                    filename = 'G4_run_protocol_blockLogging.m';
+                case 5
+                    filename = 'G4_run_protocol_CC_streaming.m';
+                case 6
+                    filename = 'G4_run_protocol_CC_blockLogging.m';
+                case 7
+                    filename = 'G4_run_protocol_streaming_blockLogging.m';
+                case 8
+                    filename = 'G4_run_protocol_CC_streaming_blockLogging.m';
+                case 9
+                    filename = 'My_Custom_Protocol.m'; 
+                otherwise
+                    disp("Invalid run protocol selected.");
+            end
+        end
+
+```
+</details>
+
+These changes will cause your new custom protocol to be displayed in the drop down list provided by the Conductor, and allow you to select it. If selected, it will be run like any of the other run protocols, which is why it is important that it take the same inputs and provide the same output as they do. 
+
 # The other run protocols
 
 Here we went through the simplest run protocol. Others that include features like streaming, have additional code and commands in them. They are well commented and you can read through them to see what extra steps are taken if you would like to implement their features in your own code. If you have any questions about them, you can contact [Lisa (Taylor) Ferguson](mailto:taylorl@janelia.hhmi.org).
