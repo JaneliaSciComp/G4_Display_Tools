@@ -192,11 +192,11 @@ When you are done working with the panels, it is important to stop the connectio
 
 Keep in mind you never have to use any of these commands. All of this is handled for you by either the Panel Host or the [G4 Experiment Conductor](experiment-conductor.md), and if you are happy with the default run protocol, you should never have to worry about these commands.
 
-But now that you have seen how these commands work, it might be more clear what the run protocol file does. The run protocol is the file which actually utilizes these commands to send the patterns, functions, and other parameters saved in your experiment to the panels. You could create your own run protocol if you wanted to change how or when any given condition in your experiment is displayed on the panels.
+But now that you have seen how these commands work, it might be more clear what the run protocol file does. The run protocol is the file which actually utilizes these commands to send the patterns, functions, and other parameters saved in your experiment to the panels. You could create your own run protocol if you wanted to change how or when any given condition in your experiment is displayed on the panels. Keep in mind, the run protocol is inherently more complicated than the code above because it also needs to pass information back to the Conductor to keep the user updated. Additional features, like the streaming feature, add code as well. You'll need to include this code in your custom run protocol for it to work with the Conductor software. 
 
-So let's look at the default run protocol and see what it controls and what it doesn't. Please note that this tutorial does not use the default streaming protocol. However, if you wanted to create your own run protocol that does collect data as the experiment runs for display on the Conductor, you would want to base your run protocol off of the default streaming run protocol.
+So let's look at the default run protocol and see what it looks like. Please note that this tutorial uses the simplest protocol. However, if you wanted to create your own run protocol that includes the streaming, block logging, or combined command features, you can.  You'd want to base it off of the provided run protocol that has the features you want to use in your own.
 
-__Warning__: Please do not alter the default run protocol file. If you would like to create your own run protocol, you may start a new `.m` file, or make a copy of the default run protocol and alter that.
+__Warning__: Please do not alter the provided run protocol file. If you would like to create your own run protocol, you may start a new `.m` file, or make a copy of the provided run protocol and alter that.
 {:.warning}
 
 # The Default Run Protocol
@@ -212,156 +212,82 @@ function [success] = G4_default_run_protocol(runcon, p)  % input should always b
 __Note__: The code shown in this documentation was copied in April 2024 and might not represent the current state of the protocol. For improved readability on the website, some reformatting was applied. If in doubt, refer to the the code in the MATLAB file itself.
 {:.info}
 
-__Reminder__: It is strongly suggested that, if you want to make a custom run protocol, you make a copy of our default protocol and edit it however you choose, rather than writing a new file from scratch. That's because much of the code from our default protocol must be included for the protocol to work.
+__Reminder__: It is strongly suggested that, if you want to make a custom run protocol, you make a copy of our provided protocol and edit it however you choose, rather than writing a new file from scratch. That's because much of the code from our default protocol must be included for the protocol to work.
 {:.warning}
 
-For example, lines 56-60 in the `G4_default_run_protocol.m` are necessary code to give the run protocol access to the application items like the progress bar and labels. Lines 63-142 take the structure that was passed in and pull out all the experiment parameters it needs to run. You will not want to cut any of this out, as any given experiment may need all of these parameters.
+For example, lines 56-60 in the `G4_default_run_protocol.m` are necessary code to give the run protocol access to the application items like the progress bar and labels. You also have access to a number of pre-made functions, saved in the Modules folder, which you can use in your custom protocol. By using the provided protocol, you can see and copy how these functions are used, like at line 63, where the function assign_parameters pulls the parameters out of the passed in structure and formats them for easier use. 
+
+## Set up parameters and confirm experiment start
 
 <details closed markdown="block">
 <summary>
-Click to expand default run protocol around lines 53…167
+Click to expand default run protocol lines 54...99
 </summary>
 
 ```matlab
-global ctrl;
+function [success] = G4_default_run_protocol(runcon, p)%input should always be 1 or 2 items
 
-% fig = runcon.fig;
-if ~isempty(runcon.view)
-    progress_bar = runcon.view.progress_bar;
-    progress_axes = runcon.view.progress_axes;
-    axes_label = runcon.view.axes_label;
-end
+    if ~isempty(runcon.view)
+        progress_bar = runcon.view.progress_bar;
+        progress_axes = runcon.view.progress_axes;
+        axes_label = runcon.view.axes_label;
+    end
 
-%% Set up parameters 
-%pretrial params-----------------------------------------------------
-if isempty(p.pretrial{1}) %no need to set up pretrial params
-    pre_start = 0;
-else %set up pretrial params here
-    pre_start = 1;
-    pre_mode = p.pretrial{1};
-    pre_pat = p.pretrial_pat_index;
-    pre_pos = p.pretrial_pos_index;
-    pre_ao_ind = p.pretrial_ao_indices;
-    if isempty(p.pretrial{8})
-        pre_frame_ind = 1;
-    elseif strcmp(p.pretrial{8},'r')
-        pre_frame_ind = 0; %use this later to randomize
+    %% Set up parameters
+    params = assign_parameters(p);
+    if params.inter_type == 1
+        ctlr_parameters_intertrial = {params.inter_mode, params.inter_pat, params.inter_gain, ...
+            params.inter_offset, params.inter_pos, params.inter_frame_rate, params.inter_frame_ind, ...
+            params.active_ao_channels, params.inter_ao_ind};
     else
-        pre_frame_ind = str2num(p.pretrial{8});
+        ctlr_parameters_intertrial = {};
     end
-    pre_frame_rate = p.pretrial{9};
-    pre_gain = p.pretrial{10};
-    pre_offset = p.pretrial{11};
-    pre_dur = p.pretrial{12};
-end
 
-%intertrial params---------------------------------------------------
-if isempty(p.intertrial{1})
-    inter_type = 0;%indicates whether or not there is an intertrial
-else
-    inter_type = 1;
-    inter_mode = p.intertrial{1};
-    inter_pat = p.intertrial_pat_index;
-    inter_pos = p.intertrial_pos_index;
-    inter_ao_ind = p.intertrial_ao_indices;
-    if isempty(p.intertrial{8})
-        inter_frame_ind = 1;
-    elseif strcmp(p.intertrial{8},'r')
-        inter_frame_ind = 0; %use this later to randomize
+    %% Open new Panels controller instance
+    ctlr = PanelsController();
+    ctlr.open(true);
+
+    %% Set root directory to the experiment folder
+    ctlr.setRootDirectory(p.experiment_folder);
+
+    %% set active ao channels
+    ctlr.setActiveAOChannels(params.active_ao_channels);
+
+    %% confirm start experiment
+    if ~isempty(runcon.view)
+        start = questdlg('Start Experiment?','Confirm Start','Start','Cancel','Start');
     else
-        inter_frame_ind = str2num(p.intertrial{8});
+        start = 'Start';
     end
-    inter_frame_rate = p.intertrial{9};
-    inter_gain = p.intertrial{10};
-    inter_offset = p.intertrial{11};
-    inter_dur = p.intertrial{12};
-end
 
-%posttrial params------------------------------------------------------
-if isempty(p.posttrial{1})
-    post_type = 0;%indicates whether or not there is a posttrial
-else
-    post_type = 1;
-    post_mode = p.posttrial{1};
-    post_pat = p.posttrial_pat_index;
-    post_pos = p.posttrial_pos_index;
-    post_ao_ind = p.posttrial_ao_indices;
-    if isempty(p.posttrial{8})
-        post_frame_ind = 1;
-    elseif strcmp(p.posttrial{8},'r')
-        post_frame_ind = 0; %use this later to randomize
-    else
-        post_frame_ind = str2num(p.posttrial{8});
-    end
-    post_frame_rate = p.posttrial{9};
-    post_gain = p.posttrial{10};
-    post_offset = p.posttrial{11};
-    post_dur = p.posttrial{12};
-end
+    switch start
 
-%define static block trial params (will define the ones that change every
-%loop later)--------------------------------------------------------------
-block_trials = p.block_trials; 
-block_ao_indices = p.block_ao_indices;
-reps = p.repetitions;
-num_cond = length(block_trials(:,1)); %number of conditions
+        case 'Cancel'
+            if isa(ctlr, 'PanelsController')
+                ctlr.close();
+            end
+            clear global;
+            success = 0;
+            return;
 
-%% Start host and switch to correct directory
-if ~isempty(ctrl)
-    if ctrl.isOpen() == 1
-       ctrl.close()
-    end
-end
-% FIXME: deprecated
-connectHost;
-pause(10);
-Panel_com('change_root_directory', p.experiment_folder);
-
-%% set active ao channels
-% FIXME: this is outdated code
-if ~isempty(p.active_ao_channels)
-    aobits = 0;
-   for bit = p.active_ao_channels
-       aobits = bitset(aobits,bit+1); %plus 1 bc aochans are 0-3
-   end
-   Panel_com('set_active_ao_channels', dec2bin(aobits,4));
-end
+        case 'Start' %The rest of the code to run the experiment goes under this case
 ```
 
 </details>
 
-Around line 170 is where the code starts that you're more likely to be interested in. Start at line 170 and scroll down with me as I explain the code's various steps.
+This first section of code is less likely to be altered for your custom protocol, but let's go through it briefly just in case. First we check if the GUI exists. You can run an experiment directly from command line with no need for the GUI, so this ensures the same run protocol can be used whether the GUI is present or not. If it is present, it stores the handles to the progress bar, the progress axes, and the axes label into easily used variables.
 
-## Confirm to run the experiment
+Next we use the function assign_parameters to pull the parameters out of the provided structure and make them more easily readable. This may seem redundant, but for example, the provided structure's intertrial parameters are saved in a cell array. The mode is intertrial{1}. The frame rate is intertrial{9}. It's not necessarily easy to remember which parameter is which element in the array. In addition, there are a few parameters that need to be calculated from the provided information, like the total number of conditions. We return a struct called params where every parameter is saved in an easily readable variable name for use later on. 
 
-The following code from the default run protocol prompts the user to confirm they want to run the experiment and gives them an option to cancel it. (l169-182)
+Remember parameters are sent to the controller in a cell array. So after using the assign_parameters function, we combine all the intertrial parameters into a cell array that will be passed to controller when it is time to run the intertrial.  We don't do the pretrial or posttrial here because these are only run once. Therefore, we do it right before they run, assuming they are present. The intertrial, if present, runs many times, so it saves time to format its parameters at the beginning.
 
-<details closed markdown="block">
-<summary>
-Click to expand default run protocol around lines 169…182
-</summary>
+Next we open the controller, set the root directory, and set any active AO channels. After that, assumign the GUI is present, we provide a dialog box to the user confirming they want to start the experiment. They have the chance  to cancel here. A switch statement is used and the rest of the code to run the experiment is contained under the "start" case. 
 
-```matlab
-%% confirm start experiment
-if ~isempty(runcon.view)
-    start = questdlg('Start Experiment?','Confirm Start','Start','Cancel','Start');
-else
-    start = 'Start';
-end
-switch start
-    case 'Cancel'
-        %FIXME: deprecated
-        disconnectHost;
-        success = 0;
-        return;
-    case 'Start' 
-```
+It's recommended you leave this code as it is unless there's a reason  you'd like to change how the parameters are stored. 
 
-</details>
+## Determine number of trials and experiment duration
 
-## Determine number of trials
-
-Then the run protocol looks at the experiment and determines how many trials will be run in total.
+Then the run protocol looks at the experiment and determines how many trials will be run in total and how long the experiment should take.  We also update the progress bar's label to refelct the experiment length, and establish a counter to track how far along in the experiment we are as it goes on.
 
 <details closed markdown="block">
 <summary>
@@ -369,73 +295,30 @@ Click to expand default run protocol around lines 187…200
 </summary>
 
 ```matlab
-total_num_steps = 0; 
-if pre_start == 1
-    total_num_steps = total_num_steps + 1;
-end
-if inter_type == 1
-    total_num_steps = total_num_steps + (reps*num_cond) - 1;
-    %Minus 1 because there is no intertrial before the first
-    %block trial OR after the last block trial.
-end
-if post_type == 1
-    total_num_steps = total_num_steps + 1;
-end
-total_num_steps = total_num_steps + (reps*num_cond);
-```
+%% Determine the total number of trials in order to define in what increments
+%the progress bar will progress.-------------------------------------------
+total_num_steps = get_total_num_trials(params);
 
-</details>
+%% Determine how long the experiment will take and update the title of the            %progress bar to reflect it------------------------------------------------
+total_time = get_total_experiment_length(params);
 
-Note that, for the default run protocol no inter-trial is played before the first block trial or after the last block trial. It assumes the pre-trial and post-trial are only played once.
-
-Details like this could change the experiment slightly, so if you wanted to do this differently, you would need to change this code. (l187-200)
-
-## Calculate experiment duration
-
-Then it calculates how long the experiment will take and updates the progress bar's text. (l205-231)
-
-<details closed markdown="block">
-<summary>
-Click to expand default run protocol around lines 205…231
-</summary>
-
-```matlab
-total_time = 0; 
-if inter_type == 1
-    for i = 1:num_cond
-        total_time = total_time + p.block_trials{i,12} + inter_dur;
-    end
-    total_time = (total_time * reps) - inter_dur; 
-    % bc no inter-trial before first rep OR after last rep of the block.
-else %meaning no inter-trial
-    for i = 1:num_cond
-        total_time = total_time + p.block_trials{i,12};
-    end
-    total_time = total_time * reps;
-end
-if pre_start == 1
-    total_time = total_time + pre_dur;
-end
-if post_type == 1
-    total_time = total_time + post_dur;
-end
-
-% Update the progress bar's label to reflect the expected
-% duration.
+%Update the progress bar's label to reflect the expected
+%duration.
 axes_label.String = "Estimated experiment duration: " + num2str(total_time/60) + " minutes.";
 
-% Will increment this every time a trial is completed to track how far along 
-% in the experiment we are
+%Will increment this every time a trial is completed to track how far along
+%in the experiment we are
 num_trial_of_total = 0;
+
 ```
 
 </details>
+
+Note that we call separate functions, saved in Modules, called `get_total_num_trials` and `get_total_experiment_length` to do these calculations. These functions assume that no inter-trial is played before the first block trial or after the last block trial of the last repetition. They assume the pre-trial and post-trial are only played once. Were these details to change, the code in thes side functions would also need to be edited.
 
 ## Start the log
 
-Around line 234 we start using [`Panel_com`](pcontrol.md) commands. This is why you must be familiar with them if you want to write your own run protocol. The default run protocol uses this order of operations:
-
-First, start the data logging with `start_log` (l234…236).
+Line 117-122 checks to see if the pause button has been pressed. If it has, it runs the pause method from the Conductor.  Then we start the data log. If the log fails to start for some reason, we abort the experiment. At line 127 we run `runcon.abort_experiment()`. Usually, this method is run when the user presses the _Abort_{:.gui-btn} button. Running this method in the code is how you press _Abort_{:.gui-btn} programmatically. The following if statement and everything in it is what the protocol uses throughout to check and respond to to the button press.
 
 <details closed markdown="block">
 <summary>
@@ -443,19 +326,39 @@ Click to expand default run protocol around lines 235…236
 </summary>
 
 ```matlab
-Panel_com('start_log');
-pause(1);
+%% Make sure the pause button hasn't been pressed
+is_paused = runcon.check_if_paused();
+if is_paused
+    disp("Experiment is paused. Please press pause button again to continue.");
+    runcon.pause();
+end
+
+%% Start log, if fails twice, abort------------------------------------
+log_started = ctlr.startLog();
+if ~log_started
+    runcon.abort_experiment();
+end
+if runcon.check_if_aborted()
+    if isa(ctlr, 'PanelsController')
+        ctlr.close();
+    end
+    clear global;
+    success = 0;
+    return;
+end
 ```
 
 </details>
 
-## Set up the pre-trial
+## Set up and run the pre-trial
 
-If there is a pre-trial, set the mode (`set_control_mode`), pattern (`set_pattern_id`), x position (`set_position_x`), function (`set_pattern_func_id`), gain and bias (`set_gain_bias`), frame rate (`set_frame_rate`), and ao functions (`set_ao_function_id`).
+The next block of code (lines 138-191) runs the pre-trial if it exists. Click to expand the code below and follow along, or follow along in the file. First we use `tic` to get the start time of the experiment. This variable, `startTime` is what we will use to track how much time has elapsed througout the experiment.  This is set regardless of whether there is a pre-trial. 
 
-Note that not all of these are used for every pre-trial. Each mode requires a subset of these, but your run protocol needs to always define them so it will work with any mode.
+Then we have an if statement which will only execute if there is a pre-trial to run. First we use the Conductor's method `update_progress` to update the progress bar. We pass in 'pre' to tell it that we're about to run the pre-trial. We also iterate `num_trial_of_total` which, remember, is how we keep track of how many trials in to the experiment we are. Next we set the controller parameters. Combine them into the cell array as required by the controller, and then pass them along. After the controller is updated, we update the display on the Conductor to reflect the correct condition parameters. This conductor method, `update_current_trial_parameters` requires all inputs shown, in that order. We give a short pause to allow the graphics time to update. Next we run the pre-trial.
 
-You can see in the top half of this file how these values are taken from the `runcon` experiment structure passed in, which is why you likely want to leave the first 160 lines or so as they are. (l240-288)
+An `if` statement at line 159 checks to see if the duration for the pre-trial is set to 0. This is another feature we have in the default run protocol that you may or may not care about. If you set the duration of the pre-trial to 0, this means the pre-trial will run indefinitely until you hit a button to tell it to move on. This is often useful if you don't want to move on with the experiment until your fly has fixated correctly and you don't know exactly how long that will take. Notice, that it will not actually run indefinitely. If the pretrial duration is 0, we pass 200 seconds in as the duration. The length duration you can pass to the panels with your `startDisplay` command is actually limited. Also note that we pass a second parameter into startDisplay. This sets the waitForEnd parameter to 'false'. This tells the startDisplay command that instead of waiting until the trial is over, we should continue running subsequent code immediately, while the condition is running. This way, the `waitforbuttonpress` command will execute right away and the user can press a button when they are ready for the experiment to continue.
+
+The code following this will be used after every condition. We check to see if the abort button has been pressed, we check to see if the pause button has been pressed, and then we run the Conductor method `update_elapsed_time`. We pass into this the amount of time that has passed so far, rounded to 2 digist. We get this with the toc command, and pass in our startTime variable, which gives us the time elapsed since we created startTime. You must include this code as well if you want the GUI to work as expected. 
 
 <details closed markdown="block">
 <summary>
@@ -463,279 +366,180 @@ Click to expand default run protocol around lines 240…288
 </summary>
 
 ```matlab
-if pre_start == 1
+%% run pretrial if it exists----------------------------------------
+startTime = tic;
+if params.pre_start == 1
     %First update the progress bar to show pretrial is running----
     runcon.update_progress('pre');
     num_trial_of_total = num_trial_of_total + 1;
-   %Set the panel values appropriately----------------
-    Panel_com('set_control_mode',pre_mode);
-    if pre_mode == 3 %For some reason, mode 3 specifically screws up the run,...
-                     %  making subsequent trials glitch. 
-        pause(.1);   %A pause is unnecessary with other modes but seems necessary...
-                     %  with mode 3. Will investigate further.
+
+    %Set the panel values appropriately----------------
+    ctlr_parameters_pretrial = {params.pre_mode, params.pre_pat, params.pre_gain, ...
+        params.pre_offset, params.pre_pos, params.pre_frame_rate, params.pre_frame_ind, ...
+        params.active_ao_channels, params.pre_ao_ind};
+    ctlr.setControllerParameters(ctlr_parameters_pretrial);
+
+    %Update status panel to show current parameters
+    runcon.update_current_trial_parameters(params.pre_mode, params.pre_pat, ...
+        params.pre_pos, p.active_ao_channels, params.pre_ao_ind, ...
+        params.pre_frame_ind, params.pre_frame_rate, params.pre_gain, ...
+        params.pre_offset, params.pre_dur);
+    pause(0.01);
+
+    %Run pretrial on screen
+    if params.pre_dur ~= 0
+        ctlr.startDisplay(params.pre_dur*10); %Panelcom usually did the *10 for us. Controller expects time in deciseconds
+    else
+        ctlr.startDisplay(2000, false); %second input, waitForEnd, equals false so code will continue executing
+        w = waitforbuttonpress; %If pretrial duration is set to zero, this
+        %causes it to loop until you press a button.
     end
-    
-    Panel_com('set_pattern_id', pre_pat);
-    if pre_mode == 3
-        pause(.1);
-    end
-       
-    %randomize frame index if indicated
-    if pre_frame_ind == 0
-        pre_frame_ind = randperm(p.num_pretrial_frames, 1);
-    end
-    
-    Panel_com('set_position_x',pre_frame_ind);
-    if pre_mode == 3
-        pause(.1);
-    end
-    
-    if pre_pos ~= 0
-        Panel_com('set_pattern_func_id', pre_pos);   
-    end
-
-    if ~isempty(pre_gain) %this assumes you'll never have gain without offset
-        Panel_com('set_gain_bias', [pre_gain, pre_offset]);
-    end
-
-    if pre_mode == 2
-        Panel_com('set_frame_rate', pre_frame_rate);
-    end
-
-    for i = 1:length(pre_ao_ind)
-        if pre_ao_ind(i) ~= 0 %if it is zero, there was no ao function for this channel
-            Panel_com('set_ao_function_id',...
-              [p.active_ao_channels(i), pre_ao_ind(i)]);
-                %[channel number, index of ao func]
-        end
-    end
-```
-
-</details>
-
-## Update the Experiment Conductor GUI
-
-Once the parameters are all set, line 291 runs a function that belongs to the [G4 Experiment Conductor](experiment-conductor.md). This function updates the data being displayed on the G4 Experiment Conductor window regarding which trial is being displayed. You can use this function in your own run protocols, but you must call it exactly as it is called here and pass in the correct variables. In our case, `runcon` is the handle to the G4 Experiment Conductor which was passed in at the beginning of the file, but you could name this anything you want in your own run protocol.
-
-<details closed markdown="block">
-<summary>
-Click to expand default run protocol around lines 291…294.
-</summary>
-
-```matlab
-runcon.update_current_trial_parameters(pre_mode, pre_pat, pre_pos, p.active_ao_channels, ...
-   pre_ao_ind, pre_frame_ind, pre_frame_rate, pre_gain, pre_offset, pre_dur);
-pause(0.01);
-```
-
-</details>
-
-## Repetition of pre-trials
-
-An `if` statement at line 297 checks to see if the duration for the pre-trial is set to 0. This is another feature we have in the default run protocol that you may or may not care about. If you set the duration of the pre-trial to 0, this means the pre-trial will run indefinitely until you hit a button to tell it to move on. This is often useful if you don't want to move on with the experiment until your fly has fixated correctly and you don't know exactly how long that will take. Notice, that it will not actually run indefinitely. If the pretrial duration is 0, we pass 2000 seconds to the `Panel_com` as the duration. The length duration you can pass to the panels with your `start_display` command is actually limited. (297-304)
-
-<details closed markdown="block">
-<summary>
-Click to expand default run protocol around lines 297…304.
-</summary>
-
-```matlab
-if pre_dur ~= 0
-   Panel_com('start_display', pre_dur+2);
-   pause(pre_dur + .01);
-else
-    Panel_com('start_display', 2000);
-    w = waitforbuttonpress; %If pretrial duration is set to zero, this
-    %causes it to loop until you press a button.
 end
-```
 
-</details>
+% Turn off AO functions if there are any
+% for i = 1:length(p.active_ao_channels)
+%     self.setAOFunctionID(p.active_ao_channels(i), 0);
+% end
 
-Notice that after a `start_display` command is sent to `Panel_com`, we then put a `pause` directly after it which lasts for the duration of the trial plus one hundredth of a second. If you do not do this, your run protocol code will continue running while the trial you just displayed is still displaying on the panels. This is bad because it will start trying to set the parameters for the next trial while the previous one is still running, which will cause the panels to back up and get glitchy. If you write your own protocol, you must remember to include these pauses.
-
-## Interactions with G4 Experiment Conductor
-
-Another two functions from our [G4 Experiment Conductor](experiment-conductor.md) are called at lines 307 and 318. The first, called `check_if_aborted`, must be included in any of your run protocols if you want the _Abort_{:.gui-btn} button the G4 Experiment Conductor to work. In our run protocol, it checks if the _Abort_{:.gui-btn} button has been clicked at the end of every trial.
-
-At line 318, the elapsed time displayed on the Conductor is updated. This also is done at the end of every trial.
-
-<details closed markdown="block">
-<summary>
-Click to expand default run protocol around lines 307…318.
-</summary>
-
-```matlab
 if runcon.check_if_aborted()
-   Panel_com('stop_display');
-   pause(.1);
-   Panel_com('stop_log');
-   pause(1);
-   % FIXME: deprecated
-   disconnectHost;
+   ctlr.stopDisplay();
+   ctlr.stopLog('showTimeoutMessage', true);
+   if isa(ctlr, 'PanelsController')
+       ctlr.close();
+   end
+   clear global;
    success = 0;
    return;
-
 end
 
-runcon.update_elapsed_time(round(toc,2));
+is_paused = runcon.check_if_paused();
+if is_paused
+    ctlr.stopLog();
+    disp("Experiment is paused. Please press pause button again to continue.");
+    runcon.pause()
+    ctlr.startLog();
+end
+runcon.update_elapsed_time(round(toc(startTime),2));
 ```
 
 </details>
 
 ## Run the conditions
 
-Lines 323-478 contain the main loop which runs your set of block trials. "Conditions" refer to each condition in the block as created in the Designer. Repetitions refers to the number of times the entire block is repeated. Each instance of the loop runs one condition and one inter-trial, except the last iteration which does not run an inter-trial.
+Lines 194-296 contain the main loop which runs your set of block trials. "Conditions" refer to each condition in the block as created in the Designer. Repetitions refers to the number of times the entire block is repeated. Each instance of the loop runs one condition and one inter-trial, except the last iteration which does not run an inter-trial. I'll go through the code in detail and you can follow along below or in the file.
+
+This code is contained in two nested for loops. The outer loop goes through each repetition, and the inner loop cycles through each condition in a repetition. 
+
+The first line uses `p.exp_order`, which is an array containing the order in which conditions are run, to find out which condition we are about to run and stores the number in the variable `cond`. This is necessary in case conditions are randomized. 
+
+Next we update the progress bar as we did before the pre-trial, and iterate the number trial we are on.
+
+Unlike the pre-trial, the parameters will change with each iteration of our loop, so next we define the parameters for this particular condition. We use the function, found in Modules, called `assign_block_trial_parameters` and it takes three inputs - `params`, `p`, and `cond`. It returns a struct called `tparams` containing this condition's parameters. These are then put into a cell array as expected by the controller, and passed to the controller. The Conductor's display is then updated with the current parameters. 
 
 <details closed markdown="block">
 <summary>
-Click to expand default run protocol around lines 323…478.
+Click to expand default run protocol around lines 194...296.
 </summary>
 
 ```matlab
-for r = 1:reps
-    for c = 1:num_cond
-       %define which condition we're using
-       cond = p.exp_order(r,c);
-       
-       %Update the progress bar--------------------------
-       num_trial_of_total = num_trial_of_total + 1;
-       runcon.update_progress('block', r, reps, c, num_cond, cond, num_trial_of_total);
-       
-       %define parameters for this trial----------------
-       trial_mode = block_trials{cond,1};
-       pat_id = p.block_pat_indices(cond);
-       pos_id = p.block_pos_indices(cond);
-       if length(block_ao_indices) >= cond
-           trial_ao_indices = block_ao_indices(cond,:);
-       else
-           trial_ao_indices = [];
-       end
-       %Set frame index
-       if isempty(block_trials{cond,8})
-           frame_ind = 1;
-       elseif strcmp(block_trials{cond,8},'r')
-           frame_ind = 0; %use this later to randomize
-       else
-          frame_ind = str2num(block_trials{cond,8});
-       end
-        
-       frame_rate = block_trials{cond, 9};
-       gain = block_trials{cond, 10};
-       offset = block_trials{cond, 11};
-       dur = block_trials{cond, 12};
-        
-       %Update panel_com-----------------------------
-       Panel_com('set_control_mode', trial_mode)
-       
-       Panel_com('set_pattern_id', pat_id)
-       
-       if ~isempty(block_trials{cond,10})
-           Panel_com('set_gain_bias', [gain, offset]);
-       end
-       if pos_id ~= 0
-           Panel_com('set_pattern_func_id', pos_id)
-       end
-       if trial_mode == 2
-           Panel_com('set_frame_rate',frame_rate);
-       end
-       
-       if frame_ind == 0
-           frame_ind = randperm(p.num_block_frames(c),1);
-       end
-       Panel_com('set_position_x', frame_ind);
-       
-       for i = 1:length(p.active_ao_channels)
-           Panel_com('set_ao_function_id',[p.active_ao_channels(i), trial_ao_indices(i)]);
-       end
-       
-       %Update status panel to show current parameters
-      runcon.update_current_trial_parameters(trial_mode, pat_id, pos_id, p.active_ao_channels, ...
-         trial_ao_indices, frame_ind, frame_rate, gain, offset, dur);
-       pause(0.01)
-       
-       %Run block trial--------------------------------------
-       Panel_com('start_display', dur+2); %duration expected in 100ms units
-       pause(dur + .01)
-       isAborted = runcon.check_if_aborted();
-       if isAborted == 1
-           Panel_com('stop_display');
-           Panel_com('stop_log');
-           pause(1);
-           % FIXME: deprecated
-           disconnectHost;
-           success = 0;
-           return;
-       end
-       runcon.update_elapsed_time(round(toc,2));
-       
-       %Tells loop to skip the intertrial if this is the last iteration of the last rep
-       if r == reps && c == num_cond
-           continue 
-       end
-       
-       %Run inter-trial assuming there is one-------------------------
-       if inter_type == 1
-           %Update progress bar to indicate start of inter-trial
-           num_trial_of_total = num_trial_of_total + 1;
-           runcon.update_progress('inter', r, reps, c, num_cond, num_trial_of_total)
-           progress_axes.Title.String = "Rep " + r + " of " + reps +...
-               ", Trial " + c + " of " + num_cond + ". Inter-trial running...";
-           progress_bar.YData = num_trial_of_total/total_num_steps;
-           drawnow;
+%% Loop to run the block/inter trials --------------------------------------
+for r = 1:params.reps
+    for c = 1:params.num_cond
+        %define which condition we're using
+        cond = p.exp_order(r,c);
 
-           %Run intertrial-------------------------
-           Panel_com('set_control_mode',inter_mode);
-           Panel_com('set_pattern_id', inter_pat);
-          
-           %randomize frame index if indicated
-           if inter_frame_ind == 0
-               inter_frame_ind = randperm(p.num_intertrial_frames, 1);
-           end
-           Panel_com('set_position_x',inter_frame_ind);
-           
-           if inter_pos ~= 0
-               Panel_com('set_pattern_func_id', inter_pos);
-           end
-            if ~isempty(inter_gain) %this assumes you'll never have gain without offset
-                Panel_com('set_gain_bias', [inter_gain, inter_offset]);
+        %Update the progress bar--------------------------
+        num_trial_of_total = num_trial_of_total + 1;
+        runcon.update_progress('block', r, params.reps, c, params.num_cond, cond, num_trial_of_total);
+
+        %define parameters for this trial----------------
+        tparams = assign_block_trial_parameters(params, p, cond);
+
+        %Update controller-----------------------------
+        ctlr_parameters = {tparams.trial_mode, tparams.pat_id, tparams.gain, ...
+            tparams.offset, tparams.pos_id, tparams.frame_rate, tparams.frame_ind...
+            params.active_ao_channels, tparams.trial_ao_indices};
+
+        ctlr.setControllerParameters(ctlr_parameters);
+
+        pause(0.01)
+
+        %Update status panel to show current parameters
+        runcon.update_current_trial_parameters(tparams.trial_mode, ...
+            tparams.pat_id, tparams.pos_id, p.active_ao_channels, ...
+            tparams.trial_ao_indices, tparams.frame_ind, tparams.frame_rate, ...
+            tparams.gain, tparams.offset, tparams.dur);
+
+        %Run block trial--------------------------------------
+        ctlr.startDisplay(tparams.dur*10); %duration expected in 100ms units
+
+        isAborted = runcon.check_if_aborted();
+        if isAborted == 1
+            ctlr.stopDisplay();
+            ctlr.stopLog('showTimeoutMessage', true);
+            if isa(ctlr, 'PanelsController')
+                ctlr.close();
             end
-            if inter_mode == 2
-                Panel_com('set_frame_rate', inter_frame_rate);
+            clear global;
+            success = 0;
+            return;
+
+        end
+
+        is_paused = runcon.check_if_paused();
+        if is_paused
+            ctlr.stopLog();
+            disp("Experiment is paused. Please press pause button again to continue.");
+            runcon.pause()
+            ctlr.startLog();
+        end
+
+        runcon.update_elapsed_time(round(toc(startTime),2));
+
+        %Tells loop to skip the intertrial if this is the last iteration of the last rep
+        if r == params.reps && c == params.num_cond
+            continue
+        end
+
+        %Run inter-trial assuming there is one-------------------------
+        if params.inter_type == 1
+            %Update progress bar to indicate start of inter-trial
+            num_trial_of_total = num_trial_of_total + 1;
+            runcon.update_progress('inter', r, params.reps, c, params.num_cond, num_trial_of_total)
+            progress_axes.Title.String = "Rep " + r + " of " + params.reps +...
+                ", Trial " + c + " of " + params.num_cond + ". Inter-trial running...";
+            progress_bar.YData = num_trial_of_total/total_num_steps;
+            drawnow;
+            if params.inter_frame_ind == 0
+                inter_frame_ind = randperm(p.num_intertrial_frames,1);
+                ctlr_parameters_intertrial{7} = inter_frame_ind;
             end
-            for i = 1:length(inter_ao_ind)
-                %if it is zero, there was no ao function for this channel
-                if inter_ao_ind(i) ~= 0 
-                    Panel_com('set_ao_function_id',...
-                      [p.active_ao_channels(i), inter_ao_ind(i)]);
-                      %[channel number, index of ao func]
-                end
-            end
-            
-           % Update status panel to show current parameters
-           runcon.update_current_trial_parameters(inter_mode,...
-              inter_pat, inter_pos, ...
-              p.active_ao_channels, ...
-              inter_ao_ind, inter_frame_ind, ...
-              inter_frame_rate, inter_gain, ...
-              inter_offset, inter_dur);
-           
+
+            ctlr.setControllerParameters(ctlr_parameters_intertrial);
+
+            %Update status panel to show current parameters
+            runcon.update_current_trial_parameters(params.inter_mode, ...
+                params.inter_pat, params.inter_pos, p.active_ao_channels, ...
+                params.inter_ao_ind, params.inter_frame_ind, params.inter_frame_rate,...
+                params.inter_gain, params.inter_offset, params.inter_dur);
+
             pause(0.01);
-            Panel_com('start_display', inter_dur+2);
-            pause(inter_dur + .01);
+
+            %Run intertrial-------------------------
+            ctlr.startDisplay(params.inter_dur*10);
+
             if runcon.check_if_aborted() == 1
-               Panel_com('stop_display');
-               pause(.1);
-               Panel_com('stop_log');
-               pause(1);
-               % FIXME: deprecated
-               disconnectHost;
-               success = 0;
-               return;
+                ctlr.stopDisplay();
+                ctlr.stopLog('showTimeoutMessage', true);
+                if isa(ctlr, 'PanelsController')
+                    ctlr.close();
+                end
+                clear global;
+                success = 0;
+                return;
             end
-            
-            runcon.update_elapsed_time(round(toc,2));
-       end 
+            runcon.update_elapsed_time(round(toc(startTime),2));
+        end
     end
 end
 ```
