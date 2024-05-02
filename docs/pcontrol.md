@@ -1,12 +1,12 @@
 ---
-title:  Panel_com
+title:  Panels Controller
 parent: Generation 4
 nav_order: 15
 ---
 
-# The `Panel_com` command
+# The `PanelsController` class 
 
-Running the [G4 Host](software_setup.md) software initiates the IO card of the system to start a TCP/IP server on the `localhost` at port `62222`. Through this TCP/IP connection, it is possible to communicate directly with the arena. Here we list the commands available in `Panel_com` which would allow you to implement the same functionality in a language of your choosing. For simplicity we document both, MATLAB's `Panel_com` command as well as the underlying TCP/IP data exchange. For the TCP/IP we use python as an example.
+Running the [G4 Host](software_setup.md) software initiates the IO card of the system to start a TCP/IP server on the `localhost` at port `62222`. Through this TCP/IP connection, it is possible to communicate directly with the arena. Here we list the commands available in `PanelsController` which would allow you to implement the same functionality in a language of your choosing. For simplicity we document both, MATLAB's `PanelsController` class as well as the underlying TCP/IP data exchange. For the TCP/IP we use python as an example.
 
 The TCP/IP commands follow a common structure: the first byte represents the length of package following the length command and the second byte is a command ID (_Stream frame_ and _Change root directory_ are notably different, they start with the command IDs followed by two bytes representing the length of the packet). This means, a two-byte TCP/IP command consists of a length of `1` and the command ID, a three-byte command would start with a length of `2`, the command ID, and a value.
 
@@ -28,20 +28,14 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
     # … commands follow here
 ```
 
-The code above establishes a tcp connection similar to what the MATLAB code `connectHost;` does, which is a wrapper around `PanelController`:
+The code above establishes a tcp connection similar to what creating an instance of the matlab `PanelsController` does:
 
 ```matlab
 ctlr = PanelsController();
-ctlr.open();
+ctlr.open(true);
 ```
 
-The `PanelController` is a class that handles the connection on the TCP/IP level. In your own code, it's good enough to use the following to initiate the connection:
-
-```matlab
-% FIXME: deprecated
-connectHost;
-% … commands follow here
-```
+The `PanelsController` is a class that handles the connection on the TCP/IP level. It contains many methods which will handle sending the TCP commands for you.
 
 ### Turn all panels on {#all_on}
 
@@ -58,7 +52,7 @@ The corresponding MATLAB code:
 
 ```matlab
 % … initiate the connection (see above)
-Panel_com('all_on');
+ctlr.allOn();
 ```
 
 ### Turn all panels off {#all_off}
@@ -76,7 +70,7 @@ The corresponding MATLAB code:
 
 ```matlab
 % … initiate the connection (see above)
-Panel_com('all_off');
+ctlr.allOff();
 ```
 
 ### Stop Display {#stop_display}
@@ -94,7 +88,7 @@ The corresponding MATLAB code:
 
 ```matlab
 % … initiate the connection (see above)
-Panel_com('stop_display');
+ctlr.stopDisplay();
 ```
 
 ### Reset Display {#reset_display}
@@ -112,7 +106,7 @@ The corresponding MATLAB code:
 
 ```matlab
 % … initiate the connection (see above)
-Panel_com('reset_display');
+ctlr.sendDisplayReset();
 ```
 
 ### Reset Panel {#reset}
@@ -130,8 +124,7 @@ This is a three-byte command with the length `0x02`, the command `0x01`, and the
 The corresponding MATLAB code:
 
 ```matlab
-% … initiate the connection (see above)
-Panel_com('reset', 2);
+% … This is not implemented in PanelsController
 ```
 
 ### Controller reset {#ctr_reset}
@@ -146,8 +139,7 @@ This is a two-byte command with the length `0x01` and the command `0x60`.
 The corresponding MATLAB code:
 
 ```matlab
-% … initiate the connection (see above)
-Panel_com('ctr_reset');
+% … This is not implemented in PanelsController
 ```
 
 ### Get Version {#get_version}
@@ -165,7 +157,7 @@ The corresponding MATLAB code:
 
 ```matlab
 % … initiate the connection (see above)
-Panel_com('get_version');
+ctlr.getVersion();
 ```
 
 ### Reset Counter {#reset_counter}
@@ -184,7 +176,7 @@ The corresponding MATLAB code:
 
 ```matlab
 % … initiate the connection (see above)
-Panel_com('reset_counter');
+ctlr.resetCounter();
 ```
 
 ### Request Treadmill Data {#request_treadmill_data}
@@ -202,8 +194,8 @@ __Note__: This command is currently not used. TODO: Explain usage.
 The corresponding MATLAB code:
 
 ```matlab
-% … initiate the connection (see above)
-Panel_com('request_treadmill_data');
+% … This is not implemented in PanelsController
+
 ```
 
 ### Update GUI Info {#update_gui_info}
@@ -221,8 +213,8 @@ __Note__: This is supposed to update gain, offset, and position information (acc
 The corresponding MATLAB code:
 
 ```matlab
-% … initiate the connection (see above)
-Panel_com('update_gui_info');
+% … This is not implemented in PanelsController
+
 ```
 
 ### Start Log {#start_log}
@@ -240,7 +232,7 @@ The corresponding MATLAB code:
 
 ```matlab
 % … initiate the connection (see above)
-Panel_com('start_log');
+ctlr.startLog();
 ```
 
 ### Stop Log {#stop_log}
@@ -260,7 +252,7 @@ The corresponding MATLAB code:
 
 ```matlab
 % … initiate the connection (see above)
-Panel_com('stop_log');
+ctlr.stopLog();
 ```
 
 ### Set Control Mode {#set_control_mode}
@@ -280,7 +272,8 @@ The corresponding MATLAB code:
 
 ```matlab
 % … initiate the connection (see above)
-Panel_com('set_control_mode', 1);
+mode = 1;
+ctlr.setControlMode(mode);
 ```
 
 ### Set active Analog Output Channels {#set_active_ao_channels}
@@ -301,7 +294,7 @@ The corresponding MATLAB code:
 
 ```matlab
 % … initiate the connection (see above)
-Panel_com('set_active_ao_channels', '0101'); % Only last 4 bits required.
+ctlr.setActiveAOChannels(0101); % Only last 4 bits required.
 ```
 
 ### Stream channels {#stream_channels}
@@ -321,8 +314,8 @@ __Note__: TODO: The exact usage is unclear.
 The corresponding MATLAB code:
 
 ```matlab
-% … initiate the connection (see above)
-Panel_com('stream_channels', '1');
+% … This is not yet implemented in PanelsController
+
 ```
 
 ### Set Pattern ID {#set_pattern_id}
@@ -341,7 +334,8 @@ The corresponding MATLAB code:
 
 ```matlab
 % … initiate the connection (see above)
-Panel_com('set_pattern_id', '1285'); 
+patID = 1;
+ctlr.setPatternID(patID); 
 ```
 
 ### Set Pattern Function ID {#set_pattern_func_id}
@@ -363,7 +357,8 @@ The corresponding MATLAB code:
 
 ```matlab
 % … initiate the connection (see above)
-Panel_com('set_pattern_func_id', '1794'); 
+funcID = 1;
+ctlr.setPatternFunctionID(funcID); 
 ```
 
 ### Start Display {#start_display}
@@ -382,7 +377,8 @@ The corresponding MATLAB code (internal conversion from second to decisecond):
 
 ```matlab
 % … initiate the connection (see above)
-Panel_com('start_display', 6); 
+dur = 6;
+ctlr.startDisplay(dur*10); 
 ```
 
 ### Set Framerate {#set_frame_rate}
@@ -402,7 +398,7 @@ The corresponding MATLAB code:
 
 ```matlab
 % … initiate the connection (see above)
-Panel_com('set_frame_rate', 500); 
+ctlr.setFrameRate(500); 
 ```
 
 ### Set Position X {#set_position_x}
@@ -419,7 +415,7 @@ The corresponding MATLAB code:
 
 ```matlab
 % … initiate the connection (see above)
-Panel_com('set_position_x', 17); 
+ctlr.setPositionX(17); 
 ```
 
 ### Set Position Y {#set_position_y}
@@ -436,7 +432,7 @@ The corresponding MATLAB code:
 
 ```matlab
 % … initiate the connection (see above)
-Panel_com('set_position_y', 10); 
+ctlr.setPositionY(10); 
 ```
 
 ### Set Analog Output Function ID {#set_ao_function_id}
@@ -455,7 +451,9 @@ The corresponding MATLAB code:
 
 ```matlab
 % … initiate the connection (see above)
-Panel_com('set_ao_function_id', 1, 23); 
+channel = 1;
+ID = 23;
+ctlr.setAOFunctionID(channel, ID); 
 ```
 
 ### Set Analog Output {#set_ao}
@@ -480,7 +478,9 @@ The corresponding MATLAB code:
 
 ```matlab
 % … initiate the connection (see above)
-Panel_com('set_ao', 1, 32767); 
+channel = 1;
+voltage = 32767;
+ctlr.setAO(channel, voltage); 
 ```
 
 ### Set Gain Bias {#set_gain_bias}
@@ -500,7 +500,9 @@ The corresponding MATLAB code:
 
 ```matlab
 % … initiate the connection (see above)
-Panel_com('set_gain_bias', 100, 100); 
+gain = 100;
+bias = 100;
+ctlr.setGain(gain, bias); 
 ```
 
 ### Set Pattern and Position Function {#set_pattern_and_position_function}
@@ -519,8 +521,8 @@ The six-byte command has a length of `0x05` and uses command `0x05`. Bytes 3 and
 The corresponding MATLAB code:
 
 ```matlab
-% … initiate the connection (see above)
-Panel_com('set_pattern_and_position_function', 100, 100); 
+% … This is not implemented in PanelsController
+
 ```
 
 ### Stream Frame {#stream_frame}
@@ -548,8 +550,8 @@ __TODO__: Clarify if `x_ao` and `y_ao` specify a value or (more likely) the ID o
 The corresponding MATLAB code:
 
 ```matlab
-% … initiate the connection (see above)
-Panel_com('stream_frame', dataLength, x_ao, y_ao, frame_content);
+% … This is not yet implemented in PanelsController
+
 ```
 
 ### Change Root Directory {#change_root_dir}
@@ -572,7 +574,7 @@ The corresponding MATLAB code:
 
 ```matlab
 % … initiate the connection (see above)
-Panel_com('change_root_dir', "C:\\my path to the patterns");
+ctlr.setRootDirectory("C:\\my path to the patterns");
 ```
 
 ### Combined Command {#combined_command}
@@ -610,5 +612,26 @@ The corresponding MATLAB code:
 
 ```matlab
 % … initiate the connection (see above)
-Panel_com('combined_command', 1, 27, 11, 25, 0, 1512, 0, 500, 6);
+mode = 1;
+patternID = 27;
+functionID = 11;
+ao0ID = 0;
+ao1ID = 15;
+ao2ID = 0;
+ao3ID = 12;
+fps = 500;
+deciSeconds = 6;
+ctlr.combinedCommand(mode, patternID, functionID, ao0ID, ao1ID, ao2ID, ao3ID, fps, deciSeconds);
+```
+
+### Set panels controller parameters
+
+Additionally, in `PanelsController` there is a command with which to set all parameters at once.
+
+The MATLAB code: 
+
+```matlab
+% … initiate the connection (see above)
+p = {mode, patternID, gain, offset, functionID, fps, frameIndex, activeAOchannels, aoIndices};
+ctlr.setControllerParameters(p);
 ```
