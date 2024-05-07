@@ -23,6 +23,9 @@ In a second step you will need to patch the G4 _Main Host_{:.gui-txt} applicatio
 
 Download and install the [latest version of MATLAB](https://www.mathworks.com/products/matlab.html). Required toolboxes are [instrument control](https://www.mathworks.com/help/instrument/index.html), [signal processing](https://www.mathworks.com/help/overview/signal-processing.html), and [statistics and machine learning](https://www.mathworks.com/help/stats/index.html). A recommended toolbox is [parallel computing](https://www.mathworks.com/help/parallel-computing/index.html). You will need a license to run MATLAB and many research institutions have campus licenses available.
 
+__Matlab Versions__: This software has been tested and is compatible with matlab versions R2019b...R2024a. New matlab versions will be tested as they are released. It has not been tested on any versions prior to R2019b.
+{:.info}
+
 ## Download Display Tools {#download-display-tools}
 
 ![On the GitHub repository website, click on "Code" and either use the HTTPS or SSH URL in your git client or choose to "Download ZIP" file](assets/p-d_c-s_t_download-or-clone.png){:standalone .ifr data-img-class="pop"}
