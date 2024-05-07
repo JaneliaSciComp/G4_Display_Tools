@@ -698,7 +698,9 @@ classdef G4_conductor_controller < handle
 
                  %Clear out live feedback panel
                 self.fb_model = feedback_model(self.doc);
-                self.fb_view.clear_view(self.fb_model);
+                if ~isempty(self.fb_view)
+                    self.fb_view.clear_view(self.fb_model);
+                end
 
 %                 [logs_removed, msg] = rmdir(fullfile(experiment_folder, 'Log Files'), 's');
 %                 pause(1);

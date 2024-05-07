@@ -118,10 +118,10 @@ function run_experiment_woGUI(filepath, metadataIn, run_test)
         if isfield(metadataIn, 'comment_text')
             con.update_comments(metadataIn.comment_text);% char/string
         end
-        if isfield(metadataIn,'plotting_file_path')
+        if isfield(metadataIn,'plotting_file_path') && ~isempty(metadataIn.plotting_file_path)
             con.update_plotting_file(metadataIn.plotting_file_path); %Filepath to plotting file
         end
-        if isfield(metadataIn, 'processing_file_path')
+        if isfield(metadataIn, 'processing_file_path') && ~isempty(metadataIn.processing_file_path)
             con.update_processing_file(metadataIn.processing_file_path); %Filepath to processing file
         end
         if isfield(metadataIn, 'run_protocol_index')
