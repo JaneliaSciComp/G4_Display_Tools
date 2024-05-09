@@ -1,5 +1,6 @@
 % Script to create directional tuning map
-exp_name = 'Motion1'; %name of experiment folder (will be saved in C:\matlabroot\G4\Experiments\)
+exp_name = 'Motion1'; %name of experiment folder (will be saved in exp_path)
+exp_path = 'C:\matlabroot\G4\Experiments';
                                                                                                                                                                                                                                                                            
 %% user-defined pattern parameters
 % all angles/distances/sizes are in units of radians rather than degrees
@@ -65,7 +66,7 @@ afnparam.flip = [ 0 0 ]; %flip the range of values of function {for non-static s
 param.ID = 0;
 
 %create experiment folders
-exp_folder = create_exp_dir_G4(exp_name);
+exp_folder = create_exp_dir_G4(exp_name, exp_path);
 
 
 %% list of patterns to be generated
@@ -103,13 +104,13 @@ for mtype = 1:2
         %generate and save pattern for this condition ID
         [Pats, param.true_step_size, param.rot180] = G4_Pattern_Generator(param);
         param.stretch = zeros(size(Pats,3),1);
-        save_pattern_G4(Pats, param, [exp_folder '\Patterns'], ['Pattern_' num2str(param.ID, '%04d') '_G4.mat']);
+        save_pattern_G4(Pats, param, fullfile(exp_folder, 'Patterns'), ['Pattern_' num2str(param.ID, '%04d') '_G4.mat']);
         %generate and save position function for this condition ID
         func = G4_Function_Generator(afnparam); afnparam.ID = param.ID;
-        save_function_G4(func, afnparam, [exp_folder '\Analog Output Functions'], ['FunctionAO_' num2str(param.ID, '%04d') '_G4.mat']);
+        save_function_G4(func, afnparam, fullfile(exp_folder, 'Analog Output Functions'), ['FunctionAO_' num2str(param.ID, '%04d') '_G4.mat']);
         %generate and save analog output function for this condition ID
         func = G4_Function_Generator(pfnparam); pfnparam.ID = param.ID;
-        save_function_G4(func, pfnparam, [exp_folder '\Functions'], ['Function_' num2str(param.ID, '%04d') '_G4.mat']);
+        save_function_G4(func, pfnparam, fullfile(exp_folder, 'Functions'), ['Function_' num2str(param.ID, '%04d') '_G4.mat']);
     end
 end
 

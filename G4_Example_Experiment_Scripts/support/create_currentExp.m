@@ -2,9 +2,9 @@ function create_currentExp(exp_folder)
 
 
 %% check for correct folders
-pattern_folder = [exp_folder '\Patterns'];
-function_folder = [exp_folder '\Functions'];
-AO_folder = [exp_folder '\Analog Output Functions'];
+pattern_folder = fullfile(exp_folder, 'Patterns');
+function_folder = fullfile(exp_folder, 'Functions');
+AO_folder = fullfile(exp_folder, 'Analog Output Functions');
 
 assert(exist(pattern_folder,'dir')==7,'did not detect pattern folder')
 assert(exist(function_folder,'dir')==7,'did not detect position function folder')
@@ -19,7 +19,7 @@ num_files = length({patinfo.name});
 for f = 1:num_files
     currentExp.pattern.pattNames{f} = matinfo(f).name;
     currentExp.pattern.patternList{f} = patinfo(f).name;
-    load([pattern_folder '\' matinfo(f).name])
+    load(fullfile(pattern_folder, matinfo(f).name))
     currentExp.pattern.x_num(f) = pattern.x_num;
     currentExp.pattern.y_num(f) = pattern.y_num;
     currentExp.pattern.gs_val(f) = pattern.gs_val;
@@ -37,7 +37,7 @@ trial_dur = 0;
 for f = 1:num_files
     currentExp.function.functionName{f} = matinfo(f).name;
     currentExp.function.functionList{f} = pfninfo(f).name;
-    load([function_folder '\' matinfo(f).name])
+    load(fullfile(function_folder, matinfo(f).name))
     currentExp.function.functionSize(f) = pfnparam.size;
     trial_dur = trial_dur + sum(pfnparam.dur);
 end
@@ -53,13 +53,13 @@ num_files = length({afninfo.name});
 for f = 1:num_files
     currentExp.aoFunction.aoFunctionName{f} = matinfo(f).name;
     currentExp.aoFunction.aoFunctionList{f} = afninfo(f).name;
-    load([AO_folder '\' matinfo(f).name])
+    load(fullfile(AO_folder, matinfo(f).name))
     currentExp.aoFunction.aoFunctionSize(f) = afnparam.size;
 end
 currentExp.aoFunction.numaoFunc = num_files;
 
 
 %% save currentExp structure
-save([exp_folder '\currentExp.mat'],'currentExp');
+save(fullfile(exp_folder, 'currentExp.mat'),'currentExp');
 
 end
