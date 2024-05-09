@@ -36,7 +36,10 @@
 % 7 - Streaming + Log Reps
 % 8 - CC + Streaming + Log Reps
 
-function md = create_metadata_woGUI()
+function [filepath, md, run_test] = create_metadata_woGUI()
+
+    filepath = 'G4_Display_Tools/G4_Protocol_Designer/test_protocols/test_protocol_4Rows/test_protocol_4Rows.g4p';
+    run_test = 0;
 
     md.experiment_type = 1;
     md.do_processing = 0;

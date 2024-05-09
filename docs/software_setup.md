@@ -73,6 +73,28 @@ Switch to the _Panel_Host_{:.gui-txt} window and try to send an _all on_{:.gui-b
 
 The second test will verify that the connection between MATLAB and the _Panel_Host_{:.gui-txt} software is working. Switch back to the MATLAB PControl_G4 GUI and click on the _arena_{:.gui-txt} tab and then _all on_{:.gui-btn}. If all LEDs on the arena turn on, then the system has been set up successfully -- and you can turn it off the same way as before. Otherwise and most likely you will need to [trouble shoot your system]({{site.baseurl}}/docs/g4_troubleshooting.html) or [get in contact]({{site.baseurl}}/Contact).
 
+Next we'll verify the Experiment Designer and Conductor are working. The first thing to check is the location of your configuration file, `HHMI Panels Configuration.ini`. If it is saved at the default path, `C:\Program Files (x86)\HHMI G4\Support Files\HHMI Panels Configuration.ini`, then you shouldn't have to do anything. However, if you've saved this file at a different path, you'll need to update the Protocol Designer settings file before you can open the Designer. To do this, open the file `G4_Display_Tools\G4_Protocol_Designer\G4_Protocol_Designer_Settings.m`. Line 4 contains the text "Configuration File Path: C:\Program Files (x86)\HHMI G4\Support Files\HHMI Panels Configuration.ini". Replace the path with the path to your .ini file. 
+
+__REPLACE THE PATH ONLY__ Note that text is pulled from this file and so every character is important. Be careful not to accidentally delete the space between the colon and first character of your path, or leave any spaces at the end of your path.
+{:.error}
+
+Save the file, then open `G4_Display_Tools\G4_Protocol_Designer\G4_Experiment_Conductor.m` and run the file. A GUI should pop up. Go to `File -> Open -> .g4p file` and open one of our two provided test protocols. One is for a screen with three rows and one is for a screen with four rows. Browse to `G4_Display_Tools\G4_Protocol_Designer\test_protocols` and choose the appropriate protocol for your arena. Inside that folder, select the .g4p file and open it. If you get a warning that the experiment couldn't load because the number of rows doesn't match, then the one you opened doesn't match the number of screen rows indicated in your configuration .ini file. 
+
+After opening the protocol, you'll want to uncheck the boxes labeled `Processing?` and `Plotting?` since this is just a test. Then click `Run`. The first condition that runs on the screen is a vertical bar used for fly fixation. It will run until you press a button on the keyboard. You'll need to push a button to continue. Then the rest of the protocol should run. The full experiment should last a minute and a half. Please see the [Conductor documentation](experiment-conductor.md) for more information about this software.
+
+To test the Designer, run the file `G4_Display_Tools\G4_Protocol_Designer\G4_Experiment_Designer.m`. The Designer should pop up. On the left of the window, select the radio button (3 rows or 4 rows) that matches your arena. Then open the test protocol by going to `File -> Open -> .g4p file` and browsing to the test protocol for your arena. This will give you a preview of what the experiment should look like. Please see the [Designer documentation](protocol-designer.md) to learn more about this software.
+
+## Verify an experiment can run without the GUI
+
+If you don't want to mess with the Designer and Conductor right now, and instead just want to make sure a protocol can run on the screens correctly, you can run our test protocols without opening up the GUI. To do this, open the file `G4_Display_Tools\G4_Protocol_Designer\support_files\create_metadata_woGUI`. Set the variable `filepath` equal to the full path to the test protocol's .g4p file on your computer, whichever test protocol is appropriate for your arena. Save this file, and then, in your matlab commandline run 
+
+```matlab
+[filepath, md, run_test] = create_metadata_woGUI;
+run_experiment_woGUI(filepath, md, run_test);
+```
+
+After a few seconds to open the Host and load the experiment, the test protocol should begin to display on the arena.
+
 ## Configure Data Processing
 
 Once you have created your first experimental protocol, it will be time to configure your settings for how the collected data should be processed. Processing happens automatically at the end of an experiment unless you disable this feature before running the experiment. Open the file `G4_Display_Tools\G4_Data_Analysis\new_data_processing\create_processing_settings.m`. This file contains a list of variables, each one affecting how your raw collected data will be turned into easily read datasets. See a full description of each setting and what it means at [G4 Data Processing](data-handling_processing.md). In summary, you will update the variables in this file to match your preferences, and then you will save the file and run it. This will generate a `.mat` file containing all your settings for data processing. When you run an experiment on the Conductor, you will provide the path to this `.mat` file, and the Conductor will then automatically take the raw data and process it into datasets once the experiment is finished according to your settings. You will also be able to manually process data collected from previous experiments this way.
