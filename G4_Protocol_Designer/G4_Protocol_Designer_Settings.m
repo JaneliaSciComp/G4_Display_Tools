@@ -21,11 +21,12 @@ Default test run protocol file: C:\matlabroot\G4_Display_Tools\G4_Protocol_Desig
 Default test processing file: path\to\processing\settings
 Default test plotting file: path\to\plotting\settings
 
-Flight test protocol file: C:\matlabroot\G4_Display_Tools\G4_Protocol_Designer\test_protocols\test_protocol1\test_protocol1.g4p
+Flight test protocol file: C:\matlabroot\G4_Display_Tools\G4_Protocol_Designer\test_protocols\test_protocol_4Rows\test_protocol_4Rows.g4p
 Camera walk test protocol file: insert walking test protocol here
 Chip walk test protocol file: insert chip walking test protocol here
 
 Overlapping graphs: 0 %0 for no, 1 for yes
 Color to fill uneditable cells: #bdbdbd
 Text to fill uneditable cells: ---------
+
 
