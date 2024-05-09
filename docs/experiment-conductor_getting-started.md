@@ -52,3 +52,25 @@ Assuming the conductor is configured and your defaults are set, all you need to 
 This overview contained a lot of information about the Conductor, so don't forget to check out the [G4 Conductor Manual](experiment-conductor.md) for in depth instructions on its use.
 
 Once an experiment is completed, the only thing left is to [analyze the data](data-handling_getting-started.md), using our tools, your own, or some combination.
+
+# Running an Experiment without the Conductor GUI
+
+It is possible to use the Conductor to run an experiment on the screens without every opening it on your screen. The visual aspect of the Conductor is for the user's convenience, but is not necessary. You may prefer to run an experiment programmatically, especially if you build other software that you want to be able to run an experiment automatically without your assistance. 
+
+Open the file `G4_Display_Tools\G4_Protocol_Designer\support_files\create_metadata_woGUI.m`. This is a function that returns the variables you need in order to run an experiment programmatically - the filepath to the experiment, a structure with all the metadata information, and a boolean representing whether you want the test protocol run before the actual experiment. 
+
+At line 41, set the variable `filepath` equal to the full path to the .g4p file you'd like to run. If you haven't created an experiment, you can use one of our test protocols, found at `G4_Display_Tools\G4_Protocol_Designer\test_protocols`. Make sure it is the full path including the .g4p file. Line 42 sets the `run_test` variable. It is 0 (no test) by default, but if you have a test protocol you'd like run before your regular experiment, you can set it to 1. Remember from the [settings tutorial](protocol-designer_configure-settings_tutorial.md) that the path to your test protocol is in your settings. If this is not set up, you should leave `run_test` set to 0 until you update the settings with the test protocol's path. 
+
+Starting at line 44, the metadata structure is created. You can leave this with the default settings assuming you are just testing out the feature, but when you're ready to run a real experiment, you'll need to fill out the metadata correctly. These metadata fields are exactly the same as the ones used in the Conductor above. Just like with the Conductor, they are pulled from the google sheet. So, for example, when setting the `genotype`, you can set it equal to a number instead of a string, that number being the index of the genotype you want in the googlesheet. So if you want the third genotype listed in the google sheet, you'd set it to 3. You can also define the metadata variables using their actual string names, but you'll need to make sure what you enter here matches exactly what is in the google sheet. The comments in the first 37 lines of create_metadata_woGUI.m go through the metadata options in detail, and how to set them. 
+
+Once you've finished editing the information in this file to match your experiment, save the file, and then write this code in the matlab command line. 
+
+```matlab
+[filepath, md, run_test] =  create_metadata_woGUI;
+run_experiment_woGUI(filepath, md, run_test);
+```
+
+This will run the protocol on the arena without ever opening the GUI. If you wanted your own software to be able to do this automatically, you'd need to write a function to update the metadata, filepath, and run_test variables for each experiment. 
+
+__Note__ When using the GUI, after a test protocol is run, a pop up asks the user if they'd like to repeat the run protocol, which they might want to do if their fly did not fixate correctly. This will not happen if you're running the experiment without the GUI. The test protocol will run once, if you choose that option, but the code which asks the user if they'd like a repeat is commented out in `run_experiment_woGUI.m`. See lines 144 to 152. If  you wanted software that is running experiments programmatically to be able to decide if and when to repeat a test protocol, you'd need to write a function the software can use to determine if the run protocol needs to be repeated, then replace line 144 with a call to your function. Then uncomment lines 149 to 152.
+{:.info}

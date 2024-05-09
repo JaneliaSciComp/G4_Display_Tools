@@ -141,15 +141,15 @@ function run_experiment_woGUI(filepath, metadataIn, run_test)
         con.prepare_test_exp();
         [original_filepath, original_fly_name] = con.run_test();
         
-        repeat = con.check_if_repeat();        
+        %repeat = con.check_if_repeat();        
         % replace the above function with your own
         %function the robot will use to check if it wants to repeat the
         %test or not. This function asks for input from the user.
 
-        while repeat > 0
-            [~, ~] = con.run_test(original_filepath, original_fly_name);
-            repeat = con.check_if_repeat(); %again replace this with your own function
-        end
+%         while repeat > 0
+%             [~, ~] = con.run_test(original_filepath, original_fly_name);
+%             repeat = con.check_if_repeat(); %again replace this with your own function
+%         end
         
         con.reopen_original_experiment(original_filepath, original_fly_name);
     end
