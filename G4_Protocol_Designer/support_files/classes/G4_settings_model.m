@@ -26,6 +26,8 @@ classdef G4_settings_model < handle
         list_of_gid_strings_
         
         lines_to_match_
+
+        settings
     
     end
 
@@ -63,6 +65,7 @@ classdef G4_settings_model < handle
         %% Constructor
         function self = G4_settings_model(varargin)
             
+            self.settings = G4_Protocol_Designer_Settings();
             %% THESE THINGS must be updated accordingly if the settings file is changed
             
             %This struct must include every occupied line from the settings file
