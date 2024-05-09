@@ -45,7 +45,7 @@ end
 %finish setting up for experiment
 exp_seconds = num_reps*num_conditions*(trial_duration+inter_trial_duration*(ceil(inter_type/10)));
 fprintf(['Estimated experiment duration: ' num2str(exp_seconds/60) ' minutes\n']);
-save(fullfile(experiment_folder, 'Log Files\exp_order.mat'),'exp_order')
+save(fullfile(experiment_folder, 'Log Files', 'exp_order.mat'),'exp_order')
 ctlr.setActiveAOChannels([AOchannel]);
 
 %% start experiment
@@ -79,7 +79,7 @@ end
 
 %rename/move results folder
 ctlr.stopLog('showTimeoutMessage', true);
-movefile([experiment_folder '\Log Files\*'],fullfile(experiment_folder,'Results',fly_name));
+movefile(fullfile(experiment_folder, 'Log Files', '*'),fullfile(experiment_folder,'Results',fly_name));
 ctlr.close()
 
 disp('finished');
