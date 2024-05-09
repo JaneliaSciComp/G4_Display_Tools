@@ -138,14 +138,18 @@ classdef G4_document < handle
 
             %Find line with number of rows and get value -------------------------------------------
             [self.configData, numRows_line, index] = self.get_setting(path, 'Number of Rows');
-            self.num_rows = str2num(self.configData{numRows_line}(end));
+            if ~isempty(self.configData)
+                self.num_rows = str2num(self.configData{numRows_line}(end));
+            end
 
             %Determine channel sample rates--------------------------------------------
-            self.chan1_rate = self.get_ending_number_from_file(self.configData, 'ADC0');
-            self.chan2_rate = self.get_ending_number_from_file(self.configData, 'ADC1');
-            self.chan3_rate = self.get_ending_number_from_file(self.configData, 'ADC2');
-            self.chan4_rate = self.get_ending_number_from_file(self.configData, 'ADC3');
-
+            if ~isempty(self.configData)
+                self.chan1_rate = self.get_ending_number_from_file(self.configData, 'ADC0');
+                self.chan2_rate = self.get_ending_number_from_file(self.configData, 'ADC1');
+                self.chan3_rate = self.get_ending_number_from_file(self.configData, 'ADC2');
+                self.chan4_rate = self.get_ending_number_from_file(self.configData, 'ADC3');
+            end
+            
             %Set rest of default property values
             self.repetitions = 1;
             self.is_randomized = 0;
@@ -2052,9 +2056,19 @@ classdef G4_document < handle
 
         function [settings_data, path, index] = get_setting(self, file, string_to_find)
             last_five = string_to_find(end-5:end);
-            settings_data = strtrim(regexp( fileread(file),'\n','split'));
-            path = find(contains(settings_data, string_to_find));
-            index = strfind(settings_data{path},last_five) + 5;
+            try
+                settings_data = strtrim(regexp( fileread(file),'\n','split'));
+            catch 
+                warning('A filepath from your settings file could not be found. Check settings for accuracy.');
+                settings_data = [];
+            end
+            if ~isempty(settings_data)
+                path = find(contains(settings_data, string_to_find));
+                index = strfind(settings_data{path},last_five) + 5;
+            else
+                path = [];
+                index = 0;
+            end
         end
 
         function [digit] = get_ending_number_from_file(self, file, string_to_find)
