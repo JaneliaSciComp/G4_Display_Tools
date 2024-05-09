@@ -1225,8 +1225,16 @@ classdef G4_document < handle
                     field = self.get_pattern_field_name(file);
                     newcurrentExp.pattern.x_num(j) = self.Patterns.(field).pattern.x_num;
                     newcurrentExp.pattern.y_num(j) = self.Patterns.(field).pattern.y_num;
-                    newcurrentExp.pattern.gs_val(j) = self.Patterns.(field).pattern.gs_val;
-                    newcurrentExp.pattern.arena_pitch(j) = self.Patterns.(field).pattern.param.arena_pitch;
+                    if isfield(self.Patterns.(field).pattern, 'gs_val')
+                        newcurrentExp.pattern.gs_val(j) = self.Patterns.(field).pattern.gs_val;
+                    else
+                        newcurrentExp.pattern.gs_val(j) = [];
+                    end
+                    if isfield(self.Patterns.(field).pattern.param, 'arena_pitch')
+                        newcurrentExp.pattern.arena_pitch(j) = self.Patterns.(field).pattern.param.arena_pitch;
+                    else
+                        newcurrentExp.pattern.arena_pitch(j) = 0;
+                    end
                     pat_list{j} = strcat(file, '.mat');
 
                 end
