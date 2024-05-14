@@ -1,13 +1,8 @@
 %G4 Protocol Designer Settings
 %--------------------------------------------------------------------------
 
-function settings = G4_Protocol_Designer_Settings(settingsIN)
+function settings = G4_Protocol_Designer_Settings()
     
-    if ~exist('settingsIN', 'var')
-        settingsIN = [];
-    end
-    
-
 %% config file
     settings.Configuration_Filepath = 'C:\Program Files (x86)\HHMI G4\Support Files\HHMI Panels Configuration.ini';
     
@@ -38,6 +33,7 @@ function settings = G4_Protocol_Designer_Settings(settingsIN)
     settings.Overlapping_Graphs = 0; %0 for no, 1 for yes
     settings.Uneditable_Cell_Color = '#bdbdbd';
     settings.Uneditable_Cell_Text = '---------';
+
 end
 
-
+   
