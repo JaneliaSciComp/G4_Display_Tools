@@ -29,8 +29,8 @@ ctlr.open(true);
 ctlr.setRootDirectory(experiment_folder);
 
 %check if log files already present for this experiment
-assert(~exist(fullfile(experiment_folder, 'Log Files', '*'),'file')),'unsorted log files present in save folder, remove before restarting experiment\n');
-assert(~exist(fullfile(experiment_folder, 'Results', fly_name),'dir')),'Results folder already exists with that fly name\n');
+assert(~exist(fullfile(experiment_folder, 'Log Files', '*'),'file'),'unsorted log files present in save folder, remove before restarting experiment\n');
+assert(~exist(fullfile(experiment_folder, 'Results', fly_name),'dir'),'Results folder already exists with that fly name\n');
 
 %create .mat file of experiment order
 if randomize == 1

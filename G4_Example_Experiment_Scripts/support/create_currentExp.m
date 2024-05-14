@@ -19,11 +19,11 @@ num_files = length({patinfo.name});
 for f = 1:num_files
     currentExp.pattern.pattNames{f} = matinfo(f).name;
     currentExp.pattern.patternList{f} = patinfo(f).name;
-    load(fullfile(pattern_folder, matinfo(f).name))
-    currentExp.pattern.x_num(f) = pattern.x_num;
-    currentExp.pattern.y_num(f) = pattern.y_num;
-    currentExp.pattern.gs_val(f) = pattern.gs_val;
-    currentExp.pattern.arena_pitch(f) = round(rad2deg(pattern.param.arena_pitch));
+    patternIN = load(fullfile(pattern_folder, matinfo(f).name));
+    currentExp.pattern.x_num(f) = patternIN.pattern.x_num; % Matlab now has its own built in class "pattern" which conflicts here.
+    currentExp.pattern.y_num(f) = patternIN.pattern.y_num;
+    currentExp.pattern.gs_val(f) = patternIN.pattern.gs_val;
+    currentExp.pattern.arena_pitch(f) = round(rad2deg(patternIN.pattern.param.arena_pitch));
 end
 currentExp.pattern.num_patterns = num_files;
 
