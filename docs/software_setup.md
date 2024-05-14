@@ -73,16 +73,19 @@ Switch to the _Panel_Host_{:.gui-txt} window and try to send an _all on_{:.gui-b
 
 The second test will verify that the connection between MATLAB and the _Panel_Host_{:.gui-txt} software is working. Switch back to the MATLAB PControl_G4 GUI and click on the _arena_{:.gui-txt} tab and then _all on_{:.gui-btn}. If all LEDs on the arena turn on, then the system has been set up successfully -- and you can turn it off the same way as before. Otherwise and most likely you will need to [trouble shoot your system]({{site.baseurl}}/docs/g4_troubleshooting.html) or [get in contact]({{site.baseurl}}/Contact).
 
-Next we'll verify the Experiment Designer and Conductor are working. The first thing to check is the location of your configuration file, `HHMI Panels Configuration.ini`. If it is saved at the default path, `C:\Program Files (x86)\HHMI G4\Support Files\HHMI Panels Configuration.ini`, then you shouldn't have to do anything. However, if you've saved this file at a different path, you'll need to update the Protocol Designer settings file before you can open the Designer. To do this, open the file `G4_Display_Tools\G4_Protocol_Designer\G4_Protocol_Designer_Settings.m`. Line 4 contains the text "Configuration File Path: C:\Program Files (x86)\HHMI G4\Support Files\HHMI Panels Configuration.ini". Replace the path with the path to your .ini file. 
+Next we'll verify the Experiment Designer and Conductor are working. Open the file `G4_Display_Tools\G4_Protocol_Designer\G4_Experiment_Designer.m` and click `Run` on the matlab editor. A window should open that looks like this. 
 
-__REPLACE THE PATH ONLY__ Note that text is pulled from this file and so every character is important. Be careful not to accidentally delete the space between the colon and first character of your path, or leave any spaces at the end of your path.
-{:.error}
+![Fly Protocol Designer main window](assets/protocol-designer_empty.png){:.pop} 
 
-Save the file, then open `G4_Display_Tools\G4_Protocol_Designer\G4_Experiment_Conductor.m` and run the file. A GUI should pop up. Go to `File -> Open -> .g4p file` and open one of our two provided test protocols. One is for a screen with three rows and one is for a screen with four rows. Browse to `G4_Display_Tools\G4_Protocol_Designer\test_protocols` and choose the appropriate protocol for your arena. Inside that folder, select the .g4p file and open it. If you get a warning that the experiment couldn't load because the number of rows doesn't match, then the one you opened doesn't match the number of screen rows indicated in your configuration .ini file. 
+In the top left corner, click File -> Settings and a settings window should open. The first item in the settings is the filepath to your HHMI Panels Configuration.ini file. Please make sure this path is accurate, or update it if necessary. Then click "Apply Changes", close the settings window, and close the Designer.
+
+Now open `G4_Display_Tools\G4_Protocol_Designer\G4_Experiment_Conductor.m` and run the file. A GUI that looks like this should pop up. 
+
+![Experiment Conductor](assets/conductor-empty.png){:.pop}
+
+Go to `File -> Open -> .g4p file` and open one of our two provided test protocols. One is for a screen with three rows and one is for a screen with four rows. Browse to `G4_Display_Tools\G4_Protocol_Designer\test_protocols` and choose the appropriate protocol for your arena. Inside that folder, select the .g4p file and open it. If you get a warning that the experiment couldn't load because the number of rows doesn't match, then the one you opened doesn't match the number of screen rows indicated in your configuration .ini file. 
 
 After opening the protocol, you'll want to uncheck the boxes labeled `Processing?` and `Plotting?` since this is just a test. Then click `Run`. The first condition that runs on the screen is a vertical bar used for fly fixation. It will run until you press a button on the keyboard. You'll need to push a button to continue. Then the rest of the protocol should run. The full experiment should last a minute and a half. Please see the [Conductor documentation](experiment-conductor.md) for more information about this software.
-
-To test the Designer, run the file `G4_Display_Tools\G4_Protocol_Designer\G4_Experiment_Designer.m`. The Designer should pop up. On the left of the window, select the radio button (3 rows or 4 rows) that matches your arena. Then open the test protocol by going to `File -> Open -> .g4p file` and browsing to the test protocol for your arena. This will give you a preview of what the experiment should look like. Please see the [Designer documentation](protocol-designer.md) to learn more about this software.
 
 ## Verify an experiment can run without the GUI
 
@@ -94,6 +97,12 @@ run_experiment_woGUI(filepath, md, run_test);
 ```
 
 After a few seconds to open the Host and load the experiment, the test protocol should begin to display on the arena.
+
+### Create and run an experiment without the GUI
+
+There is one other way to both create and run an experiment without any reliance on the Designer and Conductor software. It requires more coding, but is available for users who are interested in seeing what goes into making an experiment on their own. Open the file `G4_Display_Tools\G4_Example_Experiment_Scripts\create_experiment_G4_example.m`. There you will see a long list of user-defined parameters. For right now, don't edit anything except perhaps the first two items, the name of your test experiment and the path where you want to save it. Simply run the file. You can check the file location listed at the top of the script afterward to confirm your experiment saved. Next, run the file `G4_Display_Tools\G4_Example_Experiment_Scripts\run_experiment_G4_example.m`.
+
+You should see an experiment run on the arena, and text updates should appear in your matlab command window until the experiment is finished. 
 
 ## Configure Data Processing
 
