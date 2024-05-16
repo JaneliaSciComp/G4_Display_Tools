@@ -38,173 +38,277 @@ classdef G4_settings_controller < handle
         
         
         function update_view(self)
-            self.view.config_filepath_textbox.String = self.model.config_filepath;
-            self.view.sheet_key_textbox.String = self.model.metadata_sheet_key;
-            self.view.experimenter_gid_textbox.String = self.model.gids.experimenter;
-            self.view.age_gid_textbox.String = self.model.gids.fly_age;
-            self.view.sex_gid_textbox.String = self.model.gids.fly_sex;
-            self.view.geno_gid_textbox.String = self.model.gids.fly_geno;
-            self.view.temp_gid_textbox.String = self.model.gids.exp_temp;
-            self.view.rearing_gid_textbox.String = self.model.gids.rearing;
-            self.view.light_gid_textbox.String = self.model.gids.light_cycle;
-            self.view.run_protocol_textbox.String = self.model.default_run_protocol;
-            self.view.plot_protocol_textbox.String = self.model.default_plot_protocol;
-            self.view.proc_protocol_textbox.String = self.model.default_proc_protocol;
-            self.view.flight_test_textbox.String = self.model.flight_test_protocol;
-            self.view.walkCam_test_textbox.String = self.model.cam_walk_test_protocol;
-            self.view.walkChip_test_textbox.String = self.model.chip_walk_test_protocol;
-            self.view.test_run_textbox.String = self.model.test_run_protocol;
-            self.view.test_process_textbox.String = self.model.test_process_file;
-            self.view.test_plot_textbox.String = self.model.test_plot_file;
-            self.view.disabled_color_textbox.String = self.model.uneditable_cell_color;
-            self.view.disabled_text_textbox.String = self.model.uneditable_cell_text;
+            self.view.config_filepath_textbox.String = self.model.settings.Configuration_Filepath;
+            self.view.sheet_key_textbox.String = self.model.settings.Google_Sheet_Key;
+            self.view.experimenter_gid_textbox.String = self.model.settings.Users_Sheet_GID;
+            self.view.age_gid_textbox.String = self.model.settings.Fly_Age_Sheet_GID;
+            self.view.sex_gid_textbox.String = self.model.settings.Fly_Sex_Sheet_GID;
+            self.view.geno_gid_textbox.String = self.model.settings.Fly_Geno_Sheet_GID;
+            self.view.temp_gid_textbox.String = self.model.settings.Experiment_Temp_Sheet_GID;
+            self.view.rearing_gid_textbox.String = self.model.settings.Rearing_Protocol_Sheet_GID;
+            self.view.light_gid_textbox.String = self.model.settings.Light_Cycle_Sheet_GID;
+            self.view.run_protocol_textbox.String = self.model.settings.run_protocol_file;
+            self.view.plot_protocol_textbox.String = self.model.settings.plotting_file;
+            self.view.proc_protocol_textbox.String = self.model.settings.processing_file;
+            self.view.flight_test_textbox.String = self.model.settings.test_protocol_file_flight;
+            self.view.walkCam_test_textbox.String = self.model.settings.test_protocol_file_camWalk;
+            self.view.walkChip_test_textbox.String = self.model.settings.test_protocol_file_chipWalk;
+            self.view.test_run_textbox.String = self.model.settings.test_run_protocol_file;
+            self.view.test_process_textbox.String = self.model.settings.test_processing_file;
+            self.view.test_plot_textbox.String = self.model.settings.test_plotting_file;
+            self.view.disabled_color_textbox.String = self.model.settings.Uneditable_Cell_Color;
+            self.view.disabled_text_textbox.String = self.model.settings.Uneditable_Cell_Text;
         end
         
         %% Functions to check input values are correct. If valid, these 
         %  functions then call the model to set the new values
-        function check_valid_config(self, filepath)
-             if isfile(filepath)
-                self.model.config_filepath = filepath;
-                self.model.set_new_setting(self.model.lines_to_match.config, filepath);
+        function failed = check_valid_config(self, filepath)
+            failed = 0;
+            if ~isempty(filepath)
+                if ischar(filepath)
+                     if isfile(filepath)
+                        self.model.set_new_setting('Configuration_Filepath', filepath);
+                     else
+                         self.create_error_box("The configuration file does not exist.");
+                         failed = 1;
+                     end
+                else
+                    self.create_error_box("The configuration file input is not a character array.");
+                    failed = 1;
+                end
+            else
+                self.create_error_box("The configuration file input cannot be empty.");
+                failed = 1;
+            end
+        end
+        
+        function failed = check_valid_run_file(self, filepath)
+            failed = 0;
+            if ~isempty(filepath)
+                if ischar(filepath)
+                    if isfile(filepath)
+                        self.model.set_new_setting('run_protocol_file', filepath);
+                    else
+                        self.create_error_box("The file path for 'Default Run Protocol' does not exist.");
+                        failed = 1;
+                    end
+                else
+                    self.create_error_box("The default run protocol input is not a character array.");
+                    failed = 1;
+                end
+            else
+                self.model.set_new_setting('run_protocol_file', filepath);
+                
+            end
+        end
+        
+        function failed = check_valid_plot_file(self, filepath)
+            failed = 0;
+            if ~isempty(filepath)
+                if ischar(filepath)
+                    if isfile(filepath)
+                        self.model.set_new_setting('plotting_file', filepath);
+                    else
+                        self.create_error_box("The file path for 'Default Plotting Protocol' does not exist.");
+                        failed = 1;
+                    end
+                else
+                    self.create_error_box("The default plotting file input is not a character array.");
+                    failed = 1;
+                end
+            else
+                self.model.set_new_setting('plotting_file', filepath);
+                
+            end
+        end
+        
+        function failed = check_valid_proc_file(self, filepath)
+            failed = 0;
+            if ~isempty(filepath)
+                if ischar(filepath)
+                    if isfile(filepath)
+                        self.model.set_new_setting('processing_file', filepath);
+                    else
+                        self.create_error_box("The file path for 'Default Processing Protocol' does not exist.");
+                        failed = 1;
+                    end
+                else
+                    self.create_error_box("The default processing file input is not a character array.");
+                    failed = 1;
+                end
+            else
+                self.model.set_new_setting('processing_file', filepath);
+            end
+        end
+        
+        function failed = check_valid_flight_file(self, filepath)
+            failed = 0;
+            if ~isempty(filepath)
+                if ischar(filepath)
+                    if isfile(filepath)
+                        self.model.set_new_setting('test_protocol_file_flight', filepath);
+                    else
+                        self.create_error_box("The file path for 'Default Flight Test Protocol' does not exist.");
+                        failed = 1;
+                    end
+                else
+                    self.create_error_box("The flight test protocol input is not a character array.");
+                    failed = 1;
+                end
+            else
+                self.model.set_new_setting('test_protocol_file_flight', filepath);
+            end
+        end
+        
+        function failed = check_valid_camWalk_file(self, filepath)
+            failed = 0;
+            if ~isempty(filepath)
+                if ischar(filepath)
+                    if isfile(filepath)
+                        self.model.set_new_setting('test_protocol_file_camWalk', filepath);
+                    else
+                        self.create_error_box("The file path for 'Default Camera Walk Test Protocol' does not exist.");
+                        failed = 1;
+                    end
+                else
+                    self.create_error_box("The camera walk test protocol input is not a character array.");
+                    failed = 1;
+                end
+            else
+                self.model.set_new_setting('test_protocol_file_camWalk', filepath);
+            end
+        end
+        
+        function failed = check_valid_chipWalk_file(self, filepath)
+            failed = 0;
+             if ~isempty(filepath)
+                if ischar(filepath)
+                    if isfile(filepath)
+                        self.model.set_new_setting('test_protocol_file_chipWalk', filepath);
+                    else
+                        self.create_error_box("The file path for 'Default Chip Walk Test Protocol' does not exist.");
+                        failed = 1;
+                    end
+                else
+                    self.create_error_box("The chip walk test protocol input is not a character array.");
+                    failed = 1;
+                end
              else
-                 self.create_error_box("The configuration file does not exist.");
-             end
-        end
-        
-        function check_valid_run_file(self, filepath)
-            if isfile(filepath)
-                self.model.default_run_protocol = filepath;
-                self.model.set_new_setting(self.model.lines_to_match.run, filepath);
-            else
-                self.create_error_box("The file path for 'Default Run Protocol' does not exist.");
+                 self.model.set_new_setting('test_protocol_file_chipWalk', filepath);
             end
         end
         
-        function check_valid_plot_file(self, filepath)
-            if isfile(filepath)
-                self.model.default_plot_protocol = filepath;
-                self.model.set_new_setting(self.model.lines_to_match.plot, filepath);
+        function failed = check_valid_test_run(self, filepath)
+            failed = 0;
+            if ~isempty(filepath)
+                if ischar(filepath)
+                    if isfile(filepath)
+                        self.model.set_new_setting('test_run_protocol_file', filepath);
+                    else
+                        self.create_error_box("The file path for 'Default Run Protocol for Test' does not exist.");
+                        failed = 1;
+                    end
+                else
+                    self.create_error_box("The default test run protocol input is not a character array.");
+                    failed = 1;
+                end
             else
-                self.create_error_box("The file path for 'Default Plotting Protocol' does not exist.");
+                self.model.set_new_setting('test_run_protocol_file', filepath);
             end
         end
         
-        function check_valid_proc_file(self, filepath)
-            if isfile(filepath)
-                self.model.default_proc_protocol = filepath;
-                self.model.set_new_setting(self.model.lines_to_match.proc, filepath);
+        function failed = check_valid_test_process(self, filepath)
+            failed = 0;
+            if ~isempty(filepath)
+                if ischar(filepath)
+                    if isfile(filepath)
+                        self.model.set_new_setting('test_processing_file', filepath);
+                    else
+                        self.create_error_box("The file path for 'Default Processing File for Test' does not exist.");
+                        failed = 1;
+                    end
+                else
+                    self.create_error_box("The default test processing file input is not a character array.");
+                    failed = 1;
+                end
             else
-                self.create_error_box("The file path for 'Default Processing Protocol' does not exist.");
+                self.model.set_new_setting('test_processing_file', filepath);
             end
         end
         
-        function check_valid_flight_file(self, filepath)
-            if any(regexpi(filepath, "insert.*here")) || isfile(filepath)
-                self.model.flight_test_protocol = filepath;
-                self.model.set_new_setting(self.model.lines_to_match.flight, filepath);
+        function failed = check_valid_test_plot(self, filepath)
+            failed = 0;
+            if ~isempty(filepath)
+                if ischar(filepath)
+                    if isfile(filepath)
+                        self.model.set_new_setting('test_plotting_file', filepath);
+                    else
+                        self.create_error_box("The file path for 'Default Plotting File for Test' does not exist.");
+                        failed = 1;
+                    end
+                else
+                    self.create_error_box("The default test plotting file input is not a character array.");
+                    failed = 1;
+                end
             else
-                self.create_error_box("The file path for 'Default Flight Test Protocol' does not exist.");
-            end
-        end
-        
-        function check_valid_camWalk_file(self, filepath)
-            if any(regexpi(filepath, "insert.*here")) || isfile(filepath)
-                self.model.cam_walk_test_protocol = filepath;
-                self.model.set_new_setting(self.model.lines_to_match.cam, filepath);
-            else
-                self.create_error_box("The file path for 'Default Camera Walk Test Protocol' does not exist.");
-            end
-        end
-        
-        function check_valid_chipWalk_file(self, filepath)
-            if any(regexpi(filepath, "insert.*here")) || isfile(filepath)
-                self.model.chip_walk_test_protocol = filepath;
-                self.model.set_new_setting(self.model.lines_to_match.chip, filepath)
-            else
-                self.create_error_box("The file path for 'Default Chip Walk Test Protocol' does not exist.");
-            end
-        end
-        
-        function check_valid_test_run(self, filepath)
-            if isfile(filepath)
-                self.model.test_run_protocol = filepath;
-                self.model.set_new_setting(self.model.lines_to_match.testrun, filepath);
-            else
-                self.create_error_box("The file path for 'Default Run Protocol for Test' does not exist.");
-            end
-        end
-        
-        function check_valid_test_process(self, filepath)
-            if isfile(filepath)
-                self.model.test_process_file = filepath;
-                self.model.set_new_setting(self.model.lines_to_match.testproc, filepath);
-            else
-                self.create_error_box("The file path for 'Default Processing File for Test' does not exist.");
-            end
-        end
-        
-        function check_valid_test_plot(self, filepath)
-            if isfile(filepath)
-                self.model.test_plot_file = filepath;
-                self.model.set_new_setting(self.model.lines_to_match.testplot, filepath);
-            else
-                self.create_error_box("The file path for 'Default Plotting File for Test' does not exist.");
+                self.model.set_new_setting('test_plotting_file', filepath);
             end
         end
 
-        function check_valid_color(self, string)
+        function failed = check_valid_color(self, string)
+            failed = 0;
             if regexp(string, '\<#[a-zA-Z0-9]{6}\>')
-                self.model.uneditable_cell_color = string;
-                self.model.set_new_setting(self.model.lines_to_match.color, string);
+                self.model.set_new_setting('Uneditable_Cell_Color', string);
             else
                 self.create_error_box("Make sure your color is in 6 digit hexidecimal color code format (e.g. '#CC3300').");
+                failed = 1;
             end
         end
         
         %% These functions set new values like those above, but have no constraints on the values
-        function check_valid_text(self, string)
-            self.model.uneditable_cell_text = string;
-            self.model.set_new_setting(self.model.lines_to_match.text, string);            
+        function failed = check_valid_text(self, string)
+            failed = 0;
+            self.model.set_new_setting('Uneditable_Cell_Text', string);            
         end
         
-        function check_valid_key(self, string)
-            self.model.metadata_sheet_key = string;
-            self.model.set_new_setting(self.model.lines_to_match.key, string);           
+        function failed = check_valid_key(self, string)
+            failed = 0;
+            self.model.set_new_setting('Google_Sheet_Key', string);           
         end
         
-        function check_valid_usersGID(self, string)
-            self.model.gids.experimenter = string;
-            self.model.set_new_setting(self.model.lines_to_match.usersGID, string)
+        function failed = check_valid_usersGID(self, string)
+            failed = 0;
+            self.model.set_new_setting('Users_Sheet_GID', string)
         end
         
-        function check_valid_ageGID(self, string)
-            self.model.gids.fly_age = string;
-            self.model.set_new_setting(self.model.lines_to_match.ageGID, string)
+        function failed = check_valid_ageGID(self, string)
+            failed = 0;
+            self.model.set_new_setting('Fly_Age_Sheet_GID', string)
         end
         
-        function check_valid_sexGID(self, string)
-            self.model.gids.fly_sex = string;
-            self.model.set_new_setting(self.model.lines_to_match.sexGID, string)
+        function failed = check_valid_sexGID(self, string)
+            failed = 0;
+            self.model.set_new_setting('Fly_Sex_Sheet_GID', string)
         end
         
-        function check_valid_genoGID(self, string)
-            self.model.gids.fly_geno = string;
-            self.model.set_new_setting(self.model.lines_to_match.genoGID, string)
+        function failed = check_valid_genoGID(self, string)
+            failed = 0;
+            self.model.set_new_setting('Fly_Geno_Sheet_GID', string)
         end
         
-        function check_valid_tempGID(self, string)
-            self.model.gids.exp_temp = string;
-            self.model.set_new_setting(self.model.lines_to_match.tempGID, string)
+        function failed = check_valid_tempGID(self, string)
+            failed = 0;
+            self.model.set_new_setting('Experiment_Temp_Sheet_GID', string)
         end
         
-        function check_valid_rearingGID(self, string)
-            self.model.gids.rearing = string;
-            self.model.set_new_setting(self.model.lines_to_match.rearingGID, string)
+        function failed = check_valid_rearingGID(self, string)
+            failed = 0;
+            self.model.set_new_setting('Rearing_Protocol_Sheet_GID', string)
         end
         
-        function check_valid_lightGID(self, string)
-            self.model.gids.light_cycle = string;
-            self.model.set_new_setting(self.model.lines_to_match.lightGID, string)
+        function failed = check_valid_lightGID(self, string)
+            failed = 0;
+            self.model.set_new_setting('Light_Cycle_Sheet_GID', string)
         end
 
         %% General error message produced when something isn't valid

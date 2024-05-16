@@ -72,7 +72,7 @@ classdef G4_settings_view < handle
             
             %Configuration filepath - textbox
             config_box_position = self.calc_new_textbox_position(top_left_label, gap_between_edges, textbox_label_ratio);
-            self.config_filepath_textbox = self.create_text_box(self.fig, self.con.model.config_filepath, config_box_position);           
+            self.config_filepath_textbox = self.create_text_box(self.fig, self.con.model.settings.Configuration_Filepath, config_box_position);           
             
             %Configuration filepath - browse button
             browse_position = self.calc_new_browse_position(config_box_position, gap_between_edges, button_textbox_ratio);
@@ -85,8 +85,8 @@ classdef G4_settings_view < handle
             
             %Def run protocol - textbox
             run_box_pos = self.calc_new_textbox_position(run_label_pos, gap_between_edges, textbox_label_ratio);
-            self.run_protocol_textbox = self.create_text_box(self.fig, self.con.model.default_run_protocol, run_box_pos);
-            set(self.run_protocol_textbox);
+            self.run_protocol_textbox = self.create_text_box(self.fig, self.con.model.settings.run_protocol_file, run_box_pos);
+            %set(self.run_protocol_textbox);
             
             %Def run protocol - browse button
             browse2_pos = self.calc_new_browse_position(run_box_pos, gap_between_edges, button_textbox_ratio);
@@ -101,7 +101,7 @@ classdef G4_settings_view < handle
             %Def processing protocol - textbox
             
             proc_box_pos = self.calc_new_textbox_position(proc_label_pos, gap_between_edges, textbox_label_ratio);
-            self.proc_protocol_textbox = self.create_text_box(self.fig, self.con.model.default_proc_protocol, proc_box_pos);
+            self.proc_protocol_textbox = self.create_text_box(self.fig, self.con.model.settings.processing_file, proc_box_pos);
             
             %Def processing protocol - browse button
             browse4_pos = self.calc_new_browse_position(proc_box_pos, gap_between_edges, button_textbox_ratio);
@@ -115,7 +115,7 @@ classdef G4_settings_view < handle
             
             %Def plot protocol - textbox
             plot_box_pos = self.calc_new_textbox_position(plot_label_pos, gap_between_edges, textbox_label_ratio);
-            self.plot_protocol_textbox = self.create_text_box(self.fig, self.con.model.default_plot_protocol, plot_box_pos);
+            self.plot_protocol_textbox = self.create_text_box(self.fig, self.con.model.settings.plotting_file, plot_box_pos);
             
             %Def plot protocol - browse button
             browse3_pos = self.calc_new_browse_position(plot_box_pos, gap_between_edges, button_textbox_ratio);
@@ -129,7 +129,7 @@ classdef G4_settings_view < handle
             
             %Def flight test protocol - textbox
             flight_box_pos = self.calc_new_textbox_position(flight_label_pos, gap_between_edges, textbox_label_ratio);
-            self.flight_test_textbox = self.create_text_box(self.fig, self.con.model.flight_test_protocol, flight_box_pos);
+            self.flight_test_textbox = self.create_text_box(self.fig, self.con.model.settings.test_protocol_file_flight, flight_box_pos);
             
             %Def flight test protocol - browse button
             browse5_pos = self.calc_new_browse_position(flight_box_pos, gap_between_edges, button_textbox_ratio);
@@ -144,7 +144,7 @@ classdef G4_settings_view < handle
             %Def cam test protocol - textbox
             
             cam_box_pos = self.calc_new_textbox_position(cam_label_pos, gap_between_edges, textbox_label_ratio);
-            self.walkCam_test_textbox = self.create_text_box(self.fig, self.con.model.cam_walk_test_protocol, cam_box_pos);
+            self.walkCam_test_textbox = self.create_text_box(self.fig, self.con.model.settings.test_protocol_file_camWalk, cam_box_pos);
             
             %Def cam test protocol - browse button
             browse6_pos = self.calc_new_browse_position(cam_box_pos, gap_between_edges, button_textbox_ratio);
@@ -159,7 +159,7 @@ classdef G4_settings_view < handle
             %Def chip test protocol - textbox
             
             chip_box_pos = self.calc_new_textbox_position(chip_label_pos, gap_between_edges, textbox_label_ratio);
-            self.walkChip_test_textbox = self.create_text_box(self.fig, self.con.model.chip_walk_test_protocol, chip_box_pos);
+            self.walkChip_test_textbox = self.create_text_box(self.fig, self.con.model.settings.test_protocol_file_chipWalk, chip_box_pos);
             
             %Def chip test protocol - browse button
             browse7_pos = self.calc_new_browse_position(chip_box_pos, gap_between_edges, button_textbox_ratio);
@@ -174,7 +174,7 @@ classdef G4_settings_view < handle
             %Def run protocol for test - textbox
             
             testRun_box_pos = self.calc_new_textbox_position(testRun_label_pos, gap_between_edges, textbox_label_ratio);
-            self.test_run_textbox = self.create_text_box(self.fig, self.con.model.test_run_protocol, testRun_box_pos);
+            self.test_run_textbox = self.create_text_box(self.fig, self.con.model.settings.test_run_protocol_file, testRun_box_pos);
             
             %Def run protocol for test - browse button
             browse8_pos = self.calc_new_browse_position(testRun_box_pos, gap_between_edges, button_textbox_ratio);
@@ -189,7 +189,7 @@ classdef G4_settings_view < handle
             %Def process file for test - textbox
             
             test_process_box_pos = self.calc_new_textbox_position(test_process_label_pos, gap_between_edges, textbox_label_ratio);
-            self.test_process_textbox = self.create_text_box(self.fig, self.con.model.test_process_file, test_process_box_pos);
+            self.test_process_textbox = self.create_text_box(self.fig, self.con.model.settings.test_processing_file, test_process_box_pos);
             
             %Def process file for test - browse button
             browse9_pos = self.calc_new_browse_position(test_process_box_pos, gap_between_edges, button_textbox_ratio);
@@ -202,7 +202,7 @@ classdef G4_settings_view < handle
             
             %Def plot file for test - textbox
             test_plot_box_pos = self.calc_new_textbox_position(test_plot_label_pos, gap_between_edges, textbox_label_ratio);
-            self.test_plot_textbox = self.create_text_box(self.fig, self.con.model.test_plot_file, test_plot_box_pos);
+            self.test_plot_textbox = self.create_text_box(self.fig, self.con.model.settings.test_plotting_file, test_plot_box_pos);
             
             %Def plot file for test - browse button
             browse10_pos = self.calc_new_browse_position(test_plot_box_pos, gap_between_edges, button_textbox_ratio);
@@ -216,7 +216,7 @@ classdef G4_settings_view < handle
             
             %Disabled cell color - textbox
             color_box_pos = self.calc_new_textbox_position(color_label_pos, gap_between_edges, textbox_label_ratio);
-            self.disabled_color_textbox = self.create_text_box(self.fig, self.con.model.uneditable_cell_color, color_box_pos);
+            self.disabled_color_textbox = self.create_text_box(self.fig, self.con.model.settings.Uneditable_Cell_Color, color_box_pos);
             
             %% The fill text of disabled cells
             %Disabled cell text - label
@@ -225,7 +225,7 @@ classdef G4_settings_view < handle
             
             %Disabled cell text - textbox
             text_box_pos = self.calc_new_textbox_position(text_label_pos, gap_between_edges, textbox_label_ratio);
-            self.disabled_text_textbox = self.create_text_box(self.fig, self.con.model.uneditable_cell_text, text_box_pos);
+            self.disabled_text_textbox = self.create_text_box(self.fig, self.con.model.settings.Uneditable_Cell_Text, text_box_pos);
             
             %% Google Sheets information
             % Google Sheets key and GID values - panel
@@ -238,56 +238,56 @@ classdef G4_settings_view < handle
             sheet_label = self.create_label(googlesheet_panel, 'Google Sheets Key: ', sheet_label_pos);
             
             sheet_box_pos = self.calc_new_textbox_position(sheet_label_pos, gap_between_edges, textbox_label_ratio);
-            self.sheet_key_textbox = self.create_text_box(googlesheet_panel, self.con.model.metadata_sheet_key, sheet_box_pos);
+            self.sheet_key_textbox = self.create_text_box(googlesheet_panel, self.con.model.settings.Google_Sheet_Key, sheet_box_pos);
             
             % Google sheet key and GID values - Experimenter tab GID
             exp_label_pos = self.calc_new_label_position(sheet_label_pos, gap_between_edges);
             exp_label = self.create_label(googlesheet_panel, 'Experimenter Tab GID: ', exp_label_pos);
             
             exp_box_pos = self.calc_new_textbox_position(exp_label_pos, gap_between_edges, textbox_label_ratio);
-            self.experimenter_gid_textbox = self.create_text_box(googlesheet_panel, self.con.model.gids.experimenter, exp_box_pos);
+            self.experimenter_gid_textbox = self.create_text_box(googlesheet_panel, self.con.model.settings.Users_Sheet_GID, exp_box_pos);
             
             % Google Sheets key and GID values - Fly age tab GID
             age_label_pos = self.calc_new_label_position(exp_label_pos, gap_between_edges);
             age_label = self.create_label(googlesheet_panel, 'Fly Age Tab GID: ', age_label_pos);
             
             age_box_pos = self.calc_new_textbox_position(age_label_pos, gap_between_edges, textbox_label_ratio);
-            self.age_gid_textbox = self.create_text_box(googlesheet_panel, self.con.model.gids.fly_age, age_box_pos);
+            self.age_gid_textbox = self.create_text_box(googlesheet_panel, self.con.model.settings.Fly_Age_Sheet_GID, age_box_pos);
             
             % Google Sheets key and GID values - Fly sex tab GID
             sex_label_pos = self.calc_new_label_position(age_label_pos, gap_between_edges);
             sex_label = self.create_label(googlesheet_panel, 'Fly Sex Tab GID: ', sex_label_pos);
             
             sex_box_pos = self.calc_new_textbox_position(sex_label_pos, gap_between_edges, textbox_label_ratio);
-            self.sex_gid_textbox = self.create_text_box(googlesheet_panel, self.con.model.gids.fly_sex, sex_box_pos);
+            self.sex_gid_textbox = self.create_text_box(googlesheet_panel, self.con.model.settings.Fly_Sex_Sheet_GID, sex_box_pos);
             
             % Google Sheets key and GID values - Fly genotype tab GID
             geno_label_pos = self.calc_new_label_position(sex_label_pos, gap_between_edges);
             geno_label = self.create_label(googlesheet_panel, 'Fly Genotype Tab GID: ', geno_label_pos);
             
             geno_box_pos = self.calc_new_textbox_position(geno_label_pos, gap_between_edges, textbox_label_ratio);
-            self.geno_gid_textbox = self.create_text_box(googlesheet_panel, self.con.model.gids.fly_geno, geno_box_pos);
+            self.geno_gid_textbox = self.create_text_box(googlesheet_panel, self.con.model.settings.Fly_Geno_Sheet_GID, geno_box_pos);
             
             % Google Sheets key and GID values - Experiment temp tab GID
             temp_label_pos = self.calc_new_label_position(geno_label_pos, gap_between_edges);
             temp_label = self.create_label(googlesheet_panel, 'Experiment Temp tab GID: ', temp_label_pos);
             
             temp_box_pos = self.calc_new_textbox_position(temp_label_pos, gap_between_edges, textbox_label_ratio);
-            self.temp_gid_textbox = self.create_text_box(googlesheet_panel, self.con.model.gids.exp_temp, temp_box_pos);
+            self.temp_gid_textbox = self.create_text_box(googlesheet_panel, self.con.model.settings.Experiment_Temp_Sheet_GID, temp_box_pos);
             
             % Google Sheets key and GID values - Rearing protocol tab GID
             rearing_label_pos = self.calc_new_label_position(temp_label_pos, gap_between_edges);
             rearing_label = self.create_label(googlesheet_panel, 'Rearing Protocol tab GID: ', rearing_label_pos);
             
             rearing_box_pos = self.calc_new_textbox_position(rearing_label_pos, gap_between_edges, textbox_label_ratio);
-            self.rearing_gid_textbox = self.create_text_box(googlesheet_panel, self.con.model.gids.rearing, rearing_box_pos);
+            self.rearing_gid_textbox = self.create_text_box(googlesheet_panel, self.con.model.settings.Rearing_Protocol_Sheet_GID, rearing_box_pos);
             
             % Google Sheets key and GID values - Light Cycle tab GID
             light_label_pos = self.calc_new_label_position(rearing_label_pos, gap_between_edges);
             light_label = self.create_label(googlesheet_panel, 'Light Cycle tab GID: ', light_label_pos);
             
             light_box_pos = self.calc_new_textbox_position(light_label_pos, gap_between_edges, textbox_label_ratio);
-            self.light_gid_textbox = self.create_text_box(googlesheet_panel, self.con.model.gids.light_cycle, light_box_pos);
+            self.light_gid_textbox = self.create_text_box(googlesheet_panel, self.con.model.settings.Light_Cycle_Sheet_GID, light_box_pos);
             
             %% Apply and cancel buttons
             apply_button_pos = [gap_between_edges, gap_between_edges, self.config_filepath_textbox.Position(3)*button_textbox_ratio + .03, self.config_filepath_textbox.Position(4)];
@@ -316,32 +316,36 @@ classdef G4_settings_view < handle
            %value is valid. If it is (or has no limitation), the controller then calls the model
            %to update its value and the settings file accordingly. If not
            %valid, it returns an error
+           failed = [];
            
-           self.con.check_valid_config(self.config_filepath_textbox.String);
-           self.con.check_valid_run_file(self.run_protocol_textbox.String);
-           self.con.check_valid_plot_file(self.plot_protocol_textbox.String);
-           self.con.check_valid_proc_file(self.proc_protocol_textbox.String);
-           self.con.check_valid_flight_file(self.flight_test_textbox.String);
-           self.con.check_valid_camWalk_file(self.walkCam_test_textbox.String);
-           self.con.check_valid_chipWalk_file(self.walkChip_test_textbox.String);
-           self.con.check_valid_test_run(self.test_run_textbox.String);
-           self.con.check_valid_test_process(self.test_process_textbox.String);
-           self.con.check_valid_test_plot(self.test_plot_textbox.String);
-           self.con.check_valid_color(self.disabled_color_textbox.String);
+           failed(end+1) = self.con.check_valid_config(self.config_filepath_textbox.String);
+           failed(end+1) = self.con.check_valid_run_file(self.run_protocol_textbox.String);
+           failed(end+1) = self.con.check_valid_plot_file(self.plot_protocol_textbox.String);
+           failed(end+1) = self.con.check_valid_proc_file(self.proc_protocol_textbox.String);
+           failed(end+1) = self.con.check_valid_flight_file(self.flight_test_textbox.String);
+           failed(end+1) = self.con.check_valid_camWalk_file(self.walkCam_test_textbox.String);
+           failed(end+1) = self.con.check_valid_chipWalk_file(self.walkChip_test_textbox.String);
+           failed(end+1) = self.con.check_valid_test_run(self.test_run_textbox.String);
+           failed(end+1) = self.con.check_valid_test_process(self.test_process_textbox.String);
+           failed(end+1) = self.con.check_valid_test_plot(self.test_plot_textbox.String);
+           failed(end+1) = self.con.check_valid_color(self.disabled_color_textbox.String);
            
            %Currently no validity testing for the following
-           self.con.check_valid_text(self.disabled_text_textbox.String);
-           self.con.check_valid_key(self.sheet_key_textbox.String);
-           self.con.check_valid_usersGID(self.experimenter_gid_textbox.String);
-           self.con.check_valid_ageGID(self.age_gid_textbox.String);
-           self.con.check_valid_sexGID(self.sex_gid_textbox.String);
-           self.con.check_valid_genoGID(self.geno_gid_textbox.String);
-           self.con.check_valid_tempGID(self.temp_gid_textbox.String);
-           self.con.check_valid_rearingGID(self.rearing_gid_textbox.String);
-           self.con.check_valid_lightGID(self.light_gid_textbox.String);
+           failed(end+1) = self.con.check_valid_text(self.disabled_text_textbox.String);
+           failed(end+1) = self.con.check_valid_key(self.sheet_key_textbox.String);
+           failed(end+1) = self.con.check_valid_usersGID(self.experimenter_gid_textbox.String);
+           failed(end+1) = self.con.check_valid_ageGID(self.age_gid_textbox.String);
+           failed(end+1) = self.con.check_valid_sexGID(self.sex_gid_textbox.String);
+           failed(end+1) = self.con.check_valid_genoGID(self.geno_gid_textbox.String);
+           failed(end+1) = self.con.check_valid_tempGID(self.temp_gid_textbox.String);
+           failed(end+1) = self.con.check_valid_rearingGID(self.rearing_gid_textbox.String);
+           failed(end+1) = self.con.check_valid_lightGID(self.light_gid_textbox.String);
 
            %This updates the gui with the most current model values. 
            self.con.update_view();
+           if sum(failed) == 0
+                self.con.close_window();
+           end
         end
         
         function cancel_changes(self, ~, ~)

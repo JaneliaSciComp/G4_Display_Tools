@@ -94,6 +94,13 @@ classdef G4_document < handle
         function self = G4_document()
 
             self.settings = G4_Protocol_Designer_Settings();
+            fn = fieldnames(self.settings);
+            for i = 1:numel(fn)
+                if isstring(self.settings.(fn{i}))
+                    self.settings.(fn{i}) = convertStringsToChars(self.settings.(fn{i}));
+                end
+            end
+
 
             %%constructor sets rest of variables
             %Set these properties to empty values until they are needed
@@ -121,7 +128,7 @@ classdef G4_document < handle
             self.posttrial = self.trial_data.trial_array;
 
             %Find line with number of rows and get value -------------------------------------------
-            [self.configData, numRows_line, index] = self.get_setting(settings.Configuration_Filepath, 'Number of Rows');
+            [self.configData, numRows_line, index] = self.get_setting(self.settings.Configuration_Filepath, 'Number of Rows');
   
             if ~isempty(self.configData)
                 self.num_rows = str2num(self.configData{numRows_line}(end));
