@@ -42,13 +42,10 @@ classdef G4_document < handle
         recent_g4p_files_
         recent_files_filepath_
 
-        %filler for disabled cells
-        uneditable_cell_color_
-        uneditable_cell_text_
-
         pattern_locations
         function_locations
         aoFunc_locations
+        settings
     end
 
     properties (Dependent)
@@ -82,23 +79,28 @@ classdef G4_document < handle
         is_chan4
         chan4_rate
 
+        
         configData
 
         %Shared data on recently opened .g4p files
         recent_g4p_files
         recent_files_filepath
 
-        uneditable_cell_color
-        uneditable_cell_text
     end
 
     methods
 
 %CONSTRUCTOR--------------------------------------------------------------
         function self = G4_document()
-            %%User needs to change this if the settings file name is
-            %%changed.
-            settings_file = 'G4_Protocol_Designer_Settings.m';
+
+            self.settings = G4_Protocol_Designer_Settings();
+            fn = fieldnames(self.settings);
+            for i = 1:numel(fn)
+                if isstring(self.settings.(fn{i}))
+                    self.settings.(fn{i}) = convertStringsToChars(self.settings.(fn{i}));
+                end
+            end
+
 
             %%constructor sets rest of variables
             %Set these properties to empty values until they are needed
@@ -125,22 +127,13 @@ classdef G4_document < handle
             self.block_trials = self.trial_data.trial_array;
             self.posttrial = self.trial_data.trial_array;
 
-            %Get the path to the configuration file from settings and set the config data to the data within the configuration file
-            [settings_data, path_line, path_index] = self.get_setting(settings_file, 'Configuration File Path: ');
-            path = strtrim(settings_data{path_line}(path_index:end));
-%             self.configData = strtrim(regexp( fileread(path),'\n','split'));
-
-            [settings_data, color_line, color_index] = self.get_setting(settings_file, 'Color to fill uneditable cells: ');
-            self.uneditable_cell_color = settings_data{color_line}(color_index:end);
-
-            [settings_data, filler_line, filler_index] =  self.get_setting(settings_file, 'Text to fill uneditable cells: ');
-            self.uneditable_cell_text = settings_data{filler_line}(filler_index:end);
-
             %Find line with number of rows and get value -------------------------------------------
-            [self.configData, numRows_line, index] = self.get_setting(path, 'Number of Rows');
+            [self.configData, numRows_line, index] = self.get_setting(self.settings.Configuration_Filepath, 'Number of Rows');
+  
             if ~isempty(self.configData)
                 self.num_rows = str2num(self.configData{numRows_line}(end));
             end
+
 
             %Determine channel sample rates--------------------------------------------
             if ~isempty(self.configData)
@@ -1915,8 +1908,8 @@ classdef G4_document < handle
         end
 
         function [c] = colorgen(self)
-            color = self.uneditable_cell_color;
-            text = self.uneditable_cell_text;
+            color = self.settings.Uneditable_Cell_Color;
+            text = self.settings.Uneditable_Cell_Text;
             c = ['<html><table border=0 width=400 bgcolor=',color,'><TR><TD>',text,'</TD></TR></table>'];
         end
 
@@ -2315,14 +2308,6 @@ classdef G4_document < handle
             self.recent_files_filepath_ = value;
         end
 
-        function set.uneditable_cell_color(self, value)
-            self.uneditable_cell_color_ = value;
-        end
-
-        function set.uneditable_cell_text(self, value)
-            self.uneditable_cell_text_ = value;
-        end
-
         function set.est_exp_length(self, value)
             self.est_exp_length_ = value;
         end
@@ -2448,13 +2433,7 @@ classdef G4_document < handle
             output = self.recent_files_filepath_;
         end
 
-        function output = get.uneditable_cell_color(self)
-            output = self.uneditable_cell_color_;
-        end
 
-        function output = get.uneditable_cell_text(self)
-            output = self.uneditable_cell_text_;
-        end
 
         function output = get.est_exp_length(self)
             output = self.est_exp_length_;
