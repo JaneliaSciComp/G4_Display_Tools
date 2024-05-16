@@ -155,13 +155,6 @@ classdef G4_conductor_model < handle
         end
 
 
-        function [settings_data, path, index] = get_setting(self, string_to_find)
-            last_five = string_to_find(end-5:end);
-            settings_data = strtrim(regexp( fileread('G4_Protocol_Designer_settings.m'),'\n','split'));
-            path = find(contains(settings_data, string_to_find));
-            index = strfind(settings_data{path},last_five) + 5;
-        end
-
         function [fly_name] = create_fly_name(self, filepath)
             results_folder = fullfile(filepath,self.date_folder);
             if ~exist(results_folder)
