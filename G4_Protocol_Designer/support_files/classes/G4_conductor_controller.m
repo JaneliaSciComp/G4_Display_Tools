@@ -28,6 +28,7 @@ classdef G4_conductor_controller < handle
         current_offset_
         current_duration_
         is_paused
+        settings
     end
 
     properties (Dependent)
@@ -72,6 +73,14 @@ classdef G4_conductor_controller < handle
             else
                 self.doc = G4_document();
                 self.settings_con = G4_settings_controller();
+            end
+
+            self.settings = G4_Protocol_Designer_Settings();
+            fn = fieldnames(self.settings);
+            for i = 1:numel(fn)
+                if isstring(self.settings.(fn{i}))
+                    self.settings.(fn{i}) = convertStringsToChars(self.settings.(fn{i}));
+                end
             end
 
             exp_time = self.doc.calc_exp_length();
@@ -1060,26 +1069,10 @@ classdef G4_conductor_controller < handle
         end
 
         function prepare_test_exp(self)
-            line_to_match = 'Default test run protocol file: ';
-            %Use run protocol currently selected in drop down menu
-            % [settingsData, linePath, idx] = self.model.get_setting(line_to_match);
-            % path_to_run_protocol = strtrim(settingsData{linePath}(idx:end));
-
-            line_to_match = 'Default test processing file: ';
-
-            %Get default processing file for tests
-            [settingsData, linePath, idx] = self.model.get_setting(line_to_match);
-            path_to_proc_protocol = strtrim(settingsData{linePath}(idx:end));
-
-            line_to_match = 'Default test plotting file: ';
-
-            %Get default plotting file for tests
-            [settingsData, linePath, idx] = self.model.get_setting(line_to_match);
-            path_to_plot_protocol = strtrim(settingsData{linePath}(idx:end));
-
-            % self.model.set_run_file(path_to_run_protocol);
-            self.model.set_plot_file(path_to_plot_protocol);
-            self.model.set_proc_file(path_to_proc_protocol);
+         
+            % self.model.set_run_file(self.settings.test_run_protocol_file);
+            self.model.set_plot_file(self.settings.test_plotting_file);
+            self.model.set_proc_file(self.settings.test_processing_file);
         end
 
         function [original_exp_path, real_fly_name] = run_test(self, original_experiment, original_fly_name)
@@ -1097,18 +1090,14 @@ classdef G4_conductor_controller < handle
 
             %Get filepath to the test protocol
             if self.model.experiment_type == 1
-                %Get the flight filepath from settings
-                line_to_match = 'Flight test protocol file: ';
+               path_to_experiment = self.settings.test_protocol_file_flight;
             elseif self.model.experiment_type == 2
                 %Get path to camera test file
-                line_to_match = 'Camera walk test protocol file: ';
+                path_to_experiment = self.settings.test_protocol_file_camWalk;
             else
                 %Get path to chip test file
-                line_to_match = 'Chip walk test protocol file: ';
+                path_to_experiment = self.settings.test_protocol_file_chipWalk;
             end
-
-            [settings_data, line_path, index] = self.model.get_setting(line_to_match);
-            path_to_experiment = strtrim(settings_data{line_path}(index:end));
 
             % Open test g4p file
             self.open_g4p_file(path_to_experiment);
@@ -1160,26 +1149,11 @@ classdef G4_conductor_controller < handle
         end
 
         function reopen_original_experiment(self, filepath, fly_name)
-            line_to_match = 'Default run protocol file: ';
-            %Get default run protocol file for tests
-            % [settingsData, linePath, idx] = self.model.get_setting(line_to_match);
-            % path_to_run_protocol = strtrim(settingsData{linePath}(idx:end));
+            
 
-            line_to_match = 'Default processing file: ';
-
-            %Get default processing file for tests
-            [settingsData, linePath, idx] = self.model.get_setting(line_to_match);
-            path_to_proc_protocol = strtrim(settingsData{linePath}(idx:end));
-
-            line_to_match = 'Default plotting file: ';
-
-            %Get default plotting file for tests
-            [settingsData, linePath, idx] = self.model.get_setting(line_to_match);
-            path_to_plot_protocol = strtrim(settingsData{linePath}(idx:end));
-
-            %self.model.set_run_file(path_to_run_protocol);
-            self.model.set_plot_file(path_to_plot_protocol);
-            self.model.set_proc_file(path_to_proc_protocol);
+            %self.model.set_run_file(self.settings.run_protocol_file);
+            self.model.set_plot_file(self.settings.plotting_file);
+            self.model.set_proc_file(self.settings.processing_file);
 
             self.open_g4p_file(filepath);
             self.model.fly_name = fly_name;

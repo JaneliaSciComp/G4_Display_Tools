@@ -37,6 +37,7 @@ classdef G4_conductor_model < handle
         combine_tdms
         convert_tdms
         orig_expected_time
+        settings
     end
 
     properties (Dependent)
@@ -78,32 +79,27 @@ classdef G4_conductor_model < handle
 
         %CONSTRUCTOR--------------------------------------------------------------
         function self = G4_conductor_model()
-            %%User adjusted lists based on settings file and metadata Google Sheets
-            list_of_setting_strings = {'Default run protocol file: ', 'Default processing file: ', ...
-                'Default plotting file: ', 'Metadata Google Sheet key: '}; %These strings must match the string
-            %preceding the corresponding value in the settings file -
-            %including the space after the :
 
-            %These strings must match the class property names they
-            %correspond to.
-            list_of_settings_needed = {'run_protocol_file', 'processing_file', 'plotting_file', 'google_sheet_key'};
-
-            for i = 1:length(list_of_setting_strings)
-                [settings_data, path, index] = self.get_setting(list_of_setting_strings{i});
-                self.(list_of_settings_needed{i}) = strtrim(settings_data{path}(index:end));
+            self.settings = G4_Protocol_Designer_Settings();
+            fn = fieldnames(self.settings);
+            for i = 1:numel(fn)
+                if isstring(self.settings.(fn{i}))
+                    self.settings.(fn{i}) = convertStringsToChars(self.settings.(fn{i}));
+                end
             end
 
+            self.run_protocol_file = self.settings.run_protocol_file;
+            self.processing_file = self.settings.processing_file;
+            self.plotting_file = self.settings.plotting_file;
+            self.google_sheet_key = self.settings.Google_Sheet_Key;
+           
             %This list must be in the same order as the gid strings list.
             list_of_metadata_fields = {'experimenter', 'fly_age', 'fly_sex', 'fly_geno', 'exp_temp', 'rearing', 'light_cycle'};
-
-            list_of_gid_strings = {'Users Sheet GID: ','Fly Age Sheet GID: ', 'Fly Sex Sheet GID: ', ...
-                'Fly Geno Sheet GID: ', 'Experiment Temp Sheet GID: ', 'Rearing Protocol Sheet GID: ', 'Light Cycle Sheet GID: '};
-            self.list_of_gids = {};
-            for i = 1:length(list_of_gid_strings)
-                [settings_data, path, index] = self.get_setting(list_of_gid_strings{i});
-                self.list_of_gids{i} = strtrim(settings_data{path}(index:end));
-            end
-
+            self.list_of_gids = {self.settings.Users_Sheet_GID, self.settings.Fly_Age_Sheet_GID, ...
+                self.settings.Fly_Sex_Sheet_GID, self.settings.Fly_Geno_Sheet_GID, ...
+                self.settings.Experiment_Temp_Sheet_GID, self.settings.Rearing_Protocol_Sheet_GID, ...
+                self.settings.Light_Cycle_Sheet_GID};
+            
             %The list of available run protocols to display
             self.run_protocol_file_list = {'Simple', 'Combined Command', 'Streaming', 'Log Reps Separately', 'CC + Streaming', ...
                 'CC + Log Reps', 'Streaming + Log Reps', 'CC + Streaming + Log Reps'};

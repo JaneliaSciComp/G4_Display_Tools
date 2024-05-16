@@ -1064,12 +1064,7 @@ classdef G4_document < handle
             %save and close config file
             config = self.configData;
 
-            settings_data = strtrim(regexp( fileread('G4_Protocol_Designer_Settings.m'),'\n','split'));
-            filepath_line = find(contains(settings_data,'Configuration File Path:'));
-            exp = 'Path:';
-            startIndex = regexp(settings_data{filepath_line},exp);
-            start_filepath_index = startIndex + 6;
-            config_filepath = settings_data{filepath_line}(start_filepath_index:end);
+            config_filepath = self.settings.Configuration_Filepath;
 
             if ~isfile(config_filepath)
                 error("The configuration file " + config_filepath + " does not exist. Double check your settings.");
