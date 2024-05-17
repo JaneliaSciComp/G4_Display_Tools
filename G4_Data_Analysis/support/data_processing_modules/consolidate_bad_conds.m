@@ -5,8 +5,8 @@ function [bad_conds, bad_reps, bad_inter, summary] = consolidate_bad_conds(dur_c
     
     codes = {'DUR', 'CC', 'WBF', 'SL'};
     bad_conditions = [dur_conds; slope_conds; corr_conds; wbf_conds];
-    for i = size(bad_conditions):-1:1
-        for j = size(bad_conditions):-1:1
+    for i = size(bad_conditions,1):-1:1
+        for j = size(bad_conditions,1):-1:1
             if i == j
                 continue;
             elseif bad_conditions(i,:) == bad_conditions(j,:)
