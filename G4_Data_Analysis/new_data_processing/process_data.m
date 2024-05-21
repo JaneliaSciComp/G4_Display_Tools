@@ -88,6 +88,11 @@ function process_data(exp_folder, processing_settings_file)
         summary_save_path = s.settings.summary_save_path;
     end
     summary_filename = strcat(s.settings.summary_filename, '.txt');
+    if isfield(s.settings, 'static_conditions')
+        static_conditions = s.settings.static_conditions;
+    else
+        static_conditions = 0;
+    end
 
 
     %Set which command we should be looking for in the log files
@@ -186,8 +191,11 @@ function process_data(exp_folder, processing_settings_file)
 %%%%%then pass it in to the function to find bad wbfs where I only look at
 %%%%%the indices for the actual condition???
     [bad_duration_conds, bad_duration_intertrials] = check_condition_durations(cond_dur, intertrial_durs, path_to_protocol, duration_diff_limit);
-    [bad_slope_conds] = check_flat_conditions(trial_start_times, trial_stop_times, Log, num_reps, num_conds, exp_order);
-
+    if static_conditions == 0
+        [bad_slope_conds] = check_flat_conditions(trial_start_times, trial_stop_times, Log, num_reps, num_conds, exp_order);
+    else
+        bad_slope_conds = [];
+    end
     [bad_crossCorr_conds] = check_correlation(trial_start_times, trial_stop_times, exp_order, Log, cond_modes, corrTolerance);
 
 
