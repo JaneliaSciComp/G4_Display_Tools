@@ -1,5 +1,5 @@
 function [bad_FP_conds] = check_frame_position(path_to_protocol, start_times, stop_times, exp_order, ...
-    Log, condModes, corrTolerance)
+    Log, condModes, corrTolerance, framePosTolerance)
 
     num_conds = size(exp_order,1);
     num_reps = size(exp_order,2);
@@ -38,6 +38,24 @@ function [bad_FP_conds] = check_frame_position(path_to_protocol, start_times, st
                 if percent_off_zero(cond,rep) > corrTolerance
                     conds_outside_corr_tolerance(end+1, end+1) = [cond, rep];
                 end
+                aligned_data{cond, rep} = repData;
+                aligned_data{cond, rep}(1:abs(shift_numbers(cond,rep))) = [];
+                diff = [];
+
+                if length(expectedData) <= length(aligned_data{cond, rep})
+                    num_comparisons = length(expectedData);
+                else
+                    num_comparisons = length(aligned_data{cond, rep});
+                end
+                for dp = 1:num_comparisons
+
+                    diff(dp) = abs(expectedData(dp) - aligned_data{cond, rep}(dp));
+
+                end
+                avg_diffs(cond, rep) = mean(diff);
+                max_diffs(cond, rep) = max(diff);
+                prctile_diffs(cond, rep) = prctile(diff, 97);
+                
 
             end
 
@@ -49,6 +67,8 @@ function [bad_FP_conds] = check_frame_position(path_to_protocol, start_times, st
         % If the condition includes a position function
             % Get recorded frame position data for trial
             % get position function data
+            % Do a cross correlation to find out how far shifted they are
+            % Align them using the cross correlation info
             % Compare the two with some buffer for variation
 
 
