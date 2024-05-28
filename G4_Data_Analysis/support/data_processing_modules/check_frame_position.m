@@ -1,5 +1,5 @@
 function [bad_FP_conds] = check_frame_position(path_to_protocol, start_times, stop_times, exp_order, ...
-    Log, condModes, corrTolerance, framePosTolerance)
+    Log, condModes, corrTolerance, framePosTolerance, framePosPercentile, perctile_tol)
 
     num_conds = size(exp_order,1);
     num_reps = size(exp_order,2);
@@ -8,6 +8,8 @@ function [bad_FP_conds] = check_frame_position(path_to_protocol, start_times, st
     blockTrials = exp.exp_parameters.block_trials;
     conds_outside_corr_tolerance = [];
     bad_FP_conds = [];
+    shift_numbers = zeros(num_conds,num_reps);
+    percent_off_zero = zeros(num_conds, num_reps);
     
 
 
@@ -39,10 +41,14 @@ function [bad_FP_conds] = check_frame_position(path_to_protocol, start_times, st
                     conds_outside_corr_tolerance(end+1, end+1) = [cond, rep];
                 end
                 aligned_data{cond, rep} = repData;
-                aligned_data{cond, rep}(1:abs(shift_numbers(cond,rep))) = [];
+                aligned_data{cond, rep}(1:abs(shift_numbers(cond,rep))) = []; %Always shift left, 
+                %                                                               there should always be a lag in recorded data, 
+                %                                                               it wouldn't ever be ahead so no need 
+                %                                                               to ever shift the other way.
                 diff = [];
 
-                if length(expectedData) <= length(aligned_data{cond, rep})
+                if length(expectedData) <= length(aligned_data{cond, rep}) % The number of points to compare is always the length of the
+                                                                           % shorter array
                     num_comparisons = length(expectedData);
                 else
                     num_comparisons = length(aligned_data{cond, rep});
@@ -54,7 +60,13 @@ function [bad_FP_conds] = check_frame_position(path_to_protocol, start_times, st
                 end
                 avg_diffs(cond, rep) = mean(diff);
                 max_diffs(cond, rep) = max(diff);
-                prctile_diffs(cond, rep) = prctile(diff, 97);
+                prctile_diffs(cond, rep) = prctile(diff, framePosPercentile);
+                if avg_diffs(cond, rep) >  framePosTolerance
+                    frame_pos_avg_diff_above_tol(end+1, end+1) = [cond, rep];
+                end
+                if prctile_diffs(cond, rep) > perctile_tol
+                    frame_pos_prctile_above_tol(end+1, end+1) = [cond, rep];
+                end
                 
 
             end
@@ -63,13 +75,44 @@ function [bad_FP_conds] = check_frame_position(path_to_protocol, start_times, st
 
     end
 
-    % For each repetition of each condition
-        % If the condition includes a position function
-            % Get recorded frame position data for trial
-            % get position function data
-            % Do a cross correlation to find out how far shifted they are
-            % Align them using the cross correlation info
-            % Compare the two with some buffer for variation
+    % Display warnings to the user for any condition/rep pairs that fell
+    % out of tolerance ranges provided by the user.
+    if exist(conds_outside_corr_tolerance,'var') && ~isempty(conds_outside_corr_tolerance)
+        msg = ['These condition and rep pairs were above tolerance when the ' ...
+            'recorded frame positions were cross correlated with the expected position function:'];
+        for p = 1:size(conds_outside_corr_tolerance,1)
+            msg = [msg ' cond/rep: ' num2str(conds_outside_corr_tolerance(p,:)) ','];
+        end
+
+        warning(msg);
+    end
+
+    if exist(frame_pos_avg_diff_above_tol, 'var') && ~isempty(frame_pos_avg_diff_above_tol)
+
+        msg = ['When the recorded position frame was compared to the position ' ...
+            'function point by point, the average difference was above tolerance for these cond/rep pairs:'];
+
+        for p = 1:size(frame_pos_avg_diff_above_tol,1)
+            msg = [msg ' cond/rep: ' num2str(frame_pos_avg_diff_above_tol(p,:)) ','];
+        end
+
+        warning(msg);
+
+    end
+
+    if exist(frame_pos_prctile_above_tol, 'var') && ~isempty(frame_pos_prctile_above_tol)
+
+        msg = ['When the recorded position frame was compared to the position ' ...
+            'function point by point, the percentile value was above tolerance for these condition/rep pairs:'];
+
+        for p = 1:size(frame_pos_prctile_above_tol,1)
+            msg = [msg ' cond/rep: ' num2str(frame_pos_prctile_above_tol(p,:)) ','];
+        end
+
+        warning(msg);
+
+    end
+
 
 
 end
