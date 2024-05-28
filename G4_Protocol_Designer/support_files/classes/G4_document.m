@@ -197,7 +197,7 @@ classdef G4_document < handle
                         new_value = str2num(new_value);
                     end
                     if ~isempty(new_value) && (new_value < 1 || new_value > 7)
-                        waitfor(errordlg("Mode must be 1-7 or left empty."));
+                        self.create_error_box("Mode must be 1-7 or left empty.", 'Mode Error');
                         return;
                     end
                 end
@@ -206,7 +206,7 @@ classdef G4_document < handle
                     patfile = new_value;
                     patfield = self.get_pattern_field_name(patfile);
                     if strcmp(patfield, '')
-                        waitfor(errordlg("That block trial pat filename does not match any imported files."));
+                        self.create_error_box("That block trial pat filename does not match any imported files.", 'block pattern name', 'modal');
                         return;
                     end
                     patDim = length(self.Patterns.(patfield).pattern.Pats(1,1,:));
@@ -226,7 +226,7 @@ classdef G4_document < handle
                     posfile = new_value;
                     posfield = self.get_posfunc_field_name(posfile);
                     if strcmp(posfield,'') && ~strcmp(new_value,'')
-                        waitfor(errordlg("That block trial pos filename does not match any imported files."));
+                        self.create_error_box("That block trial pos filename does not match any imported files.", 'position function name');
                         return;
                     end
 
@@ -253,7 +253,7 @@ classdef G4_document < handle
                     aofile = new_value;
                     aofield = self.get_aofunc_field_name(aofile);
                     if strcmp(aofield,'')
-                        waitfor(errordlg("That block trial AO filename does not match any imported files."));
+                        self.create_error_box("That block trial AO filename does not match any imported files.", 'AO function filename');
                         return;
                     end
                 end
@@ -276,13 +276,13 @@ classdef G4_document < handle
                         num_pat_frames = length(self.Patterns.(patfield).pattern.Pats(1,1,:));
                         if chars == 0
                             if str2num(new_value) > num_pat_frames
-                                waitfor(errordlg("Please make sure your frame index is within the bounds of your pattern."));
+                                self.create_error_box("Please make sure your frame index is within the bounds of your pattern.", 'Frame index error');
                                 return
                             end
                         end
                     end
                     if  chars == 1 && ~strcmp(new_value,'r')
-                        waitfor(errordlg("Invalid frame index. Please enter a number or 'r'"));
+                        self.create_error_box("Invalid frame index. Please enter a number or 'r'", 'Frame Index Error');
                         return;
                     end
                 end
@@ -293,7 +293,7 @@ classdef G4_document < handle
                         new_value = str2num(new_value);
                     end
                     if new_value <= 0
-                        waitfor(errordlg("Your frame rate must be above 0"));
+                        self.create_error_box("Your frame rate must be above 0");
                         return;
                     end
                 end
@@ -310,7 +310,7 @@ classdef G4_document < handle
                         new_value = str2num(new_value);
                     end
                     if new_value < 0
-                        waitfor(errordlg("You duration must be zero or greater"));
+                        self.create_error_box("You duration must be zero or greater");
                         return;
                     end
                     %round to 1 decimal place, since the controller only takes
@@ -319,10 +319,10 @@ classdef G4_document < handle
                 end
 
                 if patRows ~= numrows
-                    waitfor(errordlg("Watch out! This pattern will not run on the size screen you have selected."));
+                    self.create_error_box("Watch out! This pattern will not run on the size screen you have selected.");
                 end
                 if patDim < funcDim
-                    waitfor(errordlg("Please make sure the dimension of your pattern and position functions match"));
+                    self.create_error_box("Please make sure the dimension of your pattern and position functions match");
                 else
 
                     %Set value
@@ -350,7 +350,7 @@ classdef G4_document < handle
                     new_value = str2num(new_value);
                 end
                 if new_value < 1 || new_value > 7
-                    waitfor(errordlg("Mode must be 1-7 or left empty."));
+                    self.create_error_box("Mode must be 1-7 or left empty.");
                     return;
                 end
             end
@@ -359,7 +359,7 @@ classdef G4_document < handle
                 patfile = new_value;
                 patfield = self.get_pattern_field_name(patfile);
                 if strcmp(patfield,'')
-                    waitfor(errordlg("That pretrial pattern filename does not match any imported files."));
+                    self.create_error_box("That pretrial pattern filename does not match any imported files.");
                     return;
                 end
                 patDim = length(self.Patterns.(patfield).pattern.Pats(1,1,:));
@@ -378,7 +378,7 @@ classdef G4_document < handle
                 posfile = new_value;
                 posfield = self.get_posfunc_field_name(posfile);
                 if strcmp(posfield,'') && ~strcmp(new_value,'')
-                    waitfor(errordlg("That pretrial position filename does not match any imported files."));
+                    self.create_error_box("That pretrial position filename does not match any imported files.");
                     return;
                 end
                 patfile = self.pretrial{2};
@@ -404,7 +404,7 @@ classdef G4_document < handle
                 aofile = new_value;
                 aofield = self.get_aofunc_field_name(aofile);
                 if strcmp(aofield,'')
-                    waitfor(errordlg("That pretrial AO filename does not match any imported files."));
+                    self.create_error_box("That pretrial AO filename does not match any imported files.");
                     return;
                 end
             end
@@ -429,13 +429,13 @@ classdef G4_document < handle
                     num_pat_frames = length(self.Patterns.(patfield).pattern.Pats(1,1,:));
                     if chars == 0
                         if str2num(new_value) > num_pat_frames
-                            waitfor(errordlg("Please make sure your frame index is within the bounds of your pattern."));
+                            self.create_error_box("Please make sure your frame index is within the bounds of your pattern.");
                             return
                         end
                     end
                 end
                 if  chars == 1 && ~strcmp(new_value,'r')
-                    waitfor(errordlg("Invalid frame index. Please enter a number or 'r'"));
+                    self.create_error_box("Invalid frame index. Please enter a number or 'r'");
                     return;
                 end
             end
@@ -446,7 +446,7 @@ classdef G4_document < handle
                     new_value = str2num(new_value);
                 end
                 if new_value <= 0
-                    waitfor(errordlg("Your frame rate must be above 0"));
+                    self.create_error_box("Your frame rate must be above 0");
                     return;
                 end
             end
@@ -463,7 +463,7 @@ classdef G4_document < handle
                     new_value = str2num(new_value);
                 end
                 if new_value < 0
-                    waitfor(errordlg("You duration must be zero or greater"));
+                    self.create_error_box("You duration must be zero or greater");
                     return;
                 end
                 %round to 1 decimal place, since the controller only takes
@@ -472,11 +472,11 @@ classdef G4_document < handle
             end
 
             if patRows ~= numrows
-                waitfor(errordlg("Watch out! This pattern will not run on the size screen you have selected."));
+                self.create_error_box("Watch out! This pattern will not run on the size screen you have selected.");
             end
 
             if patDim < funcDim
-                waitfor(errordlg("Please make sure the dimension of your pattern and position functions match"));
+                self.create_error_box("Please make sure the dimension of your pattern and position functions match");
             else
                 self.pretrial{index} =  new_value ;
             end
@@ -499,7 +499,7 @@ classdef G4_document < handle
                     new_value = str2num(new_value);
                 end
                 if new_value < 1 || new_value > 7
-                    waitfor(errordlg("Mode must be 1-7 or left empty."));
+                    self.create_error_box("Mode must be 1-7 or left empty.");
                     return;
                 end
             end
@@ -508,7 +508,7 @@ classdef G4_document < handle
                 patfile = new_value;
                 patfield = self.get_pattern_field_name(patfile);
                 if strcmp(patfield,'')
-                    waitfor(errordlg("That intertrial pattern filename does not match any imported files."));
+                    self.create_error_box("That intertrial pattern filename does not match any imported files.");
                     return;
                 end
                 patDim = length(self.Patterns.(patfield).pattern.Pats(1,1,:));
@@ -528,7 +528,7 @@ classdef G4_document < handle
                 posfile = new_value;
                 posfield = self.get_posfunc_field_name(posfile);
                 if strcmp(posfield,'') && ~strcmp(new_value,'')
-                    waitfor(errordlg("That intertrial pos filename does not match any imported files."));
+                    self.create_error_box("That intertrial pos filename does not match any imported files.");
                     return;
                 end
 
@@ -555,7 +555,7 @@ classdef G4_document < handle
                 aofile = new_value;
                 aofield = self.get_aofunc_field_name(aofile);
                 if ~isfield(self.Ao_funcs, aofield) && ~strcmp(aofield,'')
-                    waitfor(errordlg("That intertrial AO filename does not match any imported files."));
+                    self.create_error_box("That intertrial AO filename does not match any imported files.");
                     return;
                 end
             end
@@ -577,13 +577,13 @@ classdef G4_document < handle
                     num_pat_frames = length(self.Patterns.(patfield).pattern.Pats(1,1,:));
                     if chars == 0
                         if str2num(new_value) > num_pat_frames
-                            waitfor(errordlg("Please make sure your frame index is within the bounds of your pattern."));
+                            self.create_error_box("Please make sure your frame index is within the bounds of your pattern.");
                             return
                         end
                     end
                 end
                 if  chars == 1 && ~strcmp(new_value,'r')
-                    waitfor(errordlg("Invalid frame index. Please enter a number or 'r'"));
+                    self.create_error_box("Invalid frame index. Please enter a number or 'r'");
                     return;
                 end
             end
@@ -594,7 +594,7 @@ classdef G4_document < handle
                     new_value = str2num(new_value);
                 end
                 if new_value <= 0
-                    waitfor(errordlg("Your frame rate must be above 0"));
+                    self.create_error_box("Your frame rate must be above 0");
                     return;
                 end
             end
@@ -612,7 +612,7 @@ classdef G4_document < handle
                     new_value = str2num(new_value);
                 end
                 if new_value < 0
-                    waitfor(errordlg("You duration must be zero or greater"));
+                    self.create_error_box("You duration must be zero or greater");
                     return;
                 end
                 %round to 1 decimal place, since the controller only takes
@@ -620,10 +620,10 @@ classdef G4_document < handle
                 new_value = round(new_value, 1);
             end
             if patRows ~= numrows
-                waitfor(errordlg("Watch out! This pattern will not run on the size screen you have selected."));
+                self.create_error_box("Watch out! This pattern will not run on the size screen you have selected.");
             end
             if patDim < funcDim
-                 waitfor(errordlg("Please make sure the dimension of your pattern and position functions match"));
+                 self.create_error_box("Please make sure the dimension of your pattern and position functions match");
             else
                 self.intertrial{index} =  new_value ;
             end
@@ -644,7 +644,7 @@ classdef G4_document < handle
                     new_value = str2num(new_value);
                 end
                 if new_value < 1 || new_value > 7
-                    waitfor(errordlg("Mode must be 1-7 or left empty."));
+                    self.create_error_box("Mode must be 1-7 or left empty.");
                     return;
                 end
             end
@@ -655,7 +655,7 @@ classdef G4_document < handle
                 patfile = new_value;
                 patfield = self.get_pattern_field_name(patfile);
                 if strcmp(patfield,'')
-                    waitfor(errordlg("That posttrial Pattern filename does not match any imported files."));
+                    self.create_error_box("That posttrial Pattern filename does not match any imported files.");
                     return;
                 end
                 patDim = length(self.Patterns.(patfield).pattern.Pats(1,1,:));
@@ -674,7 +674,7 @@ classdef G4_document < handle
                 posfile = new_value;
                 posfield = self.get_posfunc_field_name(posfile);
                 if ~isfield(self.Pos_funcs, posfield) && ~strcmp(posfield,'')
-                    waitfor(errordlg("That posttrial pos filename does not match any imported files."));
+                    self.create_error_box("That posttrial pos filename does not match any imported files.");
                     return;
                 end
 
@@ -701,7 +701,7 @@ classdef G4_document < handle
                 aofile = new_value;
                 aofield = self.get_aofunc_field_name(aofile);
                 if strcmp(aofield,'')
-                    waitfor(errordlg("That posttrial AO filename does not match any imported files."));
+                    self.create_error_box("That posttrial AO filename does not match any imported files.");
                     return;
                 end
             end
@@ -723,13 +723,13 @@ classdef G4_document < handle
                     num_pat_frames = length(self.Patterns.(patfield).pattern.Pats(1,1,:));
                     if chars == 0
                         if str2num(new_value) > num_pat_frames
-                            waitfor(errordlg("Please make sure your frame index is within the bounds of your pattern."));
+                            self.create_error_box("Please make sure your frame index is within the bounds of your pattern.");
                             return
                         end
                     end
                 end
                 if  chars == 1 && ~strcmp(new_value,'r')
-                    waitfor(errordlg("Invalid frame index. Please enter a number or 'r'"));
+                    self.create_error_box("Invalid frame index. Please enter a number or 'r'");
                     return;
                 end
             end
@@ -740,7 +740,7 @@ classdef G4_document < handle
                    new_value = str2num(new_value);
                 end
                 if new_value <= 0
-                    waitfor(errordlg("Your frame rate must be above 0"));
+                    self.create_error_box("Your frame rate must be above 0");
                     return;
                 end
             end
@@ -757,7 +757,7 @@ classdef G4_document < handle
                     new_value = str2num(new_value);
                 end
                 if new_value < 0
-                    waitfor(errordlg("You duration must be zero or greater"));
+                    self.create_error_box("You duration must be zero or greater");
                     return;
                 end
                 %round to 1 decimal place, since the controller only takes
@@ -766,10 +766,10 @@ classdef G4_document < handle
             end
 
             if patRows ~= numrows
-                waitfor(errordlg("Watch out! This pattern will not run on the size screen you have selected."));
+                self.create_error_box("Watch out! This pattern will not run on the size screen you have selected.");
             end
             if patDim < funcDim
-                 waitfor(errordlg("Please make sure the dimension of your pattern and position functions match"));
+                 self.create_error_box("Please make sure the dimension of your pattern and position functions match");
             else
                 self.posttrial{index} =  new_value ;
             end
@@ -1097,19 +1097,19 @@ classdef G4_document < handle
             [aostatus, aomsg] = mkdir(aopath);
 
             if Expstatus == 0
-                waitfor(errordlg(Expmsg));
+                self.create_error_box(Expmsg);
                 export_successful = 0;
                 return;
             elseif patstatus == 0
-                waitfor(errordlg(patmsg));
+                self.create_error_box(patmsg);
                 export_successful = 0;
                 return;
             elseif funcstatus == 0
-                waitfor(errordlg(funcmsg));
+                self.create_error_box(funcmsg);
                 export_successful = 0;
                 return;
             elseif aostatus == 0
-                waitfor(errordlg(aomsg));
+                self.create_error_box(aomsg);
                 export_successful = 0;
                 return;
             else
@@ -1315,7 +1315,7 @@ classdef G4_document < handle
             waitbar(.5, prog, 'Exporting...');
             export_successful = self.export();% 0 - export was unable to complete 1- export completed successfully 2-user canceled and export not attempted
             if export_successful == 0
-                waitfor(errordlg("Export was unsuccessful. Please delete files to be overwritten manually and try again."));
+                self.create_error_box("Export was unsuccessful. Please delete files to be overwritten manually and try again.");
                 return;
             elseif export_successful == 2
                 return;
@@ -1332,11 +1332,11 @@ classdef G4_document < handle
 
         function save(self)
             if isempty(self.save_filename) == 1
-                waitfor(errordlg("You have not yet saved a new file. Please use 'save as'"));
+                self.create_error_box("You have not yet saved a new file. Please use 'save as'");
             else
                 export_successful = self.export();
                 if export_successful == 0
-                    waitfor(errordlg("Export was unsuccessful. Please delete folders to be replaced and use save as."));
+                    self.create_error_box("Export was unsuccessful. Please delete folders to be replaced and use save as.");
                 elseif export_successful == 2
                     return;
                 else
@@ -1351,14 +1351,14 @@ classdef G4_document < handle
             file_full = fullfile(path, file);
             [filepath, name, ext] = fileparts(file_full);
             if strcmp(ext, '.mat') == 0
-                waitfor(errordlg("Please make sure you are importing a .mat file"));
+                self.create_error_box("Please make sure you are importing a .mat file");
                 return;
             end
 
             fileData = load(file_full);
 
             if isempty(fieldnames(fileData))
-                waitfore(errordlg("I see no structure inside this .mat file. Please make sure it is formatted correctly."));
+                self.create_error_box("I see no structure inside this .mat file. Please make sure it is formatted correctly.");
                 return;
             end
             type = fieldnames(fileData);
@@ -1366,15 +1366,15 @@ classdef G4_document < handle
 
                 patRows = length(fileData.pattern.Pats(:,1,1))/16;
                 if patRows ~= self.num_rows
-                    waitfor(errordlg("Please make sure the patterns you import match the number of rows you have selected."));
+                    self.create_error_box("Please make sure the patterns you import match the number of rows you have selected.");
                     return;
                 end
                 pat_already_present = sum(count(self.imported_pattern_names,name)); %if 0, it's not present, if 1 it is.
                 if pat_already_present > 1
-                    waitfor(errordlg("This pattern name is present multiple times in the imported patterns."));
+                    self.create_error_box("This pattern name is present multiple times in the imported patterns.");
                     return;
                 elseif pat_already_present == 1
-                    waitfor(errordlg("A pattern of that name has already been imported."));
+                    self.create_error_box("A pattern of that name has already been imported.");
                     return;
                 else
                     self.imported_pattern_names{end+1} = name;
@@ -1404,10 +1404,10 @@ classdef G4_document < handle
 
                 pos_already_present = sum(count(self.imported_posfunc_names,name)); %if 0, it's not present, if 1 it is.
                 if pos_already_present > 1
-                    waitfor(errordlg("This position function is present multiple times in the imported functions."));
+                    self.create_error_box("This position function is present multiple times in the imported functions.");
                     return;
                 elseif pos_already_present == 1
-                    waitfor(errordlg("A position function of that name has already been imported."));
+                    self.create_error_box("A position function of that name has already been imported.");
                     return;
                 else
                     self.imported_posfunc_names{end+1} = name;
@@ -1435,10 +1435,10 @@ classdef G4_document < handle
 
                 ao_already_present = sum(count(self.imported_aofunc_names,name)); %if 0, it's not present, if 1 it is.
                 if ao_already_present > 1
-                    waitfor(errordlg("This ao function is present multiple times in the imported functions."));
+                    self.create_error_box("This ao function is present multiple times in the imported functions.");
                     return;
                 elseif ao_already_present == 1
-                    waitfor(errordlg("An AO function of that name has already been imported."));
+                    self.create_error_box("An AO function of that name has already been imported.");
                     return;
                 else
                     self.imported_aofunc_names{end+1} = name;
@@ -1472,7 +1472,7 @@ classdef G4_document < handle
                 bin_ext = '';
                 fileid = 0;
             else
-                waitfor(errordlg("Please make sure your file is a pattern, position function, ao function, or currentExp file, and is formatted correctly."));
+                self.create_error_box("Please make sure your file is a pattern, position function, ao function, or currentExp file, and is formatted correctly.");
                 return;
             end
             if fileid == 0
@@ -1483,11 +1483,11 @@ classdef G4_document < handle
             binary_path = fullfile(path, fileid1);
             binary_path2 = fullfile(path, fileid2);
             if ~isfile(binary_path) && ~isfile(binary_path2)
-                waitfor(errordlg("Your file was imported, but no associated binary file was found."));
+                self.create_error_box("Your file was imported, but no associated binary file was found.");
                 return;
             end
             if isfile(binary_path) && isfile(binary_path2)
-                waitfor(errordlg("Your file was imported, but there two binary files in this location with this ID."));
+                self.create_error_box("Your file was imported, but there two binary files in this location with this ID.");
                 return;
             end
             if isfile(binary_path)
@@ -1505,7 +1505,7 @@ classdef G4_document < handle
             if strcmp(bin_ext,'.pat')
                 field_name = strcat('pat', fileid);
                 if isfield(self.binary_files.pats, field_name)
-                    %errordlg("Your file was imported, but the .pat file was not. A pattern with that ID has already been imported. I am attempting to reconcile the conflict now.");
+                    
                     highestID_imported = self.get_highest_ID_imported('pattern');
                     new_ID = highestID_imported + 1;
                     fileData.pattern.param.ID = new_ID;
@@ -1547,7 +1547,7 @@ classdef G4_document < handle
 
                     warndlg("The file you tried to import has had a new ID assigned to it of " + num2str(new_ID) + " because its ID matched another imported position function.");
 
-%                     waitfor(errordlg("Your file was imported but the .pfn file was not. A function with that ID has already been imported."));
+%                     self.create_error_box("Your file was imported but the .pfn file was not. A function with that ID has already been imported."));
 %                     return;
                 else
                     self.binary_files.funcs.(field_name) = binData;
@@ -1573,8 +1573,7 @@ classdef G4_document < handle
 
                     warndlg("The file you tried to import has had a new ID assigned to it of " + num2str(new_ID) + " because its ID matched another imported AO function.");
 
-%                     waitfor(errordlg("Your file was imported but the .afn file was not. An AO function with that ID has already been imported."));
-%                     return;
+
                 else
                     self.binary_files.ao.(field_name) = binData;
                 end
@@ -1683,7 +1682,9 @@ classdef G4_document < handle
                             patData = load(full_file_path);
                             patRows = length(patData.pattern.Pats(:,1,1))/16;
                             if patRows ~= self.num_rows
-                                waitfor(errordlg("Please make sure the patterns you import match the size screen you have selected (3 row or 4 row)."));
+                                
+                                self.create_error_box("Please make sure the patterns you import match the size screen you have selected (3 row or 4 row).", 'Screen size error');
+                                
                                 return;
                             end
 
@@ -2180,6 +2181,25 @@ classdef G4_document < handle
                     self.set_block_trial_property([i,indices_to_color(j)],self.colorgen());
                 end
             end
+        end
+
+        function create_error_box(~, varargin)
+
+            if isempty(varargin)
+                return;
+            else
+                msg = varargin{1};
+                if length(varargin) >= 2
+                    title = varargin{2};
+                else
+                    title = "";
+                end
+
+                e = errordlg(msg, title, 'modal');
+                set(e, 'Resize', 'on');
+                
+            end
+
         end
 
         %% Setters

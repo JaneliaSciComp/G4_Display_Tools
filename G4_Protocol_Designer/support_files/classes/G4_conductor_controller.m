@@ -446,9 +446,9 @@ classdef G4_conductor_controller < handle
                     title = "";
                 end
 
-                e = errordlg(msg, title);
+                e = errordlg(msg, title, 'modal');
                 set(e, 'Resize', 'on');
-                waitfor(e);
+                
             end
         end
 

@@ -2779,9 +2779,9 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                     title = "";
                 end
 
-                e = errordlg(msg, title);
+                e = errordlg(msg, title, 'modal');
                 set(e, 'Resize', 'on');
-                waitfor(e);
+                
             end
         end
 
