@@ -15,8 +15,8 @@ classdef G4DisplayToolsTests < matlab.unittest.TestCase
 
     methods(TestMethodTeardown)
         function closeDesignerAndConductor(testCase)
-            testCase.designer.close_application();
-            testCase.conductor.view.close_application();
+            testCase.designer.close_application(testCase.designer.f, []);
+            testCase.conductor.view.close_application(testCase.conductor.view.fig, []);
         end
     end
 
@@ -35,7 +35,19 @@ classdef G4DisplayToolsTests < matlab.unittest.TestCase
     end
 
     methods(Test, TestTags = {'designer'})
+        
+        function accessConfigFile(testCase)
+            
+            config_filepath = testCase.designer.doc.settings.Configuration_Filepath;
+            config_data = testCase.designer.doc.configData;
 
+            fid = fopen(config_filepath,'wt');
+
+            testCase.verifyGreaterThanOrEqual(fid,0,"User does not have write permissions to config file.");
+            fprintf(fid, '%s\n', config_data{:});
+            fclose(fid);
+
+        end
     end
 
 
