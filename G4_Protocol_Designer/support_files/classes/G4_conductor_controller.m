@@ -174,8 +174,8 @@ classdef G4_conductor_controller < handle
             end
         end
 
-        function update_run_file(self, dd_index)
-            self.model.set_run_file(dd_index);
+        function update_run_file(self, dd_string)
+            self.model.set_run_file(dd_string);
         end
 
         function update_experiment_type(self, new_val)
@@ -186,59 +186,33 @@ classdef G4_conductor_controller < handle
         end
 
         function update_age(self, new_val)
-            %make sure number falls within range
-            if new_val > length(self.model.metadata_options.fly_age) || new_val < 1
-                errormsg = "There are only " + length(self.model.metadata_options.fly_age) + ...
-                    " items in the list of possible fly ages. Please make sure your entry is between " + ...
-                    "one and this number.";
-                self.create_error_box(errormsg);
-            else
-                self.model.set_fly_age(new_val);
-            end
+           
+           self.model.set_fly_age(new_val);
+            
         end
 
         function update_sex(self, new_val)
-            if new_val > length(self.model.metadata_options.fly_sex) || new_val < 1
-                errormsg = "There are only " + length(self.model.metadata_options.fly_sex) + ...
-                    " items in the list of possible fly sexes. Please make sure your entry is between " + ...
-                    "one and this number.";
-                self.create_error_box(errormsg);
-            else
-                self.model.set_fly_sex(new_val);
-            end
+            
+            self.model.set_fly_sex(new_val);
+            
         end
 
         function update_temp(self, new_val)
-            if new_val > length(self.model.metadata_options.exp_temp) || new_val < 1
-                errormsg = "There are only " + length(self.model.metadata_options.exp_temp) + ...
-                    " items in the list of possible experiment temperatures. Please make sure your entry is between " + ...
-                    "one and this number.";
-                self.create_error_box(errormsg);
-            else
-                self.model.set_temp(new_val);
-            end
+            
+            self.model.set_temp(new_val);
+            
         end
 
         function update_rearing(self, new_val)
-            if new_val > length(self.model.metadata_options.rearing) || new_val < 1
-                errormsg = "There are only " + length(self.model.metadata_options.rearing) + ...
-                    " items in the list of possible rearing protocols. Please make sure your entry is between " + ...
-                    "one and this number.";
-                self.create_error_box(errormsg);
-            else
-                self.model.set_rearing(new_val);
-            end
+            
+            self.model.set_rearing(new_val);
+            
         end
 
         function update_light_cycle(self, new_val)
-            if new_val > length(self.model.metadata_options.light_cycle) || new_val < 1
-                errormsg = "There are only " + length(self.model.metadata_options.light_cycle) + ...
-                    " items in the list of possible light cycles. Please make sure your entry is between " + ...
-                    "one and this number.";
-                self.create_error_box(errormsg);
-            else
-                self.model.set_light_cycle(new_val);
-            end
+            
+            self.model.set_light_cycle(new_val);
+           
         end
 
         function update_comments(self, new_val)
@@ -264,7 +238,7 @@ classdef G4_conductor_controller < handle
         end
 
         function update_num_attempts(self, new_val)
-            self.model.set_num_attempts_bad_conds(str2num(new_val));
+            self.model.set_num_attempts_bad_conds(new_val);
         end
 
         function update_config_file(self)

@@ -38,6 +38,7 @@ classdef G4_conductor_model < handle
         convert_tdms
         orig_expected_time
         settings
+        %experiment_types
     end
 
     properties (Dependent)
@@ -121,7 +122,8 @@ classdef G4_conductor_model < handle
             self.experimenter = self.metadata_options.experimenter{1};
             self.rearing_protocol = self.metadata_options.rearing{1};
             self.light_cycle = self.metadata_options.light_cycle{1};
-            self.experiment_type = 1;
+            self.experiment_type = 'Flight';
+            %self.experiment_types = {'Flight','Camera walk', 'Chip walk'};
             self.do_plotting = 1;
             self.do_processing = 1;
             self.num_tests_conducted = 0;
@@ -130,7 +132,7 @@ classdef G4_conductor_model < handle
             self.date_folder = datestr(now, 'mm_dd_yyyy');
             self.timestamp = datestr(now, 'mm-dd-yyyyHH_MM_SS');
             self.num_attempts_bad_conds = 1;
-            self.set_run_file(1);
+            self.set_run_file('Simple');
             self.combine_tdms = 1;
             self.convert_tdms = 1;
 
@@ -220,11 +222,11 @@ classdef G4_conductor_model < handle
         end
 
         function set_experimenter(self, new_val)
-            self.experimenter = self.metadata_options.experimenter{new_val};
+            self.experimenter = new_val;
         end
 
         function set_fly_genotype(self, new_val)
-            self.fly_genotype = self.metadata_options.fly_geno{new_val};
+            self.fly_genotype = new_val;
             self.update_fly_save_name();
         end
 
@@ -261,9 +263,11 @@ classdef G4_conductor_model < handle
             self.processing_file = filepath;
         end
 
-        function set_run_file(self, list_index)
+        function set_run_file(self, run_file_string)
+            self.run_protocol_file_desc = run_file_string;
+            list_index = find(strcmp(self.run_protocol_file_list, run_file_string));
             self.run_protocol_num = list_index;
-            self.run_protocol_file_desc = self.run_protocol_file_list{list_index};
+           
             filename = self.get_run_filename();
             self.run_protocol_file = filename;
         end
@@ -273,23 +277,23 @@ classdef G4_conductor_model < handle
         end
 
         function set_fly_age(self, new_val)
-            self.fly_age = self.metadata_options.fly_age{new_val};
+            self.fly_age = new_val;
         end
 
         function set_fly_sex(self, new_val)
-            self.fly_sex = self.metadata_options.fly_sex{new_val};
+            self.fly_sex = new_val;
         end
 
         function set_temp(self, new_val)
-            self.experiment_temp = self.metadata_options.exp_temp{new_val};
+            self.experiment_temp = new_val;
         end
 
         function set_rearing(self, new_val)
-            self.rearing_protocol = self.metadata_options.rearing{new_val};
+            self.rearing_protocol = new_val;
         end
 
         function set_light_cycle(self, new_val)
-            self.light_cycle = self.metadata_options.light_cycle{new_val};
+            self.light_cycle = new_val;
         end
 
         function set_metadata_comments(self, new_val)

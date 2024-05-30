@@ -282,150 +282,151 @@ classdef G4_conductor_view < handle
             metadata_label_position(2) = metadata_label_position(2) - 25;
             metadata_box_position(2) = metadata_box_position(2) - 25;
 
-            exp_name_label = uicontrol(metadata_pan, 'Text', 'Experiment Name:', ...
-                'HorizontalAlignment', 'left', 'units', 'pixels', 'Position', metadata_label_position);
+            exp_name_label = uilabel(metadata_pan, 'Text', 'Experiment Name:', ...
+                'Position', metadata_label_position);
 
-            self.exp_name_box = uicontrol(metadata_pan, 'Style', 'edit', 'String', self.con.doc.experiment_name, 'units', 'pixels', 'Position', ...
-                metadata_box_position, 'Callback', @self.new_experiment_name);
-            set(self.exp_name_box, 'enable', 'off');
-
-            metadata_label_position(2) = metadata_label_position(2) - 25;
-            metadata_box_position(2) = metadata_box_position(2) - 25;
-
-            fly_name_label = uicontrol(metadata_pan, 'Text', 'Fly Name:', ...
-                'HorizontalAlignment', 'left', 'units', 'pixels', 'Position', metadata_label_position);
-            self.fly_name_box = uicontrol(metadata_pan, 'Style', 'edit', 'String', self.con.model.fly_name, ...
-                'units', 'pixels', 'Position', metadata_box_position, 'Callback', @self.new_fly_name);
-
+            self.exp_name_box = uieditfield(metadata_pan, 'Value', self.con.doc.experiment_name, 'Position', ...
+                metadata_box_position, 'ValueChangedFcn', @self.new_experiment_name);
+            set(self.exp_name_box, 'Editable', 'off');
 
             metadata_label_position(2) = metadata_label_position(2) - 25;
             metadata_box_position(2) = metadata_box_position(2) - 25;
 
-            fly_genotype_label = uicontrol(metadata_pan, 'Text', 'Fly Genotype', ...
-                'HorizontalAlignment', 'left', 'units', 'pixels', 'Position', metadata_label_position);
-
-            self.fly_genotype_box = uicontrol(metadata_pan, 'Style', 'popupmenu', 'units', 'pixels', 'Value', 1, ...
-                'String', self.con.model.metadata_options.fly_geno, 'Position', metadata_box_position, 'Callback', @self.new_genotype);
-
-            metadata_label_position(2) = metadata_label_position(2) - 25;
-            metadata_box_position(2) = metadata_box_position(2) - 25;
-
-            fly_age_label = uicontrol(metadata_pan, 'Text', 'Fly Age:', ...
-                'HorizontalAlignment', 'left', 'units', 'pixels', 'Position', metadata_label_position);
-            self.age_box = uicontrol(metadata_pan, 'Style', 'popupmenu', 'units', 'pixels', 'Value', 1, ...
-                'String', self.con.model.metadata_options.fly_age, 'Position', metadata_box_position, 'Callback', @self.new_age);
+            fly_name_label = uilabel(metadata_pan, 'Text', 'Fly Name:', ...
+                'Position', metadata_label_position);
+            self.fly_name_box = uieditfield(metadata_pan, 'Value', self.con.model.fly_name, ...
+                'Position', metadata_box_position, 'ValueChangedFcn', @self.new_fly_name);
 
             metadata_label_position(2) = metadata_label_position(2) - 25;
             metadata_box_position(2) = metadata_box_position(2) - 25;
 
-            fly_sex_label =  uicontrol(metadata_pan, 'Text', 'Fly Sex:', ...
-                'HorizontalAlignment', 'left', 'units', 'pixels', 'Position', metadata_label_position);
-            self.sex_box = uicontrol(metadata_pan, 'Style', 'popupmenu', 'units', 'pixels', 'Value', 1, ...
-                'String', self.con.model.metadata_options.fly_sex, 'Position', metadata_box_position, 'Callback', @self.new_sex);
+            fly_genotype_label = uilabel(metadata_pan, 'Text', 'Fly Genotype', ...
+                'Position', metadata_label_position);
+
+            self.fly_genotype_box = uidropdown(metadata_pan, 'Items', self.con.model.metadata_options.fly_geno, ...
+                'Value', self.con.model.metadata_options.fly_geno{1}, ...
+                'Position', metadata_box_position, 'ValueChangedFcn', @self.new_genotype);
 
             metadata_label_position(2) = metadata_label_position(2) - 25;
             metadata_box_position(2) = metadata_box_position(2) - 25;
 
-            experiment_temp_label =  uicontrol(metadata_pan, 'Text', 'Experiment Temp:', ...
-                'HorizontalAlignment', 'left', 'units', 'pixels', 'Position', metadata_label_position);
-            self.temperature_box = uicontrol(metadata_pan, 'Style', 'popupmenu', 'units', 'pixels', 'Value', 1, ...
-                'String', self.con.model.metadata_options.exp_temp, 'Position', metadata_box_position, 'Callback', @self.new_temp);
+            fly_age_label = uilabel(metadata_pan, 'Text', 'Fly Age:', ...
+                'Position', metadata_label_position);
+            self.age_box = uidropdown(metadata_pan, 'Items', self.con.model.metadata_options.fly_age, ...
+                'Value', self.con.model.metadata_options.fly_age{1}, ...
+                'Position', metadata_box_position, 'ValueChangedFcn', @self.new_age);
 
             metadata_label_position(2) = metadata_label_position(2) - 25;
             metadata_box_position(2) = metadata_box_position(2) - 25;
 
-            rearing_label = uicontrol(metadata_pan, 'Text', 'Rearing Protocol:', ...
-                'HorizontalAlignment', 'left', 'units', 'pixels', 'Position', metadata_label_position);
-
-            self.rearing_protocol_box = uicontrol(metadata_pan, 'Style', 'popupmenu', 'Value', 1, 'units', 'pixels', ...
-                'String', self.con.model.metadata_options.rearing, 'Position', metadata_box_position, 'Callback', @self.new_rearing);
-
-            metadata_label_position(2) = metadata_label_position(2) - 25;
-            metadata_box_position(2) = metadata_box_position(2) - 25;
-
-            lightCycle_label = uicontrol(metadata_pan, 'Text', 'Light Cycle:', ...
-                'HorizontalAlignment', 'left', 'Units', 'pixels', 'Position', metadata_label_position);
-
-            self.light_cycle_box = uicontrol(metadata_pan, 'Style', 'popupmenu', 'Value', 1, 'units', 'pixels', ...
-                'String', self.con.model.metadata_options.light_cycle, 'Position', metadata_box_position, 'Callback', @self.new_light_cycle);
+            fly_sex_label =  uilabel(metadata_pan, 'Text', 'Fly Sex:', ...
+                'Position', metadata_label_position);
+            self.sex_box = uidropdown(metadata_pan, 'Items', self.con.model.metadata_options.fly_sex,...
+                'Value', self.con.model.metadata_options.fly_sex{1}, ...
+                 'Position', metadata_box_position, 'ValueChangedFcn', @self.new_sex);
 
             metadata_label_position(2) = metadata_label_position(2) - 25;
             metadata_box_position(2) = metadata_box_position(2) - 25;
 
-
-            date_and_time_label = uicontrol(metadata_pan, 'Text', 'Date and Time:', ...
-                'HorizontalAlignment', 'left', 'units', 'pixels', 'Position', metadata_label_position);
-            self.date_and_time_box = uicontrol(metadata_pan, 'Style', 'edit', 'String', self.con.model.timestamp, ...
-                'units', 'pixels', 'Position', metadata_box_position, 'Callback', @self.new_timestamp);
+            experiment_temp_label =  uilabel(metadata_pan, 'Text', 'Experiment Temp:', ...
+                'Position', metadata_label_position);
+            self.temperature_box = uidropdown(metadata_pan, 'Items', self.con.model.metadata_options.exp_temp, ...
+                'Value', self.con.model.metadata_options.exp_temp{1}, ...
+                'Position', metadata_box_position, 'ValueChangedFcn', @self.new_temp);
 
             metadata_label_position(2) = metadata_label_position(2) - 25;
             metadata_box_position(2) = metadata_box_position(2) - 25;
 
-            comments_label = uicontrol(metadata_pan, 'Text', 'Comments:', ...
-                'HorizontalAlignment', 'left', 'units', 'pixels', 'Position', metadata_label_position);
-            self.comments_box = uicontrol(metadata_pan, 'Style', 'edit', 'String', self.con.model.metadata_comments, ...
-                'units', 'pixels', 'Position', metadata_box_position, 'Callback', @self.new_comments);
+            rearing_label = uilabel(metadata_pan, 'Text', 'Rearing Protocol:', ...
+                'Position', metadata_label_position);
+
+            self.rearing_protocol_box = uidropdown(metadata_pan, 'Items', self.con.model.metadata_options.rearing, ...
+                'Value', self.con.model.metadata_options.rearing{1},  ...
+                'Position', metadata_box_position, 'ValueChangedFcn', @self.new_rearing);
+
+            metadata_label_position(2) = metadata_label_position(2) - 25;
+            metadata_box_position(2) = metadata_box_position(2) - 25;
+
+            lightCycle_label = uilabel(metadata_pan, 'Text', 'Light Cycle:', ...
+                'Position', metadata_label_position);
+
+            self.light_cycle_box = uidropdown(metadata_pan, 'Items', self.con.model.metadata_options.light_cycle, ...
+                'Value', self.con.model.metadata_options.light_cycle{1},  ...
+                 'Position', metadata_box_position, 'ValueChangedFcn', @self.new_light_cycle);
+
+            metadata_label_position(2) = metadata_label_position(2) - 25;
+            metadata_box_position(2) = metadata_box_position(2) - 25;
+
+
+            date_and_time_label = uilabel(metadata_pan, 'Text', 'Date and Time:', ...
+                'Position', metadata_label_position);
+            self.date_and_time_box = uieditfield(metadata_pan, 'Value', self.con.model.timestamp, ...
+                'Position', metadata_box_position, 'ValueChangedFcn', @self.new_timestamp);
+
+            metadata_label_position(2) = metadata_label_position(2) - 25;
+            metadata_box_position(2) = metadata_box_position(2) - 25;
+
+            comments_label = uilabel(metadata_pan, 'Text', 'Comments:', ...
+                'Position', metadata_label_position);
+            self.comments_box = uieditfield(metadata_pan, 'Value', self.con.model.metadata_comments, ...
+                'Position', metadata_box_position, 'ValueChangedFcn', @self.new_comments);
 
             % Experiment settings items
-            exp_type_label = uicontrol(settings_pan, 'Text', 'Experiment Type:', ...
-                'HorizontalAlignment', 'left', 'units', 'pixels', 'Position', [10, 153, 100, 15]);
-            self.exp_type_menu = uicontrol(settings_pan, 'Style', 'popupmenu', 'String', {'Flight','Camera walk', 'Chip walk'}, ...
-                'units', 'pixels', 'Position', [115, 153, 150, 18], 'Callback', @self.new_experiment_type);
-            test_button = uicontrol(settings_pan, 'Style', 'pushbutton', 'String', 'Run Test Protocol', ...
-                'units', 'pixels', 'Position', [278, 123, 120, 20], 'Callback', @self.run_test_exp);
-            
-            tdms_checkbox_label = uicontrol(settings_pan, 'Text', 'Convert TDMS?', ...
-                'HorizontalAlignment', 'left', 'units', 'pixels', 'Position', [10, 123, 80, 15]);
-            self.convert_tdms_checkbox = uicontrol(settings_pan, 'Style', 'checkbox', 'Value', self.con.model.convert_tdms, ...
-                'units', 'pixels', 'Position', [91, 123, 15, 15], 'Callback', @self.new_convert_tdms);
-            
-            processing_checkbox_label = uicontrol(settings_pan, 'Text', 'Processing?', ...
-                'HorizontalAlignment', 'left', 'units', 'pixels', 'Position', [116, 123, 65, 15]);
-            self.processing_checkbox = uicontrol(settings_pan, 'Style', 'checkbox', 'Value', self.con.model.do_processing, ...
-                'units', 'pixels', 'Position', [182, 123, 15, 15], 'Callback', @self.new_do_processing);
-            
-            processing_filename_label = uicontrol(settings_pan, 'Text', 'Processing Protocol:', ...
-                'HorizontalAlignment', 'left', 'units', 'pixels', 'Position', [10, 73, 105, 15]);
-            self.processing_textbox = uicontrol(settings_pan, 'Style', 'edit', 'units', 'pixels', ...
-                'String', self.con.model.processing_file, 'Position', [120, 73, 160, 18], 'Callback', @self.new_processing_file);
-            self.browse_button_processing = uicontrol(settings_pan, 'Style', 'pushbutton', 'units', 'pixels', ...
-                'String', 'Browse', 'Position', [285, 73, 65, 18], 'Callback', @self.proc_browse);
-            
-            
-            plotting_checkbox_label = uicontrol(settings_pan, 'Text', 'Plotting?', ...
-                'HorizontalAlignment', 'left', 'units', 'pixels', 'Position', [207, 123, 45, 15]);
-            self.plotting_checkbox = uicontrol(settings_pan, 'Style', 'checkbox', 'Value', self.con.model.do_plotting, ...
-                'units', 'pixels', 'Position', [253, 123, 15, 15], 'Callback', @self.new_do_plotting);
-            
-            plotting_filename_label = uicontrol(settings_pan, 'Text', 'Plotting Protocol:', ...
-                'HorizontalAlignment', 'left', 'units', 'pixels', 'Position', [10, 98, 105, 15]);
-            self.plotting_textbox = uicontrol(settings_pan, 'Style', 'edit', 'units', 'pixels', ...
-                'String', self.con.model.plotting_file, 'Position', [120, 98, 160, 18], 'Callback', @self.new_plotting_file);
-            self.browse_button_plotting = uicontrol(settings_pan, 'Style', 'pushbutton', 'units', 'pixels', ...
-                'String', 'Browse', 'Position', [285, 98, 65, 18], 'Callback', @self.plot_browse);
+            exp_type_label = uilabel(settings_pan, 'Text', 'Experiment Type:', ...
+                'Position', [10, 153, 100, 15]);
+            self.exp_type_menu = uidropdown(settings_pan, 'Items', {'Flight','Camera walk', 'Chip walk'}, ...
+                'Position', [115, 153, 150, 18], 'ValueChangedFcn', @self.new_experiment_type);
 
+            test_button = uibutton(settings_pan, 'Text', 'Run Test Protocol', ...
+                'Position', [278, 123, 120, 20], 'ButtonPushedFcn', @self.run_test_exp);
             
+            tdms_checkbox_label = uilabel(settings_pan, 'Text', 'Convert TDMS?', ...
+                'Position', [10, 123, 80, 15]);
+            self.convert_tdms_checkbox = uicheckbox(settings_pan, 'Value', self.con.model.convert_tdms, ...
+                'Position', [91, 123, 15, 15], 'ValueChangedFcn', @self.new_convert_tdms);
+            
+            processing_checkbox_label = uilabel(settings_pan, 'Text', 'Processing?', ...
+                'Position', [116, 123, 65, 15]);
+            self.processing_checkbox = uicheckbox(settings_pan, 'Value', self.con.model.do_processing, ...
+                'Position', [182, 123, 15, 15], 'ValueChangedFcn', @self.new_do_processing);
+            
+            processing_filename_label = uilabel(settings_pan, 'Text', 'Processing Protocol:', ...
+                'Position', [10, 73, 105, 15]);
+            self.processing_textbox = uieditfield(settings_pan, 'Value', self.con.model.processing_file, ...
+                'Position', [120, 73, 160, 18], 'ValueChangedFcn', @self.new_processing_file);
+            self.browse_button_processing = uibutton(settings_pan, 'Text', 'Browse', ...
+                'Position', [285, 73, 65, 18], 'ButtonPushedFcn', @self.proc_browse);
+            
+            
+            plotting_checkbox_label = uilabel(settings_pan, 'Text', 'Plotting?', ...
+                'Position', [207, 123, 45, 15]);
+            self.plotting_checkbox = uicheckbox(settings_pan, 'Value', self.con.model.do_plotting, ...
+                'Position', [253, 123, 15, 15], 'ValueChangedFcn', @self.new_do_plotting);
+            
+            plotting_filename_label = uilabel(settings_pan, 'Text', 'Plotting Protocol:', ...
+                'Position', [10, 98, 105, 15]);
+            self.plotting_textbox = uieditfield(settings_pan, 'Value', self.con.model.plotting_file, ...
+                'Position', [120, 98, 160, 18], 'ValueChangedFcn', @self.new_plotting_file);
+            self.browse_button_plotting = uibutton(settings_pan, 'Text', 'Browse', ...
+                'Position', [285, 98, 65, 18], 'ButtonPushedFcn', @self.plot_browse);
 
-            run_filename_label = uicontrol(settings_pan, 'Text', 'Run Protocol:', ...
-                'HorizontalAlignment', 'left', 'units', 'pixels', 'Position', [10, 48, 105, 15]);
-            self.run_dropDown = uicontrol(settings_pan, 'Style', 'popupmenu', 'String', ...
-                self.con.model.run_protocol_file_list, 'Position', [80, 48, 200, 18], ...
-                'Callback', @self.select_run);
+            run_filename_label = uilabel(settings_pan, 'Text', 'Run Protocol:', ...
+                'Position', [10, 48, 105, 15]);
+            self.run_dropDown = uidropdown(settings_pan, 'Items', self.con.model.run_protocol_file_list, ...
+                'Position', [80, 48, 200, 18],  'ValueChangedFcn', @self.select_run);
 
-            num_attempts_label = uicontrol(settings_pan, 'Text', ...
-                'Number times to re-attempt bad trials:', 'HorizontalAlignment','left', ...
-                'units', 'pixels', 'Position', [10, 23, 200, 15]);
-            self.num_attempts_textbox = uicontrol(settings_pan, 'Style', 'edit', 'units', 'pixels',...
-                'String', self.con.model.num_attempts_bad_conds, 'Position', [210, 23, 50, 15], ...
-                'Callback', @self.new_num_attempts);
+            num_attempts_label = uilabel(settings_pan, 'Text', 'Number times to re-attempt bad trials:', ...
+                'Position', [10, 23, 200, 15]);
+            self.num_attempts_textbox = uieditfield(settings_pan, 'numeric', 'Value', ...
+                self.con.model.num_attempts_bad_conds, 'Limits', [0 5], 'Position', [210, 23, 50, 15], ...
+                'ValueChangedFcn', @self.new_num_attempts);
 
-            combine_tdms_label = uicontrol(settings_pan, 'Text', ...
-                'Combine multiple TDMS files into one?', 'HorizontalAlignment','left', ...
-                'units', 'pixels', 'Position', [10, 3, 200, 15]);
+            combine_tdms_label = uilabel(settings_pan, 'Text', ...
+                'Combine multiple TDMS files into one?', 'Position', [10, 3, 200, 15]);
 
-            self.combine_tdms_checkbox = uicontrol(settings_pan, 'Style', 'checkbox', 'Value', ...
-                self.con.get_combine_tdms(), 'units', 'pixels', 'Position', [215, 3, 15, 15], ...
-               'Callback', @self.new_combine_tdms);
+            self.combine_tdms_checkbox = uicheckbox(settings_pan, 'Value', ...
+                self.con.get_combine_tdms(), 'Position', [215, 3, 15, 15], ...
+               'ValueChangedFcn', @self.new_combine_tdms);
 
             self.bad_trial_markers = [];
 
@@ -433,47 +434,47 @@ classdef G4_conductor_view < handle
         end
 
         function update_run_gui(self)
-            self.experimenter_box.Value = find(strcmp(self.con.model.metadata_options.experimenter,self.con.model.experimenter));
-            self.exp_name_box.String = self.con.doc.experiment_name;
+            self.experimenter_box.Value = self.con.model.experimenter;
+            self.exp_name_box.Value = self.con.doc.experiment_name;
             set(self.fig,'name',['Fly Experiment Conductor - ',self.con.doc.experiment_name]);
-            self.fly_name_box.String = self.con.model.fly_name;
-            self.fly_genotype_box.Value = find(strcmp(self.con.model.metadata_options.fly_geno,self.con.model.fly_genotype));
-            self.date_and_time_box.String = self.con.get_timestamp();
-            self.age_box.Value = find(strcmp(self.con.model.metadata_options.fly_age,self.con.model.fly_age));
-            self.sex_box.Value = find(strcmp(self.con.model.metadata_options.fly_sex, self.con.model.fly_sex));
-            self.temperature_box.Value = find(strcmp(self.con.model.metadata_options.exp_temp, self.con.model.experiment_temp));
-            self.rearing_protocol_box.Value = find(strcmp(self.con.model.metadata_options.rearing, self.con.model.rearing_protocol));
-            self.light_cycle_box.Value = find(strcmp(self.con.model.metadata_options.light_cycle, self.con.model.light_cycle));
-            self.comments_box.String = self.con.model.metadata_comments;
+            self.fly_name_box.Value = self.con.model.fly_name;
+            self.fly_genotype_box.Value = self.con.model.fly_genotype;
+            self.date_and_time_box.Value = self.con.get_timestamp();
+            self.age_box.Value = self.con.model.fly_age;
+            self.sex_box.Value = self.con.model.fly_sex;
+            self.temperature_box.Value = self.con.model.experiment_temp;
+            self.rearing_protocol_box.Value = self.con.model.rearing_protocol;
+            self.light_cycle_box.Value = self.con.model.light_cycle;
+            self.comments_box.Value = self.con.model.metadata_comments;
             self.plotting_checkbox.Value = self.con.model.do_plotting;
             self.con.engage_plotting_textbox();
             if self.con.model.do_plotting == 1
-                self.plotting_textbox.String = self.con.model.plotting_file;
+                self.plotting_textbox.Value = self.con.model.plotting_file;
             end
             self.processing_checkbox.Value = self.con.model.do_processing;
             self.con.engage_processing_textbox();
             if self.con.model.do_processing == 1
-                self.processing_textbox.String = self.con.model.processing_file;
+                self.processing_textbox.Value = self.con.model.processing_file;
             end
             self.convert_tdms_checkbox.Value = self.con.model.convert_tdms;
-            self.num_attempts_textbox.String = self.con.get_num_attempts();
+            self.num_attempts_textbox.Value = self.con.get_num_attempts();
             self.exp_type_menu.Value = self.con.model.experiment_type;
-            self.run_dropDown.Value = self.con.model.run_protocol_num;
+            self.run_dropDown.Value = self.con.model.run_protocol_file_list{self.con.model.run_protocol_num};
             self.set_expected_time();
             self.set_elapsed_time();
             self.set_remaining_time();
-            self.current_mode_text.String = self.con.current_mode;
-            self.current_pat_text.String = self.con.current_pat;
-            self.current_pos_text.String = self.con.current_pos;
-            self.current_ao1_text.String = self.con.current_ao1;
-            self.current_ao2_text.String = self.con.current_ao2;
-            self.current_ao3_text.String = self.con.current_ao3;
-            self.current_ao4_text.String = self.con.current_ao4;
-            self.current_frInd_text.String = self.con.current_frInd;
-            self.current_frRate_text.String = self.con.current_frRate;
-            self.current_gain_text.String = self.con.current_gain;
-            self.current_offset_text.String = self.con.current_offset;
-            self.current_duration_text.String = self.con.current_duration;
+            self.current_mode_text.Text = self.con.current_mode;
+            self.current_pat_text.Text = self.con.current_pat;
+            self.current_pos_text.Text = self.con.current_pos;
+            self.current_ao1_text.Text = self.con.current_ao1;
+            self.current_ao2_text.Text = self.con.current_ao2;
+            self.current_ao3_text.Text = self.con.current_ao3;
+            self.current_ao4_text.Text = self.con.current_ao4;
+            self.current_frInd_text.Text = self.con.current_frInd;
+            self.current_frRate_text.Text = self.con.current_frRate;
+            self.current_gain_text.Text = self.con.current_gain;
+            self.current_offset_text.Text = self.con.current_offset;
+            self.current_duration_text.Text = self.con.current_duration;
             self.set_recent_file_menu_items();
             self.combine_tdms_checkbox.Value = self.con.get_combine_tdms();
             
@@ -486,7 +487,7 @@ classdef G4_conductor_view < handle
         % the view will update itself.
 
         function new_fly_name(self, src, ~)
-            self.con.update_fly_name(src.String);
+            self.con.update_fly_name(src.Value);
             self.update_run_gui();
         end
 
@@ -496,7 +497,7 @@ classdef G4_conductor_view < handle
         end
 
         function new_experiment_name(self, src, ~)
-            self.con.update_experiment_name(src.String)
+            self.con.update_experiment_name(src.Value)
             self.update_run_gui();
         end
 
@@ -521,17 +522,17 @@ classdef G4_conductor_view < handle
         end
 
         function new_plotting_file(self, src, ~)
-            self.con.update_plotting_file(src.String);
+            self.con.update_plotting_file(src.Value);
             self.update_run_gui();
         end
 
         function new_processing_file(self, src, ~)
-            self.con.update_processing_file(src.String);
+            self.con.update_processing_file(src.Value);
             self.update_run_gui();
         end
 
         function new_num_attempts(self, src, ~)
-            self.con.update_num_attempts(src.String)
+            self.con.update_num_attempts(src.Value)
             self.update_run_gui();
         end
 
@@ -571,7 +572,7 @@ classdef G4_conductor_view < handle
         end
 
         function new_comments(self, src, ~)
-            self.con.update_comments(src.String);
+            self.con.update_comments(src.Value);
             self.update_run_gui();
         end
 
@@ -710,17 +711,17 @@ classdef G4_conductor_view < handle
 
         function set_expected_time(self)
             text = self.convert_time_format(self.con.model.expected_time);
-            self.expected_time_text.String = text;
+            self.expected_time_text.Text = text;
         end
 
         function set_elapsed_time(self)
             text = self.convert_time_format(self.con.elapsed_time);
-            self.elapsed_time_text.String = text;
+            self.elapsed_time_text.Text = text;
         end
 
         function set_remaining_time(self)
             text = self.convert_time_format(self.con.remaining_time);
-            self.remaining_time_text.String = text;
+            self.remaining_time_text.Text = text;
         end
 
         function set_repetition_lines(self)
