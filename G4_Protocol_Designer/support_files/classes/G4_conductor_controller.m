@@ -560,15 +560,16 @@ classdef G4_conductor_controller < handle
             self.is_aborted = 1;
         end
 
-        function pause_experiment(self)
-            if self.is_paused == 0
-                self.is_paused = 1;
-            elseif self.is_paused == 1
-                self.is_paused = 0;
-            else
-                self.is_paused = 0;
-                disp("There was an error with the pause feature");
-            end
+        function pause_experiment(self, val)
+            self.is_paused = val;
+%             if self.is_paused == 0
+%                 self.is_paused = 1;
+%             elseif self.is_paused == 1
+%                 self.is_paused = 0;
+%             else
+%                 self.is_paused = 0;
+%                 disp("There was an error with the pause feature");
+%             end
         end
 
         function yes = check_if_paused(self)
