@@ -172,6 +172,21 @@ function get_intertrial_data(experiment_folder, processing_settings)
             [ts_time, ts_data, inter_ts_time, inter_ts_data] = create_ts_arrays(cond_dur, data_rate, pre_dur, post_dur, num_ts_datatypes, ...
             num_conds, num_reps, trial_options, intertrial_durs, num_trials);
 
+            [bad_duration_conds, bad_duration_intertrials] = check_condition_durations(cond_dur, intertrial_durs, path_to_protocol, duration_diff_limit);
+
+            for trial = 1:num_trials
+
+                if trial_options(2)==1 && trial<num_trials && ~(any(trial==bad_duration_intertrials))
+                    %get frame position data, upsampled to match ADC timestamps
+                    start_ind = find(Log.Frames.Time(1,:)>=intertrial_start_times(trial),1);
+                    stop_ind = find(Log.Frames.Time(1,:)<=intertrial_stop_times(trial),1,'last');
+                    unaligned_time = double(Log.Frames.Time(1,start_ind:stop_ind)-intertrial_start_times(trial))/time_conv;
+                    inter_ts_data(trial,:) = align_timeseries(inter_ts_time, unaligned_time, Log.Frames.Position(1,start_ind:stop_ind)+1, 'propagate', 'median');
+                end
+            end
+
+            
+
         end
 
 
