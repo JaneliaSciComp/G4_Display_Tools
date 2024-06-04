@@ -100,13 +100,13 @@ classdef feedback_view < handle
         end
 
         function clear_view(self, model)
-            set(self.avg_wbf, 'String',string(round(model.avg_wbf,4)));
+            set(self.avg_wbf, 'Text',string(round(model.avg_wbf,4)));
             self.current_trial = 1;
 
-            if ~isempty(self.CL_function_box.String)
+            if ~isempty(self.CL_function_box.Value)
                 self.new_CL_function(self.CL_function_box, 0);
             end
-            if ~isempty(self.OL_function_box.String)
+            if ~isempty(self.OL_function_box.Value)
                 self.new_OL_function(self.OL_function_box,0);
             end
 
@@ -132,7 +132,7 @@ classdef feedback_view < handle
         end
 
         function update_feedback_view(self, model, trialType, trialinfo, bad_slope, bad_flier)
-           set(self.avg_wbf, 'String', string(round(model.avg_wbf,4)));
+           set(self.avg_wbf, 'Text', string(round(model.avg_wbf,4)));
             if ~strcmp(trialType, 'inter')
                 if bad_slope == 1 || bad_flier == 1
                     trialNum = length(model.full_streamed_intertrials) + length(model.full_streamed_conditions);
@@ -208,21 +208,21 @@ classdef feedback_view < handle
         end
 
         function new_CL_function(self, src, ~)
-            self.runcon.update_custom_CL_analysis(src.String);
+            self.runcon.update_custom_CL_analysis(src.Value);
             self.closeLoop_axis.XAxis.Limits = [-inf inf];
         end
 
         function new_OL_function(self, src, ~)
-            self.runcon.update_custom_OL_analysis(src.String);
+            self.runcon.update_custom_OL_analysis(src.Value);
             self.openLoop_axis.XAxis.Limits = [-inf inf];
         end
 
         function update_custom_CL_function(self)
-            self.CL_function_box.String = self.runcon.get_custom_OL_function();
+            self.CL_function_box.Value = self.runcon.get_custom_CL_function();
         end
 
         function update_custom_OL_function(self)
-            self.OL_function_box.String = self.runcon.get_custom_CL_function();
+            self.OL_function_box.Value = self.runcon.get_custom_OL_function();
         end
     end
 end
