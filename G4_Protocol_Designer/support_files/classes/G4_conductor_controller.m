@@ -1157,7 +1157,12 @@ classdef G4_conductor_controller < handle
         end
 
         function browse_file(self, which_file)
+
+            %% fixfocus citation
+            %% Jorg Woehl (2024). fixfocus (https://github.com/JorgWoehl/fixfocus/releases/tag/v1.2), GitHub. Retrieved June 4, 2024. 
+            ff = fixfocus();
             [file, path] = uigetfile('*.m');
+            delete(ff);
             if ~ischar(file) && ~isstring(file)
                 return;
             else
