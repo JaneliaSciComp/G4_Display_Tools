@@ -1,3 +1,15 @@
+%% This function is meant to go through all flies in an experiment folder that 
+% were processed before the update on 6/6/2024 and therefore do not have
+% their intertrial data saved in their processed data files. This goes
+% through each fly and pulls out/aligns the data from its intertrials and
+% saves it in an array sized *number of intertrials* x *number of
+% datapoints*. It adds this data, called inter_ts_data, to the processed
+% data file of each fly. If your flies' processed data files already have
+% a variable called inter_ts_data, then you don't need to use this
+% function. The function takes in the path to the experiment folder and the
+% path to the processing settings as strings, just like the process_data
+% function.
+
 function get_intertrial_data(experiment_folder, processing_settings)
 
     % Get list of all folders from experiment folders and pull out only the
