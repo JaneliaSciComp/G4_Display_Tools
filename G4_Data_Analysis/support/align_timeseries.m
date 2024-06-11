@@ -29,7 +29,11 @@ function aligned_data = align_timeseries(set_times, unaligned_times, unaligned_d
     end
     aligned_data = nan([max(row_inds) length(set_times)]);
     array_size = size(aligned_data);
-    aligned_data(sub2ind(array_size,row_inds,col_inds)) = unaligned_data;
+    if ~isempty(col_inds)
+        aligned_data(sub2ind(array_size,row_inds,col_inds)) = unaligned_data;
+    else
+        aligned_data = nan([1,length(set_times)]);
+    end
 
     %% downscale data if data rate is higher than set rate
     switch lower(downscaling)
