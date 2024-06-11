@@ -1,4 +1,4 @@
-function [times] = separate_originals_from_reruns(start_times, ...
+function [times, ended_early, num_extra_trials] = separate_originals_from_reruns(start_times, ...
     stop_times, start_idx, trial_options, trials_rerun, num_conds, num_reps, frame_movement_start_times)
    
     num_trials = num_conds*num_reps; 
@@ -10,8 +10,20 @@ function [times] = separate_originals_from_reruns(start_times, ...
         total_rerun_trials = 0;
     end
    
-    assert(total_original_trials + total_rerun_trials == length(start_times),...
-       'The total rerun trials and original trials do not add up to the number of trials detected.');
+    if total_original_trials + total_rerun_trials > length(start_times)
+       warning(['The number of trials detected do not match the number of trials expected. ' ...
+           'It is assumed this experiment was ended early and processing will attempt to continue anyway.']);
+       ended_early = 1;
+       num_extra_trials = total_original_trials + total_rerun_trials - length(start_times);
+    elseif total_original_trials + total_rerun_trials < length(start_times)
+        warning('More trials executed than were expected. Processing may fail.');
+        ended_early = 0;
+        num_extra_trials = 0;
+    else
+        ended_early = 0;
+        num_extra_trials = 0;
+    end
+
    
     if length(start_times) > total_original_trials
        

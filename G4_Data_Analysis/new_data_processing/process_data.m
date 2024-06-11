@@ -150,17 +150,14 @@ function process_data(exp_folder, processing_settings_file)
     
     % Returns a struct, times, with 8 fields. The start times, stop times,
     % start idx, and movement times for the original trials and the rerun
-    % trials. 
-    times = separate_originals_from_reruns(start_times, stop_times, start_idx, ...
+    % trials. Also determines if the experiment was ended early, and if so,
+    % how many more trials are expected than were recorded
+    [times, ended_early, num_trials_short] = separate_originals_from_reruns(start_times, stop_times, start_idx, ...
         trial_options, trials_rerun, num_conds, num_reps, frame_movement_start_times);
     
     %get order of pattern IDs (maybe use for error-checking?)
     [modeID_order, patternID_order] = get_modeID_order(combined_command, Log, times.origin_start_idx);
-    
-
-    %load the order in which conditions were run, as well as the number of
-    %conditions and reps
-    [exp_order, num_conds, num_reps] = get_exp_order(exp_folder);
+   
 
     %Determine start and stop times for different trial types (pre, inter,
     %regular). This also replaces start/stop times of trials marked as bad
@@ -170,12 +167,12 @@ function process_data(exp_folder, processing_settings_file)
     [num_trials, trial_start_times, trial_stop_times, ...
     trial_move_start_times,trial_modes, intertrial_start_times, intertrial_stop_times, ...
     intertrial_durs, times] = get_trial_startStop(exp_order, trial_options, ...
-    times, modeID_order, time_conv, trials_rerun);
+    times, modeID_order, time_conv, trials_rerun, ended_early);
 
     %organize trial duration and control mode by condition/repetition
     [cond_dur, cond_modes,  cond_frame_move_time, cond_start_times, cond_gaps] = organize_durations_modes(num_conds, num_reps, ...
     num_trials, exp_order, trial_stop_times, trial_start_times,  ...
-    trial_move_start_times, trial_modes, time_conv);
+    trial_move_start_times, trial_modes, time_conv, ended_early, num_trials_short);
 
 
  % pre-allocate arrays for aligning the timeseries data

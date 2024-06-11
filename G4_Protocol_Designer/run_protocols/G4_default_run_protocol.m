@@ -238,14 +238,19 @@ function [success] = G4_default_run_protocol(runcon, p)%input should always be 1
                     runcon.update_progress('block', r, params.reps, c, params.num_cond, cond, num_trial_of_total);
 
                     isAborted = runcon.check_if_aborted();
-                    if isAborted == 1
+                    isEnded = runcon.check_if_ended();
+                    if isAborted || isEnded
                         ctlr.stopDisplay();
                         ctlr.stopLog('showTimeoutMessage', true);
                         if isa(ctlr, 'PanelsController')
                             ctlr.close();
                         end
                         clear global;
-                        success = 0;
+                        if isAborted
+                            success = 0;
+                        else
+                            success = 1;
+                        end
                         return;
 
                     end
@@ -292,14 +297,20 @@ function [success] = G4_default_run_protocol(runcon, p)%input should always be 1
                             ctlr.stopDisplay()
                         end
                         
-                        if runcon.check_if_aborted() == 1
+                        isAborted = runcon.check_if_aborted();
+                        isEnded = runcon.check_if_ended();
+                        if isAborted || isEnded
                             ctlr.stopDisplay();
                             ctlr.stopLog('showTimeoutMessage', true);
                             if isa(ctlr, 'PanelsController')
                                 ctlr.close();
                             end
                             clear global;
-                            success = 0;
+                            if isAborted
+                                success = 0;
+                            else
+                                success = 1;
+                            end
                             return;
                         end
                         runcon.update_elapsed_time(round(toc(startTime),2));
@@ -331,7 +342,7 @@ function [success] = G4_default_run_protocol(runcon, p)%input should always be 1
                     pause(params.post_dur)
                     ctlr.stopDisplay()
                 end
-
+                
                 if runcon.check_if_aborted() == 1
                     ctlr.stopDisplay();
                     ctlr.stopLog('showTimeoutMessage', true);

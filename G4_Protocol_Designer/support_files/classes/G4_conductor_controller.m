@@ -29,6 +29,7 @@ classdef G4_conductor_controller < handle
         current_duration_
         is_paused
         settings
+        is_ended_early
     end
 
     properties (Dependent)
@@ -101,6 +102,7 @@ classdef G4_conductor_controller < handle
             self.current_offset = '';
             self.current_duration = '';
             self.is_aborted = 0;
+            self.set_is_ended_early(0);
 
             self.fb_model = feedback_model(self.doc);
         end
@@ -571,6 +573,14 @@ classdef G4_conductor_controller < handle
             end
         end
 
+        function end_early(self)
+            self.set_is_ended_early(1);
+        end
+
+        function [ended] = check_if_ended(self)
+            ended = self.get_is_ended_early();
+        end
+
         function yes = check_if_paused(self)
             if self.is_paused == 1
                 yes = 1;
@@ -584,8 +594,8 @@ classdef G4_conductor_controller < handle
         end
 
         function run(self)
-            self.is_aborted = false; %change aborted back to zero in case the experiment was aborted earlier.
-
+            self.is_aborted = 0; %change aborted back to zero in case the experiment was aborted earlier.
+            self.set_is_ended_early(0);
             % Update timestamp to reflect actual start time of experiment
             self.update_timestamp();
 
@@ -1754,6 +1764,19 @@ classdef G4_conductor_controller < handle
             pdf_path = fullfile(fly_results_folder,plot_filename);
             new_pdf_path = fullfile(fly_results_folder,new_plot_filename);
             movefile(pdf_path, new_pdf_path);
+        end
+
+        function set_is_ended_early(self, new_val)
+            if new_val == 0 || new_val == 1
+                self.is_ended_early = new_val;
+            else
+                disp("There was an error with the button to end an experiment early. Please try again");
+                self.is_ended_early = 0;
+            end
+        end
+
+        function value = get_is_ended_early(self)
+            value = self.is_ended_early;
         end
 
         function ts = get_timestamp(self)
