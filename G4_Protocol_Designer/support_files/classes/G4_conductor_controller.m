@@ -40,7 +40,7 @@ classdef G4_conductor_controller < handle
             self.set_elapsed_time(0);
             if ~isempty(varargin)
                 self.set_doc(varargin{1});
-                self.model.fly_name = self.model.create_fly_name(self.doc.top_export_path);
+                self.model.set_fly_name(self.model.create_fly_name(self.doc.top_export_path));
                 self.set_settings_con(varargin{2});
             else
                 self.set_doc(G4_document());
@@ -129,7 +129,7 @@ classdef G4_conductor_controller < handle
         function update_plotting_file(self, filepath)
             %check to make sure file exists
             if isfile(filepath)
-                self.model.set_plot_file(filepath)
+                self.model.set_plotting_file(filepath)
             else
                 errormsg = "This plotting file does not exist. Please check the path.";
                 self.create_error_box(errormsg);
@@ -139,7 +139,7 @@ classdef G4_conductor_controller < handle
         function update_processing_file(self, filepath)
             %check to make sure file exists
             if isfile(filepath)
-                self.model.set_proc_file(filepath);
+                self.model.set_processing_file(filepath);
             else
                 errormsg = "This processing file does not exist. Please check the path.";
                 self.create_error_box(errormsg);
@@ -171,13 +171,13 @@ classdef G4_conductor_controller < handle
 
         function update_temp(self, new_val)
             
-            self.model.set_temp(new_val);
+            self.model.set_experiment_temp(new_val);
             
         end
 
         function update_rearing(self, new_val)
             
-            self.model.set_rearing(new_val);
+            self.model.set_rearing_protocol(new_val);
             
         end
 
@@ -478,7 +478,7 @@ classdef G4_conductor_controller < handle
 
                 self.doc.set_recent_files(filepath);
                 self.doc.update_recent_files_file();
-                self.model.fly_name = self.model.create_fly_name(top_folder_path);
+                self.model.set_fly_name(self.model.create_fly_name(top_folder_path));
                 self.update_expected_time();
                 self.update_elapsed_time(0);
                 if ~isempty(self.view)
@@ -531,7 +531,7 @@ classdef G4_conductor_controller < handle
         end
 
         function run(self)
-            self.is_aborted = false; %change aborted back to zero in case the experiment was aborted earlier.
+            self.set_is_aborted(false); %change aborted back to zero in case the experiment was aborted earlier.
 
             % Update timestamp to reflect actual start time of experiment
             self.update_timestamp();
@@ -676,7 +676,7 @@ classdef G4_conductor_controller < handle
                     end
 
                 end
-                self.is_aborted = 0;
+                self.set_is_aborted(0);
                 return;
             end
 
@@ -699,7 +699,7 @@ classdef G4_conductor_controller < handle
             self.create_metadata_file();
 
              %Clear out live feedback panel
-            self.fb_model = feedback_model(self.doc);
+            self.set_fb_model(feedback_model(self.doc));
             if ~isempty(self.fb_view)
                 self.fb_view.clear_view(self.fb_model);
             end
@@ -1018,8 +1018,8 @@ classdef G4_conductor_controller < handle
         function prepare_test_exp(self)
          
             % self.model.set_run_file(self.settings.test_run_protocol_file);
-            self.model.set_plot_file(self.settings.test_plotting_file);
-            self.model.set_proc_file(self.settings.test_processing_file);
+            self.model.set_plotting_file(self.settings.test_plotting_file);
+            self.model.set_processing_file(self.settings.test_processing_file);
         end
 
         function [original_exp_path, real_fly_name] = run_test(self, original_experiment, original_fly_name)
@@ -1099,11 +1099,11 @@ classdef G4_conductor_controller < handle
             
 
             %self.model.set_run_file(self.settings.run_protocol_file);
-            self.model.set_plot_file(self.settings.plotting_file);
-            self.model.set_proc_file(self.settings.processing_file);
+            self.model.set_plotting_file(self.settings.plotting_file);
+            self.model.set_processing_file(self.settings.processing_file);
 
             self.open_g4p_file(filepath);
-            self.model.fly_name = fly_name;
+            self.model.set_fly_name(fly_name);
             self.update_view_if_exists();
         end
 
@@ -1148,9 +1148,9 @@ classdef G4_conductor_controller < handle
             if strcmp(which_file, 'run')
                 self.model.set_run_file(filepath);
             elseif strcmp(which_file, 'plot')
-                self.model.set_plot_file(filepath);
+                self.model.set_plotting_file(filepath);
             elseif strcmp(which_file, 'proc')
-                self.model.set_proc_file(filepath);
+                self.model.set_processing_file(filepath);
             elseif strcmp(which_file, 'CL_cust')
                 self.update_custom_CL_analysis(filepath);
             elseif strcmp(which_file, 'OL_cust')
