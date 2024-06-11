@@ -38,6 +38,7 @@ classdef G4_conductor_model < handle
         convert_tdms
         orig_expected_time
         settings
+        
         %experiment_types
     end
 

@@ -1,37 +1,7 @@
 classdef G4_conductor_controller < handle
 
     properties
-        model_
-        doc_
-        settings_con_
-        view_
-        fb_model_
-        fb_view_
 
-        %Time tracking
-
-        elapsed_time_
-        remaining_time_
-        is_aborted_
-
-        %These values are updated every trial
-        current_mode_
-        current_pat_
-        current_pos_
-        current_ao1_
-        current_ao2_
-        current_ao3_
-        current_ao4_
-        current_frInd_
-        current_frRate_
-        current_gain_
-        current_offset_
-        current_duration_
-        is_paused
-        settings
-    end
-
-    properties (Dependent)
         model
         doc
         settings_con
@@ -58,24 +28,26 @@ classdef G4_conductor_controller < handle
         remaining_time
 
         is_aborted
+        is_paused
+        settings
     end
 
     methods
 
         %% constructor
         function self = G4_conductor_controller(varargin)
-            self.model = G4_conductor_model();
-            self.elapsed_time = 0;
+            self.model = self.set_model(G4_conductor_model());
+            self.set_elapsed_time(0);
             if ~isempty(varargin)
-                self.doc = varargin{1};
+                self.set_doc(varargin{1});
                 self.model.fly_name = self.model.create_fly_name(self.doc.top_export_path);
-                self.settings_con = varargin{2};
+                self.set_settings_con(varargin{2});
             else
-                self.doc = G4_document();
-                self.settings_con = G4_settings_controller();
+                self.set_doc(G4_document());
+                self.set_settings_con(G4_settings_controller());
             end
 
-            self.settings = G4_Protocol_Designer_Settings();
+            self.set_settings(G4_Protocol_Designer_Settings());
             fn = fieldnames(self.settings);
             for i = 1:numel(fn)
                 if isstring(self.settings.(fn{i}))
@@ -85,29 +57,29 @@ classdef G4_conductor_controller < handle
 
             exp_time = self.doc.calc_exp_length();
             self.model.set_expected_time(exp_time);
-            self.remaining_time = self.model.expected_time;
-            self.is_paused = 0;
+            self.set_remaining_time(self.model.expected_time);
+            self.set_is_paused(0);
 
-            self.current_mode = '';
-            self.current_pat = '';
-            self.current_pos = '';
-            self.current_ao1 = '';
-            self.current_ao2 = '';
-            self.current_ao3 = '';
-            self.current_ao4 = '';
-            self.current_frInd = '';
-            self.current_frRate = '';
-            self.current_gain = '';
-            self.current_offset = '';
-            self.current_duration = '';
-            self.is_aborted = 0;
+            self.set_current_mode('');
+            self.set_current_pat('');
+            self.set_current_pos('');
+            self.set_current_ao1('');
+            self.set_current_ao2('');
+            self.set_current_ao3('');
+            self.set_current_ao4('');
+            self.set_current_frInd('');
+            self.set_current_frRate('');
+            self.set_current_gain('');
+            self.set_current_offset('');
+            self.set_current_duration('');
+            self.set_is_aborted(0);
 
-            self.fb_model = feedback_model(self.doc);
+            self.set_fb_model(feedback_model(self.doc));
         end
 
         function layout(self)
-            self.view = G4_conductor_view(self);
-            self.fb_view = feedback_view(self, [910 17]);
+            self.set_view(G4_conductor_view(self));
+            self.set_fb_view(feedback_view(self, [910 17]));
         end
 
         function update_timestamp(self)
@@ -221,8 +193,8 @@ classdef G4_conductor_controller < handle
         end
 
         function update_elapsed_time(self, new_val)
-            self.elapsed_time = new_val;
-            self.remaining_time = self.model.expected_time - new_val;
+            self.set_elapsed_time(new_val);
+            self.set_remaining_time(self.model.expected_time - new_val);
             self.update_view_if_exists();
         end
 
@@ -243,7 +215,7 @@ classdef G4_conductor_controller < handle
 
         function update_config_file(self)
             clear('self.doc');
-            self.doc = G4_document();
+            self.set_doc(G4_document());
             self.fb_model.update_model_channels(self.doc)
 
         end
@@ -336,24 +308,24 @@ classdef G4_conductor_controller < handle
                 ao_inds, frInd, frRate, gain, offset, dur)
             for i = 1:length(active_channels) %This figures out which ao channel to put the ao function index under.
                 if active_channels(i) == 0
-                    self.current_ao1 = num2str(ao_inds(i));
+                    self.set_current_ao1(num2str(ao_inds(i)));
                 elseif active_channels(i) == 1
-                    self.current_ao2 = num2str(ao_inds(i));
+                    self.set_current_ao2(num2str(ao_inds(i)));
                 elseif active_channels(i) == 2
-                    self.current_ao3 = num2str(ao_inds(i));
+                    self.set_current_ao3(num2str(ao_inds(i)));
                 else
-                    self.current_ao4 = num2str(ao_inds(i));
+                    self.set_current_ao4(num2str(ao_inds(i)));
                 end
             end
 
-            self.current_mode = num2str(mode);
-            self.current_pat = num2str(pat);
-            self.current_pos = num2str(pos);
-            self.current_frInd = num2str(frInd);
-            self.current_frRate = num2str(frRate);
-            self.current_gain = num2str(gain);
-            self.current_offset = num2str(offset);
-            self.current_duration = num2str(dur);
+            self.set_current_mode(num2str(mode));
+            self.set_current_pat(num2str(pat));
+            self.set_current_pos(num2str(pos));
+            self.set_current_frInd(num2str(frInd));
+            self.set_current_frRate(num2str(frRate));
+            self.set_current_gain(num2str(gain));
+            self.set_current_offset(num2str(offset));
+            self.set_current_duration(num2str(dur));
             self.update_view_if_exists();
         end
 
@@ -1768,173 +1740,149 @@ classdef G4_conductor_controller < handle
             value = self.model.get_convert_tdms();
         end
 
-       
+        %% Getters
 
-        %% SETTERS
-        function set.model(self, value)
-            self.model_ = value;
+        function value = get_model(self)
+            value = self.model;
         end
-
-        function set.doc(self, value)
-            self.doc_ = value;
+        function value = get_doc(self)
+            value = self.doc;
         end
-
-        function set.current_mode(self, value)
-            self.current_mode_ = value;
+        function value = get_settings_con(self)
+            value = self.settings_con;
         end
-
-        function set.current_pat(self, value)
-            self.current_pat_ = value;
+        function value = get_view(self)
+            value = self.view;
         end
-
-        function set.current_pos(self, value)
-            self.current_pos_ = value;
+        function value = get_fb_model(self)
+            value = self.fb_model;
         end
-
-        function set.current_ao1(self, value)
-            self.current_ao1_ = value;
+        function value = get_fb_view(self)
+            value = self.fb_view;
         end
-
-        function set.current_ao2(self, value)
-            self.current_ao2_ = value;
+        function value = get_current_mode(self)
+            value = self.current_mode;
         end
-
-        function set.current_ao3(self, value)
-            self.current_ao3_ = value;
+        function value = get_current_pat(self)
+            value = self.current_pat;
         end
-
-        function set.current_ao4(self, value)
-            self.current_ao4_ = value;
+        function value = get_current_pos(self)
+            value = self.current_pos;
         end
-
-        function set.current_frInd(self, value)
-            self.current_frInd_ = value;
+        function value = get_current_ao1(self)
+            value = self.current_ao1;
         end
-
-        function set.current_frRate(self, value)
-            self.current_frRate_ = value;
+        function value = get_current_ao2(self)
+            value = self.current_ao2;
         end
-
-        function set.current_gain(self, value)
-            self.current_gain_ = value;
+        function value = get_current_ao3(self)
+            value = self.current_ao3;
         end
-
-        function set.current_offset(self, value)
-            self.current_offset_ = value;
+        function value = get_current_ao4(self)
+            value = self.current_ao4;
         end
-
-        function set.current_duration(self, value)
-            self.current_duration_ = value;
+        function value = get_current_frInd(self)
+            value = self.current_frInd;
         end
-
-        function set.is_aborted(self, value)
-            self.is_aborted_ = value;
+        function value = get_current_frRate(self)
+            value = self.current_frRate;
         end
-
-        function set.elapsed_time(self, value)
-            self.elapsed_time_ = value;
+        function value = get_current_gain(self)
+            value = self.current_gain;
         end
-
-        function set.remaining_time(self, value)
-            self.remaining_time_ = value;
+        function value = get_current_offset(self)
+            value = self.current_offset;
         end
-
-        function set.settings_con(self, value)
-            self.settings_con_ = value;
+        function value = get_current_duration(self)
+            value = self.current_duration;
+        end
+        function value = get_elapsed_time(self)
+            value = self.elapsed_time;
+        end
+        function value = get_remaining_time(self)
+            value = self.remaining_time(self);
+        end
+        function value = get_is_aborted(self)
+            value = self.is_aborted;
+        end
+        function value = get_is_paused(self)
+            value = self.is_paused;
+        end
+        function value = get_settings(self)
+            value = self.settings;
         end
 
-        function set.view(self, value)
-            self.view_ = value;
+        %% Setters
+
+        function set_model(self, value)
+            self.model = value;
+        end
+        function set_doc(self, value)
+            self.doc = value;
+        end
+        function set_settings_con(self, value)
+            self.settings_con = value;
+        end
+        function set_view(self, value)
+            self.view = value;
+        end
+        function set_fb_model(self, value)
+            self.fb_model = value;
+        end
+        function set_fb_view(self, value)
+            self.fb_view = value;
+        end
+        function set_current_mode(self, value)
+            self.current_mode = value;
+        end
+        function set_current_pat(self, value)
+            self.current_pat = value;
+        end
+        function set_current_pos(self, value)
+            self.current_pos = value;
+        end
+        function set_current_ao1(self, value)
+            self.current_ao1 = value;
+        end
+        function set_current_ao2(self, value)
+            self.current_ao2 = value;
+        end
+        function set_current_ao3(self, value)
+            self.current_ao3 = value;
+        end
+        function set_current_ao4(self, value)
+            self.current_ao4 = value;
+        end
+        function set_current_frInd(self, value)
+            self.current_frInd = value;
+        end
+        function set_current_frRate(self, value)
+            self.current_frRate = value;
+        end
+        function set_current_gain(self, value)
+            self.current_gain = value;
+        end
+        function set_current_offset(self, value)
+            self.current_offset = value;
+        end
+        function set_current_duration(self, value)
+            self.current_duration = value;
+        end
+        function set_elapsed_time(self, value)
+            self.elapsed_time = value;
+        end
+        function set_remaining_time(self, value)
+            self.remaining_time = value;
+        end
+        function set_is_aborted(self, value)
+            self.is_aborted = value;
+        end
+        function set_is_paused(self, value)
+            self.is_paused = value;
+        end
+        function set_settings(self, value)
+            self.settings = value;
         end
 
-        function set.fb_model(self, value)
-            self.fb_model_ = value;
-        end
-
-        function set.fb_view(self, value)
-            self.fb_view_ = value;
-        end
-
-        %% GETTERS
-        function value = get.model(self)
-           value = self.model_;
-        end
-
-        function value = get.doc(self)
-            value = self.doc_;
-        end
-
-        function value = get.current_mode(self)
-            value = self.current_mode_;
-        end
-
-        function value = get.current_pat(self)
-            value = self.current_pat_;
-        end
-
-        function value = get.current_pos(self)
-            value = self.current_pos_;
-        end
-
-        function value = get.current_ao1(self)
-            value = self.current_ao1_;
-        end
-
-        function value = get.current_ao2(self)
-            value = self.current_ao2_;
-        end
-
-        function value = get.current_ao3(self)
-            value = self.current_ao3_;
-        end
-
-        function value = get.current_ao4(self)
-            value = self.current_ao4_;
-        end
-
-        function value = get.current_frInd(self)
-            value = self.current_frInd_;
-        end
-
-        function value = get.current_frRate(self)
-            value = self.current_frRate_;
-        end
-
-        function value = get.current_gain(self)
-            value = self.current_gain_;
-        end
-
-        function value = get.current_offset(self)
-            value = self.current_offset_;
-        end
-
-        function value = get.current_duration(self)
-            value = self.current_duration_;
-        end
-
-        function value = get.is_aborted(self)
-            value = self.is_aborted_;
-        end
-
-        function output = get.elapsed_time(self)
-            output = self.elapsed_time_;
-        end
-
-        function output = get.remaining_time(self)
-            output = self.remaining_time_;
-        end
-
-        function output = get.settings_con(self)
-            output = self.settings_con_;
-        end
-        function output = get.view(self)
-            output = self.view_;
-        end
-        function output = get.fb_view(self)
-            output = self.fb_view_;
-        end
-        function output = get.fb_model(self)
-            output = self.fb_model_;
-        end
     end
 end
