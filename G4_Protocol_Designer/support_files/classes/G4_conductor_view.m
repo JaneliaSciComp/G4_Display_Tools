@@ -23,6 +23,7 @@ classdef G4_conductor_view < handle
         plotting_checkbox
         plotting_textbox
         processing_checkbox
+        processing_textbox
         run_dropDown
         num_attempts_textbox
         current_running_trial
@@ -67,7 +68,7 @@ classdef G4_conductor_view < handle
             self.con = con;
             % Layout the window
             pix = get(0, 'screensize');
-            self.fig_size = [.1*pix(3), .1*pix(4), .8*pix(3), .65*pix(4)];
+            self.fig_size = [.1*pix(3), .1*pix(4), .85*pix(3), .65*pix(4)];
             set(self.fig,'Position',self.fig_size);
 
             menu = uimenu(self.fig, 'Text', 'File');

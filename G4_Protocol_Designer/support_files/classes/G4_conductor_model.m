@@ -287,8 +287,8 @@ classdef G4_conductor_model < handle
             self.orig_expected_time = new_val;
         end
 
-        function set_timestamp(self)
-            self.timestamp = datestr(now, 'mm-dd-yyyyHH_MM_SS');
+        function set_timestamp(self, new_val)
+            self.timestamp = new_val;
         end
 
         function set_num_tests_conducted(self, new_val)
@@ -446,7 +446,7 @@ classdef G4_conductor_model < handle
             value = self.run_protocol_num;
         end
 
-        function value  = get_goole_sheet_key(self)
+        function value  = get_google_sheet_key(self)
             value = self.google_sheet_key;
         end
 

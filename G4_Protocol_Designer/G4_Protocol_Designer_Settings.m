@@ -4,7 +4,7 @@
 function settings = G4_Protocol_Designer_Settings()
 
 %% config file
-settings.Configuration_Filepath = "C:\Program Files (x86)\HHMI G4\Support Files\HHMI Panels Configuration.ini";
+settings.Configuration_Filepath = "/Users/lisaferguson/Documents/Programming/Reiser/HHMI Panels Configuration.ini";
 
 %% Google sheet settings
 settings.Google_Sheet_Key = "1g4IYtTNq-QAaGgPDIut5P_5y6CNWU0azGazq4zguqw8";
