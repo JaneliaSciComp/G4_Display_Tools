@@ -1,3 +1,4 @@
+
 %% This function is meant to go through all flies in an experiment folder that 
 % were processed before the update on 6/6/2024 and therefore do not have
 % their intertrial data saved in their processed data files. This goes
@@ -139,6 +140,7 @@ function get_intertrial_data(experiment_folder, processing_settings)
                     stop_ind = find(Log.Frames.Time(1,:)<=intertrial_stop_times(trial),1,'last');
                     unaligned_time = double(Log.Frames.Time(1,start_ind:stop_ind)-intertrial_start_times(trial))/time_conv;
                     inter_ts_data(trial,:) = align_timeseries(inter_ts_time, unaligned_time, Log.Frames.Position(1,start_ind:stop_ind)+1, 'propagate', 'median');
+
                     if isnan(inter_ts_data(trial,:))
                         warning(['There was a problem with ' fly_folder ' intertrial ' num2str(trial) ' and its data could not be displayed. Likely the issue was in the timestamps.']);
                     end
