@@ -1,4 +1,4 @@
-function [bad_FP_conds] = check_frame_position(path_to_protocol, start_times, stop_times, exp_order, ...
+function [frame_position_check] = check_frame_position(path_to_protocol, start_times, stop_times, exp_order, ...
     Log, condModes, corrTolerance, framePosTolerance, framePosPercentile, perctile_tol)
 
     num_conds = size(exp_order,1);
@@ -6,8 +6,6 @@ function [bad_FP_conds] = check_frame_position(path_to_protocol, start_times, st
     exp = load(path_to_protocol,'-mat');
     [expPath, expName, ~] = fileparts(path_to_protocol);
     blockTrials = exp.exp_parameters.block_trials;
-    conds_outside_corr_tolerance = [];
-    bad_FP_conds = [];
     shift_numbers = zeros(num_conds,num_reps);
     percent_off_zero = zeros(num_conds, num_reps);
     conds_outside_corr_tolerance = {};
@@ -78,6 +76,14 @@ function [bad_FP_conds] = check_frame_position(path_to_protocol, start_times, st
         end
 
     end
+
+    frame_position_check = struct;
+    frame_position_check.average_difference = avg_diffs;
+    frame_position_check.max_difference = max_diffs;
+    frame_position_check.percentile_difference = prctile_diffs;
+    frame_position_check.correlation_outside_tolerance = conds_outside_corr_tolerance;
+    frame_position_check.average_above_tolerance = frame_pos_avg_diff_above_tol;
+    frame_position_check.percentile_above_tolerance = frame_pos_prctile_above_tol;
 
     % Display warnings to the user for any condition/rep pairs that fell
     % out of tolerance ranges provided by the user.
