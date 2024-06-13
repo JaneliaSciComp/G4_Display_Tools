@@ -183,10 +183,12 @@ function process_data(exp_folder, processing_settings_file)
 %%%%%then pass it in to the function to find bad wbfs where I only look at
 %%%%%the indices for the actual condition???
     [bad_duration_conds, bad_duration_intertrials] = check_condition_durations(cond_dur, intertrial_durs, path_to_protocol, duration_diff_limit);
-    [bad_slope_conds] = check_flat_conditions(trial_start_times, trial_stop_times, Log, num_reps, num_conds, exp_order);
-
-    [bad_crossCorr_conds] = check_correlation(trial_start_times, trial_stop_times, exp_order, Log, cond_modes, corrTolerance);
-
+ %   [bad_slope_conds] = check_flat_conditions(trial_start_times, trial_stop_times, Log, num_reps, num_conds, exp_order);
+    if num_trials_short == 0
+        [bad_crossCorr_conds] = check_correlation(trial_start_times, trial_stop_times, exp_order, Log, cond_modes, corrTolerance);
+    else
+        bad_crossCorr_conds = [];
+    end
 
     if remove_nonflying_trials && flying
         [bad_WBF_conds, wbf_data] = find_bad_wbf_trials(Log, ts_data, wbf_range, wbf_cutoff, ...
@@ -201,7 +203,7 @@ function process_data(exp_folder, processing_settings_file)
         'unexpected order of trial modes - check that pre-trial, post-trial, and intertrial options are correct')
      %Generate report of bad conditions  
     [bad_conds, bad_reps, bad_intertrials, bad_conds_summary] = ...
-        consolidate_bad_conds(bad_duration_conds, bad_duration_intertrials, bad_slope_conds,...
+        consolidate_bad_conds(bad_duration_conds, bad_duration_intertrials,...
         bad_crossCorr_conds, bad_WBF_conds, num_trials, num_conds, num_reps, trial_options);
     
     if ~isempty(bad_conds)
