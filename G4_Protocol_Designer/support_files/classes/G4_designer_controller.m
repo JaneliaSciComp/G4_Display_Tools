@@ -3166,9 +3166,6 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
 %              %%%%%%%%%%%%%%%%%%WORKING WITH ANY RELEASE. CHECK NEW
 %              RELEASES TO SEE IF THIS BUG HAS BEEN FIXED
 
-%% findjob citation
-%% Yair Altman (2024). findjobj - find java handles of Matlab graphic objects (https://www.mathworks.com/matlabcentral/fileexchange/14317-findjobj-find-java-handles-of-matlab-graphic-objects), 
-%% MATLAB Central File Exchange. Retrieved June 4, 2024. 
             jTable = findjobj(self.block_table);
             jScrollPane = jTable.getComponent(0);
             javaObjectEDT(jScrollPane);

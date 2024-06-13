@@ -126,7 +126,7 @@ classdef G4_conductor_view < handle
             self.con = con;
             % Layout the window
             pix = get(0, 'screensize');
-            self.fig_size = [.1*pix(3), .1*pix(4), .85*pix(3), .65*pix(4)];
+            self.fig_size = [.15*pix(3), .15*pix(4), .8*pix(3), .6*pix(4)];
             set(self.fig,'Position',self.fig_size);
 
             menu = uimenu(self.fig, 'Text', 'File');
@@ -150,7 +150,7 @@ classdef G4_conductor_view < handle
                 [265, self.fig_size(4) - 305, 115, 85], 'ValueChangedFcn', @self.pause);
 
             settings_pan = uipanel(self.fig, 'Title', 'Settings', 'FontSize', 13, 'units', 'pixels', ...
-                'Position', [15, self.fig_size(4) - 215, 415, 200]);
+                'Position', [15, self.fig_size(4) - 215, 405, 200]);
             metadata_pan = uipanel(self.fig, 'Title', 'Metadata', 'units', 'pixels', ...
                 'FontSize', 13, 'Position', [settings_pan.Position(1) + settings_pan.Position(3) + 180, self.fig_size(4) - 305, 275, 305]);
             status_pan = uipanel(self.fig, 'Title', 'Status', 'FontSize', 13, 'units', 'pixels', ...
@@ -378,54 +378,54 @@ classdef G4_conductor_view < handle
                 'Position', [115, 153, 150, 18], 'ValueChangedFcn', @self.new_experiment_type);
 
             test_button = uibutton(settings_pan, 'Text', 'Run Test Protocol', ...
-                'Position', [290, 123, 120, 20], 'ButtonPushedFcn', @self.run_test_exp);
+                'Position', [278, 123, 120, 20], 'ButtonPushedFcn', @self.run_test_exp);
             
             tdms_checkbox_label = uilabel(settings_pan, 'Text', 'Convert TDMS?', ...
-                'Position', [10, 123, 100, 15]);
+                'Position', [10, 123, 80, 15]);
             self.convert_tdms_checkbox = uicheckbox(settings_pan, 'Value', self.con.model.convert_tdms, ...
-                'Position', [101, 123, 15, 15], 'ValueChangedFcn', @self.new_convert_tdms);
+                'Position', [91, 123, 15, 15], 'ValueChangedFcn', @self.new_convert_tdms);
             
             processing_checkbox_label = uilabel(settings_pan, 'Text', 'Processing?', ...
-                'Position', [120, 123, 75, 15]);
+                'Position', [116, 123, 65, 15]);
             self.processing_checkbox = uicheckbox(settings_pan, 'Value', self.con.model.do_processing, ...
-                'Position', [196, 123, 15, 15], 'ValueChangedFcn', @self.new_do_processing);
+                'Position', [182, 123, 15, 15], 'ValueChangedFcn', @self.new_do_processing);
             
             processing_filename_label = uilabel(settings_pan, 'Text', 'Processing Protocol:', ...
-                'Position', [10, 73, 115, 15]);
+                'Position', [10, 73, 105, 15]);
             self.processing_textbox = uieditfield(settings_pan, 'Value', self.con.model.processing_file, ...
-                'Position', [130, 73, 160, 18], 'ValueChangedFcn', @self.new_processing_file);
+                'Position', [120, 73, 160, 18], 'ValueChangedFcn', @self.new_processing_file);
             self.browse_button_processing = uibutton(settings_pan, 'Text', 'Browse', ...
-                'Position', [295, 73, 65, 18], 'ButtonPushedFcn', @self.proc_browse);
+                'Position', [285, 73, 65, 18], 'ButtonPushedFcn', @self.proc_browse);
             
             
             plotting_checkbox_label = uilabel(settings_pan, 'Text', 'Plotting?', ...
-                'Position', [215, 123, 55, 15]);
+                'Position', [207, 123, 45, 15]);
             self.plotting_checkbox = uicheckbox(settings_pan, 'Value', self.con.model.do_plotting, ...
-                'Position', [271, 123, 15, 15], 'ValueChangedFcn', @self.new_do_plotting);
+                'Position', [253, 123, 15, 15], 'ValueChangedFcn', @self.new_do_plotting);
             
             plotting_filename_label = uilabel(settings_pan, 'Text', 'Plotting Protocol:', ...
-                'Position', [10, 98, 115, 15]);
+                'Position', [10, 98, 105, 15]);
             self.plotting_textbox = uieditfield(settings_pan, 'Value', self.con.model.plotting_file, ...
-                'Position', [130, 98, 160, 18], 'ValueChangedFcn', @self.new_plotting_file);
+                'Position', [120, 98, 160, 18], 'ValueChangedFcn', @self.new_plotting_file);
             self.browse_button_plotting = uibutton(settings_pan, 'Text', 'Browse', ...
-                'Position', [295, 98, 65, 18], 'ButtonPushedFcn', @self.plot_browse);
+                'Position', [285, 98, 65, 18], 'ButtonPushedFcn', @self.plot_browse);
 
             run_filename_label = uilabel(settings_pan, 'Text', 'Run Protocol:', ...
-                'Position', [10, 48, 115, 15]);
+                'Position', [10, 48, 105, 15]);
             self.run_dropDown = uidropdown(settings_pan, 'Items', self.con.model.run_protocol_file_list, ...
-                'Position', [130, 48, 200, 18],  'ValueChangedFcn', @self.select_run);
+                'Position', [80, 48, 200, 18],  'ValueChangedFcn', @self.select_run);
 
             num_attempts_label = uilabel(settings_pan, 'Text', 'Number times to re-attempt bad trials:', ...
-                'Position', [10, 23, 210, 15]);
+                'Position', [10, 23, 200, 15]);
             self.num_attempts_textbox = uieditfield(settings_pan, 'numeric', 'Value', ...
-                self.con.model.num_attempts_bad_conds, 'Limits', [0 5], 'Position', [225, 23, 50, 15], ...
+                self.con.model.num_attempts_bad_conds, 'Limits', [0 5], 'Position', [210, 23, 50, 15], ...
                 'ValueChangedFcn', @self.new_num_attempts);
 
             combine_tdms_label = uilabel(settings_pan, 'Text', ...
-                'Combine multiple TDMS files into one?', 'Position', [10, 3, 210, 15]);
+                'Combine multiple TDMS files into one?', 'Position', [10, 3, 200, 15]);
 
             self.combine_tdms_checkbox = uicheckbox(settings_pan, 'Value', ...
-                self.con.get_combine_tdms(), 'Position', [225, 3, 15, 15], ...
+                self.con.get_combine_tdms(), 'Position', [215, 3, 15, 15], ...
                'ValueChangedFcn', @self.new_combine_tdms);
 
             self.bad_trial_markers = [];
