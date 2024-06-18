@@ -3,52 +3,7 @@ classdef G4_document < handle
     %   Detailed explanation goes here
 
     properties
-        top_folder_path_
-        top_export_path_
-        Patterns_
-        Pos_funcs_
-        Ao_funcs_
-        imported_pattern_names_
-        imported_posfunc_names_
-        imported_aofunc_names_
-        binary_files_
-        save_filename_
-        currentExp_
-        experiment_name_
-        est_exp_length_
 
-        %Variables saved to .g4p files
-        pretrial_
-        block_trials_
-        intertrial_
-        posttrial_
-        repetitions_
-        is_randomized_
-        num_rows_
-        is_chan1_
-        chan1_rate_
-        is_chan2_
-        chan2_rate_
-        is_chan3_
-        chan3_rate_
-        is_chan4_
-        chan4_rate_
-        trial_data
-
-        %Data to save to configuration file
-        configData_
-
-        %Shared data on recently opened .g4p files
-        recent_g4p_files_
-        recent_files_filepath_
-
-        pattern_locations
-        function_locations
-        aoFunc_locations
-        settings
-    end
-
-    properties (Dependent)
         top_folder_path
         top_export_path
         Patterns
@@ -78,13 +33,17 @@ classdef G4_document < handle
         chan3_rate
         is_chan4
         chan4_rate
-
-        
+        trial_data
         configData
 
         %Shared data on recently opened .g4p files
         recent_g4p_files
         recent_files_filepath
+
+        pattern_locations
+        function_locations
+        aoFunc_locations
+        settings
 
     end
 
@@ -93,7 +52,7 @@ classdef G4_document < handle
 %CONSTRUCTOR--------------------------------------------------------------
         function self = G4_document()
 
-            self.settings = G4_Protocol_Designer_Settings();
+            self.set_settings(G4_Protocol_Designer_Settings());
             fn = fieldnames(self.settings);
             for i = 1:numel(fn)
                 if isstring(self.settings.(fn{i}))
@@ -104,76 +63,76 @@ classdef G4_document < handle
 
             %%constructor sets rest of variables
             %Set these properties to empty values until they are needed
-            self.top_folder_path = '';
-            self.top_export_path = '';
+            self.set_top_folder_path('');
+            self.set_top_export_path('');
             self.Patterns = struct;
             self.Pos_funcs = struct;
             self.Ao_funcs = struct;
-            self.imported_pattern_names = {};
-            self.imported_posfunc_names = {};
-            self.imported_aofunc_names = {};
+            self.set_imported_pattern_names({});
+            self.set_imported_posfunc_names({});
+            self.set_imported_aofunc_names({});
             self.binary_files.pats = struct;
             self.binary_files.funcs = struct;
             self.binary_files.ao = struct;
-            self.save_filename = '';
+            self.set_save_filename('');
             self.currentExp = struct;
-            self.experiment_name = '';
-            self.trial_data = G4_trial_model();
-            self.est_exp_length = 0;
+            self.set_experiment_name('');
+            self.set_trial_data(G4_trial_model());
+            self.set_est_exp_length(0);
 
             %Make table parameters into a cell array so they work with the tables more easily
-            self.pretrial = self.trial_data.trial_array;
-            self.intertrial = self.trial_data.trial_array;
-            self.block_trials = self.trial_data.trial_array;
-            self.posttrial = self.trial_data.trial_array;
+            self.set_pretrial(self.trial_data.trial_array);
+            self.set_intertrial(self.trial_data.trial_array);
+            self.set_block_trials(self.trial_data.trial_array);
+            self.set_posttrial(self.trial_data.trial_array);
 
             %Find line with number of rows and get value -------------------------------------------
-            [self.configData, numRows_line, index] = self.get_setting(self.settings.Configuration_Filepath, 'Number of Rows');
+            [self.configData, numRows_line, ~] = self.get_setting(self.settings.Configuration_Filepath, 'Number of Rows');
   
             if ~isempty(self.configData)
-                self.num_rows = str2num(self.configData{numRows_line}(end));
+                self.set_num_rows(str2num(self.configData{numRows_line}(end)));
             end
 
 
             %Determine channel sample rates--------------------------------------------
             if ~isempty(self.configData)
-                self.chan1_rate = self.get_ending_number_from_file(self.configData, 'ADC0');
-                self.chan2_rate = self.get_ending_number_from_file(self.configData, 'ADC1');
-                self.chan3_rate = self.get_ending_number_from_file(self.configData, 'ADC2');
-                self.chan4_rate = self.get_ending_number_from_file(self.configData, 'ADC3');
+                self.set_chan1_rate(self.get_ending_number_from_file(self.configData, 'ADC0'));
+                self.set_chan2_rate(self.get_ending_number_from_file(self.configData, 'ADC1'));
+                self.set_chan3_rate(self.get_ending_number_from_file(self.configData, 'ADC2'));
+                self.set_chan4_rate(self.get_ending_number_from_file(self.configData, 'ADC3'));
             end
             
             %Set rest of default property values
-            self.repetitions = 1;
-            self.is_randomized = 0;
+            self.set_repetitions(1);
+            self.set_is_randomized(0);
             if self.chan1_rate == 0
-                self.is_chan1 = 0;
+                self.set_is_chan1(0);
             else
-                self.is_chan1 = 1;
+                self.set_is_chan1(1);
             end
             if self.chan2_rate == 0
-                self.is_chan2 = 0;
+                self.set_is_chan2(0);
             else
-                self.is_chan2 = 1;
+                self.set_is_chan2(1);
             end
             if self.chan3_rate == 0
-                self.is_chan3 = 0;
+                self.set_is_chan3(0);
             else
-                self.is_chan3 = 1;
+                self.set_is_chan3(1);
             end
             if self.chan4_rate == 0
-                self.is_chan4 = 0;
+                self.set_is_chan4(0);
             else
-                self.is_chan4 = 1;
+                self.set_is_chan4(1);
             end
 
             %Get the recently opened .g4p files
             %Get info from log of recently opened .g4p files
             recent_files_filename = 'recently_opened_g4p_files.m';
             filepath = fileparts(which(recent_files_filename));
-            self.recent_files_filepath = fullfile(filepath, recent_files_filename);
-            self.recent_g4p_files = strtrim(regexp( fileread(self.recent_files_filepath),'\n','split'));
-            self.recent_g4p_files = self.recent_g4p_files(~cellfun('isempty',self.recent_g4p_files));
+            self.set_recent_files_filepath(fullfile(filepath, recent_files_filename));
+            self.set_recent_g4p_files(strtrim(regexp( fileread(self.recent_files_filepath),'\n','split')));
+            self.set_recent_g4p_files(self.recent_g4p_files(~cellfun('isempty',self.recent_g4p_files)));
         end
 
 %SETTING INDIVIDUAL TRIAL PROPERTIES---------------------------------------
@@ -182,7 +141,7 @@ classdef G4_document < handle
             if index(1) > size(self.block_trials,1)
                 posfield = self.get_posfunc_field_name(new_value{3});
                 %new_value{12} = length(self.Pos_funcs.(posfield).pfnparam.func)/1000;
-                self.block_trials = [self.block_trials;new_value];
+                self.set_block_trials([self.block_trials;new_value]);
 %                 block_data = self.block_trials;
 
             else
@@ -1262,7 +1221,7 @@ classdef G4_document < handle
                     newcurrentExp.aoFunction.numaoFunc = num_ao;
                 end
 
-                self.currentExp = newcurrentExp;
+                self.set_currentExp(newcurrentExp);
                 currentExp = self.currentExp;
                 currentExpFile = 'currentExp.mat';
                 filepath = fullfile(Exppath, currentExpFile);
@@ -1276,7 +1235,7 @@ classdef G4_document < handle
 
         function [opened_data] = open(self, filepath)
             opened_data = load(filepath, '-mat');
-            self.save_filename = filepath;
+            self.set_save_filename(filepath);
         end
 
         function saveas(self, path, prog)
@@ -1286,10 +1245,10 @@ classdef G4_document < handle
 
             [savepath, name, ~] = fileparts(path);
             savename = strcat(name, homemade_ext);
-            self.top_export_path = fullfile(savepath, self.experiment_name);
+            self.set_top_export_path(fullfile(savepath, self.experiment_name));
             % Get path to file you want to save including new extension
             save_file = fullfile(self.top_export_path, savename);
-            self.save_filename = save_file;
+            self.set_save_filename(save_file);
             if isfile(save_file)
                 question = 'This file already exists. Are you sure you want to replace it?';
                 replace = questdlg(question);
@@ -1301,7 +1260,7 @@ classdef G4_document < handle
                         delete(save_file);
                         temp_path = strcat(self.top_export_path, 'temp');
                         movefile(self.top_export_path, temp_path);
-                        self.top_folder_path = temp_path;
+                        self.set_top_folder_path(temp_path);
                     else
                         return;
                     end
@@ -1468,7 +1427,7 @@ classdef G4_document < handle
                 else
                     success_message = "One currentExp file imported.";
                 end
-                self.currentExp = load(file_full);
+                self.set_currentExp(load(file_full));
                 bin_ext = '';
                 fileid = 0;
             else
@@ -1730,9 +1689,9 @@ classdef G4_document < handle
                             if isempty(fieldnames(self.currentExp)) == 0
                                 currentExp_replaced = 1;
                             end
-                            self.currentExp = load(full_file_path);
+                            self.set_currentExp(load(full_file_path));
                             [folderpath, foldname] = fileparts(filepath);
-                            self.experiment_name = foldname;
+                            self.set_experiment_name(foldname);
                         else
                             disp("Unrecognized field")
                             disp(strcat(name,ext))
@@ -1750,7 +1709,7 @@ classdef G4_document < handle
 % Import a folder, called from the controller and calls more specific import functions for each type of folder ---------------------------------
         function success_statement = import_folder(self, path)
             % prog = waitbar(0, 'Importing...', 'WindowStyle', 'modal'); %start waiting bar
-            self.top_folder_path = path;
+            self.set_top_folder_path(path);
             [file_names, folder_names] = self.get_file_folder_names(path);
             for fold = length(folder_names):-1:1
                 if ~isempty(regexp(folder_names{fold}, '\d\d*_\d\d*_\d\d\d\d', 'once')) && regexp(folder_names{fold}, '\d\d*_\d\d*_\d\d\d\d')==1
@@ -2203,255 +2162,294 @@ classdef G4_document < handle
         end
 
         %% Setters
-        function set.top_folder_path(self, value)
-            self.top_folder_path_ = value;
+        function set_top_folder_path(self, value)
+            self.top_folder_path = value;
         end
 
-        function set.top_export_path(self, value)
-            self.top_export_path_ = value;
+        function set_top_export_path(self, value)
+            self.top_export_path = value;
         end
 
-        function set.Patterns(self, value)
-            self.Patterns_ = value;
+        function set_Patterns(self, value)
+            self.Patterns = value;
         end
 
-        function set.Pos_funcs(self, value)
-            self.Pos_funcs_ = value;
+        function set_Pos_funcs(self, value)
+            self.Pos_funcs = value;
         end
 
-        function set.Ao_funcs(self, value)
-            self.Ao_funcs_ = value;
+        function set_Ao_funcs(self, value)
+            self.Ao_funcs = value;
         end
 
-        function set.save_filename(self, value)
-            self.save_filename_ = value;
+        function set_save_filename(self, value)
+            self.save_filename = value;
         end
 
-        function set.currentExp(self, value)
-            self.currentExp_ = value;
+        function set_currentExp(self, value)
+            self.currentExp = value;
         end
 
-        function set.experiment_name(self, value)
-            self.experiment_name_ = value;
+        function set_experiment_name(self, value)
+            self.experiment_name = value;
         end
 
-        function set.pretrial(self, value)
-            self.pretrial_ = value;
+        function set_pretrial(self, value)
+            self.pretrial = value;
         end
 
-        function set.intertrial(self, value)
-            self.intertrial_ = value;
+        function set_intertrial(self, value)
+            self.intertrial = value;
         end
 
-        function set.block_trials(self, value)
-            self.block_trials_ = value;
+        function set_block_trials(self, value)
+            self.block_trials = value;
         end
 
-        function set.posttrial(self, value)
-            self.posttrial_ = value;
+        function set_posttrial(self, value)
+            self.posttrial = value;
         end
 
-        function set.repetitions(self, value)
-            self.repetitions_ = value;
+        function set_repetitions(self, value)
+            self.repetitions = value;
         end
 
-        function set.is_randomized(self, value)
-            self.is_randomized_ = value;
+        function set_is_randomized(self, value)
+            self.is_randomized = value;
         end
 
-        function set.num_rows(self, value)
-            self.num_rows_ = value;
+        function set_num_rows(self, value)
+            self.num_rows = value;
         end
 
-        function set.is_chan1(self, value)
-            self.is_chan1_ = value;
+        function set_is_chan1(self, value)
+            self.is_chan1 = value;
         end
 
-        function set.is_chan2(self, value)
-            self.is_chan2_ = value;
+        function set_is_chan2(self, value)
+            self.is_chan2 = value;
         end
 
-        function set.is_chan3(self, value)
-            self.is_chan3_ = value;
+        function set_is_chan3(self, value)
+            self.is_chan3 = value;
         end
 
-        function set.is_chan4(self, value)
-            self.is_chan4_ = value;
+        function set_is_chan4(self, value)
+            self.is_chan4 = value;
         end
 
-        function set.chan1_rate(self, value)
-            self.chan1_rate_ = value;
+        function set_chan1_rate(self, value)
+            self.chan1_rate = value;
         end
 
-        function set.chan2_rate(self, value)
-            self.chan2_rate_ = value;
+        function set_chan2_rate(self, value)
+            self.chan2_rate = value;
         end
 
-        function set.chan3_rate(self, value)
-            self.chan3_rate_ = value;
+        function set_chan3_rate(self, value)
+            self.chan3_rate = value;
         end
 
-        function set.chan4_rate(self, value)
-            self.chan4_rate_ = value;
+        function set_chan4_rate(self, value)
+            self.chan4_rate = value;
         end
 
-        function set.configData(self, value)
-            self.configData_ = value;
+        function set_configData(self, value)
+            self.configData = value;
         end
 
-        function set.binary_files(self, value)
-            self.binary_files_ = value;
+        function set_binary_files(self, value)
+            self.binary_files = value;
         end
 
-        function set.imported_pattern_names(self,value)
-            self.imported_pattern_names_ = value;
+        function set_imported_pattern_names(self,value)
+            self.imported_pattern_names = value;
         end
 
-        function set.imported_posfunc_names(self, value)
-            self.imported_posfunc_names_ = value;
+        function set_imported_posfunc_names(self, value)
+            self.imported_posfunc_names = value;
         end
 
-        function set.imported_aofunc_names(self, value)
-            self.imported_aofunc_names_ = value;
+        function set_imported_aofunc_names(self, value)
+            self.imported_aofunc_names = value;
         end
 
-        function set.recent_g4p_files(self, value)
-            self.recent_g4p_files_ = value;
+        function set_recent_g4p_files(self, value)
+            self.recent_g4p_files = value;
         end
 
-        function set.recent_files_filepath(self, value)
-            self.recent_files_filepath_ = value;
+        function set_recent_files_filepath(self, value)
+            self.recent_files_filepath = value;
         end
 
-        function set.est_exp_length(self, value)
-            self.est_exp_length_ = value;
+        function set_est_exp_length(self, value)
+            self.est_exp_length = value;
+        end
+
+        function set_trial_data(self, value)
+            self.trial_data = value;
+        end
+
+        function set_pattern_locations(self, value)
+            self.pattern_locations = value;
+        end
+
+        function set_function_locations(self, value)
+            self.function_locations = value;
+        end
+
+        function set_aoFunc_locations(self, value)
+            self.aoFunc_locations = value;
+        end
+
+        function set_settings(self, value)
+            self.settings = value;
         end
 
         %% Getters
-        function value = get.top_folder_path(self)
-            value = self.top_folder_path_;
+        function value = get_top_folder_path(self)
+            value = self.top_folder_path;
         end
 
-        function value = get.top_export_path(self)
-            value = self.top_export_path_;
+        function value = get_top_export_path(self)
+            value = self.top_export_path;
         end
 
-        function value = get.Patterns(self)
-            value = self.Patterns_;
+        function value = get_Patterns(self)
+            value = self.Patterns;
         end
 
-        function value = get.Pos_funcs(self)
-            value = self.Pos_funcs_;
+        function value = get_Pos_funcs(self)
+            value = self.Pos_funcs;
         end
 
-        function value = get.Ao_funcs(self)
-            value = self.Ao_funcs_;
+        function value = get_Ao_funcs(self)
+            value = self.Ao_funcs;
         end
 
-        function value = get.save_filename(self)
-            value = self.save_filename_;
+        function value = get_save_filename(self)
+            value = self.save_filename;
         end
 
-        function value = get.currentExp(self)
-            value = self.currentExp_;
+        function value = get_currentExp(self)
+            value = self.currentExp;
         end
 
-        function value = get.experiment_name(self)
-            value = self.experiment_name_;
+        function value = get_experiment_name(self)
+            value = self.experiment_name;
         end
 
-        function output = get.pretrial(self)
-            output = self.pretrial_;
+        function output = get_pretrial(self)
+            output = self.pretrial;
         end
 
-        function output = get.block_trials(self)
-            output = self.block_trials_;
+        function output = get_block_trials(self)
+            output = self.block_trials;
         end
 
-        function output = get.intertrial(self)
-            output = self.intertrial_;
+        function output = get_intertrial(self)
+            output = self.intertrial;
         end
 
-        function output = get.posttrial(self)
-            output = self.posttrial_;
+        function output = get_posttrial(self)
+            output = self.posttrial;
         end
 
-        function output = get.repetitions(self)
-            output = self.repetitions_;
+        function output = get_repetitions(self)
+            output = self.repetitions;
         end
 
-        function output = get.is_randomized(self)
-            output = self.is_randomized_;
+        function output = get_is_randomized(self)
+            output = self.is_randomized;
         end
 
-        function output = get.is_chan1(self)
-            output = self.is_chan1_;
+        function output = get_is_chan1(self)
+            output = self.is_chan1;
         end
 
-        function output = get.chan1_rate(self)
-            output = self.chan1_rate_;
+        function output = get_chan1_rate(self)
+            output = self.chan1_rate;
         end
 
-        function output = get.is_chan2(self)
-            output = self.is_chan2_;
+        function output = get_is_chan2(self)
+            output = self.is_chan2;
         end
 
-        function output = get.chan2_rate(self)
-            output = self.chan2_rate_;
+        function output = get_chan2_rate(self)
+            output = self.chan2_rate;
         end
 
-        function output = get.is_chan3(self)
-            output = self.is_chan3_;
+        function output = get_is_chan3(self)
+            output = self.is_chan3;
         end
 
-        function output = get.chan3_rate(self)
-            output = self.chan3_rate_;
+        function output = get_chan3_rate(self)
+            output = self.chan3_rate;
         end
 
-        function output = get.is_chan4(self)
-            output = self.is_chan4_;
+        function output = get_is_chan4(self)
+            output = self.is_chan4;
         end
 
-        function output = get.chan4_rate(self)
-           output = self.chan4_rate_;
+        function output = get_chan4_rate(self)
+           output = self.chan4_rate;
         end
 
-        function output = get.num_rows(self)
-            output = self.num_rows_;
+        function output = get_num_rows(self)
+            output = self.num_rows;
         end
 
-        function output = get.configData(self)
-            output = self.configData_;
+        function output = get_configData(self)
+            output = self.configData;
         end
 
-        function output = get.binary_files(self)
-            output = self.binary_files_;
+        function output = get_binary_files(self)
+            output = self.binary_files;
         end
 
-        function output = get.imported_pattern_names(self)
-            output = self.imported_pattern_names_;
+        function output = get_imported_pattern_names(self)
+            output = self.imported_pattern_names;
         end
 
-        function output = get.imported_posfunc_names(self)
-            output = self.imported_posfunc_names_;
+        function output = get_imported_posfunc_names(self)
+            output = self.imported_posfunc_names;
         end
 
-        function output = get.imported_aofunc_names(self)
-            output = self.imported_aofunc_names_;
+        function output = get_imported_aofunc_names(self)
+            output = self.imported_aofunc_names;
         end
 
-        function output = get.recent_g4p_files(self)
-            output = self.recent_g4p_files_;
+        function output = get_recent_g4p_files(self)
+            output = self.recent_g4p_files;
         end
 
-        function output = get.recent_files_filepath(self)
-            output = self.recent_files_filepath_;
+        function output = get_recent_files_filepath(self)
+            output = self.recent_files_filepath;
         end
 
-
-
-        function output = get.est_exp_length(self)
-            output = self.est_exp_length_;
+        function output = get_est_exp_length(self)
+            output = self.est_exp_length;
         end
+
+        function output = get_trial_data(self)
+            output = self.trial_data;
+        end
+
+        function output = get_pattern_locations(self)
+            output = self.pattern_locations;
+        end
+
+        function output = get_function_locations(self)
+            output = self.function_locations;
+        end
+
+        function output = get_aoFunc_locations(self)
+            output = self.aoFunc_locations;
+        end
+
+        function output = get_settings(self)
+            output = self.settings;
+        end
+
     end
 end

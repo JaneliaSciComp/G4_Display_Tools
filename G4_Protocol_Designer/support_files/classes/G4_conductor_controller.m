@@ -40,7 +40,7 @@ classdef G4_conductor_controller < handle
             self.set_elapsed_time(0);
             if ~isempty(varargin)
                 self.set_doc(varargin{1});
-                self.model.set_fly_name(self.model.create_fly_name(self.doc.top_export_path));
+                self.model.set_fly_name(self.model.create_fly_name(self.doc.get_top_export_path()));
                 self.set_settings_con(varargin{2});
             else
                 self.set_doc(G4_document());
@@ -422,35 +422,35 @@ classdef G4_conductor_controller < handle
 %                 end
                 disp(import_success);
 
-                if isempty(fieldnames(self.doc.Patterns))
+                if isempty(fieldnames(self.doc.get_Patterns()))
                     %no patterns were successfully imported, so don't load
                     %experiment. 
                     return;
                 end
 
                 [~, exp_name, ~] = fileparts(filepath);
-                self.doc.experiment_name = exp_name;
-                self.doc.save_filename = top_folder_path;
-                self.doc.top_export_path = top_folder_path;
+                self.doc.set_experiment_name(exp_name);
+                self.doc.set_save_filename(top_folder_path);
+                self.doc.set_top_export_path(top_folder_path);
 
                 data = self.doc.open(filepath);
-                p = data.exp_parameters;
+                p = data.get_exp_parameters();
 
-                self.doc.repetitions = p.repetitions;
-                self.doc.is_randomized = p.is_randomized;
-                self.doc.is_chan1 = p.is_chan1;
-                self.doc.is_chan2 = p.is_chan2;
-                self.doc.is_chan3 = p.is_chan3;
-                self.doc.is_chan4 = p.is_chan4;
-                self.doc.chan1_rate = p.chan1_rate;
+                self.doc.set_repetitions(p.repetitions);
+                self.doc.set_is_randomized(p.is_randomized);
+                self.doc.set_is_chan1(p.is_chan1);
+                self.doc.set_is_chan2(p.is_chan2);
+                self.doc.set_is_chan3(p.is_chan3);
+                self.doc.set_is_chan4(p.is_chan4);
+                self.doc.set_chan1_rate(p.chan1_rate);
                 self.doc.set_config_data(p.chan1_rate, 1);
-                self.doc.chan2_rate = p.chan2_rate;
+                self.doc.set_chan2_rate(p.chan2_rate);
                 self.doc.set_config_data(p.chan2_rate, 2);
-                self.doc.chan3_rate = p.chan3_rate;
+                self.doc.set_chan3_rate(p.chan3_rate);
                 self.doc.set_config_data(p.chan3_rate, 3);
-                self.doc.chan4_rate = p.chan4_rate;
+                self.doc.set_chan4_rate(p.chan4_rate);
                 self.doc.set_config_data(p.chan4_rate, 4);
-                self.doc.num_rows = p.num_rows;
+                self.doc.set_num_rows(p.num_rows);
                 self.doc.set_config_data(p.num_rows, 0);
                 self.doc.update_config_file();
                 self.fb_model.update_model_channels(self.doc);
