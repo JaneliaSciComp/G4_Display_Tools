@@ -74,7 +74,7 @@ classdef G4_designer_view < handle
             uilabel(self.f, 'Text', 'Pre-Trial', 'FontSize', font_size, 'Position', ...
                 [positions.pre(1) - .04, positions.pre(2) + .025, .04, .015].*[fSize, fSize]);
 
-            self.pretrial_table = uitable(self.f, 'data', self.doc.pretrial, 'columnname', column_names, ...
+            self.pretrial_table = uitable(self.f, 'data', self.con.doc.pretrial, 'columnname', column_names, ...
             'units', 'normalized', 'Position', positions.pre, 'ColumnEditable', columns_editable, 'ColumnFormat', column_format, ...
             'ColumnWidth', column_widths, 'CellEditCallback', @self.update_model_pretrial, 'CellSelectionCallback', {@self.preview_selection, positions});
             
@@ -83,7 +83,7 @@ classdef G4_designer_view < handle
             uilabel(self.f, 'Text', 'Inter-Trial', 'FontSize', font_size, 'Position', ...
                [positions.inter(1) - .04, positions.inter(2) + .025, .04, .015].*[fSize, fSize]);
 
-            self.intertrial_table = uitable(self.f, 'data', self.doc.intertrial, 'columnname', column_names, ...
+            self.intertrial_table = uitable(self.f, 'data', self.con.doc.intertrial, 'columnname', column_names, ...
             'units', 'normalized', 'Position', positions.inter, 'ColumnEditable', columns_editable, 'ColumnFormat', column_format, ...
             'ColumnWidth', column_widths, 'CellEditCallback', @self.update_model_intertrial, 'CellSelectionCallback', {@self.preview_selection, positions});
 
@@ -91,7 +91,7 @@ classdef G4_designer_view < handle
             uilabel(self.f, 'Text', 'Block Trials', 'FontSize', font_size, 'Position', ...
                [positions.block(1) - .04, positions.block(2) + .5*positions.block(4), .04, .015].*[fSize, fSize]);
 
-            self.block_table = uitable(self.f, 'data', self.doc.block_trials, 'columnname', column_names, ...
+            self.block_table = uitable(self.f, 'data', self.con.doc.block_trials, 'columnname', column_names, ...
             'units', 'normalized', 'Position', positions.block, 'ColumnEditable', columns_editable, 'ColumnFormat', column_format, ...
             'ColumnWidth', column_widths, 'CellEditCallback', @self.update_model_block_trials, 'CellSelectionCallback', {@self.preview_selection, positions});
 
@@ -99,7 +99,7 @@ classdef G4_designer_view < handle
             uilabel(self.f, 'Text', 'Post-Trial', 'FontSize', font_size, 'Position', ...
                 [positions.post(1) - .04, positions.post(2) + .025, .04, .015].*[fSize, fSize]);
 
-            self.posttrial_table = uitable(self.f, 'data', self.doc.posttrial, 'columnname', column_names, ...
+            self.posttrial_table = uitable(self.f, 'data', self.con.doc.posttrial, 'columnname', column_names, ...
             'units', 'normalized', 'Position', positions.post, 'ColumnEditable', columns_editable, 'ColumnFormat', column_format, ...
             'ColumnWidth', column_widths, 'CellEditCallback', @self.update_model_posttrial, 'CellSelectionCallback', {@self.preview_selection, positions});
 
@@ -111,9 +111,9 @@ classdef G4_designer_view < handle
             uibutton(self.f, 'Text', 'Delete Trial', 'Position', [positions.block(1) + positions.block(3) + left_margin, ...
                 positions.block(2), .05, .02].*[fSize, fSize], 'ButtonPushedFcn', @self.delete_trial);
 
-            self.isSelect_all_box = uicontrol(self.f, 'Style', 'checkbox', 'String', 'Select All', 'Value', self.model.isSelect_all, 'units', ...
-                'normalized','FontSize', font_size, 'Position', [positions.block(1) + positions.block(3) - .03, ...
-                positions.block(2) + positions.block(4) + .0015, .05, .02], 'Callback', @self.select_all);
+            self.isSelect_all_box = uicheckbox(self.f, 'Text', 'Select All', 'Value', self.con.model.isSelect_all,'FontSize', font_size, ...
+                'Position', [positions.block(1) + positions.block(3) - .03, positions.block(2) + positions.block(4) + .0015, ...
+                .05, .02].*[fSize, fSize], 'ValueChangedFcn', @self.select_all);
 
             %invert_selection
             uibutton(self.f, 'Text', 'Invert Selection', 'Position', [positions.block(1) + positions.block(3) + left_margin, ...
@@ -142,9 +142,9 @@ classdef G4_designer_view < handle
                 'Position', [pos_panel(1) + pos_panel(3) + .01, pos_panel(2) + pos_panel(4) + .02, ...
                 .09, .04].*[fSize, fSize], 'FontSize', font_size);
 
-            self.listbox_imported_files = uicontrol(self.f, 'Style', 'listbox', 'String', {'Imported files here'},  ...
-                'units', 'normalized', 'Position', [listbox_files_label.Position(1), listbox_files_label.Position(2) - .24, ...
-                .09, .24],'Callback', @self.preview_selection);
+            self.listbox_imported_files = uilistbox(self.f, 'Items', {'Imported files here'},  ...
+                'Position', [listbox_files_label.Position(1), listbox_files_label.Position(2) - .24*fSize(2), ...
+                .09*fSize(1), .24*fSize(2)],'ValueChangedFcn', @self.preview_selection);
 
              %select_imported_file_button
              uibutton(self.f, 'Text', 'Select', 'Position',  [self.listbox_imported_files.Position(1) + .5*self.listbox_imported_files.Position(3), ...
@@ -164,9 +164,9 @@ classdef G4_designer_view < handle
 
             %Checkbox to turn on/off displaying inscreen previews on the
             %arena.
-            uicontrol(self.f, 'Style', 'checkbox', 'String', 'Arena preview', ...
-                'Value', self.preview_on_arena, 'units', 'normalized', 'Position', ...
-                [pos_panel(1) + pos_panel(3) + .05, pos_panel(2) - .04, .07, .045], 'Callback', @self.update_preview_on_arena);
+            uicheckbox(self.f, 'Text', 'Arena preview', 'Value', self.con.preview_on_arena, 'Position', ...
+                [pos_panel(1) + pos_panel(3) + .05, pos_panel(2) - .04, .07, .045].*[fSize, fSize], ...
+                'ValueChangedFcn', @self.update_preview_on_arena);
 
             %play_button
             uibutton(self.f, 'Text', 'Play', 'FontSize', font_size,'Position', [pos_panel(1) + .5*pos_panel(3) - .08, ...
@@ -176,7 +176,8 @@ classdef G4_designer_view < handle
             uibutton(self.f, 'Text', 'Pause', 'FontSize', font_size, 'Position', [pos_panel(1) + .5*pos_panel(3) - .025, ...
                 pos_panel(2) - .03, .05, .02].*[fSize, fSize], 'ButtonPushedFcn', @self.preview_pause);
 
-            %stop_button =
+
+            %stop_button 
             uibutton(self.f, 'Text', 'Stop', 'FontSize', font_size, 'Position', [pos_panel(1) + .5*pos_panel(3) + .03, ...
                 pos_panel(2) - .03, .05, .02].*[fSize, fSize], 'ButtonPushedFcn', @self.preview_stop);
 
@@ -196,9 +197,9 @@ classdef G4_designer_view < handle
                 [pos_panel(1) + .5*pos_panel(3) - .21, pos_panel(2) - .03, .07, .02].*[fSize, fSize], ...
                 'Enable', 'off', 'ButtonPushedFcn', @self.page_down_4d);
 
-            self.exp_name_box = uicontrol(self.f, 'Style', 'edit', ...
-                'FontSize', 14, 'units', 'normalized', 'Position', ...
-                [pos_panel(1)+ (pos_panel(3)/2) - .125, pos_panel(2) - .07, .25, .03], 'Callback', @self.update_experiment_name);
+            self.exp_name_box = uieditfield(self.f,  'FontSize', 14, 'Position', ...
+                [pos_panel(1)+ (pos_panel(3)/2) - .125, pos_panel(2) - .07, .25, .03].*[fSize, fSize], ...
+                'ValueChangedFcn', @self.update_experiment_name);
 
             %exp_name_label
             uilabel(self.f, 'Text', 'Experiment Name: ', 'FontSize', 16, 'Position',...
@@ -213,13 +214,13 @@ classdef G4_designer_view < handle
             %menu_recent_files
             uimenu(self.menu_open, 'Text', '.g4p file', 'Callback', {@self.open_file, ''});
 
-            for i = 1:length(self.doc.recent_g4p_files)
-                [~, filename] = fileparts(self.doc.recent_g4p_files{i});
-                self.recent_file_menu_items{i} = uimenu(self.menu_open, 'Text', filename, 'Callback', {@self.open_file, self.doc.recent_g4p_files{i}});
+            for i = 1:length(self.con.doc.recent_g4p_files)
+                [~, filename] = fileparts(self.con.doc.recent_g4p_files{i});
+                self.con.recent_file_menu_items{i} = uimenu(self.menu_open, 'Text', filename, 'Callback', {@self.open_file, self.con.doc.recent_g4p_files{i}});
             end
 
-            if length(self.doc.recent_g4p_files) < 1
-                self.recent_file_menu_items = {};
+            if length(self.con.doc.recent_g4p_files) < 1
+                self.con.recent_file_menu_items = {};
             end
 
             %menu_saveas
@@ -246,20 +247,18 @@ classdef G4_designer_view < handle
             self.randomize_buttonGrp = uibuttongroup(self.f, 'units', 'normalized', 'Position', ...
                 [left_margin, positions.block(2) + positions.block(4) - .05, .08, .06], ...
                 'SelectionChangedFcn', @self.update_randomize);
+            grpSize = [self.randomize_buttonGrp.Position(3), self.randomize_buttonGrp.Position(4)];
 
 
-            self.isRandomized_radio = uicontrol(self.randomize_buttonGrp, 'Style', 'radiobutton', ...
-                'String', 'Randomize Trials', 'FontSize', font_size, ...
-                'units', 'normalized', 'Position', [.001, .55, .95, .4]);
+            self.isRandomized_radio = uiradiobutton(self.randomize_buttonGrp, 'Text', ...
+                'Randomize Trials', 'FontSize', font_size, 'Position', [.001, .55, .95, .4].*[grpSize, grpSize]);
 
-            self.isSequential_radio = uicontrol(self.randomize_buttonGrp, 'Style', 'radiobutton', ...
-                'String', 'Sequential Trials', 'FontSize', font_size, ...
-                'units', 'normalized', 'Position', [.001,.1, .95, .4]);
+            self.isSequential_radio = uiradiobutton(self.randomize_buttonGrp, 'Text', 'Sequential Trials', ...
+                'FontSize', font_size, 'Position', [.001,.1, .95, .4].*[grpSize, grpSize]);
         %Repetitions
 
-            self.repetitions_box = uicontrol(self.f, 'Style', 'edit', 'units', ...
-                'normalized', 'Position', [.05, positions.block(2) + positions.block(4) - .08, ...
-                .035, .02], 'Callback', @self.update_repetitions);
+            self.repetitions_box = uieditfield(self.f, "numeric", 'Position', [.05, positions.block(2) + positions.block(4) - .08, ...
+                .035, .02].*[fSize, fSize], 'ValueChangedFcn', @self.update_repetitions);
 
             %repetitions_label
             uilabel(self.f, 'Text','Repetitions:', 'FontSize', font_size, 'Position', ...
@@ -282,29 +281,29 @@ classdef G4_designer_view < handle
                 'Position', [left_margin, positions.block(2) + positions.block(4) - .31, .15, .13]);
             chan_pan_size = [chan_pan.Position(3), chan_pan.Position(4)];
 
-            self.chan1_rate_box = uicontrol(chan_pan, 'Style', 'edit', 'String', num2str(self.doc.chan1_rate), 'units', 'normalized', 'Position', ...
-                [.65, .72, .25, .15],'Callback', @self.update_chan1_rate);
+            self.chan1_rate_box = uieditfield(chan_pan, "numeric", 'Value', num2str(self.con.doc.chan1_rate), 'Position', ...
+                [.65, .72, .25, .15].*[chan_pan_size, chan_pan_size],'ValueChangedFcn', @self.update_chan1_rate);
 
             %chan1_rate_label
             uilabel(chan_pan, 'Text', 'Channel 1 Sample Rate', 'FontSize', font_size, ...
                 'Position', [.05, .7, .5, .17].*[chan_pan_size, chan_pan_size]);
 
-            self.chan2_rate_box = uicontrol(chan_pan, 'Style', 'edit', 'String', num2str(self.doc.chan2_rate), 'units', 'normalized', 'Position', ...
-                [.65, .52, .25, .17], 'Callback', @self.update_chan2_rate);
+            self.chan2_rate_box = uieditfield(chan_pan, "numeric", 'Value', num2str(self.con.doc.chan2_rate), 'Position', ...
+                [.65, .52, .25, .17].*[chan_pan_size, chan_pan_size], 'ValueChangedFcn', @self.update_chan2_rate);
 
             %chan2_rate_label
             uilabel(chan_pan, 'Text', 'Channel 2 Sample Rate', 'FontSize', font_size, ...
                 'Position', [.05, .5, .5, .17].*[chan_pan_size, chan_pan_size]);
 
-            self.chan3_rate_box = uicontrol(chan_pan, 'Style', 'edit', 'String', num2str(self.doc.chan3_rate), 'units', 'normalized', 'Position', ...
-                [.65, .32, .25, .17], 'Callback', @self.update_chan3_rate);
+            self.chan3_rate_box = uieditfield(chan_pan, "numeric", 'Value', num2str(self.con.doc.chan3_rate), 'Position', ...
+                [.65, .32, .25, .17].*[chan_pan_size, chan_pan_size], 'ValueChangedFcn', @self.update_chan3_rate);
 
             %chan3_rate_label
             uilabel(chan_pan, 'Text', 'Channel 3 Sample Rate', 'FontSize', font_size, ...
                 'Position', [.05, .3, .5, .17].*[chan_pan_size, chan_pan_size]);
 
-            self.chan4_rate_box = uicontrol(chan_pan, 'Style', 'edit', 'String', num2str(self.doc.chan4_rate), 'units', 'normalized', 'Position', ...
-                [.65, .12, .25, .17], 'Callback', @self.update_chan4_rate);
+            self.chan4_rate_box = uieditfield(chan_pan, "numeric", 'Value', num2str(self.con.doc.chan4_rate), 'Position', ...
+                [.65, .12, .25, .17].*[chan_pan_size, chan_pan_size], 'ValueChangedFcn', @self.update_chan4_rate);
 
             %chan4_rate_label
             uilabel(chan_pan, 'Text', 'Channel 4 Sample Rate', 'FontSize', font_size, ...
@@ -312,14 +311,13 @@ classdef G4_designer_view < handle
 
             self.num_rows_buttonGrp = uibuttongroup(self.f, 'units', 'normalized', ...
                 'Position', [left_margin, chan_pan.Position(2) - .05, chan_pan.Position(3), .04], 'SelectionChangedFcn', @self.update_rowNum);
+            rowGrpSize = [self.num_rows_buttonGrp.Position(3), self.num_rows_buttonGrp.Position(4)];
 
+            self.num_rows_3 = uiradiobutton(self.num_rows_buttonGrp, 'Text', '3 Row Screen', ...
+                'FontSize', font_size, 'Position', [.05, .05, .45, .9].*[rowGrpSize, rowGrpSize]);
 
-            self.num_rows_3 = uicontrol(self.num_rows_buttonGrp, 'Style', ...
-                'radiobutton', 'String', '3 Row Screen', 'FontSize', font_size, ...
-                'units', 'normalized', 'Position', [.05, .05, .45, .9]);
-
-            self.num_rows_4 = uicontrol(self.num_rows_buttonGrp, 'Style', 'radiobutton', 'String', '4 Row Screen', 'FontSize', font_size, ...
-                'units', 'normalized', 'Position', [.5, .05, .45, .9]);
+            self.num_rows_4 = uiradiobutton(self.num_rows_buttonGrp, 'Text', '4 Row Screen', ...
+                'FontSize', font_size, 'Position', [.5, .05, .45, .9].*[rowGrpSize, rowGrpSize]);
 
 
             key_pan = uipanel(self.f, 'Title', 'Mode Key:', 'BackgroundColor', [.75, .75, .75], ...
@@ -378,7 +376,167 @@ classdef G4_designer_view < handle
 
         end
 
-       
+        function update_model_pretrial(self)
+
+
+        end
+
+        function update_model_intertrial(self)
+
+
+        end
+
+        function update_model_posttrial(self)
+
+
+        end
+
+        function update_model_block_trials(self)
+
+
+        end
+
+        function preview_selection(self, positions)
+
+        end
+
+        function add_trials_callback(self)
+
+        end
+
+        function delete_trial(self)
+
+        end
+
+        function select_all(self)
+
+        end
+
+        function invert_selection(self)
+
+        end
+
+        function shift_up_callback(self)
+
+        end
+
+        function shift_down_callback(self)
+
+        end
+
+        function clear_all(self)
+
+        end
+
+        function autofill(self)
+
+        end
+
+        function select_new_file(self)
+
+        end
+
+        function full_preview(self)
+
+        end
+
+        function update_preview_on_arena(self)
+
+
+        end
+        
+        function preview_play(self)
+
+        end
+
+        function preview_pause(self)
+
+        end
+
+        function preview_stop(self)
+
+        end
+
+        function frame_back(self)
+
+        end
+
+        function frame_forward(self)
+
+        end
+
+        function page_up_4d(self)
+
+        end
+
+        function page_down_4d(self)
+
+        end
+
+        function update_experiment_name(self)
+
+        end
+
+        function import(self)
+
+        end
+
+        function open_file(self)
+
+        end
+
+        function saveas(self)
+
+        end
+
+        function copy_to(self)
+
+        end
+
+        function set_selected(self)
+
+        end
+
+        function open_settings(self)
+
+        end
+
+        function calculate_experiment_length(self)
+
+        end
+
+        function update_randomize(self)
+
+        end
+
+        function update_repetitions(self)
+
+        end
+        function dry_run(self)
+
+        end
+        function open_run_gui(self)
+
+        end
+        function update_chan1_rate(self)
+
+        end
+        function update_chan2_rate(self)
+
+        end
+        function update_chan3_rate(self)
+
+        end
+        function update_chan4_rate(self)
+
+        end
+        function update_rowNum(self)
+
+        end
+        function reset_defaults(self)
+
+        end
+        
 
     end
 
