@@ -2,96 +2,27 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
 
 %% Properties
     properties
-        model_ %contains all data that does not persist with saving
-        doc_ %contains all data that is stored in the saved file
-        preview_con_ %controller for the fullscreen preview
-        run_con_ %controller for the run window - can be opened independently
-        settings_con_ %controller (containing the view and model) for the settings panel
 
-%tables that show the trial data
-        pretrial_table_
-        intertrial_table_
-        block_table_
-        posttrial_table_
+        ctlr % contains the panels controller when its opened
+        model %contains all data that does not persist with saving
+        preview_con %controller for the fullscreen preview
+        run_con %controller for the run window - can be opened independently
+        doc %contains all data that is stored in the saved file
+        settings_con %controller (containing the view and model) for the settings panel
 
-%structs in which to load files as they are entered
-        pre_files_
-        block_files_
-        inter_files_
-        post_files_
-
-        %GUI parts
-        f_
-        preview_panel_
-        hAxes_
-        second_axes_
-        inscreen_plot_
-
-        %channel gui objects
-        chan1_
-        chan1_rate_box_
-        chan2_
-        chan2_rate_box_
-        chan3_
-        chan3_rate_box_
-        chan4_
-        chan4_rate_box_
-
-        %Settings GUI objects
-        num_rows_buttonGrp_
-        num_rows_3_
-        num_rows_4_
-        randomize_buttonGrp_
-        isRandomized_radio_
-        isSequential_radio_
-        repetitions_box_
-        exp_name_box_
-
-        %GUI Manipulation
-        isSelect_all_box_
-        pageUp_button_
-        pageDown_button_
-        exp_length_display_
-        listbox_imported_files_
-        recent_g4p_files_
-        recent_files_filepath_
-        recent_file_menu_items_
-        menu_open_
-        preview_on_arena_
-
-        ctlr
-    end
-
-    properties(Dependent)
-        model
-        preview_con
-        run_con
-        doc
-        settings_con
-
+        %tables that show the trial data
         pretrial_table
         intertrial_table
         posttrial_table
         block_table
 
+        %structs in which to load files as they are entered
         pre_files
         inter_files
         block_files
         post_files
 
-        %Tracking which cell is selected in each table
-        pre_selected_index
-        inter_selected_index
-        post_selected_index
-        block_selected_index
-
-        current_preview_file
-        current_selected_cell
-
-        %Tracking position in in-window preview
-        auto_preview_index
-        is_paused
-
+        %channel gui objects
         chan1
         chan1_rate_box
         chan2
@@ -100,6 +31,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
         chan3_rate_box
         chan4
         chan4_rate_box
+
         num_rows_buttonGrp
         num_rows_3
         num_rows_4
@@ -135,18 +67,13 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
 %% CONSTRUCTOR-------------------------------------------------------------
 
         function self = G4_designer_controller()
-            self.model = G4_designer_model();
-            self.doc = G4_document();
-            self.settings_con = G4_settings_controller();
-            self.preview_con = G4_preview_controller(self.doc);
-            self.preview_on_arena = 0;
+            self.set_model(G4_designer_model());
+            self.set_doc(G4_document());
+            self.set_settings_con(G4_settings_controller());
+            self.set_preview_con(G4_preview_controller(self.doc));
+            self.set_preview_on_arena(0);
 
-            %get screensize to calculate gui dimensions
-            screensize = get(0, 'screensize');
-
-            %create figure
-            self.f = figure('Name', 'Fly Experiment Designer', 'NumberTitle', 'off','units', 'normalized', 'MenuBar', 'none', ...
-                'ToolBar', 'none', 'outerposition', [.05 .05, .9, .9], 'closeRequestFcn', @self.close_application);
+           
 
             %, 'Resize', 'off'
 
@@ -178,344 +105,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
         function layout_gui(self)
             %LAYOUT PARAMETERS TO BE EDITED
 
-            column_names = {'Mode', 'Pattern Name' 'Position Function', ...
-                'AO 2', 'AO 3', 'AO 4', 'AO 5', ...
-                'Frame Index', 'Frame Rate', 'Gain', 'Offset', 'Duration' ...
-                'Select'};
-            columns_editable = true;
-            column_format = {'numeric', 'char', 'char', 'char', 'char','char', ...
-                'char', 'char', 'numeric', 'numeric', 'numeric', 'numeric', 'logical'};
-            column_widths = {'auto', 'auto', 'auto', 'auto', 'auto', 'auto', ...
-                'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto',};
-            font_size = 10;
-
-            positions.pre = [.2, .92, .682, .06];
-            positions.inter = [.2, .84, .682, .06];
-            positions.block = [.2, .45, .682, .35];
-            positions.post = [.2, .37, .682, .06];
-            pos_panel = [.2, .08, .682, .27];
-            left_margin = .003;
-            chan_label_height = .1;
-            chan_label_margin = .05;
-            chan_label_width = .9;
-
-            %NO FURTHER EDITING PARAMETERS
-
-            %pretrial_label
-            uicontrol(self.f, 'Style', 'text', 'String', 'Pre-Trial', ...
-               'Units', 'normalized', 'FontSize', font_size, 'Position', ...
-               [positions.pre(1) - .04, positions.pre(2) + .025, .04, .015]);
-
-            self.pretrial_table = uitable(self.f, 'data', self.doc.pretrial, 'columnname', column_names, ...
-            'units', 'normalized', 'Position', positions.pre, 'ColumnEditable', columns_editable, 'ColumnFormat', column_format, ...
-            'ColumnWidth', column_widths, 'CellEditCallback', @self.update_model_pretrial, 'CellSelectionCallback', {@self.preview_selection, positions});
             
-
-            % intertrial_label
-            uicontrol(self.f, 'Style', 'text', 'String', 'Inter-Trial', ...
-               'units', 'normalized', 'FontSize', font_size, 'Position', ...
-               [positions.inter(1) - .04, positions.inter(2) + .025, .04, .015]);
-
-            self.intertrial_table = uitable(self.f, 'data', self.doc.intertrial, 'columnname', column_names, ...
-            'units', 'normalized', 'Position', positions.inter, 'ColumnEditable', columns_editable, 'ColumnFormat', column_format, ...
-            'ColumnWidth', column_widths, 'CellEditCallback', @self.update_model_intertrial, 'CellSelectionCallback', {@self.preview_selection, positions});
-
-            %blocktrial_label
-            uicontrol(self.f, 'Style', 'text', 'String', 'Block Trials', ...
-               'units', 'normalized', 'FontSize', font_size, 'Position', ...
-               [positions.block(1) - .04, positions.block(2) + .5*positions.block(4), .04, .015]);
-
-            self.block_table = uitable(self.f, 'data', self.doc.block_trials, 'columnname', column_names, ...
-            'units', 'normalized', 'Position', positions.block, 'ColumnEditable', columns_editable, 'ColumnFormat', column_format, ...
-            'ColumnWidth', column_widths, 'CellEditCallback', @self.update_model_block_trials, 'CellSelectionCallback', {@self.preview_selection, positions});
-
-            %posttrial_label
-            uicontrol(self.f, 'Style', 'text', 'String', 'Post-Trial', ...
-               'units', 'normalized', 'FontSize', font_size, ...
-               'Position', [positions.post(1) - .04, positions.post(2) + .025, .04, .015]);
-
-            self.posttrial_table = uitable(self.f, 'data', self.doc.posttrial, 'columnname', column_names, ...
-            'units', 'normalized', 'Position', positions.post, 'ColumnEditable', columns_editable, 'ColumnFormat', column_format, ...
-            'ColumnWidth', column_widths, 'CellEditCallback', @self.update_model_posttrial, 'CellSelectionCallback', {@self.preview_selection, positions});
-
-            %add_trial_button
-            uicontrol(self.f, 'Style', 'pushbutton','String','Add Trial','units', ...
-                'normalized','Position', [positions.block(1) + positions.block(3) + left_margin, ...
-                positions.block(2) + .02, .05, .02], 'Callback',@self.add_trials_callback);
-
-            %delete_trial_button
-            uicontrol(self.f, 'Style', 'pushbutton', 'String', 'Delete Trial', ...
-                'units', 'normalized', 'Position', [positions.block(1) + positions.block(3) + left_margin, positions.block(2), ...
-                .05, .02], 'Callback', @self.delete_trial);
-
-            self.isSelect_all_box = uicontrol(self.f, 'Style', 'checkbox', 'String', 'Select All', 'Value', self.model.isSelect_all, 'units', ...
-                'normalized','FontSize', font_size, 'Position', [positions.block(1) + positions.block(3) - .03, ...
-                positions.block(2) + positions.block(4) + .0015, .05, .02], 'Callback', @self.select_all);
-
-            %invert_selection
-            uicontrol(self.f, 'Style', 'pushbutton', 'String', 'Invert Selection', ...
-                 'units', 'normalized', 'Position', [positions.block(1) + positions.block(3) + left_margin, ...
-                positions.block(2) - .021, .05, .02], 'Callback', @self.invert_selection);
-
-            %up_button
-            uicontrol(self.f, 'Style', 'pushbutton', 'String', 'Shift up', 'units', ...
-                'normalized', 'Position', [positions.block(1) + positions.block(3) + left_margin, positions.block(2) + .65*positions.block(4), ...
-                .05, .02], 'Callback', @self.shift_up_callback);
-
-            %down_button
-            uicontrol(self.f, 'Style', 'pushbutton', 'String', 'Shift down', 'units', ...
-                'normalized', 'Position', [positions.block(1) + positions.block(3) + left_margin, positions.block(2) + .35*positions.block(4), ...
-                .05, .02], 'Callback', @self.shift_down_callback);
-
-            % clear_all_button
-            uicontrol(self.f, 'Style', 'pushbutton', 'String', 'Clear All','FontSize', 12, 'units', ...
-                'normalized', 'Position', [positions.block(1) + 1.03*positions.block(3), positions.pre(2), ...
-                .054, positions.pre(4)], 'Callback', @self.clear_all);
-
-            %autofill_button
-            uicontrol(self.f, 'Style', 'pushbutton', 'String', 'Auto-Fill', ...
-                'FontSize', 14, 'units', 'normalized', 'Position', [pos_panel(1), pos_panel(2) - .05, .07, .05], ...
-                'Callback', @self.autofill);
-
-            self.preview_panel = uipanel(self.f, 'Title', 'Preview', 'FontSize', font_size, 'units', 'normalized', ...
-                'Position', pos_panel);
-
-            listbox_files_label = uicontrol(self.f, 'Style', 'text', 'String', 'Imported files for selected cell:',...
-                'units', 'normalized', 'Position', [pos_panel(1) + pos_panel(3) + .01, pos_panel(2) + pos_panel(4) + .02, ...
-                .09, .04], 'FontSize', font_size);
-
-            self.listbox_imported_files = uicontrol(self.f, 'Style', 'listbox', 'String', {'Imported files here'},  ...
-                'units', 'normalized', 'Position', [listbox_files_label.Position(1), listbox_files_label.Position(2) - .24, ...
-                .09, .24],'Callback', @self.preview_selection);
-
-             %select_imported_file_button
-             uicontrol(self.f, 'Style', 'pushbutton', 'String', 'Select', 'units', 'normalized', 'Position', ...
-                [self.listbox_imported_files.Position(1) + .5*self.listbox_imported_files.Position(3), ...
-                self.listbox_imported_files.Position(2) - .02, .045, .016], 'Callback', @self.select_new_file);
-
-            %code to make the above panel transparent, so the preview image
-            %can be seen.
-            jPanel = self.preview_panel.JavaFrame.getPrintableComponent;
-            jPanel.setOpaque(false)
-            jPanel.getParent.setOpaque(false)
-            jPanel.getComponent(0).setOpaque(false)
-            jPanel.repaint
-
-            %preview_button
-            uicontrol(self.f, 'Style', 'pushbutton', 'String', 'Preview', 'Fontsize', ...
-                font_size, 'units', 'normalized', 'Position', [pos_panel(1) + pos_panel(3), ...
-                pos_panel(2), .05, .045], 'Callback', @self.full_preview);
-
-            %Checkbox to turn on/off displaying inscreen previews on the
-            %arena.
-            uicontrol(self.f, 'Style', 'checkbox', 'String', 'Arena preview', ...
-                'Value', self.preview_on_arena, 'units', 'normalized', 'Position', ...
-                [pos_panel(1) + pos_panel(3) + .05, pos_panel(2) - .04, .07, .045], 'Callback', @self.set_preview_on_arena);
-
-            %play_button
-            uicontrol(self.f, 'Style', 'pushbutton', 'String', 'Play', 'FontSize', ...
-                font_size, 'units', 'normalized', 'Position', [pos_panel(1) + .5*pos_panel(3) - .08, ...
-                pos_panel(2) - .03, .05, .02], 'Callback', @self.preview_play);
-
-            %pause_button
-            uicontrol(self.f, 'Style', 'pushbutton', 'String', 'Pause', 'FontSize', ...
-                font_size, 'units', 'normalized', 'Position', [pos_panel(1) + .5*pos_panel(3) - .025, ...
-                pos_panel(2) - .03, .05, .02], 'Callback', @self.preview_pause);
-
-            %stop_button =
-            uicontrol(self.f, 'Style', 'pushbutton', 'String', 'Stop', 'FontSize', ...
-                font_size, 'units', 'normalized', 'Position', [pos_panel(1) + .5*pos_panel(3) + .03, ...
-                pos_panel(2) - .03, .05, .02], 'Callback', @self.preview_stop);
-
-            %frameBack_button
-            uicontrol(self.f, 'Style', 'pushbutton', 'String', 'Back Frame', 'FontSize', ...
-                font_size, 'units', 'normalized', 'Position', [pos_panel(1) + .5*pos_panel(3) - .135, ...
-                pos_panel(2) - .03, .05, .02], 'Callback', @self.frame_back);
-
-            %frameForward_button =
-            uicontrol(self.f, 'Style', 'pushbutton', 'String', 'Forward Frame', ...
-                'FontSize', font_size, 'units', 'normalized', 'Position', [pos_panel(1) + .5*pos_panel(3) ...
-                + .085, pos_panel(2) - .03, .07, .02], 'Callback', @self.frame_forward);
-
-            self.pageUp_button = uicontrol(self.f, 'Style', 'pushbutton', 'String', 'Page Up', ...
-                'FontSize', font_size, 'units', 'normalized', 'Position', [pos_panel(1) + .5*pos_panel(3) + .16, ...
-                pos_panel(2) - .03, .07, .02], 'Enable', 'off', 'Callback', @self.page_up_4d);
-
-            self.pageDown_button = uicontrol(self.f, 'Style', 'pushbutton', 'String', 'Page Down', ...
-                'FontSize', font_size, 'units', 'normalized', 'Position', [pos_panel(1) + .5*pos_panel(3) - .21, ...
-                pos_panel(2) - .03, .07, .02], 'Enable', 'off', 'Callback', @self.page_down_4d);
-
-            self.exp_name_box = uicontrol(self.f, 'Style', 'edit', ...
-                'FontSize', 14, 'units', 'normalized', 'Position', ...
-                [pos_panel(1)+ (pos_panel(3)/2) - .125, pos_panel(2) - .07, .25, .03], 'Callback', @self.update_experiment_name);
-
-            %exp_name_label
-            uicontrol(self.f, 'Style', 'text', 'String', 'Experiment Name: ', ...
-                'FontSize', 16, 'units', 'normalized', 'Position', [pos_panel(1) + (pos_panel(3)/2) - .25, ...
-                pos_panel(2) - .07, .1, .03]);
-
-        %Drop down menu and associated labels and buttons
-
-            menu = uimenu(self.f, 'Text', 'File');
-            %menu_import
-            uimenu(menu, 'Text', 'Import', 'Callback', @self.import);
-            self.menu_open = uimenu(menu, 'Text', 'Open');
-            %menu_recent_files
-            uimenu(self.menu_open, 'Text', '.g4p file', 'Callback', {@self.open_file, ''});
-
-            for i = 1:length(self.doc.recent_g4p_files)
-                [~, filename] = fileparts(self.doc.recent_g4p_files{i});
-                self.recent_file_menu_items{i} = uimenu(self.menu_open, 'Text', filename, 'Callback', {@self.open_file, self.doc.recent_g4p_files{i}});
-            end
-
-            if length(self.doc.recent_g4p_files) < 1
-                self.recent_file_menu_items = {};
-            end
-
-            %menu_saveas
-            uimenu(menu, 'Text', 'Save as', 'Callback', @self.saveas);
-            %menu_copy
-            uimenu(menu, 'Text', 'Copy to...', 'Callback', @self.copy_to);
-            %menu_set
-            uimenu(menu, 'Text', 'Set Selected...', 'Callback', @self.set_selected);
-            %menu_settings
-            uimenu(menu, 'Text', 'Settings', 'Callback', @self.open_settings);
-
-        %Button to calculate estimated length of experiment
-
-            exp_length_button = uicontrol(self.f, 'Style', 'pushbutton', 'units', 'normalized', 'Position', ...
-                [left_margin, positions.block(2) + positions.block(4) + .04, .09,.02],'String', ...
-                'Calculate Experiment Length', 'Callback', @self.calculate_experiment_length);
-
-            self.exp_length_display = uicontrol(self.f, 'Style', 'text', 'units', 'normalized', 'Position', ...
-                [exp_length_button.Position(1) + exp_length_button.Position(3) + left_margin, ...
-                exp_length_button.Position(2), .07, .02], 'FontSize', 12, 'String', '');
-
-        %Randomization
-
-            self.randomize_buttonGrp = uibuttongroup(self.f, 'units', 'normalized', 'Position', ...
-                [left_margin, positions.block(2) + positions.block(4) - .05, .08, .06], ...
-                'SelectionChangedFcn', @self.update_randomize);
-
-
-            self.isRandomized_radio = uicontrol(self.randomize_buttonGrp, 'Style', 'radiobutton', ...
-                'String', 'Randomize Trials', 'FontSize', font_size, ...
-                'units', 'normalized', 'Position', [.001, .55, .95, .4]);
-
-            self.isSequential_radio = uicontrol(self.randomize_buttonGrp, 'Style', 'radiobutton', ...
-                'String', 'Sequential Trials', 'FontSize', font_size, ...
-                'units', 'normalized', 'Position', [.001,.1, .95, .4]);
-        %Repetitions
-
-            self.repetitions_box = uicontrol(self.f, 'Style', 'edit', 'units', ...
-                'normalized', 'Position', [.05, positions.block(2) + positions.block(4) - .08, ...
-                .035, .02], 'Callback', @self.update_repetitions);
-
-            %repetitions_label
-            uicontrol(self.f, 'Style', 'text', 'String', ...
-                'Repetitions:', 'FontSize', font_size, 'units', 'normalized', ...
-                'Position', [left_margin, positions.block(2) + positions.block(4) - .08, .04, .02]);
-
-%        %Dry Run
-            %dry_run
-            uicontrol(self.f, 'Style', 'pushbutton', 'String', ...
-                'Dry Run', 'FontSize', font_size, 'units', 'normalized', 'Position', ...
-                [pos_panel(1) + pos_panel(3), pos_panel(2) - .04, .05, .045],'Callback',@self.dry_run);
-
-        %Actual run button
-            uicontrol(self.f, 'Style', 'pushbutton', 'String', 'Run Trials', 'FontSize', font_size, 'units', 'normalized', 'Position', ...
-                 [left_margin, positions.block(2) + positions.block(4) - .15, .06, .06], 'Callback', @self.open_run_gui);
-
-        %Channels to acquire
-
-            chan_pan = uipanel(self.f, 'Title', 'Analog Input Channels', 'FontSize', font_size, 'units', 'normalized', ...
-                'Position', [left_margin, positions.block(2) + positions.block(4) - .31, .15, .13]);
-
-            self.chan1_rate_box = uicontrol(chan_pan, 'Style', 'edit', 'String', num2str(self.doc.chan1_rate), 'units', 'normalized', 'Position', ...
-                [.65, .72, .25, .15],'Callback', @self.update_chan1_rate);
-
-            %chan1_rate_label
-            uicontrol(chan_pan, 'Style', 'text', 'String', 'Channel 1 Sample Rate', 'FontSize', font_size, ...
-                'units', 'normalized', 'HorizontalAlignment', 'left', 'Position', [.05, .7, .5, .17]);
-
-            self.chan2_rate_box = uicontrol(chan_pan, 'Style', 'edit', 'String', num2str(self.doc.chan2_rate), 'units', 'normalized', 'Position', ...
-                [.65, .52, .25, .17], 'Callback', @self.update_chan2_rate);
-
-            %chan2_rate_label
-            uicontrol(chan_pan, 'Style', 'text', 'String', 'Channel 2 Sample Rate', 'FontSize', font_size, ...
-                'units', 'normalized', 'HorizontalAlignment', 'left', 'Position', [.05, .5, .5, .17]);
-
-            self.chan3_rate_box = uicontrol(chan_pan, 'Style', 'edit', 'String', num2str(self.doc.chan3_rate), 'units', 'normalized', 'Position', ...
-                [.65, .32, .25, .17], 'Callback', @self.update_chan3_rate);
-
-            %chan3_rate_label
-            uicontrol(chan_pan, 'Style', 'text', 'String', 'Channel 3 Sample Rate', 'FontSize', font_size, ...
-                'HorizontalAlignment', 'left', 'units', 'normalized', 'Position', [.05, .3, .5, .17]);
-
-            self.chan4_rate_box = uicontrol(chan_pan, 'Style', 'edit', 'String', num2str(self.doc.chan4_rate), 'units', 'normalized', 'Position', ...
-                [.65, .12, .25, .17], 'Callback', @self.update_chan4_rate);
-
-            %chan4_rate_label
-            uicontrol(chan_pan, 'Style', 'text', 'String', 'Channel 4 Sample Rate', 'FontSize', font_size, ...
-                'HorizontalAlignment', 'left', 'units', 'normalized', 'Position', [.05, .1, .5, .17]);
-
-            self.num_rows_buttonGrp = uibuttongroup(self.f, 'units', 'normalized', ...
-                'Position', [left_margin, chan_pan.Position(2) - .05, chan_pan.Position(3), .04], 'SelectionChangedFcn', @self.update_rowNum);
-
-
-            self.num_rows_3 = uicontrol(self.num_rows_buttonGrp, 'Style', ...
-                'radiobutton', 'String', '3 Row Screen', 'FontSize', font_size, ...
-                'units', 'normalized', 'Position', [.05, .05, .45, .9]);
-
-            self.num_rows_4 = uicontrol(self.num_rows_buttonGrp, 'Style', 'radiobutton', 'String', '4 Row Screen', 'FontSize', font_size, ...
-                'units', 'normalized', 'Position', [.5, .05, .45, .9]);
-
-
-            key_pan = uipanel(self.f, 'Title', 'Mode Key:', 'BackgroundColor', [.75, .75, .75], ...
-                'BorderType', 'none', 'FontSize', 13, 'units', 'normalized', ...
-                'Position', [left_margin, self.num_rows_buttonGrp.Position(2) - .41, ...
-                self.num_rows_buttonGrp.Position(3), .4]);
-
-            mode_1_label = uicontrol(key_pan, 'Style', 'text', 'String', ...
-                'Mode 1: Position Function', 'BackgroundColor', [.75,.75,.75], ...
-                'HorizontalAlignment', 'left', 'FontSize', 11, 'units', 'normalized', ...
-                'Position', [chan_label_margin, .85, chan_label_width, chan_label_height]);
-
-            mode_2_label = uicontrol(key_pan, 'Style', 'text', 'String', 'Mode 2: Constant Rate', ...
-                'BackgroundColor', [.75,.75,.75], 'HorizontalAlignment', 'left',...
-                'FontSize', 11, 'units', 'normalized', 'Position', [chan_label_margin, ...
-                mode_1_label.Position(2) - chan_label_height, chan_label_width, chan_label_height]);
-
-            mode_3_label = uicontrol(key_pan, 'Style', 'text', 'String', 'Mode 3: Constant Index', 'BackgroundColor', [.75,.75,.75], ...
-                'HorizontalAlignment', 'left','FontSize', 11, 'units', 'normalized', 'Position', ...
-                [chan_label_margin, mode_2_label.Position(2) - chan_label_height, chan_label_width, chan_label_height]);
-
-            mode_4_label = uicontrol(key_pan, 'Style', 'text', 'String', 'Mode 4: Closed-loop sets frame rate', 'BackgroundColor', [.75,.75,.75], ...
-                'HorizontalAlignment', 'left','FontSize', 11, 'units', 'normalized', 'Position', ...
-                [chan_label_margin, mode_3_label.Position(2) - chan_label_height, chan_label_width, chan_label_height]);
-
-            mode_5_label = uicontrol(key_pan, 'Style', 'text', 'String', 'Mode 5: Closed-loop rate + offset', 'BackgroundColor', [.75,.75,.75], ...
-                'HorizontalAlignment', 'left','FontSize', 11, 'units', 'normalized', 'Position', ...
-                [chan_label_margin, mode_4_label.Position(2) - chan_label_height/2, chan_label_width, chan_label_height/2]);
-
-            mode_5_label_cont = uicontrol(key_pan, 'Style', 'text', 'String', 'position function', 'BackgroundColor', [.75,.75,.75], 'HorizontalAlignment', ...
-                'left', 'FontSize', 11, 'units', 'normalized', 'Position', ...
-                [chan_label_margin, mode_5_label.Position(2) - chan_label_height, chan_label_width, chan_label_height]);
-
-            mode_6_label = uicontrol(key_pan, 'Style', 'text', 'String', 'Mode 6: Closed-loop rate X + position', 'BackgroundColor', [.75,.75,.75], ...
-                'HorizontalAlignment', 'left','FontSize', 11, 'units', 'normalized', 'Position', ...
-                [chan_label_margin, mode_5_label_cont.Position(2) - chan_label_height/2, chan_label_width, chan_label_height/2]);
-
-            mode_6_label_cont = uicontrol(key_pan, 'Style', 'text', 'String', 'function Y', 'BackgroundColor', [.75,.75,.75], 'HorizontalAlignment', ...
-                'left', 'FontSize', 11, 'units', 'normalized', 'Position', ...
-                [chan_label_margin, mode_6_label.Position(2) - chan_label_height, chan_label_width, chan_label_height]);
-
-            mode_7_label = uicontrol(key_pan, 'Style', 'text', 'String', 'Mode 7: Closed-loop sets frame index', 'BackgroundColor', [.75,.75,.75], ...
-                'HorizontalAlignment', 'left','FontSize', 11, 'units', 'normalized', 'Position', ...
-                [chan_label_margin, mode_6_label_cont.Position(2) - chan_label_height, chan_label_width, chan_label_height]);
-            
-            self.reset_defaults();
-        
         
         end
 
@@ -1383,7 +973,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
         % Display preview of file when an appropriate table cell is
         % selected
 
-        function set_preview_on_arena(self, ~, ~)
+        function update_preview_on_arena(self, ~, ~)
             if self.preview_on_arena == 1
                 self.preview_on_arena = 0;
                 if self.model.screen_on == 1
@@ -3352,343 +2942,347 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
         end
 
 %% SETTERS
-
-        function set.model(self, value)
-            self.model_ = value;
+        
+        function set_ctlr(self, value)
+            self.ctlr = value;
         end
 
-        function set.preview_con(self, value)
-            self.preview_con_ = value;
+        function set_model(self, value)
+            self.model = value;
         end
 
-        function set.run_con(self, value)
-            self.run_con_ = value;
+        function set_preview_con(self, value)
+            self.preview_con = value;
         end
 
-        function set.pretrial_table(self, value)
-            self.pretrial_table_ = value;
+        function set_run_con(self, value)
+            self.run_con = value;
         end
 
-        function set.intertrial_table(self, value)
-            self.intertrial_table_ = value;
+        function set_pretrial_table(self, value)
+            self.pretrial_table = value;
         end
 
-        function set.posttrial_table(self, value)
-            self.posttrial_table_ = value;
+        function set_intertrial_table(self, value)
+            self.intertrial_table = value;
         end
 
-        function set.block_table(self, value)
-            self.block_table_ = value;
+        function set_posttrial_table(self, value)
+            self.posttrial_table = value;
         end
 
-        function set.pre_files(self, value)
-            self.pre_files_ = value;
+        function set_block_table(self, value)
+            self.block_table = value;
         end
 
-        function set.block_files(self, value)
-            self.block_files_ = value;
+        function set_pre_files(self, value)
+            self.pre_files = value;
         end
 
-        function set.inter_files(self, value)
-            self.inter_files_ = value;
+        function set_block_files(self, value)
+            self.block_files = value;
         end
 
-        function set.post_files(self, value)
-            self.post_files_ = value;
+        function set_inter_files(self, value)
+            self.inter_files = value;
         end
 
-        function set.chan1(self, value)
-            self.chan1_ = value;
+        function set_post_files(self, value)
+            self.post_files = value;
         end
 
-        function set.chan2(self, value)
-            self.chan2_ = value;
+        function set_chan1(self, value)
+            self.chan1 = value;
         end
 
-        function set.chan3(self, value)
-            self.chan3_ = value;
+        function set_chan2(self, value)
+            self.chan2 = value;
         end
 
-        function set.chan4(self, value)
-            self.chan4_ = value;
+        function set_chan3(self, value)
+            self.chan3 = value;
         end
 
-        function set.chan1_rate_box(self, value)
-            self.chan1_rate_box_ = value;
+        function set_chan4(self, value)
+            self.chan4 = value;
         end
 
-        function set.chan2_rate_box(self, value)
-            self.chan2_rate_box_ = value;
+        function set_chan1_rate_box(self, value)
+            self.chan1_rate_box = value;
         end
 
-        function set.chan3_rate_box(self, value)
-            self.chan3_rate_box_ = value;
+        function set_chan2_rate_box(self, value)
+            self.chan2_rate_box = value;
         end
 
-        function set.chan4_rate_box(self, value)
-            self.chan4_rate_box_ = value;
+        function set_chan3_rate_box(self, value)
+            self.chan3_rate_box = value;
         end
 
-        function set.isRandomized_radio(self, value)
-            self.isRandomized_radio_ = value;
+        function set_chan4_rate_box(self, value)
+            self.chan4_rate_box = value;
         end
 
-        function set.isSequential_radio(self, value)
-            self.isSequential_radio_ = value;
+        function set_isRandomized_radio(self, value)
+            self.isRandomized_radio = value;
         end
 
-        function set.repetitions_box(self, value)
-            self.repetitions_box_ = value;
+        function set_isSequential_radio(self, value)
+            self.isSequential_radio = value;
         end
 
-        function set.num_rows_buttonGrp(self, value)
-            self.num_rows_buttonGrp_ = value;
+        function set_repetitions_box(self, value)
+            self.repetitions_box = value;
         end
 
-        function set.num_rows_3(self, value)
-            self.num_rows_3_ = value;
+        function set_num_rows_buttonGrp(self, value)
+            self.num_rows_buttonGrp = value;
         end
 
-        function set.num_rows_4(self, value)
-            self.num_rows_4_ = value;
+        function set_num_rows_3(self, value)
+            self.num_rows_3 = value;
         end
 
-        function set.randomize_buttonGrp(self, value)
-            self.randomize_buttonGrp_ = value;
+        function set_num_rows_4(self, value)
+            self.num_rows_4 = value;
         end
 
-        function set.isSelect_all_box(self, value)
-            self.isSelect_all_box_ = value;
+        function set_randomize_buttonGrp(self, value)
+            self.randomize_buttonGrp = value;
         end
 
-        function set.f(self, value)
-            self.f_ = value;
+        function set_isSelect_all_box(self, value)
+            self.isSelect_all_box = value;
         end
 
-        function set.preview_panel(self, value)
-            self.preview_panel_ = value;
+        function set_f(self, value)
+            self.f = value;
         end
 
-        function set.hAxes(self, value)
-            self.hAxes_ = value;
+        function set_preview_panel(self, value)
+            self.preview_panel = value;
         end
 
-        function set.exp_name_box(self, value)
-            self.exp_name_box_ = value;
+        function set_hAxes(self, value)
+            self.hAxes = value;
         end
 
-        function set.doc(self, value)
-            self.doc_ = value;
+        function set_exp_name_box(self, value)
+            self.exp_name_box = value;
         end
 
-        function set.second_axes(self, value)
-            self.second_axes_ = value;
+        function set_doc(self, value)
+            self.doc = value;
         end
 
-        function set.pageUp_button(self, value)
-            self.pageUp_button_ = value;
+        function set_second_axes(self, value)
+            self.second_axes = value;
         end
 
-        function set.pageDown_button(self, value)
-            self.pageDown_button_ = value;
+        function set_pageUp_button(self, value)
+            self.pageUp_button = value;
         end
 
-        function set.listbox_imported_files(self, value)
-            self.listbox_imported_files_ = value;
+        function set_pageDown_button(self, value)
+            self.pageDown_button = value;
         end
 
-        function set.recent_file_menu_items(self, value)
-            self.recent_file_menu_items_ = value;
+        function set_listbox_imported_files(self, value)
+            self.listbox_imported_files = value;
         end
 
-        function set.menu_open(self, value)
-            self.menu_open_ = value;
+        % function set_recent_file_menu_items(self, value)
+        %     self.recent_file_menu_items = value;
+        % end
+
+        function set_menu_open(self, value)
+            self.menu_open = value;
         end
 
-        function set.exp_length_display(self, value)
-            self.exp_length_display_ = value;
+        function set_exp_length_display(self, value)
+            self.exp_length_display = value;
         end
 
-        function set.inscreen_plot(self, value)
-            self.inscreen_plot_ = value;
+        function set_inscreen_plot(self, value)
+            self.inscreen_plot = value;
         end
 
-        function set.settings_con(self, value)
-            self.settings_con_ = value;
+        function set_settings_con(self, value)
+            self.settings_con = value;
         end
 
-        function set.preview_on_arena(self, value)
-            self.preview_on_arena_ = value;
+        function set_preview_on_arena(self, value)
+            self.preview_on_arena = value;
         end
 
 %% GETTERS
 
-        function output = get.model(self)
-            output = self.model_;
+        function output = get_model(self)
+            output = self.model;
         end
 
-        function output = get.preview_con(self)
-            output = self.preview_con_;
+        function output = get_preview_con(self)
+            output = self.preview_con;
         end
 
-        function output = get.run_con(self)
-            output = self.run_con_;
+        function output = get_run_con(self)
+            output = self.run_con;
         end
 
-        function output = get.pretrial_table(self)
-           output = self.pretrial_table_;
+        function output = get_pretrial_table(self)
+           output = self.pretrial_table;
         end
 
-        function output = get.intertrial_table(self)
-            output = self.intertrial_table_;
+        function output = get_intertrial_table(self)
+            output = self.intertrial_table;
         end
 
-        function output = get.posttrial_table(self)
-            output = self.posttrial_table_;
+        function output = get_posttrial_table(self)
+            output = self.posttrial_table;
         end
 
-        function output = get.block_table(self)
-            output = self.block_table_;
+        function output = get_block_table(self)
+            output = self.block_table;
         end
 
-        function output = get.pre_files(self)
-            output = self.pre_files_;
+        function output = get_pre_files(self)
+            output = self.pre_files;
         end
 
-        function output = get.block_files(self)
-            output = self.block_files_;
+        function output = get_block_files(self)
+            output = self.block_files;
         end
 
-        function output = get.inter_files(self)
-            output = self.inter_files_;
+        function output = get_inter_files(self)
+            output = self.inter_files;
         end
 
-        function output = get.post_files(self)
-            output = self.post_files_;
+        function output = get_post_files(self)
+            output = self.post_files;
         end
 
-        function output = get.chan1(self)
-            output = self.chan1_;
+        function output = get_chan1(self)
+            output = self.chan1;
         end
 
-        function output = get.chan2(self)
-            output = self.chan2_;
+        function output = get_chan2(self)
+            output = self.chan2;
         end
 
-        function output = get.chan3(self)
-            output = self.chan3_;
+        function output = get_chan3(self)
+            output = self.chan3;
         end
 
-        function output = get.chan4(self)
-            output = self.chan4_;
+        function output = get_chan4(self)
+            output = self.chan4;
         end
 
-        function output = get.chan1_rate_box(self)
-            output = self.chan1_rate_box_;
+        function output = get_chan1_rate_box(self)
+            output = self.chan1_rate_box;
         end
 
-        function output = get.chan2_rate_box(self)
-            output = self.chan2_rate_box_;
+        function output = get_chan2_rate_box(self)
+            output = self.chan2_rate_box;
         end
 
-        function output = get.chan3_rate_box(self)
-            output = self.chan3_rate_box_;
+        function output = get_chan3_rate_box(self)
+            output = self.chan3_rate_box;
         end
 
-        function output = get.chan4_rate_box(self)
-            output = self.chan4_rate_box_;
+        function output = get_chan4_rate_box(self)
+            output = self.chan4_rate_box;
         end
 
-        function output = get.isRandomized_radio(self)
-            output = self.isRandomized_radio_;
+        function output = get_isRandomized_radio(self)
+            output = self.isRandomized_radio;
         end
 
-        function output = get.isSequential_radio(self)
-            output = self.isSequential_radio_;
+        function output = get_isSequential_radio(self)
+            output = self.isSequential_radio;
         end
 
-        function output = get.repetitions_box(self)
-            output = self.repetitions_box_;
+        function output = get_repetitions_box(self)
+            output = self.repetitions_box;
         end
 
-        function output = get.num_rows_buttonGrp(self)
-            output = self.num_rows_buttonGrp_;
+        function output = get_num_rows_buttonGrp(self)
+            output = self.num_rows_buttonGrp;
         end
 
-        function output = get.num_rows_3(self)
-            output = self.num_rows_3_;
+        function output = get_num_rows_3(self)
+            output = self.num_rows_3;
         end
 
-        function output = get.num_rows_4(self)
-            output = self.num_rows_4_;
+        function output = get_num_rows_4(self)
+            output = self.num_rows_4;
         end
 
-        function output = get.randomize_buttonGrp(self)
-            output = self.randomize_buttonGrp_;
+        function output = get_randomize_buttonGrp(self)
+            output = self.randomize_buttonGrp;
         end
 
-        function output = get.isSelect_all_box(self)
-            output = self.isSelect_all_box_;
+        function output = get_isSelect_all_box(self)
+            output = self.isSelect_all_box;
         end
 
-        function output = get.f(self)
-            output = self.f_;
+        function output = get_f(self)
+            output = self.f;
         end
 
-        function output = get.preview_panel(self)
-            output = self.preview_panel_;
+        function output = get_preview_panel(self)
+            output = self.preview_panel;
         end
 
-        function output = get.hAxes(self)
-            output = self.hAxes_;
+        function output = get_hAxes(self)
+            output = self.hAxes;
         end
 
-        function output = get.exp_name_box(self)
-            output = self.exp_name_box_;
+        function output = get_exp_name_box(self)
+            output = self.exp_name_box;
         end
 
-        function output = get.doc(self)
-           output = self.doc_;
+        function output = get_doc(self)
+           output = self.doc;
         end
 
-        function output = get.second_axes(self)
-            output = self.second_axes_;
+        function output = get_second_axes(self)
+            output = self.second_axes;
         end
 
-        function output = get.pageUp_button(self)
-            output = self.pageUp_button_;
+        function output = get_pageUp_button(self)
+            output = self.pageUp_button;
         end
 
-        function output = get.pageDown_button(self)
-            output = self.pageDown_button_;
+        function output = get_pageDown_button(self)
+            output = self.pageDown_button;
         end
 
-        function output = get.listbox_imported_files(self)
-            output = self.listbox_imported_files_;
+        function output = get_listbox_imported_files(self)
+            output = self.listbox_imported_files;
         end
 
-        function output = get.recent_file_menu_items(self)
-            output = self.recent_file_menu_items_;
+        function output = get_recent_file_menu_items(self)
+            output = self.recent_file_menu_items;
         end
 
-        function output = get.menu_open(self)
-            output = self.menu_open_;
+        function output = get_menu_open(self)
+            output = self.menu_open;
         end
 
-        function output = get.exp_length_display(self)
-            output = self.exp_length_display_;
+        function output = get_exp_length_display(self)
+            output = self.exp_length_display;
         end
 
-        function output = get.inscreen_plot(self)
-            output = self.inscreen_plot_;
+        function output = get_inscreen_plot(self)
+            output = self.inscreen_plot;
         end
 
-        function output = get.settings_con(self)
-            output = self.settings_con_;
+        function output = get_settings_con(self)
+            output = self.settings_con;
         end
 
-        function output = get.preview_on_arena(self)
-            output = self.preview_on_arena_;
+        function output = get_preview_on_arena(self)
+            output = self.preview_on_arena;
         end
      end
 end
