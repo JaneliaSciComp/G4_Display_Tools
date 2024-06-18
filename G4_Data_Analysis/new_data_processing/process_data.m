@@ -139,6 +139,10 @@ function process_data(exp_folder, processing_settings_file)
      %load the order in which conditions were run, as well as the number of
     %conditions and reps
     [exp_order, num_conds, num_reps] = get_exp_order(exp_folder);
+    total_exp_trials = num_conds*num_reps  + trial_options(1) + trial_options(3);
+    if trial_options(2)
+        total_exp_trials = total_exp_trials + ((num_conds*num_reps) - 1);
+    end
 
 
     % Determine the start and stop times of each trial (if we want to create a
@@ -169,10 +173,12 @@ function process_data(exp_folder, processing_settings_file)
     intertrial_durs, times] = get_trial_startStop(exp_order, trial_options, ...
     times, modeID_order, time_conv, trials_rerun, ended_early);
 
+    num_conds_short = num_trials - length(trial_start_times);
+
     %organize trial duration and control mode by condition/repetition
     [cond_dur, cond_modes,  cond_frame_move_time, cond_start_times, cond_gaps] = organize_durations_modes(num_conds, num_reps, ...
     num_trials, exp_order, trial_stop_times, trial_start_times,  ...
-    trial_move_start_times, trial_modes, time_conv, ended_early, num_trials_short);
+    trial_move_start_times, trial_modes, time_conv, ended_early, num_conds_short);
 
 
  % pre-allocate arrays for aligning the timeseries data
@@ -192,16 +198,21 @@ function process_data(exp_folder, processing_settings_file)
 
     if remove_nonflying_trials && flying
         [bad_WBF_conds, wbf_data] = find_bad_wbf_trials(Log, ts_data, wbf_range, wbf_cutoff, ...
-        wbf_end_percent, trial_start_times, trial_stop_times, num_conds, num_reps, exp_order);
+        wbf_end_percent, trial_start_times, trial_stop_times, num_conds, num_reps, exp_order, ...
+        num_trials, num_conds_short);
     else
         bad_WBF_conds = [];
     end
 
 
     %check condition durations and control modes for experiment errors
-    assert(all(all((cond_modes-repmat(cond_modes(:,1),[1 num_reps]))==0)),...
-        'unexpected order of trial modes - check that pre-trial, post-trial, and intertrial options are correct')
-     %Generate report of bad conditions  
+%     assert(all(all((cond_modes-repmat(cond_modes(:,1),[1 num_reps]))==0)),...
+%         'unexpected order of trial modes - check that pre-trial, post-trial, and intertrial options are correct')
+    if all(all((cond_modes-repmat(cond_modes(:,1),[1 num_reps]))~=0))
+        warning('unexpected order of trial modes - if the experiment was not ended early, check that pre-trial, post-trial, and intertrial options are correct.');
+    end
+
+%      %Generate report of bad conditions  
     [bad_conds, bad_reps, bad_intertrials, bad_conds_summary] = ...
         consolidate_bad_conds(bad_duration_conds, bad_duration_intertrials,...
         bad_crossCorr_conds, bad_WBF_conds, num_trials, num_conds, num_reps, trial_options);
@@ -215,7 +226,7 @@ function process_data(exp_folder, processing_settings_file)
     end
     
     %loop for every trial
-    for trial=1:num_trials
+    for trial=1:num_trials-num_conds_short
         cond = exp_order(trial);
         rep = floor((trial-1)/num_conds)+1;
 
@@ -387,7 +398,7 @@ function process_data(exp_folder, processing_settings_file)
         'faLmR_avg_over_reps', 'faLmR_avg_reps_norm','channelNames', 'histograms_CL', ...
         'summaries', 'summaries_normalized','conditionModes', 'interhistogram', 'timestamps', ...
         'pos_series', 'mean_pos_series', 'pos_conditions', 'normalization_max', ...
-        'bad_duration_conds', 'bad_duration_intertrials','bad_slope_conds', 'bad_crossCorr_conds',...
+        'bad_duration_conds', 'bad_duration_intertrials', 'bad_crossCorr_conds',...
         'bad_WBF_conds','cond_frame_move_time', 'pattern_movement_time_avg', 'cond_start_times', 'cond_gaps');
 
     else
@@ -424,7 +435,7 @@ function process_data(exp_folder, processing_settings_file)
         save(fullfile(exp_folder,processed_file_name), 'timeseries', 'ts_avg_reps',...
             'channelNames',  'summaries', 'conditionModes', 'interhistogram', ...
             'timestamps', 'bad_duration_conds', 'bad_duration_intertrials',...
-            'bad_slope_conds', 'bad_crossCorr_conds', 'cond_frame_move_time',...
+             'bad_crossCorr_conds', 'cond_frame_move_time',...
             'pattern_movement_time_avg', 'cond_start_times', 'cond_gaps');
 
 
