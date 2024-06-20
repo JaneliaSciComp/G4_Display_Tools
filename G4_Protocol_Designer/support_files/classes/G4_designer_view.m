@@ -76,7 +76,7 @@ classdef G4_designer_view < handle
 
             self.pretrial_table = uitable(self.f, 'data', self.con.doc.pretrial, 'columnname', column_names, ...
             'units', 'normalized', 'Position', positions.pre, 'ColumnEditable', columns_editable, 'ColumnFormat', column_format, ...
-            'ColumnWidth', column_widths, 'CellEditCallback', @self.update_model_pretrial, 'CellSelectionCallback', {@self.preview_selection, positions});
+            'ColumnWidth', column_widths, 'CellEditCallback', {@self.update_trial, 'pre'}, 'CellSelectionCallback', {@self.preview_selection, positions});
             
 
             % intertrial_label
@@ -85,7 +85,7 @@ classdef G4_designer_view < handle
 
             self.intertrial_table = uitable(self.f, 'data', self.con.doc.intertrial, 'columnname', column_names, ...
             'units', 'normalized', 'Position', positions.inter, 'ColumnEditable', columns_editable, 'ColumnFormat', column_format, ...
-            'ColumnWidth', column_widths, 'CellEditCallback', @self.update_model_intertrial, 'CellSelectionCallback', {@self.preview_selection, positions});
+            'ColumnWidth', column_widths, 'CellEditCallback', {@self.update_trial, 'inter'}, 'CellSelectionCallback', {@self.preview_selection, positions});
 
             %blocktrial_label
             uilabel(self.f, 'Text', 'Block Trials', 'FontSize', font_size, 'Position', ...
@@ -93,7 +93,7 @@ classdef G4_designer_view < handle
 
             self.block_table = uitable(self.f, 'data', self.con.doc.block_trials, 'columnname', column_names, ...
             'units', 'normalized', 'Position', positions.block, 'ColumnEditable', columns_editable, 'ColumnFormat', column_format, ...
-            'ColumnWidth', column_widths, 'CellEditCallback', @self.update_model_block_trials, 'CellSelectionCallback', {@self.preview_selection, positions});
+            'ColumnWidth', column_widths, 'CellEditCallback', {@self.update_trial, 'block'}, 'CellSelectionCallback', {@self.preview_selection, positions});
 
             %posttrial_label
             uilabel(self.f, 'Text', 'Post-Trial', 'FontSize', font_size, 'Position', ...
@@ -101,7 +101,7 @@ classdef G4_designer_view < handle
 
             self.posttrial_table = uitable(self.f, 'data', self.con.doc.posttrial, 'columnname', column_names, ...
             'units', 'normalized', 'Position', positions.post, 'ColumnEditable', columns_editable, 'ColumnFormat', column_format, ...
-            'ColumnWidth', column_widths, 'CellEditCallback', @self.update_model_posttrial, 'CellSelectionCallback', {@self.preview_selection, positions});
+            'ColumnWidth', column_widths, 'CellEditCallback', {@self.update_trial, 'post'},'CellSelectionCallback', {@self.preview_selection, positions});
 
             %add_trial_button
             uibutton(self.f, 'Text','Add Trial','Position', [positions.block(1) + positions.block(3) + left_margin, ...
@@ -381,28 +381,27 @@ classdef G4_designer_view < handle
 
         end
 
-        function update_model_pretrial(self, ~, event)
+        function update_trial(self, ~, event, trialtype)
 
             new = event.EditData;
+            x = event.Indices(1);
             y = event.Indices(2);
-
-
-        end
-
-        function update_model_intertrial(self)
-
-
-        end
-
-        function update_model_posttrial(self)
-
-
-        end
-
-        function update_model_block_trials(self)
-
+            if y == 1
+                allow = 1;                
+            else
+                mode = self.con.get_mode(trialtype, x);
+                allow = self.con.check_editable(mode, y);              
+            end
+            if allow == 1
+                self.con.update_trial_doc(new, x, y);
+            else
+                self.con.create_error_box("You cannot edit that field in this mode.");
+            end
+            self.update_gui();
 
         end
+
+        
 
         function preview_selection(self, positions)
 

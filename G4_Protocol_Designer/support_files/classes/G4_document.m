@@ -136,6 +136,10 @@ classdef G4_document < handle
         end
 
 %SETTING INDIVIDUAL TRIAL PROPERTIES---------------------------------------
+
+        function set_trial_property(self, x, y, new_value, trialtype)
+
+        end
         function set_block_trial_property(self, index, new_value)
             %Adding a new row
             if index(1) > size(self.block_trials,1)

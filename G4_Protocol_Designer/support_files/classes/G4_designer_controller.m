@@ -108,119 +108,22 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
 
         %Update pretrial model data
 
-        function update_model_pretrial(self, ~, event)
-            mode = self.doc.pretrial{1};
-            new = event.EditData;
-            y = event.Indices(2);
-            allow = self.check_editable(mode, y);
-            if allow == 1 %&& within_bounds == 1
-                if y >= 2 && y <= 7
+        function update_trial_doc(self, new, x, y, trialtype)
 
-                    self.set_pretrial_files_(y, new);
-                    self.doc.set_pretrial_property(y,new);
-                elseif y ~= 13
-                    self.doc.set_pretrial_property(y, new);
-                else
-                    self.doc.set_pretrial_property(y,new);
-                end
-            else
-                self.create_error_box("You cannot edit that field in this mode.");
+            if y >= 2 && y <= 7
+                self.set_files(x, y, new, trialtype)
             end
-            if y == 1
-               self.clear_fields(str2num(new));
-            end
-            self.update_gui();
-        end
-
-        %Update block trials model data
-        function update_model_block_trials(self, ~, event)
-            new = event.EditData;
-            x = event.Indices(1);
-            y = event.Indices(2);
-            mode = self.doc.block_trials{x, 1};
-            allow = self.check_editable(mode, y);
-
-            if allow == 1
-                if y >= 2 && y <= 7
-                    self.set_blocktrial_files_(x, y, new);
-                    self.doc.set_block_trial_property([x,y], new);
-                    %src.Data{x,y} = new;
-                else
-                    self.doc.set_block_trial_property([x,y], new);
-                end
-                %self.doc.block_trials
-            else
-                self.create_error_box("You cannot edit that field in this mode.");
-            end
-
-            if y == 13 && new == 0
-                self.deselect_selectAll();
-            end
-
+            self.doc.set_trial_property(x, y, new, trialtype);
             if y == 1
                 self.clear_fields(str2num(new));
             end
-            self.update_gui();
-            %disp(self.block_files);
-        end
-
-        %Update intertrial model data
-        function update_model_intertrial(self, ~, event)
-            new = event.EditData;
-            x = event.Indices(1);
-            y = event.Indices(2);
-            mode = self.doc.intertrial{1};
-            allow = self.check_editable(mode, y);
-            if allow == 1
-                if y >= 2 && y <= 7
-                    self.set_intertrial_files_(y,new);
-                    self.doc.set_intertrial_property(y, new);
-                elseif y~=13
-                    self.doc.set_intertrial_property(y, new);
-                %self.doc.intertrial;
-                else
-                    self.doc.set_intertrial_property(y, new);
+            if strcmp(trialtype, 'block')
+                if y == 13 && new == 0
+                    self.deselect_selectAll();
                 end
-            else
-                self.create_error_box("You cannot edit that field in this mode.");
-                %self.layout_gui();
             end
-
-            if y == 1
-                self.clear_fields(str2num(new));
-            end
-            self.update_gui();
-            %disp(self.inter_files);
         end
 
-        %Update posttrial model data
-        function update_model_posttrial(self, ~, event)
-            new = event.EditData;
-            x = event.Indices(1);
-            y = event.Indices(2);
-            mode = self.doc.posttrial{x, 1};
-            allow = self.check_editable(mode, y);
-
-            if allow == 1
-                if y >= 2 && y <= 7
-                    self.set_posttrial_files_(y,new);
-                    self.doc.set_posttrial_property(y, new);
-                elseif y~=13
-                    self.doc.set_posttrial_property(y, new);
-                %self.doc.intertrial;
-                else
-                    self.doc.set_posttrial_property(y, new);
-                end
-            else
-                self.create_error_box("You cannot edit that field in this mode.");
-                %self.layout_gui();
-            end
-            if y == 1
-                self.clear_fields(str2num(new));
-            end
-            self.update_gui();
-            %disp(self.post_files);
-        end
 
         %Update repetitions
         function update_repetitions(self, src, ~)
@@ -2687,6 +2590,26 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
             self.block_table.ColumnWidth = max_len(4,:);
         end
 
+        function mode = get_mode(self, trialtype, trialnum)
+
+            if strcmp(trialtype, 'pre')
+                mode = self.doc.pretrial{1};
+
+            elseif strcmp(trialtype, 'inter')
+                mode = self.doc.intertrial{1};
+
+            elseif strcmp(trialtype, 'post')
+                mode = self.doc.posttrial{1};
+
+            elseif strcmp(trialtype, 'block')
+
+                mode = self.doc.block_trials{trialnum, 1};
+
+            end
+
+
+        end
+
 %% Additional Update functions
 
         %Update the preview controller property
@@ -2844,95 +2767,60 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
             self.exp_length_display.String = [num2str(round(self.doc.est_exp_length/60, 2)), ' minutes'];
         end
 
-        function  set_pretrial_files_(self, y, new_value)
-             new_value = string(new_value);
-            if y == 2
-                self.pre_files.pattern = new_value;
-            end
-            if y == 3
-                self.pre_files.position = new_value;
-            end
-            if y == 4
-                self.pre_files.ao1 = new_value;
-            end
-            if y == 5
-                self.pre_files.ao2 = new_value;
-            end
-            if y == 6
-                self.pre_files.ao3 = new_value;
-            end
-            if y == 7
-                self.pre_files.ao4 = new_value;
-            end
-        end
-
-        function  set_intertrial_files_(self, y, new_value)
-             new_value = string(new_value);
-            if y == 2
-                self.inter_files.pattern = new_value;
-            end
-            if y == 3
-                self.inter_files.position = new_value;
-            end
-            if y == 4
-                self.inter_files.ao1 = new_value;
-            end
-            if y == 5
-                self.inter_files.ao2 = new_value;
-            end
-            if y == 6
-                self.inter_files.ao3 = new_value;
-            end
-            if y == 7
-                self.inter_files.ao4 = new_value;
-            end
-        end
-
-        function  set_posttrial_files_(self, y, new_value)
+        function set_files(self, x, y, new_value, trialtype)
             new_value = string(new_value);
-
-            if y == 2
-                self.post_files.pattern = new_value;
+            %If it is files for  block trial, the code is slightly
+            %different.
+            if strcmp(trialtype, 'pre')
+                filesVar = 'pre_files';
+            elseif strcmp(trialtype, 'inter')
+                filesVar = 'inter_files';
+            elseif strcmp(trialtype, 'post')
+                filesVar = 'post_files';
             end
-            if y == 3
-                self.post_files.position = new_value;
-            end
-            if y == 4
-                self.post_files.ao1 = new_value;
-            end
-            if y == 5
-                self.post_files.ao2 = new_value;
-            end
-            if y == 6
-                self.post_files.ao3 = new_value;
-            end
-            if y == 7
-                self.post_files.ao4 = new_value;
-            end
-        end
-
-        function  set_blocktrial_files_(self, x, y, new_value)
-           new_value = string(new_value);
-
-            if y == 2
+            if strcmp(trialtype, 'block')
+                if y == 2
                 self.block_files.pattern(x) = new_value;
+                end
+                if y == 3
+                    self.block_files.position(x) = new_value;
+                end
+                if y == 4
+                    self.block_files.ao1(x) = new_value;
+                end
+                if y == 5
+                    self.block_files.ao2(x) = new_value;
+                end
+                if y == 6
+                    self.block_files.ao3(x) = new_value;
+                end
+                if y == 7
+                    self.block_files.ao4(x) = new_value;
+                end
+            else
+                if y == 2
+                    self.(filesVar).pattern = new_value;
+                end
+                if y == 3
+                    self.(filesVar).position = new_value;
+                end
+                if y == 4
+                    self.(filesVar).ao1 = new_value;
+                end
+                if y == 5
+                    self.(filesVar).ao2 = new_value;
+                end
+                if y == 6
+                    self.(filesVar).ao3 = new_value;
+                end
+                if y == 7
+                    self.(filesVar).ao4 = new_value;
+                end
             end
-            if y == 3
-                self.block_files.position(x) = new_value;
-            end
-            if y == 4
-                self.block_files.ao1(x) = new_value;
-            end
-            if y == 5
-                self.block_files.ao2(x) = new_value;
-            end
-            if y == 6
-                self.block_files.ao3(x) = new_value;
-            end
-            if y == 7
-                self.block_files.ao4(x) = new_value;
-            end
+
         end
+
+        
 
 %% SETTERS
         
