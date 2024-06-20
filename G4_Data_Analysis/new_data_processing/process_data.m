@@ -227,7 +227,7 @@ function process_data(exp_folder, processing_settings_file)
     end
 
     frame_position_check = check_frame_position(path_to_protocol, trial_start_times, trial_stop_times, exp_order, ...
-        Log, cond_modes, corrTolerance, framePosTolerance, framePosPercentile, perctile_tol);
+        Log, cond_modes, corrTolerance, framePosTolerance, framePosPercentile, perctile_tol, num_conds_short);
 
 
     %check condition durations and control modes for experiment errors
