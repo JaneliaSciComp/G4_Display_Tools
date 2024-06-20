@@ -139,6 +139,10 @@ function process_data(exp_folder, processing_settings_file)
      %load the order in which conditions were run, as well as the number of
     %conditions and reps
     [exp_order, num_conds, num_reps] = get_exp_order(exp_folder);
+    total_exp_trials = num_conds*num_reps  + trial_options(1) + trial_options(3);
+    if trial_options(2)
+        total_exp_trials = total_exp_trials + ((num_conds*num_reps) - 1);
+    end
 
 
     % Determine the start and stop times of each trial (if we want to create a
@@ -150,17 +154,14 @@ function process_data(exp_folder, processing_settings_file)
     
     % Returns a struct, times, with 8 fields. The start times, stop times,
     % start idx, and movement times for the original trials and the rerun
-    % trials. 
-    times = separate_originals_from_reruns(start_times, stop_times, start_idx, ...
+    % trials. Also determines if the experiment was ended early, and if so,
+    % how many more trials are expected than were recorded
+    [times, ended_early, num_trials_short] = separate_originals_from_reruns(start_times, stop_times, start_idx, ...
         trial_options, trials_rerun, num_conds, num_reps, frame_movement_start_times);
     
     %get order of pattern IDs (maybe use for error-checking?)
     [modeID_order, patternID_order] = get_modeID_order(combined_command, Log, times.origin_start_idx);
-    
-
-    %load the order in which conditions were run, as well as the number of
-    %conditions and reps
-    [exp_order, num_conds, num_reps] = get_exp_order(exp_folder);
+   
 
     %Determine start and stop times for different trial types (pre, inter,
     %regular). This also replaces start/stop times of trials marked as bad
@@ -170,12 +171,14 @@ function process_data(exp_folder, processing_settings_file)
     [num_trials, trial_start_times, trial_stop_times, ...
     trial_move_start_times,trial_modes, intertrial_start_times, intertrial_stop_times, ...
     intertrial_durs, times] = get_trial_startStop(exp_order, trial_options, ...
-    times, modeID_order, time_conv, trials_rerun);
+    times, modeID_order, time_conv, trials_rerun, ended_early);
+
+    num_conds_short = num_trials - length(trial_start_times);
 
     %organize trial duration and control mode by condition/repetition
     [cond_dur, cond_modes,  cond_frame_move_time, cond_start_times, cond_gaps] = organize_durations_modes(num_conds, num_reps, ...
     num_trials, exp_order, trial_stop_times, trial_start_times,  ...
-    trial_move_start_times, trial_modes, time_conv);
+    trial_move_start_times, trial_modes, time_conv, ended_early, num_conds_short);
 
 
  % pre-allocate arrays for aligning the timeseries data
@@ -186,25 +189,32 @@ function process_data(exp_folder, processing_settings_file)
 %%%%%then pass it in to the function to find bad wbfs where I only look at
 %%%%%the indices for the actual condition???
     [bad_duration_conds, bad_duration_intertrials] = check_condition_durations(cond_dur, intertrial_durs, path_to_protocol, duration_diff_limit);
-    [bad_slope_conds] = check_flat_conditions(trial_start_times, trial_stop_times, Log, num_reps, num_conds, exp_order);
-
-    [bad_crossCorr_conds] = check_correlation(trial_start_times, trial_stop_times, exp_order, Log, cond_modes, corrTolerance);
-
+ %   [bad_slope_conds] = check_flat_conditions(trial_start_times, trial_stop_times, Log, num_reps, num_conds, exp_order);
+    if num_trials_short == 0
+        [bad_crossCorr_conds] = check_correlation(trial_start_times, trial_stop_times, exp_order, Log, cond_modes, corrTolerance);
+    else
+        bad_crossCorr_conds = [];
+    end
 
     if remove_nonflying_trials && flying
         [bad_WBF_conds, wbf_data] = find_bad_wbf_trials(Log, ts_data, wbf_range, wbf_cutoff, ...
-        wbf_end_percent, trial_start_times, trial_stop_times, num_conds, num_reps, exp_order);
+        wbf_end_percent, trial_start_times, trial_stop_times, num_conds, num_reps, exp_order, ...
+        num_trials, num_conds_short);
     else
         bad_WBF_conds = [];
     end
 
 
     %check condition durations and control modes for experiment errors
-    assert(all(all((cond_modes-repmat(cond_modes(:,1),[1 num_reps]))==0)),...
-        'unexpected order of trial modes - check that pre-trial, post-trial, and intertrial options are correct')
-     %Generate report of bad conditions  
+%     assert(all(all((cond_modes-repmat(cond_modes(:,1),[1 num_reps]))==0)),...
+%         'unexpected order of trial modes - check that pre-trial, post-trial, and intertrial options are correct')
+    if all(all((cond_modes-repmat(cond_modes(:,1),[1 num_reps]))~=0))
+        warning('unexpected order of trial modes - if the experiment was not ended early, check that pre-trial, post-trial, and intertrial options are correct.');
+    end
+
+%      %Generate report of bad conditions  
     [bad_conds, bad_reps, bad_intertrials, bad_conds_summary] = ...
-        consolidate_bad_conds(bad_duration_conds, bad_duration_intertrials, bad_slope_conds,...
+        consolidate_bad_conds(bad_duration_conds, bad_duration_intertrials,...
         bad_crossCorr_conds, bad_WBF_conds, num_trials, num_conds, num_reps, trial_options);
     
     if ~isempty(bad_conds)
@@ -216,7 +226,7 @@ function process_data(exp_folder, processing_settings_file)
     end
     
     %loop for every trial
-    for trial=1:num_trials
+    for trial=1:num_trials-num_conds_short
         cond = exp_order(trial);
         rep = floor((trial-1)/num_conds)+1;
 
@@ -390,7 +400,7 @@ function process_data(exp_folder, processing_settings_file)
         'faLmR_avg_over_reps', 'faLmR_avg_reps_norm','inter_ts_data', 'channelNames', 'histograms_CL', ...
         'summaries', 'summaries_normalized','conditionModes', 'interhistogram', 'timestamps', ...
         'pos_series', 'mean_pos_series', 'pos_conditions', 'normalization_max', ...
-        'bad_duration_conds', 'bad_duration_intertrials','bad_slope_conds', 'bad_crossCorr_conds',...
+        'bad_duration_conds', 'bad_duration_intertrials', 'bad_crossCorr_conds',...
         'bad_WBF_conds','cond_frame_move_time', 'pattern_movement_time_avg', 'cond_start_times', 'cond_gaps');
 
     else
@@ -427,7 +437,7 @@ function process_data(exp_folder, processing_settings_file)
         save(fullfile(exp_folder,processed_file_name), 'timeseries', 'ts_avg_reps',...
             'channelNames',  'summaries', 'conditionModes', 'inter_ts_data', 'interhistogram', ...
             'timestamps', 'bad_duration_conds', 'bad_duration_intertrials',...
-            'bad_slope_conds', 'bad_crossCorr_conds', 'cond_frame_move_time',...
+             'bad_crossCorr_conds', 'cond_frame_move_time',...
             'pattern_movement_time_avg', 'cond_start_times', 'cond_gaps');
 
 
