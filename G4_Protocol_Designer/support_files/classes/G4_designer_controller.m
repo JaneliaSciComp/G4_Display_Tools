@@ -5,6 +5,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
 
         ctlr % contains the panels controller when its opened
         model %contains all data that does not persist with saving
+        view %contains all GUI objects
         preview_con %controller for the fullscreen preview
         run_con %controller for the run window - can be opened independently
         doc %contains all data that is stored in the saved file
@@ -95,19 +96,11 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                'ao2',self.doc.posttrial(5),'ao3',self.doc.posttrial(6),...
                'ao4',self.doc.posttrial(7));
 
-           self.layout_gui() ;
+           self.view = G4_designer_view();
            self.update_gui() ;
            self.set_num_rows_buttonGrp_selection();
         end
 
-%% GUI LAYOUT METHOD DECLARES ALL OBJECTS ON SCREEN------------------------
-
-        function layout_gui(self)
-            %LAYOUT PARAMETERS TO BE EDITED
-
-            
-        
-        end
 
 %% CALLBACK FUNCTIONS------------------------------------------------------
     %% Edit callbacks to update values in the model

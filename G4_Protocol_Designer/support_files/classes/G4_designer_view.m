@@ -371,12 +371,20 @@ classdef G4_designer_view < handle
             self.reset_defaults();
         end
 
+        function update_gui(self)
+
+
+        end
+
         function close_application(self)
 
 
         end
 
-        function update_model_pretrial(self)
+        function update_model_pretrial(self, ~, event)
+
+            new = event.EditData;
+            y = event.Indices(2);
 
 
         end
