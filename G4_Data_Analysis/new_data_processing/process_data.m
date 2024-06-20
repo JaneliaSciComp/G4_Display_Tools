@@ -88,6 +88,27 @@ function process_data(exp_folder, processing_settings_file)
         summary_save_path = s.settings.summary_save_path;
     end
     summary_filename = strcat(s.settings.summary_filename, '.txt');
+    % if isfield(s.settings, 'static_conditions')
+    %     static_conditions = s.settings.static_conditions;
+    % else
+    %     static_conditions = 0;
+    % end
+    if isfield(s.settings, 'frame_position_tolerance')
+        framePosTolerance = s.settings.frame_position_tolerance;
+    else
+        framePosTolerance = 1;
+    end
+    if isfield(s.settings, 'frame_position_percentile')
+        framePosPercentile = s.settings.frame_position_percentile;
+    else
+        framePosPercentile = 97;
+    end
+    if isfield(s.settings, 'percentile_tolerance')
+        perctile_tol = s.settings.percentile_tolerance;
+    else
+        perctile_tol = 1;
+    end
+
 
 
     %Set which command we should be looking for in the log files
@@ -189,6 +210,7 @@ function process_data(exp_folder, processing_settings_file)
 %%%%%then pass it in to the function to find bad wbfs where I only look at
 %%%%%the indices for the actual condition???
     [bad_duration_conds, bad_duration_intertrials] = check_condition_durations(cond_dur, intertrial_durs, path_to_protocol, duration_diff_limit);
+
  %   [bad_slope_conds] = check_flat_conditions(trial_start_times, trial_stop_times, Log, num_reps, num_conds, exp_order);
     if num_trials_short == 0
         [bad_crossCorr_conds] = check_correlation(trial_start_times, trial_stop_times, exp_order, Log, cond_modes, corrTolerance);
@@ -204,6 +226,9 @@ function process_data(exp_folder, processing_settings_file)
         bad_WBF_conds = [];
     end
 
+    frame_position_check = check_frame_position(path_to_protocol, trial_start_times, trial_stop_times, exp_order, ...
+        Log, cond_modes, corrTolerance, framePosTolerance, framePosPercentile, perctile_tol);
+
 
     %check condition durations and control modes for experiment errors
 %     assert(all(all((cond_modes-repmat(cond_modes(:,1),[1 num_reps]))==0)),...
@@ -214,7 +239,7 @@ function process_data(exp_folder, processing_settings_file)
 
 %      %Generate report of bad conditions  
     [bad_conds, bad_reps, bad_intertrials, bad_conds_summary] = ...
-        consolidate_bad_conds(bad_duration_conds, bad_duration_intertrials,...
+        consolidate_bad_conds(bad_duration_conds, bad_duration_intertrials, ...
         bad_crossCorr_conds, bad_WBF_conds, num_trials, num_conds, num_reps, trial_options);
     
     if ~isempty(bad_conds)
@@ -401,7 +426,9 @@ function process_data(exp_folder, processing_settings_file)
         'summaries', 'summaries_normalized','conditionModes', 'interhistogram', 'timestamps', ...
         'pos_series', 'mean_pos_series', 'pos_conditions', 'normalization_max', ...
         'bad_duration_conds', 'bad_duration_intertrials', 'bad_crossCorr_conds',...
-        'bad_WBF_conds','cond_frame_move_time', 'pattern_movement_time_avg', 'cond_start_times', 'cond_gaps');
+        'bad_WBF_conds','cond_frame_move_time', 'pattern_movement_time_avg', ...
+        'cond_start_times', 'cond_gaps', 'frame_position_check');
+
 
     else
         da_data = ts_data;
@@ -438,7 +465,7 @@ function process_data(exp_folder, processing_settings_file)
             'channelNames',  'summaries', 'conditionModes', 'inter_ts_data', 'interhistogram', ...
             'timestamps', 'bad_duration_conds', 'bad_duration_intertrials',...
              'bad_crossCorr_conds', 'cond_frame_move_time',...
-            'pattern_movement_time_avg', 'cond_start_times', 'cond_gaps');
+            'pattern_movement_time_avg', 'cond_start_times', 'cond_gaps', 'frame_position_check');
 
 
     end
