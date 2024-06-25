@@ -26,6 +26,7 @@ classdef G4_designer_view < handle
         num_rows_buttonGrp
         num_rows_3
         num_rows_4
+        recent_file_menu_items
 
     end
 
@@ -214,13 +215,11 @@ classdef G4_designer_view < handle
             %menu_recent_files
             uimenu(self.menu_open, 'Text', '.g4p file', 'Callback', {@self.open_file, ''});
 
-            for i = 1:length(self.con.doc.recent_g4p_files)
-                [~, filename] = fileparts(self.con.doc.recent_g4p_files{i});
-                self.con.recent_file_menu_items{i} = uimenu(self.menu_open, 'Text', filename, 'Callback', {@self.open_file, self.con.doc.recent_g4p_files{i}});
-            end
 
             if length(self.con.doc.recent_g4p_files) < 1
-                self.con.recent_file_menu_items = {};
+                self.recent_file_menu_items = {};
+            else
+                self.set_recent_file_menu_items();
             end
 
             %menu_saveas
@@ -373,13 +372,119 @@ classdef G4_designer_view < handle
 
         function update_gui(self)
 
-
+            self.pretrial_table.Data = self.con.get_pretrial_data();
+            self.intertrial_table.Data = self.con.get_intertrial_data();
+            self.block_table.Data = self.con.get_blocktrial_data();
+            self.posttrial_table.Data = self.con.get_posttrial_data();
+            self.set_randomize_buttonGrp_selection();
+            self.repetitions_box.String = num2str(self.con.get_repetitions());
+            self.isSelect_all_box.Value = self.con.get_isSelect_all();
+            self.chan1_rate_box.String = num2str(self.con.get_chan1_rate);
+            self.chan2_rate_box.String = num2str(self.con.get_chan2_rate);
+            self.chan3_rate_box.String = num2str(self.con.get_chan3_rate);
+            self.chan4_rate_box.String = num2str(self.con.get_chan4_rate);
+            self.set_num_rows_buttonGrp_selection();
+            set(self.exp_name_box,'String', self.con.get_experiment_name());
+            self.set_recent_file_menu_items();
+            self.set_exp_length_display();
+            self.con.doc_replace_grey_cells();
+            self.update_column_widths();
+            self.con.insert_greyed_cells();
+            
         end
+
 
         function close_application(self)
 
 
         end
+
+        function set_randomize_buttonGrp_selection(self)
+            if self.con.get_is_randomized()
+                set(self.randomize_buttonGrp,'SelectedObject',self.isRandomized_radio);
+            else
+                set(self.randomize_buttonGrp,'SelectedObject',self.isSequential_radio);
+            end
+        end
+
+        function set_num_rows_buttonGrp_selection(self)
+            value = get(self.num_rows_3, 'Enable');
+            if strcmp(value,'off') == 1
+                %do nothing
+            else
+                if self.con.get_num_rows() == 3
+                    set(self.num_rows_buttonGrp,'SelectedObject',self.num_rows_3);
+                else
+                    set(self.num_rows_buttonGrp,'SelectedObject',self.num_rows_4);
+                end
+            end
+        end
+
+        function set_recent_file_menu_items(self)
+            files = self.con.get_recent_g4p_files();
+            for i = 1:length(files)
+                 [~,filename] = fileparts(files{i});
+                if i > length(self.recent_file_menu_items)
+                    self.recent_file_menu_items{end + 1} = uimenu(self.menu_open, 'Text', filename, 'MenuSelectedFcn', {@self.open_file, files{i}});
+                else
+
+                    set(self.recent_file_menu_items{i},'Text',filename);
+                    set(self.recent_file_menu_items{i}, 'MenuSelectedFcn', {@self.open_file, files{i}});
+                end
+            end
+        end
+
+        function set_exp_length_display(self)
+            
+            length = self.con.get_est_exp_length();
+            self.exp_length_display.String = [num2str(round(length/60, 2)), ' minutes'];
+
+        end
+
+        function update_column_widths(self)
+
+            %establish minimum width for each column
+            max_len = cell(4,13);
+            for i = 1:size(max_len,1)
+                for j = 1:size(max_len,2)
+                    if j == 2 || j == 3
+                        max_len{i,j} = 20;
+                    elseif j == 8 || j == 9 || j == 12
+                        max_len{i,j} = 15;
+                    else
+                        max_len{i,j} = 10;
+                    end
+                end
+            end
+
+            tables = {self.pretrial_table, self.intertrial_table, self.posttrial_table, self.block_table};
+            data = {self.con.get_pretrial_data(), self.con.get_intertrial_data(), self.con.get_posttrial_data(), self.con.get_blocktrial_data()};
+
+            % get max width for each column in pretrial
+            for table = 1:length(tables)
+                for col = 1:size(data{table},2)
+                    for row = 1:size(data{table},1)
+                        width = length(data{table}{row, col});
+                        if width > max_len{table,col}
+                            max_len{table,col} = width;
+                        end
+                    end
+                end
+           end
+
+            %convert from length in characters to pixels
+            for i = 1:size(max_len,1)
+                for j = 1:size(max_len,2)
+                    max_len{i,j} = max_len{i,j}*5;
+                end
+            end
+
+            self.pretrial_table.ColumnWidth = max_len(1,:);
+            self.intertrial_table.ColumnWidth = max_len(2,:);
+            self.posttrial_table.ColumnWidth = max_len(3,:);
+            self.block_table.ColumnWidth = max_len(4,:);
+        end
+
 
         function update_trial(self, ~, event, trialtype)
 
@@ -400,8 +505,6 @@ classdef G4_designer_view < handle
             self.update_gui();
 
         end
-
-        
 
         function preview_selection(self, positions)
 

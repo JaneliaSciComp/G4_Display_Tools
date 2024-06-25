@@ -139,197 +139,53 @@ classdef G4_document < handle
 
         function set_trial_property(self, x, y, new_value, trialtype)
 
-        end
-        function set_block_trial_property(self, index, new_value)
-            %Adding a new row
-            if index(1) > size(self.block_trials,1)
-                posfield = self.get_posfunc_field_name(new_value{3});
-                %new_value{12} = length(self.Pos_funcs.(posfield).pfnparam.func)/1000;
-                self.set_block_trials([self.block_trials;new_value]);
-%                 block_data = self.block_trials;
+            if strcmp(trialtype, 'block')
+                propName  = 'block_trials';
 
-            else
-                if self.check_if_cell_disabled(new_value)
-                    self.set_uneditable_block_trial_property(index, new_value);
+                if x > size(self.block_trials, 1)
+                    posfield = self.get_posfunc_field_name(new_value{3});
+                    self.set_block_trials([self.block_trials;new_value]);
                     return;
                 end
-
-                %If the user edited the pattern or position function, make sure the file dimensions match
-                if index(2) == 1 && ~strcmp(num2str(new_value),'')
-                    if ~isnumeric(new_value)
-                        new_value = str2num(new_value);
-                    end
-                    if ~isempty(new_value) && (new_value < 1 || new_value > 7)
-                        self.create_error_box("Mode must be 1-7 or left empty.", 'Mode Error');
-                        return;
-                    end
-                end
-
-                if index(2) == 2 && ~strcmp(string(new_value),'') && ~isempty(new_value)
-                    patfile = new_value;
-                    patfield = self.get_pattern_field_name(patfile);
-                    if strcmp(patfield, '')
-                        self.create_error_box("That block trial pat filename does not match any imported files.", 'block pattern name', 'modal');
-                        return;
-                    end
-                    patDim = length(self.Patterns.(patfield).pattern.Pats(1,1,:));
-                    patRows = length(self.Patterns.(patfield).pattern.Pats(:,1,1))/16;
-                    numrows = self.num_rows;
-                    if ~strcmp(string(self.block_trials{index(1),3}),'') && ~self.check_if_cell_disabled(self.block_trials{index(1),3})
-                        posfile = self.block_trials{index(1),3};
-                        posfield = self.get_posfunc_field_name(posfile);
-                        funcDim = max(self.Pos_funcs.(posfield).pfnparam.func);
-                    else
-                        patDim = 0;
-                        funcDim = 0;
-                    end
-
-                elseif index(2) == 3 && ~strcmp(string(new_value),'') && ~isempty(new_value) && ~strcmp(string(self.block_trials{index(1),2}),'')
-
-                    posfile = new_value;
-                    posfield = self.get_posfunc_field_name(posfile);
-                    if strcmp(posfield,'') && ~strcmp(new_value,'')
-                        self.create_error_box("That block trial pos filename does not match any imported files.", 'position function name');
-                        return;
-                    end
-
-                    patfile = self.block_trials{index(1),2};
-                    patfield = self.get_pattern_field_name(patfile);
-                    patDim = length(self.Patterns.(patfield).pattern.Pats(1,1,:));
-                    funcDim = max(self.Pos_funcs.(posfield).pfnparam.func);
-                    patRows = 0;
-                    numrows = 0;
-
-                    if self.Pos_funcs.(posfield).pfnparam.gs_val == 1
-                        self.block_trials{index(1),12} = round(self.Pos_funcs.(posfield).pfnparam.size/2000,1);
-                    else
-                        self.block_trials{index(1),12} = round(self.Pos_funcs.(posfield).pfnparam.size/1000,1);
-                    end
-                else
-                    patDim = 0;
-                    funcDim = 0;
-                    patRows = 0;
-                    numrows = 0;
-                end
-
-                if index(2) > 3 && index(2) < 8 && ~strcmp(string(new_value),'') && ~isempty(new_value)
-                    aofile = new_value;
-                    aofield = self.get_aofunc_field_name(aofile);
-                    if strcmp(aofield,'')
-                        self.create_error_box("That block trial AO filename does not match any imported files.", 'AO function filename');
-                        return;
-                    end
-                end
-
-                if index(2) == 8 && ~strcmp(num2str(new_value),'')
-                    if isnumeric(new_value)
-                        new_value = num2str(new_value);
-                    end
-                    nums = isstrprop(new_value,'digit');
-                    chars = 0;
-                    for i = 1:length(nums)
-                        if nums(i) == 0
-                            chars = 1;
-                        end
-                    end
-
-                    associated_pattern = self.block_trials{index(1),2};
-                    if ~isempty(associated_pattern)
-                        patfield = self.get_pattern_field_name(associated_pattern);
-                        num_pat_frames = length(self.Patterns.(patfield).pattern.Pats(1,1,:));
-                        if chars == 0
-                            if str2num(new_value) > num_pat_frames
-                                self.create_error_box("Please make sure your frame index is within the bounds of your pattern.", 'Frame index error');
-                                return
-                            end
-                        end
-                    end
-                    if  chars == 1 && ~strcmp(new_value,'r')
-                        self.create_error_box("Invalid frame index. Please enter a number or 'r'", 'Frame Index Error');
-                        return;
-                    end
-                end
-
-                %Make sure frame rate is > 0
-                if index(2) == 9 && ~strcmp(num2str(new_value),'')
-                    if ~isnumeric(new_value)
-                        new_value = str2num(new_value);
-                    end
-                    if new_value <= 0
-                        self.create_error_box("Your frame rate must be above 0");
-                        return;
-                    end
-                end
-
-                %Make sure gain/offset are numerical
-                if index(2) == 10 || index(2) == 11 && ~strcmp(num2str(new_value),'')
-                    if ~isnumeric(new_value)
-                        new_value = str2num(new_value);
-                    end
-                end
-
-                if index(2) == 12 && ~strcmp(num2str(new_value),'')
-                    if ~isnumeric(new_value)
-                        new_value = str2num(new_value);
-                    end
-                    if new_value < 0
-                        self.create_error_box("You duration must be zero or greater");
-                        return;
-                    end
-                    %round to 1 decimal place, since the controller only takes
-                    %numbers to 1 decimal place.
-                    new_value = round(new_value, 1);
-                end
-
-                if patRows ~= numrows
-                    self.create_error_box("Watch out! This pattern will not run on the size screen you have selected.");
-                end
-                if patDim < funcDim
-                    self.create_error_box("Please make sure the dimension of your pattern and position functions match");
-                else
-
-                    %Set value
-                    self.block_trials{index(1), index(2)} = new_value;
-                end
-            end
-            self.insert_greyed_cells();
-        end
-
-        function set_uneditable_block_trial_property(self, index, new_value)
-            self.block_trials{index(1), index(2)} = new_value;
-        end
-
-
-%Same as above for pretrial, intertrial, and posttrial
-        function set_pretrial_property(self, index, new_value)
-            %If the user edited the pattern or position function, make sure
-            %the file dimensions match
-            if self.check_if_cell_disabled(new_value)
-                self.set_uneditable_pretrial_property(index, new_value)
+            elseif strcmp(trialtype, 'pre')
+                propName = 'pretrial';
+            elseif strcmp(trialtype, 'inter')
+                propName = 'intertrial';
+            elseif strcmp(trialtype, 'post')
+                propName = 'posttrial';
+            else
+                self.create_error_box("There was an issue with your trial selection. Please try again.");
                 return;
             end
-            if index == 1 && ~isempty(new_value)
+                
+            if self.check_if_cell_disabled(new_value)
+                self.set_uneditable_trial_property([x,y], new_value, propName);
+                return;
+            end
+
+            %If the user edited the pattern or position function, make sure the file dimensions match
+            if y == 1 && ~strcmp(num2str(new_value),'')
                 if ~isnumeric(new_value)
                     new_value = str2num(new_value);
                 end
-                if new_value < 1 || new_value > 7
-                    self.create_error_box("Mode must be 1-7 or left empty.");
+                if ~isempty(new_value) && (new_value < 1 || new_value > 7)
+                    self.create_error_box("Mode must be 1-7 or left empty.", 'Mode Error');
                     return;
                 end
             end
 
-            if index == 2 && ~strcmp(string(new_value),'')
+            if y == 2 && ~strcmp(string(new_value),'') && ~isempty(new_value)
                 patfile = new_value;
                 patfield = self.get_pattern_field_name(patfile);
-                if strcmp(patfield,'')
-                    self.create_error_box("That pretrial pattern filename does not match any imported files.");
+                if strcmp(patfield, '')
+                    self.create_error_box("That trial pat filename does not match any imported files.", 'pattern name', 'modal');
                     return;
                 end
                 patDim = length(self.Patterns.(patfield).pattern.Pats(1,1,:));
                 patRows = length(self.Patterns.(patfield).pattern.Pats(:,1,1))/16;
                 numrows = self.num_rows;
-                if ~strcmp(string(self.pretrial{3}),'') && ~self.check_if_cell_disabled(self.pretrial{3})
-                    posfile = self.pretrial{3};
+                if ~strcmp(string(self.(propName){x,3}),'') && ~self.check_if_cell_disabled(self.(propName){x,3})
+                    posfile = self.(propName){x,3};
                     posfield = self.get_posfunc_field_name(posfile);
                     funcDim = max(self.Pos_funcs.(posfield).pfnparam.func);
                 else
@@ -337,14 +193,16 @@ classdef G4_document < handle
                     funcDim = 0;
                 end
 
-            elseif index == 3 && ~strcmp(string(new_value),'') && ~strcmp(string(self.pretrial{2}),'') && ~isempty(new_value)
+            elseif y == 3 && ~strcmp(string(new_value),'') && ~isempty(new_value) && ~strcmp(string(self.(propName){x,2}),'')
+
                 posfile = new_value;
                 posfield = self.get_posfunc_field_name(posfile);
                 if strcmp(posfield,'') && ~strcmp(new_value,'')
-                    self.create_error_box("That pretrial position filename does not match any imported files.");
+                    self.create_error_box("That trial position filename does not match any imported files.", 'position function name');
                     return;
                 end
-                patfile = self.pretrial{2};
+
+                patfile = self.(propName){x,2};
                 patfield = self.get_pattern_field_name(patfile);
                 patDim = length(self.Patterns.(patfield).pattern.Pats(1,1,:));
                 funcDim = max(self.Pos_funcs.(posfield).pfnparam.func);
@@ -352,9 +210,9 @@ classdef G4_document < handle
                 numrows = 0;
 
                 if self.Pos_funcs.(posfield).pfnparam.gs_val == 1
-                    self.pretrial{12} = round(self.Pos_funcs.(posfield).pfnparam.size/2000,1);
+                    self.(propName){x,12} = round(self.Pos_funcs.(posfield).pfnparam.size/2000,1);
                 else
-                    self.pretrial{12} = round(self.Pos_funcs.(posfield).pfnparam.size/1000,1);
+                    self.(propName){x,12} = round(self.Pos_funcs.(posfield).pfnparam.size/1000,1);
                 end
             else
                 patDim = 0;
@@ -363,19 +221,16 @@ classdef G4_document < handle
                 numrows = 0;
             end
 
-            if index > 3 && index < 8 && ~strcmp(string(new_value),'') && ~isempty(new_value)
+            if y > 3 && y < 8 && ~strcmp(string(new_value),'') && ~isempty(new_value)
                 aofile = new_value;
                 aofield = self.get_aofunc_field_name(aofile);
                 if strcmp(aofield,'')
-                    self.create_error_box("That pretrial AO filename does not match any imported files.");
+                    self.create_error_box("That trial AO filename does not match any imported files.", 'AO function filename');
                     return;
                 end
             end
 
-            %%add error checking here for rest of parameters.
-
-            %Make sure frame index isn't out of bounds
-            if index == 8 && ~strcmp(num2str(new_value),'')
+            if y == 8 && ~strcmp(num2str(new_value),'')
                 if isnumeric(new_value)
                     new_value = num2str(new_value);
                 end
@@ -386,25 +241,26 @@ classdef G4_document < handle
                         chars = 1;
                     end
                 end
-                associated_pattern = self.pretrial{2};
+
+                associated_pattern = self.(propName){x,2};
                 if ~isempty(associated_pattern)
                     patfield = self.get_pattern_field_name(associated_pattern);
                     num_pat_frames = length(self.Patterns.(patfield).pattern.Pats(1,1,:));
                     if chars == 0
                         if str2num(new_value) > num_pat_frames
-                            self.create_error_box("Please make sure your frame index is within the bounds of your pattern.");
+                            self.create_error_box("Please make sure your frame index is within the bounds of your pattern.", 'Frame index error');
                             return
                         end
                     end
                 end
                 if  chars == 1 && ~strcmp(new_value,'r')
-                    self.create_error_box("Invalid frame index. Please enter a number or 'r'");
+                    self.create_error_box("Invalid frame index. Please enter a number or 'r'", 'Frame Index Error');
                     return;
                 end
             end
 
             %Make sure frame rate is > 0
-            if index == 9 && ~strcmp(num2str(new_value),'')
+            if y == 9 && ~strcmp(num2str(new_value),'')
                 if ~isnumeric(new_value)
                     new_value = str2num(new_value);
                 end
@@ -415,13 +271,13 @@ classdef G4_document < handle
             end
 
             %Make sure gain/offset are numerical
-            if index == 10 || index == 11 && ~strcmp(num2str(new_value),'')
+            if y == 10 || y == 11 && ~strcmp(num2str(new_value),'')
                 if ~isnumeric(new_value)
                     new_value = str2num(new_value);
                 end
             end
 
-            if index == 12 && ~strcmp(num2str(new_value),'')
+            if y == 12 && ~strcmp(num2str(new_value),'')
                 if ~isnumeric(new_value)
                     new_value = str2num(new_value);
                 end
@@ -437,310 +293,22 @@ classdef G4_document < handle
             if patRows ~= numrows
                 self.create_error_box("Watch out! This pattern will not run on the size screen you have selected.");
             end
-
             if patDim < funcDim
                 self.create_error_box("Please make sure the dimension of your pattern and position functions match");
             else
-                self.pretrial{index} =  new_value ;
+
+                %Set value
+                self.(propName){x, y} = new_value;
+            end
+            if strcmp(trialtype, 'block')
+                self.insert_greyed_cells();
             end
         end
 
-        function set_uneditable_pretrial_property(self, index, new_value)
-            self.pretrial{index} = new_value;
+        function set_uneditable_trial_property(self, index, new_value,  propName)
+            self.(propName){index(1), index(2)} = new_value;
         end
-
-        function set_intertrial_property(self, index, new_value)
-            %If the user edited the pattern or position function, make sure
-            %the file dimensions match
-            if self.check_if_cell_disabled(new_value)
-                self.set_uneditable_intertrial_property(index, new_value);
-                return;
-            end
-
-            if index == 1 && ~isempty(new_value)
-                if ~isnumeric(new_value)
-                    new_value = str2num(new_value);
-                end
-                if new_value < 1 || new_value > 7
-                    self.create_error_box("Mode must be 1-7 or left empty.");
-                    return;
-                end
-            end
-
-            if index == 2 && strcmp(string(new_value),'') == 0
-                patfile = new_value;
-                patfield = self.get_pattern_field_name(patfile);
-                if strcmp(patfield,'')
-                    self.create_error_box("That intertrial pattern filename does not match any imported files.");
-                    return;
-                end
-                patDim = length(self.Patterns.(patfield).pattern.Pats(1,1,:));
-                patRows = length(self.Patterns.(patfield).pattern.Pats(:,1,1))/16;
-                numrows = self.num_rows;
-                if ~strcmp(string(self.intertrial{3}),'') && ~self.check_if_cell_disabled(self.intertrial{3})
-                    posfile = self.intertrial{3};
-                    posfield = self.get_posfunc_field_name(posfile);
-                    funcDim = max(self.Pos_funcs.(posfield).pfnparam.func);
-                else
-                    patDim = 0;
-                    funcDim = 0;
-                end
-
-            elseif index == 3 && strcmp(string(new_value),'') == 0 && strcmp(string(self.intertrial{2}),'') == 0
-
-                posfile = new_value;
-                posfield = self.get_posfunc_field_name(posfile);
-                if strcmp(posfield,'') && ~strcmp(new_value,'')
-                    self.create_error_box("That intertrial pos filename does not match any imported files.");
-                    return;
-                end
-
-                patfile = self.intertrial{2};
-                patfield = self.get_pattern_field_name(patfile);
-                patDim = length(self.Patterns.(patfield).pattern.Pats(1,1,:));
-                funcDim = max(self.Pos_funcs.(posfield).pfnparam.func);
-                patRows = 0;
-                numrows = 0;
-
-                if self.Pos_funcs.(posfield).pfnparam.gs_val == 1
-                    self.intertrial{12} = round(self.Pos_funcs.(posfield).pfnparam.size/2000,1);
-                else
-                    self.intertrial{12} = round(self.Pos_funcs.(posfield).pfnparam.size/1000,1);
-                end
-            else
-                patDim = 0;
-                funcDim = 0;
-                patRows = 0;
-                numrows = 0;
-            end
-
-            if index > 3 && index < 8 && ~strcmp(string(new_value),'') && ~isempty(new_value)
-                aofile = new_value;
-                aofield = self.get_aofunc_field_name(aofile);
-                if ~isfield(self.Ao_funcs, aofield) && ~strcmp(aofield,'')
-                    self.create_error_box("That intertrial AO filename does not match any imported files.");
-                    return;
-                end
-            end
-
-            if index == 8 && ~strcmp(num2str(new_value),'')
-                if isnumeric(new_value)
-                    new_value = num2str(new_value);
-                end
-                nums = isstrprop(new_value,'digit');
-                chars = 0;
-                for i = 1:length(nums)
-                    if nums(i) == 0
-                        chars = 1;
-                    end
-                end
-                associated_pattern = self.intertrial{2};
-                if ~isempty(associated_pattern)
-                    patfield = self.get_pattern_field_name(associated_pattern);
-                    num_pat_frames = length(self.Patterns.(patfield).pattern.Pats(1,1,:));
-                    if chars == 0
-                        if str2num(new_value) > num_pat_frames
-                            self.create_error_box("Please make sure your frame index is within the bounds of your pattern.");
-                            return
-                        end
-                    end
-                end
-                if  chars == 1 && ~strcmp(new_value,'r')
-                    self.create_error_box("Invalid frame index. Please enter a number or 'r'");
-                    return;
-                end
-            end
-
-            %Make sure frame rate is > 0
-            if index == 9 && ~strcmp(num2str(new_value),'')
-                if ~isnumeric(new_value)
-                    new_value = str2num(new_value);
-                end
-                if new_value <= 0
-                    self.create_error_box("Your frame rate must be above 0");
-                    return;
-                end
-            end
-
-            %Make sure gain/offset are numerical
-
-            if index == 10 || index == 11 && ~strcmp(num2str(new_value),'')
-                if ~isnumeric(new_value)
-                    new_value = str2num(new_value);
-                end
-            end
-
-            if index == 12 && ~strcmp(num2str(new_value),'')
-                if ~isnumeric(new_value)
-                    new_value = str2num(new_value);
-                end
-                if new_value < 0
-                    self.create_error_box("You duration must be zero or greater");
-                    return;
-                end
-                %round to 1 decimal place, since the controller only takes
-                %numbers to 1 decimal place.
-                new_value = round(new_value, 1);
-            end
-            if patRows ~= numrows
-                self.create_error_box("Watch out! This pattern will not run on the size screen you have selected.");
-            end
-            if patDim < funcDim
-                 self.create_error_box("Please make sure the dimension of your pattern and position functions match");
-            else
-                self.intertrial{index} =  new_value ;
-            end
-        end
-
-        function set_uneditable_intertrial_property(self, index, new_value)
-            self.intertrial{index} = new_value;
-        end
-
-        function set_posttrial_property(self, index, new_value)
-            if self.check_if_cell_disabled(new_value)
-                self.set_uneditable_posttrial_property(index, new_value);
-                return;
-            end
-
-            if index == 1 && ~isempty(new_value)
-                if ~isnumeric(new_value)
-                    new_value = str2num(new_value);
-                end
-                if new_value < 1 || new_value > 7
-                    self.create_error_box("Mode must be 1-7 or left empty.");
-                    return;
-                end
-            end
-
-            %If the user edited the pattern or position function, make sure
-            %the file dimensions match
-            if index == 2 && strcmp(string(new_value),'') == 0
-                patfile = new_value;
-                patfield = self.get_pattern_field_name(patfile);
-                if strcmp(patfield,'')
-                    self.create_error_box("That posttrial Pattern filename does not match any imported files.");
-                    return;
-                end
-                patDim = length(self.Patterns.(patfield).pattern.Pats(1,1,:));
-                patRows = length(self.Patterns.(patfield).pattern.Pats(:,1,1))/16;
-                numrows = self.num_rows;
-                if ~strcmp(string(self.posttrial{3}),'') && ~self.check_if_cell_disabled(self.posttrial{3})
-                    posfile = self.posttrial{3};
-                    posfield = self.get_posfunc_field_name(posfile);
-                    funcDim = max(self.Pos_funcs.(posfield).pfnparam.func);
-                else
-                    patDim = 0;
-                    funcDim = 0;
-                end
-
-            elseif index == 3 && ~strcmp(string(new_value),'') && ~isempty(new_value) && ~strcmp(string(self.posttrial{2}),'')
-                posfile = new_value;
-                posfield = self.get_posfunc_field_name(posfile);
-                if ~isfield(self.Pos_funcs, posfield) && ~strcmp(posfield,'')
-                    self.create_error_box("That posttrial pos filename does not match any imported files.");
-                    return;
-                end
-
-                patfile = self.posttrial{2};
-                patfield = self.get_pattern_field_name(patfile);
-                patDim = length(self.Patterns.(patfield).pattern.Pats(1,1,:));
-                funcDim = max(self.Pos_funcs.(posfield).pfnparam.func);
-                patRows = 0;
-                numrows = 0;
-
-                if self.Pos_funcs.(posfield).pfnparam.gs_val == 1
-                    self.posttrial{12} = round(self.Pos_funcs.(posfield).pfnparam.size/2000,1);
-                else
-                    self.posttrial{12} = round(self.Pos_funcs.(posfield).pfnparam.size/1000,1);
-                end
-            else
-                patDim = 0;
-                funcDim = 0;
-                patRows = 0;
-                numrows = 0;
-            end
-
-            if index > 3 && index < 8 && ~strcmp(string(new_value),'') && ~isempty(new_value)
-                aofile = new_value;
-                aofield = self.get_aofunc_field_name(aofile);
-                if strcmp(aofield,'')
-                    self.create_error_box("That posttrial AO filename does not match any imported files.");
-                    return;
-                end
-            end
-
-            if index == 8 && ~strcmp(num2str(new_value),'')
-                if isnumeric(new_value)
-                    new_value = num2str(new_value);
-                end
-                nums = isstrprop(new_value,'digit');
-                chars = 0;
-                for i = 1:length(nums)
-                    if nums(i) == 0
-                        chars = 1;
-                    end
-                end
-                associated_pattern = self.posttrial{2};
-                if ~isempty(associated_pattern)
-                    patfield = self.get_pattern_field_name(associated_pattern);
-                    num_pat_frames = length(self.Patterns.(patfield).pattern.Pats(1,1,:));
-                    if chars == 0
-                        if str2num(new_value) > num_pat_frames
-                            self.create_error_box("Please make sure your frame index is within the bounds of your pattern.");
-                            return
-                        end
-                    end
-                end
-                if  chars == 1 && ~strcmp(new_value,'r')
-                    self.create_error_box("Invalid frame index. Please enter a number or 'r'");
-                    return;
-                end
-            end
-
-            %Make sure frame rate is > 0
-            if index == 9 && ~strcmp(num2str(new_value),'')
-                if ~isnumeric(new_value)
-                   new_value = str2num(new_value);
-                end
-                if new_value <= 0
-                    self.create_error_box("Your frame rate must be above 0");
-                    return;
-                end
-            end
-
-            %Make sure gain/offset are numerical
-            if index == 10 || index == 11 && ~strcmp(num2str(new_value),'')
-                if ~isnumeric(new_value)
-                    new_value = str2num(new_value);
-                end
-            end
-
-            if index == 12 && ~strcmp(num2str(new_value),'')
-               if ~isnumeric(new_value)
-                    new_value = str2num(new_value);
-                end
-                if new_value < 0
-                    self.create_error_box("You duration must be zero or greater");
-                    return;
-                end
-                %round to 1 decimal place, since the controller only takes
-                %numbers to 1 decimal place.
-                new_value = round(new_value, 1);
-            end
-
-            if patRows ~= numrows
-                self.create_error_box("Watch out! This pattern will not run on the size screen you have selected.");
-            end
-            if patDim < funcDim
-                 self.create_error_box("Please make sure the dimension of your pattern and position functions match");
-            else
-                self.posttrial{index} =  new_value ;
-            end
-        end
-
-        function set_uneditable_posttrial_property(self, index, new_value)
-            self.posttrial{index} = new_value;
-        end
+        
 
         function set_recent_files(self, filepath)
             on_list = find(strcmp(self.recent_g4p_files,filepath));

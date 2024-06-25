@@ -74,8 +74,6 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
             self.set_preview_con(G4_preview_controller(self.doc));
             self.set_preview_on_arena(0);
 
-           
-
             %, 'Resize', 'off'
 
             %ALL REST OF PROPERTIES ARE DEFINED IN LAYOUT
@@ -2547,48 +2545,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
             end
         end
 
-        function update_column_widths(self)
 
-            %establish minimum width for each column
-            max_len = cell(4,13);
-            for i = 1:size(max_len,1)
-                for j = 1:size(max_len,2)
-                    if j == 2 || j == 3
-                        max_len{i,j} = 20;
-                    elseif j == 8 || j == 9 || j == 12
-                        max_len{i,j} = 15;
-                    else
-                        max_len{i,j} = 10;
-                    end
-                end
-            end
-            tables = {self.pretrial_table, self.intertrial_table, self.posttrial_table, self.block_table};
-            data = {self.doc.pretrial, self.doc.intertrial, self.doc.posttrial, self.doc.block_trials};
-
-            % get max width for each column in pretrial
-            for table = 1:length(tables)
-                for col = 1:size(data{table},2)
-                    for row = 1:size(data{table},1)
-                        width = length(data{table}{row, col});
-                        if width > max_len{table,col}
-                            max_len{table,col} = width;
-                        end
-                    end
-                end
-           end
-
-            %convert from length in characters to pixels
-            for i = 1:size(max_len,1)
-                for j = 1:size(max_len,2)
-                    max_len{i,j} = max_len{i,j}*5;
-                end
-            end
-
-            self.pretrial_table.ColumnWidth = max_len(1,:);
-            self.intertrial_table.ColumnWidth = max_len(2,:);
-            self.posttrial_table.ColumnWidth = max_len(3,:);
-            self.block_table.ColumnWidth = max_len(4,:);
-        end
 
         function mode = get_mode(self, trialtype, trialnum)
 
@@ -2625,80 +2582,37 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
 
         % Update the GUI to reflect the up to date model values
         function update_gui(self)
-            
-            self.set_pretrial_table_data();
-            self.set_intertrial_table_data();
-            self.set_block_table_data();
-            self.set_posttrial_table_data();
-            self.set_randomize_buttonGrp_selection();
-            self.set_repetitions_box_val();
-            self.set_isSelect_all_box_val();
-            self.set_chan1_val();
-            self.set_chan2_val();
-            self.set_chan3_val();
-            self.set_chan4_val();
-            self.set_chan1_rate_box_val();
-            self.set_chan2_rate_box_val();
-            self.set_chan3_rate_box_val();
-            self.set_chan4_rate_box_val();
-            self.set_num_rows_buttonGrp_selection();
-            self.set_exp_name();
-            self.set_recent_file_menu_items();
-            self.set_exp_length_text();
-            self.doc.replace_greyed_cell_values();
-            self.update_column_widths();
-            self.insert_greyed_cells();
+
+            self.view.update_gui();
+          
         end
 
  %% Functions to set the value of each GUI object
 
-        function set_pretrial_table_data(self)
-            self.pretrial_table.Data = self.doc.pretrial;
-        end
+  %% Save this code until I confirm it's no longer needed with the uifigure      
+%         function set_block_table_data(self)
+% %              %%%%%%%%%%%%%%%%%%THIS IS NOT A GOOD PERMANENT SOLUTION FOR
+% %              %%%%%%%%%%%%%%%%%%THE SCROLLBAR JUMPING ISSUE. USING PAUSE CAN
+% %              %%%%%%%%%%%%%%%%%%UNDER CERTAIN CIRCUMSTANCES HAVE WEIRD
+% %              %%%%%%%%%%%%%%%%%%RESULTS, AND JAVA INTERVENTIONS MAY STOP
+% %              %%%%%%%%%%%%%%%%%%WORKING WITH ANY RELEASE. CHECK NEW
+% %              RELEASES TO SEE IF THIS BUG HAS BEEN FIXED
+% 
+% %% findjob citation
+% %% Yair Altman (2024). findjobj - find java handles of Matlab graphic objects (https://www.mathworks.com/matlabcentral/fileexchange/14317-findjobj-find-java-handles-of-matlab-graphic-objects), 
+% %% MATLAB Central File Exchange. Retrieved June 4, 2024. 
+%             jTable = findjobj(self.block_table);
+%             jScrollPane = jTable.getComponent(0);
+%             javaObjectEDT(jScrollPane);
+%             currentViewPos = jScrollPane.getViewPosition;
+% 
+%             self.block_table.Data = self.doc.block_trials;
+%             pause(0);
+%             jScrollPane.setViewPosition(currentViewPos);
+%         end
 
-        function set_intertrial_table_data(self)
-            self.intertrial_table.Data = self.doc.intertrial;
-        end
-
-        function set_posttrial_table_data(self)
-            self.posttrial_table.Data = self.doc.posttrial;
-        end
-
-        function set_block_table_data(self)
-%              %%%%%%%%%%%%%%%%%%THIS IS NOT A GOOD PERMANENT SOLUTION FOR
-%              %%%%%%%%%%%%%%%%%%THE SCROLLBAR JUMPING ISSUE. USING PAUSE CAN
-%              %%%%%%%%%%%%%%%%%%UNDER CERTAIN CIRCUMSTANCES HAVE WEIRD
-%              %%%%%%%%%%%%%%%%%%RESULTS, AND JAVA INTERVENTIONS MAY STOP
-%              %%%%%%%%%%%%%%%%%%WORKING WITH ANY RELEASE. CHECK NEW
-%              RELEASES TO SEE IF THIS BUG HAS BEEN FIXED
-
-%% findjob citation
-%% Yair Altman (2024). findjobj - find java handles of Matlab graphic objects (https://www.mathworks.com/matlabcentral/fileexchange/14317-findjobj-find-java-handles-of-matlab-graphic-objects), 
-%% MATLAB Central File Exchange. Retrieved June 4, 2024. 
-            jTable = findjobj(self.block_table);
-            jScrollPane = jTable.getComponent(0);
-            javaObjectEDT(jScrollPane);
-            currentViewPos = jScrollPane.getViewPosition;
-
-            self.block_table.Data = self.doc.block_trials;
-            pause(0);
-            jScrollPane.setViewPosition(currentViewPos);
-        end
-
-        function set_randomize_buttonGrp_selection(self)
-            if self.doc.is_randomized == 1
-                set(self.randomize_buttonGrp,'SelectedObject',self.isRandomized_radio);
-            else
-                set(self.randomize_buttonGrp,'SelectedObject',self.isSequential_radio);
-            end
-        end
-
-        function set_repetitions_box_val(self)
-            self.repetitions_box.String = num2str(self.doc.repetitions);
-        end
-
-        function set_isSelect_all_box_val(self)
-            self.isSelect_all_box.Value = self.model.isSelect_all;
+        function doc_replace_grey_cells(self)
+            self.doc.replace_greyed_cell_values();
         end
 
         function set_chan1_val(self)
@@ -2717,55 +2631,6 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
             self.chan4.Value = self.doc.is_chan4;
         end
 
-        function set_chan1_rate_box_val(self)
-            self.chan1_rate_box.String = num2str(self.doc.chan1_rate);
-        end
-
-        function set_chan2_rate_box_val(self)
-            self.chan2_rate_box.String = num2str(self.doc.chan2_rate);
-        end
-
-        function set_chan3_rate_box_val(self)
-            self.chan3_rate_box.String = num2str(self.doc.chan3_rate);
-        end
-
-        function set_chan4_rate_box_val(self)
-            self.chan4_rate_box.String = num2str(self.doc.chan4_rate);
-        end
-
-        function set_num_rows_buttonGrp_selection(self)
-             value = get(self.num_rows_3, 'Enable');
-            if strcmp(value,'off') == 1
-                %do nothing
-            else
-                if self.doc.num_rows == 3
-                    set(self.num_rows_buttonGrp,'SelectedObject',self.num_rows_3);
-                else
-                    set(self.num_rows_buttonGrp,'SelectedObject',self.num_rows_4);
-                end
-            end
-        end
-
-        function set_exp_name(self)
-            set(self.exp_name_box,'String', self.doc.experiment_name);
-        end
-
-        function set_recent_file_menu_items(self)
-            for i = 1:length(self.doc.recent_g4p_files)
-                 [~,filename] = fileparts(self.doc.recent_g4p_files{i});
-                if i > length(self.recent_file_menu_items)
-                    self.recent_file_menu_items{end + 1} = uimenu(self.menu_open, 'Text', filename, 'MenuSelectedFcn', {@self.open_file, self.doc.recent_g4p_files{i}});
-                else
-
-                    set(self.recent_file_menu_items{i},'Text',filename);
-                    set(self.recent_file_menu_items{i}, 'MenuSelectedFcn', {@self.open_file, self.doc.recent_g4p_files{i}});
-                end
-            end
-        end
-
-        function set_exp_length_text(self)
-            self.exp_length_display.String = [num2str(round(self.doc.est_exp_length/60, 2)), ' minutes'];
-        end
 
         function set_files(self, x, y, new_value, trialtype)
             new_value = string(new_value);
@@ -2998,6 +2863,70 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
 
 %% GETTERS
 
+        %Getting stuff from the document object
+        function output =  get_pretrial_data(self)
+            output = self.doc.get_pretrial();
+        end
+        function output = get_blocktrial_data(self)
+            output = self.doc.get_block_trials();
+        end
+        function output = get_intertrial_data(self)
+            output = self.doc.get_intertrial();
+        end
+        function output = get_posttrial_data(self)
+            output = self.doc.get_posttrial();
+        end
+        function output = get_is_randomized(self)
+            output = self.doc.get_is_randomized();
+        end
+        function output = get_repetitions(self)
+            output = self.doc.get_repetitions();
+        end
+        function output = get_is_chan1(self)
+            output =  self.doc.get_is_chan1();
+        end
+        function output = get_is_chan2(self)
+            output =  self.doc.get_is_chan2();
+        end
+        function output = get_is_chan3(self)
+            output = self.doc.get_is_chan3();
+        end
+        function output = get_is_chan4(self)
+            output = self.doc.get_is_chan4();
+        end
+        function output = get_chan1_rate(self)
+            output = self.doc.get_chan1_rate();
+        end
+        function  output = get_chan2_rate(self)
+            output = self.doc.get_chan2_rate();
+        end
+        function output = get_chan3_rate(self)
+            output =  self.doc.get_chan3_rate();
+        end
+        function output = get_chan4_rate(self)
+            output = self.doc.get_chan4_rate();
+        end
+        function output = get_num_rows(self)
+            output = self.doc.get_num_rows();
+        end
+        function output = get_experiment_name(self)
+            output = self.doc.get_experiment_name();
+        end
+        function output = get_recent_g4p_files(self)
+            output = self.doc.get_recent_g4p_files();
+        end
+        function output = get_est_esp_length(self)
+            output = self.doc.get_est_exp_length();
+        end
+         
+
+% Get stuff from the model object
+        function output =  get_isSelect_all(self)
+            output =  self.model.isSelect_all;
+        end
+
+        
+
         function output = get_model(self)
             output = self.model;
         end
@@ -3165,6 +3094,8 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
         function output = get_preview_on_arena(self)
             output = self.preview_on_arena;
         end
+
+        
      end
 end
 
