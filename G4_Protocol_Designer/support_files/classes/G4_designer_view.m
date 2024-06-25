@@ -394,8 +394,11 @@ classdef G4_designer_view < handle
         end
 
 
-        function close_application(self)
+        function close_application(self, src, event)
 
+            clear('con');
+            delete(src);
+            evalin('base', 'clear con');
 
         end
 

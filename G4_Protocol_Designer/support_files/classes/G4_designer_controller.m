@@ -2241,13 +2241,6 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
             end
         end
 
-        function close_application(self, src, event)
-            
-            clear('con');
-            delete(src);
-            evalin('base', 'clear con');
-
-        end
 
 %% Error handling Functions
 
