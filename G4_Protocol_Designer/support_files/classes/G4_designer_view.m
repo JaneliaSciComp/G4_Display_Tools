@@ -27,6 +27,8 @@ classdef G4_designer_view < handle
         num_rows_3
         num_rows_4
         recent_file_menu_items
+        hAxes
+        second_axes
 
     end
 
@@ -497,7 +499,7 @@ classdef G4_designer_view < handle
             if y == 1
                 allow = 1;                
             else
-                mode = self.con.get_mode(trialtype, x);
+                mode = self.con.get_trial_component(trialtype, x, 1);
                 allow = self.con.check_editable(mode, y);              
             end
             if allow == 1
@@ -509,8 +511,161 @@ classdef G4_designer_view < handle
 
         end
 
-        function preview_selection(self, positions)
+        function preview_selection(self, varargin)
+            %When a new cell is selected, first delete the current preview axes if
+        %there
 
+            delete(self.hAxes);
+            delete(self.second_axes);
+
+            src = varargin{1};
+            event = varargin{2};
+            if length(varargin) >= 3
+                positions = varargin{3};
+            end
+
+      %Determine whether we are previewing a file from a table or from the
+      %listbox
+
+            if src.Position == self.listbox_imported_files.Position
+                is_table = 0;
+            else
+                if ~isempty(event.Indices)
+                    is_table = 1;
+                else
+                    is_table = NaN;
+                end
+            end
+
+            if is_table == 1
+                %get index of selected cell, table it resides in, and
+                %string of the file in the cell if its index is 2-7
+                file = self.check_table_selected(src, event, positions);
+
+                %Fill embedded list with imported files appropriate for the
+                %selected cell
+                self.provide_file_list(event);
+            else
+                file = self.listbox_imported_files.String{self.listbox_imported_files.Value};
+            end
+
+
+        end
+
+        function [file] = check_table_selected(self, src, event, positions)
+
+            x_event_index = event.Indices(1);
+            y_event_index = event.Indices(2);
+            if y_event_index > 1 && y_event_index< 8
+                file = string(src.Data(x_event_index, y_event_index));
+            else
+                file = '';
+            end
+
+            if round(src.Position,4) - round(positions.pre,4) == 0
+                table = "pre";
+            elseif round(src.Position,4) - round(positions.inter,4) == 0
+                table = "inter";
+            elseif round(src.Position,4) - round(positions.block,4) == 0
+                table = "block";
+            elseif round(src.Position,4) - round(positions.post,4) == 0
+                table = "post";
+            end
+
+            self.con.set_current_selected_cell(table, event.Indices);
+
+        end
+
+        % When a table cell is selected, this populates the imported files box with
+        % all imported files available to fill that cell
+        function provide_file_list(self, event)
+
+            if event.Indices(2) == 2
+                pats = self.con.get_patterns();
+                fields = fieldnames(pats);
+                if isempty(fields)
+                    self.listbox_imported_files.String = {''};
+                    return;
+                end
+
+                for i = 1:length(fields)
+                    filenames{i} = pats(fields{i}).filename;
+                end
+                self.listbox_imported_files.String = filenames;
+
+            elseif event.Indices(2) == 3
+                curr_cell = self.con.get_current_selected_cell();
+                if strcmp(curr_cell.table, "pre")
+                    mode = self.con.get_trial_component('pre', 1, 1);
+                elseif strcmp(curr_cell.table, "inter")
+                    mode = self.con.get_trial_component('inter', 1, 1);
+                elseif strcmp(curr_cell.table, "post")
+                    mode = self.con.get_trial_component('post', 1, 1);
+                else
+                    mode = self.con.get_trial_component('block', event.Indices(1), 1);
+                end
+
+                edit = self.con.check_editable(mode, 3);
+
+                if edit == 0
+                    self.con.create_error_box("You cannot edit the position function in this mode.");
+                    return;
+                end
+
+                funcs = self.con.get_pos_funcs();
+                fields = fieldnames(funcs);
+
+                if isempty(fields)
+                    self.listbox_imported_files.String = {''};
+                    return;
+                end
+
+                for i = 1:length(fields)
+                    filenames{i} = funcs(fields{i}).filename;
+                end
+
+                self.listbox_imported_files.String = filenames;
+
+           elseif event.Indices(2) > 3 && event.Indices(2) < 8
+
+                ao = self.con.get_ao_funcs();
+                fields = fieldnames(ao);
+                if isempty(fields)
+                    self.listbox_imported_files.String = {''};
+                    return;
+                end
+
+                for i = 1:length(fields)
+                    filenames{i} = ao.(fields{i}).filename;
+                end
+
+                self.listbox_imported_files.String = filenames;
+            else
+                return;
+            end
+
+            curr_cell = self.con.get_current_selected_cell();
+            if strcmp(curr_cell.table,"pre")
+                selected_file = self.con.get_trial_component('pre', 1, event.Indices(2));
+                ind = find(strcmp(filenames, selected_file));
+            elseif strcmp(curr_cell.table,"inter")
+                selected_file = self.con.get_trial_component('inter', 1, event.Indices(2));
+                ind = find(strcmp(filenames, selected_file));
+            elseif strcmp(curr_cell.table, "block")
+                selected_file = self.con.get_trial_component('block', event.Indices(1), event.Indices(2));
+                ind = find(strcmp(filenames, selected_file));
+            else
+                selected_file = self.con.get_trial_component('post', event.Indices(2));
+                ind = find(strcmp(filenames, selected_file));
+            end
+
+            if ~isempty(ind)
+                self.listbox_imported_files.Value = ind;
+            else
+                self.listbox_imported_files.Value = 1;
+            end
+
+           
         end
 
         function add_trials_callback(self)
