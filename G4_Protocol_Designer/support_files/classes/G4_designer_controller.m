@@ -849,42 +849,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
 
         function preview_selection(self, varargin)
 
-        %When a new cell is selected, first delete the current preview axes if
-        %there
-
-            delete(self.hAxes);
-            delete(self.second_axes);
-
-            src = varargin{1};
-            event = varargin{2};
-            if length(varargin) >= 3
-                positions = varargin{3};
-            end
-
-      %Determine whether we are previewing a file from a table or from the
-      %listbox
-
-            if src.Position == self.listbox_imported_files.Position
-                is_table = 0;
-            else
-                if ~isempty(event.Indices)
-                    is_table = 1;
-                else
-                    is_table = NaN;
-                end
-            end
-
-            if is_table == 1
-                %get index of selected cell, table it resides in, and
-                %string of the file in the cell if its index is 2-7
-                file = self.check_table_selected(src, event, positions);
-
-                %Fill embedded list with imported files appropriate for the
-                %selected cell
-                self.provide_file_list(event);
-            else
-                file = self.listbox_imported_files.String{self.listbox_imported_files.Value};
-            end
+       
 
             %Get all parameters that might be needed for preview from
             %the trial the selected cell belongs to.
@@ -1311,93 +1276,8 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
             self.model.isSelect_all = 0;
         end
 
-        % When a table cell is selected, this populates the imported files box with
-        % all imported files available to fill that cell
-        function provide_file_list(self, event)
 
-            if event.Indices(2) == 2
-                pats = self.doc.Patterns;
-                fields = fieldnames(pats);
-                if isempty(fields)
-                    self.listbox_imported_files.String = {''};
-                    return;
-                end
 
-                for i = 1:length(fields)
-                    filenames{i} = self.doc.Patterns.(fields{i}).filename;
-                end
-                self.listbox_imported_files.String = filenames;
-
-            elseif event.Indices(2) == 3
-                if strcmp(self.model.current_selected_cell.table, "pre")
-                    mode = self.doc.pretrial{1};
-                elseif strcmp(self.model.current_selected_cell.table, "inter")
-                    mode = self.doc.intertrial{1};
-                elseif strcmp(self.model.current_selected_cell.table, "post")
-                    mode = self.doc.posttrial{1};
-                else
-                    mode = self.doc.block_trials{event.Indices(1),1};
-                end
-
-                edit = self.check_editable(mode, 3);
-
-                if edit == 0
-                    self.create_error_box("You cannot edit the position function in this mode.");
-                    return;
-                end
-
-                funcs = self.doc.Pos_funcs;
-                fields = fieldnames(funcs);
-
-                if isempty(fields)
-                    self.listbox_imported_files.String = {''};
-                    return;
-                end
-
-                for i = 1:length(fields)
-                    filenames{i} = self.doc.Pos_funcs.(fields{i}).filename;
-                end
-
-                self.listbox_imported_files.String = filenames;
-
-            elseif event.Indices(2) > 3 && event.Indices(2) < 8
-
-                ao = self.doc.Ao_funcs;
-                fields = fieldnames(ao);
-                if isempty(fields)
-                    self.listbox_imported_files.String = {''};
-                    return;
-                end
-
-                for i = 1:length(fields)
-                    filenames{i} = self.doc.Ao_funcs.(fields{i}).filename;
-                end
-
-                self.listbox_imported_files.String = filenames;
-            else
-                return;
-            end
-
-            if strcmp(self.model.current_selected_cell.table,"pre")
-                selected_file = self.doc.pretrial{event.Indices(2)};
-                ind = find(strcmp(filenames, selected_file));
-            elseif strcmp(self.model.current_selected_cell.table,"inter")
-                selected_file = self.doc.intertrial{event.Indices(2)};
-                ind = find(strcmp(filenames, selected_file));
-            elseif strcmp(self.model.current_selected_cell.table, "block")
-                selected_file = self.doc.block_trials{event.Indices(1), event.Indices(2)};
-                ind = find(strcmp(filenames, selected_file));
-            else
-                selected_file = self.doc.posttrial{event.Indices(2)};
-                ind = find(strcmp(filenames, selected_file));
-            end
-
-            if ~isempty(ind)
-                self.listbox_imported_files.Value = ind;
-            else
-                self.listbox_imported_files.Value = 1;
-            end
-        end
 
         % When the mode is changed, clear and disable appropriate fields
         function clear_fields(self, mode)
@@ -1594,29 +1474,8 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
             num_checked = length(checked_rows);
         end
 
-        % Check which table the currently selected cell belongs to
-        function [file] = check_table_selected(self, src, event, positions)
-
-            x_event_index = event.Indices(1);
-            y_event_index = event.Indices(2);
-            self.model.current_selected_cell.index = event.Indices;
-            if y_event_index > 1 && y_event_index< 8
-                file = string(src.Data(x_event_index, y_event_index));
-            else
-                file = '';
-            end
-
-            if round(src.Position,4) - round(positions.pre,4) == 0
-                self.model.current_selected_cell.table = "pre";
-            elseif round(src.Position,4) - round(positions.inter,4) == 0
-                self.model.current_selected_cell.table = "inter";
-            elseif round(src.Position,4) - round(positions.block,4) == 0
-                self.model.current_selected_cell.table = "block";
-            elseif round(src.Position,4) - round(positions.post,4) == 0
-                self.model.current_selected_cell.table = "post";
-            end
-
-        end
+        
+        
 
         % Get data from selected trial or throw error if more than one
         % trial is selected
@@ -2502,27 +2361,19 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
             end
         end
 
-
-
-        function mode = get_mode(self, trialtype, trialnum)
+        function output = get_trial_component(self, trialtype, trialnum, comp_ind)
 
             if strcmp(trialtype, 'pre')
-                mode = self.doc.pretrial{1};
-
+                output = self.doc.pretrial{comp_ind};
             elseif strcmp(trialtype, 'inter')
-                mode = self.doc.intertrial{1};
-
+                output = self.doc.intertrial{comp_ind};
             elseif strcmp(trialtype, 'post')
-                mode = self.doc.posttrial{1};
-
+                output = self.doc.posttrial{comp_ind};
             elseif strcmp(trialtype, 'block')
-
-                mode = self.doc.block_trials{trialnum, 1};
-
+                output = self.doc.block_trials{trialnum, comp_ind};
             end
-
-
         end
+
 
 %% Additional Update functions
 
@@ -2645,7 +2496,12 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
         
 
 %% SETTERS
-        
+
+% Setting values in the model
+        function set_current_selected_cell(self, table, index)
+                    self.model.set_current_selected_cell(table, index);
+        end
+                
         function set_ctlr(self, value)
             self.ctlr = value;
         end
@@ -2875,11 +2731,23 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
         function output = get_est_esp_length(self)
             output = self.doc.get_est_exp_length();
         end
+        function output = get_patterns(self)
+            output = self.doc.Patterns;
+        end
+        function output = get_pos_funcs(self)
+            output = self.doc.Pos_funcs;
+        end
+        function output  = get_ao_funcs(self)
+            output = self.doc.Ao_funcs;
+        end
          
 
 % Get stuff from the model object
         function output =  get_isSelect_all(self)
             output =  self.model.isSelect_all;
+        end
+        function output = get_current_selected_cell(self)
+            output = self.model.current_selected_cell;
         end
 
         
