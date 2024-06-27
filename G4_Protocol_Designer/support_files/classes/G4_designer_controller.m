@@ -11,50 +11,15 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
         doc %contains all data that is stored in the saved file
         settings_con %controller (containing the view and model) for the settings panel
 
-        %tables that show the trial data
-        pretrial_table
-        intertrial_table
-        posttrial_table
-        block_table
 
         %structs in which to load files as they are entered
         pre_files
         inter_files
         block_files
         post_files
-
-        %channel gui objects
-        chan1
-        chan1_rate_box
-        chan2
-        chan2_rate_box
-        chan3
-        chan3_rate_box
-        chan4
-        chan4_rate_box
-
-        num_rows_buttonGrp
-        num_rows_3
-        num_rows_4
-        isSelect_all
-        isRandomized_radio
-        isSequential_radio
-        randomize_buttonGrp
-        repetitions_box
-        isSelect_all_box
-        f
-        preview_panel
         hAxes
         second_axes
-        exp_name_box
-        pageUp_button
-        pageDown_button
-        exp_length_display
-
         listbox_imported_files
-        recent_g4p_files
-        recent_files_filepath
-        recent_file_menu_items
         menu_open
         inscreen_plot
         preview_on_arena
@@ -96,7 +61,6 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
 
            self.view = G4_designer_view();
            self.update_gui() ;
-           self.set_num_rows_buttonGrp_selection();
         end
 
 

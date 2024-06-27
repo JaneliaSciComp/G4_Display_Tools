@@ -27,6 +27,8 @@ classdef G4_designer_view < handle
         num_rows_3
         num_rows_4
         recent_file_menu_items
+        hAxes
+        second_axes
 
     end
 
