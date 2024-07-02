@@ -549,6 +549,12 @@ classdef G4_designer_view < handle
                 file = self.listbox_imported_files.String{self.listbox_imported_files.Value};
             end
 
+            if ~strcmp(file,'') && ~strncmp(file, '<html>',6) && ~isnan(is_table)
+                self.con.preview_selection(is_table);
+            else
+                self.con.turn_off_screen();
+            end
+
 
         end
 
@@ -666,6 +672,28 @@ classdef G4_designer_view < handle
             end
 
            
+        end
+
+        function set_preview_axes(self)
+
+            self.second_axes = axes(self.preview_panel, 'units', 'normalized', 'Position', [.1, .15, .8 ,.7], 'XAxisLocation', 'top', 'YAxisLocation', 'right');
+            self.hAxes = axes(self.preview_panel,'units', 'normalized', 'Position', self.second_axes.Position);
+            plot_data = self.con.get_current_preview_file();
+
+            self.inscreen_plot = plot(plot_data, 'parent', self.hAxes);
+            self.hAxes.XLabel.String = frameLabel;
+            self.second_axes.XLabel.String = timeLabel;
+            set(self.hAxes, 'XLim', xax, 'YLim', yax, 'TickLength',[0,0]);
+            self.hAxes.YLabel.String = patLabel;
+            yax2 = yax;
+            set(self.second_axes, 'Position', self.hAxes.Position, 'XLim', xax2, 'YLim', yax2, 'TickLength', [0,0], 'Color', 'none');
+            
+            if linedur ~= 0
+                line('XData', linedur, 'YData', yax, 'parent', self.hAxes, 'Color', [1 0 0], 'LineWidth', 2);
+            end
+            
+            datacursormode on;
+
         end
 
         function add_trials_callback(self)

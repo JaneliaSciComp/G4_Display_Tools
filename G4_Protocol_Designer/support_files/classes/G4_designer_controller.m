@@ -847,22 +847,22 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
             end
         end
 
-        function preview_selection(self, varargin)
-
-       
+        function preview_selection(self, is_table)
 
             %Get all parameters that might be needed for preview from
             %the trial the selected cell belongs to.
 
-            if ~strcmp(file,'') && ~strncmp(file, '<html>',6) && ~isnan(is_table)
-                [frame_rate, dur, patfield, posfield, aofield, file_type] = get_preview_parameters(self, is_table);
+            [frame_rate, dur, patfield, posfield, aofield, file_type] = get_preview_parameters(self, is_table);
             %Now actually display the preview of whatever file is
             %selected
-                self.display_inscreen_preview(frame_rate, dur, patfield, posfield, aofield, file_type);
-            elseif self.model.screen_on == 1
-                self.ctlr.stopDisplay();
-                self.model.screen_on = 0;
+            if strcmp(file_type, 'pat') && ~strcmp(patfield,'')
+                self.inscreen_pattern_preview(patfield);
+            elseif strcmp(file_type, 'pos') && ~strcmp(funcfield,'')
+                self.inscreen_pos_preview(frame_rate, dur, posfield);
+            elseif strcmp(file_type, 'ao') && ~strcmp(aofield,'')
+                self.inscreen_ao_preview(aofield);
             end
+            
         end
 
 
@@ -1556,91 +1556,83 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                 ylabel(y_label);
         end
 
+        function turn_off_screen(self)
+            if self.model.screen_on
+                self.ctlr.stopDisplay();
+                self.model.set_screen_on(0);
+            end
+        end
+
         % Display the in-screen preview
 %%%%%%TO DO: THIS FUNCTION IS LONG, SEE IF YOU CAN BREAK IT UP
-        function display_inscreen_preview(self, frame_rate, dur, patfield, funcfield, aofield, file_type)
+function inscreen_pos_preview(self, frame_rate, dur, funcfield)
 
-            if strcmp(file_type, 'pat') && ~strcmp(patfield,'')
-                self.inscreen_pattern_preview(patfield);
-            elseif strcmp(file_type, 'pos') && ~strcmp(funcfield,'')
-                if self.model.screen_on
-                    self.ctlr.stopDisplay();
-                    self.model.screen_on = 0;
-                end
+            self.turn_off_screen();
 
-                self.model.current_preview_file = self.doc.Pos_funcs.(funcfield).pfnparam.func;
+            self.model.set_current_preview_file(self.doc.Pos_funcs.(funcfield).pfnparam.func);
+            axis_position = [.1, .15, .8 ,.7];
 
-                self.second_axes = axes(self.preview_panel, 'units', 'normalized', 'Position', [.1, .15, .8 ,.7], 'XAxisLocation', 'top', 'YAxisLocation', 'right');
-                self.hAxes = axes(self.preview_panel,'units', 'normalized', 'Position', self.second_axes.Position);
-
-                timeLabel = 'Time (ms)';
-                patLabel = 'Pattern';
-                frameLabel = 'Frame Number';
-                yax = [min(self.model.current_preview_file) max(self.model.current_preview_file)];
-                if yax(1) == yax(2)
-                    yax = [yax(1)-1 yax(2) + 1];
-                end
-                if frame_rate == 1000
-                    time_in_ms = length(self.model.current_preview_file(1,:));
-                else
-                    time_in_ms = length(self.model.current_preview_file(1,:))*2;
-                end
-
-                num_frames = frame_rate*(1/1000)*time_in_ms;
-                xax = [0 num_frames];
-                xax2 = [0 time_in_ms];
-
-                self.inscreen_plot = plot(self.model.current_preview_file, 'parent', self.hAxes);
-                self.hAxes.XLabel.String = frameLabel;
-                self.second_axes.XLabel.String = timeLabel;
-                set(self.hAxes, 'XLim', xax, 'YLim', yax, 'TickLength',[0,0]);
-                self.hAxes.YLabel.String = patLabel;
-                yax2 = yax;
-                set(self.second_axes, 'Position', self.hAxes.Position, 'XLim', xax2, 'YLim', yax2, 'TickLength', [0,0], 'Color', 'none');
-
-                if dur <= xax2(2)
-                    if frame_rate == 1000
-                        linedur = [dur, dur];
-
-                    else
-                        linedur = [dur/2, dur/2];
-                    end
-
-                    line('XData', linedur, 'YData', yax, 'parent', self.hAxes, 'Color', [1 0 0], 'LineWidth', 2);
-                end
-                datacursormode on;
-            elseif strcmp(file_type, 'ao') && ~strcmp(aofield,'')
-                if self.model.screen_on
-                    self.ctlr.stopDisplay();
-                    self.model.screen_on = 0;
-                end
-
-                self.model.current_preview_file = self.doc.Ao_funcs.(aofield).afnparam.func;
-                self.second_axes = axes(self.preview_panel, 'units', 'normalized', 'OuterPosition', [.1, .04, .8 ,.9], 'XAxisLocation', 'top', 'YAxisLocation', 'right');
-
-                self.hAxes = axes(self.preview_panel,'units', 'normalized', 'OuterPosition', [.1, .04, .8 ,.9]);
-
-                plot(self.model.current_preview_file, 'parent', self.hAxes);
-                time_in_ms = length(self.model.current_preview_file(1,:));
-
-                xax = [0 length(self.model.current_preview_file(1,:))];
-                yax = [min(self.model.current_preview_file) max(self.model.current_preview_file)];
-
-                timeLabel = 'Time (ms)';
-                patLabel = 'Pattern';
-                frameLabel = 'Frame Number';
-                set(self.hAxes, 'XLim', xax, 'YLim', yax, 'TickLength',[0,0]);
-                self.hAxes.XLabel.String = timeLabel;
-                self.hAxes.YLabel.String = patLabel;
-
-                num_frames = frame_rate*(1/1000)*time_in_ms;
-                xax2 = [0 num_frames];
-                yax2 = yax;
-                set(self.second_axes, 'Position', self.hAxes.Position, 'XLim', xax2, 'YLim', yax2, 'TickLength', [0,0], 'Color', 'none');
-                self.second_axes.XLabel.String = frameLabel;
-
-                datacursormode on;
+            labels.timeLabel = 'Time (ms)';
+            labels.patLabel = 'Pattern';
+            labels.frameLabel = 'Frame Number';
+            yax = [min(self.model.current_preview_file) max(self.model.current_preview_file)];
+            if yax(1) == yax(2)
+                yax = [yax(1)-1 yax(2) + 1];
             end
+            if frame_rate == 1000
+                time_in_ms = length(self.model.current_preview_file(1,:));
+            else
+                time_in_ms = length(self.model.current_preview_file(1,:))*2;
+            end
+
+            num_frames = frame_rate*(1/1000)*time_in_ms;
+            xax = [0 num_frames];
+            xax2 = [0 time_in_ms];
+
+
+            if dur <= xax2(2)
+                if frame_rate == 1000
+                    linedur = [dur, dur];
+
+                else
+                    linedur = [dur/2, dur/2];
+                end
+            else
+                linedur = 0;
+            end
+
+            self.view.set_preview_axes(axis_position, labels, yax, time_in_ms, xax, xax2, linedur)
+
+            
+        end
+        function inscreen_ao_preview(self, aofield)
+            self.turn_off_screen();
+
+            self.model.set_current_preview_file(self.doc.Ao_funcs.(aofield).afnparam.func);
+            self.second_axes = axes(self.preview_panel, 'units', 'normalized', 'OuterPosition', [.1, .04, .8 ,.9], 'XAxisLocation', 'top', 'YAxisLocation', 'right');
+
+            self.hAxes = axes(self.preview_panel,'units', 'normalized', 'OuterPosition', [.1, .04, .8 ,.9]);
+
+            plot(self.model.current_preview_file, 'parent', self.hAxes);
+            time_in_ms = length(self.model.current_preview_file(1,:));
+
+            xax = [0 length(self.model.current_preview_file(1,:))];
+            yax = [min(self.model.current_preview_file) max(self.model.current_preview_file)];
+
+            timeLabel = 'Time (ms)';
+            patLabel = 'Pattern';
+            frameLabel = 'Frame Number';
+            set(self.hAxes, 'XLim', xax, 'YLim', yax, 'TickLength',[0,0]);
+            self.hAxes.XLabel.String = timeLabel;
+            self.hAxes.YLabel.String = patLabel;
+
+            num_frames = frame_rate*(1/1000)*time_in_ms;
+            xax2 = [0 num_frames];
+            yax2 = yax;
+            set(self.second_axes, 'Position', self.hAxes.Position, 'XLim', xax2, 'YLim', yax2, 'TickLength', [0,0], 'Color', 'none');
+            self.second_axes.XLabel.String = frameLabel;
+
+            datacursormode on;
         end
 
         function mouse_over_plot(self, src, ~)
@@ -1729,8 +1721,8 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
         % in screen preview
         function inscreen_pattern_preview(self, patfield)
 
-            self.model.auto_preview_index = self.check_pattern_dimensions(patfield);
-            self.model.current_preview_file = self.doc.Patterns.(patfield).pattern.Pats;
+            self.model.set_auto_preview_index(self.check_pattern_dimensions(patfield));
+            self.model.set_current_preview_file(self.doc.Patterns.(patfield).pattern.Pats);
             grayscale_val = self.doc.Patterns.(patfield).pattern.gs_val;
 
             x = [0 length(self.model.current_preview_file(1,:,1))];
@@ -1744,7 +1736,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                 adjusted_matrix = self.model.current_preview_file(:,:,i) ./ max_num;
                 adjusted_file(:,:,i) = adjusted_matrix(:,:,1);
             end
-            self.model.current_preview_file = adjusted_file;
+            self.model.set_current_preview_file(adjusted_file);
 
             self.hAxes = axes(self.preview_panel, 'units', 'normalized', 'OuterPosition', [.1, .04, .8 ,.9], 'XTick', [], 'YTick', [] ,'XLim', x, 'YLim', y);
             im = imshow(adjusted_file(:,:,self.model.auto_preview_index), 'Colormap',gray);
@@ -2499,8 +2491,9 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
 
 % Setting values in the model
         function set_current_selected_cell(self, table, index)
-                    self.model.set_current_selected_cell(table, index);
+              self.model.set_current_selected_cell(table, index);
         end
+
                 
         function set_ctlr(self, value)
             self.ctlr = value;
@@ -2748,6 +2741,9 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
         end
         function output = get_current_selected_cell(self)
             output = self.model.current_selected_cell;
+        end
+        function output = get_current_preview_file(self)
+            output = self.model.current_preview_file;
         end
 
         
