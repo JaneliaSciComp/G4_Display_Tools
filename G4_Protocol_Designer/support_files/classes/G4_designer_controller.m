@@ -212,20 +212,26 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
         function reset_defaults(self)
 
             % Make default be that there is no pretrial
-            extra_input = [];
-            event.EditData = '';
-            event.Indices = [1,1];
-            self.model.current_selected_cell.table = "pre";
-            self.model.current_selected_cell.index = [1,1];
-            self.update_model_pretrial(extra_input, event);
+            
+            newData = '';
+            x = 1;
+            y = 1;
+            curr_cell.table = "pre";
+            curr_cell.index = [1,1];
+            self.set_current_selected_cell(curr_cell);
+            self.update_trial_doc(newData, x, y, 'pre');
 
             % Make default be that there is no intertrial
-            self.model.current_selected_cell.table = "inter";
-            self.update_model_intertrial(extra_input, event);
+            curr_cell.table = "inter";
+            curr_cell.index = [1,1];
+            self.set_current_selected_cell(curr_cell);
+            self.update_trial_doc(newData, x, y, 'inter');
 
             % Make default be that there is no posttrial
-            self.model.current_selected_cell.table = "post";
-            self.update_model_posttrial(extra_input, event);
+            curr_cell.table = "post";
+            curr_cell.index = [1,1];
+            self.set_current_selected_cell(curr_cell);
+            self.update_trial_doc(newData, x, y, 'post');
 
         end
 
@@ -440,35 +446,35 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
             else
                 ao1 = '';
             end
-            
-            d.set_pretrial_property(1, default_mode);
-            d.set_pretrial_property(2, pat1);
-            d.set_pretrial_property(3, pos1);
-            d.set_pretrial_property(4, ao1);
+            x, y, new_value, trialtype
+            d.set_trial_property(1, 1, default_mode, 'pre');
+            d.set_trial_property(2, 1, pat1, 'pre');
+            d.set_trial_property(3, 1, pos1, 'pre');
+            d.set_trial_property(4, 1, ao1, 'pre');
 
             %disable appropriate cells for mode 1
-            d.set_pretrial_property(9, self.doc.colorgen());
-            d.set_pretrial_property(10, self.doc.colorgen());
-            d.set_pretrial_property(11, self.doc.colorgen());
+            d.set_trial_property(9, 1, self.doc.colorgen(), 'pre');
+            d.set_trial_property(10, 1, self.doc.colorgen(), 'pre');
+            d.set_trial_property(11, 1, self.doc.colorgen(), 'pre');
 
-            d.set_intertrial_property(1, default_mode);
-            d.set_intertrial_property(2, pat1);
-            d.set_intertrial_property(3, pos1);
-            d.set_intertrial_property(4, ao1);
+            d.set_trial_property(1, 1, default_mode, 'inter');
+            d.set_trial_property(2, 1, pat1,'inter');
+            d.set_trial_property(3, 1, pos1,'inter');
+            d.set_trial_property(4, 1, ao1,'inter');
 
             %disable appropriate cells for mode 1
-            d.set_intertrial_property(9, self.doc.colorgen());
-            d.set_intertrial_property(10, self.doc.colorgen());
-            d.set_intertrial_property(11, self.doc.colorgen());
+            d.set_trial_property(9, 1, self.doc.colorgen(),'inter');
+            d.set_trial_property(10, 1, self.doc.colorgen(),'inter');
+            d.set_trial_property(11, 1, self.doc.colorgen(),'inter');
 
-            d.set_posttrial_property(1, default_mode);
-            d.set_posttrial_property(2, pat1);
-            d.set_posttrial_property(3, pos1);
-            d.set_posttrial_property(4, ao1);
+            d.set_trial_property(1, 1, default_mode, 'post');
+            d.set_trial_property(2, 1, pat1, 'post');
+            d.set_trial_property(3, 1, pos1, 'post');
+            d.set_trial_property(4, 1, ao1, 'post');
 
-            d.set_posttrial_property(9, self.doc.colorgen());
-            d.set_posttrial_property(10, self.doc.colorgen());
-            d.set_posttrial_property(11, self.doc.colorgen());
+            d.set_trial_property(9, 1, self.doc.colorgen(), 'post');
+            d.set_trial_property(10, 1, self.doc.colorgen(), 'post');
+            d.set_trial_property(11, 1, self.doc.colorgen(), 'post');
 
             if num_pos ~= 0
                 if d.Pos_funcs.(pos1_field).pfnparam.gs_val == 1
@@ -477,16 +483,16 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                 else
                     block_dur = round(d.Pos_funcs.(pos1_field).pfnparam.size/1000,1);
                 end
-                d.set_block_trial_property([1,12], block_dur);
+                d.set_trial_property(1,12, block_dur, 'block');
             end
-            d.set_block_trial_property([1,1], default_mode);
-            d.set_block_trial_property([1,2], pat1);
-            d.set_block_trial_property([1,3], pos1);
-            d.set_block_trial_property([1,4], ao1);
+            d.set_trial_property(1, 1, default_mode, 'block');
+            d.set_trial_property(1, 2, pat1, 'block');
+            d.set_trial_property(1, 3, pos1, 'block');
+            d.set_trial_property(1, 4, ao1, 'block');
 
-            d.set_block_trial_property([1,9], self.doc.colorgen());
-            d.set_block_trial_property([1,10], self.doc.colorgen());
-            d.set_block_trial_property([1,11], self.doc.colorgen());
+            d.set_trial_property(1, 9, self.doc.colorgen(), 'block');
+            d.set_trial_property(1, 10, self.doc.colorgen(), 'block');
+            d.set_trial_property(1, 11, self.doc.colorgen(), 'block');
 
             j = 1; %will end up as the count of how many patterns are used. Acts as the indices to "pat_indices"
             pat_index = pat_index + 1;
@@ -549,7 +555,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                         end
                     end
 
-                    d.set_block_trial_property([j,1],newrow);
+                    d.set_trial_property(j, 1, newrow, 'block');
                     self.block_files.pattern(end + 1) = string(newrow{2});
                     self.block_files.position(end + 1) = string(newrow{3});
                 end
@@ -560,17 +566,13 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
         %Replace the currently selected cell in the tables with the
         %currently selected file in the imported files list.
 
-        function select_new_file(self, ~, ~)
-            new_file = self.listbox_imported_files.String{self.listbox_imported_files.Value};
-            if strcmp(self.model.current_selected_cell.table, "pre")
-                self.doc.set_pretrial_property(self.model.current_selected_cell.index(2), new_file);
-            elseif strcmp(self.model.current_selected_cell.table, "inter")
-                self.doc.set_intertrial_property(self.model.current_selected_cell.index(2), new_file);
-            elseif strcmp(self.model.current_selected_cell.table, "post")
-                self.doc.set_posttrial_property(self.model.current_selected_cell.index(2), new_file);
-            else
-                self.doc.set_block_trial_property(self.model.current_selected_cell.index, new_file);
-            end
+        function select_new_file(self, new_file)
+            self.doc.set_trial_property()
+            curr_cell = self.get_current_selected_cell();
+            x = curr_cell.index(1);
+            y = curr_cell.index(2);
+            trialtype = curr_cell.table;
+            self.doc.set_trial_property(x, y, new_file, trialtype);
             self.update_gui();
         end
 
@@ -831,19 +833,20 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
         % Display preview of file when an appropriate table cell is
         % selected
 
-        function update_preview_on_arena(self, ~, ~)
+        function update_preview_on_arena(self)
             if self.preview_on_arena == 1
                 self.preview_on_arena = 0;
-                if self.model.screen_on == 1
-                    self.ctlr.stopDisplay();
-                    self.model.screen_on = 0;
-                end
-                if self.model.host_connected
-                    self.ctlr.close();
-                    self.model.host_connected = 0;
-                end
+                self.turn_off_screen();
+                self.close_host();
             else
                 self.preview_on_arena = 1;
+            end
+        end
+
+        function close_host(self)
+            if self.model.host_connected
+                self.ctlr.close();
+                self.model.set_host_connected(0);
             end
         end
 
@@ -871,167 +874,41 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
 
         %Play through the pattern library in in-screen preview
 
-        function preview_play(self, ~, ~)
-            self.model.is_paused = false;
-            if strcmp(self.model.current_selected_cell.table, "pre")
-                mode = self.doc.pretrial{1};
-                if mode == 2
-                    fr_rate = self.doc.pretrial{9};
-                else
-                    fr_rate = 30;
-                end
-            elseif strcmp(self.model.current_selected_cell.table, "inter")
-                mode = self.doc.intertrial{1};
-                if mode == 2
-                    fr_rate = self.doc.intertrial{9};
-                else
-                    fr_rate = 30;
-                end
-            elseif strcmp(self.model.current_selected_cell.table, "block")
-                mode = self.doc.block_trials{self.model.current_selected_cell.index(1), 1};
-                if mode == 2
-                    fr_rate = self.doc.block_trials{self.model.current_selected_cell.index(1), 9};
-                else
-                    fr_rate = 30;
-                end
-            elseif strcmp(self.model.current_selected_cell.table, "post")
-                mode = self.doc.posttrial{1};
-                if mode == 2
-                    fr_rate = self.doc.posttrial{9};
-                else
-                    fr_rate = 30;
-                end
+        function fr_rate = prepare_preview_play(self)
+            self.model.set_is_paused(false);
+            curr_cell = self.get_current_selected_cell();
+            trialtype = curr_cell.table;
+            x = curr_cell.index(1);
+            y = curr_cell.index(2);
+            mode = self.get_trial_component(trialtype, x, 1);
+            if mode == 2
+                fr_rate = self.get_trial_component(trialtype, x, 9);
             else
-                self.create_error_box("Please make sure you have selected a cell and try again");
-                return;
+                fr_rate = 30;
             end
 
-            if ~strcmp(self.model.current_preview_file,'') && length(self.model.current_preview_file(1,1,:)) > 1
-                len = length(self.model.current_preview_file(1,1,:));
-                xax = [0 length(self.model.current_preview_file(1,:,1))];
-                yax = [0 length(self.model.current_preview_file(:,1,1))];
-                max_num = max(self.model.current_preview_file,[],[1 2]);
-%                 adjusted_file = zeros(yax(2), xax(2), len);
-%
-%                 for i = 1:len
-%                     adjusted_matrix = self.model.current_preview_file(:,:,i) ./ max_num(i);
-%                     adjusted_file(:,:,i) = adjusted_matrix(:,:,1);
-%                 end
-
-                im = imshow(self.model.current_preview_file(:,:,self.model.auto_preview_index), 'Colormap', gray);
-                set(im,'parent', self.hAxes);
-                set(self.hAxes, 'XLim', xax, 'YLim', yax );
-
-                for i = 1:len
-                    if self.model.is_paused == false
-                        self.model.auto_preview_index = self.model.auto_preview_index + 1;
-                        if self.model.auto_preview_index > len
-                            self.model.auto_preview_index = 1;
-                        end
-                        %imagesc(self.model.current_preview_file.pattern.Pats(:,:,self.model.auto_preview_index), 'parent', hAxes);
-                        set(im,'cdata',self.model.current_preview_file(:,:,self.model.auto_preview_index), 'parent', self.hAxes);
-                        drawnow
-
-                        pause(1/fr_rate);
-                    end
-                end
-            end
         end
 
         %Pause the currently playing in-screen preview
 
-        function preview_pause(self, ~, ~)
+        function preview_pause(self)
 
-            self.model.is_paused = true;
+            self.model.set_is_paused(true);
 
         end
 
         %Stop the currently playing in-screen preview (returns to frame 1)
 
-        function preview_stop(self, ~, ~)
-            if strcmp(self.model.current_selected_cell.table, "")
-                self.create_error_box("Please make sure you've selected a cell.");
-                return;
-            end
+        function preview_stop_reset(self)
+           
+            self.model.set_is_paused(true);
+            self.model.set_auto_preview_index(1);
 
-            self.model.is_paused = true;
-            self.model.auto_preview_index = 1;
-
-            %hAxes = gca;
-            x = [0 length(self.model.current_preview_file(1,:,1))];
-            y = [0 length(self.model.current_preview_file(:,1,1))];
-
-%             max_num = max(self.model.current_preview_file,[],[1 2]);
-%             adjusted_matrix = self.model.current_preview_file(:,:,self.model.auto_preview_index) ./ max_num(self.model.auto_preview_index);
-
-            im = imshow(self.model.current_preview_file(:,:), 'Colormap', gray);
-            set(im, 'parent', self.hAxes);
-            set(self.hAxes, 'XLim', x, 'YLim', y);
-        end
-
-        %Move forward a single frame through pattern library in in-screen
-        %preview
-
-        function frame_forward(self, ~, ~)
-            if ~strcmp(self.model.current_preview_file,'') && length(self.model.current_preview_file(1,1,:)) > 1
-                self.model.auto_preview_index = self.model.auto_preview_index + 1;
-                if self.model.auto_preview_index > length(self.model.current_preview_file(1,1,:))
-                    self.model.auto_preview_index = 1;
-                end
-                preview_data = self.model.current_preview_file(:,:,self.model.auto_preview_index);
-
-                xax = [0 length(preview_data(1,:))];
-                yax = [0 length(preview_data(:,1))];
-
-%                 max_num = max(preview_data,[],[1 2]);
-%                 adjusted_matrix = preview_data ./ max_num;
-
-                im = imshow(preview_data(:,:), 'Colormap', gray);
-                set(im, 'parent', self.hAxes);
-                set(self.hAxes, 'XLim', xax, 'YLim', yax);
-
-                self.update_arena_pattern_index();
-            end
-        end
-
-        %Move backward a single frame through pattern library in in-screen preview
-
-        function frame_back(self, ~, ~)
-            if ~strcmp(self.model.current_preview_file,'') && length(self.model.current_preview_file(1,1,:)) > 1
-                self.model.auto_preview_index = self.model.auto_preview_index - 1;
-                if self.model.auto_preview_index < 1
-                    self.model.auto_preview_index = length(self.model.current_preview_file(1,1,:));
-                end
-
-                data = self.model.current_preview_file;
-                preview_data = data(:,:,self.model.auto_preview_index);
-
-                xax = [0 length(preview_data(1,:))];
-                yax = [0 length(preview_data(:,1))];
-
-%                 max_num = max(preview_data,[],[1 2]);
-%                 adjusted_matrix = preview_data ./ max_num;
-
-                im = imshow(preview_data(:,:), 'Colormap', gray);
-                set(im, 'parent', self.hAxes);
-                set(self.hAxes, 'XLim', xax, 'YLim', yax);
-                self.update_arena_pattern_index();
-            end
-        end
-
-        %Page up in fourth dimension through 4D pattern library (not yet
-        %working)
-        function page_up_4d(self, src, event)
-        end
-
-        %Page down in fourth dimension through 4D pattern library (not yet
-        %working)
-        function page_down_4d(self, src, event)
         end
 
         % Open a full, cohesive preview of the selected trial
 
-        function full_preview(self, src, event)
+        function full_preview(self)
             data = self.check_one_selected();
             if isempty(data)
                %do nothing
@@ -2475,6 +2352,9 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
         function set_current_selected_cell(self, table, index)
               self.model.set_current_selected_cell(table, index);
         end
+        function set_auto_preview_index(self, new_val)
+            self.model.set_auto_preview_index(new_val);
+        end
 
                 
         function set_ctlr(self, value)
@@ -2732,6 +2612,9 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
         end
         function output = get_auto_preview_index(self)
             output = self.model.auto_preview_index;
+        end
+        function output = get_is_paused(self)
+            output = self.model.is_paused;
         end
 
         

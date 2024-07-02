@@ -504,7 +504,7 @@ classdef G4_designer_view < handle
                 allow = self.con.check_editable(mode, y);              
             end
             if allow == 1
-                self.con.update_trial_doc(new, x, y);
+                self.con.update_trial_doc(new, x, y, trialType);
             else
                 self.con.create_error_box("You cannot edit that field in this mode.");
             end
@@ -547,7 +547,7 @@ classdef G4_designer_view < handle
                 %selected cell
                 self.provide_file_list(event);
             else
-                file = self.listbox_imported_files.String{self.listbox_imported_files.Value};
+                file = self.listbox_imported_files.Items{self.listbox_imported_files.Value};
             end
 
             if ~strcmp(file,'') && ~strncmp(file, '<html>',6) && ~isnan(is_table)
@@ -736,64 +736,163 @@ classdef G4_designer_view < handle
 
         end
 
-        function shift_up_callback(self)
+        function shift_up_callback(self, ~, ~)
 
             self.con.shift_up_callback();
 
         end
 
-        function shift_down_callback(self)
+        function shift_down_callback(self, ~, ~)
 
             self.con.shift_down_callback();
 
         end
 
-        function clear_all(self)
+        function clear_all(self, ~, ~)
+
+            self.con.clear_all();
 
         end
 
-        function autofill(self)
+        function autofill(self, ~, ~)
+
+            self.con.autofill();
 
         end
 
-        function select_new_file(self)
+        function select_new_file(self, ~, ~)
+
+            new_file = self.listbox_imported_files.Items{self.listbox_imported_files.Value};
+            self.con.select_new_file(new_file);
 
         end
 
-        function full_preview(self)
+        function full_preview(self, ~, ~)
+
+            self.con.full_preview();
 
         end
 
-        function update_preview_on_arena(self)
+        function update_preview_on_arena(self, ~, ~)
 
-
-        end
-        
-        function preview_play(self)
-
+            self.con.update_preview_on_arena();
         end
 
-        function preview_pause(self)
+        function preview_play(self, ~, ~)
+            fr_rate = self.con.prepare_preview_play();
+            curr_file = self.con.get_current_preview_file();
+            index = self.con.get_auto_preview_index();
+            if ~strcmp(curr_file,'') && length(curr_file(1,1,:)) > 1
+                len = length(curr_file(1,1,:));
+                xax = [0 length(curr_file(1,:,1))];
+                yax = [0 length(curr_file(:,1,1))];
+
+                im = imshow(curr_file(:,:,index), 'Colormap', gray);
+                set(im,'parent', self.hAxes);
+                set(self.hAxes, 'XLim', xax, 'YLim', yax );
+                is_paused = self.con.get_is_paused();
+
+                for i = 1:len
+                    if is_paused == false
+                        index = index + 1;
+                        self.con.set_auto_preview_index(index);
+                        if index > len
+                            index = 1;
+                            self.con.set_auto_preview_index(index);
+                        end
+                        %imagesc(self.model.current_preview_file.pattern.Pats(:,:,self.model.auto_preview_index), 'parent', hAxes);
+                        set(im,'cdata',curr_file(:,:,index), 'parent', self.hAxes);
+                        drawnow
+
+                        pause(1/fr_rate);
+                    end
+                end
+            end
+            
 
         end
 
-        function preview_stop(self)
+        function preview_pause(self, ~, ~)
+
+            self.con.preview_pause();
 
         end
+ %Stop the currently playing in-screen preview (returns to frame 1)
+        function preview_stop(self, ~, ~)
 
-        function frame_back(self)
+            curr_cell = self.con.get_current_selected_cell();
+            curr_file = self.con.get_current_preview_file();
+            if strcmp(curr_cell.table, "")
+                self.con.create_error_box("Please make sure you've selected a cell.");
+                return;
+            end
+            % sets pause to true and resets the viewing index
+            self.con.preview_stop_reset();
+
+            %hAxes = gca;
+            x = [0 length(curr_file(1,:,1))];
+            y = [0 length(curr_file(:,1,1))];
+
+            im = imshow(curr_file(:,:), 'Colormap', gray);
+            set(im, 'parent', self.hAxes);
+            set(self.hAxes, 'XLim', x, 'YLim', y);
 
         end
+ %Move backward a single frame through pattern library in in-screen preview
+        function frame_back(self, ~, ~)
 
+            curr_file = self.con.get_current_preview_file();
+            index = self.con.get_auto_preview_index();
+            if ~strcmp(curr_file,'') && length(curr_file(1,1,:)) > 1
+                self.con.set_auto_preview_index(index - 1);
+                index = self.con.get_auto_preview_index();
+                if index < 1
+                    self.con.set_auto_preview_index(length(curr_file(1,1,:)));
+                end
+
+                self.plot_pattern();
+                
+            end
+        end
+ %Move forward a single frame through pattern library in in-screen
+        %preview
         function frame_forward(self)
+            curr_file = self.con.get_current_preview_file();
+            index = self.con.get_auto_preview_index();
+            if ~strcmp(curr_file,'') && length(curr_file(1,1,:)) > 1
+                self.con.set_auto_preview_index(index + 1);
+                index = self.con.get_auto_preview_index();
+                if index > length(curr_file(1,1,:))
+                    self.con.set_auto_preview_index(1);
+                end
+
+                self.plot_pattern();
+
+            end
+        end
+
+        function plot_pattern(self)
+
+            data = self.con.get_current_preview_file();
+            index = self.con.get_auto_preview_index();
+            preview_data = data(:,:,index);
+
+            xax = [0 length(preview_data(1,:))];
+            yax = [0 length(preview_data(:,1))];
+
+            im = imshow(preview_data(:,:), 'Colormap', gray);
+            set(im, 'parent', self.hAxes);
+            set(self.hAxes, 'XLim', xax, 'YLim', yax);
+            self.con.update_arena_pattern_index();
+
+        end
+        %Page up/down in fourth dimension through 4D pattern library (not yet
+        %working)
+        function page_up_4d(self, src, event)
 
         end
 
-        function page_up_4d(self)
-
-        end
-
-        function page_down_4d(self)
+        function page_down_4d(self, src, event)
 
         end
 
