@@ -29,6 +29,7 @@ classdef G4_designer_view < handle
         recent_file_menu_items
         hAxes
         second_axes
+        inscreen_plot
 
     end
 
@@ -674,17 +675,19 @@ classdef G4_designer_view < handle
            
         end
 
-        function set_preview_axes(self)
+        function set_preview_axes_function(self, axis_position, labels, yax, xax, xax2, linedur)
 
-            self.second_axes = axes(self.preview_panel, 'units', 'normalized', 'Position', [.1, .15, .8 ,.7], 'XAxisLocation', 'top', 'YAxisLocation', 'right');
-            self.hAxes = axes(self.preview_panel,'units', 'normalized', 'Position', self.second_axes.Position);
+            axis_position = axis_position.*self.preview_panel.Position;
+
+            self.second_axes = axes(self.preview_panel, 'Position', axis_position, 'XAxisLocation', 'top', 'YAxisLocation', 'right');
+            self.hAxes = axes(self.preview_panel,'Position', self.second_axes.Position);
             plot_data = self.con.get_current_preview_file();
 
             self.inscreen_plot = plot(plot_data, 'parent', self.hAxes);
-            self.hAxes.XLabel.String = frameLabel;
-            self.second_axes.XLabel.String = timeLabel;
+            self.hAxes.XLabel.String = labels.frameLabel;
+            self.second_axes.XLabel.String = labels.timeLabel;
             set(self.hAxes, 'XLim', xax, 'YLim', yax, 'TickLength',[0,0]);
-            self.hAxes.YLabel.String = patLabel;
+            self.hAxes.YLabel.String = labels.patLabel;
             yax2 = yax;
             set(self.second_axes, 'Position', self.hAxes.Position, 'XLim', xax2, 'YLim', yax2, 'TickLength', [0,0], 'Color', 'none');
             
@@ -696,27 +699,52 @@ classdef G4_designer_view < handle
 
         end
 
-        function add_trials_callback(self)
+        function set_preview_axes_pattern(self, axis_position)
+            
+            axis_position = axis_position.*self.preview_panel.Position;
+            self.hAxes = axes(self.preview_panel, 'Position', axis_position, 'XTick', [], 'YTick', [] ,'XLim', x, 'YLim', y);
+
+            ind = self.con.get_auto_preview_index();
+            file =  self.con.get_current_preview_file();
+            im = imshow(file(:,:,ind), 'Colormap',gray);
+
+            set(im, 'parent', self.hAxes);
 
         end
 
-        function delete_trial(self)
+        function add_trials_callback(self, ~, ~)
+
+            self.con.add_trials_callback();
 
         end
 
-        function select_all(self)
+        function delete_trial(self, ~, ~)
+
+            self.con.delete_trial();
 
         end
 
-        function invert_selection(self)
+        function select_all(self, src, ~)
+
+            self.con.select_all(src)
+
+        end
+
+        function invert_selection(self, ~, ~)
+
+            self.con.invert_selection();
 
         end
 
         function shift_up_callback(self)
 
+            self.con.shift_up_callback();
+
         end
 
         function shift_down_callback(self)
+
+            self.con.shift_down_callback();
 
         end
 

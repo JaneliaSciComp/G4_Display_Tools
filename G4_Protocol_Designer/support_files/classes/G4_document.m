@@ -305,6 +305,12 @@ classdef G4_document < handle
             end
         end
 
+        function set_block_trial(self, index, new_val)
+
+            self.block_trials(index, :) = new_val;
+
+        end
+
         function set_uneditable_trial_property(self, index, new_value,  propName)
             self.(propName){index(1), index(2)} = new_value;
         end

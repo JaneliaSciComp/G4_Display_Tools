@@ -306,7 +306,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                     end
                 end
             end
-            self.model.isSelect_all = src.Value;
+            self.model.set_isSelect_all(src.Value);
             self.update_gui();
         end
 
@@ -860,7 +860,10 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
             elseif strcmp(file_type, 'pos') && ~strcmp(funcfield,'')
                 self.inscreen_pos_preview(frame_rate, dur, posfield);
             elseif strcmp(file_type, 'ao') && ~strcmp(aofield,'')
-                self.inscreen_ao_preview(aofield);
+                self.inscreen_ao_preview(frame_rate, aofield);
+
+            else 
+                self.inscreen_function_preview(frame_rate, dur, posfield, aofield, file_type);
             end
             
         end
@@ -1238,16 +1241,17 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
 
         % Moves a single trial up in the block table
         function move_trial_up(self, index)
-            selected = self.doc.block_trials(index, :);
+
+            selected = self.get_single_blocktrial(index);
             if index == 1
                 self.create_error_box("I can't shift up any more.");
                 return;
             else
-                above_selected = self.doc.block_trials(index - 1, :);
+                above_selected = self.get_single_blocktrial(index-1);
             end
 
-            self.doc.block_trials(index, :) = above_selected;
-            self.doc.block_trials(index - 1, :) = selected;
+            self.doc.set_block_trial(index, above_selected);
+            self.doc.set_block_trial(index - 1, selected);
 
             self.update_gui();
         end
@@ -1256,17 +1260,17 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
         function move_trial_down(self, index)
             %index = first index of selected row in the block trials
             %cell array
-            selected = self.doc.block_trials(index, :);
+            selected = self.get_single_blocktrial(index);
 
             if index == length(self.doc.block_trials(:,1))
                 self.create_error_box("I can't shift down any further.");
                 return;
             else
-                below_selected = self.doc.block_trials(index + 1, :);
+                below_selected = self.get_single_blocktrial(index + 1);
             end
 
-            self.doc.block_trials(index,:) = below_selected;
-            self.doc.block_trials(index + 1, :) = selected;
+            self.doc.set_block_trial(index,below_selected);
+            self.doc.set_block_trial(index + 1, selected);
 
             self.update_gui();
         end
@@ -1563,18 +1567,29 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
             end
         end
 
-        % Display the in-screen preview
-%%%%%%TO DO: THIS FUNCTION IS LONG, SEE IF YOU CAN BREAK IT UP
-function inscreen_pos_preview(self, frame_rate, dur, funcfield)
+        % Display the in-screen preview of a position or ao function
 
+        function inscreen_function_preview(frame_rate, dur, posfield, aofield, file_type)
+            
             self.turn_off_screen();
-
-            self.model.set_current_preview_file(self.doc.Pos_funcs.(funcfield).pfnparam.func);
-            axis_position = [.1, .15, .8 ,.7];
-
             labels.timeLabel = 'Time (ms)';
             labels.patLabel = 'Pattern';
             labels.frameLabel = 'Frame Number';
+
+            if strcmp(file_type, 'pos') && ~strcmp(posfield,'')
+                self.model.set_current_preview_file(self.doc.Pos_funcs.(posfield).pfnparam.func);
+                axis_position = [.1, .15, .8 ,.7];
+
+            elseif strcmp(file_type, 'ao') && ~strcmp(aofield,'')
+                self.model.set_current_preview_file(self.doc.Ao_funcs.(aofield).afnparam.func);
+                axis_position = [.1, .04, .8 ,.9];
+
+            else
+                warning("Cannot preview this file, unrecognized type");
+                return;
+
+            end
+   
             yax = [min(self.model.current_preview_file) max(self.model.current_preview_file)];
             if yax(1) == yax(2)
                 yax = [yax(1)-1 yax(2) + 1];
@@ -1584,11 +1599,9 @@ function inscreen_pos_preview(self, frame_rate, dur, funcfield)
             else
                 time_in_ms = length(self.model.current_preview_file(1,:))*2;
             end
-
             num_frames = frame_rate*(1/1000)*time_in_ms;
-            xax = [0 num_frames];
+            xax = [0 num_frames]; %As long as frame rate is 1000 (always true for ao funcs), time in ms and num frames are equal.
             xax2 = [0 time_in_ms];
-
 
             if dur <= xax2(2)
                 if frame_rate == 1000
@@ -1601,40 +1614,10 @@ function inscreen_pos_preview(self, frame_rate, dur, funcfield)
                 linedur = 0;
             end
 
-            self.view.set_preview_axes(axis_position, labels, yax, time_in_ms, xax, xax2, linedur)
+            self.view.set_preview_axes_function(axis_position, labels, yax, xax, xax2, linedur);
 
-            
         end
-        function inscreen_ao_preview(self, aofield)
-            self.turn_off_screen();
-
-            self.model.set_current_preview_file(self.doc.Ao_funcs.(aofield).afnparam.func);
-            self.second_axes = axes(self.preview_panel, 'units', 'normalized', 'OuterPosition', [.1, .04, .8 ,.9], 'XAxisLocation', 'top', 'YAxisLocation', 'right');
-
-            self.hAxes = axes(self.preview_panel,'units', 'normalized', 'OuterPosition', [.1, .04, .8 ,.9]);
-
-            plot(self.model.current_preview_file, 'parent', self.hAxes);
-            time_in_ms = length(self.model.current_preview_file(1,:));
-
-            xax = [0 length(self.model.current_preview_file(1,:))];
-            yax = [min(self.model.current_preview_file) max(self.model.current_preview_file)];
-
-            timeLabel = 'Time (ms)';
-            patLabel = 'Pattern';
-            frameLabel = 'Frame Number';
-            set(self.hAxes, 'XLim', xax, 'YLim', yax, 'TickLength',[0,0]);
-            self.hAxes.XLabel.String = timeLabel;
-            self.hAxes.YLabel.String = patLabel;
-
-            num_frames = frame_rate*(1/1000)*time_in_ms;
-            xax2 = [0 num_frames];
-            yax2 = yax;
-            set(self.second_axes, 'Position', self.hAxes.Position, 'XLim', xax2, 'YLim', yax2, 'TickLength', [0,0], 'Color', 'none');
-            self.second_axes.XLabel.String = frameLabel;
-
-            datacursormode on;
-        end
-
+        
         function mouse_over_plot(self, src, ~)
             fig = src;
             obj = hittest(fig);
@@ -1737,11 +1720,9 @@ function inscreen_pos_preview(self, frame_rate, dur, funcfield)
                 adjusted_file(:,:,i) = adjusted_matrix(:,:,1);
             end
             self.model.set_current_preview_file(adjusted_file);
+            axis_position  = [.1, .04, .8 ,.9];
 
-            self.hAxes = axes(self.preview_panel, 'units', 'normalized', 'OuterPosition', [.1, .04, .8 ,.9], 'XTick', [], 'YTick', [] ,'XLim', x, 'YLim', y);
-            im = imshow(adjusted_file(:,:,self.model.auto_preview_index), 'Colormap',gray);
-
-            set(im, 'parent', self.hAxes);
+            self.view.set_preview_axes_pattern(axis_position)
 
             if self.preview_on_arena == 1
                 self.display_pattern_arena(patfield);
@@ -1792,8 +1773,9 @@ function inscreen_pos_preview(self, frame_rate, dur, funcfield)
         end
 
         function [frame_rate, dur, patfield, funcfield, aofield, file_type] = get_preview_parameters(self, is_table)
-            index = self.model.current_selected_cell.index;
-            table = self.model.current_selected_cell.table;
+            curr_cell = self.get_current_selected_cell();
+            index = curr_cell.index;
+            table = curr_cell.table;
             file_type = '';
             patfile = '';
             funcfile = '';
@@ -2676,6 +2658,9 @@ function inscreen_pos_preview(self, frame_rate, dur, funcfield)
         function output = get_blocktrial_data(self)
             output = self.doc.get_block_trials();
         end
+        function output = get_single_blocktrial(self, index)
+            output = self.doc.block_trials(index,:);
+        end
         function output = get_intertrial_data(self)
             output = self.doc.get_intertrial();
         end
@@ -2744,6 +2729,9 @@ function inscreen_pos_preview(self, frame_rate, dur, funcfield)
         end
         function output = get_current_preview_file(self)
             output = self.model.current_preview_file;
+        end
+        function output = get_auto_preview_index(self)
+            output = self.model.auto_preview_index;
         end
 
         
