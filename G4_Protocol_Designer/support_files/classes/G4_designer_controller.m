@@ -197,12 +197,8 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
         end
 
         %Update the experiment name
-        function update_experiment_name(self, src, ~)
-            new_val = src.String;
-
-            self.doc.experiment_name = new_val;
-            self.set_exp_name();
-            self.update_gui();
+        function update_experiment_name(self, new_val)
+            self.doc.set_experiment_name(new_val);
             if ~isempty(self.run_con)
                 self.run_con.view.update_run_gui();
             end
