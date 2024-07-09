@@ -904,11 +904,17 @@ classdef G4_designer_view < handle
 
         end
 
-        function import(self)
+        function import(self, ~, ~)
+
+            self.con.import();
 
         end
 
-        function open_file(self)
+        function open_file(self, ~, ~, filepath)
+            self.con.open_file(filepath);
+            self.update_gui();
+            set(self.num_rows_3, 'Enable', 'off');
+            set(self.num_rows_4, 'Enable', 'off');
 
         end
 

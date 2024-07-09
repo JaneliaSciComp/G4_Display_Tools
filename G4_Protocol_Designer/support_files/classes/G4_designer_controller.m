@@ -580,7 +580,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
     %% File menu callback functions
 
         %Import a folder or file
-        function import(self, ~, ~)
+        function import(self)
            options = {'Folder', 'File', 'Filtered File'};
            answer = listdlg('PromptString', 'Would you like to import a folder or a file?',...
                'SelectionMode', 'Single', 'ListString', options, 'ListSize', [180,60]);
@@ -598,7 +598,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
         end
 
         %Open a .g4p file. Optionally input a filepath
-        function open_file(self, ~, ~, filepath)
+        function open_file(self, filepath)
             %Get filepath if one has not been inputted
             if strcmp(filepath,'')
                 [filename, top_folder_path] = uigetfile('*.g4p');
@@ -625,30 +625,30 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                 d = data.exp_parameters;
 
                 %Set parameters outside tables
-                self.doc.experiment_name = exp_name;
-                self.set_exp_name();
-                m.repetitions = d.repetitions;
-                m.is_randomized = d.is_randomized;
-                m.is_chan1 = d.is_chan1;
-                m.is_chan2 = d.is_chan2;
-                m.is_chan3 = d.is_chan3;
-                m.is_chan4 = d.is_chan4;
-                m.chan1_rate = d.chan1_rate;
+                self.update_experiment_name(exp_name);
+                m.set_repetitions(d.repetitions);
+                m.set_is_randomized(d.is_randomized);
+                m.set_is_chan1(d.is_chan1);
+                m.set_is_chan2(d.is_chan2);
+                m.set_is_chan3(d.is_chan3);
+                m.set_is_chan4(d.is_chan4);
+                m.set_chan1_rate(d.chan1_rate);
                 m.set_config_data(d.chan1_rate, 1);
-                m.chan2_rate = d.chan2_rate;
+                m.set_chan2_rate(d.chan2_rate);
                 m.set_config_data(d.chan2_rate, 2);
-                m.chan3_rate = d.chan3_rate;
+                m.set_chan3_rate(d.chan3_rate);
                 m.set_config_data(d.chan3_rate, 3);
-                m.chan4_rate = d.chan4_rate;
+                m.set_chan4_rate(d.chan4_rate);
                 m.set_config_data(d.chan4_rate, 4);
-                m.num_rows = d.num_rows;
+                m.set_num_rows(d.num_rows);
                 m.set_config_data(d.num_rows, 0);
                 self.doc.update_config_file();
 
                 for k = 1:13
-                    m.set_pretrial_property(k, d.pretrial{k});
-                    m.set_intertrial_property(k, d.intertrial{k});
-                    m.set_posttrial_property(k, d.posttrial{k});
+                    m.set_trial_property(1, k, d.pretrial{k}, 'pre');
+                    m.set_trial_property(1, k, d.intertrial{k}, 'inter');
+                    m.set_trial_property(1, k, d.posttrial{k}, 'post');
+
                 end
 
                 for i = 2:length(m.block_trials(:, 1))
@@ -660,10 +660,10 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                 for j = 1:block_x
                     if j > length(m.block_trials(:,1))
                         newrow = d.block_trials(j,1:end);
-                        m.set_block_trial_property([j, block_y], newrow);
+                        m.set_trial_property(j, block_y, newrow, 'block');
                     else
                         for n = 1:13
-                            m.set_block_trial_property([j, n], d.block_trials{j,n});
+                            m.set_trial_property(j, n, d.block_trials{j,n}, 'block');
                         end
                     end
                 end
@@ -671,13 +671,12 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                 self.insert_greyed_cells();
                 self.doc.set_recent_files(filepath);
                 self.doc.update_recent_files_file();
-                self.update_gui();
+                
 
                 if ~isempty(self.run_con)
                     self.run_con.view.update_run_gui();
                 end
-                set(self.num_rows_3, 'Enable', 'off');
-                set(self.num_rows_4, 'Enable', 'off');
+                
             end
         end
 
