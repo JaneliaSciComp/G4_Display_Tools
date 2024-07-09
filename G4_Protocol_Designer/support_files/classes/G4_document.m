@@ -1693,13 +1693,14 @@ classdef G4_document < handle
             end
 
             for i = 1:length(pre_indices_to_color)
-                self.set_pretrial_property(pre_indices_to_color(i),self.colorgen());
+                self.set_trial_property(1, pre_indices_to_color(i), self.colorgen(), 'pre');
             end
             for i = 1:length(inter_indices_to_color)
-                self.set_intertrial_property(inter_indices_to_color(i),self.colorgen());
+                self.set_trial_property(1, inter_indices_to_color(i),self.colorgen(), 'inter');
+
             end
             for i = 1:length(post_indices_to_color)
-                self.set_posttrial_property(post_indices_to_color(i),self.colorgen());
+                self.set_trial_property(1, post_indices_to_color(i),self.colorgen(), 'post');
             end
 
             for i = 1:length(self.block_trials(:,1))
@@ -1720,7 +1721,8 @@ classdef G4_document < handle
                     end
                 end
                 for j = 1:length(indices_to_color)
-                    self.set_block_trial_property([i,indices_to_color(j)],self.colorgen());
+                    self.set_trial_property(i,indices_to_color(j),self.colorgen(), 'block');
+
                 end
             end
         end

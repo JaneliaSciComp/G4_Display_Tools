@@ -250,13 +250,14 @@ classdef G4_designer_view < handle
                 [left_margin, positions.block(2) + positions.block(4) - .05, .08, .06], ...
                 'SelectionChangedFcn', @self.update_randomize);
             grpSize = [self.randomize_buttonGrp.Position(3), self.randomize_buttonGrp.Position(4)];
+            grpSize_pix = grpSize .* self.f.Position(3:4);
 
 
             self.isRandomized_radio = uiradiobutton(self.randomize_buttonGrp, 'Text', ...
-                'Randomize Trials', 'FontSize', font_size, 'Position', [.001, .55, .95, .4].*[grpSize, grpSize]);
+                'Randomize Trials', 'FontSize', font_size, 'Position', [.001, .55, .95, .4].*[grpSize_pix, grpSize_pix]);
 
             self.isSequential_radio = uiradiobutton(self.randomize_buttonGrp, 'Text', 'Sequential Trials', ...
-                'FontSize', font_size, 'Position', [.001,.1, .95, .4].*[grpSize, grpSize]);
+                'FontSize', font_size, 'Position', [.001,.1, .95, .4].*[grpSize_pix, grpSize_pix]);
         %Repetitions
 
             self.repetitions_box = uieditfield(self.f, "numeric", 'Position', [.05, positions.block(2) + positions.block(4) - .08, ...
@@ -282,47 +283,49 @@ classdef G4_designer_view < handle
             chan_pan = uipanel(self.f, 'Title', 'Analog Input Channels', 'FontSize', font_size, 'units', 'normalized', ...
                 'Position', [left_margin, positions.block(2) + positions.block(4) - .31, .15, .13]);
             chan_pan_size = [chan_pan.Position(3), chan_pan.Position(4)];
+            chan_pan_size_pix = chan_pan_size .* self.f.Position(3:4);
 
 %             self.chan1_rate_box = uieditfield(chan_pan, "numeric", 'Value', self.con.doc.chan1_rate, 'Position', ...
 %                 [.65, .72, .25, .15].*[chan_pan_size, chan_pan_size],'ValueChangedFcn', @self.update_chan1_rate);
 
             self.chan1_rate_box = uieditfield(chan_pan, "numeric", 'Position', ...
-                [.65, .72, .25, .15].*[chan_pan_size, chan_pan_size],'ValueChangedFcn', @self.update_chan1_rate);
+                [.65, .72, .25, .15].*[chan_pan_size_pix, chan_pan_size_pix],'ValueChangedFcn', @self.update_chan1_rate);
 
             %chan1_rate_label
             uilabel(chan_pan, 'Text', 'Channel 1 Sample Rate', 'FontSize', font_size, ...
-                'Position', [.05, .7, .5, .17].*[chan_pan_size, chan_pan_size]);
+                'Position', [.05, .7, .5, .17].*[chan_pan_size_pix, chan_pan_size_pix]);
 
             self.chan2_rate_box = uieditfield(chan_pan, "numeric", 'Position', ...
-                [.65, .52, .25, .17].*[chan_pan_size, chan_pan_size], 'ValueChangedFcn', @self.update_chan2_rate);
+                [.65, .52, .25, .17].*[chan_pan_size_pix, chan_pan_size_pix], 'ValueChangedFcn', @self.update_chan2_rate);
 
             %chan2_rate_label
             uilabel(chan_pan, 'Text', 'Channel 2 Sample Rate', 'FontSize', font_size, ...
-                'Position', [.05, .5, .5, .17].*[chan_pan_size, chan_pan_size]);
+                'Position', [.05, .5, .5, .17].*[chan_pan_size_pix, chan_pan_size_pix]);
 
             self.chan3_rate_box = uieditfield(chan_pan, "numeric", 'Position', ...
-                [.65, .32, .25, .17].*[chan_pan_size, chan_pan_size], 'ValueChangedFcn', @self.update_chan3_rate);
+                [.65, .32, .25, .17].*[chan_pan_size_pix, chan_pan_size_pix], 'ValueChangedFcn', @self.update_chan3_rate);
 
             %chan3_rate_label
             uilabel(chan_pan, 'Text', 'Channel 3 Sample Rate', 'FontSize', font_size, ...
-                'Position', [.05, .3, .5, .17].*[chan_pan_size, chan_pan_size]);
+                'Position', [.05, .3, .5, .17].*[chan_pan_size_pix, chan_pan_size_pix]);
 
             self.chan4_rate_box = uieditfield(chan_pan, "numeric", 'Position', ...
-                [.65, .12, .25, .17].*[chan_pan_size, chan_pan_size], 'ValueChangedFcn', @self.update_chan4_rate);
+                [.65, .12, .25, .17].*[chan_pan_size_pix, chan_pan_size_pix], 'ValueChangedFcn', @self.update_chan4_rate);
 
             %chan4_rate_label
             uilabel(chan_pan, 'Text', 'Channel 4 Sample Rate', 'FontSize', font_size, ...
-                'Position', [.05, .1, .5, .17].*[chan_pan_size, chan_pan_size]);
+                'Position', [.05, .1, .5, .17].*[chan_pan_size_pix, chan_pan_size_pix]);
 
             self.num_rows_buttonGrp = uibuttongroup(self.f, 'units', 'normalized', ...
                 'Position', [left_margin, chan_pan.Position(2) - .05, chan_pan.Position(3), .04], 'SelectionChangedFcn', @self.update_rowNum);
             rowGrpSize = [self.num_rows_buttonGrp.Position(3), self.num_rows_buttonGrp.Position(4)];
+            rowGrpSize_pix = rowGrpSize .* self.f.Position(3:4);
 
             self.num_rows_3 = uiradiobutton(self.num_rows_buttonGrp, 'Text', '3 Row Screen', ...
-                'FontSize', font_size, 'Position', [.05, .05, .45, .9].*[rowGrpSize, rowGrpSize]);
+                'FontSize', font_size, 'Position', [.05, .05, .45, .9].*[rowGrpSize_pix, rowGrpSize_pix]);
 
             self.num_rows_4 = uiradiobutton(self.num_rows_buttonGrp, 'Text', '4 Row Screen', ...
-                'FontSize', font_size, 'Position', [.5, .05, .45, .9].*[rowGrpSize, rowGrpSize]);
+                'FontSize', font_size, 'Position', [.5, .05, .45, .9].*[rowGrpSize_pix, rowGrpSize_pix]);
 
 
             key_pan = uipanel(self.f, 'Title', 'Mode Key:', 'BackgroundColor', [.75, .75, .75], ...
@@ -330,50 +333,50 @@ classdef G4_designer_view < handle
                 'Position', [left_margin, self.num_rows_buttonGrp.Position(2) - .41, ...
                 self.num_rows_buttonGrp.Position(3), .4]);
             key_pan_size = [key_pan.Position(3), key_pan.Position(4)];
+            key_pan_size_pix = key_pan_size .* self.f.Position(3:4);
 
             mode_1_label = uilabel(key_pan, 'Text', 'Mode 1: Position Function', 'BackgroundColor', [.75,.75,.75], ...
                 'HorizontalAlignment', 'left', 'FontSize', 11, 'Position', ...
-                [chan_label_margin, chan_label_bottom, chan_label_width, chan_label_height].*[key_pan_size, key_pan_size]);
+                [chan_label_margin, chan_label_bottom, chan_label_width, chan_label_height].*[key_pan_size_pix, key_pan_size_pix]);
 
             mode_2_label = uilabel(key_pan, 'Text', 'Mode 2: Constant Rate', ...
                 'BackgroundColor', [.75,.75,.75], 'HorizontalAlignment', 'left',...
-                'FontSize', 11, 'Position', [chan_label_margin*key_pan_size(1), ...
-                mode_1_label.Position(2) - chan_label_height*key_pan_size(2), ...
-                chan_label_width*key_pan_size(1), chan_label_height*key_pan_size(2)]);
+                'FontSize', 11, 'Position', [chan_label_margin*key_pan_size_pix(1), ...
+                mode_1_label.Position(2) - chan_label_height*key_pan_size_pix(2), ...
+                chan_label_width*key_pan_size_pix(1), chan_label_height*key_pan_size_pix(2)]);
 
             mode_3_label = uilabel(key_pan, 'Text', 'Mode 3: Constant Index', 'BackgroundColor', [.75,.75,.75], ...
-                'HorizontalAlignment', 'left','FontSize', 11, 'Position', [chan_label_margin*key_pan_size(1), ...
-                mode_2_label.Position(2) - chan_label_height*key_pan_size(2), chan_label_width*key_pan_size(1), ...
-                chan_label_height*key_pan_size(2)]);
+                'HorizontalAlignment', 'left','FontSize', 11, 'Position', [chan_label_margin*key_pan_size_pix(1), ...
+                mode_2_label.Position(2) - chan_label_height*key_pan_size_pix(2), chan_label_width*key_pan_size_pix(1), ...
+                chan_label_height*key_pan_size_pix(2)]);
 
             mode_4_label = uilabel(key_pan, 'Text', 'Mode 4: Closed-loop sets frame rate', 'BackgroundColor', [.75,.75,.75], ...
-                'HorizontalAlignment', 'left','FontSize', 11, 'Position', [chan_label_margin*key_pan_size(1), ...
-                mode_3_label.Position(2) - chan_label_height*key_pan_size(2), chan_label_width*key_pan_size(1), ...
-                chan_label_height*key_pan_size(2)]);
+                'HorizontalAlignment', 'left','FontSize', 11, 'Position', [chan_label_margin*key_pan_size_pix(1), ...
+                mode_3_label.Position(2) - chan_label_height*key_pan_size_pix(2), chan_label_width*key_pan_size_pix(1), ...
+                chan_label_height*key_pan_size_pix(2)]);
 
             mode_5_label = uilabel(key_pan, 'Text', 'Mode 5: Closed-loop rate + offset', 'BackgroundColor', [.75,.75,.75], ...
-                'HorizontalAlignment', 'left','FontSize', 11, 'Position', [chan_label_margin*key_pan_size(1), ...
-                mode_4_label.Position(2) - (chan_label_height/2)*key_pan_size(2), chan_label_width*key_pan_size(1), ...
-                (chan_label_height/2)*key_pan_size(2)]);
+                'HorizontalAlignment', 'left','FontSize', 11, 'Position', [chan_label_margin*key_pan_size_pix(1), ...
+                mode_4_label.Position(2) - (chan_label_height/2)*key_pan_size_pix(2), chan_label_width*key_pan_size_pix(1), ...
+                (chan_label_height/2)*key_pan_size_pix(2)]);
 
             mode_5_label_cont = uilabel(key_pan, 'Text', 'position function', 'BackgroundColor', [.75,.75,.75], 'HorizontalAlignment', ...
-                'left', 'FontSize', 11, 'Position', [chan_label_margin*key_pan_size(1), mode_5_label.Position(2) - chan_label_height*key_pan_size(2), ...
-                chan_label_width*key_pan_size(1), chan_label_height*key_pan_size(2)]);
+                'left', 'FontSize', 11, 'Position', [chan_label_margin*key_pan_size_pix(1), mode_5_label.Position(2) - chan_label_height*key_pan_size_pix(2), ...
+                chan_label_width*key_pan_size_pix(1), chan_label_height*key_pan_size_pix(2)]);
 
             mode_6_label = uilabel(key_pan, 'Text', 'Mode 6: Closed-loop rate X + position', 'BackgroundColor', [.75,.75,.75], ...
-                'HorizontalAlignment', 'left','FontSize', 11, 'Position', [chan_label_margin*key_pan_size(1), ...
-                mode_5_label_cont.Position(2) - (chan_label_height/2)*key_pan_size(2), chan_label_width*key_pan_size(1), ...
-                (chan_label_height/2)*key_pan_size(2)]);
+                'HorizontalAlignment', 'left','FontSize', 11, 'Position', [chan_label_margin*key_pan_size_pix(1), ...
+                mode_5_label_cont.Position(2) - (chan_label_height/2)*key_pan_size_pix(2), chan_label_width*key_pan_size_pix(1), ...
+                (chan_label_height/2)*key_pan_size_pix(2)]);
 
             mode_6_label_cont = uilabel(key_pan, 'Text', 'function Y', 'BackgroundColor', [.75,.75,.75], 'HorizontalAlignment', ...
-                'left', 'FontSize', 11, 'Position', [chan_label_margin*key_pan_size(1), mode_6_label.Position(2) - chan_label_height*key_pan_size(2), ...
-                chan_label_width*key_pan_size(1), chan_label_height*key_pan_size(2)]);
+                'left', 'FontSize', 11, 'Position', [chan_label_margin*key_pan_size_pix(1), mode_6_label.Position(2) - chan_label_height*key_pan_size_pix(2), ...
+                chan_label_width*key_pan_size_pix(1), chan_label_height*key_pan_size_pix(2)]);
 
             mode_7_label = uilabel(key_pan, 'Text', 'Mode 7: Closed-loop sets frame index', 'BackgroundColor', [.75,.75,.75], ...
-                'HorizontalAlignment', 'left','FontSize', 11, 'Position', [chan_label_margin*key_pan_size(1), ...
-                mode_6_label_cont.Position(2) - chan_label_height*key_pan_size(2), chan_label_width*key_pan_size(1), chan_label_height*key_pan_size(2)]);
-            
-            self.reset_defaults();
+                'HorizontalAlignment', 'left','FontSize', 11, 'Position', [chan_label_margin*key_pan_size_pix(1), ...
+                mode_6_label_cont.Position(2) - chan_label_height*key_pan_size_pix(2), chan_label_width*key_pan_size_pix(1), chan_label_height*key_pan_size_pix(2)]);
+
         end
 
         function update_gui(self)
@@ -507,7 +510,7 @@ classdef G4_designer_view < handle
                 allow = self.con.check_editable(mode, y);              
             end
             if allow == 1
-                self.con.update_trial_doc(new, x, y, trialType);
+                self.con.update_trial_doc(new, x, y, trialtype);
             else
                 self.con.create_error_box("You cannot edit that field in this mode.");
             end
@@ -550,11 +553,11 @@ classdef G4_designer_view < handle
                 %selected cell
                 self.provide_file_list(event);
             else
-                file = self.listbox_imported_files.Items{self.listbox_imported_files.Value};
+                file = self.listbox_imported_files.Value;
             end
 
             if ~strcmp(file,'') && ~strncmp(file, '<html>',6) && ~isnan(is_table)
-                self.con.preview_selection(is_table);
+                self.con.preview_selection(is_table, file);
             else
                 self.con.turn_off_screen();
             end
@@ -594,14 +597,14 @@ classdef G4_designer_view < handle
                 pats = self.con.get_patterns();
                 fields = fieldnames(pats);
                 if isempty(fields)
-                    self.listbox_imported_files.String = {''};
+                    self.listbox_imported_files.Items = {''};
                     return;
                 end
 
                 for i = 1:length(fields)
-                    filenames{i} = pats(fields{i}).filename;
+                    filenames{i} = pats.(fields{i}).filename;
                 end
-                self.listbox_imported_files.String = filenames;
+                self.listbox_imported_files.Items = filenames;
 
             elseif event.Indices(2) == 3
                 curr_cell = self.con.get_current_selected_cell();
@@ -626,22 +629,22 @@ classdef G4_designer_view < handle
                 fields = fieldnames(funcs);
 
                 if isempty(fields)
-                    self.listbox_imported_files.String = {''};
+                    self.listbox_imported_files.Items = {''};
                     return;
                 end
 
                 for i = 1:length(fields)
-                    filenames{i} = funcs(fields{i}).filename;
+                    filenames{i} = funcs.(fields{i}).filename;
                 end
 
-                self.listbox_imported_files.String = filenames;
+                self.listbox_imported_files.Items = filenames;
 
            elseif event.Indices(2) > 3 && event.Indices(2) < 8
 
                 ao = self.con.get_ao_funcs();
                 fields = fieldnames(ao);
                 if isempty(fields)
-                    self.listbox_imported_files.String = {''};
+                    self.listbox_imported_files.Items = {''};
                     return;
                 end
 
@@ -649,7 +652,7 @@ classdef G4_designer_view < handle
                     filenames{i} = ao.(fields{i}).filename;
                 end
 
-                self.listbox_imported_files.String = filenames;
+                self.listbox_imported_files.Items = filenames;
             else
                 return;
             end
@@ -670,9 +673,9 @@ classdef G4_designer_view < handle
             end
 
             if ~isempty(ind)
-                self.listbox_imported_files.Value = ind;
+                self.listbox_imported_files.Value = self.listbox_imported_files.Items{ind};
             else
-                self.listbox_imported_files.Value = 1;
+                self.listbox_imported_files.Value = self.listbox_imported_files.Items{1};
             end
 
            
@@ -702,7 +705,7 @@ classdef G4_designer_view < handle
 
         end
 
-        function set_preview_axes_pattern(self, axis_position)
+        function set_preview_axes_pattern(self, axis_position, x, y)
             
             axis_position = axis_position.*self.preview_panel.Position;
             self.hAxes = axes(self.preview_panel, 'Position', axis_position, 'XTick', [], 'YTick', [] ,'XLim', x, 'YLim', y);
@@ -773,7 +776,7 @@ classdef G4_designer_view < handle
 
         function select_new_file(self, ~, ~)
 
-            new_file = self.listbox_imported_files.Items{self.listbox_imported_files.Value};
+            new_file = self.listbox_imported_files.Value;
             self.con.select_new_file(new_file);
             self.update_gui();
 
@@ -995,31 +998,31 @@ classdef G4_designer_view < handle
         end
         function update_chan1_rate(self, src, ~)
 
-            new = str2num(src.String);
+            new = src.Value;
             self.con.update_chan1_rate(new);
             self.update_gui();
 
         end
         function update_chan2_rate(self, src, ~)
-            new = str2num(src.String);
+            new = src.Value;
             self.con.update_chan2_rate(new);
             self.update_gui();
 
         end
         function update_chan3_rate(self, src, ~)
-            new = str2num(src.String);
+            new = src.Value;
             self.con.update_chan3_rate(new);
             self.update_gui();
 
         end
         function update_chan4_rate(self, src, ~)
-            new = str2num(src.String);
+            new = src.Value;
             self.con.update_chan4_rate(new);
             self.update_gui();
 
         end
         function update_rowNum(self, ~, event)
-            new = event.NewValue.String;
+            new = event.NewValue.Text;
             if strcmp(new, '3 Row Screen') == 1
                 new_val = 3;
             else
@@ -1029,10 +1032,7 @@ classdef G4_designer_view < handle
             self.update_gui();
 
         end
-        function reset_defaults(self)
 
-        end
-        
 
     end
 

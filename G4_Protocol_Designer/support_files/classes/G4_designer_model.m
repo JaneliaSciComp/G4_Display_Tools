@@ -61,13 +61,10 @@ classdef G4_designer_model < handle
         function set_current_preview_file(self, new_val)
             self.current_preview_file = new_val;
         end
-        function set_current_selected_cell(self, new_table, new_index)
-            if ~isempty(new_table)
-                self.current_selected_cell.table = new_table;
-            end
-            if ~isempty(new_index)
-                self.current_selected_cell.index = new_index;
-            end
+        function set_current_selected_cell(self, table, index)
+           
+           self.current_selected_cell.table = table;
+           self.current_selected_cell.index = index;
         end
         
         function set_auto_preview_index(self, new_val)

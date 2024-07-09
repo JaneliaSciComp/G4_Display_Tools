@@ -60,6 +60,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                'ao4',self.doc.posttrial(7));
 
            self.view = G4_designer_view(self);
+           self.reset_defaults();
            self.update_gui() ;
         end
 
@@ -174,21 +175,15 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
             newData = '';
             x = 1;
             y = 1;
-            curr_cell.table = "pre";
-            curr_cell.index = [1,1];
-            self.set_current_selected_cell(curr_cell);
+            self.set_current_selected_cell("pre", [1,1]);
             self.update_trial_doc(newData, x, y, 'pre');
 
             % Make default be that there is no intertrial
-            curr_cell.table = "inter";
-            curr_cell.index = [1,1];
-            self.set_current_selected_cell(curr_cell);
+            self.set_current_selected_cell("inter", [1,1]);
             self.update_trial_doc(newData, x, y, 'inter');
 
             % Make default be that there is no posttrial
-            curr_cell.table = "post";
-            curr_cell.index = [1,1];
-            self.set_current_selected_cell(curr_cell);
+            self.set_current_selected_cell("post", [1,1]);
             self.update_trial_doc(newData, x, y, 'post');
 
         end
@@ -807,12 +802,12 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
             end
         end
 
-        function preview_selection(self, is_table)
+        function preview_selection(self, is_table, file)
 
             %Get all parameters that might be needed for preview from
             %the trial the selected cell belongs to.
 
-            [frame_rate, dur, patfield, posfield, aofield, file_type] = get_preview_parameters(self, is_table);
+            [frame_rate, dur, patfield, posfield, aofield, file_type] = self.get_preview_parameters(is_table, file);
             %Now actually display the preview of whatever file is
             %selected
             if strcmp(file_type, 'pat') && ~strcmp(patfield,'')
@@ -1153,8 +1148,12 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                 if index_of_pat > length(pos_fields)
                     index_of_pat = rem(length(pos_fields), index_of_pat);
                 end
-                pos_field = pos_fields{index_of_pat};
-                pos = self.doc.Pos_funcs.(pos_field).filename;
+                if ~isempty(index_of_pat)
+                    pos_field = pos_fields{index_of_pat};
+                    pos = self.doc.Pos_funcs.(pos_field).filename;
+                else
+                    pos = '';
+                end
                 gain = 1;
                 offset = 0;
                 self.set_mode_dep_props(pos, indx, rate, gain, offset);
@@ -1479,7 +1478,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
             self.model.set_current_preview_file(adjusted_file);
             axis_position  = [.1, .04, .8 ,.9];
 
-            self.view.set_preview_axes_pattern(axis_position)
+            self.view.set_preview_axes_pattern(axis_position, x, y)
 
             if self.preview_on_arena == 1
                 self.display_pattern_arena(patfield);
@@ -1529,7 +1528,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
             end
         end
 
-        function [frame_rate, dur, patfield, funcfield, aofield, file_type] = get_preview_parameters(self, is_table)
+        function [frame_rate, dur, patfield, funcfield, aofield, file_type] = get_preview_parameters(self, is_table, file)
             curr_cell = self.get_current_selected_cell();
             index = curr_cell.index;
             table = curr_cell.table;
@@ -1543,31 +1542,20 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
 
                 if index(2) == 2
                     file_type = 'pat';
-                    if is_table == 0
-                        patfile = self.listbox_imported_files.String{self.listbox_imported_files.Value};
-                    else
-                        patfile = self.doc.pretrial{2};
-                    end
+                    patfile = file;
                 end
 
                 if index(2) == 3
                     file_type = 'pos';
-                    if is_table == 0
-                        funcfile = self.listbox_imported_files.String{self.listbox_imported_files.Value};
-                    else
-                        funcfile = self.doc.pretrial{3};
-                    end
+                    funcfile = file;
                 end
 
                 if index(2) > 3 && index(2) < 8
+
                     file_type = 'ao';
-                    if is_table == 0
-                        aofile = self.listbox_imported_files.String{self.listbox_imported_files.Value};
-                        patfile = self.doc.pretrial{2};
-                    else
-                        aofile = self.doc.pretrial{index(2)};
-                        patfile = self.doc.pretrial{2};
-                    end
+                    aofile = file;
+                    patfile = self.doc.pretrial{2};
+
                 end
 
                 patfield = self.doc.get_pattern_field_name(patfile);
@@ -1603,32 +1591,25 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
 
                 if index(2) == 2
                     file_type = 'pat';
-                    if is_table == 0
-                        patfile = self.listbox_imported_files.String{self.listbox_imported_files.Value};
-                    else
-                        patfile = self.doc.intertrial{2};
-                    end
+                    patfile = file;
                 end
 
                 if index(2) == 3
                     file_type = 'pos';
                     if is_table == 0
-                        funcfile = self.listbox_imported_files.String{self.listbox_imported_files.Value};
+                        funcfile = file;
                     else
-                        funcfile = self.doc.intertrial{3};
+                        funcfile = file;
                         patfile = self.doc.intertrial{2};
                     end
                 end
 
                 if index(2) > 3 && index(2) < 8
                     file_type = 'ao';
-                    if is_table == 0
-                        aofile = self.listbox_imported_files.String{self.listbox_imported_files.Value};
-                        patfile = self.doc.intertrial{2};
-                    else
-                        aofile = self.doc.intertrial{index(2)};
-                        patfile = self.doc.intertrial{2};
-                    end
+                    
+                    aofile = file;
+                    patfile = self.doc.intertrial{2};
+
                 end
 
                 patfield = self.doc.get_pattern_field_name(patfile);
@@ -1664,32 +1645,25 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
 
                 if index(2) == 2
                     file_type = 'pat';
-                    if is_table == 0
-                        patfile = self.listbox_imported_files.String{self.listbox_imported_files.Value};
-                    else
-                        patfile = self.doc.block_trials{index(1), 2};
-                    end
+                    patfile = file;
                 end
 
                 if index(2) == 3
                     file_type = 'pos';
                     if is_table == 0
-                        funcfile = self.listbox_imported_files.String{self.listbox_imported_files.Value};
+                        funcfile = file;
                     else
-                        funcfile = self.doc.block_trials{index(1), 3};
+                        funcfile = file;
                         patfile = self.doc.block_trials{index(1), 2};
                     end
                 end
 
                 if index(2) > 3 && index(2) < 8
                     file_type = 'ao';
-                    if is_table == 0
-                        aofile = self.listbox_imported_files.String{self.listbox_imported_files.Value};
-                        patfile = self.doc.block_trials{index(1), 2};
-                    else
-                        aofile = self.doc.block_trials{index(1), index(2)};
-                        patfile = self.doc.block_trials{index(1), 2};
-                    end
+
+                    aofile = file;
+                    patfile = self.doc.block_trials{index(1), 2};
+
                 end
 
                 patfield = self.doc.get_pattern_field_name(patfile);
@@ -1724,32 +1698,25 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
 
                 if index(2) == 2
                     file_type = 'pat';
-                    if is_table == 0
-                        patfile = self.listbox_imported_files.String{self.listbox_imported_files.Value};
-                    else
-                        patfile = self.doc.posttrial{2};
-                    end
+                    patfile = file;
                 end
 
                 if index(2) == 3
                     file_type = 'pos';
 
                     if is_table == 0
-                        funcfile = self.listbox_imported_files.String{self.listbox_imported_files.Value};
+                        funcfile = file;
                     else
-                        funcfile = self.doc.posttrial{3};
+                        funcfile = file;
                         patfile = self.doc.posttrial{2};
                     end
                 end
                 if index(2) > 3 && index(2) < 8
                     file_type = 'ao';
-                    if is_table == 0
-                        aofile = self.listbox_imported_files.String{self.listbox_imported_files.Value};
-                        patfile = self.doc.posttrial{2};
-                    else
-                        aofile = self.doc.posttrial{index(2)};
-                        patfile = self.doc.posttrial{2};
-                    end
+                    
+                    aofile = file;
+                    patfile = self.doc.posttrial{2};
+                
                 end
 
                 patfield = self.doc.get_pattern_field_name(patfile);
@@ -2222,8 +2189,8 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
 %% SETTERS
 
 % Setting values in the model
-        function set_current_selected_cell(self, table, index)
-              self.model.set_current_selected_cell(table, index);
+function set_current_selected_cell(self, table, index)
+            self.model.set_current_selected_cell(table, index);
         end
         function set_auto_preview_index(self, new_val)
             self.model.set_auto_preview_index(new_val);
