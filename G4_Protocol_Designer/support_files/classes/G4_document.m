@@ -100,6 +100,11 @@ classdef G4_document < handle
                 self.set_chan2_rate(self.get_ending_number_from_file(self.configData, 'ADC1'));
                 self.set_chan3_rate(self.get_ending_number_from_file(self.configData, 'ADC2'));
                 self.set_chan4_rate(self.get_ending_number_from_file(self.configData, 'ADC3'));
+            else
+                self.set_chan1_rate(1000);
+                self.set_chan2_rate(1000);
+                self.set_chan3_rate(1000);
+                self.set_chan4_rate(1000);
             end
             
             %Set rest of default property values
@@ -144,7 +149,7 @@ classdef G4_document < handle
 
                 if x > size(self.block_trials, 1)
                     posfield = self.get_posfunc_field_name(new_value{3});
-                    self.set_block_trials([self.block_trials;new_value]);
+                    self.set_block_trial(x, new_value);
                     return;
                 end
             elseif strcmp(trialtype, 'pre')
@@ -1769,7 +1774,14 @@ classdef G4_document < handle
         end
 
         function set_experiment_name(self, value)
-            self.experiment_name = value;
+            % add timestamp to name if it's not empty
+            if ~isempty(value)
+                dateFormat = 'mm-dd-yy_HH-MM-SS';
+                dated_exp_name = strcat(value, datestr(now, dateFormat));
+            else
+                dated_exp_name = value;
+            end
+            self.experiment_name = dated_exp_name;
         end
 
         function set_pretrial(self, value)
@@ -1817,19 +1829,59 @@ classdef G4_document < handle
         end
 
         function set_chan1_rate(self, value)
-            self.chan1_rate = value;
+            if rem(value,100) ~= 0 && value ~= 0
+                self.create_error_box("The value you've entered is not a multiple of 100. Please double check your entry.");
+            else
+                self.chan1_rate = value;
+                if value == 0
+                    self.set_is_chan1(0);
+                else
+                    self.set_is_chan1(1);
+                end
+            
+            end
         end
 
         function set_chan2_rate(self, value)
-            self.chan2_rate = value;
+            if rem(value,100) ~= 0 && value ~= 0
+                self.create_error_box("The value you've entered is not a multiple of 100. Please double check your entry.");
+            else
+                self.chan2_rate = value;
+                if value == 0
+                    self.set_is_chan2(0);
+                else
+                    self.set_is_chan2(1);
+                end
+            
+            end
         end
 
         function set_chan3_rate(self, value)
-            self.chan3_rate = value;
+            if rem(value,100) ~= 0 && value ~= 0
+                self.create_error_box("The value you've entered is not a multiple of 100. Please double check your entry.");
+            else
+                self.chan3_rate = value;
+                if value == 0
+                    self.set_is_chan3(0);
+                else
+                    self.set_is_chan3(1);
+                end
+            
+            end
         end
 
         function set_chan4_rate(self, value)
-            self.chan4_rate = value;
+            if rem(value,100) ~= 0 && value ~= 0
+                self.create_error_box("The value you've entered is not a multiple of 100. Please double check your entry.");
+            else
+                self.chan4_rate = value;
+                if value == 0
+                    self.set_is_chan4(0);
+                else
+                    self.set_is_chan4(1);
+                end
+            
+            end
         end
 
         function set_configData(self, value)
@@ -1914,7 +1966,13 @@ classdef G4_document < handle
         end
 
         function value = get_experiment_name(self)
-            value = self.experiment_name;
+            cut_date_off_name = regexp(self.experiment_name,'-','split');
+
+            if length(cut_date_off_name) > 1
+                value = cut_date_off_name{1}(1:end-2);
+            else
+                value = self.experiment_name;
+            end
         end
 
         function output = get_pretrial(self)

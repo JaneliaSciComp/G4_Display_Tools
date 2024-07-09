@@ -59,7 +59,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                'ao2',self.doc.posttrial(5),'ao3',self.doc.posttrial(6),...
                'ao4',self.doc.posttrial(7));
 
-           self.view = G4_designer_view();
+           self.view = G4_designer_view(self);
            self.update_gui() ;
         end
 
@@ -72,9 +72,21 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
 
         function update_trial_doc(self, new, x, y, trialtype)
 
+            % if we are adding an entire new trial to the block, add all
+            % new files to the files list
+            if strcmp(trialtype,'block') && x > size(self.doc.block_trials, 1)
+                for i = 2:7
+                    self.set_files(x, i, new{i}, 'block');
+                end
+            end
+
+            %if we are only updating one cell but it is a file cell, update
+            %the files list
             if y >= 2 && y <= 7
                 self.set_files(x, y, new, trialtype)
             end
+
+            %set the property (or add entire new trial)
             self.doc.set_trial_property(x, y, new, trialtype);
             if y == 1
                 self.clear_fields(str2num(new));
@@ -88,112 +100,62 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
 
 
         %Update repetitions
-        function update_repetitions(self, src, ~)
-            new = str2num(src.String);
-            self.doc.repetitions = new;
-            self.update_gui();
-            %self.doc.repetitions
+        function update_repetitions(self, new)
+            
+            self.doc.set_repetitions(new);
+
         end
 
         %Update Randomization
 
-        function update_randomize(self, ~, event)
-            new = event.NewValue.String;
+        function update_randomize(self, new)
+            
             if strcmp(new, 'Randomize Trials') == 1
                 new_val = 1;
             else
                 new_val = 0;
             end
-            self.doc.is_randomized = new_val;
-            self.update_gui();
-            %self.doc.is_randomized
+            self.doc.set_is_randomized(new_val);
+    
         end
 
         %Update channel sample rates
-        function update_chan1_rate(self, src, ~)
-            new = str2num(src.String);
-            if rem(new,100) ~= 0 && new ~= 0
-                self.create_error_box("The value you've entered is not a multiple of 100. Please double check your entry.");
-            end
-            self.doc.chan1_rate = new;
-            if new == 0
-                self.doc.is_chan1 = 0;
-            else
-                self.doc.is_chan1 = 1;
-            end
+        function update_chan1_rate(self, new)
+
+            self.doc.set_chan1_rate(new);         
             self.doc.set_config_data(new, 1);
             self.doc.update_config_file();
-            self.update_gui();
-            %self.doc.chan1_rate
+            
         end
 
-        function update_chan2_rate(self, src, ~)
-            new = str2num(src.String);
-            if rem(new,1000) ~= 0
-                self.create_error_box("The value you've entered is not a multiple of 1000. Please double check your entry.");
-            end
+        function update_chan2_rate(self, new)
+
+            self.doc.set_chan2_rate(new);
             self.doc.set_config_data(new,2);
-            self.doc.chan2_rate = new;
-            if new == 0
-                self.doc.is_chan2 = 0;
-            else
-                self.doc.is_chan2 = 1;
-            end
             self.doc.update_config_file();
-            self.update_gui();
-            %self.doc.chan2_rate
+
         end
 
-        function update_chan3_rate(self, src, ~)
-            new = str2num(src.String);
-            if rem(new,1000) ~= 0
-                self.create_error_box("The value you've entered is not a multiple of 1000. Please double check your entry.");
-            end
-            self.doc.chan3_rate = new;
-            if new == 0
-                self.doc.is_chan3 = 0;
-            else
-                self.doc.is_chan3 = 1;
-            end
-            self.doc.set_config_data(new, 3);
+        function update_chan3_rate(self, new)
+            self.doc.set_chan3_rate(new);
+            self.doc.set_config_data(new,3);
             self.doc.update_config_file();
-            self.update_gui();
-            %self.doc.chan3_rate
         end
 
-        function update_chan4_rate(self, src, ~)
-            new = str2num(src.String);
-            if rem(new,1000) ~= 0
-                self.create_error_box("The value you've entered is not a multiple of 1000. Please double check your entry.");
-            end
-            self.doc.chan4_rate = new;
-            if new == 0
-                self.doc.is_chan4 = 0;
-            else
-                self.doc.is_chan4 = 1;
-            end
-            self.doc.set_config_data(new, 4);
+        function update_chan4_rate(self, new)
+            self.doc.set_chan4_rate(new);
+            self.doc.set_config_data(new,4);
             self.doc.update_config_file();
-            self.update_gui();
-            %self.doc.chan4_rate
+
         end
 
         %Update the screen type (3 or 4 rows)
-        function update_rowNum(self, ~, event)
-            new = event.NewValue.String;
-            if strcmp(new, '3 Row Screen') == 1
-                new_val = 3;
-            else
-                new_val = 4;
-            end
-            %Check to make sure the number in the config file now matches
-            %this new value
+        function update_rowNum(self, new_val)
 
-            self.doc.num_rows = new_val;%do this for other config updating
+            self.doc.set_num_rows(new_val);%do this for other config updating
             self.doc.set_config_data(new_val, 0);
             self.doc.update_config_file();
-            self.set_num_rows_buttonGrp_selection();
-%            self.update_gui();
+
         end
 
         %Update the experiment name
@@ -255,10 +217,11 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                 self.create_error_box("You didn't select a trial to delete.");
             else
                 for i = 1:checked_count
-                     self.doc.block_trials(checked_list(i) - (i-1),:) = [];
+                    self.doc.set_block_trial(checked_list(i) - (i-1), []);
+                     %self.doc.block_trials(checked_list(i) - (i-1),:) = [];
                 end
             end
-            self.update_gui();
+            
         end
 
         %Shift one or more trials up in the block trials table
@@ -298,18 +261,18 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
             if src.Value == false
                 for i = 1:length(self.doc.block_trials(:,1))
                     if self.doc.block_trials{i, l} == 1
-                        self.doc.set_block_trial_property([i, l], false);
+                        self.update_trial_doc(false, i, l, 'block');
                     end
                 end
             else
                 for i = 1:length(self.doc.block_trials(:,1))
                     if cell2mat(self.doc.block_trials(i, l)) == 0
-                        self.doc.set_block_trial_property([i, l], true);
+                        self.update_trial_doc(true, i, l, 'block');
                     end
                 end
             end
             self.model.set_isSelect_all(src.Value);
-            self.update_gui();
+            
         end
 
         % Invert which trials in the block trial are selected
@@ -319,15 +282,15 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
 
             for i = 1:num
                 if cell2mat(self.doc.block_trials(i,len)) == 0
-                    self.doc.set_block_trial_property([i, len], true);
+                    self.update_trial_doc(true, i, len, 'block');
                 elseif cell2mat(self.doc.block_trials(i,len)) == 1
-                    self.doc.set_block_trial_property([i,len], false);
+                    self.update_trial_doc(false, i,len, 'block');
                 else
                     disp('There has been an error, the selected value must be true or false');
                 end
             end
 
-            self.update_gui();
+            
 
         end
 
@@ -442,35 +405,36 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
             else
                 ao1 = '';
             end
-            x, y, new_value, trialtype
-            d.set_trial_property(1, 1, default_mode, 'pre');
-            d.set_trial_property(2, 1, pat1, 'pre');
-            d.set_trial_property(3, 1, pos1, 'pre');
-            d.set_trial_property(4, 1, ao1, 'pre');
+
+            self.update_trial_doc(default_mode, 1, 1, 'pre');
+            self.update_trial_doc(pat1, 2, 1, 'pre');
+            self.update_trial_doc(pos1, 3, 1, 'pre');
+            self.update_trial_doc(ao1, 4, 1, 'pre');
 
             %disable appropriate cells for mode 1
-            d.set_trial_property(9, 1, self.doc.colorgen(), 'pre');
-            d.set_trial_property(10, 1, self.doc.colorgen(), 'pre');
-            d.set_trial_property(11, 1, self.doc.colorgen(), 'pre');
+            self.update_trial_doc(self.doc.colorgen(), 9, 1, 'pre');
+            self.update_trial_doc(self.doc.colorgen(), 10, 1, 'pre');
+            self.update_trial_doc(self.doc.colorgen(), 11, 1, 'pre');
 
-            d.set_trial_property(1, 1, default_mode, 'inter');
-            d.set_trial_property(2, 1, pat1,'inter');
-            d.set_trial_property(3, 1, pos1,'inter');
-            d.set_trial_property(4, 1, ao1,'inter');
+            self.update_trial_doc(default_mode, 1, 1, 'inter');
+            self.update_trial_doc(pat1, 2, 1, 'inter');
+            self.update_trial_doc(pos1, 3, 1, 'inter');
+            self.update_trial_doc(ao1, 4, 1, 'inter');
 
             %disable appropriate cells for mode 1
-            d.set_trial_property(9, 1, self.doc.colorgen(),'inter');
-            d.set_trial_property(10, 1, self.doc.colorgen(),'inter');
-            d.set_trial_property(11, 1, self.doc.colorgen(),'inter');
+            self.update_trial_doc(self.doc.colorgen(), 9, 1, 'inter');
+            self.update_trial_doc(self.doc.colorgen(), 10, 1, 'inter');
+            self.update_trial_doc(self.doc.colorgen(), 11, 1, 'inter');
 
-            d.set_trial_property(1, 1, default_mode, 'post');
-            d.set_trial_property(2, 1, pat1, 'post');
-            d.set_trial_property(3, 1, pos1, 'post');
-            d.set_trial_property(4, 1, ao1, 'post');
+            self.update_trial_doc(default_mode, 1, 1, 'post');
+            self.update_trial_doc(pat1, 2, 1, 'post');
+            self.update_trial_doc(pos1, 3, 1, 'post');
+            self.update_trial_doc(ao1, 4, 1, 'post');
 
-            d.set_trial_property(9, 1, self.doc.colorgen(), 'post');
-            d.set_trial_property(10, 1, self.doc.colorgen(), 'post');
-            d.set_trial_property(11, 1, self.doc.colorgen(), 'post');
+            %disable appropriate cells for mode 1
+            self.update_trial_doc(self.doc.colorgen(), 9, 1, 'post');
+            self.update_trial_doc(self.doc.colorgen(), 10, 1, 'post');
+            self.update_trial_doc(self.doc.colorgen(), 11, 1, 'post');
 
             if num_pos ~= 0
                 if d.Pos_funcs.(pos1_field).pfnparam.gs_val == 1
@@ -479,16 +443,17 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                 else
                     block_dur = round(d.Pos_funcs.(pos1_field).pfnparam.size/1000,1);
                 end
-                d.set_trial_property(1,12, block_dur, 'block');
+                self.update_trial_doc(block_dur, 1, 12, 'block');
             end
-            d.set_trial_property(1, 1, default_mode, 'block');
-            d.set_trial_property(1, 2, pat1, 'block');
-            d.set_trial_property(1, 3, pos1, 'block');
-            d.set_trial_property(1, 4, ao1, 'block');
+            self.update_trial_doc(default_mode, 1, 1, 'block');
+            self.update_trial_doc(pat1, 2, 1, 'block');
+            self.update_trial_doc(pos1, 3, 1, 'block');
+            self.update_trial_doc(ao1, 4, 1, 'block');
 
-            d.set_trial_property(1, 9, self.doc.colorgen(), 'block');
-            d.set_trial_property(1, 10, self.doc.colorgen(), 'block');
-            d.set_trial_property(1, 11, self.doc.colorgen(), 'block');
+            %disable appropriate cells for mode 1
+            self.update_trial_doc(self.doc.colorgen(), 9, 1, 'block');
+            self.update_trial_doc(self.doc.colorgen(), 10, 1, 'block');
+            self.update_trial_doc(self.doc.colorgen(), 11, 1, 'block');
 
             j = 1; %will end up as the count of how many patterns are used. Acts as the indices to "pat_indices"
             pat_index = pat_index + 1;
@@ -550,26 +515,24 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                             newrow{3} = '';
                         end
                     end
+                    self.update_trial_doc(newrow, j, 1, 'block')
 
-                    d.set_trial_property(j, 1, newrow, 'block');
-                    self.block_files.pattern(end + 1) = string(newrow{2});
-                    self.block_files.position(end + 1) = string(newrow{3});
                 end
             end
-            self.update_gui();
+            
         end
 
         %Replace the currently selected cell in the tables with the
         %currently selected file in the imported files list.
 
         function select_new_file(self, new_file)
-            self.doc.set_trial_property()
+
             curr_cell = self.get_current_selected_cell();
             x = curr_cell.index(1);
             y = curr_cell.index(2);
             trialtype = curr_cell.table;
-            self.doc.set_trial_property(x, y, new_file, trialtype);
-            self.update_gui();
+            self.update_trial_doc(new_file, x, y, trialtype)
+            
         end
 
         %Callback upon right click of table cell (does nothing atm)
@@ -610,7 +573,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
             if isequal (top_folder_path,0)
                 return; %Return if user canceled
             else
-                self.doc.top_export_path = top_folder_path;
+                self.doc.set_top_export_path(top_folder_path);
                 import_success = self.doc.import_folder(top_folder_path);
                 waitfor(msgbox(import_success, 'Import successful!'));
                 [~, exp_name, ~] = fileparts(filepath);
@@ -645,9 +608,9 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                 self.doc.update_config_file();
 
                 for k = 1:13
-                    m.set_trial_property(1, k, d.pretrial{k}, 'pre');
-                    m.set_trial_property(1, k, d.intertrial{k}, 'inter');
-                    m.set_trial_property(1, k, d.posttrial{k}, 'post');
+                    self.update_trial_doc(d.pretrial{k}, 1, k, 'pre');
+                    self.update_trial_doc(d.intertrial{k}, 1, k, 'inter');
+                    self.update_trial_doc(d.posttrial{k}, 1, k, 'post');
 
                 end
 
@@ -660,10 +623,12 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                 for j = 1:block_x
                     if j > length(m.block_trials(:,1))
                         newrow = d.block_trials(j,1:end);
-                        m.set_trial_property(j, block_y, newrow, 'block');
+                        self.update_trial_doc(newrow, j, block_y, 'block');
+           
                     else
                         for n = 1:13
-                            m.set_trial_property(j, n, d.block_trials{j,n}, 'block');
+                            self.update_trial_doc(d.block_trials{j,n}, j, n, 'block');
+                       
                         end
                     end
                 end
@@ -682,18 +647,11 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
 
         %Save current experiment as a .g4p file and export necessary files
 
-        function saveas(self, ~, ~)
-            cut_date_off_name = regexp(self.doc.experiment_name,'-','split');
-
-            if length(cut_date_off_name) > 1
-                exp_name = cut_date_off_name{1}(1:end-2);
-            else
-                exp_name = self.doc.experiment_name;
-            end
-
-            dateFormat = 'mm-dd-yy_HH-MM-SS';
-            dated_exp_name = strcat(exp_name, datestr(now, dateFormat));
-            self.doc.experiment_name = dated_exp_name;
+        function saveas(self)
+            %gets the current experiment name without the timestamp
+            exp_name = self.doc.get_experiment_name();   
+            %adds current timestamp before saving the experiment name
+            self.doc.set_experiment_name(exp_name);
             [file, path] = uiputfile('*.g4p','File Selection', self.doc.experiment_name);
             full_path = fullfile(path, file);
 
@@ -702,9 +660,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
             end
 
             prog = waitbar(0,'Please wait...');
-
             waitbar(.33,prog,'Saving...');
-
             self.doc.replace_greyed_cell_values();
             self.doc.saveas(full_path, prog);
 
@@ -718,11 +674,11 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
             self.insert_greyed_cells();
             self.doc.set_recent_files(g4p_path);
             self.doc.update_recent_files_file();
-            self.update_gui();
+            
         end
 
         %Copy selected block trial cell to the pretrial, intertrial, and/or posttrial
-        function copy_to(self, ~, ~)
+        function copy_to(self)
             [checked_count, checked] = self.check_num_trials_selected();
             if checked_count == 0
                 self.create_error_box("You must select a trial to copy over");
@@ -741,24 +697,30 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                 else
                     for i = 1:length(indx)
                         if indx(i) == 1
-                            self.doc.pretrial = selected;
+                            for p = 1:length(selected)
+                                self.update_trial_doc(selected{p},1,p,'pre');
+                            end
                         elseif indx(i) == 2
-                            self.doc.intertrial = selected;
+                            for p = 1:length(selected)
+                                self.update_trial_doc(selected{p}, 1, p, 'inter');
+                            end
                         elseif indx(i) == 3
-                            self.doc.posttrial = selected;
+                            for p = 1:length(selected)
+                                self.update_trial_doc(selected{p}, 1, p, 'post');
+                            end
                         else
                             disp("There has been an error, please try again.");
                         end
                     end
                 end
-                self.update_gui();
+                
             end
         end
 
         %Prompt the users for parameter values with which to populate all
         %selected trials
 
-        function set_selected(self, ~, ~)
+        function set_selected(self)
             %Check if any rows in the block are checked, add indexes of any
             %checked ones into checked_block
 
@@ -792,34 +754,34 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
 
             if self.doc.pretrial{13} == true
                 for i = length(adjusted_answer)
-                    self.doc.set_pretrial_property(i, adjusted_answer{i});
+                    self.update_trial_doc(adjusted_answer{i}, 1, i, 'pre');
                 end
             end
 
             if self.doc.intertrial{13} == true
                 for i = length(adjusted_answer)
-                    self.doc.set_intertrial_property(i, adjusted_answer{i});
+                    self.update_trial_doc(adjusted_answer{i}, 1, i, 'inter');
                 end
             end
 
             if self.doc.posttrial{13} == true
                 for i = length(adjusted_answer)
-                    self.doc.set_posttrial_property(i, adjusted_answer{i});
+                    self.update_trial_doc(adjusted_answer{i}, 1, i, 'post');
                 end
             end
 
             if checked_block_count ~= 0
                 for i = 1:checked_block_count
                     for k = 1:length(adjusted_answer)
-                        self.doc.set_block_trial_property([checked_block(i),k], adjusted_answer{k})
+                        self.update_trial_doc(adjusted_answer{k}, checked_block(i),k, 'block');
+
                     end
                 end
             end
-            self.update_gui();
-            %disp(self.doc.block_trials(2,13));
+
         end
 
-        function open_settings(self, ~, ~)
+        function open_settings(self)
             self.settings_con.layout_view();
         end
 
@@ -916,7 +878,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
         %% General experiment callbacks
         %Clear out all current data to design a new experiment
 
-        function clear_all(self, ~, ~)
+        function clear_all(self)
             question = "Make sure you have saved your experiment, or it will be lost.";
             answer = questdlg(question, 'Confirm Clear All', 'Continue', 'Cancel', 'Cancel');
             switch answer
@@ -930,14 +892,14 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                 self.settings_con = G4_settings_controller();
                 self.preview_con = G4_preview_controller(self.doc);
                 self.reset_defaults();
-                self.update_gui();
+                
             end
         end
 
         %Calculate the approximate length of the current experiment and
         %display on the designer
 
-        function calculate_experiment_length(self, ~, ~)
+        function calculate_experiment_length(self)
             total_dur = 0;
             if ~ischar(self.doc.pretrial{12})
                 total_dur = total_dur + self.doc.pretrial{12};
@@ -955,16 +917,15 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                     total_dur = total_dur + (self.doc.block_trials{i,12}*self.doc.repetitions);
                 end
             end
+            self.doc.set_est_exp_length(total_dur);
             
-            self.update_exp_length(total_dur);
         end
 
         %Run a single trial on the screens (no analog input/output)
 
-        function dry_run(self, ~, ~)
+        function dry_run(self)
             self.doc.replace_greyed_cell_values();
             trial = self.check_one_selected;
-            %block_trials = self.doc.block_trials();
             trial_mode = trial{1};
             trial_duration = trial{12};
             pat_field = self.doc.get_pattern_field_name(trial{2});
@@ -981,7 +942,6 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
 
             trial_fr_rate = trial{9};
 
-            %intertrial = self.doc.intertrial();
             if isempty(trial{10}) == 0
                 LmR_gain = trial{10};
                 LmR_offset = trial{11};
@@ -1000,20 +960,9 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                     func_location = [];
                 end
             else
-                pat_location = self.doc.top_export_path;
-                func_location = self.doc.top_export_path;
+                pat_location = self.doc.get_top_export_path();
+                func_location = self.doc.get_top_export_path();
             end
-
-                % self.create_error_box("You must save the experiment before you can test it on the screens.");
-                % return;
-           
-            %experiment_folder = self.doc.top_export_path;
-            % answer = questdlg("If you have imported from multiple locations, you must save your experiment" + ...
-            %     " before you can test it on the screens.", 'Confirm Save', 'Continue', 'Go back', 'Continue');
-
-            % if strcmp(answer, 'Go back')
-            %     return;
-            % end
 
             if isempty(self.ctlr)
                 self.ctlr = PanelsController();
@@ -1022,15 +971,13 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
             pause(10);
             self.model.host_connected = 1;
            
-
-            
             start = questdlg('Start Dry Run?','Confirm Start','Start','Cancel','Start');
             switch start
             case 'Cancel'
                 return;
 
             case 'Start'
-                self.model.screen_on = 1;
+                self.model.set_screen_on(1);
                 pattern_index = self.doc.get_pattern_index(trial{2});
                 func_index = self.doc.get_posfunc_index(trial{3});
                 
@@ -1058,7 +1005,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
 
                 if trial_duration ~= 0
                     self.ctlr.startDisplay(trial_duration*10); %duration expected in 100ms units
-                    self.model.screen_on = 0;
+                    self.model.set_screen_on(0);
                 else
                     self.ctlr.startDisplay(2000, false);
                     w = waitforbuttonpress; %If pretrial duration is set to zero, this
@@ -1072,10 +1019,8 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
         end
 
         %Open the conductor to run an experiment
-        function open_run_gui(self, ~, ~)
+        function open_run_gui(self)
             self.check_and_disconnect_host();
-            %self.run_con = G4_conductor_controller(self.doc, self.settings_con);
-            %self.run_con.layout();
             if ~isempty(self.doc.save_filename)
                 evalin('base', 'G4_Experiment_Conductor()');
                 evalin('base', 'run_con.open_g4p_file(con.doc.save_filename)');
@@ -1099,16 +1044,16 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                 newRow = self.doc.block_trials(index,1:end-1);
             end
             newRow{end+1} = false;
-            self.doc.set_block_trial_property([x,y],newRow);
+            self.update_trial_doc(newRow, x, y, 'block');
 
-            self.block_files.pattern(end + 1) = string(cell2mat(newRow(2)));
-            self.block_files.position(end + 1) = string(cell2mat(newRow(3)));
-            self.block_files.ao1(end + 1) = string(cell2mat(newRow(4)));
-            self.block_files.ao2(end + 1) = string(cell2mat(newRow(5)));
-            self.block_files.ao3(end + 1) = string(cell2mat(newRow(6)));
-            self.block_files.ao4(end + 1) = string(cell2mat(newRow(7)));
+%             self.block_files.pattern(end + 1) = string(cell2mat(newRow(2)));
+%             self.block_files.position(end + 1) = string(cell2mat(newRow(3)));
+%             self.block_files.ao1(end + 1) = string(cell2mat(newRow(4)));
+%             self.block_files.ao2(end + 1) = string(cell2mat(newRow(5)));
+%             self.block_files.ao3(end + 1) = string(cell2mat(newRow(6)));
+%             self.block_files.ao4(end + 1) = string(cell2mat(newRow(7)));
 
-            self.update_gui();
+            
         end
 
         % Moves a single trial up in the block table
@@ -1124,8 +1069,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
 
             self.doc.set_block_trial(index, above_selected);
             self.doc.set_block_trial(index - 1, selected);
-
-            self.update_gui();
+            
         end
 
         % Moves a single trial down in the block table
@@ -1144,7 +1088,6 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
             self.doc.set_block_trial(index,below_selected);
             self.doc.set_block_trial(index + 1, selected);
 
-            self.update_gui();
         end
 
         % Deselect the "Select All" box when any trial is deselected
@@ -1242,104 +1185,46 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                 gain = self.doc.colorgen();
                 offset = self.doc.colorgen();
                 self.set_mode_dep_props(pos, indx, rate, gain, offset);
-                if strcmp(self.model.current_selected_cell.table,"pre")
-                    self.doc.set_pretrial_property(2, self.doc.colorgen());
-                    for i = 4:7
-                        self.doc.set_pretrial_property(i,self.doc.colorgen());
-                    end
-                    self.doc.set_pretrial_property(12,self.doc.colorgen());
-                elseif strcmp(table,'inter') || strcmp(self.model.current_selected_cell.table,"inter") == 1
-                    self.doc.set_intertrial_property(2, self.doc.colorgen());
-                    for i = 4:7
-                        self.doc.set_intertrial_property(i,self.doc.colorgen());
-                    end
-                    self.doc.set_intertrial_property(12,self.doc.colorgen());
-                elseif strcmp(table, 'post') || strcmp(self.model.current_selected_cell.table,"post") == 1
-                    self.doc.set_posttrial_property(2, self.doc.colorgen());
-                    for i = 4:7
-                        self.doc.set_posttrial_property(i,self.doc.colorgen());
-                    end
-                    self.doc.set_posttrial_property(12,self.doc.colorgen());
-                else
-                    x = self.model.current_selected_cell.index(1);
-                    self.doc.set_block_trial_property([x,2], self.doc.colorgen());
-                    for i = 4:7
-                        self.doc.set_block_trial_property([x,i],self.doc.colorgen());
-                    end
-                    self.doc.set_block_trial_property([x,12],self.doc.colorgen());
+                trialtype = convertStringsToChars(self.model.current_selected_cell.table);
+                x = self.model.current_selected_cell.index(1);
+
+                self.update_trial_doc(self.doc.colorgen(),x,2,trialtype);
+                for i = 4:7
+                    self.update_trial_doc(self.doc.colorgen(), x, i, trialtype);
                 end
+                self.update_trial_doc(self.doc.colorgen(), x, 12, trialtype);
+
             end
         end
 
         % Set all properties dependent on the mode
         function set_mode_dep_props(self, pos, indx, rate, gain, offset, varargin)
 
-            if strcmp(self.model.current_selected_cell.table,"pre")
-                self.doc.set_pretrial_property(3, pos);
-                self.doc.set_pretrial_property(8, indx);
-                self.doc.set_pretrial_property(9, rate);
-                self.doc.set_pretrial_property(10, gain);
-                self.doc.set_pretrial_property(11, offset);
-                self.set_pretrial_files_(3, pos);
-
-                if ~isempty(self.doc.pretrial{1})
-                    self.doc.set_pretrial_property(4,'');
-                    self.doc.set_pretrial_property(5,'');
-                    self.doc.set_pretrial_property(6,'');
-                    self.doc.set_pretrial_property(7,'');
-                    self.doc.set_pretrial_property(12,self.doc.trial_data.trial_array{12});
-                end
-
-            elseif strcmp(self.model.current_selected_cell.table,"inter") == 1
-                self.doc.set_intertrial_property(3, pos);
-                self.doc.set_intertrial_property(8, indx);
-                self.doc.set_intertrial_property(9, rate);
-                self.doc.set_intertrial_property(10, gain);
-                self.doc.set_intertrial_property(11, offset);
-                self.set_intertrial_files_(3,pos);
-
-                if ~isempty(self.doc.intertrial{1})
-                    self.doc.set_intertrial_property(4,'');
-                    self.doc.set_intertrial_property(5,'');
-                    self.doc.set_intertrial_property(6,'');
-                    self.doc.set_intertrial_property(7,'');
-                    self.doc.set_intertrial_property(12,self.doc.trial_data.trial_array{12});
-                end
-
-            elseif strcmp(self.model.current_selected_cell.table,"post") == 1
-                self.doc.set_posttrial_property(3, pos);
-                self.doc.set_posttrial_property(8, indx);
-                self.doc.set_posttrial_property(9, rate);
-                self.doc.set_posttrial_property(10, gain);
-                self.doc.set_posttrial_property(11, offset);
-                self.set_posttrial_files_(3,pos);
-
-                if ~isempty(self.doc.posttrial{1})
-                    self.doc.set_posttrial_property(4,'');
-                    self.doc.set_posttrial_property(5,'');
-                    self.doc.set_posttrial_property(6,'');
-                    self.doc.set_posttrial_property(7,'');
-                    self.doc.set_posttrial_property(12,self.doc.trial_data.trial_array{12});
-                end
-
-
-            else
-                x = self.model.current_selected_cell.index(1);
-                self.doc.set_block_trial_property([x,3], pos);
-                self.doc.set_block_trial_property([x,8], indx);
-                self.doc.set_block_trial_property([x,9], rate);
-                self.doc.set_block_trial_property([x,10], gain);
-                self.doc.set_block_trial_property([x,11], offset);
-                self.set_blocktrial_files_(self.model.current_selected_cell.index(1),3,pos);
-
-                if ~isempty(self.doc.block_trials{x,1})
-                    self.doc.set_block_trial_property([x,4],'');
-                    self.doc.set_block_trial_property([x,5],'');
-                    self.doc.set_block_trial_property([x,6],'');
-                    self.doc.set_block_trial_property([x,7],'');
-                    self.doc.set_block_trial_property([x,12],self.doc.trial_data.trial_array{12});
-                end
+            trialtype = convertStringsToChars(self.model.current_selected_cell.table);
+            x = self.model.current_selected_cell.index(1);
+            if strcmp(trialtype, 'pre')
+                trial_var = 'pretrial';
+            elseif strcmp(trialtype, 'inter')
+                trial_var = 'intertrial';
+            elseif strcmp(trialtype, 'post')
+                trial_var = 'posttrial';
+            elseif strcmp(trialtype, 'block')
+                trial_var = 'block_trials';
             end
+
+            self.update_trial_doc(pos, x, 3, trialtype);
+            self.update_trial_doc(indx, x, 8, trialtype);
+            self.update_trial_doc(rate, x, 9, trialtype);
+            self.update_trial_doc(gain, x, 10, trialtype);
+            self.update_trial_doc(offset, x, 11, trialtype);
+            if ~isempty(self.doc.(trial_var){1})
+                self.update_trial_doc('', x, 4, trialtype);
+                self.update_trial_doc('', x, 5, trialtype);
+                self.update_trial_doc('', x, 6, trialtype);
+                self.update_trial_doc('', x, 7, trialtype);
+                self.update_trial_doc(self.doc.trial_data.trial_array{12}, x, 12, trialtype);
+            end
+
             self.update_gui();
         end
 
@@ -2068,14 +1953,16 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
             end
 
             for i = 1:length(pre_indices_to_color)
-                self.doc.set_pretrial_property(pre_indices_to_color(i),self.doc.colorgen());
+                self.update_trial_doc(self.doc.colorgen(), 1, pre_indices_to_color(i), 'pre');
 
             end
             for i = 1:length(inter_indices_to_color)
-                self.doc.set_intertrial_property(inter_indices_to_color(i),self.doc.colorgen());
+                self.update_trial_doc(self.doc.colorgen(), 1, inter_indices_to_color(i), 'inter');
+
             end
             for i = 1:length(post_indices_to_color)
-                self.doc.set_posttrial_property(post_indices_to_color(i),self.doc.colorgen());
+                self.update_trial_doc(self.doc.colorgen(), 1, post_indices_to_color(i), 'post');
+
             end
 
             for i = 1:length(self.doc.block_trials(:,1))
@@ -2094,7 +1981,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                     indices_to_color = [3, 9, 10, 11];
                 end
                 for j = 1:length(indices_to_color)
-                    self.doc.set_block_trial_property([i,indices_to_color(j)],self.doc.colorgen());
+                    self.update_trial_doc(self.doc.colorgen(), i, indices_to_color(j), 'block');
                 end
             end
         end
@@ -2125,12 +2012,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
             else
                 import_success = self.doc.import_folder(path);
                 waitfor(msgbox(import_success, 'Import Successful!'));
-
-                self.set_exp_name();
-                set(self.num_rows_3, 'Enable', 'off');
-                set(self.num_rows_4, 'Enable', 'off');
-
-                self.update_gui();
+                
             end
         end
 
@@ -2147,9 +2029,6 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
             else
                 self.doc.import_single_file(imported_file, path);
 
-                set(self.num_rows_3, 'Enable', 'off');
-                set(self.num_rows_4, 'Enable', 'off');
-                self.update_gui();
             end
         end
 
@@ -2171,7 +2050,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                     pat_field = self.doc.get_pattern_field_name(self.doc.pretrial{2});
                 elseif ~isempty(self.doc.imported_pattern_names)
                     pat_field = pat_fields{1};
-                    self.doc.set_pretrial_property(2,self.doc.Patterns.(pat_field).filename);
+                    self.update_trial_doc(self.doc.Patterns.(pat_field).filename, 1, 2, 'pre');
                 else
                     pat_field = '';
                 end
@@ -2181,7 +2060,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                     pat_field = self.doc.get_pattern_field_name(self.doc.intertrial{2});
                 elseif ~isempty(self.doc.imported_pattern_names)
                     pat_field = pat_fields{1};
-                    self.doc.set_intertrial_property(2,self.doc.Patterns.(pat_field).filename);
+                    self.update_trial_doc(self.doc.Patterns.(pat_field).filename, 1, 2, 'inter');
                 else
                     pat_field = '';
                 end
@@ -2190,7 +2069,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                     pat_field = self.doc.get_pattern_field_name(self.doc.posttrial{2});
                 elseif ~isempty(self.doc.imported_pattern_names)
                     pat_field = pat_fields{1};
-                    self.doc.set_posttrial_property(2,self.doc.Patterns.(pat_field).filename);
+                    self.update_trial_doc(self.doc.Patterns.(pat_field).filename, 1, 2, 'post');
                 else
                     pat_field = '';
                 end
@@ -2200,7 +2079,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                     pat_field = self.doc.get_pattern_field_name(self.doc.block_trials{self.model.current_selected_cell.index(1),2});
                 elseif ~isempty(self.doc.imported_pattern_names)
                     pat_field = pat_fields{1};
-                    self.doc.set_block_trial_property([self.model.current_selected_cell.index(1),2],self.doc.Patterns.(pat_field).filename);
+                    self.update_trial_doc(self.doc.Patterns.(pat_field).filename, self.model.current_selected_cell.index(1), 2, 'block');
                 else
                     pat_field = '';
                 end
@@ -2226,12 +2105,6 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
         %Update the preview controller property
         function update_preview_con(self, new_value)
             self.preview_con = new_value;
-        end
-
-         %Update the predicted experiment length
-        function update_exp_length(self, new)
-            self.doc.est_exp_length = new;
-            self.update_gui();
         end
 
         % Update the GUI to reflect the up to date model values
@@ -2287,53 +2160,58 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
 
 
         function set_files(self, x, y, new_value, trialtype)
-            new_value = string(new_value);
-            %If it is files for  block trial, the code is slightly
-            %different.
-            if strcmp(trialtype, 'pre')
-                filesVar = 'pre_files';
-            elseif strcmp(trialtype, 'inter')
-                filesVar = 'inter_files';
-            elseif strcmp(trialtype, 'post')
-                filesVar = 'post_files';
-            end
-            if strcmp(trialtype, 'block')
-                if y == 2
-                self.block_files.pattern(x) = new_value;
-                end
-                if y == 3
-                    self.block_files.position(x) = new_value;
-                end
-                if y == 4
-                    self.block_files.ao1(x) = new_value;
-                end
-                if y == 5
-                    self.block_files.ao2(x) = new_value;
-                end
-                if y == 6
-                    self.block_files.ao3(x) = new_value;
-                end
-                if y == 7
-                    self.block_files.ao4(x) = new_value;
-                end
+            if isempty(new_value)
+                return;
             else
-                if y == 2
-                    self.(filesVar).pattern = new_value;
+                new_value = string(new_value);
+                %If it is files for  block trial, the code is slightly
+                %different.
+                
+                if strcmp(trialtype, 'pre')
+                    filesVar = 'pre_files';
+                elseif strcmp(trialtype, 'inter')
+                    filesVar = 'inter_files';
+                elseif strcmp(trialtype, 'post')
+                    filesVar = 'post_files';
                 end
-                if y == 3
-                    self.(filesVar).position = new_value;
-                end
-                if y == 4
-                    self.(filesVar).ao1 = new_value;
-                end
-                if y == 5
-                    self.(filesVar).ao2 = new_value;
-                end
-                if y == 6
-                    self.(filesVar).ao3 = new_value;
-                end
-                if y == 7
-                    self.(filesVar).ao4 = new_value;
+                if strcmp(trialtype, 'block')
+                    if y == 2
+                    self.block_files.pattern(x) = new_value;
+                    end
+                    if y == 3
+                        self.block_files.position(x) = new_value;
+                    end
+                    if y == 4
+                        self.block_files.ao1(x) = new_value;
+                    end
+                    if y == 5
+                        self.block_files.ao2(x) = new_value;
+                    end
+                    if y == 6
+                        self.block_files.ao3(x) = new_value;
+                    end
+                    if y == 7
+                        self.block_files.ao4(x) = new_value;
+                    end
+                else
+                    if y == 2
+                        self.(filesVar).pattern = new_value;
+                    end
+                    if y == 3
+                        self.(filesVar).position = new_value;
+                    end
+                    if y == 4
+                        self.(filesVar).ao1 = new_value;
+                    end
+                    if y == 5
+                        self.(filesVar).ao2 = new_value;
+                    end
+                    if y == 6
+                        self.(filesVar).ao3 = new_value;
+                    end
+                    if y == 7
+                        self.(filesVar).ao4 = new_value;
+                    end
                 end
             end
 
@@ -2581,7 +2459,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
         function output = get_recent_g4p_files(self)
             output = self.doc.get_recent_g4p_files();
         end
-        function output = get_est_esp_length(self)
+        function output = get_est_exp_length(self)
             output = self.doc.get_est_exp_length();
         end
         function output = get_patterns(self)

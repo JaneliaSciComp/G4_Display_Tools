@@ -32,7 +32,7 @@ classdef G4_designer_model < handle
             
             self.set_isSelect_all(false);
             self.set_is_paused(false);
-            self.set_current_selected_cell(struct('table', "", 'index', [0,0]));
+            self.set_current_selected_cell("", [1,1]);
             self.set_auto_preview_index(1);
             self.set_current_preview_file('');
             self.set_host_connected(0);

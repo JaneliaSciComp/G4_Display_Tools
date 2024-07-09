@@ -156,11 +156,11 @@ classdef G4_designer_view < handle
 
             %code to make the above panel transparent, so the preview image
             %can be seen.
-            jPanel = self.preview_panel.JavaFrame.getPrintableComponent;
-            jPanel.setOpaque(false)
-            jPanel.getParent.setOpaque(false)
-            jPanel.getComponent(0).setOpaque(false)
-            jPanel.repaint
+%             jPanel = self.preview_panel.JavaFrame.getPrintableComponent;
+%             jPanel.setOpaque(false)
+%             jPanel.getParent.setOpaque(false)
+%             jPanel.getComponent(0).setOpaque(false)
+%             jPanel.repaint
 
             %preview_button
             uibutton(self.f, 'Text', 'Preview', 'Fontsize', font_size, 'Position', [pos_panel(1) + pos_panel(3), ...
@@ -283,28 +283,31 @@ classdef G4_designer_view < handle
                 'Position', [left_margin, positions.block(2) + positions.block(4) - .31, .15, .13]);
             chan_pan_size = [chan_pan.Position(3), chan_pan.Position(4)];
 
-            self.chan1_rate_box = uieditfield(chan_pan, "numeric", 'Value', num2str(self.con.doc.chan1_rate), 'Position', ...
+%             self.chan1_rate_box = uieditfield(chan_pan, "numeric", 'Value', self.con.doc.chan1_rate, 'Position', ...
+%                 [.65, .72, .25, .15].*[chan_pan_size, chan_pan_size],'ValueChangedFcn', @self.update_chan1_rate);
+
+            self.chan1_rate_box = uieditfield(chan_pan, "numeric", 'Position', ...
                 [.65, .72, .25, .15].*[chan_pan_size, chan_pan_size],'ValueChangedFcn', @self.update_chan1_rate);
 
             %chan1_rate_label
             uilabel(chan_pan, 'Text', 'Channel 1 Sample Rate', 'FontSize', font_size, ...
                 'Position', [.05, .7, .5, .17].*[chan_pan_size, chan_pan_size]);
 
-            self.chan2_rate_box = uieditfield(chan_pan, "numeric", 'Value', num2str(self.con.doc.chan2_rate), 'Position', ...
+            self.chan2_rate_box = uieditfield(chan_pan, "numeric", 'Position', ...
                 [.65, .52, .25, .17].*[chan_pan_size, chan_pan_size], 'ValueChangedFcn', @self.update_chan2_rate);
 
             %chan2_rate_label
             uilabel(chan_pan, 'Text', 'Channel 2 Sample Rate', 'FontSize', font_size, ...
                 'Position', [.05, .5, .5, .17].*[chan_pan_size, chan_pan_size]);
 
-            self.chan3_rate_box = uieditfield(chan_pan, "numeric", 'Value', num2str(self.con.doc.chan3_rate), 'Position', ...
+            self.chan3_rate_box = uieditfield(chan_pan, "numeric", 'Position', ...
                 [.65, .32, .25, .17].*[chan_pan_size, chan_pan_size], 'ValueChangedFcn', @self.update_chan3_rate);
 
             %chan3_rate_label
             uilabel(chan_pan, 'Text', 'Channel 3 Sample Rate', 'FontSize', font_size, ...
                 'Position', [.05, .3, .5, .17].*[chan_pan_size, chan_pan_size]);
 
-            self.chan4_rate_box = uieditfield(chan_pan, "numeric", 'Value', num2str(self.con.doc.chan4_rate), 'Position', ...
+            self.chan4_rate_box = uieditfield(chan_pan, "numeric", 'Position', ...
                 [.65, .12, .25, .17].*[chan_pan_size, chan_pan_size], 'ValueChangedFcn', @self.update_chan4_rate);
 
             %chan4_rate_label
@@ -380,14 +383,14 @@ classdef G4_designer_view < handle
             self.block_table.Data = self.con.get_blocktrial_data();
             self.posttrial_table.Data = self.con.get_posttrial_data();
             self.set_randomize_buttonGrp_selection();
-            self.repetitions_box.String = num2str(self.con.get_repetitions());
+            self.repetitions_box.Value = self.con.get_repetitions();
             self.isSelect_all_box.Value = self.con.get_isSelect_all();
-            self.chan1_rate_box.String = num2str(self.con.get_chan1_rate);
-            self.chan2_rate_box.String = num2str(self.con.get_chan2_rate);
-            self.chan3_rate_box.String = num2str(self.con.get_chan3_rate);
-            self.chan4_rate_box.String = num2str(self.con.get_chan4_rate);
+            self.chan1_rate_box.Value = self.con.get_chan1_rate();
+            self.chan2_rate_box.Value = self.con.get_chan2_rate();
+            self.chan3_rate_box.Value = self.con.get_chan3_rate();
+            self.chan4_rate_box.Value = self.con.get_chan4_rate();
             self.set_num_rows_buttonGrp_selection();
-            set(self.exp_name_box,'String', self.con.get_experiment_name());
+            set(self.exp_name_box,'Value', self.con.get_experiment_name());
             self.set_recent_file_menu_items();
             self.set_exp_length_display();
             self.con.doc_replace_grey_cells();
@@ -443,7 +446,7 @@ classdef G4_designer_view < handle
         function set_exp_length_display(self)
             
             length = self.con.get_est_exp_length();
-            self.exp_length_display.String = [num2str(round(length/60, 2)), ' minutes'];
+            self.exp_length_display.Text = [num2str(round(length/60, 2)), ' minutes'];
 
         end
 
@@ -715,48 +718,56 @@ classdef G4_designer_view < handle
         function add_trials_callback(self, ~, ~)
 
             self.con.add_trials_callback();
+            self.update_gui();
 
         end
 
         function delete_trial(self, ~, ~)
 
             self.con.delete_trial();
+            self.update_gui();
 
         end
 
         function select_all(self, src, ~)
 
-            self.con.select_all(src)
+            self.con.select_all(src);
+            self.update_gui();
 
         end
 
         function invert_selection(self, ~, ~)
 
             self.con.invert_selection();
+            self.update_gui();
 
         end
 
         function shift_up_callback(self, ~, ~)
 
             self.con.shift_up_callback();
+            self.update_gui();
 
         end
 
         function shift_down_callback(self, ~, ~)
 
             self.con.shift_down_callback();
+            self.update_gui();
 
         end
 
         function clear_all(self, ~, ~)
 
             self.con.clear_all();
+            self.update_gui();
 
         end
 
         function autofill(self, ~, ~)
 
             self.con.autofill();
+            self.update_gui();
 
         end
 
@@ -764,6 +775,7 @@ classdef G4_designer_view < handle
 
             new_file = self.listbox_imported_files.Items{self.listbox_imported_files.Value};
             self.con.select_new_file(new_file);
+            self.update_gui();
 
         end
 
@@ -907,6 +919,10 @@ classdef G4_designer_view < handle
         function import(self, ~, ~)
 
             self.con.import();
+            set(self.num_rows_3, 'Enable', 'off');
+            set(self.num_rows_4, 'Enable', 'off');
+
+            self.update_gui();
 
         end
 
@@ -918,52 +934,99 @@ classdef G4_designer_view < handle
 
         end
 
-        function saveas(self)
+        function saveas(self, ~, ~)
+
+            self.con.saveas();
+            self.update_gui();
 
         end
 
-        function copy_to(self)
+        function copy_to(self, ~, ~)
+
+            self.con.copy_to();
+            self.update_gui();
 
         end
 
-        function set_selected(self)
+        function set_selected(self, ~, ~)
+
+            self.con.set_selected();
+            self.update_gui();
 
         end
 
-        function open_settings(self)
+        function open_settings(self, ~, ~)
+
+            self.con.open_settings();
 
         end
 
-        function calculate_experiment_length(self)
+        function calculate_experiment_length(self, ~, ~)
+
+            self.con.calculate_experiment_length();
+            self.update_gui();
 
         end
 
-        function update_randomize(self)
+        function update_randomize(self, ~, event)
+
+            new = event.NewValue.String;
+            self.con.update_randomize(new);
+            self.update_gui();
 
         end
 
-        function update_repetitions(self)
+        function update_repetitions(self, src, ~)
+
+            new = str2num(src.String);
+            self.con.update_repetitions(new);
+            self.update_gui();
 
         end
-        function dry_run(self)
+        function dry_run(self, ~, ~)
+
+            self.con.dry_run();
 
         end
-        function open_run_gui(self)
+        function open_run_gui(self, ~, ~)
+
+            self.con.open_run_gui();
 
         end
-        function update_chan1_rate(self)
+        function update_chan1_rate(self, src, ~)
+
+            new = str2num(src.String);
+            self.con.update_chan1_rate(new);
+            self.update_gui();
 
         end
-        function update_chan2_rate(self)
+        function update_chan2_rate(self, src, ~)
+            new = str2num(src.String);
+            self.con.update_chan2_rate(new);
+            self.update_gui();
 
         end
-        function update_chan3_rate(self)
+        function update_chan3_rate(self, src, ~)
+            new = str2num(src.String);
+            self.con.update_chan3_rate(new);
+            self.update_gui();
 
         end
-        function update_chan4_rate(self)
+        function update_chan4_rate(self, src, ~)
+            new = str2num(src.String);
+            self.con.update_chan4_rate(new);
+            self.update_gui();
 
         end
-        function update_rowNum(self)
+        function update_rowNum(self, ~, event)
+            new = event.NewValue.String;
+            if strcmp(new, '3 Row Screen') == 1
+                new_val = 3;
+            else
+                new_val = 4;
+            end
+            self.con.update_rowNum(new_val);
+            self.update_gui();
 
         end
         function reset_defaults(self)
