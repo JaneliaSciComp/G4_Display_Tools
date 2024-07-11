@@ -79,8 +79,8 @@ classdef G4_designer_view < handle
                 [positions.pre(1) - .04, positions.pre(2) + .025, .04, .015].*[fSize, fSize]);
 
             self.pretrial_table = uitable(self.f, 'data', self.con.doc.pretrial, 'columnname', column_names, ...
-            'units', 'normalized', 'Position', positions.pre, 'ColumnEditable', columns_editable, 'ColumnFormat', column_format, ...
-            'ColumnWidth', column_widths, 'CellEditCallback', {@self.update_trial, 'pre'}, 'CellSelectionCallback', {@self.preview_selection, positions});
+            'units', 'normalized', 'Position', positions.pre, 'Tag', 'pre', 'ColumnEditable', columns_editable, 'ColumnFormat', column_format, ...
+            'ColumnWidth', column_widths, 'CellEditCallback', @self.update_trial, 'CellSelectionCallback', @self.preview_selection);
             
 
             % intertrial_label
@@ -88,24 +88,24 @@ classdef G4_designer_view < handle
                [positions.inter(1) - .04, positions.inter(2) + .025, .04, .015].*[fSize, fSize]);
 
             self.intertrial_table = uitable(self.f, 'data', self.con.doc.intertrial, 'columnname', column_names, ...
-            'units', 'normalized', 'Position', positions.inter, 'ColumnEditable', columns_editable, 'ColumnFormat', column_format, ...
-            'ColumnWidth', column_widths, 'CellEditCallback', {@self.update_trial, 'inter'}, 'CellSelectionCallback', {@self.preview_selection, positions});
+            'units', 'normalized', 'Position', positions.inter, 'Tag', 'inter', 'ColumnEditable', columns_editable, 'ColumnFormat', column_format, ...
+            'ColumnWidth', column_widths, 'CellEditCallback', @self.update_trial, 'CellSelectionCallback', @self.preview_selection);
 
             %blocktrial_label
             uilabel(self.f, 'Text', 'Block Trials', 'FontSize', font_size, 'Position', ...
                [positions.block(1) - .04, positions.block(2) + .5*positions.block(4), .04, .015].*[fSize, fSize]);
 
             self.block_table = uitable(self.f, 'data', self.con.doc.block_trials, 'columnname', column_names, ...
-            'units', 'normalized', 'Position', positions.block, 'ColumnEditable', columns_editable, 'ColumnFormat', column_format, ...
-            'ColumnWidth', column_widths, 'CellEditCallback', {@self.update_trial, 'block'}, 'CellSelectionCallback', {@self.preview_selection, positions});
+            'units', 'normalized', 'Position', positions.block, 'Tag', 'block', 'ColumnEditable', columns_editable, 'ColumnFormat', column_format, ...
+            'ColumnWidth', column_widths, 'CellEditCallback', @self.update_trial, 'CellSelectionCallback', @self.preview_selection);
 
             %posttrial_label
             uilabel(self.f, 'Text', 'Post-Trial', 'FontSize', font_size, 'Position', ...
                 [positions.post(1) - .04, positions.post(2) + .025, .04, .015].*[fSize, fSize]);
 
             self.posttrial_table = uitable(self.f, 'data', self.con.doc.posttrial, 'columnname', column_names, ...
-            'units', 'normalized', 'Position', positions.post, 'ColumnEditable', columns_editable, 'ColumnFormat', column_format, ...
-            'ColumnWidth', column_widths, 'CellEditCallback', {@self.update_trial, 'post'},'CellSelectionCallback', {@self.preview_selection, positions});
+            'units', 'normalized', 'Position', positions.post, 'Tag', 'post', 'ColumnEditable', columns_editable, 'ColumnFormat', column_format, ...
+            'ColumnWidth', column_widths, 'CellEditCallback', @self.update_trial,'CellSelectionCallback', @self.preview_selection);
 
             %add_trial_button
             uibutton(self.f, 'Text','Add Trial','Position', [positions.block(1) + positions.block(3) + left_margin, ...
@@ -498,11 +498,13 @@ classdef G4_designer_view < handle
         end
 
 
-        function update_trial(self, ~, event, trialtype)
+        function update_trial(self, src, event, a)
 
             new = event.EditData;
             x = event.Indices(1);
             y = event.Indices(2);
+            trialtype = src.Tag;
+            self.con.set_current_selected_cell(trialtype, event.Indices);
             if y == 1
                 allow = 1;                
             else
@@ -518,18 +520,12 @@ classdef G4_designer_view < handle
 
         end
 
-        function preview_selection(self, varargin)
+        function preview_selection(self, src, event)
             %When a new cell is selected, first delete the current preview axes if
         %there
 
             delete(self.hAxes);
             delete(self.second_axes);
-
-            src = varargin{1};
-            event = varargin{2};
-            if length(varargin) >= 3
-                positions = varargin{3};
-            end
 
       %Determine whether we are previewing a file from a table or from the
       %listbox
@@ -547,7 +543,7 @@ classdef G4_designer_view < handle
             if is_table == 1
                 %get index of selected cell, table it resides in, and
                 %string of the file in the cell if its index is 2-7
-                file = self.check_table_selected(src, event, positions);
+                file = self.check_table_selected(src, event);
 
                 %Fill embedded list with imported files appropriate for the
                 %selected cell
@@ -565,23 +561,24 @@ classdef G4_designer_view < handle
 
         end
 
-        function [file] = check_table_selected(self, src, event, positions)
+        function [file] = check_table_selected(self, src, event)
 
             x_event_index = event.Indices(1);
             y_event_index = event.Indices(2);
+            tag = src.Tag;
             if y_event_index > 1 && y_event_index< 8
                 file = string(src.Data(x_event_index, y_event_index));
             else
                 file = '';
             end
 
-            if round(src.Position,4) - round(positions.pre,4) == 0
+            if strcmp(tag, 'pre')
                 table = "pre";
-            elseif round(src.Position,4) - round(positions.inter,4) == 0
+            elseif strcmp(tag, 'inter')
                 table = "inter";
-            elseif round(src.Position,4) - round(positions.block,4) == 0
+            elseif strcmp(tag, 'block')
                 table = "block";
-            elseif round(src.Position,4) - round(positions.post,4) == 0
+            elseif strcmp(tag, 'post')
                 table = "post";
             end
 
@@ -668,7 +665,7 @@ classdef G4_designer_view < handle
                 selected_file = self.con.get_trial_component('block', event.Indices(1), event.Indices(2));
                 ind = find(strcmp(filenames, selected_file));
             else
-                selected_file = self.con.get_trial_component('post', event.Indices(2));
+                selected_file = self.con.get_trial_component('post', 1, event.Indices(2));
                 ind = find(strcmp(filenames, selected_file));
             end
 
@@ -871,7 +868,7 @@ classdef G4_designer_view < handle
         end
  %Move forward a single frame through pattern library in in-screen
         %preview
-        function frame_forward(self)
+        function frame_forward(self, ~, ~)
             curr_file = self.con.get_current_preview_file();
             index = self.con.get_auto_preview_index();
             if ~strcmp(curr_file,'') && length(curr_file(1,1,:)) > 1
@@ -973,7 +970,7 @@ classdef G4_designer_view < handle
 
         function update_randomize(self, ~, event)
 
-            new = event.NewValue.String;
+            new = event.NewValue.Text;
             self.con.update_randomize(new);
             self.update_gui();
 
@@ -981,7 +978,7 @@ classdef G4_designer_view < handle
 
         function update_repetitions(self, src, ~)
 
-            new = str2num(src.String);
+            new = src.Value;
             self.con.update_repetitions(new);
             self.update_gui();
 

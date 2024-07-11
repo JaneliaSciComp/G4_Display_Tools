@@ -89,7 +89,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
 
             %set the property (or add entire new trial)
             self.doc.set_trial_property(x, y, new, trialtype);
-            if y == 1
+            if y == 1 && isnumeric(new)
                 self.clear_fields(str2num(new));
             end
             if strcmp(trialtype, 'block')
@@ -812,10 +812,10 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
             %selected
             if strcmp(file_type, 'pat') && ~strcmp(patfield,'')
                 self.inscreen_pattern_preview(patfield);
-            elseif strcmp(file_type, 'pos') && ~strcmp(funcfield,'')
-                self.inscreen_pos_preview(frame_rate, dur, posfield);
+            elseif strcmp(file_type, 'pos') && ~strcmp(posfield,'')
+                self.inscreen_function_preview(frame_rate, dur, posfield, aofield, file_type);
             elseif strcmp(file_type, 'ao') && ~strcmp(aofield,'')
-                self.inscreen_ao_preview(frame_rate, aofield);
+                self.inscreen_function_preview(frame_rate, dur, posfield, aofield, file_type);
 
             else 
                 self.inscreen_function_preview(frame_rate, dur, posfield, aofield, file_type);
@@ -1325,7 +1325,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
 
         % Display the in-screen preview of a position or ao function
 
-        function inscreen_function_preview(frame_rate, dur, posfield, aofield, file_type)
+        function inscreen_function_preview(self, frame_rate, dur, posfield, aofield, file_type)
             
             self.turn_off_screen();
             labels.timeLabel = 'Time (ms)';

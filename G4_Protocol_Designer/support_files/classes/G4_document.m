@@ -311,8 +311,11 @@ classdef G4_document < handle
         end
 
         function set_block_trial(self, index, new_val)
-
-            self.block_trials(index, :) = new_val;
+            if ~isempty(new_val)
+                self.block_trials(index, :) = new_val;
+            else
+                self.block_trials(index, :) = [];
+            end
 
         end
 
