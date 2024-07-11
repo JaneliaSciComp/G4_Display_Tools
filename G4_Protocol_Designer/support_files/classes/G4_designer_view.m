@@ -241,8 +241,8 @@ classdef G4_designer_view < handle
                  'ButtonPushedFcn', @self.calculate_experiment_length);
 
             self.exp_length_display = uilabel(self.f, 'Text', '', 'Position', ...
-                [exp_length_button.Position(1) + exp_length_button.Position(3) + left_margin, ...
-                exp_length_button.Position(2), .07, .02].*[fSize, fSize], 'FontSize', 12);
+                [exp_length_button.Position(1) + exp_length_button.Position(3) + (left_margin*fSize(1)), ...
+                exp_length_button.Position(2), (.07*fSize(1)), (.02*fSize(2))], 'FontSize', 12);
 
         %Randomization
 
@@ -704,14 +704,13 @@ classdef G4_designer_view < handle
 
         function set_preview_axes_pattern(self, axis_position, x, y)
             
-            axis_position = axis_position.*self.preview_panel.Position;
-            self.hAxes = axes(self.preview_panel, 'Position', axis_position, 'XTick', [], 'YTick', [] ,'XLim', x, 'YLim', y);
 
+            self.hAxes = axes(self.preview_panel, 'Position', axis_position, 'XTick', [], 'YTick', [] ,'XLim', x, 'YLim', y);
             ind = self.con.get_auto_preview_index();
             file =  self.con.get_current_preview_file();
-            im = imshow(file(:,:,ind), 'Colormap',gray);
+            im = imshow(file(:,:,ind), 'parent', self.hAxes, 'Colormap',gray);
 
-            set(im, 'parent', self.hAxes);
+     %       set(im, 'parent', self.hAxes);
 
         end
 
@@ -799,12 +798,13 @@ classdef G4_designer_view < handle
                 xax = [0 length(curr_file(1,:,1))];
                 yax = [0 length(curr_file(:,1,1))];
 
-                im = imshow(curr_file(:,:,index), 'Colormap', gray);
-                set(im,'parent', self.hAxes);
+                im = imshow(curr_file(:,:,index), 'parent', self.hAxes, 'Colormap', gray);
+     %           set(im,'parent', self.hAxes);
                 set(self.hAxes, 'XLim', xax, 'YLim', yax );
-                is_paused = self.con.get_is_paused();
+                % is_paused = self.con.get_is_paused();
 
                 for i = 1:len
+                    is_paused = self.con.get_is_paused();
                     if is_paused == false
                         index = index + 1;
                         self.con.set_auto_preview_index(index);
@@ -845,8 +845,8 @@ classdef G4_designer_view < handle
             x = [0 length(curr_file(1,:,1))];
             y = [0 length(curr_file(:,1,1))];
 
-            im = imshow(curr_file(:,:), 'Colormap', gray);
-            set(im, 'parent', self.hAxes);
+            im = imshow(curr_file(:,:), 'parent', self.hAxes, 'Colormap', gray);
+  %          set(im, 'parent', self.hAxes);
             set(self.hAxes, 'XLim', x, 'YLim', y);
 
         end
@@ -892,8 +892,8 @@ classdef G4_designer_view < handle
             xax = [0 length(preview_data(1,:))];
             yax = [0 length(preview_data(:,1))];
 
-            im = imshow(preview_data(:,:), 'Colormap', gray);
-            set(im, 'parent', self.hAxes);
+            im = imshow(preview_data(:,:), 'parent', self.hAxes, 'Colormap', gray);
+     %       set(im, 'parent', self.hAxes);
             set(self.hAxes, 'XLim', xax, 'YLim', yax);
             self.con.update_arena_pattern_index();
 

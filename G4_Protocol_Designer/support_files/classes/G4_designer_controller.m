@@ -90,7 +90,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
             %set the property (or add entire new trial)
             self.doc.set_trial_property(x, y, new, trialtype);
             if y == 1 && isnumeric(new)
-                self.clear_fields(str2num(new));
+                self.clear_fields(new);
             end
             if strcmp(trialtype, 'block')
                 if y == 13 && new == 0
@@ -402,34 +402,34 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
             end
 
             self.update_trial_doc(default_mode, 1, 1, 'pre');
-            self.update_trial_doc(pat1, 2, 1, 'pre');
-            self.update_trial_doc(pos1, 3, 1, 'pre');
-            self.update_trial_doc(ao1, 4, 1, 'pre');
+            self.update_trial_doc(pat1, 1, 2, 'pre');
+            self.update_trial_doc(pos1, 1, 3, 'pre');
+            self.update_trial_doc(ao1, 1, 4, 'pre');
 
             %disable appropriate cells for mode 1
-            self.update_trial_doc(self.doc.colorgen(), 9, 1, 'pre');
-            self.update_trial_doc(self.doc.colorgen(), 10, 1, 'pre');
-            self.update_trial_doc(self.doc.colorgen(), 11, 1, 'pre');
+            self.update_trial_doc(self.doc.colorgen(), 1,9, 'pre');
+            self.update_trial_doc(self.doc.colorgen(), 1, 10, 'pre');
+            self.update_trial_doc(self.doc.colorgen(), 1, 11, 'pre');
 
             self.update_trial_doc(default_mode, 1, 1, 'inter');
-            self.update_trial_doc(pat1, 2, 1, 'inter');
-            self.update_trial_doc(pos1, 3, 1, 'inter');
-            self.update_trial_doc(ao1, 4, 1, 'inter');
+            self.update_trial_doc(pat1, 1, 2, 'inter');
+            self.update_trial_doc(pos1, 1, 3, 'inter');
+            self.update_trial_doc(ao1, 1, 4, 'inter');
 
             %disable appropriate cells for mode 1
-            self.update_trial_doc(self.doc.colorgen(), 9, 1, 'inter');
-            self.update_trial_doc(self.doc.colorgen(), 10, 1, 'inter');
-            self.update_trial_doc(self.doc.colorgen(), 11, 1, 'inter');
+            self.update_trial_doc(self.doc.colorgen(), 1, 9, 'inter');
+            self.update_trial_doc(self.doc.colorgen(), 1, 10, 'inter');
+            self.update_trial_doc(self.doc.colorgen(), 1, 11, 'inter');
 
             self.update_trial_doc(default_mode, 1, 1, 'post');
-            self.update_trial_doc(pat1, 2, 1, 'post');
-            self.update_trial_doc(pos1, 3, 1, 'post');
-            self.update_trial_doc(ao1, 4, 1, 'post');
+            self.update_trial_doc(pat1, 1, 2, 'post');
+            self.update_trial_doc(pos1, 1, 3, 'post');
+            self.update_trial_doc(ao1, 1, 4, 'post');
 
             %disable appropriate cells for mode 1
-            self.update_trial_doc(self.doc.colorgen(), 9, 1, 'post');
-            self.update_trial_doc(self.doc.colorgen(), 10, 1, 'post');
-            self.update_trial_doc(self.doc.colorgen(), 11, 1, 'post');
+            self.update_trial_doc(self.doc.colorgen(), 1, 9, 'post');
+            self.update_trial_doc(self.doc.colorgen(), 1, 10, 'post');
+            self.update_trial_doc(self.doc.colorgen(), 1, 11, 'post');
 
             if num_pos ~= 0
                 if d.Pos_funcs.(pos1_field).pfnparam.gs_val == 1
@@ -441,14 +441,14 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                 self.update_trial_doc(block_dur, 1, 12, 'block');
             end
             self.update_trial_doc(default_mode, 1, 1, 'block');
-            self.update_trial_doc(pat1, 2, 1, 'block');
-            self.update_trial_doc(pos1, 3, 1, 'block');
-            self.update_trial_doc(ao1, 4, 1, 'block');
+            self.update_trial_doc(pat1, 1, 2, 'block');
+            self.update_trial_doc(pos1, 1, 3, 'block');
+            self.update_trial_doc(ao1, 1, 4, 'block');
 
             %disable appropriate cells for mode 1
-            self.update_trial_doc(self.doc.colorgen(), 9, 1, 'block');
-            self.update_trial_doc(self.doc.colorgen(), 10, 1, 'block');
-            self.update_trial_doc(self.doc.colorgen(), 11, 1, 'block');
+            self.update_trial_doc(self.doc.colorgen(), 1, 9, 'block');
+            self.update_trial_doc(self.doc.colorgen(), 1, 10, 'block');
+            self.update_trial_doc(self.doc.colorgen(), 1, 11, 'block');
 
             j = 1; %will end up as the count of how many patterns are used. Acts as the indices to "pat_indices"
             pat_index = pat_index + 1;
