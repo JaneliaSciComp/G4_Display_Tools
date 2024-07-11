@@ -1331,14 +1331,13 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
             labels.timeLabel = 'Time (ms)';
             labels.patLabel = 'Pattern';
             labels.frameLabel = 'Frame Number';
+            axis_position = [.1, .15, .8 ,.7];
 
             if strcmp(file_type, 'pos') && ~strcmp(posfield,'')
                 self.model.set_current_preview_file(self.doc.Pos_funcs.(posfield).pfnparam.func);
-                axis_position = [.1, .15, .8 ,.7];
-
+                
             elseif strcmp(file_type, 'ao') && ~strcmp(aofield,'')
                 self.model.set_current_preview_file(self.doc.Ao_funcs.(aofield).afnparam.func);
-                axis_position = [.1, .04, .8 ,.9];
 
             else
                 warning("Cannot preview this file, unrecognized type");

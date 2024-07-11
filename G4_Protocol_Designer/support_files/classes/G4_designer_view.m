@@ -680,8 +680,6 @@ classdef G4_designer_view < handle
 
         function set_preview_axes_function(self, axis_position, labels, yax, xax, xax2, linedur)
 
-            axis_position = axis_position.*self.preview_panel.Position;
-
             self.second_axes = axes(self.preview_panel, 'Position', axis_position, 'XAxisLocation', 'top', 'YAxisLocation', 'right');
             self.hAxes = axes(self.preview_panel,'Position', self.second_axes.Position);
             plot_data = self.con.get_current_preview_file();
@@ -698,7 +696,8 @@ classdef G4_designer_view < handle
                 line('XData', linedur, 'YData', yax, 'parent', self.hAxes, 'Color', [1 0 0], 'LineWidth', 2);
             end
             
-            datacursormode on;
+            datacursormode(self.hAxes, 'on');
+ %           datacursormode(self.second_axes, 'on');
 
         end
 
