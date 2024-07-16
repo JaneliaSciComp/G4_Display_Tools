@@ -93,6 +93,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                 self.clear_fields(new);
             end
             if strcmp(trialtype, 'block')
+
                 if y == 13 && new == 0
                     self.deselect_selectAll();
                 end
@@ -407,9 +408,10 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
             self.update_trial_doc(ao1, 1, 4, 'pre');
 
             %disable appropriate cells for mode 1
-            self.update_trial_doc(self.doc.colorgen(), 1,9, 'pre');
-            self.update_trial_doc(self.doc.colorgen(), 1, 10, 'pre');
-            self.update_trial_doc(self.doc.colorgen(), 1, 11, 'pre');
+            self.update_trial_doc(self.doc.get_uneditable_text(), 1,9, 'pre');
+            self.update_trial_doc(self.doc.get_uneditable_text(), 1, 10, 'pre');
+            self.update_trial_doc(self.doc.get_uneditable_text(), 1, 11, 'pre');
+            self.set_cell_style(1, [9, 10, 11], 'pre');
 
             self.update_trial_doc(default_mode, 1, 1, 'inter');
             self.update_trial_doc(pat1, 1, 2, 'inter');
@@ -417,9 +419,10 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
             self.update_trial_doc(ao1, 1, 4, 'inter');
 
             %disable appropriate cells for mode 1
-            self.update_trial_doc(self.doc.colorgen(), 1, 9, 'inter');
-            self.update_trial_doc(self.doc.colorgen(), 1, 10, 'inter');
-            self.update_trial_doc(self.doc.colorgen(), 1, 11, 'inter');
+            self.update_trial_doc(self.doc.get_uneditable_text(), 1, 9, 'inter');
+            self.update_trial_doc(self.doc.get_uneditable_text(), 1, 10, 'inter');
+            self.update_trial_doc(self.doc.get_uneditable_text(), 1, 11, 'inter');
+            self.set_cell_style(1, [9, 10, 11], 'inter');
 
             self.update_trial_doc(default_mode, 1, 1, 'post');
             self.update_trial_doc(pat1, 1, 2, 'post');
@@ -427,9 +430,10 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
             self.update_trial_doc(ao1, 1, 4, 'post');
 
             %disable appropriate cells for mode 1
-            self.update_trial_doc(self.doc.colorgen(), 1, 9, 'post');
-            self.update_trial_doc(self.doc.colorgen(), 1, 10, 'post');
-            self.update_trial_doc(self.doc.colorgen(), 1, 11, 'post');
+            self.update_trial_doc(self.doc.get_uneditable_text(), 1, 9, 'post');
+            self.update_trial_doc(self.doc.get_uneditable_text(), 1, 10, 'post');
+            self.update_trial_doc(self.doc.get_uneditable_text(), 1, 11, 'post');
+            self.set_cell_style(1, [9, 10, 11], 'post');
 
             if num_pos ~= 0
                 if d.Pos_funcs.(pos1_field).pfnparam.gs_val == 1
@@ -446,9 +450,10 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
             self.update_trial_doc(ao1, 1, 4, 'block');
 
             %disable appropriate cells for mode 1
-            self.update_trial_doc(self.doc.colorgen(), 1, 9, 'block');
-            self.update_trial_doc(self.doc.colorgen(), 1, 10, 'block');
-            self.update_trial_doc(self.doc.colorgen(), 1, 11, 'block');
+            self.update_trial_doc(self.doc.get_uneditable_text(), 1, 9, 'block');
+            self.update_trial_doc(self.doc.get_uneditable_text(), 1, 10, 'block');
+            self.update_trial_doc(self.doc.get_uneditable_text(), 1, 11, 'block');
+            self.set_cell_style(1, [9, 10, 11], 'block');
 
             j = 1; %will end up as the count of how many patterns are used. Acts as the indices to "pat_indices"
             pat_index = pat_index + 1;
@@ -1100,11 +1105,13 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
 
             pos_fields = fieldnames(self.doc.Pos_funcs);
             pat_fields = fieldnames(self.doc.Patterns);
-            pos = self.doc.colorgen();
+            pos = self.doc.get_uneditable_text();
             indx = [];
-            rate = self.doc.colorgen();
-            gain = self.doc.colorgen();
-            offset = self.doc.colorgen();
+            rate = self.doc.get_uneditable_text();
+            gain = self.doc.get_uneditable_text();
+            offset = self.doc.get_uneditable_text();
+            trialtype = convertStringsToChars(self.model.current_selected_cell.table);
+            x = self.model.current_selected_cell.index(1);
 
             if mode == 1
 
@@ -1180,22 +1187,25 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                 %clear all
 
             elseif isempty(mode)
-                pos = self.doc.colorgen();
-                indx = self.doc.colorgen();
-                rate = self.doc.colorgen();
-                gain = self.doc.colorgen();
-                offset = self.doc.colorgen();
+                pos = self.doc.get_uneditable_text();
+                indx = self.doc.get_uneditable_text();
+                rate = self.doc.get_uneditable_text();
+                gain = self.doc.get_uneditable_text();
+                offset = self.doc.get_uneditable_text();
                 self.set_mode_dep_props(pos, indx, rate, gain, offset);
-                trialtype = convertStringsToChars(self.model.current_selected_cell.table);
-                x = self.model.current_selected_cell.index(1);
+                
+                
 
-                self.update_trial_doc(self.doc.colorgen(),x,2,trialtype);
+                self.update_trial_doc(self.doc.get_uneditable_text(),x,2,trialtype);
                 for i = 4:7
-                    self.update_trial_doc(self.doc.colorgen(), x, i, trialtype);
+                    self.update_trial_doc(self.doc.get_uneditable_text(), x, i, trialtype);
                 end
-                self.update_trial_doc(self.doc.colorgen(), x, 12, trialtype);
+                self.update_trial_doc(self.doc.get_uneditable_text(), x, 12, trialtype);
+                self.set_cell_style(x, [2:12], trialtype);
 
             end
+            uneditable_indices = self.get_uneditable_indices(mode);
+            self.set_cell_style(x, uneditable_indices, trialtype);
         end
 
         % Set all properties dependent on the mode
@@ -1853,105 +1863,63 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
             pretrial_mode = self.doc.pretrial{1};
             intertrial_mode = self.doc.intertrial{1};
             posttrial_mode = self.doc.posttrial{1};
-            pre_indices_to_color = [];
-            inter_indices_to_color = [];
-            post_indices_to_color = [];
-            indices_to_color = [];
-            if ~isempty(pretrial_mode)
-                if pretrial_mode == 1
-                    pre_indices_to_color = [9, 10, 11];
-                elseif pretrial_mode == 2
-                    pre_indices_to_color = [3, 10, 11];
-                elseif pretrial_mode == 3
-                    pre_indices_to_color = [3, 9, 10, 11];
-                elseif pretrial_mode == 4
-                    pre_indices_to_color = [3, 9];
-                elseif pretrial_mode == 5 || pretrial_mode == 6
-                    pre_indices_to_color = 9;
-                elseif pretrial_mode == 7
-                    pre_indices_to_color = [3, 9, 10, 11];
-                end
-            else
-%                 self.model.current_selected_cell.table = "pre";
-%                 self.model.current_selected_cell.index = [1,1];
-%                 self.clear_fields(pretrial_mode)
-                pre_indices_to_color = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
-            end
-
-            if ~isempty(intertrial_mode)
-                if intertrial_mode == 1
-                    inter_indices_to_color = [9, 10, 11];
-                elseif intertrial_mode == 2
-                    inter_indices_to_color = [3, 10, 11];
-                elseif intertrial_mode == 3
-                    inter_indices_to_color = [3, 9, 10, 11];
-                elseif intertrial_mode == 4
-                    inter_indices_to_color = [3, 9];
-                elseif intertrial_mode == 5 || intertrial_mode == 6
-                    inter_indices_to_color = 9;
-                elseif intertrial_mode == 7
-                    inter_indices_to_color = [3, 9, 10, 11];
-                end
-            else
-%               self.model.current_selected_cell.table = "inter";
-%               self.model.current_selected_cell.index = [1,1];
-%               self.clear_fields(intertrial_mode);
-                inter_indices_to_color = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
-            end
-
-            if ~isempty(posttrial_mode)
-                if posttrial_mode == 1
-                    post_indices_to_color = [9, 10, 11];
-                elseif posttrial_mode == 2
-                    post_indices_to_color = [3, 10, 11];
-                elseif posttrial_mode == 3
-                    post_indices_to_color = [3, 9, 10, 11];
-                elseif posttrial_mode == 4
-                    post_indices_to_color = [3, 9];
-                elseif posttrial_mode == 5 || posttrial_mode == 6
-                    post_indices_to_color = 9;
-                elseif posttrial_mode == 7
-                    post_indices_to_color = [3, 9, 10, 11];
-                end
-            else
-%               self.model.current_selected_cell.table = "post";
-%               self.model.current_selected_cell.index = [1,1];
-%               self.clear_fields(posttrial_mode);
-                post_indices_to_color = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
-            end
+            pre_indices_to_color = self.get_uneditable_indices(pretrial_mode);
+            inter_indices_to_color = self.get_uneditable_indices(intertrial_mode);
+            post_indices_to_color = self.get_uneditable_indices(posttrial_mode);            
 
             for i = 1:length(pre_indices_to_color)
-                self.update_trial_doc(self.doc.colorgen(), 1, pre_indices_to_color(i), 'pre');
+                self.update_trial_doc(self.doc.get_uneditable_text(), 1, pre_indices_to_color(i), 'pre');
+                self.set_cell_style(1, pre_indices_to_color(i), 'pre');
 
             end
             for i = 1:length(inter_indices_to_color)
-                self.update_trial_doc(self.doc.colorgen(), 1, inter_indices_to_color(i), 'inter');
+                self.update_trial_doc(self.doc.get_uneditable_text(), 1, inter_indices_to_color(i), 'inter');
+                self.set_cell_style(1, inter_indices_to_color(i), 'inter');
 
             end
             for i = 1:length(post_indices_to_color)
-                self.update_trial_doc(self.doc.colorgen(), 1, post_indices_to_color(i), 'post');
+                self.update_trial_doc(self.doc.get_uneditable_text(), 1, post_indices_to_color(i), 'post');
+                self.set_cell_style(1, post_indices_to_color(i), 'post');
 
             end
 
             for i = 1:length(self.doc.block_trials(:,1))
                 mode = self.doc.block_trials{i,1};
-                if mode == 1
-                    indices_to_color = [9, 10, 11];
-                elseif mode == 2
-                    indices_to_color = [3, 10, 11];
-                elseif mode == 3
-                    indices_to_color = [3, 9, 10, 11];
-                elseif mode == 4
-                    indices_to_color = [3, 9];
-                elseif mode == 5 || mode == 6
-                    indices_to_color = 9;
-                elseif mode == 7
-                    indices_to_color = [3, 9, 10, 11];
-                end
+                indices_to_color = self.get_uneditable_indices(mode);
                 for j = 1:length(indices_to_color)
-                    self.update_trial_doc(self.doc.colorgen(), i, indices_to_color(j), 'block');
+                    self.update_trial_doc(self.doc.get_uneditable_text(), i, indices_to_color(j), 'block');
+                    self.set_cell_style(i, indices_to_color(j), 'block');
                 end
             end
+        end
+
+        function indices =  get_uneditable_indices(self, mode)
+
+            if ~isempty(mode)
+                if mode == 1
+                    indices = [9, 10, 11];
+                elseif mode == 2
+                    indices = [3, 10, 11];
+                elseif mode == 3
+                    indices = [3, 9, 10, 11];
+                elseif mode == 4
+                    indices = [3, 9];
+                elseif mode == 5 || mode == 6
+                    indices = 9;
+                elseif mode == 7
+                    indices = [3, 9, 10, 11];
+                end
+            else
+                indices = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+            end
+            
+
+        end
+
+        function set_cell_style(self, row, column, table)
+            
+            self.view.style_cell(row, column, table);
+
         end
 
 
@@ -2185,6 +2153,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
 
         end
 
+        
         
 
 %% SETTERS
@@ -2438,6 +2407,9 @@ function set_current_selected_cell(self, table, index)
         end
         function output  = get_ao_funcs(self)
             output = self.doc.Ao_funcs;
+        end
+        function output = get_uneditable_color(self)
+            output = self.doc.get_uneditable_color();
         end
          
 

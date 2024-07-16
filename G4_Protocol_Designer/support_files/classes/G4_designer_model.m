@@ -13,6 +13,7 @@ classdef G4_designer_model < handle
 %tracking which file is in the current preview window
         current_preview_file
         current_selected_cell
+        current_uneditable_indices
         
 %Tracking position in in-window preview
         auto_preview_index
@@ -35,8 +36,25 @@ classdef G4_designer_model < handle
             self.set_current_selected_cell("", [1,1]);
             self.set_auto_preview_index(1);
             self.set_current_preview_file('');
+            
+            uneditable_cells.pre = {};
+            uneditable_cells.inter = {};
+            uneditable_cells.block = {};
+            uneditable_cells.post = {};
+            self.set_current_uneditable_indices(uneditable_cells);
+
             self.set_host_connected(0);
             self.set_screen_on(0);
+
+        end
+
+        function update_uneditable_cell(self, table, index)
+            % index should be a cell array with indices of each uneditable
+            % cell for that trial. For pre/inter/post, the y value will
+            % always be 1, for block it'll be whichever trial is being
+            % edited. 
+            current_ue_cell = self.get_current_uneditable_indices();
+            current_ue_cell.(table){index(2)} = index;
 
         end
         
@@ -65,6 +83,13 @@ classdef G4_designer_model < handle
            
            self.current_selected_cell.table = table;
            self.current_selected_cell.index = index;
+        end
+        function set_current_uneditable_indices(self, new_val)
+            % should be a struct with  4 fields, pre, inter, block, and
+            % post. Each field should have a cell array of [x, y] pairs
+            % representing the column and row values of each uneditable
+            % cell in that table based on the modes. 
+            self.current_uneditable_indices = new_val;
         end
         
         function set_auto_preview_index(self, new_val)
@@ -105,8 +130,11 @@ classdef G4_designer_model < handle
         function value = get_current_preview_file(self)
             value = self.current_preview_file;
         end
-        function value = get_current_selected_cell(sel)
+        function value = get_current_selected_cell(self)
             value  = self.current_selected_cell;
+        end
+        function value = get_current_uneditable_indices(self)
+            value = self.current_uneditable_indices;
         end
         function value = get_auto_preview_index(self)
             value = self.auto_preview_index;

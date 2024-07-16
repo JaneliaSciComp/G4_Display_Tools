@@ -305,9 +305,7 @@ classdef G4_document < handle
                 %Set value
                 self.(propName){x, y} = new_value;
             end
-            if strcmp(trialtype, 'block')
-                self.insert_greyed_cells();
-            end
+
         end
 
         function set_block_trial(self, index, new_val)
@@ -1448,10 +1446,12 @@ classdef G4_document < handle
             end
         end
 
-        function [c] = colorgen(self)
-            color = self.settings.Uneditable_Cell_Color;
+        function [text] = get_uneditable_text(self)
             text = self.settings.Uneditable_Cell_Text;
-            c = ['<html><table border=0 width=400 bgcolor=',color,'><TR><TD>',text,'</TD></TR></table>'];
+        end
+
+        function [color] = get_uneditable_color(self)
+            color =  self.settings.Uneditable_Cell_Color;
         end
 
 %CREATE STRUCTURE TO SAVE TO .G4P FILE WHEN SAVING------------------------
@@ -1475,7 +1475,7 @@ classdef G4_document < handle
         end
 
         function [is_disabled] = check_if_cell_disabled(self, cell_value)
-            if strncmp(cell_value, '<html>', 6)
+            if strcmp(cell_value, self.settings.Uneditable_Cell_Text)
                 is_disabled = 1;
             else
                 is_disabled = 0;
@@ -1638,97 +1638,98 @@ classdef G4_document < handle
         %
         % Reads 1st column from trial values, modifies properties via
         % set_*_property()
-        function insert_greyed_cells(self)
-
-            pretrial_mode = self.pretrial{1};
-            intertrial_mode = self.intertrial{1};
-            posttrial_mode = self.posttrial{1};
-            pre_indices_to_color = [];
-            inter_indices_to_color = [];
-            post_indices_to_color = [];
-            indices_to_color = [];
-            if ~isempty(pretrial_mode)
-                if pretrial_mode == 1
-                    pre_indices_to_color = [9, 10, 11];
-                elseif pretrial_mode == 2
-                    pre_indices_to_color = [3, 10, 11];
-                elseif pretrial_mode == 3
-                    pre_indices_to_color = [3, 9, 10, 11];
-                elseif pretrial_mode == 4
-                    pre_indices_to_color = [3, 9];
-                elseif pretrial_mode == 5 || pretrial_mode == 6
-                    pre_indices_to_color = 9;
-                elseif pretrial_mode == 7
-                    pre_indices_to_color = [3, 9, 10, 11];
-                end
-            end
-
-            if ~isempty(intertrial_mode)
-                if intertrial_mode == 1
-                    inter_indices_to_color = [9, 10, 11];
-                elseif intertrial_mode == 2
-                    inter_indices_to_color = [3, 10, 11];
-                elseif intertrial_mode == 3
-                    inter_indices_to_color = [3, 9, 10, 11];
-                elseif intertrial_mode == 4
-                    inter_indices_to_color = [3, 9];
-                elseif intertrial_mode == 5 || intertrial_mode == 6
-                    inter_indices_to_color = 9;
-                elseif intertrial_mode == 7
-                    inter_indices_to_color = [3, 9, 10, 11];
-                end
-            end
-
-            if ~isempty(posttrial_mode)
-                if posttrial_mode == 1
-                    post_indices_to_color = [9, 10, 11];
-                elseif posttrial_mode == 2
-                    post_indices_to_color = [3, 10, 11];
-                elseif posttrial_mode == 3
-                    post_indices_to_color = [3, 9, 10, 11];
-                elseif posttrial_mode == 4
-                    post_indices_to_color = [3, 9];
-                elseif posttrial_mode == 5 || posttrial_mode == 6
-                    post_indices_to_color = 9;
-                elseif posttrial_mode == 7
-                    post_indices_to_color = [3, 9, 10, 11];
-                end
-            end
-
-            for i = 1:length(pre_indices_to_color)
-                self.set_trial_property(1, pre_indices_to_color(i), self.colorgen(), 'pre');
-            end
-            for i = 1:length(inter_indices_to_color)
-                self.set_trial_property(1, inter_indices_to_color(i),self.colorgen(), 'inter');
-
-            end
-            for i = 1:length(post_indices_to_color)
-                self.set_trial_property(1, post_indices_to_color(i),self.colorgen(), 'post');
-            end
-
-            for i = 1:length(self.block_trials(:,1))
-                mode = self.block_trials{i,1};
-                if ~isempty(mode)
-                    if mode == 1
-                        indices_to_color = [9, 10, 11];
-                    elseif mode == 2
-                        indices_to_color = [3, 10, 11];
-                    elseif mode == 3
-                        indices_to_color = [3, 9, 10, 11];
-                    elseif mode == 4
-                        indices_to_color = [3, 9];
-                    elseif mode == 5 || mode == 6
-                        indices_to_color = 9;
-                    elseif mode == 7
-                        indices_to_color = [3, 9, 10, 11];
-                    end
-                end
-                for j = 1:length(indices_to_color)
-                    self.set_trial_property(i,indices_to_color(j),self.colorgen(), 'block');
-
-                end
-            end
-        end
+%         function insert_greyed_cells(self)
+% 
+%             pretrial_mode = self.pretrial{1};
+%             intertrial_mode = self.intertrial{1};
+%             posttrial_mode = self.posttrial{1};
+%             pre_indices_to_color = [];
+%             inter_indices_to_color = [];
+%             post_indices_to_color = [];
+%             indices_to_color = [];
+%             if ~isempty(pretrial_mode)
+%                 if pretrial_mode == 1
+%                     pre_indices_to_color = [9, 10, 11];
+%                 elseif pretrial_mode == 2
+%                     pre_indices_to_color = [3, 10, 11];
+%                 elseif pretrial_mode == 3
+%                     pre_indices_to_color = [3, 9, 10, 11];
+%                 elseif pretrial_mode == 4
+%                     pre_indices_to_color = [3, 9];
+%                 elseif pretrial_mode == 5 || pretrial_mode == 6
+%                     pre_indices_to_color = 9;
+%                 elseif pretrial_mode == 7
+%                     pre_indices_to_color = [3, 9, 10, 11];
+%                 end
+%             end
+% 
+%             if ~isempty(intertrial_mode)
+%                 if intertrial_mode == 1
+%                     inter_indices_to_color = [9, 10, 11];
+%                 elseif intertrial_mode == 2
+%                     inter_indices_to_color = [3, 10, 11];
+%                 elseif intertrial_mode == 3
+%                     inter_indices_to_color = [3, 9, 10, 11];
+%                 elseif intertrial_mode == 4
+%                     inter_indices_to_color = [3, 9];
+%                 elseif intertrial_mode == 5 || intertrial_mode == 6
+%                     inter_indices_to_color = 9;
+%                 elseif intertrial_mode == 7
+%                     inter_indices_to_color = [3, 9, 10, 11];
+%                 end
+%             end
+% 
+%             if ~isempty(posttrial_mode)
+%                 if posttrial_mode == 1
+%                     post_indices_to_color = [9, 10, 11];
+%                 elseif posttrial_mode == 2
+%                     post_indices_to_color = [3, 10, 11];
+%                 elseif posttrial_mode == 3
+%                     post_indices_to_color = [3, 9, 10, 11];
+%                 elseif posttrial_mode == 4
+%                     post_indices_to_color = [3, 9];
+%                 elseif posttrial_mode == 5 || posttrial_mode == 6
+%                     post_indices_to_color = 9;
+%                 elseif posttrial_mode == 7
+%                     post_indices_to_color = [3, 9, 10, 11];
+%                 end
+%             end
+% 
+%             for i = 1:length(pre_indices_to_color)
+%                 self.set_trial_property(1, pre_indices_to_color(i), self.get_uneditable_text(), 'pre');
+%             end
+%             for i = 1:length(inter_indices_to_color)
+%                 self.set_trial_property(1, inter_indices_to_color(i),self.get_uneditable_text(), 'inter');
+% 
+%             end
+%             for i = 1:length(post_indices_to_color)
+%                 self.set_trial_property(1, post_indices_to_color(i),self.get_uneditable_text(), 'post');
+%             end
+% 
+%             for i = 1:length(self.block_trials(:,1))
+%                 mode = self.block_trials{i,1};
+%                 if ~isempty(mode)
+%                     if mode == 1
+%                         indices_to_color = [9, 10, 11];
+%                     elseif mode == 2
+%                         indices_to_color = [3, 10, 11];
+%                     elseif mode == 3
+%                         indices_to_color = [3, 9, 10, 11];
+%                     elseif mode == 4
+%                         indices_to_color = [3, 9];
+%                     elseif mode == 5 || mode == 6
+%                         indices_to_color = 9;
+%                     elseif mode == 7
+%                         indices_to_color = [3, 9, 10, 11];
+%                     end
+%                 end
+%                 for j = 1:length(indices_to_color)
+%                     self.set_trial_property(i,indices_to_color(j),self.get_uneditable_text(), 'block');
+%                     
+% 
+%                 end
+%             end
+%         end
 
         function create_error_box(~, varargin)
 

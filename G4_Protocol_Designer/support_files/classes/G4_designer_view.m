@@ -30,6 +30,7 @@ classdef G4_designer_view < handle
         hAxes
         second_axes
         inscreen_plot
+        uneditableStyle
 
     end
 
@@ -377,6 +378,8 @@ classdef G4_designer_view < handle
                 'HorizontalAlignment', 'left','FontSize', 11, 'Position', [chan_label_margin*key_pan_size_pix(1), ...
                 mode_6_label_cont.Position(2) - chan_label_height*key_pan_size_pix(2), chan_label_width*key_pan_size_pix(1), chan_label_height*key_pan_size_pix(2)]);
 
+            self.uneditableStyle = uistyle;
+
         end
 
         function update_gui(self)
@@ -399,6 +402,7 @@ classdef G4_designer_view < handle
             self.con.doc_replace_grey_cells();
             self.update_column_widths();
             self.con.insert_greyed_cells();
+            self.update_uneditable_style();
             
         end
 
@@ -699,7 +703,7 @@ classdef G4_designer_view < handle
                 line('XData', linedur, 'YData', yax, 'parent', self.hAxes, 'Color', [1 0 0], 'LineWidth', 2);
             end
             
-            datacursormode(self.hAxes, 'on');
+            datacursormode(self.f, 'on');
  %           datacursormode(self.second_axes, 'on');
 
         end
@@ -1029,6 +1033,35 @@ classdef G4_designer_view < handle
             end
             self.con.update_rowNum(new_val);
             self.update_gui();
+
+        end
+
+        function update_uneditable_style(self)
+
+            ue_color = self.con.get_uneditable_color();
+            self.uneditableStyle.BackgroundColor = ue_color;
+
+        end
+
+        function style_cell(self, row, col, table)
+            
+            if strcmp(table, 'pre')
+                table_handle =  self.pretrial_table;
+            elseif strcmp(table, 'inter')
+                table_handle = self.intertrial_table;
+            elseif strcmp(table, 'block')
+                table_handle = self.block_table;
+            elseif strcmp(table, 'post')
+                table_handle =  self.posttrial_table;
+            end
+            if length(col) ==  1
+                    
+                addStyle(table_handle, self.uneditableStyle, "cell", [row, col]);
+            else
+                for c = 1:length(col)
+                    addStyle(table_handle, self.uneditableStyle, "cell", [row, col(c)]);
+                end
+            end
 
         end
 
