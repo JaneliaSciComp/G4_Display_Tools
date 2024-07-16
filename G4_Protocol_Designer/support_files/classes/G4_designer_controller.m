@@ -921,96 +921,98 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
         function dry_run(self)
             self.doc.replace_greyed_cell_values();
             trial = self.check_one_selected;
-            trial_mode = trial{1};
-            trial_duration = trial{12};
-            pat_field = self.doc.get_pattern_field_name(trial{2});
-            
-            
-            if isempty(trial{8})
-                trial_frame_index = 1;
-            elseif strcmp(trial{8},'r')
-                num_frames = length(self.doc.Patterns.(pat_field).pattern.Pats(1,1,:));
-                trial_frame_index = randperm(num_frames,1);
-            else
-                trial_frame_index = str2num(trial{8});
-            end
-
-            trial_fr_rate = trial{9};
-
-            if isempty(trial{10}) == 0
-                LmR_gain = trial{10};
-                LmR_offset = trial{11};
-            else
-                LmR_gain = 0;
-                LmR_offset = 0;
-            end
-            %pre_start = 0;
-            if strcmp(self.doc.top_export_path,'')
-                pat_location = self.doc.pattern_locations.(pat_field);
-                if ~isempty(trial{3}) && ~contains(trial{3}, '<html>')
-                    func_field = self.doc.get_posfunc_field_name(trial{3});
-                    func_location = self.doc.function_locations.(func_field);
-                else
-                    func_field = [];
-                    func_location = [];
-                end
-            else
-                pat_location = self.doc.get_top_export_path();
-                func_location = self.doc.get_top_export_path();
-            end
-
-            if isempty(self.ctlr)
-                self.ctlr = PanelsController();
-            end
-            self.ctlr.open(true);
-            pause(10);
-            self.model.host_connected = 1;
-           
-            start = questdlg('Start Dry Run?','Confirm Start','Start','Cancel','Start');
-            switch start
-            case 'Cancel'
-                return;
-
-            case 'Start'
-                self.model.set_screen_on(1);
-                pattern_index = self.doc.get_pattern_index(trial{2});
-                func_index = self.doc.get_posfunc_index(trial{3});
+            if ~isempty(trial)
+                trial_mode = trial{1};
+                trial_duration = trial{12};
+                pat_field = self.doc.get_pattern_field_name(trial{2});
                 
-                [patRootDir, ~] = fileparts(pat_location);
-                self.ctlr.setRootDirectory(patRootDir)
-
-                self.ctlr.setControlMode(trial_mode);
-                self.ctlr.setPatternID(pattern_index);
-
-                if func_index ~= 0
-                    [funcRootDir, ~] = fileparts(func_location);
-                    self.ctlr.setRootDirectory(funcRootDir);
-                    self.ctlr.setPatternFunctionID(func_index);
-                end
-
-                if ~isempty(trial{10})
-                    self.ctlr.setGain(LmR_gain, LmR_offset);
-                end
-
-                if trial_mode == 2
-                    self.ctlr.setFrameRate(trial_fr_rate);
-                end
-
-                self.ctlr.setPositionX(trial_frame_index);
-
-                if trial_duration ~= 0
-                    self.ctlr.startDisplay(trial_duration*10); %duration expected in 100ms units
-                    self.model.set_screen_on(0);
+                
+                if isempty(trial{8})
+                    trial_frame_index = 1;
+                elseif strcmp(trial{8},'r')
+                    num_frames = length(self.doc.Patterns.(pat_field).pattern.Pats(1,1,:));
+                    trial_frame_index = randperm(num_frames,1);
                 else
-                    self.ctlr.startDisplay(2000, false);
-                    w = waitforbuttonpress; %If pretrial duration is set to zero, this
-                    %causes it to loop until a button is press or
-                    %mouse clicked
-                    self.ctlr.stopDisplay();
-                    self.model.screen_on = 0;
+                    trial_frame_index = str2num(trial{8});
                 end
+    
+                trial_fr_rate = trial{9};
+    
+                if isempty(trial{10}) == 0
+                    LmR_gain = trial{10};
+                    LmR_offset = trial{11};
+                else
+                    LmR_gain = 0;
+                    LmR_offset = 0;
+                end
+                %pre_start = 0;
+                if strcmp(self.doc.top_export_path,'')
+                    pat_location = self.doc.pattern_locations.(pat_field);
+                    if ~isempty(trial{3}) && ~contains(trial{3}, '<html>')
+                        func_field = self.doc.get_posfunc_field_name(trial{3});
+                        func_location = self.doc.function_locations.(func_field);
+                    else
+                        func_field = [];
+                        func_location = [];
+                    end
+                else
+                    pat_location = self.doc.get_top_export_path();
+                    func_location = self.doc.get_top_export_path();
+                end
+    
+                if isempty(self.ctlr)
+                    self.ctlr = PanelsController();
+                end
+                self.ctlr.open(true);
+                pause(10);
+                self.model.host_connected = 1;
+               
+                start = questdlg('Start Dry Run?','Confirm Start','Start','Cancel','Start');
+                switch start
+                case 'Cancel'
+                    return;
+    
+                case 'Start'
+                    self.model.set_screen_on(1);
+                    pattern_index = self.doc.get_pattern_index(trial{2});
+                    func_index = self.doc.get_posfunc_index(trial{3});
+                    
+                    [patRootDir, ~] = fileparts(pat_location);
+                    self.ctlr.setRootDirectory(patRootDir)
+    
+                    self.ctlr.setControlMode(trial_mode);
+                    self.ctlr.setPatternID(pattern_index);
+    
+                    if func_index ~= 0
+                        [funcRootDir, ~] = fileparts(func_location);
+                        self.ctlr.setRootDirectory(funcRootDir);
+                        self.ctlr.setPatternFunctionID(func_index);
+                    end
+    
+                    if ~isempty(trial{10})
+                        self.ctlr.setGain(LmR_gain, LmR_offset);
+                    end
+    
+                    if trial_mode == 2
+                        self.ctlr.setFrameRate(trial_fr_rate);
+                    end
+    
+                    self.ctlr.setPositionX(trial_frame_index);
+    
+                    if trial_duration ~= 0
+                        self.ctlr.startDisplay(trial_duration*10); %duration expected in 100ms units
+                        self.model.set_screen_on(0);
+                    else
+                        self.ctlr.startDisplay(2000, false);
+                        w = waitforbuttonpress; %If pretrial duration is set to zero, this
+                        %causes it to loop until a button is press or
+                        %mouse clicked
+                        self.ctlr.stopDisplay();
+                        self.model.screen_on = 0;
+                    end
+                end
+                self.ctlr.close(true);
             end
-            self.ctlr.close(true);
         end
 
         %Open the conductor to run an experiment

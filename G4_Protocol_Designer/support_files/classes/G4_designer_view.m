@@ -548,6 +548,9 @@ classdef G4_designer_view < handle
                 %Fill embedded list with imported files appropriate for the
                 %selected cell
                 self.provide_file_list(event);
+                if strcmp(file, "")
+                    file = self.listbox_imported_files.Items{1};
+                end
             else
                 file = self.listbox_imported_files.Value;
             end
