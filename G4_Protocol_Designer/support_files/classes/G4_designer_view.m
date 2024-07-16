@@ -552,14 +552,12 @@ classdef G4_designer_view < handle
                 %Fill embedded list with imported files appropriate for the
                 %selected cell
                 self.provide_file_list(event);
-                if strcmp(file, "")
-                    file = self.listbox_imported_files.Items{1};
-                end
+                
             else
                 file = self.listbox_imported_files.Value;
             end
 
-            if ~strcmp(file,'') && ~strncmp(file, '<html>',6) && ~isnan(is_table)
+            if ~strcmp(file,'') && ~strcmp(file, self.con.get_uneditable_text()) && ~isnan(is_table)
                 self.con.preview_selection(is_table, file);
             else
                 self.con.turn_off_screen();
@@ -575,6 +573,9 @@ classdef G4_designer_view < handle
             tag = src.Tag;
             if y_event_index > 1 && y_event_index< 8
                 file = string(src.Data(x_event_index, y_event_index));
+                if strcmp(file, "")
+                    file = self.listbox_imported_files.Items{1};
+                end
             else
                 file = '';
             end

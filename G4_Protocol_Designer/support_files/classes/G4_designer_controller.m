@@ -953,7 +953,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                 %pre_start = 0;
                 if strcmp(self.doc.top_export_path,'')
                     pat_location = self.doc.pattern_locations.(pat_field);
-                    if ~isempty(trial{3}) && ~contains(trial{3}, '<html>')
+                    if ~isempty(trial{3}) && ~strcmp(trial{3}, self.doc.get_uneditable_text())
                         func_field = self.doc.get_posfunc_field_name(trial{3});
                         func_location = self.doc.function_locations.(func_field);
                     else
@@ -2410,6 +2410,9 @@ function set_current_selected_cell(self, table, index)
         end
         function output = get_uneditable_color(self)
             output = self.doc.get_uneditable_color();
+        end
+        function output = get_uneditable_text(self)
+            output = self.doc.get_uneditable_text();
         end
          
 

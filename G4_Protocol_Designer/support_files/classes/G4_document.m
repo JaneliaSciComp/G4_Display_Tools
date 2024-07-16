@@ -1407,7 +1407,7 @@ classdef G4_document < handle
         function replace_greyed_cell_values(self)
 
             for i = 1:length(self.pretrial)
-                if strncmp(self.pretrial{i},'<html>',6)
+                if strcmp(self.pretrial{i},self.get_uneditable_text())
                     if i >= 2 && i <= 7
                         self.pretrial{i} = '';
                     else
@@ -1416,7 +1416,7 @@ classdef G4_document < handle
                 end
             end
             for i = 1:length(self.intertrial)
-                if strncmp(self.intertrial{i},'<html>',6)
+                if strcmp(self.intertrial{i},self.get_uneditable_text())
                     if i >= 2 && i <= 7
                         self.intertrial{i} = '';
                     else
@@ -1425,7 +1425,7 @@ classdef G4_document < handle
                 end
             end
             for i = 1:length(self.posttrial)
-                if strncmp(self.posttrial{i},'<html>',6)
+                if strcmp(self.posttrial{i},self.get_uneditable_text())
                     if i >= 2 && i <= 7
                         self.posttrial{i} = '';
                     else
@@ -1435,7 +1435,7 @@ classdef G4_document < handle
             end
             for i = 1:length(self.block_trials(:,1))
                 for j = 1:length(self.block_trials(1,:))
-                    if strncmp(self.block_trials{i,j},'<html>',6)
+                    if strcmp(self.block_trials{i,j},self.get_uneditable_text())
                         if j == 3
                             self.block_trials{i,j} = '';
                         else
