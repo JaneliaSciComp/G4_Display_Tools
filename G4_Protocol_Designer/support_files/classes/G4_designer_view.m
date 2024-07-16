@@ -504,7 +504,7 @@ classdef G4_designer_view < handle
 
         function update_trial(self, src, event, a)
 
-            new = event.EditData;
+            new = event.NewData;
             x = event.Indices(1);
             y = event.Indices(2);
             trialtype = src.Tag;
@@ -1055,7 +1055,7 @@ classdef G4_designer_view < handle
             elseif strcmp(table, 'post')
                 table_handle =  self.posttrial_table;
             end
-            if length(col) ==  1
+            if isscalar(col)
                     
                 addStyle(table_handle, self.uneditableStyle, "cell", [row, col]);
             else
