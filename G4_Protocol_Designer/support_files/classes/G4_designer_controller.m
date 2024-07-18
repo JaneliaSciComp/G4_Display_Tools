@@ -61,7 +61,9 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
 
            self.view = G4_designer_view(self);
            self.reset_defaults();
+           
            self.update_gui() ;
+           self.insert_greyed_cells();
         end
 
 
@@ -89,9 +91,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
 
             %set the property (or add entire new trial)
             self.doc.set_trial_property(x, y, new, trialtype);
-            if y == 1 && isnumeric(new)
-                self.clear_fields(new);
-            end
+
             if strcmp(trialtype, 'block')
 
                 if y == 13 && new == 0
@@ -1112,6 +1112,9 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
             offset = self.doc.get_uneditable_text();
             trialtype = convertStringsToChars(self.model.current_selected_cell.table);
             x = self.model.current_selected_cell.index(1);
+            if ~isnumeric(mode) && ~isempty(mode)
+                mode = str2num(mode);
+            end
 
             if mode == 1
 
@@ -1126,14 +1129,13 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                     pos = self.doc.Pos_funcs.(pos_field).filename;
 
                 end
-                self.set_mode_dep_props(pos, indx, rate, gain, offset);
+                
 
             elseif mode == 2
 
                 pat_field = self.get_or_insert_pattern();
                 rate = 60;
-                self.set_mode_dep_props(pos, indx, rate, gain, offset);
-                %frame rate, clear others
+
 
 
             elseif mode == 3
@@ -1141,15 +1143,13 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                 pat_field = self.get_or_insert_pattern();
 
                 indx = 1;
-                self.set_mode_dep_props(pos, indx, rate, gain, offset);
-                %frame index, clear others
+
 
             elseif mode == 4
                 pat_field = self.get_or_insert_pattern();
                 gain = 1;
                 offset = 0;
-                self.set_mode_dep_props(pos, indx, rate, gain, offset);
-                %gain, offset, clear others
+
 
             elseif mode == 5
                 pat_field = self.get_or_insert_pattern();
@@ -1165,8 +1165,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                 end
                 gain = 1;
                 offset = 0;
-                self.set_mode_dep_props(pos, indx, rate, gain, offset);
-                %pos, gain, offset, clear others
+
 
             elseif mode == 6
                 pat_field = self.get_or_insert_pattern();
@@ -1178,13 +1177,11 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                 pos = self.doc.Pos_funcs.(pos_field).filename;
                 gain = 1;
                 offset = 0;
-                self.set_mode_dep_props(pos, indx, rate, gain, offset);
-                %pos, gain, offset, clear others
+
 
             elseif mode == 7
                 pat_field = self.get_or_insert_pattern();
-                self.set_mode_dep_props(pos, indx, rate, gain, offset);
-                %clear all
+
 
             elseif isempty(mode)
                 pos = self.doc.get_uneditable_text();
@@ -1192,22 +1189,26 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                 rate = self.doc.get_uneditable_text();
                 gain = self.doc.get_uneditable_text();
                 offset = self.doc.get_uneditable_text();
-                self.set_mode_dep_props(pos, indx, rate, gain, offset);
                 
-                
-
-                self.update_trial_doc(self.doc.get_uneditable_text(),x,2,trialtype);
-                for i = 4:7
-                    self.update_trial_doc(self.doc.get_uneditable_text(), x, i, trialtype);
-                end
-                self.update_trial_doc(self.doc.get_uneditable_text(), x, 12, trialtype);
-                self.set_cell_style(x, [2:12], trialtype, 0);
+%                 
+%                 
+% 
+%                 self.update_trial_doc(self.doc.get_uneditable_text(),x,2,trialtype);
+%                 for i = 4:7
+%                     self.update_trial_doc(self.doc.get_uneditable_text(), x, i, trialtype);
+%                 end
+%                 self.update_trial_doc(self.doc.get_uneditable_text(), x, 12, trialtype);
+%                 self.set_cell_style(x, [2:12], trialtype, 0);
 
             end
-            uneditable_indices = self.get_uneditable_indices(mode);
-            editable_indices = self.get_editable_indices(uneditable_indices);
-            self.set_cell_style(x, uneditable_indices, trialtype, 0);
-            self.set_cell_style(x, editable_indices, trialtype, 1);
+
+            self.set_mode_dep_props(pos, indx, rate, gain, offset);
+%             if ~isempty(mode)
+%                 uneditable_indices = self.get_uneditable_indices(mode);
+%                 editable_indices = self.get_editable_indices(uneditable_indices);
+%                 self.set_cell_style(x, uneditable_indices, trialtype, 0);
+%                 self.set_cell_style(x, editable_indices, trialtype, 1);
+%             end
         end
 
         % Set all properties dependent on the mode
@@ -1238,7 +1239,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                 self.update_trial_doc(self.doc.trial_data.trial_array{12}, x, 12, trialtype);
             end
 
-            self.update_gui();
+            %self.update_gui();
         end
 
         % Check which and how many block trials are selected
@@ -1867,31 +1868,37 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
             posttrial_mode = self.doc.posttrial{1};
             pre_indices_to_color = self.get_uneditable_indices(pretrial_mode);
             inter_indices_to_color = self.get_uneditable_indices(intertrial_mode);
-            post_indices_to_color = self.get_uneditable_indices(posttrial_mode);            
+            post_indices_to_color = self.get_uneditable_indices(posttrial_mode); 
+            pre_indices_to_clear = self.get_editable_indices(pre_indices_to_color);
+            inter_indices_to_clear = self.get_editable_indices(inter_indices_to_color);
+            post_indices_to_clear = self.get_editable_indices(post_indices_to_color);
 
             for i = 1:length(pre_indices_to_color)
                 self.update_trial_doc(self.doc.get_uneditable_text(), 1, pre_indices_to_color(i), 'pre');
-                self.set_cell_style(1, pre_indices_to_color(i), 'pre', 0);
-
             end
+            self.set_cell_style(1, pre_indices_to_color, 'pre', 0);
+            self.set_cell_style(1, pre_indices_to_clear, 'pre', 1);
             for i = 1:length(inter_indices_to_color)
                 self.update_trial_doc(self.doc.get_uneditable_text(), 1, inter_indices_to_color(i), 'inter');
-                self.set_cell_style(1, inter_indices_to_color(i), 'inter', 0);
-
             end
+            self.set_cell_style(1, inter_indices_to_color, 'inter', 0);
+            self.set_cell_style(1, inter_indices_to_clear, 'inter', 1);
             for i = 1:length(post_indices_to_color)
                 self.update_trial_doc(self.doc.get_uneditable_text(), 1, post_indices_to_color(i), 'post');
-                self.set_cell_style(1, post_indices_to_color(i), 'post', 0);
-
             end
+            self.set_cell_style(1, post_indices_to_color, 'post', 0);
+            self.set_cell_style(1, post_indices_to_clear, 'post', 1);
 
             for i = 1:length(self.doc.block_trials(:,1))
                 mode = self.doc.block_trials{i,1};
                 indices_to_color = self.get_uneditable_indices(mode);
+                indices_to_clear = self.get_editable_indices(indices_to_color);
                 for j = 1:length(indices_to_color)
                     self.update_trial_doc(self.doc.get_uneditable_text(), i, indices_to_color(j), 'block');
-                    self.set_cell_style(i, indices_to_color(j), 'block', 0);
+                    
                 end
+                self.set_cell_style(i, indices_to_color, 'block', 0);
+                self.set_cell_style(i, indices_to_clear,'block', 1);
             end
         end
 
@@ -1928,7 +1935,6 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
             editable_inds = all_inds;
 
         end
-
 
 
         function set_cell_style(self, row, column, table, editable)

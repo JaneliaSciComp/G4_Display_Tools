@@ -382,6 +382,7 @@ classdef G4_designer_view < handle
 
             self.uneditableStyle = uistyle;
             self.editableStyle = uistyle;
+            
 
         end
 
@@ -402,10 +403,11 @@ classdef G4_designer_view < handle
             set(self.exp_name_box,'Value', self.con.get_experiment_name());
             self.set_recent_file_menu_items();
             self.set_exp_length_display();
-            self.con.doc_replace_grey_cells();
+            %self.con.doc_replace_grey_cells();
             self.update_column_widths();
-            self.con.insert_greyed_cells();
             self.update_uneditable_style();
+            
+            
             
         end
 
@@ -523,6 +525,10 @@ classdef G4_designer_view < handle
             else
                 self.con.create_error_box("You cannot edit that field in this mode.");
             end
+            if y == 1
+                self.con.clear_fields(new);
+            end
+            self.con.insert_greyed_cells();
             self.update_gui();
 
         end
@@ -1051,18 +1057,35 @@ classdef G4_designer_view < handle
             
             table_handle = get_table_handle(self, table);
             if editable
-                s = self.editableStyle;
-            else
-                s = self.uneditableStyle;
-            end
-            if isscalar(col)
-                    
-                addStyle(table_handle, s, "cell", [row, col]);
-            else
+                configs = table_handle.StyleConfigurations;
+                numStyles =  1;
+                targ = [];
                 for c = 1:length(col)
-                    addStyle(table_handle, s, "cell", [row, col(c)]);
+                    for r = 1:size(configs,1)
+                        if configs.TargetIndex{r} == [row col(c)]
+                            targ(numStyles) = r;
+                            numStyles = numStyles + 1;
+                        end
+                    end
+                    if ~isempty(targ)
+                        removeStyle(table_handle, targ);
+                        targ = [];
+                        numStyles =  1;
+                        configs = table_handle.StyleConfigurations;
+                    end
+                end
+
+            else
+                if isscalar(col)
+                    
+                    addStyle(table_handle, self.uneditableStyle, "cell", [row, col]);
+                else
+                    for c = 1:length(col)
+                        addStyle(table_handle, self.uneditableStyle, "cell", [row, col(c)]);
+                    end
                 end
             end
+            
 
         end
 
