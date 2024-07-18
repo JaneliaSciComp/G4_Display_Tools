@@ -61,9 +61,9 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
 
            self.view = G4_designer_view(self);
            self.reset_defaults();
-           
-           self.update_gui() ;
            self.insert_greyed_cells();
+           self.update_gui() ;
+           
         end
 
 
@@ -1127,6 +1127,8 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                 if ~isempty(index_of_pat)
                     pos_field = pos_fields{index_of_pat};
                     pos = self.doc.Pos_funcs.(pos_field).filename;
+                else
+                    pos = '';
 
                 end
                 
@@ -1201,8 +1203,9 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
 %                 self.set_cell_style(x, [2:12], trialtype, 0);
 
             end
-
-            self.set_mode_dep_props(pos, indx, rate, gain, offset);
+            if mode >=1 && mode <= 7 || isempty(mode)
+                self.set_mode_dep_props(pat_field, pos, indx, rate, gain, offset);
+            end
 %             if ~isempty(mode)
 %                 uneditable_indices = self.get_uneditable_indices(mode);
 %                 editable_indices = self.get_editable_indices(uneditable_indices);
@@ -1212,7 +1215,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
         end
 
         % Set all properties dependent on the mode
-        function set_mode_dep_props(self, pos, indx, rate, gain, offset, varargin)
+        function set_mode_dep_props(self, pat_field, pos, indx, rate, gain, offset, varargin)
 
             trialtype = convertStringsToChars(self.model.current_selected_cell.table);
             x = self.model.current_selected_cell.index(1);
@@ -1225,7 +1228,11 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
             elseif strcmp(trialtype, 'block')
                 trial_var = 'block_trials';
             end
-
+            if ~isempty(pat_field)
+                self.update_trial_doc(self.doc.Patterns.(pat_field).filename, x, 2, trialtype);
+            else
+                self.update_trial_doc(pat_field, x, 2, trialtype);
+            end
             self.update_trial_doc(pos, x, 3, trialtype);
             self.update_trial_doc(indx, x, 8, trialtype);
             self.update_trial_doc(rate, x, 9, trialtype);
@@ -2007,7 +2014,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                     pat_field = self.doc.get_pattern_field_name(self.doc.pretrial{2});
                 elseif ~isempty(self.doc.imported_pattern_names)
                     pat_field = pat_fields{1};
-                    self.update_trial_doc(self.doc.Patterns.(pat_field).filename, 1, 2, 'pre');
+                   
                 else
                     pat_field = '';
                 end
@@ -2017,7 +2024,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                     pat_field = self.doc.get_pattern_field_name(self.doc.intertrial{2});
                 elseif ~isempty(self.doc.imported_pattern_names)
                     pat_field = pat_fields{1};
-                    self.update_trial_doc(self.doc.Patterns.(pat_field).filename, 1, 2, 'inter');
+                    
                 else
                     pat_field = '';
                 end
@@ -2026,7 +2033,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                     pat_field = self.doc.get_pattern_field_name(self.doc.posttrial{2});
                 elseif ~isempty(self.doc.imported_pattern_names)
                     pat_field = pat_fields{1};
-                    self.update_trial_doc(self.doc.Patterns.(pat_field).filename, 1, 2, 'post');
+                    
                 else
                     pat_field = '';
                 end
@@ -2036,7 +2043,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                     pat_field = self.doc.get_pattern_field_name(self.doc.block_trials{self.model.current_selected_cell.index(1),2});
                 elseif ~isempty(self.doc.imported_pattern_names)
                     pat_field = pat_fields{1};
-                    self.update_trial_doc(self.doc.Patterns.(pat_field).filename, self.model.current_selected_cell.index(1), 2, 'block');
+                    
                 else
                     pat_field = '';
                 end
@@ -2073,27 +2080,6 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
 
  %% Functions to set the value of each GUI object
 
-  %% Save this code until I confirm it's no longer needed with the uifigure      
-%         function set_block_table_data(self)
-% %              %%%%%%%%%%%%%%%%%%THIS IS NOT A GOOD PERMANENT SOLUTION FOR
-% %              %%%%%%%%%%%%%%%%%%THE SCROLLBAR JUMPING ISSUE. USING PAUSE CAN
-% %              %%%%%%%%%%%%%%%%%%UNDER CERTAIN CIRCUMSTANCES HAVE WEIRD
-% %              %%%%%%%%%%%%%%%%%%RESULTS, AND JAVA INTERVENTIONS MAY STOP
-% %              %%%%%%%%%%%%%%%%%%WORKING WITH ANY RELEASE. CHECK NEW
-% %              RELEASES TO SEE IF THIS BUG HAS BEEN FIXED
-% 
-% %% findjob citation
-% %% Yair Altman (2024). findjobj - find java handles of Matlab graphic objects (https://www.mathworks.com/matlabcentral/fileexchange/14317-findjobj-find-java-handles-of-matlab-graphic-objects), 
-% %% MATLAB Central File Exchange. Retrieved June 4, 2024. 
-%             jTable = findjobj(self.block_table);
-%             jScrollPane = jTable.getComponent(0);
-%             javaObjectEDT(jScrollPane);
-%             currentViewPos = jScrollPane.getViewPosition;
-% 
-%             self.block_table.Data = self.doc.block_trials;
-%             pause(0);
-%             jScrollPane.setViewPosition(currentViewPos);
-%         end
 
         function doc_replace_grey_cells(self)
             self.doc.replace_greyed_cell_values();

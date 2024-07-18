@@ -382,6 +382,7 @@ classdef G4_designer_view < handle
 
             self.uneditableStyle = uistyle;
             self.editableStyle = uistyle;
+            self.update_uneditable_style();
             
 
         end
@@ -406,9 +407,7 @@ classdef G4_designer_view < handle
             %self.con.doc_replace_grey_cells();
             self.update_column_widths();
             self.update_uneditable_style();
-            
-            
-            
+
         end
 
 
