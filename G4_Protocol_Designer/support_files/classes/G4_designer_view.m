@@ -31,6 +31,8 @@ classdef G4_designer_view < handle
         second_axes
         inscreen_plot
         uneditableStyle
+        editableStyle
+
 
     end
 
@@ -379,6 +381,7 @@ classdef G4_designer_view < handle
                 mode_6_label_cont.Position(2) - chan_label_height*key_pan_size_pix(2), chan_label_width*key_pan_size_pix(1), chan_label_height*key_pan_size_pix(2)]);
 
             self.uneditableStyle = uistyle;
+            self.editableStyle = uistyle;
 
         end
 
@@ -1044,25 +1047,37 @@ classdef G4_designer_view < handle
 
         end
 
-        function style_cell(self, row, col, table)
+        function style_cell(self, row, col, table, editable)
             
-            if strcmp(table, 'pre')
-                table_handle =  self.pretrial_table;
-            elseif strcmp(table, 'inter')
-                table_handle = self.intertrial_table;
-            elseif strcmp(table, 'block')
-                table_handle = self.block_table;
-            elseif strcmp(table, 'post')
-                table_handle =  self.posttrial_table;
+            table_handle = get_table_handle(self, table);
+            if editable
+                s = self.editableStyle;
+            else
+                s = self.uneditableStyle;
             end
             if isscalar(col)
                     
-                addStyle(table_handle, self.uneditableStyle, "cell", [row, col]);
+                addStyle(table_handle, s, "cell", [row, col]);
             else
                 for c = 1:length(col)
-                    addStyle(table_handle, self.uneditableStyle, "cell", [row, col(c)]);
+                    addStyle(table_handle, s, "cell", [row, col(c)]);
                 end
             end
+
+        end
+
+        function table_handle = get_table_handle(self, trialtype)
+
+            if strcmp(trialtype, 'pre')
+                table_handle =  self.pretrial_table;
+            elseif strcmp(trialtype, 'inter')
+                table_handle = self.intertrial_table;
+            elseif strcmp(trialtype, 'block')
+                table_handle = self.block_table;
+            elseif strcmp(trialtype, 'post')
+                table_handle =  self.posttrial_table;
+            end
+
 
         end
 
