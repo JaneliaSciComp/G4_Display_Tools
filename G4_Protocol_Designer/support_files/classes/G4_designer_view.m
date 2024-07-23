@@ -1055,8 +1055,9 @@ classdef G4_designer_view < handle
         function style_cell(self, row, col, table, editable)
             
             table_handle = get_table_handle(self, table);
+            configs = table_handle.StyleConfigurations;
             if editable
-                configs = table_handle.StyleConfigurations;
+
                 numStyles =  1;
                 targ = [];
                 for c = 1:length(col)
@@ -1075,13 +1076,21 @@ classdef G4_designer_view < handle
                 end
 
             else
-                if isscalar(col)
+                for c = 1:length(col)
+                    targ = [];
                     
-                    addStyle(table_handle, self.uneditableStyle, "cell", [row, col]);
-                else
-                    for c = 1:length(col)
+                    for r = 1:size(configs,1)
+                        if configs.TargetIndex{r} == [row col(c)]
+                            targ(end+1) = 1;
+                        else
+                            targ(end+1) = 0;
+                        end
+                    end
+                    if sum(targ) == 0 || isempty(targ)
+                                                    
                         addStyle(table_handle, self.uneditableStyle, "cell", [row, col(c)]);
                     end
+                
                 end
             end
             
