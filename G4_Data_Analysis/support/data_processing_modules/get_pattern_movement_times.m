@@ -21,9 +21,8 @@ function [frame_movement_start_times] = get_pattern_movement_times(start_times, 
             end
         end
         if idx < length(start_times)
-            movetime = ftime + 11; % In Log.Frames.Position, the first 9-11 frame numbers after the start time
-        end                        % seem random and do not reflect the frame
-                                   % actually being displayed - so skip them.
+            movetime = ftime; 
+        end                       
         if movetime < length(Log.Frames.Position)
             while double(Log.Frames.Position(movetime + 1)) - double(Log.Frames.Position(movetime)) == 0
                 if movetime < length(Log.Frames.Position)-1
