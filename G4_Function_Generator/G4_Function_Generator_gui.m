@@ -1321,7 +1321,11 @@ function pushbutton3_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 handles.save_dir = uigetdir('', 'Pick a Directory');
-set(handles.text8,'String',handles.save_dir);
+if handles.save_dir ~= 0
+    set(handles.text8,'String',handles.save_dir);
+else
+    handles.save_dir = get(handles.text8,'String');
+end
 
 %set function ID
 handles.param.ID = get_function_ID(handles.param.type, handles.save_dir);
