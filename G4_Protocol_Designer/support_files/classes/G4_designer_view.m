@@ -925,8 +925,8 @@ classdef G4_designer_view < handle
 
         function update_experiment_name(self, src, ~)
 
-            new_val = src.String;
-            self.con.update_experiment_name(self, new_val);
+            new_val = src.Value;
+            self.con.update_experiment_name(new_val);
             self.update_gui();
 
         end
