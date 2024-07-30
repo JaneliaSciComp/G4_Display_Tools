@@ -2166,7 +2166,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
 %% SETTERS
 
 % Setting values in the model
-function set_current_selected_cell(self, table, index)
+        function set_current_selected_cell(self, table, index)
             self.model.set_current_selected_cell(table, index);
         end
         function set_auto_preview_index(self, new_val)
