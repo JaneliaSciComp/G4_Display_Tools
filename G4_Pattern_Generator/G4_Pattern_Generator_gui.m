@@ -65,9 +65,10 @@ sdata.color = [0 1 0; 0.6 0 0.9];
 s2data.enable = [0 0];
 s2data.sa_mask = [0 0 pi 0];
 s2data.long_lat_mask = [-pi pi -pi/2 pi/2 0];
-handles.arena_folder = 'C:\matlabroot\G4\Arena';
-handles.scripts_folder = 'C:\matlabroot\G4\Scripts';
+handles.arena_folder = '/Users/lisaferguson/Documents/Programming/Reiser/Arena/Arena';
+handles.scripts_folder = '/Users/lisaferguson/Documents/Programming/Reiser/Arena/Scripts';
 handles.arena_file = 'arena_parameters.mat';
+set(handles.text26, 'String', '/Users/lisaferguson/Documents/Programming/Reiser/Arena');
 if exist(fullfile(handles.arena_folder, handles.arena_file),'file')
     load(fullfile(handles.arena_folder, handles.arena_file));
     s3data.arena_pitch = rad2deg(aparam.rotations(2));
