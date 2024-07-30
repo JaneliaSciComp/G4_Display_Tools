@@ -1,4 +1,4 @@
-function [Pats, num_frames, true_step_size] = make_grating_edge(param, arena_x, arena_y, arena_z)
+function [Pats, num_frames, true_step_size] = make_grating_edge(param, arena_x, arena_y, arena_z, arena_file)
 % FUNCTION [Pats, frames, true_step_size] = make_grating_edge(param, arena_x, arena_y, arena_z)
 % 
 % Creates moving pattern of gratings or advancing edges.
@@ -55,7 +55,7 @@ end
 
 %take numerous samples for each pixel's field-of-view
 % coord = samples_by_diff(coord, param.aa_samples); 
-coord = samples_by_p_rad(coord, param.aa_samples); 
+coord = samples_by_p_rad(coord, param.aa_samples, arena_file); 
 
 %calculate number of frames needed to create pattern (must be at least 1)
 num_frames = max([1 round(param.spat_freq/param.step_size)]); 

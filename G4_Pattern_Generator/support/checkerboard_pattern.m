@@ -1,4 +1,4 @@
-function Pats = checkerboard_pattern(Pats1, Pats2)
+function Pats = checkerboard_pattern(Pats1, Pats2, arena_file)
 %FUNCTION frame = checkerboard_pattern(frame1, frame2)
 %converts two pattern matrices into a single matrix, rearranged so that the
 %first pattern will be displayed on one half of a checkerboard-layout LED
@@ -8,7 +8,7 @@ function Pats = checkerboard_pattern(Pats1, Pats2)
 %frame1: pattern that will fill checkerboard starting at (1,1)
 %frame2: pattern that will fill checkerboard starting at (1,2)
 
-load('C:\matlabroot\G4\Arena\arena_parameters.mat');
+load(arena_file);
 
 if nargin==1 %for only 1 pattern input, duplicate it for both checkboards
     Pats2 = Pats1;

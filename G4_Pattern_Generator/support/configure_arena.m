@@ -53,11 +53,15 @@ function configure_arena_OpeningFcn(hObject, eventdata, handles, varargin)
 % varargin   command line arguments to configure_arena (see VARARGIN)
 
 handles.gui1tag = findobj('Tag','G4_Pattern_Generator_gui');
+handles.arena_folder = 'C:\matlabroot\G4\Arena';
+handles.scripts_folder = 'C:\matlabroot\G4\Scripts';
+handles.arena_file = 'arena_parameters.mat';
+arena_fullfile = fullfile(handles.arena_folder, handles.arena_file);
 
 try
-    load('C:\matlabroot\G4\arena\arena_parameters.mat','aparam')
+    load(arena_fullfile,'aparam')
 catch
-    disp('Could not locate C:\matlabroot\G4\arena\arena_parameters.mat, setting default parameters instead')
+    disp(['Could not locate ' arena_fullfile ', setting default parameters instead'])
     aparam.Psize = 16;
     aparam.Prows = 3;
     aparam.Pcols = 12;
@@ -354,7 +358,7 @@ model = popup_strings{get(handles.popupmenu1, 'Value')};
 rotations = [str2double(get(handles.edit5, 'String')), str2double(get(handles.edit6, 'String')), str2double(get(handles.edit7, 'String'))];
 translations = [str2double(get(handles.edit8, 'String')), str2double(get(handles.edit9, 'String')), str2double(get(handles.edit10, 'String'))];
 
-arena_coordinates(Psize, Pcols, Prows, Pcircle, rot180, model, rotations, translations)
+arena_coordinates(Psize, Pcols, Prows, Pcircle, rot180, model, rotations, translations, fullfile(handles.arena_folder, handles.arena_file))
 
 s3data.arena_pitch = rad2deg(rotations(2));
 s3data.updated = 1;

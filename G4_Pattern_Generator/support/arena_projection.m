@@ -1,4 +1,4 @@
-function arena_projection(Pats, gs_val, color, plot_type, frame, checker)
+function arena_projection(Pats, gs_val, color, plot_type, frame, checker, arena_file)
 % FUNCTION arena_projection(Pats, gs_val, color, plot_type frame)
 % 
 % Plots a single frame of the input pattern as a scatter plot of dots.
@@ -15,7 +15,7 @@ function arena_projection(Pats, gs_val, color, plot_type, frame, checker)
 % checker: sets whether the pattern to be plotted is a checkerboard layout
 
 
-load('C:\matlabroot\G4\Arena\arena_parameters.mat');
+load(arena_file);
 [arena_phi, arena_theta, ~] = cart2sphere(arena_x, arena_y, arena_z);
 
 %figure size settings
@@ -46,8 +46,8 @@ if checker==1
         x = rot90(x,2);
         y = rot90(y,2);
     end
-    x = checkerboard_pattern(x,x);
-    y = checkerboard_pattern(y,y);
+    x = checkerboard_pattern(x,x, arena_file);
+    y = checkerboard_pattern(y,y, arena_file);
     if aparam.rot180==1
         x = rot90(x,2);
         y = rot90(y,2);
@@ -71,7 +71,7 @@ Pats_vec = reshape(Pats(:,:,frame)/(2^gs_val - 1),[num_pixels 1]);
 if checker==1
     colors1 = repmat(permute(color(1,:),[1 3 2]),[size(Pats(:,:,frame)) 1]);
     colors2 = repmat(permute(color(2,:),[1 3 2]),[size(Pats(:,:,frame)) 1]);
-    colors = checkerboard_pattern(colors1,colors2);
+    colors = checkerboard_pattern(colors1,colors2, arena_file);
     colors = reshape(colors,[num_pixels,3]).*repmat(Pats_vec,[1 3]);
 else
     colors = repmat(color(1,:),[num_pixels,1]).*repmat(Pats_vec,[1 3]);

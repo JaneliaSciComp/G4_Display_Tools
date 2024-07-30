@@ -1,4 +1,4 @@
-function [Pats, num_frames, true_step_size] = make_starfield(param, arena_x, arena_y, arena_z)
+function [Pats, num_frames, true_step_size] = make_starfield(param, arena_x, arena_y, arena_z, arena_folder)
 % function [Pats, num_frames, true_step_size] = make_starfield(param, arena_x, arena_y, arena_z)
 % 
 % Creates moving pattern of starfield of dots.
@@ -51,9 +51,9 @@ end
 %% calculate random starting coordinates of dots
 dots_exist = 1;
 if param.dot_re_random == 0 %use previously generated dots starting locations
-    if exist('C:\matlabroot\G4\Arena\startfield_dots.mat','file')
+    if exist(fullfile(arena_folder, 'startfield_dots.mat'),'file')
         % use previouslparam.dot_re_randomy generated locations of dots
-        load('C:\matlabroot\G4\Arena\startfield_dots.mat','dots_x','dots_y','dots_z');
+        load(fullfile(arena_folder, 'startfield_dots.mat'),'dots_x','dots_y','dots_z');
     else
         dots_exist = 0;
     end
@@ -62,7 +62,7 @@ elseif param.dot_re_random == 1 || dots_exist == 0 %re-randomize dot starting lo
     dots_x = rand(param.num_dots, 1)*2 - 1;
     dots_y = rand(param.num_dots, 1)*2 - 1;
     dots_z = rand(param.num_dots, 1)*2 - 1;
-    save('C:\matlabroot\G4\Arena\startfield_dots.mat','dots_x','dots_y','dots_z');
+    save(fullfile(arena_folder, 'startfield_dots.mat'),'dots_x','dots_y','dots_z');
 end
 
 %rotate coordinates to match rotation of arena (only compatible with cardinal axes rotations)

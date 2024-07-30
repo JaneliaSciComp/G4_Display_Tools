@@ -65,8 +65,11 @@ sdata.color = [0 1 0; 0.6 0 0.9];
 s2data.enable = [0 0];
 s2data.sa_mask = [0 0 pi 0];
 s2data.long_lat_mask = [-pi pi -pi/2 pi/2 0];
-if exist('C:\matlabroot\G4\Arena\arena_parameters.mat','file')
-    load('C:\matlabroot\G4\Arena\arena_parameters.mat');
+handles.arena_folder = 'C:\matlabroot\G4\Arena';
+handles.scripts_folder = 'C:\matlabroot\G4\Scripts';
+handles.arena_file = 'arena_parameters.mat';
+if exist(fullfile(handles.arena_folder, handles.arena_file),'file')
+    load(fullfile(handles.arena_folder, handles.arena_file));
     s3data.arena_pitch = rad2deg(aparam.rotations(2));
     set(handles.edit2, 'String', num2str(round(1000*rad2deg(p_rad))/1000));
     s3data.updated = 1;
@@ -192,11 +195,11 @@ else
 end
 
 %generate pattern
-[handles.Pats, handles.param.true_step_size, handles.param.rot180] = G4_Pattern_Generator(handles.param);
+[handles.Pats, handles.param.true_step_size, handles.param.rot180] = G4_Pattern_Generator(handles);
 handles.num_frames = size(handles.Pats,3);
 handles.param.stretch = ones(handles.num_frames,1);
 if handles.param.checker_layout==1
-    handles.Pats = checkerboard_pattern(handles.Pats);
+    handles.Pats = checkerboard_pattern(handles.Pats, fullfile(handles.arena_folder, handles.arena_file));
 end
 
 %update step size if needed to be changed
@@ -222,7 +225,8 @@ handles.cur_frame = 1+handles.param.back_frame;
 set(handles.edit16,'String',num2str(handles.cur_frame));
 set(handles.text24,'String',num2str(handles.num_frames));
 handles.plot_type = get(handles.popupmenu6, 'Value');
-arena_projection(handles.Pats, handles.param.gs_val, handles.color, handles.plot_type, handles.cur_frame, handles.param.checker_layout);
+arena_projection(handles.Pats, handles.param.gs_val, handles.color, ...
+    handles.plot_type, handles.cur_frame, handles.param.checker_layout, fullfile(handles.arena_folder, handles.arena_file));
 
 %update pattern
 set(handles.pushbutton1,'String','Update Pattern')
@@ -741,7 +745,8 @@ if handles.cur_frame>handles.num_frames;
     handles.cur_frame = 1;
 end
 set(handles.edit16,'String',num2str(handles.cur_frame));
-arena_projection(handles.Pats, handles.param.gs_val, handles.color, handles.plot_type, handles.cur_frame, handles.param.checker_layout);
+arena_projection(handles.Pats, handles.param.gs_val, handles.color, handles.plot_type, ...
+    handles.cur_frame, handles.param.checker_layout, fullfile(handles.arena_folder, handles.arena_file));
 guidata(hObject, handles);
 
 
@@ -756,7 +761,8 @@ if handles.cur_frame<1;
     handles.cur_frame = handles.num_frames;
 end
 set(handles.edit16,'String',num2str(handles.cur_frame));
-arena_projection(handles.Pats, handles.param.gs_val, handles.color, handles.plot_type, handles.cur_frame, handles.param.checker_layout);
+arena_projection(handles.Pats, handles.param.gs_val, handles.color, handles.plot_type, ...
+    handles.cur_frame, handles.param.checker_layout, fullfile(handles.arena_folder, handles.arena_file));
 guidata(hObject, handles);
 
 
@@ -778,7 +784,8 @@ set(handles.text37,'visible',strings{1})
 set(handles.text38,'visible',strings{2})
 set(handles.text39,'visible',strings{1})
 set(handles.text40,'visible',strings{2})
-arena_projection(handles.Pats, handles.param.gs_val, handles.color, handles.plot_type, handles.cur_frame, handles.param.checker_layout);
+arena_projection(handles.Pats, handles.param.gs_val, handles.color, handles.plot_type, ...
+    handles.cur_frame, handles.param.checker_layout, fullfile(handles.arena_folder, handles.arena_file));
 guidata(hObject, handles);
 
 
@@ -853,7 +860,8 @@ handles.patName = get(handles.edit15,'String');
 
 %save .mat and .pat files
 if handles.param.checker_layout==0
-    save_pattern_G4(handles.Pats, handles.param, handles.save_dir, handles.patName)
+    save_pattern_G4(handles.Pats, handles.param, handles.save_dir, ...
+        handles.patName, fullfile(handles.arena_folder, handles.arena_file))
 else
     save_pattern_checkerboard_G4(handles.param, handles.save_dir, handles.patName, handles.Pats)
 end
@@ -934,7 +942,8 @@ else
     handles.cur_frame = round(frame);
 end
 set(hObject,'String',num2str(handles.cur_frame));
-arena_projection(handles.Pats, handles.param.gs_val, handles.color, handles.plot_type, handles.cur_frame, handles.param.checker_layout);
+arena_projection(handles.Pats, handles.param.gs_val, handles.color, handles.plot_type, ...
+    handles.cur_frame, handles.param.checker_layout, fullfile(handles.arena_folder, handles.arena_file));
 guidata(hObject, handles);
 
 
@@ -1192,7 +1201,7 @@ try
     guidata(hObject, handles);
     
     %check if Pattern is same size as current arena
-    load('C:\matlabroot\G4\Arena\arena_parameters.mat','arena_x');
+    load(fullfile(handles.arena_folder, handles.arena_file),'arena_x');
     if numel(arena_x)~=numel(handles.Pats(:,:,1))
         disp('warning: loaded pattern was made for a differently-sized arena')
     end
@@ -1218,7 +1227,8 @@ catch
     
     guidata(hObject, handles);
     
-    arena_projection(handles.Pats, handles.param.gs_val, handles.color, handles.plot_type, handles.cur_frame, handles.param.checker_layout);
+    arena_projection(handles.Pats, handles.param.gs_val, handles.color, handles.plot_type, ...
+        handles.cur_frame, handles.param.checker_layout, fullfile(handles.arena_folder, handles.arena_file));
 end
     
 
@@ -1259,7 +1269,7 @@ function pushbutton11_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-PGgui2script_G4(handles.param);
+PGgui2script_G4(handles);
 
 
 % --- Executes on button press in pushbutton11.
