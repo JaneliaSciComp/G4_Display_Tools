@@ -564,8 +564,13 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
         function open_file(self, filepath)
             %Get filepath if one has not been inputted
             if strcmp(filepath,'')
+                  %% fixfocus citation
+            %% Jorg Woehl (2024). fixfocus (https://github.com/JorgWoehl/fixfocus/releases/tag/v1.2), GitHub. Retrieved June 4, 2024. 
+                ff = fixfocus();
                 [filename, top_folder_path] = uigetfile('*.g4p');
+                delete(ff);
                 filepath = fullfile(top_folder_path, filename);
+             
             else
                 [top_folder_path, ~] = fileparts(filepath);
             end
