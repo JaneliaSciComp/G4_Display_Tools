@@ -1990,9 +1990,17 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
         % Import a file
         function import_file(self, str_to_match)
             if strcmp(str_to_match,'')
+                 %% fixfocus citation
+            %% Jorg Woehl (2024). fixfocus (https://github.com/JorgWoehl/fixfocus/releases/tag/v1.2), GitHub. Retrieved June 4, 2024. 
+                ff = fixfocus();
                 [imported_file, path] = uigetfile('*.mat');
+                delete(ff);
             else
+                 %% fixfocus citation
+            %% Jorg Woehl (2024). fixfocus (https://github.com/JorgWoehl/fixfocus/releases/tag/v1.2), GitHub. Retrieved June 4, 2024. 
+                ff = fixfocus();
                 [imported_file, path] = uigetfile(['*',str_to_match,'*.mat']);
+                delete(ff);
             end
 
             if isequal(imported_file,0)
