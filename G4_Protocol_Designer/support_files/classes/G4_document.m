@@ -168,7 +168,6 @@ classdef G4_document < handle
                 return;
             end
 
-            %If the user edited the pattern or position function, make sure the file dimensions match
             if y == 1 && ~strcmp(num2str(new_value),'')
                 if ~isnumeric(new_value)
                     new_value = str2num(new_value);

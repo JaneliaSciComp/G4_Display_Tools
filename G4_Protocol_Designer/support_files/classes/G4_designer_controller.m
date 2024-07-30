@@ -1243,7 +1243,9 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                 self.update_trial_doc('', x, 5, trialtype);
                 self.update_trial_doc('', x, 6, trialtype);
                 self.update_trial_doc('', x, 7, trialtype);
-                self.update_trial_doc(self.doc.trial_data.trial_array{12}, x, 12, trialtype);
+                if isempty(self.doc.(trial_var){3})
+                    self.update_trial_doc(self.doc.trial_data.trial_array{12}, x, 12, trialtype);
+                end
             end
 
             %self.update_gui();
