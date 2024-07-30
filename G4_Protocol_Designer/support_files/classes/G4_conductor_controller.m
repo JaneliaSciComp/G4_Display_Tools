@@ -434,7 +434,7 @@ classdef G4_conductor_controller < handle
                 self.doc.set_top_export_path(top_folder_path);
 
                 data = self.doc.open(filepath);
-                p = data.get_exp_parameters();
+                p = data.exp_parameters();
 
                 self.doc.set_repetitions(p.repetitions);
                 self.doc.set_is_randomized(p.is_randomized);
@@ -456,9 +456,9 @@ classdef G4_conductor_controller < handle
                 self.fb_model.update_model_channels(self.doc);
 
                 for k = 1:13
-                    self.doc.set_pretrial_property(k, p.pretrial{k});
-                    self.doc.set_intertrial_property(k, p.intertrial{k});
-                    self.doc.set_posttrial_property(k, p.posttrial{k});
+                    self.doc.set_trial_property(1, k, p.pretrial{k}, 'pre');
+                    self.doc.set_trial_property(1, k, p.intertrial{k}, 'inter');
+                    self.doc.set_trial_property(1, k, p.posttrial{k}, 'post');
                 end
 
                 for i = 2:length(self.doc.block_trials(:, 1))
@@ -473,10 +473,12 @@ classdef G4_conductor_controller < handle
                 for j = 1:block_x
                     if j > length(self.doc.block_trials(:,1))
                         newrow = p.block_trials(j,1:end);
-                        self.doc.set_block_trial_property([j, block_y], newrow);
+                      
+                        self.doc.set_trial_property(j, block_y, newrow, 'block');
                     else
                         for n = 1:13
-                            self.doc.set_block_trial_property([j, n], p.block_trials{j,n});
+                            self.doc.set_trial_property(j, n, p.block_trials{j,n}, 'block');
+
                         end
                     end
                 end
@@ -1179,7 +1181,7 @@ classdef G4_conductor_controller < handle
             if ~isempty(self.view)
                 waitfor(msgbox("Please add any final comments, then click OK to continue. Anything you change in the metadata after clicking OK will not be saved." ...
                     + newline + newline + " If you're changing flies for the next experiment, don't forget to update the fly name after clicking OK.", "Reminder"));
-                self.model.set_metadata_comments(self.view.comments_box.String);
+                self.model.set_metadata_comments(self.view.comments_box.Value);
             end
 
             [experiment_path, ~, ~] = fileparts(self.doc.save_filename);
