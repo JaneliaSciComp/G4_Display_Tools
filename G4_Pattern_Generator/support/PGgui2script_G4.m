@@ -22,7 +22,7 @@ if exist([script_dir 'temp_pattern_script_G4.m'],'file')
     delete([script_dir 'temp_pattern_script_G4.m']);
     recycle('off');
 end
-FID = fopen([script_dir 'temp_pattern_script_G4.m'],'a');
+FID = fopen(fullfile(script_dir, 'temp_pattern_script_G4.m'),'a');
 
 fprintf(FID,'%s\n','% Script version of G4_Pattern_Generator with current GUI parameters');
 fprintf(FID,'%s\n',['% (script saved in ' script_dir ')']);
@@ -73,6 +73,6 @@ fprintf(FID,'%s\n','save_pattern_G4(Pats, param, save_dir, patName, arena_file);
 fprintf(FID,'%s\n','');
 
 fclose(FID);
-edit(fullfile(script_dir, temp_pattern_script_G4.m));
+edit(fullfile(script_dir, 'temp_pattern_script_G4.m'));
 
 end
