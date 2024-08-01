@@ -54,7 +54,13 @@ function G4_Function_Generator_gui_OpeningFcn(hObject, eventdata, handles, varar
 
 % Choose default command line output for G4_Function_Generator_gui
 handles.output = hObject;
-
+handles.pfn_dir = '/Users/lisaferguson/Documents/Programming/Reiser/Arena/Functions';
+handles.afn_dir = '/Users/lisaferguson/Documents/Programming/Reiser/Arena/AOFunctions';
+handles.script_dir = '/Users/lisaferguson/Documents/Programming/Reiser/Arena/Scripts';
+set(handles.text8, 'String', '/Users/lisaferguson/Documents/Programming/Reiser/Arena');
+%'C:\matlabroot\G4\Functions'
+%'C:\matlabroot\G4\Analog Output Functions'
+%'C:\matlabroot\G4\Scripts'
 %calculate default function
 handles = pushbutton2_Callback(hObject, eventdata, handles);
 
@@ -232,7 +238,7 @@ function pushbutton1_Callback(hObject, eventdata, handles)
 % hObject    handle to pushbutton1 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-FGgui2script_G4(handles.param);
+FGgui2script_G4(handles);
 
 % --- Executes on button press in checkbox3.
 function checkbox3_Callback(hObject, eventdata, handles)
@@ -1290,8 +1296,8 @@ end
 set(handles.text22,'String',title);
 
 %set function name
-pfn_dir = 'C:\matlabroot\G4\Functions\';
-afn_dir = 'C:\matlabroot\G4\Analog Output Functions\';
+pfn_dir = handles.pfn_dir;
+afn_dir = handles.afn_dir;
 save_dir = get(handles.text8,'String');
 if strcmp(save_dir,pfn_dir)==0 && strcmp(save_dir,afn_dir)==0
     handles.save_dir = get(handles.text8,'String');
