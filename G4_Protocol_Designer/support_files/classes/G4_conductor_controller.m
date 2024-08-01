@@ -1666,9 +1666,9 @@ classdef G4_conductor_controller < handle
             metadata.fly_name = self.model.get_fly_name();
             metadata.fly_genotype = self.model.get_fly_genotype();
             if ~isempty(self.view)
-                metadata.timestamp = self.view.date_and_time_box.String;
+                metadata.timestamp = self.view.date_and_time_box.Value;
             else
-                metadata.timestamp = datestr(now, 'mm-dd-yyyy HH:MM:SS');
+                metadata.timestamp = char(datetime('now', 'Format', 'MM-dd-yyyy HH:mm:SS'));
             end
             metadata.fly_age = self.model.get_fly_age();
             metadata.fly_sex = self.model.get_fly_sex();

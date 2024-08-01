@@ -1782,8 +1782,8 @@ classdef G4_document < handle
         function set_experiment_name(self, value)
             % add timestamp to name if it's not empty
             if ~isempty(value)
-                dateFormat = 'mm-dd-yy_HH-MM-SS';
-                dated_exp_name = strcat(value, datestr(now, dateFormat));
+                dateFormat = 'MM-dd-yy_HH-mm-SS';
+                dated_exp_name = strcat(value, char(datetime('now', 'Format', dateFormat)));
             else
                 dated_exp_name = value;
             end

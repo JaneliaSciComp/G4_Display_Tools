@@ -92,9 +92,9 @@ classdef G4_conductor_model < handle
             self.set_do_processing(1);
             self.set_num_tests_conducted(0);
             self.set_aborted_count(0);
-            self.set_fly_save_name([self.fly_genotype,'-',datestr(now, 'HH_MM_SS')]);
-            self.set_date_folder(datestr(now, 'mm_dd_yyyy'));
-            self.set_timestamp(datestr(now, 'mm-dd-yyyyHH_MM_SS'));
+            self.set_fly_save_name([self.fly_genotype,'-',char(datetime('now', 'Format', 'HH_mm_SS'))]);
+            self.set_date_folder(datetime('now', 'Format', 'MM_dd_yyyy'));
+            self.set_timestamp(datetime('now', 'Format', 'MM-dd-yyyyHH_mm_SS'));
             self.set_num_attempts_bad_conds(1);
             self.set_run_file('Simple');
             self.set_combine_tdms(1);
@@ -194,7 +194,7 @@ classdef G4_conductor_model < handle
         end
 
         function update_fly_save_name(self)
-            self.set_fly_save_name([self.fly_genotype,'-',datestr(now, 'HH_MM_SS')]);
+            self.set_fly_save_name([self.fly_genotype,'-',char(datetime('now', 'Format', 'HH_mm_SS'))]);
         end
 
         %% Setters
@@ -290,9 +290,12 @@ classdef G4_conductor_model < handle
         function set_timestamp(self, varargin)
             if ~isempty(varargin)
                 new_val = varargin{1};
+                if ~ischar(new_val)
+                    new_val = char(new_val);
+                end
                 self.timestamp = new_val;
             else
-                self.timestamp = datestr(now, 'mm-dd-yyyyHH_MM_SS');
+                self.timestamp = char(datetime('now', 'Format', 'MM-dd-yyyyHH_mm_SS'));
             end
         end
 
@@ -349,6 +352,9 @@ classdef G4_conductor_model < handle
         end
 
         function set_date_folder(self, new_val)
+            if ~ischar(new_val)
+                new_val = char(new_val);
+            end
             self.date_folder = new_val;
         end
 
