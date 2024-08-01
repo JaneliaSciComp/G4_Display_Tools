@@ -54,13 +54,13 @@ function G4_Function_Generator_gui_OpeningFcn(hObject, eventdata, handles, varar
 
 % Choose default command line output for G4_Function_Generator_gui
 handles.output = hObject;
-handles.pfn_dir = '/Users/lisaferguson/Documents/Programming/Reiser/Arena/Functions';
-handles.afn_dir = '/Users/lisaferguson/Documents/Programming/Reiser/Arena/AOFunctions';
-handles.script_dir = '/Users/lisaferguson/Documents/Programming/Reiser/Arena/Scripts';
-set(handles.text8, 'String', '/Users/lisaferguson/Documents/Programming/Reiser/Arena');
-%'C:\matlabroot\G4\Functions'
-%'C:\matlabroot\G4\Analog Output Functions'
-%'C:\matlabroot\G4\Scripts'
+handles.pfn_dir = 'C:\matlabroot\G4\Functions';
+handles.afn_dir = 'C:\matlabroot\G4\Analog Output Functions';
+handles.script_dir = 'C:\matlabroot\G4\Scripts';
+set(handles.text8, 'String', 'C:\matlabroot\G4');
+%
+%
+%
 %calculate default function
 handles = pushbutton2_Callback(hObject, eventdata, handles);
 
