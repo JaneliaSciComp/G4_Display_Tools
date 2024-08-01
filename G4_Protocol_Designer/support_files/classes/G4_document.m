@@ -289,11 +289,10 @@ classdef G4_document < handle
                     self.create_error_box("You duration must be zero or greater");
                     return;
                 end
-                %I believe the controller now accepts more than one decimal
-                %place? 
-%                 %round to 1 decimal place, since the controller only takes
-%                 %numbers to 1 decimal place.
-%                 new_value = round(new_value, 1);
+      
+                %round to 1 decimal place, since the controller only takes
+                %numbers to 1 decimal place.
+                new_value = round(new_value, 1);
             end
 
             if patRows ~= numrows
