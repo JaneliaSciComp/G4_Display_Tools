@@ -13,6 +13,9 @@ has_toc: false
 
 This set of MATLAB scripts and GUIs can be used to design patterns (primarily for displaying motion, rather than pictures of objects) on a G4 display. Patterns are generated using the `G4_Pattern_Generator.m` script based on input parameters that describe the desired motion. These scripts output two types of pattern files: The first type is a .mat file which contains the created pattern matrix (named `Pats`) and all the pattern parameters so that it can be easily read back into MATLAB. The second type is a .pat file containing a binary vector of the pattern that can be quickly accessed by the Display Controller. Only the .pat file is necessary to be displayed on a G4 arena, though the .mat file is needed to be easily loaded back into MATLAB for viewing, debugging, or for creating experiments with the [G4 Protocol Designer](protocol-designer.md).
 
+Note: These scripts include filepaths in the code which must be present on the computer being used. If using this software on the arena computer with the file system set up as described in our setup instructions, it should work fine. However, if you want to use this to create patterns or functions on another computer or personal laptop, you will need to edit the filepaths in the code before using the software. A description of how to do this can be found in the [tutorial](pattern-generator_generate_tutorial.md). Additionally, while this software can be used on Windows or MacOS, it has not been tested on Linux systems.
+{:.warning}
+
 ## Mapping the display pixel coordinates in 3D
 
 [![Coordinate conventions](assets/coordinate-conventions.png){:.ifr}](assets/coordinate-conventions.pdf)
