@@ -1,4 +1,4 @@
-function PGgui2script_G4(param)
+function PGgui2script_G4(handles)
 % function PGgui2script_G4(param)
 %
 % creates a matlab script file that will create and save the pattern
@@ -6,12 +6,14 @@ function PGgui2script_G4(param)
 % G4_Pattern_Generator_gui
 %
 % Script given the temporary name 'temp_script_G4.m' and saved in the 
-% directory 'C:\matlabroot\G4\scripts\'
+% scripts directory
 %
 % inputs:
 % param: all pattern parameters
-
-script_dir = 'C:\matlabroot\G4\Scripts\';
+param = handles.param;
+script_dir = handles.scripts_folder;
+[save_folder, ~] = fileparts(handles.arena_folder);
+arena_file = fullfile(handles.arena_folder, handles.arena_file);
 if ~exist(script_dir, 'dir')
     mkdir(script_dir);
 end
@@ -20,10 +22,10 @@ if exist([script_dir 'temp_pattern_script_G4.m'],'file')
     delete([script_dir 'temp_pattern_script_G4.m']);
     recycle('off');
 end
-FID = fopen([script_dir 'temp_pattern_script_G4.m'],'a');
+FID = fopen(fullfile(script_dir, 'temp_pattern_script_G4.m'),'a');
 
 fprintf(FID,'%s\n','% Script version of G4_Pattern_Generator with current GUI parameters');
-fprintf(FID,'%s\n','% (script saved in C:\matlabroot\G4\Scripts\)');
+fprintf(FID,'%s\n',['% (script saved in ' script_dir ')']);
 fprintf(FID,'%s\n','%');
 fprintf(FID,'%s\n','% Save this script with a new filename to keep it from being overwritten');
 fprintf(FID,'%s\n','');
@@ -64,13 +66,13 @@ fprintf(FID,'%s\n','param.stretch = zeros(size(Pats,3),1); %stretch increases (w
 fprintf(FID,'%s\n','');
 fprintf(FID,'%s\n','');
 fprintf(FID,'%s\n','%% save pattern');
-fprintf(FID,'%s\n','save_dir = ''C:\matlabroot\G4\Patterns\'';');
+fprintf(FID,'%s\n',['save_dir = ' save_folder ';']);
 fprintf(FID,'%s\n','patName = ''Pattern'';');
 fprintf(FID,'%s\n','param.ID = get_pattern_ID(save_dir);');
-fprintf(FID,'%s\n','save_pattern_G4(Pats, param, save_dir, patName);');
+fprintf(FID,'%s\n','save_pattern_G4(Pats, param, save_dir, patName, arena_file);');
 fprintf(FID,'%s\n','');
 
 fclose(FID);
-edit C:\matlabroot\G4\Scripts\temp_pattern_script_G4.m;
+edit(fullfile(script_dir, 'temp_pattern_script_G4.m'));
 
 end

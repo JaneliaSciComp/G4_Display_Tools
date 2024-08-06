@@ -4,7 +4,12 @@ function ID = get_pattern_ID(save_dir)
 %finds the first available pattern ID number in the specified save directory
 
 cd(save_dir);
-patfiles = ls('*.pat');
+try
+    patfiles = ls('*.pat');
+catch
+    warning("Found no pattern files in the save directory.");
+    patfiles = [];
+end
 if isempty(patfiles)
     ID = 1;
 else

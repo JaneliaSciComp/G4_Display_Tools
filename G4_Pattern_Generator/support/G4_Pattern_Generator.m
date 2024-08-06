@@ -1,4 +1,4 @@
-function [Pats, true_step_size, rot180] = G4_Pattern_Generator(param)
+function [Pats, true_step_size, rot180] = G4_Pattern_Generator(handles)
     % FUNCTION [Pats, arena_phi, arena_theta, true_step_size, rot180] = G4_Pattern_Generator(param)
     %
     % inputs:
@@ -10,7 +10,8 @@ function [Pats, true_step_size, rot180] = G4_Pattern_Generator(param)
     % true_step_size: value (in radians) of corrected step_size (may have been
     %      altered in order to divide evenly into spatial frequency of pattern)
     % rot180: if physical arena is flipped upside-down
-
+    param = handles.param;
+    arena_fullfile = fullfile(handles.arena_folder, handles.arena_file);
     %% check for parameter errors
     if param.gs_val~=1 && param.gs_val~=4
         error('gs_val must be either 1 or 4');
@@ -51,15 +52,15 @@ function [Pats, true_step_size, rot180] = G4_Pattern_Generator(param)
 
     %% calculate arena coordinates
     %get starting arena parameters
-    if ~exist('C:\matlabroot\G4\Arena\arena_parameters.mat','file') %create default arena
-        arena_coordinates(16, 12, 3, 18, 0, 'poly', [0 0 0], [0 0 0]);
+    if ~exist(arena_fullfile,'file') %create default arena
+        arena_coordinates(16, 12, 3, 18, 0, 'poly', [0 0 0], [0 0 0], arena_fullfile);
     end
 
-    load('C:\matlabroot\G4\Arena\arena_parameters.mat');
+    load(arena_fullfile);
     if abs(aparam.rotations(2)-param.arena_pitch)>0.001 %check if arena_pitch has been changed
         arena_coordinates(aparam.Psize, aparam.Pcols, aparam.Prows, aparam.Pcircle, aparam.rot180, ...
-            aparam.model, [aparam.rotations(1) param.arena_pitch aparam.rotations(3)], aparam.translations);
-        load('C:\matlabroot\G4\Arena\arena_parameters.mat');
+            aparam.model, [aparam.rotations(1) param.arena_pitch aparam.rotations(3)], aparam.translations, arena_fullfile);
+        load(arena_fullfile);
     end
 
     rot180 = aparam.rot180;
@@ -69,12 +70,12 @@ function [Pats, true_step_size, rot180] = G4_Pattern_Generator(param)
     %% create pattern
     switch lower(param.pattern_type(1:2))
         case 'st' %starfield
-            [Pats, num_frames, true_step_size] = make_starfield(param, arena_x, arena_y, arena_z);
+            [Pats, num_frames, true_step_size] = make_starfield(param, arena_x, arena_y, arena_z, handles.arena_folder);
         case 'of' %off_on
             true_step_size = param.step_size;
             [Pats, num_frames] = make_off_on(param);
         otherwise %grating or edge
-            [Pats, num_frames, true_step_size] = make_grating_edge(param, arena_x, arena_y, arena_z);
+            [Pats, num_frames, true_step_size] = make_grating_edge(param, arena_x, arena_y, arena_z, arena_fullfile);
     end
 
     %% apply masks to pattern

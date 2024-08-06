@@ -1,4 +1,4 @@
-function samples = samples_by_p_rad(m, num_samples)
+function samples = samples_by_p_rad(m, num_samples, arena_file)
 % FUNCTION samples = samples_by_p_rad(m, num_samples)
 %
 % This script turns an (m,n) array of values into an (m,n,num_samples) 
@@ -24,7 +24,7 @@ if num_samples == 1
     samples = m;
     
 else
-    load('C:\matlabroot\G4\Arena\arena_parameters.mat','p_rad')
+    load(arena_file,'p_rad')
     [rows, cols] = size(m);
 
     %calculate array of differences from each original element

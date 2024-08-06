@@ -13,7 +13,12 @@ function ID = get_function_ID(function_type, save_dir)
     end
 
     cd(save_dir);
-    files = ls(['*.' function_type]);
+    try
+        files = ls(['*.' function_type]);
+    catch
+        warning("Found no function files in the save directory.");
+        files = [];
+    end
     if isempty(files)
         ID = 1;
     else

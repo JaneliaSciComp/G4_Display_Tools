@@ -1,4 +1,4 @@
-function FGgui2script_G4(param)
+function FGgui2script_G4(handles)
     % FUNCTION FGgui2script_G4(param)
     %
     % creates a matlab script file that will create and save the function
@@ -10,16 +10,20 @@ function FGgui2script_G4(param)
     % param: all function parameters
 
     %determine function type
+    param = handles.param;
+    pfn_dir = handles.pfn_dir;
+    afn_dir = handles.afn_dir;
+    script_dir = handles.script_dir;
     if strcmp(param.type,'pfn')==1
         tempname = 'temp_position_function_script_G4.m';
-        foldername = 'Functions\';
+        [folderpath,  foldername] = fileparts(pfn_dir);
     else
         tempname = 'temp_AO_function_script_G4.m';
-        foldername = 'Analog Output Functions\';
+        [folderpath, foldername] = fileparts(afn_dir);
     end
 
     %create script file
-    script_dir = 'C:\matlabroot\G4\Scripts\';
+    script_dir = handles.script_dir;
     if ~exist(script_dir, 'dir')
         mkdir(script_dir);
     end
@@ -28,7 +32,7 @@ function FGgui2script_G4(param)
         delete([script_dir tempname]);
         recycle('off');
     end
-    FID = fopen([script_dir tempname],'a');
+    FID = fopen(fullfile(script_dir, tempname),'a');
 
     %print descriptive comments of script
     fprintf(FID,'%s\n','% Script version of G4_Function_Generator with current GUI parameters');
@@ -85,7 +89,7 @@ function FGgui2script_G4(param)
 
     %print script to save function
     fprintf(FID,'%s\n','%% save function');
-    fprintf(FID,'%s\n',['save_dir = ''C:\matlabroot\G4\' foldername ''';']);
+    fprintf(FID,'%s\n',['save_dir = ''' fullfile(folderpath, foldername) ''';']);
     fprintf(FID,'%s\n',[param.type 'param.ID = get_function_ID(''' param.type ''',save_dir);']);
     fprintf(FID,'%s\n','filename = ''TestFunction'';');
     fprintf(FID,'%s\n',['save_function_G4(func, ' param.type 'param, save_dir, filename);']);
@@ -94,9 +98,9 @@ function FGgui2script_G4(param)
     %close script file and open in Matlab
     fclose(FID);
     if strcmp(param.type,'pfn')==1
-        edit 'C:\matlabroot\G4\Scripts\temp_position_function_script_G4.m';
+        edit(fullfile(script_dir, 'temp_position_function_script_G4.m'));
     else
-        edit 'C:\matlabroot\G4\Scripts\temp_AO_function_script_G4.m';
+        edit(fullfile(script_dir, 'temp_AO_function_script_G4.m'));
     end
 
 end

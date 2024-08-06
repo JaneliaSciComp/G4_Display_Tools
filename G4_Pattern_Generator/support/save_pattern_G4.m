@@ -1,4 +1,4 @@
-function save_pattern_G4(Pats, param, save_dir, filename, Pats2)
+function save_pattern_G4(Pats, param, save_dir, filename, Pats2, arena_file)
 % FUNCTION save_pattern_G4(Pats, param, save_loc, filename)
 % 
 % Saves the Pats variable to both .mat and .pat files, the former of which
@@ -21,7 +21,7 @@ if isfield(param,'checker_layout')
         if nargin<5
             Pats2 = Pats;
         end
-        Pats = checkerboard_pattern(Pats, Pats2);
+        Pats = checkerboard_pattern(Pats, Pats2, arena_file);
     end
 else
     param.checker_layout = 0;

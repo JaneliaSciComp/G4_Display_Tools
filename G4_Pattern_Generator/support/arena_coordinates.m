@@ -1,4 +1,4 @@
-function arena_coordinates(Psize, Pcols, Prows, Pcircle, rot180, model, rotations, translations)
+function arena_coordinates(Psize, Pcols, Prows, Pcircle, rot180, model, rotations, translations, save_file)
 % FUNCTION arena_coordinates(Prows, Pcols, Psize, Pcircle, rot180, model, rotations, translations)
 %
 % Calculates the cartesian coordinates of every pixel in a cylindrical LED
@@ -78,8 +78,9 @@ arena_y = arena_y + translations(2);
 arena_z = arena_z + translations(3);
 
 %save arena coordinates and parameters
-if ~exist('C:\matlabroot\G4\Arena\','dir')
-    mkdir('C:\matlabroot\G4\Arena\');
+[arena_folder, ~] = fileparts(save_file); 
+if ~exist(arena_folder,'dir')
+    mkdir(arena_folder);
 end
 aparam.Psize = Psize;
 aparam.Pcols = Pcols;
@@ -89,6 +90,6 @@ aparam.rot180 = rot180;
 aparam.model = model;
 aparam.rotations = rotations;
 aparam.translations = translations;
-save('C:\matlabroot\G4\Arena\arena_parameters.mat','arena_x','arena_y','arena_z','p_rad','aparam');
+save(save_file,'arena_x','arena_y','arena_z','p_rad','aparam');
 
 end
