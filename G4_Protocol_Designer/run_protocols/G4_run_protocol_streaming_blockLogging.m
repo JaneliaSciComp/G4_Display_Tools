@@ -169,7 +169,7 @@ function [success] = G4_run_protocol_streaming_blockLogging(runcon, p)%input sho
             
             %Update the progress bar's label to reflect the expected
             %duration.
-            axes_label.String = "Estimated experiment duration: " + num2str(total_time/60) + " minutes.";
+            axes_label.Text = "Estimated experiment duration: " + num2str(total_time/60) + " minutes.";
             
             %Will increment this every time a trial is completed to track how far along
             %in the experiment we are
