@@ -809,7 +809,7 @@ classdef G4_designer_view < handle
             curr_file = self.con.get_current_preview_file();
             index = self.con.get_auto_preview_index();
             if ~strcmp(curr_file,'') && length(curr_file(1,1,:)) > 1
-                len = length(curr_file(1,1,:));
+                len = length(curr_file(1,1,:))-(index-1);
                 xax = [0 length(curr_file(1,:,1))];
                 yax = [0 length(curr_file(:,1,1))];
 
@@ -823,7 +823,7 @@ classdef G4_designer_view < handle
                     if is_paused == false
                         index = index + 1;
                         self.con.set_auto_preview_index(index);
-                        if index > len
+                        if index > length(curr_file(1,1,:))
                             index = 1;
                             self.con.set_auto_preview_index(index);
                         end
