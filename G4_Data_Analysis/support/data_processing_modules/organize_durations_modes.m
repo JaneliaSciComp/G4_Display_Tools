@@ -1,7 +1,7 @@
 function [cond_dur, cond_modes, cond_frame_move_time, cond_start_times, ...
     cond_gaps] = organize_durations_modes(num_conds, num_reps, ...
     num_trials, exp_order, trial_stop_times, trial_start_times, ...
-    trial_move_start_times, trial_modes, time_conv) 
+    trial_move_start_times, trial_modes, time_conv, ended_early, num_trials_short) 
     
     % Holds duration of each trial
     cond_dur = nan(num_conds, num_reps);
@@ -24,6 +24,9 @@ function [cond_dur, cond_modes, cond_frame_move_time, cond_start_times, ...
     
     % Holds the mode of each condition
     cond_modes = nan(num_conds, num_reps);
+    if ended_early
+        num_trials = num_trials - num_trials_short;
+    end
     
     for trial=1:num_trials
         cond = exp_order(trial);

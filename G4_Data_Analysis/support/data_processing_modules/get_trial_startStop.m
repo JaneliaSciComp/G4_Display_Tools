@@ -1,7 +1,7 @@
 function [num_trials, trial_start_times, trial_stop_times,trial_move_start_times,...
     trial_modes, intertrial_start_times, intertrial_stop_times, ...
     intertrial_durs, times] = get_trial_startStop(exp_order, trial_options, times, ...
-    modeID_order, time_conv, trials_rerun)
+    modeID_order, time_conv, trials_rerun, ended_early)
     
 
     start_times = times.origin_start_times;
@@ -11,17 +11,26 @@ function [num_trials, trial_start_times, trial_stop_times,trial_move_start_times
     rerun_stop_times = times.rerun_stop_times;
     rerun_movement_start_times = times.rerun_movement_start_times;
     
-    num_trials = numel(exp_order);
-    assert(length(start_times)==num_trials + trial_options(1) + trial_options(3) + ((num_trials-1)*trial_options(2)),...
-        'unexpected number  of trials detected - check that pre-trial, post-trial, and intertrial options are correct')
+    num_trials = numel(exp_order); %Only refers to conditions not inter/pre/post
+
+    
+    % assert(length(start_times)==num_trials + trial_options(1) + trial_options(3) + ((num_trials-1)*trial_options(2)),...
+    %     'unexpected number  of trials detected - check that pre-trial, post-trial, and intertrial options are correct')
+    if ended_early
+        trial_options(3) = 0;
+    end
+
     if trial_options(1) %if pre-trial was run
         trial_start_ind = 2; %exclude pre-trial
+
+        
     else
         trial_start_ind = 1;
     end
     
     if trial_options(3) %if post-trial was run
         trial_end_ind = length(start_times)-1; %exclude post-trial
+
     else
         trial_end_ind = length(start_times);
 %        start_times = [start_times stop_times(end)]; %if no post-trial, add last 'stop-display' to mark end of last trial

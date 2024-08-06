@@ -87,9 +87,12 @@ classdef G4_conductor_view < handle
 
             abort_button = uibutton(self.fig, 'Text', 'Abort Experiment', 'Position', ...
                 [140, self.fig_size(4) - 305, 115, 85], 'ButtonPushedFcn', @self.abort);
-            
+
             pause_button = uibutton(self.fig, 'state', 'Text', 'Pause',  'Position', ...
                 [265, self.fig_size(4) - 305, 115, 85], 'ValueChangedFcn', @self.pause);
+
+             end_button = uibutton(self.fig,  'Text', 'End Experiment', ...
+                'units', 'pixels', 'Position', [375, self.fig_size(4) - 305, 115, 85], 'Callback', @self.end_early);
 
             settings_pan = uipanel(self.fig, 'Title', 'Settings', 'FontSize', 13, 'units', 'pixels', ...
                 'Position', [15, self.fig_size(4) - 215, 415, 200]);
@@ -544,6 +547,10 @@ classdef G4_conductor_view < handle
         function pause(self, ~, event)
             val = event.Value;
             self.con.pause_experiment(val);
+        end
+
+        function end_early(self, ~, ~)
+            self.con.end_early();
         end
 
         function run_exp(self, ~, ~)

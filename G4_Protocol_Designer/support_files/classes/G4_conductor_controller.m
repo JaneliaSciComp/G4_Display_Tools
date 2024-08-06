@@ -30,6 +30,7 @@ classdef G4_conductor_controller < handle
         is_aborted
         is_paused
         settings
+        is_ended_early
     end
 
     methods
@@ -60,6 +61,7 @@ classdef G4_conductor_controller < handle
             self.set_remaining_time(self.model.get_expected_time());
             self.set_is_paused(0);
 
+
             self.set_current_mode('');
             self.set_current_pat('');
             self.set_current_pos('');
@@ -73,6 +75,8 @@ classdef G4_conductor_controller < handle
             self.set_current_offset('');
             self.set_current_duration('');
             self.set_is_aborted(0);
+            self.set_is_ended_early(0);
+
 
             self.set_fb_model(feedback_model(self.doc));
         end
@@ -525,6 +529,14 @@ classdef G4_conductor_controller < handle
 %             end
         end
 
+        function end_early(self)
+            self.set_is_ended_early(1);
+        end
+
+        function [ended] = check_if_ended(self)
+            ended = self.get_is_ended_early();
+        end
+
         function yes = check_if_paused(self)
             if self.is_paused == 1
                 yes = 1;
@@ -538,7 +550,9 @@ classdef G4_conductor_controller < handle
         end
 
         function run(self)
+
             self.set_is_aborted(false); %change aborted back to zero in case the experiment was aborted earlier.
+            self.set_is_ended_early(0);
 
             % Update timestamp to reflect actual start time of experiment
             self.update_timestamp();
@@ -1713,6 +1727,19 @@ classdef G4_conductor_controller < handle
             pdf_path = fullfile(fly_results_folder,plot_filename);
             new_pdf_path = fullfile(fly_results_folder,new_plot_filename);
             movefile(pdf_path, new_pdf_path);
+        end
+
+        function set_is_ended_early(self, new_val)
+            if new_val == 0 || new_val == 1
+                self.is_ended_early = new_val;
+            else
+                disp("There was an error with the button to end an experiment early. Please try again");
+                self.is_ended_early = 0;
+            end
+        end
+
+        function value = get_is_ended_early(self)
+            value = self.is_ended_early;
         end
 
         function ts = get_timestamp(self)
