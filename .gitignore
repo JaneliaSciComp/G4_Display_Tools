@@ -11,7 +11,7 @@
 *.m~
 
 # Compiled MEX binaries (all platforms)
-*.mexw*
+*.mex*
 
 # Packaged app and toolbox files
 *.mlappinstall
