@@ -189,6 +189,8 @@ function [success] = G4_run_protocol_streaming_blockLogging(runcon, p)%input sho
                 %First update the progress bar to show pretrial is running----
                 runcon.update_progress('pre');
                 num_trial_of_total = num_trial_of_total + 1;
+
+                ctlr.startLog(); % Must start log before setting controller parameters or it'll affect data processing.
                 
                 %Set the controller values appropriately----------------
                 ctlr.setControllerParameters(ctlr_parameters_pretrial);
@@ -199,7 +201,6 @@ function [success] = G4_run_protocol_streaming_blockLogging(runcon, p)%input sho
                 pause(0.01);
                 
                 %Run pretrial on screen
-                ctlr.startLog();
                 if pre_dur ~= 0
                     ctlr.startDisplay(pre_dur*10);
                 else
@@ -526,12 +527,14 @@ function [success] = G4_run_protocol_streaming_blockLogging(runcon, p)%input sho
                 %Update progress bar--------------------------
                 num_trial_including_rescheduled = num_trial_including_rescheduled + 1;
                 num_trial_of_total = num_trial_of_total + 1;
+
+                ctlr.startLog(); % Must start log before setting controller parameters or it'll affect data processing.
                 
                 ctlr.setControllerParameters(ctlr_parameters_posttrial);
                 
                 tcpread_cache = pnet(ctlr.tcpConn, 'read', 'noblock'); % clear cache
                 
-                ctlr.startLog();
+
                 ctlr.startDisplay((post_dur + .5)*10, false);
                 timeSincePost = tic;
                 runcon.update_progress('post', num_trial_of_total);

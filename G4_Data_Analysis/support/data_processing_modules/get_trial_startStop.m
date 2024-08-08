@@ -32,7 +32,7 @@ function [num_trials, trial_start_times, trial_stop_times,trial_move_start_times
         trial_end_ind = length(start_times)-1; %exclude post-trial
 
     else
-        trial_end_ind = length(start_times);
+        trial_end_ind = length(start_times); 
 %        start_times = [start_times stop_times(end)]; %if no post-trial, add last 'stop-display' to mark end of last trial
     end
     

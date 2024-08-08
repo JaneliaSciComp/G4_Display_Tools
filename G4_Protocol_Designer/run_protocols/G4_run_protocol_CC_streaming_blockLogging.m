@@ -248,6 +248,8 @@ switch start
                 pre_frame_ind = randperm(p.num_pretrial_frames, 1);
             end
 
+            ctlr.startLog(); % Must start log before setting controller parameters or it'll affect data processing.
+
             ctlr.setPositionX(pre_frame_ind);
 
             if ~isempty(pre_gain) %this assumes you'll never have gain without offset
@@ -259,7 +261,6 @@ switch start
                 pre_ao_ind, pre_frame_ind, pre_frame_rate, pre_gain, pre_offset, pre_dur);
 
             pause(0.01);
-            ctlr.startLog();
  
             if pre_dur ~= 0
                 ctlr.combinedCommand(pre_mode, pre_pat, pre_pos, pre_ao_ind(1), pre_ao_ind(2), pre_ao_ind(3), pre_ao_ind(4), pre_frame_rate, pre_dur*10);
@@ -647,6 +648,8 @@ switch start
             %Update progress bar--------------------------
             num_trial_including_rescheduled = num_trial_including_rescheduled + 1;
             num_trial_of_total = num_trial_of_total + 1;
+
+            ctlr.startLog(); % Must start log before setting controller parameters or it'll affect data processing.
                
 
             if ~isempty(post_gain)
@@ -660,7 +663,6 @@ switch start
             ctlr.setPositionX(post_frame_ind);
 
             tcpread_cache = pnet(ctlr.tcpConn, 'read', 'noblock'); % clear cache
-            ctlr.startLog();
                  
             ctlr.combinedCommand(post_mode, post_pat, post_pos, post_ao_ind(1), post_ao_ind(2), post_ao_ind(3), post_ao_ind(4),post_frame_rate, post_dur*10, false);
             timeSincePost = tic;

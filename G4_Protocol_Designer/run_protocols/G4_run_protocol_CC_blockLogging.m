@@ -261,13 +261,15 @@ function [success] = G4_run_protocol_CC_blockLogging(runcon, p) %input should al
 
                 pause(0.01);
 
+                ctlr.startLog(); % Must start log before setting controller parameters or it'll affect data processing.
+
                 ctlr.setPositionX(pre_frame_ind);
 
                 if ~isempty(pre_gain) %this assumes you'll never have gain without offset
                     ctlr.setGain(pre_gain, pre_offset);
                 end
 
-                ctlr.startLog();
+                
                 if pre_dur ~= 0
                     ctlr.combinedCommand(pre_mode, pre_pat, pre_pos, pre_ao_ind(1), pre_ao_ind(2), pre_ao_ind(3), pre_ao_ind(4), pre_frame_rate, pre_dur*10);
                 else
@@ -419,6 +421,8 @@ function [success] = G4_run_protocol_CC_blockLogging(runcon, p) %input should al
                 num_trial_of_total = num_trial_of_total + 1;
                 runcon.update_progress('post', num_trial_of_total);
 
+                ctlr.startLog(); % Must start log before setting controller parameters or it'll affect data processing.
+
                 if ~isempty(post_gain)
                     ctlr.setGain(post_gain, post_offset);
                 end
@@ -426,6 +430,7 @@ function [success] = G4_run_protocol_CC_blockLogging(runcon, p) %input should al
                 if post_frame_ind == 0
                     post_frame_ind = randperm(p.num_posttrial_frames, 1);
                 end
+                
 
                 ctlr.setPositionX(post_frame_ind);
 
@@ -433,7 +438,6 @@ function [success] = G4_run_protocol_CC_blockLogging(runcon, p) %input should al
                 runcon.update_current_trial_parameters(post_mode, post_pat, post_pos, p.active_ao_channels, ...
                     post_ao_ind, post_frame_ind, post_frame_rate, post_gain, post_offset, post_dur);
 
-                ctlr.startLog();
 
                 ctlr.combinedCommand(post_mode, post_pat, post_pos, post_ao_ind(1), post_ao_ind(2), post_ao_ind(3), post_ao_ind(4),post_frame_rate, post_dur*10);
                 ctlr.stopLog('timeout', 60, 'showTimeoutDialog', true);

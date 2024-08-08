@@ -129,6 +129,8 @@ function [success] = G4_run_protocol_blockLogging(runcon, p) %input should alway
                     params.pre_offset, params.pre_pos, params.pre_frame_rate, params.pre_frame_ind, ...
                     params.active_ao_channels, params.pre_ao_ind};
 
+                ctlr.startLog(); % Must start log before setting controller parameters or it will affect data processing.
+
                 ctlr.setControllerParameters(ctlr_parameters_pretrial);
 
                 %Update status panel to show current parameters
@@ -140,7 +142,7 @@ function [success] = G4_run_protocol_blockLogging(runcon, p) %input should alway
                 pause(0.01);
 
                 %Run pretrial on screen
-                ctlr.startLog();
+                
                 if params.pre_dur ~= 0
                     ctlr.startDisplay(params.pre_dur*10); %Panelcom usually did the *10 for us. Controller expects time in deciseconds
                 else
@@ -272,6 +274,8 @@ function [success] = G4_run_protocol_blockLogging(runcon, p) %input should alway
                     params.post_offset, params.post_pos, params.post_frame_rate, params.post_frame_ind, ...
                     params.active_ao_channels, params.post_ao_ind};
 
+                ctlr.startLog(); % Must start log before setting controller parameters or it'll affect data processing.
+
                 ctlr.setControllerParameters(ctlr_parameters_posttrial);
 
                 %Update status panel to show current parameters
@@ -280,7 +284,7 @@ function [success] = G4_run_protocol_blockLogging(runcon, p) %input should alway
                     params.post_ao_ind, params.post_frame_ind, params.post_frame_rate, ...
                     params.post_gain, params.post_offset, params.post_dur);
 
-                ctlr.startLog();
+                
                 ctlr.startDisplay((params.post_dur + .5)*10);
 
 
