@@ -6,8 +6,11 @@ classdef G4_conductor_view < handle
         fig
         fig_size
         progress_axes
+        rerun_axes
         axes_label
         progress_bar
+        rerun_bar
+        rerun_label
         experimenter_box
         exp_name_box
         fly_name_box
@@ -188,15 +191,24 @@ classdef G4_conductor_view < handle
                 [remaining_time_label.Position(1) + remaining_time_label.Position(3) + 10, 5, 120, 20]);
 
             %Progress bar items
-            self.progress_axes = axes(self.fig, 'units','pixels', 'Position', [15, status_pan.Position(2) + status_pan.Position(4) + 15, status_pan.Position(3) ,50]);
+            self.progress_axes = axes(self.fig, 'units','pixels', 'Position', [15, status_pan.Position(2) + status_pan.Position(4) + 15, status_pan.Position(3)*.75 ,50]);
+            self.rerun_axes = axes(self.fig, 'units', 'pixels', 'Position', [self.progress_axes.Position(3) + 25, self.progress_axes.Position(2), .25*status_pan.Position(3) - 25, 50]);
             self.axes_label = uilabel(self.fig, 'Text', 'Progress:', 'FontSize', 13, 'Position', ...
                 [15, self.progress_axes.Position(2) + self.progress_axes.Position(4) + 10, 100, 20]);
+            self.rerun_label = uilabel(self.fig, 'Text', 'Re-run Progress:', 'FontSize', 13, 'Position', ...
+                [self.rerun_axes.Position(1), self.rerun_axes.Position(2) + self.rerun_axes.Position(4)+10, 150, 20]);
             self.progress_bar = barh(0, 'Parent', self.progress_axes,'BaseValue', 0);
             self.progress_axes.XAxis.Limits = [0 1];
             self.progress_axes.YTickLabel = [];
             self.progress_axes.XTickLabel = [];
             self.progress_axes.XTick = [];
             self.progress_axes.YTick = [];
+            self.rerun_bar = barh(0, 'Parent', self.rerun_axes, 'BaseValue', 0);
+            self.rerun_axes.XAxis.Limits = [0 1];
+            self.rerun_axes.YTickLabel = [];
+            self.rerun_axes.XTickLabel = [];
+            self.rerun_axes.XTick = [];
+            self.rerun_axes.YTick = [];
             self.set_repetition_lines();
             % reps = self.con.doc.repetitions;
             % total_steps = self.con.doc.repetitions * length(self.con.doc.block_trials(:,1));
