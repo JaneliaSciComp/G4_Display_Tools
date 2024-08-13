@@ -1149,6 +1149,13 @@ classdef G4_conductor_controller < handle
             end
         end
 
+        function num = get_num_bad_conds(self)
+
+            bad_conds = self.fb_model.get_bad_trials();
+            num = length(bad_conds);
+
+        end
+
         function browse_file(self, which_file)
 
             %% fixfocus citation

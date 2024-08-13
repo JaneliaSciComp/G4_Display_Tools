@@ -355,6 +355,7 @@ function [success] = G4_default_run_protocol_streaming(runcon, p) %input should 
             % additional time if the first re-run also fails.
 
             res_conds = runcon.fb_model.get_bad_trials();
+            num_rescheduled_trials = runcon.get_num_bad_conds();
             num_attempts = runcon.get_num_attempts();
             num_trial_including_rescheduled = num_trial_of_total;
 
@@ -422,7 +423,7 @@ function [success] = G4_default_run_protocol_streaming(runcon, p) %input should 
                     ctlr.startDisplay((tparams.dur + .5)*10, false); %duration expected in 100ms units
                     timeSinceRes = tic;
 
-                    runcon.update_progress('rescheduled', cond, num_trial_of_total);
+                    runcon.update_progress('rescheduled', cond, badtrial/num_rescheduled_trials);
                     %Update status panel to show current parameters
                     runcon.update_current_trial_parameters(tparams.trial_mode, ...
                         tparams.pat_id, tparams.pos_id, p.active_ao_channels, ...

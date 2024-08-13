@@ -634,11 +634,18 @@ classdef G4_conductor_view < handle
             elseif strcmp(trial_type, 'rescheduled')
                 cond = varargin{1};
                 self.progress_axes.Title.String = "Running rescheduled condition #: " + cond;
+                self.update_rerun_bar(data);
             else
                 disp("I can't update the progress bar.");
             end
 
             drawnow;
+        end
+
+        function update_rerun_bar(self, data)
+
+            self.rerun_bar.YData = data;
+
         end
 
         function set_progress_title(self, text)
