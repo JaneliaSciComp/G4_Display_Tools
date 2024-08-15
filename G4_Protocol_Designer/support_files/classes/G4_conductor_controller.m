@@ -297,8 +297,8 @@ classdef G4_conductor_controller < handle
                 end
             elseif strcmp(trial_type, 'rescheduled')
                 cond = varargin{1};
-                total_trial = varargin{2};
-                data = total_trial/trials;
+                data = varargin{2};
+                % data = total_trial/trials;
                 if ~isempty(self.view)
                     self.view.update_progress_bar(trial_type, data, cond);
                 end
