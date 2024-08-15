@@ -553,6 +553,9 @@ classdef G4_conductor_controller < handle
 
             self.set_is_aborted(false); %change aborted back to zero in case the experiment was aborted earlier.
             self.set_is_ended_early(0);
+            if ~isempty(self.view)
+                self.view.clear_progress_bars();
+            end
 
             % Update timestamp to reflect actual start time of experiment
             self.update_timestamp();

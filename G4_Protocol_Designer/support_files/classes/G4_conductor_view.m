@@ -56,6 +56,7 @@ classdef G4_conductor_view < handle
         alignment_alert_text
         fly_position_line
         bad_trial_markers
+        bad_trial_markers_rerun
         combine_tdms_checkbox
         convert_tdms_checkbox
         menu_config
@@ -607,7 +608,7 @@ classdef G4_conductor_view < handle
                     delete(self.bad_trial_markers(bt));
                 end
                 self.bad_trial_markers = [];
-                self.progress_axes.Title.String = "Running Pretrial...";
+                self.set_progress_title("Running Pretrial...");
                 self.progress_bar.YData = data;
             elseif strcmp(trial_type, 'block')
                 rep = varargin{1};
@@ -648,12 +649,35 @@ classdef G4_conductor_view < handle
 
         end
 
+        function clear_progress_bars(self)
+
+            %clear regular progress bar
+            for bt = 1:length(self.bad_trial_markers)
+                delete(self.bad_trial_markers(bt));
+            end
+            self.bad_trial_markers = [];
+            self.set_progress_title('Progress:');
+            self.progress_bar.YData = 0;
+
+            %clear reruns progress bar
+            for rbt = 1:length(self.bad_trial_markers_rerun)
+                delete(self.bad_trial_markers_rerun(rbt));
+            end
+            self.bad_trial_markers_rerun = [];
+            self.rerun_bar.YData = 0;
+
+        end
+
         function set_progress_title(self, text)
             self.progress_axes.Title.String = text;
         end
 
         function add_bad_trial_marker(self, num_trials, trialNum)
             self.bad_trial_markers(end+1) = xline(self.progress_axes, trialNum/num_trials, 'Color', 'r');
+        end
+
+        function add_bad_trial_marker_rerun(self, num_trials, trialNum)
+            self.bad_trial_markers_rerun(end+1) = xline(self.rerun_axes, trialNum/num_trials, 'Color', 'r');
         end
 
         function set_recent_file_menu_items(self)
