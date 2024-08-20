@@ -288,7 +288,7 @@ function [success] = G4_default_run_protocol_streaming(runcon, p) %input should 
                     isAborted = runcon.check_if_aborted();
                     isEnded = runcon.check_if_ended();
 
-                   if isAborted || isEnded
+                    if isAborted || isEnded
                         ctlr.stopDisplay();
                         ctlr.stopLog('showTimeoutMessage', true);
                         if isa(ctlr, 'PanelsController')
@@ -350,7 +350,7 @@ function [success] = G4_default_run_protocol_streaming(runcon, p) %input should 
                                 success = 1;
                             end
                             return;
-                        end
+                         end
                          runcon.update_elapsed_time(round(toc(startTime),2));
                     end
                 end
@@ -402,16 +402,22 @@ function [success] = G4_default_run_protocol_streaming(runcon, p) %input should 
                     pause(inter_dur - toc(timeSinceInter));
                     tcpread{end+1} = pnet(ctlr.tcpConn, 'read', 'noblock');
                     prev_num_trials = num_trial_including_rescheduled;
-                    if runcon.check_if_aborted() == 1
+                    isAborted = runcon.check_if_aborted();
+                    isEnded = runcon.check_if_ended();
+                    if isAborted || isEnded
                         ctlr.stopDisplay();
                         ctlr.stopLog('showTimeoutMessage', true);
                         if isa(ctlr, 'PanelsController')
                             ctlr.close();
                         end
                         clear global;
-                        success = 0;
+                        if isAborted
+                            success = 0;
+                        else
+                            success = 1;
+                        end
                         return;
-                    end
+                     end
                     runcon.update_elapsed_time(round(toc(startTime),2));
                 end
 
@@ -456,17 +462,22 @@ function [success] = G4_default_run_protocol_streaming(runcon, p) %input should 
                     prev_c = cond;
                     prev_num_trials = num_trial_including_rescheduled;
 
-                    if runcon.check_if_aborted() == 1
+                    isAborted = runcon.check_if_aborted();
+                    isEnded = runcon.check_if_ended();
+                    if isAborted || isEnded
                         ctlr.stopDisplay();
                         ctlr.stopLog('showTimeoutMessage', true);
                         if isa(ctlr, 'PanelsController')
                             ctlr.close();
                         end
                         clear global;
-                        success = 0;
+                        if isAborted
+                            success = 0;
+                        else
+                            success = 1;
+                        end
                         return;
-
-                    end
+                     end
                     runcon.update_elapsed_time(round(toc(startTime),2));
                     if badtrial == length(res_conds)
                         continue;
@@ -499,16 +510,21 @@ function [success] = G4_default_run_protocol_streaming(runcon, p) %input should 
                         tcpread{end+1} = pnet(ctlr.tcpConn, 'read', 'noblock');
                         prev_num_trials = num_trial_including_rescheduled;
 
-                        if runcon.check_if_aborted() == 1
+                        isEnded = runcon.check_if_ended();
+                        if isAborted || isEnded
                             ctlr.stopDisplay();
                             ctlr.stopLog('showTimeoutMessage', true);
                             if isa(ctlr, 'PanelsController')
                                 ctlr.close();
                             end
                             clear global;
-                            success = 0;
+                            if isAborted
+                                success = 0;
+                            else
+                                success = 1;
+                            end
                             return;
-                        end
+                         end
                         runcon.update_elapsed_time(round(toc(startTime),2));
                     end
                 end

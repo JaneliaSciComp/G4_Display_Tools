@@ -518,14 +518,19 @@ function [success] = G4_run_protocol_CC_streaming(runcon, p) %input should alway
                     tcpread{end+1} = pnet(ctlr.tcpConn, 'read', 'noblock');
                     prev_num_trials = num_trial_including_rescheduled;
 
-                    if runcon.check_if_aborted() == 1
+                    isEnded = runcon.check_if_ended();
+                    if isAborted || isEnded
                         ctlr.stopDisplay();
                         ctlr.stopLog('showTimeoutMessage', true);
                         if isa(ctlr, 'PanelsController')
                             ctlr.close();
                         end
                         clear global;
-                        success = 0;
+                        if isAborted
+                            success = 0;
+                        else
+                            success = 1;
+                        end
                         return;
                     end
                     runcon.update_elapsed_time(round(toc(startTime),2));
@@ -604,14 +609,19 @@ function [success] = G4_run_protocol_CC_streaming(runcon, p) %input should alway
                     prev_c = cond;
                     prev_num_trials = num_trial_including_rescheduled;
 
-                    if runcon.check_if_aborted() == 1
+                    isEnded = runcon.check_if_ended();
+                    if isAborted || isEnded
                         ctlr.stopDisplay();
                         ctlr.stopLog('showTimeoutMessage', true);
                         if isa(ctlr, 'PanelsController')
                             ctlr.close();
                         end
                         clear global;
-                        success = 0;
+                        if isAborted
+                            success = 0;
+                        else
+                            success = 1;
+                        end
                         return;
                     end
                     runcon.update_elapsed_time(round(toc(startTime),2));
@@ -623,48 +633,53 @@ function [success] = G4_run_protocol_CC_streaming(runcon, p) %input should alway
 
                     if inter_type == 1
 
-                    %Update progress bar to indicate start of inter-trial
-                    num_trial_including_rescheduled = num_trial_including_rescheduled + 1;
-                    %runcon.update_progress('inter', r, reps, c, num_cond, num_trial_of_total)
-
-                    %randomize frame index if indicated
-                    if inter_frame_ind == 0
-                        inter_frame_ind = randperm(p.num_intertrial_frames, 1);
-                    end
-                    ctlr.setPositionX(inter_frame_ind);
-
-                    if ~isempty(inter_gain) %this assumes you'll never have gain without offset
-                        ctlr.setGain(inter_gain, inter_offset);
-                    end
-
-                    tcpread_cache = pnet(ctlr.tcpConn, 'read', 'noblock'); % clear cache
-
-                    ctlr.combinedCommand(inter_mode, inter_pat, inter_pos, inter_ao_ind(1), inter_ao_ind(2), inter_ao_ind(3), inter_ao_ind(4),inter_frame_rate, inter_dur*10, false);
-
-                    timeSinceResInter = tic;
-                    %Update status panel to show current parameters
-                    runcon.update_current_trial_parameters(inter_mode, inter_pat, inter_pos, p.active_ao_channels, ...
-                        inter_ao_ind, inter_frame_ind, inter_frame_rate, inter_gain, inter_offset, inter_dur);
-                    runcon.update_streamed_data(tcpread{end}, 'rescheduled', prev_r, prev_c, prev_num_trials);
-
-                    pause(inter_dur - toc(timeSinceResInter));
-
-                    tcpread{end+1} = pnet(ctlr.tcpConn, 'read', 'noblock');
-                    prev_num_trials = num_trial_including_rescheduled;
-
-                    if runcon.check_if_aborted() == 1
-                        ctlr.stopDisplay();
-                        ctlr.stopLog('showTimeoutMessage', true);
-                        if isa(ctlr, 'PanelsController')
-                            ctlr.close();
+                        %Update progress bar to indicate start of inter-trial
+                        num_trial_including_rescheduled = num_trial_including_rescheduled + 1;
+                        %runcon.update_progress('inter', r, reps, c, num_cond, num_trial_of_total)
+    
+                        %randomize frame index if indicated
+                        if inter_frame_ind == 0
+                            inter_frame_ind = randperm(p.num_intertrial_frames, 1);
                         end
-                        clear global;
-                        success = 0;
-                        return;
+                        ctlr.setPositionX(inter_frame_ind);
+    
+                        if ~isempty(inter_gain) %this assumes you'll never have gain without offset
+                            ctlr.setGain(inter_gain, inter_offset);
+                        end
+    
+                        tcpread_cache = pnet(ctlr.tcpConn, 'read', 'noblock'); % clear cache
+    
+                        ctlr.combinedCommand(inter_mode, inter_pat, inter_pos, inter_ao_ind(1), inter_ao_ind(2), inter_ao_ind(3), inter_ao_ind(4),inter_frame_rate, inter_dur*10, false);
+    
+                        timeSinceResInter = tic;
+                        %Update status panel to show current parameters
+                        runcon.update_current_trial_parameters(inter_mode, inter_pat, inter_pos, p.active_ao_channels, ...
+                            inter_ao_ind, inter_frame_ind, inter_frame_rate, inter_gain, inter_offset, inter_dur);
+                        runcon.update_streamed_data(tcpread{end}, 'rescheduled', prev_r, prev_c, prev_num_trials);
+    
+                        pause(inter_dur - toc(timeSinceResInter));
+    
+                        tcpread{end+1} = pnet(ctlr.tcpConn, 'read', 'noblock');
+                        prev_num_trials = num_trial_including_rescheduled;
+    
+                        isEnded = runcon.check_if_ended();
+                        if isAborted || isEnded
+                            ctlr.stopDisplay();
+                            ctlr.stopLog('showTimeoutMessage', true);
+                            if isa(ctlr, 'PanelsController')
+                                ctlr.close();
+                            end
+                            clear global;
+                            if isAborted
+                                success = 0;
+                            else
+                                success = 1;
+                            end
+                            return;
+                         end
+                        runcon.update_elapsed_time(round(toc(startTime),2));
                     end
-                    runcon.update_elapsed_time(round(toc(startTime),2));
                 end
-            end
 
             %reset res_conds to equal the new updated badTrials list.
             %If it's empty, no more conditions will run

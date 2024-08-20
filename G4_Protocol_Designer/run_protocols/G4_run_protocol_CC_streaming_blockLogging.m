@@ -505,16 +505,21 @@ switch start
                 prev_num_trials = num_trial_including_rescheduled;
 
 
-                if runcon.check_if_aborted() == 1
+                isEnded = runcon.check_if_ended();
+                if isAborted || isEnded
                     ctlr.stopDisplay();
                     ctlr.stopLog('showTimeoutMessage', true);
                     if isa(ctlr, 'PanelsController')
                         ctlr.close();
                     end
                     clear global;
-                    success = 0;
+                    if isAborted
+                        success = 0;
+                    else
+                        success = 1;
+                    end
                     return;
-                end
+                 end
                 runcon.update_elapsed_time(round(toc(startTime),2));
             end
             
@@ -587,17 +592,21 @@ switch start
                 prev_c = cond;
                 prev_num_trials = num_trial_including_rescheduled;
                     
-                if runcon.check_if_aborted() == 1
+                isEnded = runcon.check_if_ended();
+                if isAborted || isEnded
                     ctlr.stopDisplay();
                     ctlr.stopLog('showTimeoutMessage', true);
                     if isa(ctlr, 'PanelsController')
                         ctlr.close();
                     end
                     clear global;
-                    success = 0;
+                    if isAborted
+                        success = 0;
+                    else
+                        success = 1;
+                    end
                     return;
-                
-                end
+                 end
                 runcon.update_elapsed_time(round(toc(startTime),2));
 
                 if badtrial == length(res_conds)
@@ -635,15 +644,20 @@ switch start
                     tcpread{end+1} = pnet(ctlr.tcpConn, 'read', 'noblock');
                     prev_num_trials = num_trial_including_rescheduled;
                          
-                    if runcon.check_if_aborted() == 1
-                       ctlr.stopDisplay();
-                       ctlr.stopLog('showTimeoutMessage', true);
-                       if isa(ctlr, 'PanelsController')
-                           ctlr.close();
-                       end
-                       clear global;
-                       success = 0;
-                       return;
+                    isEnded = runcon.check_if_ended();
+                    if isAborted || isEnded
+                        ctlr.stopDisplay();
+                        ctlr.stopLog('showTimeoutMessage', true);
+                        if isa(ctlr, 'PanelsController')
+                            ctlr.close();
+                        end
+                        clear global;
+                        if isAborted
+                            success = 0;
+                        else
+                            success = 1;
+                        end
+                        return;
                     end
                     runcon.update_elapsed_time(round(toc(startTime),2));                  
                 end
