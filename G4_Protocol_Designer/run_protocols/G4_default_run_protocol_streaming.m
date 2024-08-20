@@ -285,15 +285,23 @@ function [success] = G4_default_run_protocol_streaming(runcon, p) %input should 
                     prev_r = r;
                     prev_num_trials = num_trial_of_total;
 
-                    if runcon.check_if_aborted()
+                    isAborted = runcon.check_if_aborted();
+                    isEnded = runcon.check_if_ended();
+
+                   if isAborted || isEnded
                         ctlr.stopDisplay();
                         ctlr.stopLog('showTimeoutMessage', true);
                         if isa(ctlr, 'PanelsController')
                             ctlr.close();
                         end
                         clear global;
-                        success = 0;
+                        if isAborted
+                            success = 0;
+                        else
+                            success = 1;
+                        end
                         return;
+
                     end
                     runcon.update_elapsed_time(round(toc(startTime),2));
 
@@ -327,16 +335,22 @@ function [success] = G4_default_run_protocol_streaming(runcon, p) %input should 
                         tcpread{end+1} = pnet(ctlr.tcpConn, 'read', 'noblock');
                         prev_num_trials = num_trial_of_total;
 
-                        if runcon.check_if_aborted() == 1
+                        isAborted = runcon.check_if_aborted();
+                        isEnded = runcon.check_if_ended();
+                        if isAborted || isEnded
                             ctlr.stopDisplay();
                             ctlr.stopLog('showTimeoutMessage', true);
                             if isa(ctlr, 'PanelsController')
                                 ctlr.close();
                             end
                             clear global;
-                            success = 0;
+                            if isAborted
+                                success = 0;
+                            else
+                                success = 1;
+                            end
                             return;
-                         end
+                        end
                          runcon.update_elapsed_time(round(toc(startTime),2));
                     end
                 end
@@ -478,7 +492,7 @@ function [success] = G4_default_run_protocol_streaming(runcon, p) %input should 
                         %Update status panel to show current parameters
                         runcon.update_current_trial_parameters(inter_mode, inter_pat, inter_pos, p.active_ao_channels, ...
                             inter_ao_ind, inter_frame_ind, inter_frame_rate, inter_gain, inter_offset, inter_dur);
-                        runcon.update_streamed_data(tcpread{end}, 'rescheduled', prev_r, prev_c, prev_num_trials);
+                        runcon.update_streamed_data(tcpread{end}, 'rescheduled', prev_r, prev_c, badtrial/num_rescheduled_trials);
 
                         pause(inter_dur - toc(timeSinceResInter));
 

@@ -366,14 +366,20 @@ switch start
                 prev_num_trials = num_trial_of_total;
 
                     
-                if runcon.check_if_aborted()
+                isAborted = runcon.check_if_aborted();
+                isEnded = runcon.check_if_ended();
+                if isAborted || isEnded
                     ctlr.stopDisplay();
                     ctlr.stopLog('showTimeoutMessage', true);
                     if isa(ctlr, 'PanelsController')
                         ctlr.close();
                     end
                     clear global;
-                    success = 0;
+                    if isAborted
+                        success = 0;
+                    else
+                        success = 1;
+                    end
                     return;
                 end
 
@@ -419,15 +425,21 @@ switch start
                     tcpread{end+1} = pnet(ctlr.tcpConn, 'read', 'noblock');
                     prev_num_trials = num_trial_of_total;
 
-                    if runcon.check_if_aborted() == 1
-                       ctlr.stopDisplay();
-                       ctlr.stopLog('showTimeoutMessage', true);
-                       if isa(ctlr, 'PanelsController')
-                           ctlr.close();
-                       end
-                       clear global;
-                       success = 0;
-                       return;
+                    isAborted = runcon.check_if_aborted();
+                    isEnded = runcon.check_if_ended();
+                    if isAborted || isEnded
+                        ctlr.stopDisplay();
+                        ctlr.stopLog('showTimeoutMessage', true);
+                        if isa(ctlr, 'PanelsController')
+                            ctlr.close();
+                        end
+                        clear global;
+                        if isAborted
+                            success = 0;
+                        else
+                            success = 1;
+                        end
+                        return;
                     end
                     runcon.update_elapsed_time(round(toc(startTime),2));
                 end 

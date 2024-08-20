@@ -1,4 +1,4 @@
-%% Default protocol by which to run a flight experiment.
+2:%% Default protocol by which to run a flight experiment.
 
 %Notice that the inputs can be variable. In fact, there should only ever be
 %one or two inputs. The first should always be a struct of the experiment

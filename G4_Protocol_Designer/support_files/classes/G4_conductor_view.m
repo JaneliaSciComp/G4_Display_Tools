@@ -678,6 +678,7 @@ classdef G4_conductor_view < handle
 
         function add_bad_trial_marker_rerun(self, percentage)
             self.bad_trial_markers_rerun(end+1) = xline(self.rerun_axes, percentage, 'Color', 'r');
+            drawnow;
         end
 
         function set_recent_file_menu_items(self)

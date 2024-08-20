@@ -351,14 +351,19 @@ function [success] = G4_run_protocol_CC_blockLogging(runcon, p) %input should al
                     runcon.update_progress('block', r, reps, c, num_cond, cond, num_trial_of_total);
 
                     isAborted = runcon.check_if_aborted();
-                    if isAborted == 1
+                    isEnded = runcon.check_if_ended();
+                    if isAborted || isEnded
                         ctlr.stopDisplay();
-                        ctlr.stopLog('timeout', 60.0, 'showTimeoutMessage', true);
+                        ctlr.stopLog('showTimeoutMessage', true);
                         if isa(ctlr, 'PanelsController')
                             ctlr.close();
                         end
                         clear global;
-                        success = 0;
+                        if isAborted
+                            success = 0;
+                        else
+                            success = 1;
+                        end
                         return;
                     end
                     runcon.update_elapsed_time(round(toc(startTime),2));
@@ -398,14 +403,20 @@ function [success] = G4_run_protocol_CC_blockLogging(runcon, p) %input should al
 
                         ctlr.combinedCommand(inter_mode, inter_pat, inter_pos, inter_ao_ind(1), inter_ao_ind(2), inter_ao_ind(3), inter_ao_ind(4),inter_frame_rate, inter_dur*10);
 
-                        if runcon.check_if_aborted() == 1
+                        isAborted = runcon.check_if_aborted();
+                        isEnded = runcon.check_if_ended();
+                        if isAborted || isEnded
                             ctlr.stopDisplay();
-                            ctlr.stopLog('timeout', 60.0, 'showTimeoutMessage', true);
+                            ctlr.stopLog('showTimeoutMessage', true);
                             if isa(ctlr, 'PanelsController')
                                 ctlr.close();
                             end
                             clear global;
-                            success = 0;
+                            if isAborted
+                                success = 0;
+                            else
+                                success = 1;
+                            end
                             return;
                         end
                         runcon.update_elapsed_time(round(toc(startTime),2));
