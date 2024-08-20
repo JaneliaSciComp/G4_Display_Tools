@@ -676,8 +676,8 @@ classdef G4_conductor_view < handle
             self.bad_trial_markers(end+1) = xline(self.progress_axes, trialNum/num_trials, 'Color', 'r');
         end
 
-        function add_bad_trial_marker_rerun(self, num_trials, trialNum)
-            self.bad_trial_markers_rerun(end+1) = xline(self.rerun_axes, trialNum/num_trials, 'Color', 'r');
+        function add_bad_trial_marker_rerun(self, percentage)
+            self.bad_trial_markers_rerun(end+1) = xline(self.rerun_axes, percentage, 'Color', 'r');
         end
 
         function set_recent_file_menu_items(self)

@@ -231,6 +231,13 @@ classdef G4_conductor_controller < handle
             end
         end
 
+        function add_bad_trial_marker_rerun(self, progPercentage)
+            
+            if ~isempty(self.view)
+                self.view.add_bad_trial_marker_rerun(progPercentage);
+            end
+        end
+
         function new_exp_length = calc_rescheduled_time(self)
 
             orig_exp_length = self.model.get_expected_time();
@@ -298,7 +305,7 @@ classdef G4_conductor_controller < handle
             elseif strcmp(trial_type, 'rescheduled')
                 cond = varargin{1};
                 data = varargin{2};
-                % data = total_trial/trials;
+                % data = trial num/total rescheduled trials;
                 if ~isempty(self.view)
                     self.view.update_progress_bar(trial_type, data, cond);
                 end
@@ -1140,6 +1147,10 @@ classdef G4_conductor_controller < handle
             if strcmp(trialType, 'rescheduled')
                 if bad_slope == 0 && bad_flier == 0
                     self.fb_model.remove_bad_condition(rep, cond);
+
+                else
+                    self.add_bad_trial_marker_rerun(trialnum);
+
                 end
             else
                 if bad_slope == 1 || bad_flier == 1

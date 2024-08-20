@@ -432,7 +432,7 @@ function [success] = G4_default_run_protocol_streaming(runcon, p) %input should 
                     if inter_type
                         runcon.update_streamed_data(tcpread{end}, 'inter', prev_r, prev_c, prev_num_trials);
                     else
-                        runcon.update_streamed_data(tcpread{end}, 'rescheduled', prev_r, prev_c, prev_num_trials);
+                        runcon.update_streamed_data(tcpread{end}, 'rescheduled', prev_r, prev_c, badtrial/num_rescheduled_trials);
                     end
 
                     pause(tparams.dur - toc(timeSinceRes));
