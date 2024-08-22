@@ -56,21 +56,21 @@ When you press "Run" on the Conductor to run your experiment, this is what happe
 					if it's the last conditon and last rep, skip inter-trial
 					run inter-trial
 		post-trial runs (if present)
-					
+
 This means that no inter-trial runs between the pre-trial and first condition. An inter-trial does run in between the last trial of one repetition and the first trial of the next repetition. And an inter-trial does not run after the last condition of the last repetition. 
 
 12. Inside the loop that runs each condition, this is the order of operations:
 
-	Determine the condition to play next if randomized
-	Send parameters to the controller
-	Start the display
-	Update the progress bar and GUI text while condition runs
-	If streaming is enabled, update the graphs with the previous condition's collected data while current condition runs.
-	After the condition ends, collect streamed data if streaming is enabled. 
-	Update loop parameters.
-	If its time to move to the next repetition, the log will be stopped and re-started if block logging is enabled. 
-	If it is the last repetition and last condition, the inter-trial is skipped.
-	Update the elapsed and expected time.
+	- Determine the condition to play next if randomized
+	- Send parameters to the controller
+	- Start the display
+	- Update the progress bar and GUI text while condition runs
+	- If streaming is enabled, update the graphs with the previous condition's collected data while current condition runs.
+	- After the condition ends, collect streamed data if streaming is enabled. 
+	- Update loop parameters.
+	- If its time to move to the next repetition, the log will be stopped and re-started if block logging is enabled. 
+	- If it is the last repetition and last condition, the inter-trial is skipped.
+	- Update the elapsed and expected time.
 
 13. After all repetitions have been run, it then runs any rescheduled conditions if this feature is enabled. Information for all bad trials (repetition and condition number) are collected. An inter-trial, if present, is run before the first rescheduled condition. The rescheduled conditions are run in the exact same manner as they were in the main experiment.  If you have set the protocol to attempt these bad conditions more than once, then after they've all been attempted, any that were bad a second time are attempted again, up to the number of attempts set by the user. 
 
