@@ -272,6 +272,14 @@ classdef G4_conductor_controller < handle
             
         end
 
+        function reset_exp_length(self)
+
+            exp_time = self.doc.calc_exp_length();
+            self.model.set_expected_time(exp_time);
+            self.set_remaining_time(self.model.get_expected_time());
+
+        end
+
 
         function update_progress(self, trial_type, varargin)
             trials = self.get_num_trials();
@@ -570,6 +578,7 @@ classdef G4_conductor_controller < handle
             if ~isempty(self.view)
                 self.view.clear_progress_bars();
             end
+            self.reset_exp_length();
 
             % Update timestamp to reflect actual start time of experiment
             self.update_timestamp();
