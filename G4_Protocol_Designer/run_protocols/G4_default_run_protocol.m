@@ -1,4 +1,4 @@
-2:%% Default protocol by which to run a flight experiment.
+%% Default protocol by which to run a flight experiment.
 
 %Notice that the inputs can be variable. In fact, there should only ever be
 %one or two inputs. The first should always be a struct of the experiment
@@ -158,20 +158,27 @@ function [success] = G4_default_run_protocol(runcon, p)%input should always be 1
                     if params.pre_dur ~= 0
                         pause(params.pre_dur);
                         ctlr.stopDisplay();
+                        preLength = 0;
                     else
+                        pretrialTimer = tic;
                         w = waitforbuttonpress;
+                        preLength = toc(pretrialTimer);
                     end
                 else
                
                     %Run pretrial on screen
                     if params.pre_dur ~= 0
                         ctlr.startDisplay(params.pre_dur*10); %Panelcom usually did the *10 for us. Controller expects time in deciseconds
+                        preLength = 0;
                     else
+                        pretrialTimer = tic;
                         ctlr.startDisplay(2000, false); %second input, waitForEnd, equals false so code will continue executing
                         w = waitforbuttonpress; %If pretrial duration is set to zero, this
                         %causes it to loop until you press a button.
+                        preLength = toc(pretrialTimer);
                     end
                 end
+                runcon.add_pretrial_to_exp_length(preLength);
             end
 
             % Turn off AO functions if there are any

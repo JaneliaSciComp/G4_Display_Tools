@@ -265,6 +265,13 @@ classdef G4_conductor_controller < handle
             self.model.set_expected_time(curr_exp_length + add_time);
         end
 
+        function add_pretrial_to_exp_length(self, preLength)
+            
+            curr_exp_length = self.model.get_expected_time();
+            self.model.set_expected_time(curr_exp_length + preLength);
+            
+        end
+
 
         function update_progress(self, trial_type, varargin)
             trials = self.get_num_trials();
