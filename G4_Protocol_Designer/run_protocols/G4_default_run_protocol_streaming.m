@@ -213,9 +213,14 @@ function [success] = G4_default_run_protocol_streaming(runcon, p) %input should 
                 %Run pretrial on screen
                 if pre_dur ~= 0
                     ctlr.startDisplay(pre_dur*10);
+
                 else
+                    pretrialTimer = tic;
                     ctlr.startDisplay(2000, false); %second input, waitForEnd, equals false so code will continue executing
                     w = waitforbuttonpress; %If pretrial duration is set to zero, this causes it to loop until you press a button.
+                    preLength = toc(pretrialTimer);
+                    runcon.add_pretrial_to_exp_length(preLength);
+
                 end
             end
 

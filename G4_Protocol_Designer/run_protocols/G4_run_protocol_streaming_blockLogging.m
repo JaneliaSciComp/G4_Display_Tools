@@ -204,9 +204,12 @@ function [success] = G4_run_protocol_streaming_blockLogging(runcon, p)%input sho
                 if pre_dur ~= 0
                     ctlr.startDisplay(pre_dur*10);
                 else
+                    pretrialTimer = tic;
                     ctlr.startDisplay(2000, false); %second input, waitForEnd, equals false so code will continue executing
                     w = waitforbuttonpress; %If pretrial duration is set to zero, this
                     %causes it to loop until you press a button.
+                    preLength = toc(pretrialTimer);
+                    runcon.add_pretrial_to_exp_length(preLength);
                 end
                 ctlr.stopLog('showTimeoutMessage', true);
                 

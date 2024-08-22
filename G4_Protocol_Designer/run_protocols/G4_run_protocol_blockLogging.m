@@ -146,9 +146,12 @@ function [success] = G4_run_protocol_blockLogging(runcon, p) %input should alway
                 if params.pre_dur ~= 0
                     ctlr.startDisplay(params.pre_dur*10); %Panelcom usually did the *10 for us. Controller expects time in deciseconds
                 else
+                    pretrialTimer = tic;
                     ctlr.startDisplay(2000, false); %second input, waitForEnd, equals false so code will continue executing
                     w = waitforbuttonpress; %If pretrial duration is set to zero, this
                     %causes it to loop until you press a button.
+                    preLength = toc(pretrialTimer);
+                    runcon.add_pretrial_to_exp_length(preLength);
                 end
                 ctlr.stopLog('showTimeoutMessage', true);
                 if runcon.check_if_aborted()

@@ -265,8 +265,11 @@ switch start
             if pre_dur ~= 0
                 ctlr.combinedCommand(pre_mode, pre_pat, pre_pos, pre_ao_ind(1), pre_ao_ind(2), pre_ao_ind(3), pre_ao_ind(4), pre_frame_rate, pre_dur*10);
             else
+                pretrialTimer = tic;
                 ctlr.combinedCommand(pre_mode, pre_pat, pre_pos, pre_ao_ind(1), pre_ao_ind(2), pre_ao_ind(3), pre_ao_ind(4), pre_frame_rate, 2000, false);
                 w = waitforbuttonpress;
+                preLength = toc(pretrialTimer);
+                runcon.add_pretrial_to_exp_length(preLength);
             end
   
             ctlr.stopLog('showTimeoutMessage', true); 
