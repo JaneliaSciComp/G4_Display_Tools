@@ -463,6 +463,7 @@ switch start
         % additional time if the first re-run also fails. 
              
         res_conds = runcon.fb_model.get_bad_trials();
+        num_rescheduled_trials = runcon.get_num_bad_conds();
         num_attempts = runcon.get_num_attempts();
         num_trial_including_rescheduled = num_trial_of_total;
 
@@ -507,7 +508,7 @@ switch start
                 tcpread{end+1} = pnet(ctlr.tcpConn, 'read', 'noblock');
                 prev_num_trials = num_trial_including_rescheduled;
 
-
+                isAborted = runcon.check_if_aborted();
                 isEnded = runcon.check_if_ended();
                 if isAborted || isEnded
                     ctlr.stopDisplay();
@@ -578,14 +579,14 @@ switch start
 
                 timeSinceRes = tic;
                     
-                runcon.update_progress('rescheduled', cond, num_trial_of_total);
+                runcon.update_progress('rescheduled', cond, badtrial/num_rescheduled_trials);
                 %Update status panel to show current parameters
                 runcon.update_current_trial_parameters(trial_mode, pat_id, pos_id, p.active_ao_channels, ...
                     trial_ao_indices, frame_ind, frame_rate, gain, offset, dur);
                 if inter_type
                     runcon.update_streamed_data(tcpread{end}, 'inter', prev_r, prev_c, prev_num_trials);
                 else
-                    runcon.update_streamed_data(tcpread{end}, 'rescheduled', prev_r, prev_c, prev_num_trials);
+                    runcon.update_streamed_data(tcpread{end}, 'rescheduled', prev_r, prev_c, badtrial/num_rescheduled_trials);
                 end
                     
                 pause(dur - toc(timeSinceRes));
@@ -594,7 +595,8 @@ switch start
                 prev_r = rep;
                 prev_c = cond;
                 prev_num_trials = num_trial_including_rescheduled;
-                    
+
+                isAborted = runcon.check_if_aborted();    
                 isEnded = runcon.check_if_ended();
                 if isAborted || isEnded
                     ctlr.stopDisplay();
@@ -640,13 +642,14 @@ switch start
                     %Update status panel to show current parameters
                     runcon.update_current_trial_parameters(inter_mode, inter_pat, inter_pos, p.active_ao_channels, ...
                         inter_ao_ind, inter_frame_ind, inter_frame_rate, inter_gain, inter_offset, inter_dur);
-                    runcon.update_streamed_data(tcpread{end}, 'rescheduled', prev_r, prev_c, prev_num_trials);
+                    runcon.update_streamed_data(tcpread{end}, 'rescheduled', prev_r, prev_c, badtrial/num_rescheduled_trials);
                          
                     pause(inter_dur - toc(timeSinceResInter));
                          
                     tcpread{end+1} = pnet(ctlr.tcpConn, 'read', 'noblock');
                     prev_num_trials = num_trial_including_rescheduled;
-                         
+                    
+                    isAborted = runcon.check_if_aborted();     
                     isEnded = runcon.check_if_ended();
                     if isAborted || isEnded
                         ctlr.stopDisplay();

@@ -515,6 +515,7 @@ function [success] = G4_default_run_protocol_streaming(runcon, p) %input should 
                         tcpread{end+1} = pnet(ctlr.tcpConn, 'read', 'noblock');
                         prev_num_trials = num_trial_including_rescheduled;
 
+                        isAborted = runcon.check_if_aborted();
                         isEnded = runcon.check_if_ended();
                         if isAborted || isEnded
                             ctlr.stopDisplay();
