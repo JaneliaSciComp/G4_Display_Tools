@@ -256,13 +256,14 @@ classdef G4_conductor_controller < handle
         end
 
         function add_to_exp_length(self, cond)
-
-            curr_exp_length = self.model.get_expected_time();
-            add_time = self.doc.block_trials{cond,12};
-            if ~isempty(self.doc.intertrial{1})
-                add_time = add_time + self.doc.intertrial{12};
+            if self.get_num_attempts() ~= 0
+                curr_exp_length = self.model.get_expected_time();
+                add_time = self.doc.block_trials{cond,12};
+                if ~isempty(self.doc.intertrial{1})
+                    add_time = add_time + self.doc.intertrial{12};
+                end
+                self.model.set_expected_time(curr_exp_length + add_time);
             end
-            self.model.set_expected_time(curr_exp_length + add_time);
         end
 
         function add_pretrial_to_exp_length(self, preLength)
