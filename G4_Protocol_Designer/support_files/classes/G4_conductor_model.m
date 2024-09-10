@@ -66,8 +66,8 @@ classdef G4_conductor_model < handle
                 self.settings.Light_Cycle_Sheet_GID});
             
             %The list of available run protocols to display
-            self.set_run_protocol_file_list({'Simple', 'Combined Command', 'Streaming', 'Log Reps Separately', 'CC + Streaming', ...
-                'CC + Log Reps', 'Streaming + Log Reps', 'CC + Streaming + Log Reps'});
+            self.set_run_protocol_file_list({'Simple', 'Streaming', 'Log Reps Separately',  ...
+                'Streaming + Log Reps'});
 
             %%run functions to 1)read the metadata options from the google
             %%sheet and 2) create a metadata_lists cell array with the list
@@ -158,19 +158,12 @@ classdef G4_conductor_model < handle
                 case 1
                     filename = 'G4_default_run_protocol.m';
                 case 2
-                    filename = 'G4_run_protocol_combinedCommand.m';
-                case 3
                     filename = 'G4_default_run_protocol_streaming.m';
+                case 3
+                    filename = 'G4_run_protocol_blockLogging.m';               
                 case 4
-                    filename = 'G4_run_protocol_blockLogging.m';
-                case 5
-                    filename = 'G4_run_protocol_CC_streaming.m';
-                case 6
-                    filename = 'G4_run_protocol_CC_blockLogging.m';
-                case 7
                     filename = 'G4_run_protocol_streaming_blockLogging.m';
-                case 8
-                    filename = 'G4_run_protocol_CC_streaming_blockLogging.m';
+
                 otherwise
                     disp("Invalid run protocol selected.");
             end
