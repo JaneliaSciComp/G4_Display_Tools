@@ -31,6 +31,7 @@ function process_data(exp_folder, processing_settings_file)
     s = load(processing_settings_file);
     channel_order = s.settings.channel_order;
 
+
     %specify time ranges for parsing and data analysis
     data_rate = s.settings.data_rate; % rate (in Hz) which all data will be aligned to
     pre_dur = s.settings.pre_dur; %seconds before start of trial to include

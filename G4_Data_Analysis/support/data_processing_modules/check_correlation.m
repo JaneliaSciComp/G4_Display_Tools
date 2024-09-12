@@ -1,9 +1,10 @@
 function [bad_conds] = check_correlation(start_times, stop_times, exp_order, ...
-    Log, condModes, corrTolerance)
+    Log, condModes, corrTolerance, path_to_protocol)
 
     num_conds = size(exp_order,1);
     num_reps = size(exp_order,2);
-    num_comparisons = ((num_reps-1)/2)*(num_reps);
+    exp = load(path_to_protocol, '-mat');
+
     i =  1;
     for f = 1:num_reps -1
         for r = f+1:num_reps
