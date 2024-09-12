@@ -1,10 +1,10 @@
 function [bad_conds, bad_reps, bad_inter, summary] = consolidate_bad_conds(dur_conds, ...
-    dur_inter, corr_conds, wbf_conds, num_trials, num_conds, num_reps, trial_options)
+    dur_inter, wbf_conds, num_trials, num_conds, num_reps, trial_options)
 
     num_intertrials = (num_trials - 1)*trial_options(2);
     
     codes = {'DUR', 'CC', 'WBF', 'SL'};
-    bad_conditions = [dur_conds; corr_conds; wbf_conds];
+    bad_conditions = [dur_conds; wbf_conds];
     for i = size(bad_conditions,1):-1:1
         for j = size(bad_conditions,1):-1:1
             if i == j
@@ -84,13 +84,7 @@ function [bad_conds, bad_reps, bad_inter, summary] = consolidate_bad_conds(dur_c
         summ_ind = summ_ind + 1;
     end
 
-    
-    for corr_cond = 1:size(corr_conds,1)
-         summary{summ_ind} = strcat('Condition: ', num2str(corr_conds(corr_cond, 2)), ...
-            '     Rep: ', num2str(corr_conds(corr_cond, 1)), '     Error Code: ', codes{2});
-        summ_ind = summ_ind + 1;
-    end
-    
+
     for wbf_cond = 1:size(wbf_conds,1)
         summary{summ_ind} = strcat('Condition: ', num2str(wbf_conds(wbf_cond, 2)), ...
             '     Rep: ', num2str(wbf_conds(wbf_cond, 1)), '     Error Code: ', codes{3});

@@ -90,6 +90,24 @@ function process_data(exp_folder, processing_settings_file)
     end
     summary_filename = strcat(s.settings.summary_filename, '.txt');
 
+    if isempty(s.settings.framePosPercentile)
+        framePosPercentile = .98;
+    else
+        framePosPercentile = s.settings.framePosPercentile;
+    end
+
+    if isempty(s.settings.framePosTolerance)
+        framePosTolerance = 1;
+    else
+        framePosTolerance = s.settings.framePosTolerance;
+    end
+
+    if isempty(s.settings.perctile_tol)
+        perctile_tol = .02;
+    else
+        perctile_tol = s.settings.perctile_tol;
+    end
+
 
     %Set which command we should be looking for in the log files
     if combined_command == 1
@@ -97,6 +115,8 @@ function process_data(exp_folder, processing_settings_file)
     else
         command_string = 'start-display';
     end
+
+
 
 
     % Load TDMS file
@@ -196,8 +216,8 @@ function process_data(exp_folder, processing_settings_file)
     % else
     %     bad_crossCorr_conds = [];
     % end
-    bad_FP_conds = check_frame_position(path_to_protocol, start_times, stop_times, exp_order, ...
-        Log, condModes, corrTolerance, framePosTolerance, framePosPercentile, perctile_tol);
+    frame_position_check = check_frame_position(path_to_protocol, start_times, stop_times, exp_order, ...
+        Log, cond_modes, corrTolerance, framePosTolerance, framePosPercentile, perctile_tol);
 
     if remove_nonflying_trials && flying
         [bad_WBF_conds, wbf_data] = find_bad_wbf_trials(Log, ts_data, wbf_range, wbf_cutoff, ...
@@ -218,7 +238,7 @@ function process_data(exp_folder, processing_settings_file)
 %      %Generate report of bad conditions  
     [bad_conds, bad_reps, bad_intertrials, bad_conds_summary] = ...
         consolidate_bad_conds(bad_duration_conds, bad_duration_intertrials,...
-        bad_crossCorr_conds, bad_WBF_conds, num_trials, num_conds, num_reps, trial_options);
+        bad_WBF_conds, num_trials, num_conds, num_reps, trial_options);
     
     if ~isempty(bad_conds)
         for c = 1:length(bad_conds)
@@ -403,7 +423,7 @@ function process_data(exp_folder, processing_settings_file)
         'faLmR_avg_over_reps', 'faLmR_avg_reps_norm','inter_ts_data', 'channelNames', 'histograms_CL', ...
         'summaries', 'summaries_normalized','conditionModes', 'interhistogram', 'timestamps', ...
         'pos_series', 'mean_pos_series', 'pos_conditions', 'normalization_max', ...
-        'bad_duration_conds', 'bad_duration_intertrials', 'bad_crossCorr_conds',...
+        'frame_position_check', 'bad_duration_conds', 'bad_duration_intertrials', ...
         'bad_WBF_conds','cond_frame_move_time', 'pattern_movement_time_avg', 'cond_start_times', 'cond_gaps');
 
     else
@@ -440,7 +460,7 @@ function process_data(exp_folder, processing_settings_file)
         save(fullfile(exp_folder,processed_file_name), 'timeseries', 'ts_avg_reps',...
             'channelNames',  'summaries', 'conditionModes', 'inter_ts_data', 'interhistogram', ...
             'timestamps', 'bad_duration_conds', 'bad_duration_intertrials',...
-             'bad_crossCorr_conds', 'cond_frame_move_time',...
+             'cond_frame_move_time','frame_position_check', ...
             'pattern_movement_time_avg', 'cond_start_times', 'cond_gaps');
 
 
