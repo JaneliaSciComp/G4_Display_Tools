@@ -90,22 +90,25 @@ function process_data(exp_folder, processing_settings_file)
     end
     summary_filename = strcat(s.settings.summary_filename, '.txt');
 
-    if isempty(s.settings.framePosPercentile)
-        framePosPercentile = .98;
-    else
+    if isfield(s.settings, 'framePosPercentile')
         framePosPercentile = s.settings.framePosPercentile;
+    else
+        
+        framePosPercentile = .98;
     end
 
-    if isempty(s.settings.framePosTolerance)
-        framePosTolerance = 1;
-    else
+    if isfield(s.settings, 'framePosTolerance')
         framePosTolerance = s.settings.framePosTolerance;
+        
+    else
+        framePosTolerance = 1;
     end
 
-    if isempty(s.settings.perctile_tol)
-        perctile_tol = .02;
-    else
+    if isfield(s.settings, 'perctile_tol')
         perctile_tol = s.settings.perctile_tol;
+        
+    else
+        perctile_tol = .02;
     end
 
 
