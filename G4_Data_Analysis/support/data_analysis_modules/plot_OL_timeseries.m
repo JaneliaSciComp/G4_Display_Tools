@@ -99,7 +99,7 @@ function plot_OL_timeseries(timeseries_data, timestampsIN, model, plot_settings,
                             timestamps = timestampsIN(~nanidx);
                             meandata(nanidx) = [];
                             semdata(nanidx) = [];
-                            ms_to_move = mean(squeeze(pat_move_time(g,:,cond,:),'omitnan'))/1000;
+                            ms_to_move = mean(squeeze(pat_move_time(g,:,cond,:)),'omitnan')/1000;
                             if ~isempty(timestamps)
                                 move_line(g) = timestamps(1) + ms_to_move;
                             else

@@ -245,6 +245,8 @@ function plot_falmr_timeseries(falmr_data, timestampsIN, plot_settings, exp_sett
                 if ~isempty(figure_titles{fig})
                     set(gcf, 'Name', figure_titles{fig});
                 end
+            else
+                set(gcf, 'Name', figure_titles(1))
             end
             if timeseries_ylimits(7,:) == 0
                 allax = findall(gcf, 'Type', 'axes');
