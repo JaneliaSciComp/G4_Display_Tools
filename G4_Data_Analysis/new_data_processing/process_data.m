@@ -191,11 +191,13 @@ function process_data(exp_folder, processing_settings_file)
 %%%%%the indices for the actual condition???
     [bad_duration_conds, bad_duration_intertrials] = check_condition_durations(cond_dur, intertrial_durs, path_to_protocol, duration_diff_limit);
  %   [bad_slope_conds] = check_flat_conditions(trial_start_times, trial_stop_times, Log, num_reps, num_conds, exp_order);
-    if num_trials_short == 0
-        [bad_crossCorr_conds] = check_correlation(trial_start_times, trial_stop_times, exp_order, Log, cond_modes, corrTolerance);
-    else
-        bad_crossCorr_conds = [];
-    end
+    % if num_trials_short == 0
+    %     [bad_crossCorr_conds] = check_correlation(trial_start_times, trial_stop_times, exp_order, Log, cond_modes, corrTolerance);
+    % else
+    %     bad_crossCorr_conds = [];
+    % end
+    bad_FP_conds = check_frame_position(path_to_protocol, start_times, stop_times, exp_order, ...
+        Log, condModes, corrTolerance, framePosTolerance, framePosPercentile, perctile_tol);
 
     if remove_nonflying_trials && flying
         [bad_WBF_conds, wbf_data] = find_bad_wbf_trials(Log, ts_data, wbf_range, wbf_cutoff, ...
