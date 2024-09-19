@@ -111,6 +111,12 @@ function process_data(exp_folder, processing_settings_file)
         perctile_tol = .02;
     end
 
+    if isfield(s.settings, 'static_conds')
+        static_conds = s.settings.static_conds;
+    else
+        static_conds = 0;
+    end
+
 
     %Set which command we should be looking for in the log files
     if combined_command == 1
@@ -213,7 +219,11 @@ function process_data(exp_folder, processing_settings_file)
 %%%%%then pass it in to the function to find bad wbfs where I only look at
 %%%%%the indices for the actual condition???
     [bad_duration_conds, bad_duration_intertrials] = check_condition_durations(cond_dur, intertrial_durs, path_to_protocol, duration_diff_limit);
- %   [bad_slope_conds] = check_flat_conditions(trial_start_times, trial_stop_times, Log, num_reps, num_conds, exp_order);
+    if ~static_conds
+        [bad_slope_conds] = check_flat_conditions(trial_start_times, trial_stop_times, Log, num_reps, num_conds, exp_order);
+    else
+        bad_slope_conds = [];
+    end
     % if num_trials_short == 0
     %     [bad_crossCorr_conds] = check_correlation(trial_start_times, trial_stop_times, exp_order, Log, cond_modes, corrTolerance);
     % else
@@ -241,7 +251,7 @@ function process_data(exp_folder, processing_settings_file)
 %      %Generate report of bad conditions  
     [bad_conds, bad_reps, bad_intertrials, bad_conds_summary] = ...
         consolidate_bad_conds(bad_duration_conds, bad_duration_intertrials,...
-        bad_WBF_conds, num_trials, num_conds, num_reps, trial_options);
+        bad_WBF_conds, bad_slope_conds, num_trials, num_conds, num_reps, trial_options);
     
     if ~isempty(bad_conds)
         for c = 1:length(bad_conds)
@@ -427,7 +437,7 @@ function process_data(exp_folder, processing_settings_file)
         'summaries', 'summaries_normalized','conditionModes', 'interhistogram', 'timestamps', ...
         'pos_series', 'mean_pos_series', 'pos_conditions', 'normalization_max', ...
         'frame_position_check', 'bad_duration_conds', 'bad_duration_intertrials', ...
-        'bad_WBF_conds','cond_frame_move_time', 'pattern_movement_time_avg', 'cond_start_times', 'cond_gaps');
+        'bad_WBF_conds','bad_slope_conds', 'cond_frame_move_time', 'pattern_movement_time_avg', 'cond_start_times', 'cond_gaps');
 
     else
         da_data = ts_data;
