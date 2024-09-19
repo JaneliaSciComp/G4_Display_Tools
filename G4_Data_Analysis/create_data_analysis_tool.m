@@ -104,8 +104,8 @@
         %file are needed.
             self.flags = varargin;
             data_needed = {'conditionModes', 'channelNames', 'summaries', ...
-                'summaries_normalized', 'timestamps', 'bad_crossCorr_conds',...
-                'bad_duration_conds', 'bad_duration_intertrials', 'bad_slope_conds', 'bad_WBF_conds'};
+                'summaries_normalized', 'timestamps',...
+                'bad_duration_conds', 'bad_duration_intertrials', 'bad_WBF_conds'};
             for i = 1:length(self.flags)
                 
                 switch lower(self.flags{i})

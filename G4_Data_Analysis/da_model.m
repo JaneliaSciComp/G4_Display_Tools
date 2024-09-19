@@ -140,14 +140,14 @@ classdef da_model < handle
         
         function get_removed_trials(self, CombData)
             
-            badcorr = CombData.bad_crossCorr_conds;
+%            badcorr = CombData.bad_crossCorr_conds;
             baddur = CombData.bad_duration_conds;
             badint = CombData.bad_duration_intertrials;
-            badslope = CombData.bad_slope_conds;
+%            badslope = CombData.bad_slope_conds;
             badwbf = CombData.bad_WBF_conds;
             
             self.bad_intertrials = badint;
-            self.bad_trials = [badcorr; baddur; badslope; badwbf];
+            self.bad_trials = [baddur; badwbf];
 
             for i = size(self.bad_trials):-1:1
                 for j = size(self.bad_trials):-1:1

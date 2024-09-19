@@ -100,10 +100,12 @@ function plot_OL_timeseries(timeseries_data, timestampsIN, model, plot_settings,
                             meandata(nanidx) = [];
                             semdata(nanidx) = [];
                             ms_to_move = mean(squeeze(pat_move_time(g,:,cond,:)),'omitnan')/1000;
-                            if ~isempty(timestamps)
-                                move_line(g) = timestamps(1) + ms_to_move;
-                            else
+                            if isempty(timestamps)
+                            %     move_line(g) = timestamps(1) + ms_to_move;
+                            % else
                                 move_line(g) = NaN;
+                            else
+                                move_line(g) = ms_to_move;
                             end
                             if cutoff_time > 0
                                 cutoff_ind = find(timestamps>cutoff_time);
