@@ -33,6 +33,8 @@ function [cond_dur, cond_modes, cond_frame_move_time, cond_start_times, ...
         rep = floor((trial-1)/num_conds)+1;
         cond_dur(cond,rep) = double(trial_stop_times(trial) - trial_start_times(trial))/time_conv;
         cond_modes(cond,rep) = trial_modes(trial);
+        %time between the start of the trial and the timestamp at which the
+        %frame position changed.
         cond_frame_move_time(cond, rep) = (double(trial_move_start_times(trial)) - double(trial_start_times(trial)))/(time_conv/1000);
         cond_start_times(cond,rep) = trial_start_times(trial);
         if trial == 1
