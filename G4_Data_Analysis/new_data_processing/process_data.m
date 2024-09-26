@@ -303,6 +303,8 @@ function process_data(exp_folder, processing_settings_file)
     end
     
     ts_data = search_for_misaligned_data(ts_data, percent_to_shift, num_conds, num_reps, Frame_ind);
+
+    frame_movement_times = get_pattern_move_times_test(ts_data, Frame_ind);
     
     if flying
          %% Normalize LmR timeseries data
@@ -437,7 +439,8 @@ function process_data(exp_folder, processing_settings_file)
         'summaries', 'summaries_normalized','conditionModes', 'interhistogram', 'timestamps', ...
         'pos_series', 'mean_pos_series', 'pos_conditions', 'normalization_max', ...
         'frame_position_check', 'bad_duration_conds', 'bad_duration_intertrials', ...
-        'bad_WBF_conds','bad_slope_conds', 'cond_frame_move_time', 'pattern_movement_time_avg', 'cond_start_times', 'cond_gaps');
+        'bad_WBF_conds','bad_slope_conds', 'cond_frame_move_time', 'pattern_movement_time_avg', ...
+        'cond_start_times', 'cond_gaps', 'frame_movement_times');
 
     else
         da_data = ts_data;

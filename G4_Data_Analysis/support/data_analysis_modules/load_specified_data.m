@@ -271,7 +271,7 @@ function [CombData, files_excluded] = load_specified_data(exp_folder, CombData, 
                             
                             CombData.(fi)(g,e,:,:) = fields.(fi);
                             
-                        case 'pattern_movement_time_avg'
+                        case 'frame_movement_times_avg'
                             
                             CombData.(fi)(g,e,:,:) = fields.(fi);
 
