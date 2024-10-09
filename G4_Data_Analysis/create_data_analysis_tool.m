@@ -128,7 +128,7 @@
                         data_needed{end+1} = 'ts_avg_reps';
                         data_needed{end+1} = 'timeseries';
                         data_needed{end+1} = 'timeseries_normalized';
-                        data_needed{end+1} = 'frame_movement_times_avg';
+                        data_needed{end+1} = 'frame_movement_times_median';
                         
                         if self.faLmR == 1
 
@@ -593,7 +593,7 @@
                         number_groups = size(timeseries_data,1);
                         genotypes = {self.exp_settings.genotypes{1}, self.exp_settings.genotypes{group}};
                         
-                        pattern_movement_time = [self.CombData.frame_movement_times_avg(1,:,:,:);self.CombData.frame_movement_times_avg(group,:,:,:)];
+                        pattern_movement_time = [self.CombData.frame_movement_times_median(1,:,:,:);self.CombData.frame_movement_times_median(group,:,:,:)];
                         
                         %Plot timeseries groups in a loop, once per group
                         for k = 1:numel(self.timeseries_plot_settings.OL_TS_conds)
@@ -637,7 +637,7 @@
                         % Pattern movement time is ordered by condition - may need to make a second
 % one ordered by how conditions are paired during flipping and averaging? 
 
-                        pattern_movement_time = self.CombData.frame_movement_times_avg;
+                        pattern_movement_time = self.CombData.frame_movement_times_median;
                         for k = 1:numel(self.timeseries_plot_settings.OL_TS_conds)
                             plot_OL_timeseries(timeseries_data, self.CombData.timestamps, ...
                                 self.model, self.timeseries_plot_settings, self.exp_settings,...
@@ -661,7 +661,7 @@
                                 timeseries_data = self.CombData.timeseries_normalized;
                             end
                             
-                            pattern_movement_time = self.CombData.frame_movement_times_avg;
+                            pattern_movement_time = self.CombData.frame_movement_times_median;
                             
                             for k = 1:numel(self.timeseries_plot_settings.OL_TS_conds)
                             plot_OL_timeseries(timeseries_data, self.CombData.timestamps, ...

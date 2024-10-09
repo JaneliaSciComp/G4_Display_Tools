@@ -304,7 +304,7 @@ function process_data(exp_folder, processing_settings_file)
     
     ts_data = search_for_misaligned_data(ts_data, percent_to_shift, num_conds, num_reps, Frame_ind);
 
-    frame_movement_times = get_pattern_move_times_test(ts_data, Frame_ind);
+    
     
     if flying
          %% Normalize LmR timeseries data
@@ -364,6 +364,8 @@ function process_data(exp_folder, processing_settings_file)
         ts_avg_reps_norm = squeeze(mean(da_data_norm, 3, 'omitnan'));
         LmR_avg_reps_norm = squeeze(ts_avg_reps_norm(LmR_ind,:,:));   
         LpR_avg_reps_norm = squeeze(ts_avg_reps_norm(LpR_ind,:,:));
+
+        frame_movement_times = get_pattern_move_times_test(da_data, Frame_ind);
     
         %Generate flipped and averaged datasets if requested
            
@@ -429,6 +431,9 @@ function process_data(exp_folder, processing_settings_file)
         summaries_normalized = tc_data_norm;
         conditionModes = cond_modes(:,1); %[condition]
         pattern_movement_time_avg = squeeze(mean(cond_frame_move_time,2, 'omitnan'));
+        frame_movement_times_avg = squeeze(mean(frame_movement_times,2,'omitnan'));
+        pattern_movement_time_median = squeeze(median(cond_frame_move_time,2,'omitnan'));
+        frame_movement_times_median = squeeze(median(frame_movement_times, 2, 'omitnan'));
 %       LmR_normalization_max = maxs(LmR_ind,1,1)
 
     
@@ -440,7 +445,8 @@ function process_data(exp_folder, processing_settings_file)
         'pos_series', 'mean_pos_series', 'pos_conditions', 'normalization_max', ...
         'frame_position_check', 'bad_duration_conds', 'bad_duration_intertrials', ...
         'bad_WBF_conds','bad_slope_conds', 'cond_frame_move_time', 'pattern_movement_time_avg', ...
-        'cond_start_times', 'cond_gaps', 'frame_movement_times');
+        'cond_start_times', 'cond_gaps', 'frame_movement_times', 'frame_movement_times_avg', ...
+        'pattern_movement_time_median', 'frame_movement_times_median');
 
     else
         da_data = ts_data;

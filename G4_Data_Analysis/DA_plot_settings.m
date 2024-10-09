@@ -6,14 +6,14 @@ function [exp_settings, histogram_plot_settings, histogram_annotation_settings, 
 %% Settings which need updating regularly (more static settings below)
 
     % The path to your processing settings for this protocol
-    exp_settings.path_to_processing_settings = '/Users/taylorl/Desktop/narrowGrating09-08-21_17-27-53/later_processing_settings.mat';
+    exp_settings.path_to_processing_settings = 'C:\Users\taylo\Documents\Programming\Reiser\RealData\Protocol004_OpticFlow_KirShibire_01-09-20_13-23-42\DA_Files\processing_settings_Lisa_daStart.mat';
 
 %% Settings for exp_folder generation and saving results
     
     %The path where you wish to save the results of the data analysis
-    save_settings.save_path = '/Users/taylorl/Desktop/narrowGrating09-08-21_17-27-53/09_09_2021/Analysis';
+    save_settings.save_path = 'C:\Users\taylo\Documents\Programming\Reiser\RealData\Protocol004_OpticFlow_KirShibire_01-09-20_13-23-42\Results\Experiment001_emptysplit\emptysplit_13';
     
-    save_settings.report_path = '/Users/taylorl/Desktop/narrowGrating09-08-21_17-27-53/09_09_2021/Analysis/DA_report.pdf';    
+    save_settings.report_path = 'C:\Users\taylo\Documents\Programming\Reiser\RealData\Protocol004_OpticFlow_KirShibire_01-09-20_13-23-42\Results\Experiment001_emptysplit\emptysplit_13\DA_report.pdf';    
     
     %Field names are metadata field names
     exp_settings.field_to_sort_by{1} = ["fly_genotype"];
@@ -29,14 +29,14 @@ function [exp_settings, histogram_plot_settings, histogram_annotation_settings, 
 %     exp_settings.field_values{4} = ["OL0042B_UAS_Kir_JFRC49", "kappagantular"];
 
     %For a single group or multiple groups, the flag is '-group'
-    exp_settings.single_group = 1;%1-all flies should be in one group, so exp_folder should be 1xX cell array
+    exp_settings.single_group = 0;%1-all flies should be in one group, so exp_folder should be 1xX cell array
     
     %The flag for a single fly is '-single'
-    exp_settings.single_fly = 0;%1- only a single fly is being analyzed, the exp_folder will simply be the path to the fly
+    exp_settings.single_fly = 1;%1- only a single fly is being analyzed, the exp_folder will simply be the path to the fly
     
     %If you're running a single fly, you need to provide the path to that
     %fly folder
-    exp_settings.fly_path = '/Users/taylorl/Desktop/narrowGrating09-08-21_17-27-53/09_09_2021/DL-14_57_22';
+    exp_settings.fly_path = 'C:\Users\taylo\Documents\Programming\Reiser\RealData\Protocol004_OpticFlow_KirShibire_01-09-20_13-23-42\Results\Experiment001_emptysplit\emptysplit_13';
     
     %1 - each genotype will be plotted in its own figure against a control. 
     %0 - groups will be plotted as laid out below. 
@@ -46,7 +46,7 @@ function [exp_settings, histogram_plot_settings, histogram_annotation_settings, 
     exp_settings.control_genotype = '';
       
     %Array of genotype names
-    exp_settings.genotypes = ["DL"];
+    exp_settings.genotypes = ["ES"];
     
 
 %% Experiment settings
@@ -56,7 +56,7 @@ function [exp_settings, histogram_plot_settings, histogram_annotation_settings, 
     exp_settings.plot_norm_and_unnorm = 1;  
 
     %Log file will be named using this
-    exp_settings.group_being_analyzed_name = 'DL';
+    exp_settings.group_being_analyzed_name = 'ES13';
     
 %% Histogram settings ('-hist')
 
