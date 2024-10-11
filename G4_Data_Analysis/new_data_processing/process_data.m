@@ -36,8 +36,8 @@ function process_data(exp_folder, processing_settings_file)
     data_rate = s.settings.data_rate; % rate (in Hz) which all data will be aligned to
     pre_dur = s.settings.pre_dur; %seconds before start of trial to include
     post_dur = s.settings.post_dur; %seconds after end of trial to include
-    da_start = s.settings.da_start; %seconds after start of trial to start data analysis
-    da_stop = s.settings.da_stop; %seconds before end of trial to end data analysis
+    % da_start = s.settings.da_start; %seconds after start of trial to start data analysis
+    % da_stop = s.settings.da_stop; %seconds before end of trial to end data analysis
     time_conv = s.settings.time_conv; %converts seconds to microseconds (TDMS timestamps are in micros)
     common_cond_dur = s.settings.common_cond_dur; %sets whether all condition durations are the same (1) or not (0), for error-checking
     processed_file_name = s.settings.processed_file_name;
@@ -175,18 +175,18 @@ function process_data(exp_folder, processing_settings_file)
     end
 
 
-    % Determine the start and stop times of each trial (if we want to create a
+    % Determine the start and stop times based on start-display command of each trial (if we want to create a
     % different method of doing this, just write a new module and plug it in
     % here)
 
-    [start_idx, stop_idx, start_times, stop_times] = get_start_stop_times(Log, command_string, manual_first_start);
-    [frame_movement_start_times] = get_pattern_movement_times(start_times, Log);
+    [start_idx, stop_idx, start_disp_times, stop_times] = get_start_stop_times(Log, command_string, manual_first_start);
+    [frame_movement_start_times] = get_pattern_movement_times(start_disp_times, Log);
     
     % Returns a struct, times, with 8 fields. The start times, stop times,
     % start idx, and movement times for the original trials and the rerun
     % trials. Also determines if the experiment was ended early, and if so,
     % how many more trials are expected than were recorded
-    [times, ended_early, num_trials_short] = separate_originals_from_reruns(start_times, stop_times, start_idx, ...
+    [times, ended_early, num_trials_short] = separate_originals_from_reruns(start_disp_times, stop_times, start_idx, ...
         trial_options, trials_rerun, num_conds, num_reps, frame_movement_start_times);
     
     %get order of pattern IDs (maybe use for error-checking?)
@@ -196,7 +196,7 @@ function process_data(exp_folder, processing_settings_file)
     %Determine start and stop times for different trial types (pre, inter,
     %regular). This also replaces start/stop times of trials marked as bad
     %during streaming with the start/stop times of the final re-run of that
-    %trial so the correct data will be pulled later1`
+    %trial so the correct data will be pulled later
 
     [num_trials, trial_start_times, trial_stop_times, ...
     trial_move_start_times,trial_modes, intertrial_start_times, intertrial_stop_times, ...
@@ -229,7 +229,7 @@ function process_data(exp_folder, processing_settings_file)
     % else
     %     bad_crossCorr_conds = [];
     % end
-    frame_position_check = check_frame_position(path_to_protocol, start_times, stop_times, exp_order, ...
+    frame_position_check = check_frame_position(path_to_protocol, start_disp_times, stop_times, exp_order, ...
         Log, cond_modes, corrTolerance, framePosTolerance, framePosPercentile, perctile_tol);
 
     if remove_nonflying_trials && flying

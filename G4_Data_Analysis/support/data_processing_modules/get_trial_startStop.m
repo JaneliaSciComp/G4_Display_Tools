@@ -1,15 +1,15 @@
-function [num_trials, trial_start_times, trial_stop_times,trial_move_start_times,...
-    trial_modes, intertrial_start_times, intertrial_stop_times, ...
-    intertrial_durs, times] = get_trial_startStop(exp_order, trial_options, times, ...
-    modeID_order, time_conv, trials_rerun, ended_early)
+function [num_trials, trial_start_times, trial_stop_times, trial_modes, ...
+    intertrial_start_times, intertrial_stop_times, intertrial_durs, times] = ...
+    get_trial_startStop(exp_order, trial_options, times, modeID_order, ...
+    time_conv, trials_rerun, ended_early)
     
 
     start_times = times.origin_start_times;
     stop_times = times.origin_stop_times;
-    frame_movement_start_times = times.origin_movement_start_times;
+%    frame_movement_start_times = times.origin_movement_start_times;
     rerun_start_times = times.rerun_start_times;
     rerun_stop_times = times.rerun_stop_times;
-    rerun_movement_start_times = times.rerun_movement_start_times;
+%    rerun_movement_start_times = times.rerun_movement_start_times;
     
     num_trials = numel(exp_order); %Only refers to conditions not inter/pre/post
 
@@ -40,19 +40,19 @@ function [num_trials, trial_start_times, trial_stop_times,trial_move_start_times
         %get start times/modes of trials
         trial_start_times = start_times(trial_start_ind:2:trial_end_ind);
         trial_stop_times = stop_times(trial_start_ind:2:trial_end_ind);
-        trial_move_start_times = frame_movement_start_times(trial_start_ind:2:trial_end_ind);
+%        trial_move_start_times = frame_movement_start_times(trial_start_ind:2:trial_end_ind);
         trial_modes = modeID_order(trial_start_ind:2:trial_end_ind);
         
         if ~isempty(rerun_start_times)
             rerun_trial_start_times = rerun_start_times(1:2:end);
             rerun_trial_stop_times = rerun_stop_times(1:2:end);
-            rerun_trial_move_start_times = rerun_movement_start_times(1:2:end);
+ %           rerun_trial_move_start_times = rerun_movement_start_times(1:2:end);
             rerun_intertrial_start_times = rerun_start_times(2:2:end-1);
             rerun_intertrial_stop_times = rerun_stop_times(2:2:end-1);
         else
             rerun_trial_start_times = [];
             rerun_trial_stop_times = [];
-            rerun_trial_move_start_times = [];
+%            rerun_trial_move_start_times = [];
             rerun_intertrial_start_times = [];
             rerun_intertrial_stop_times = [];
         end
@@ -69,7 +69,7 @@ function [num_trials, trial_start_times, trial_stop_times,trial_move_start_times
         %get start times/modes of trials
         trial_start_times = start_times(trial_start_ind:trial_end_ind);
         trial_stop_times = stop_times(trial_start_ind:trial_end_ind);
-        trial_move_start_times = frame_movement_start_times(trial_start_ind:trial_end_ind);
+%        trial_move_start_times = frame_movement_start_times(trial_start_ind:trial_end_ind);
         trial_modes = modeID_order(trial_start_ind:trial_end_ind);
         intertrial_start_times = [];
         intertrial_stop_times = [];
@@ -78,11 +78,11 @@ function [num_trials, trial_start_times, trial_stop_times,trial_move_start_times
         if ~isempty(rerun_start_times)
             rerun_trial_start_times = rerun_start_times;
             rerun_trial_stop_times = rerun_stop_times;
-            rerun_trial_move_start_times = rerun_movement_start_times;
+%            rerun_trial_move_start_times = rerun_movement_start_times;
         else
             rerun_trial_start_times = [];
             rerun_trial_stop_times = [];
-            rerun_trial_move_start_times = [];
+%            rerun_trial_move_start_times = [];
         end
         rerun_intertrial_start_times = [];
         rerun_intertrial_stop_times = [];
@@ -111,14 +111,14 @@ function [num_trials, trial_start_times, trial_stop_times,trial_move_start_times
         
         trial_start_times(trial_num) = rerun_trial_start_times(rerun);
         trial_stop_times(trial_num) = rerun_trial_stop_times(rerun);
-        trial_move_start_times(trial_num) = rerun_trial_move_start_times(rerun);
+%        trial_move_start_times(trial_num) = rerun_trial_move_start_times(rerun);
         
         
     end
     
     times.rerun_trial_start_times = rerun_trial_start_times;
     times.rerun_trial_stop_times = rerun_trial_stop_times;
-    times.rerun_trial_move_start_times = rerun_trial_move_start_times;
+%    times.rerun_trial_move_start_times = rerun_trial_move_start_times;
     times.rerun_intertrial_start_times = rerun_intertrial_start_times;
     times.rerun_intertrial_stop_times = rerun_intertrial_stop_times;
 

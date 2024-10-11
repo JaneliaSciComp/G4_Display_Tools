@@ -14,8 +14,8 @@ function create_processing_settings()
     settings.data_rate = 1000; % rate (in Hz) which all data will be aligned to
     settings.pre_dur = .05; %seconds before start of trial to include
     settings.post_dur = .05; %seconds after end of trial to include
-    settings.da_start = .05; %seconds after start of trial to start data analysis
-    settings.da_stop = .15; %seconds before end of trial to end data analysis
+    % settings.da_start = .05; %seconds after start of trial to start data analysis
+    % settings.da_stop = .15; %seconds before end of trial to end data analysis
     settings.time_conv = 1000000; %converts seconds to microseconds (TDMS timestamps are in micros)
     settings.common_cond_dur = 0; %sets whether all condition durations are the same (1) or not (0), for error-checking
     settings.processed_file_name = 'processedData';

@@ -1,10 +1,10 @@
 function [times, ended_early, num_extra_trials] = separate_originals_from_reruns(start_times, ...
-    stop_times, start_idx, trial_options, trials_rerun, num_conds, num_reps, frame_movement_start_times)
+    stop_times, start_idx, trial_options, trials_rerun, num_conds, num_reps)
    
     num_trials = num_conds*num_reps; 
    
     total_original_trials = num_trials + trial_options(1) + trial_options(3) + ((num_trials-1)*trial_options(2)); 
-    if length(trials_rerun) ~= 0
+    if ~isempty(trials_rerun)
         total_rerun_trials = length(trials_rerun) + (length(trials_rerun)-1)*trial_options(2)+1;
     else
         total_rerun_trials = 0;
@@ -39,7 +39,7 @@ function [times, ended_early, num_extra_trials] = separate_originals_from_reruns
            origin_start_times(trial) = start_times(trial);
            origin_stop_times(trial) = stop_times(trial);
            origin_start_idx(trial) = start_idx(trial);
-           origin_movement_start_times(trial) = frame_movement_start_times(trial);
+   %        origin_movement_start_times(trial) = frame_movement_start_times(trial);
        end
        
        %Because post trial is run AFTER the rescheduled conditions
@@ -47,7 +47,7 @@ function [times, ended_early, num_extra_trials] = separate_originals_from_reruns
            origin_start_times(end+1) = start_times(end);
            origin_stop_times(end+1) = stop_times(end);
            origin_start_idx(end+1) = start_idx(end);
-           origin_movement_start_times(end+1) = frame_movement_start_times(end);
+  %         origin_movement_start_times(end+1) = frame_movement_start_times(end);
        end
        
        for rerun = 1:total_rerun_trials
@@ -56,7 +56,7 @@ function [times, ended_early, num_extra_trials] = separate_originals_from_reruns
            rerun_start_times(rerun) = start_times(idx);
            rerun_stop_times(rerun) = stop_times(idx);
            rerun_start_idx(rerun) = start_idx(idx);
-           rerun_movement_start_times(rerun) = frame_movement_start_times(idx);
+    %       rerun_movement_start_times(rerun) = frame_movement_start_times(idx);
        end
        
     else
@@ -64,12 +64,12 @@ function [times, ended_early, num_extra_trials] = separate_originals_from_reruns
        origin_start_times = start_times;
        origin_stop_times = stop_times;
        origin_start_idx = start_idx;
-       origin_movement_start_times = frame_movement_start_times;
+ %      origin_movement_start_times = frame_movement_start_times;
        
        rerun_start_times = [];
        rerun_stop_times = [];
        rerun_start_idx = [];
-       rerun_movement_start_times = [];
+%       rerun_movement_start_times = [];
        
        
        
@@ -79,10 +79,10 @@ function [times, ended_early, num_extra_trials] = separate_originals_from_reruns
     times.origin_start_times = origin_start_times;
     times.origin_stop_times = origin_stop_times;
     times.origin_start_idx = origin_start_idx;
-    times.origin_movement_start_times = origin_movement_start_times;
+%    times.origin_movement_start_times = origin_movement_start_times;
     times.rerun_start_times = rerun_start_times;
     times.rerun_stop_times = rerun_stop_times;
     times.rerun_start_idx = rerun_start_idx;
-    times.rerun_movement_start_times = rerun_movement_start_times;
+ %   times.rerun_movement_start_times = rerun_movement_start_times;
    
 end
