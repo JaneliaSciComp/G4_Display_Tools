@@ -144,10 +144,17 @@ function process_data_new(exp_folder, processing_settings_file)
         trials_rerun = [];
     end
 
+
+
     %get the order in which conditions were run, the number of conditions
     %and repetitions in the experiment, and the total number of expected
     %trials
     [exp_order, num_conds, num_reps, total_exp_trials] = get_exp_order(exp_folder, trial_options);
+    
+    % Load the position functions for each condition and save the position
+    % function (the expected frame position data) in the cell array
+    % position_functions which has an element per condition.
+    position_functions = get_position_functions(path_to_protocol, num_conds);
 
     % Determine the start and stop times based on start-display command of
     % each trial (will be used later to find precise start/stop times).
@@ -156,9 +163,6 @@ function process_data_new(exp_folder, processing_settings_file)
 
     [start_idx, stop_idx, start_disp_times, stop_disp_times] = get_start_stop_times(Log, command_string, manual_first_start);
 
-      %get order of pattern IDs (maybe use for error-checking?)
-    [modeID_order, patternID_order] = get_modeID_order(combined_command, Log, times.origin_start_idx);
-    
     % Returns a struct, times, which contains six arrays: 
 %     times.origin_start_times = start_disp_times of original conditions
 %     times.origin_stop_times = stop_disp_times of original conditions
@@ -169,32 +173,96 @@ function process_data_new(exp_folder, processing_settings_file)
 %     ended_early is 1 if the experiment was ended early
 %     num_trials_short is the number of trials that were not run if the
 %     experiment was ended early.
-    [times, ended_early, num_trials_short] = separate_originals_from_reruns(start_disp_times, stop_times, start_idx, ...
+    [times, ended_early, num_trials_short] = separate_originals_from_reruns(start_disp_times, stop_disp_times, start_idx, ...
         trial_options, trials_rerun, num_conds, num_reps);
+
+      %get order of mode and pattern IDs (maybe use for error-checking?)
+    [modeID_order, patternID_order] = get_modeID_order(combined_command, Log, times.origin_start_idx);
+    
+
 
     %Determine start and stop times for different trial types (pre, inter,
     %regular). This also replaces start/stop times of trials marked as bad
     %during streaming with the start/stop times of the final re-run of that
     %trial so the correct data will be pulled later. Still using
-    %start-display command (will fine turn alignment with frame position
-    %movement later).
+    %start-display command (will fine tune alignment with frame position
+    %movement later). trial_start_times includes conditions only, no
+    %pre/inter/post. pre and post trials are not included at all, since
+    %they aren't generally used in data analysis. 
 
     [num_trials, trial_start_times, trial_stop_times, trial_modes, ...
     intertrial_start_times, intertrial_stop_times, intertrial_durs, times] = ...
     get_trial_startStop(exp_order, trial_options, times, modeID_order, ...
     time_conv, trials_rerun, ended_early);
     
-    %Get the number of conditions short if experiment was ended early.
+    %Get the number of conditions short (versus total trials short) if experiment was ended early.
     num_conds_short = num_trials - length(trial_start_times);
 
     %get information about the data (durations, modes, gaps, etc) organized
     %by condition/repetition
     [cond_dur, cond_modes, cond_start_times, cond_gaps] = organize_durations_modes(num_conds, num_reps, ...
     num_trials, exp_order, trial_stop_times, trial_start_times,  ...
-    trial_move_start_times, trial_modes, time_conv, ended_early, num_conds_short);
+    trial_modes, time_conv, ended_early, num_conds_short);
 
      % pre-allocate arrays for aligning the timeseries data
     [ts_time, ts_data, inter_ts_time, inter_ts_data] = create_ts_arrays(cond_dur, data_rate, pre_dur, post_dur, num_ts_datatypes, ...
     num_conds, num_reps, trial_options, intertrial_durs, num_trials);
+
+    
+    % unaligned_ts_data: timeseries data that has not been aligned yet organized by cond/rep.
+
+    unaligned_ts_data = get_unaligned_data(ts_data, num_ADC_chans, Log, ...
+        trial_start_times, trial_stop_times, num_trials, num_conds_short, ...
+        exp_order, Frame_ind);
+
+ 
+    % alignment_data: Struct with three variables
+    %       - shift_numbers: the result of cross correlation between each
+    %       collected frame position data and the expected frame position
+    %       data telling how far to shift collected data to make them align
+    %       - percent_off_zero: the percentage each cond/rep needs to be
+    %       shifted
+    %       - conds_outside_corr_tol: the cond/rep pairs for which
+    %       percent_off_zero falls outside of tolerance. 
+    alignment_data = position_cross_corr(position_functions, ...
+    num_conds_short, cond_modes, unaligned_ts_data, Frame_ind, corrTolerance);
+
+    % Remove any conditions that need to be shifted by a larger percentage
+    % than that given by the corrTolerance. 
+    
+    % Shifts each timeseries cond/rep pair by the lag
+    % found by xcorr
+    shifted_ts_data = shift_xcorrelated_data(ts_data, alignment_data, ...
+    num_conds_short, Frame_ind, num_ADC_chans);
+
+    % Now that data has been shifted, do cross correlation for quality
+    % check
+
+
+    % frame_movement_times: The index at which the pattern started moving
+    %       for each cond/rep pair with index 0 being the start display
+    %       command
+
+        % Find bad condition/rep pairs for removal before cross correlation
+     % and shifting
+    [bad_duration_conds, bad_duration_intertrials] = check_condition_durations(cond_dur, ...
+        intertrial_durs, path_to_protocol, duration_diff_limit);
+    if ~static_conds
+        [bad_slope_conds] = check_flat_conditions(trial_start_times, trial_stop_times, Log, num_reps, num_conds, exp_order);
+    else
+        bad_slope_conds = [];
+    end
+     if remove_nonflying_trials && flying
+        [bad_WBF_conds, wbf_data] = find_bad_wbf_trials(Log, unaligned_ts_data, ...
+            wbf_range, wbf_cutoff, wbf_end_percent, trial_start_times, ...
+            trial_stop_times, num_conds, num_reps, exp_order,  num_trials, num_conds_short);
+    else
+        bad_WBF_conds = [];
+     end
+
+      [bad_conds, bad_reps, bad_intertrials, bad_conds_summary] = ...
+        consolidate_bad_conds(bad_duration_conds, bad_duration_intertrials,...
+        bad_WBF_conds, bad_slope_conds, num_trials, num_conds, num_reps, trial_options);
+
 
 end
