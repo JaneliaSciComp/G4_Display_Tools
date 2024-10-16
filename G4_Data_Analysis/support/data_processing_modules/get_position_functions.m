@@ -1,4 +1,4 @@
-function position_functions = get_position_functions(path_to_protocol, num_conds)
+function [position_functions, exp] = get_position_functions(path_to_protocol, num_conds)
 
     exp = load(path_to_protocol,'-mat');
     [expPath, expName, ~] = fileparts(path_to_protocol);

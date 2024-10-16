@@ -153,8 +153,9 @@ function process_data_new(exp_folder, processing_settings_file)
     
     % Load the position functions for each condition and save the position
     % function (the expected frame position data) in the cell array
-    % position_functions which has an element per condition.
-    position_functions = get_position_functions(path_to_protocol, num_conds);
+    % position_functions which has one element per condition. Save
+    % experiment data (the loaded .g4p file) in exp for future use. 
+    [position_functions, exp] = get_position_functions(path_to_protocol, num_conds);
 
     % Determine the start and stop times based on start-display command of
     % each trial (will be used later to find precise start/stop times).
@@ -215,6 +216,33 @@ function process_data_new(exp_folder, processing_settings_file)
         trial_start_times, trial_stop_times, num_trials, num_conds_short, ...
         exp_order, Frame_ind);
 
+    %Look for bad conditions due to duration, wbf, slope, etc and gather
+    %cond/rep information.
+    [bad_duration_conds, bad_duration_intertrials] = check_condition_durations(cond_dur, intertrial_durs, exp, duration_diff_limit);
+    if ~static_conds
+        [bad_slope_conds] = check_flat_conditions(unaligned_ts_data, Frame_ind);
+    else
+        bad_slope_conds = [];
+    end
+    if remove_nonflying_trials && flying
+        [bad_WBF_conds, wbf_data] = find_bad_wbf_trials(unaligned_ts_data, wbf_range, ...
+            wbf_cutoff,  wbf_end_percent, F_chan_idx);
+    else
+        bad_WBF_conds = [];
+    end
+
+       % Consolidate bad conditions from various reasons into one group with no repeats 
+       % bad_conds and bad_reps line up, so for each element in bad_conds,
+       % the corresponding element in bad_reps is the repetition of that
+       % condition that was bad. 
+    [bad_conds, bad_reps, bad_intertrials] = consolidate_bad_conds(bad_duration_conds, ...
+        bad_duration_intertrials, bad_WBF_conds, bad_slope_conds);
+
+    % Remove bad conditions from the unaligned_ts_data before doing cross
+    % correlation so we don't waste time doing correlations on data we
+    % already know is getting tossed. 
+
+    unaligned_ts_data = remove_bad_conditions(unaligned_ts_data, bad_conds, bad_reps);
  
     % alignment_data: Struct with three variables
     %       - shift_numbers: the result of cross correlation between each
@@ -227,21 +255,30 @@ function process_data_new(exp_folder, processing_settings_file)
     alignment_data = position_cross_corr(position_functions, ...
     num_conds_short, cond_modes, unaligned_ts_data, Frame_ind, corrTolerance);
 
+    % Check cross correlation data against the correlation tolerance which
+    % determines if a condition was so far off it should be removed. Return
+    % any bad conditions/reps for removal.
+    [bad_corr_conds, bad_corr_reps] = compile_bad_xcorr_conds(alignment_data, ...
+    corrTolerance, unaligned_ts_data);
+
     % Remove any conditions that need to be shifted by a larger percentage
     % than that given by the corrTolerance. 
+    unaligned_ts_data = remove_bad_conditions(unaligned_ts_data, bad_corr_conds, bad_corr_reps);
     
     % Shifts each timeseries cond/rep pair by the lag
     % found by xcorr
     shifted_ts_data = shift_xcorrelated_data(ts_data, alignment_data, ...
     num_conds_short, Frame_ind, num_ADC_chans);
 
+    % frame_movement_times: The index at which the pattern started moving
+    %       for each cond/rep pair with index 0 being the start of the
+    %       shifted data after cross correlating to its position function.
+
     % Now that data has been shifted, do cross correlation for quality
     % check
 
 
-    % frame_movement_times: The index at which the pattern started moving
-    %       for each cond/rep pair with index 0 being the start display
-    %       command
+
 
         % Find bad condition/rep pairs for removal before cross correlation
      % and shifting
