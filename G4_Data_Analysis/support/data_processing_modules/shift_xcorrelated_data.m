@@ -31,7 +31,7 @@ function shifted_ts_data = shift_xcorrelated_data(ts_data, alignment_data, ...
                     shifted_fr_data(1:shift) = NaN;
                 elseif shift < 0
                     shifted_fr_data = circshift(unshifted_fr_data, shift);
-                    shifted_fr_data(end+(shift+1):end) = NaN;
+                    shifted_fr_data(end-(shift+1):end) = NaN;
                 else
                     shifted_fr_data = unshifted_fr_data;
                 end

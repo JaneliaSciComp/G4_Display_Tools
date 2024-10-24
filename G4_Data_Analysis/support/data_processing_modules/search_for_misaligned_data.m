@@ -7,17 +7,22 @@ function ts_data = search_for_misaligned_data(ts_data, dev_limit, num_conds, num
             else
                 l = 1;
                 while ts_data(Frame_ind, cond, rep, l+1) - ts_data(Frame_ind, cond, rep, l) == 0 || ...
-                        isnan((ts_data(Frame_ind, cond, rep, l+1) - ts_data(Frame_ind, cond, rep, l)))
-                    l = l + 1;
-                end
-                if ~isempty(find(isnan(ts_data(Frame_ind, cond, rep, l:l+10))))
-                    nan_inds = find(isnan(ts_data(Frame_ind, cond, rep, l:l+10)));
-                    l = nan_inds(end) + l + 1;
-                    while ts_data(Frame_ind, cond, rep, l+1) - ts_data(Frame_ind, cond, rep, l) == 0 || ...
                         isnan((ts_data(Frame_ind, cond, rep, l+1) - ts_data(Frame_ind, cond, rep, l))) && ...
                         l ~= size(ts_data,4)-1
 
-                        l = l + 1;
+                    l = l + 1;
+
+                end
+                if l <= size(ts_data,4)-10
+                    if ~isempty(find(isnan(ts_data(Frame_ind, cond, rep, l:l+10))))
+                        nan_inds = find(isnan(ts_data(Frame_ind, cond, rep, l:l+10)));
+                        l = nan_inds(end) + l + 1;
+                        while ts_data(Frame_ind, cond, rep, l+1) - ts_data(Frame_ind, cond, rep, l) == 0 || ...
+                            isnan((ts_data(Frame_ind, cond, rep, l+1) - ts_data(Frame_ind, cond, rep, l))) && ...
+                            l ~= size(ts_data,4)-1
+    
+                            l = l + 1;
+                        end
                     end
                 end
                 if l < size(ts_data,4)
