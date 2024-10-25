@@ -274,7 +274,8 @@ function process_data_new(exp_folder, processing_settings_file)
     unaligned_ts_data = remove_bad_conditions(unaligned_ts_data, bad_corr_conds, bad_corr_reps);
     
     % Shifts each timeseries cond/rep pair by the lag
-    % found by xcorr
+    % found by xcorr. If conditions do not have position functions for
+    % cross correlating, this function will have no effect. 
     shifted_ts_data = shift_xcorrelated_data(unaligned_ts_data, alignment_data, ...
     Frame_ind, num_ADC_chans);
 
@@ -287,7 +288,7 @@ function process_data_new(exp_folder, processing_settings_file)
     [pattern_movement_times, pos_func_movement_times, bad_conds_movement, ...
         bad_reps_movement] = get_pattern_move_times(shifted_ts_data, ...
     position_functions, Frame_ind);
-    [intertrial_move_times] = get_intertrial_move_times(unaligned_inter_data);
+    [intertrial_move_times] = get_intertrial_move_times(unaligned_inter_data, Frame_ind);
     
     %If any conditions had frame position data that did not line up to its
     %position function at all, remove them here.
@@ -328,7 +329,7 @@ function process_data_new(exp_folder, processing_settings_file)
     bad_trials_summary.movement_intertrials = bad_movement_intertrials;
     bad_trials_summary.wbf_conds = bad_WBF_conds;
 
-    create_bad_conditions_report(bad_conds, bad_intertrials, bad_trials_summary, ...
+    bad_conds_summary = create_bad_conditions_report(bad_conds, bad_intertrials, bad_trials_summary, ...
         num_conds, num_reps, trial_options, num_trials, num_trials_short, num_conds_short);    
 
     if pre_dur ~= 0
@@ -433,7 +434,9 @@ function process_data_new(exp_folder, processing_settings_file)
         %get histogram of intertrial pattern position
         %get histogram of intertrial pattern position
         if trial_options(2) %if intertrials were run
-            inter_hist_data = calculate_intertrial_histograms(inter_ts_data);
+            %create data set of only position data for intertrials
+            inter_pos_data = squeeze(inter_ts_data(Frame_ind, :, :));
+            inter_hist_data = calculate_intertrial_histograms(inter_pos_data);
         else
             inter_hist_data = [];
         end
@@ -487,20 +490,19 @@ function process_data_new(exp_folder, processing_settings_file)
         'bad_posfunc_conds');
 
     else
-        da_data = ts_data;
-        da_start_ind = find(ts_time>=da_start,1);
-        da_data(:,:,:,1:da_start_ind) = nan; %omit data before trial start
-        for con = 1:num_conds
-            if ~isempty(find(con==bad_conds))
-                continue;
-            end
-            da_stop_ind = find(ts_time<=(cond_dur(con,1)-da_stop),1,'last');
-            assert(~isempty(da_stop_ind),'data analysis window extends past trial end')
-            da_data(:,con,:,da_stop_ind:end) = nan; %omit data after trial end
-        end
+        % da_start_ind = find(ts_time>=da_start,1);
+        % da_data(:,:,:,1:da_start_ind) = nan; %omit data before trial start
+        % for con = 1:num_conds
+        %     if ~isempty(find(con==bad_conds))
+        %         continue;
+        %     end
+        %     da_stop_ind = find(ts_time<=(cond_dur(con,1)-da_stop),1,'last');
+        %     assert(~isempty(da_stop_ind),'data analysis window extends past trial end')
+        %     ts_data(:,con,:,da_stop_ind:end) = nan; %omit data after trial end
+        % end
 
-        ts_avg_reps = squeeze(mean(da_data, 3, 'omitnan'));
-        tc_data = mean(da_data,4, 'omitnan');
+        ts_avg_reps = squeeze(mean(ts_data, 3, 'omitnan'));
+        tc_data = mean(ts_data,4, 'omitnan');
         %get histogram of intertrial pattern position
         if trial_options(2) %if intertrials were run
             inter_hist_data = calculate_intertrial_histograms(inter_ts_data);
@@ -512,7 +514,7 @@ function process_data_new(exp_folder, processing_settings_file)
         channelNames.histograms = hist_datatypes; %cell array of channel names for histogram
         interhistogram = inter_hist_data; %[repetition, pattern-position]
         timestamps = ts_time; %[1 timestamp]
-        timeseries = da_data; %[datatype, condition, repition, datapoint]
+        timeseries = ts_data; %[datatype, condition, repition, datapoint]
         summaries = tc_data; %[datatype, condition, repition]
         conditionModes = cond_modes(:,1); %[condition]
         pattern_movement_time_avg = squeeze(mean(cond_frame_move_time,2, 'omitnan'));
@@ -522,7 +524,6 @@ function process_data_new(exp_folder, processing_settings_file)
             'timestamps', 'bad_duration_conds', 'bad_duration_intertrials',...
              'cond_frame_move_time','frame_position_check', ...
             'pattern_movement_time_avg', 'cond_start_times', 'cond_gaps');
-
 
     end
 

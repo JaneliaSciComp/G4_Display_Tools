@@ -10,7 +10,7 @@ function [ts_time, ts_data, inter_ts_time, inter_ts_data] = create_ts_arrays(con
     ts_data = nan([num_ts_datatypes num_conds num_reps length(ts_time)]);
     if trial_options(2) %if intertrials were run
         inter_ts_time = 0:1/data_rate:max(intertrial_durs)+0.01; 
-        inter_ts_data = nan([num_trials-1 length(inter_ts_time)]);
+        inter_ts_data = nan([num_ts_datatypes num_trials-1 length(inter_ts_time)]);
     else
         inter_ts_time = [];
         inter_ts_data = [];

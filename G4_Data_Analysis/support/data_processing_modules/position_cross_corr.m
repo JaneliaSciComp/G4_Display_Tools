@@ -31,7 +31,7 @@ function alignment_data = position_cross_corr(position_functions, ...
                     avg_shift_nums(cond, rep) = nan;
                     percent_off_zero(cond, rep) = nan;
                 end
-            end
+            end            
         end
     end
     alignment_data = struct;

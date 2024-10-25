@@ -6,11 +6,16 @@ function [position_functions, exp] = get_position_functions(path_to_protocol, nu
     position_functions = {};
 
     for cond = 1:num_conds
-        funcName = blockTrials{cond,3};
-        funcPath = fullfile(expPath, 'Functions', [funcName '.mat']);
-        funcData = load(funcPath);
-        expectedData = funcData.pfnparam.func;
-        position_functions{cond} = expectedData;
+        mode = blockTrials{cond,1};
+        if mode == 1 || mode == 5 || mode == 6
+            funcName = blockTrials{cond,3};
+            funcPath = fullfile(expPath, 'Functions', [funcName '.mat']);
+            funcData = load(funcPath);
+            expectedData = funcData.pfnparam.func;
+            position_functions{cond} = expectedData;
+        else
+            positon_functions{cond} = NaN;
+        end
 
     end
 

@@ -38,30 +38,32 @@ function [move_aligned_ts_data, aligned_inter_data, bad_intertrials] = shift_dat
 
         end
     end
-    for trial = 1:size(inter_data,1)
+    for trial = 1:size(inter_data,2)
         bad = 1;
         intshift = inter_move_times(trial);
-        unshifted_intdata = inter_data(trial,:);
-        if sum(~isnan(inter_data(trial,:))) > 0
-            if intshift ~= 0 && ~isnan(intshift)
-                if shift/size(inter_data,2) < inter_shift_limit
-                    shifted_intdata = circshift(unshifted_intdata, shift*(-1));
-                    shifted_intdata(end-(shift-1):end) = NaN;
-                else
-                    bad_intertrials(bad) = trial;
-                    bad = bad + 1;
-                    shifted_intdata = nan([1 size(inter_data,2)]);
-                end
-            else
-                shifted_intdata = unshifted_intdata;
+        unshifted_intdata_fr = squeeze(inter_data(Frame_ind, trial,:));
+        %check if intertrial needs to be shifted more than the limit allows
+        if shift/size(inter_data,3) > inter_shift_limit
+            bad_intertrials(bad) = trial;
+            bad = bad + 1;
+            aligned_inter_data(Frame_ind, trial, :) = nan([1 size(inter_data,3)]);
+            for chan = 1:num_ADC_chans
+                aligned_inter_data(chan, trial, :) = nan([1 size(inter_data,3)]);
             end
-            aligned_inter_data(trial,:) = shifted_intdata;
+        else
+            if sum(~isnan(unshifted_intdata_fr)) > 0
+                if intshift ~= 0 && ~isnan(intshift)
+                    shifted_intdata_fr = circshift(unshifted_intdata_fr, shift*(-1));
+                    shifted_intdata_fr(end-(shift-1):end) = NaN;
+                    aligned_inter_data(Frame_ind, trial, :) = shifted_intdata_fr;
+                    for chan = 1:num_ADC_chans
+                        unshifted_intdata = squeeze(inter_data(chan, trial, :)); 
+                        shifted_intdata = circshift(unshifted_intdata, shift*(-1));
+                        shifted_intdata(end-(shift-1):end) = NaN;
+                        aligned_inter_data(chan, trial, :) = shifted_intdata;
+                    end
+                end
+            end
         end
-
-
-
     end
-
-    
-
 end
