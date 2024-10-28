@@ -43,7 +43,7 @@ function [move_aligned_ts_data, aligned_inter_data, bad_intertrials] = shift_dat
         intshift = inter_move_times(trial);
         unshifted_intdata_fr = squeeze(inter_data(Frame_ind, trial,:));
         %check if intertrial needs to be shifted more than the limit allows
-        if shift/size(inter_data,3) > inter_shift_limit
+        if intshift/size(inter_data,3) > inter_shift_limit
             bad_intertrials(bad) = trial;
             bad = bad + 1;
             aligned_inter_data(Frame_ind, trial, :) = nan([1 size(inter_data,3)]);
@@ -53,13 +53,13 @@ function [move_aligned_ts_data, aligned_inter_data, bad_intertrials] = shift_dat
         else
             if sum(~isnan(unshifted_intdata_fr)) > 0
                 if intshift ~= 0 && ~isnan(intshift)
-                    shifted_intdata_fr = circshift(unshifted_intdata_fr, shift*(-1));
-                    shifted_intdata_fr(end-(shift-1):end) = NaN;
+                    shifted_intdata_fr = circshift(unshifted_intdata_fr, intshift*(-1));
+                    shifted_intdata_fr(end-(intshift-1):end) = NaN;
                     aligned_inter_data(Frame_ind, trial, :) = shifted_intdata_fr;
                     for chan = 1:num_ADC_chans
                         unshifted_intdata = squeeze(inter_data(chan, trial, :)); 
-                        shifted_intdata = circshift(unshifted_intdata, shift*(-1));
-                        shifted_intdata(end-(shift-1):end) = NaN;
+                        shifted_intdata = circshift(unshifted_intdata, intshift*(-1));
+                        shifted_intdata(end-(intshift-1):end) = NaN;
                         aligned_inter_data(chan, trial, :) = shifted_intdata;
                     end
                 end

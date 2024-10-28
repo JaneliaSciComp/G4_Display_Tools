@@ -111,7 +111,7 @@ function [exp_settings, histogram_plot_settings, histogram_annotation_settings, 
     %Set this to 1 if you want a vertical line on your plot indicating the
     %point at which the pattern actually started moving on the screen
     
-    timeseries_plot_settings.pattern_motion_indicator = 1;
+%    timeseries_plot_settings.pattern_motion_indicator = 1;
     
     % Should match the OL_TC_conds array as you may want different
     % indicators for each condition. For any condition that does not need a

@@ -2,7 +2,7 @@
 
 function plot_OL_timeseries(timeseries_data, timestampsIN, model, plot_settings,...
     exp_settings, save_settings, gen_settings, num_groups, genotype, single, ...
-    fig_num, pat_move_time)
+    fig_num)%, pat_move_time)
 
     % Get needed items from the settings structures
     %timeseries plot settings
@@ -28,7 +28,7 @@ function plot_OL_timeseries(timeseries_data, timestampsIN, model, plot_settings,
         other_indicators = [];
     end
 
-    pattern_motion_indicator = plot_settings.pattern_motion_indicator;
+  %  pattern_motion_indicator = plot_settings.pattern_motion_indicator;
     condition_pairs = plot_settings.opposing_condition_pairs;
 
     %General plot settings
@@ -99,14 +99,14 @@ function plot_OL_timeseries(timeseries_data, timestampsIN, model, plot_settings,
                             timestamps = timestampsIN(~nanidx);
                             meandata(nanidx) = [];
                             semdata(nanidx) = [];
-                            ms_to_move = median(squeeze(pat_move_time(g,:,cond,:)),'omitnan')/1000;
-                            if isempty(timestamps)
-                            %     move_line(g) = timestamps(1) + ms_to_move;
+                            % ms_to_move = median(squeeze(pat_move_time(g,:,cond,:)),'omitnan')/1000;
+                            % if isempty(timestamps)
+                            % %     move_line(g) = timestamps(1) + ms_to_move;
+                            % % else
+                            %     move_line(g) = NaN;
                             % else
-                                move_line(g) = NaN;
-                            else
-                                move_line(g) = ms_to_move;
-                            end
+                            %     move_line(g) = ms_to_move;
+                            % end
                             if cutoff_time > 0
                                 cutoff_ind = find(timestamps>cutoff_time);
                                 if ~isempty(cutoff_ind)
@@ -221,16 +221,17 @@ function plot_OL_timeseries(timeseries_data, timestampsIN, model, plot_settings,
                                 ydata = [ydata, mm];
                             end
                         end
-                        if pattern_motion_indicator == 1
-                            if max(move_line)-min(move_line) > 50
-                                msg = "variation in start times of " + string(max(move_line)-min(move_line)) + " for cond " + string(cond);
-                                disp(msg);
-                            end
-                            disp_move_line = median(move_line);
-                            if ~isnan(disp_move_line) && ~isempty(disp_move_line)
-                                xline(disp_move_line);
-                            end
-                        end
+                        xline(0); % Always plot vertical line at 0 because this is when the pattern began moving
+                        % if pattern_motion_indicator == 1
+                        %     if max(move_line)-min(move_line) > 50
+                        %         msg = "variation in start times of " + string(max(move_line)-min(move_line)) + " for cond " + string(cond);
+                        %         disp(msg);
+                        %     end
+                        %     disp_move_line = median(move_line);
+                        %     if ~isnan(disp_move_line) && ~isempty(disp_move_line)
+                        %         xline(disp_move_line);
+                        %     end
+                        % end
                         if ~isempty(other_indicators)
                             line_value = other_indicators(1+(row-1),col);
                             if ~isnan(line_value) && line_value ~= 0

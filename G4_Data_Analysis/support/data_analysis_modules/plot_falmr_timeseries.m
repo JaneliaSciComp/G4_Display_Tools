@@ -17,7 +17,7 @@ function plot_falmr_timeseries(falmr_data, timestampsIN, plot_settings, exp_sett
     show_ind_reps = plot_settings.show_individual_reps;
     cutoff_time = plot_settings.cutoff_time;
     other_indicators = plot_settings.other_indicators;
-    pattern_motion_indicator = plot_settings.pattern_motion_indicator;
+%    pattern_motion_indicator = plot_settings.pattern_motion_indicator;
     condition_pairs = plot_settings.faLmR_pairs;
 
     % general plot settings
@@ -85,8 +85,8 @@ function plot_falmr_timeseries(falmr_data, timestampsIN, plot_settings, exp_sett
                             timestamps = timestampsIN(~nanidx);
                             meandata(nanidx) = [];
                             semdata(nanidx) = [];
-                            ms_to_move = mean(squeeze(pat_move_time(g,:,cond,:)),'omitnan')/1000;
-                            move_line(g) = timestamps(1) + ms_to_move;
+  %                          ms_to_move = mean(squeeze(pat_move_time(g,:,cond,:)),'omitnan')/1000;
+%                            move_line(g) = timestamps(1) + ms_to_move;
                             if cutoff_time > 0
                                 cutoff_ind = find(timestamps>cutoff_time);
                                 if ~isempty(cutoff_ind)
@@ -192,15 +192,15 @@ function plot_falmr_timeseries(falmr_data, timestampsIN, plot_settings, exp_sett
 
                             end
                         end
-
-                        if pattern_motion_indicator == 1
-                            if max(move_line)-min(move_line) > 50
-                                msg = "variation in start times of " + string(max(move_line)-min(move_line)) + " for cond " + string(cond);
-                                disp(msg);
-                            end
-                            disp_move_line = median(move_line);
-                            xline(disp_move_line);
-                        end
+                        % 
+                        % if pattern_motion_indicator == 1
+                        %     if max(move_line)-min(move_line) > 50
+                        %         msg = "variation in start times of " + string(max(move_line)-min(move_line)) + " for cond " + string(cond);
+                        %         disp(msg);
+                        %     end
+                        %     disp_move_line = median(move_line);
+                        %     xline(disp_move_line);
+                        % end
 %                         if frame_superimpose==1
 %                             curr_ylim = ylim(gca);
 %                             yrange = diff(curr_ylim);
