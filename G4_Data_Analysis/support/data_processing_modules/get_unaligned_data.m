@@ -7,6 +7,7 @@ function [unaligned_ts_data, unaligned_inter_data, ...
     unaligned_ts_data = ts_data;
     unaligned_ts_time = ts_data;
 
+   
     num_conds = size(ts_data, 2);    
 
     for trial=1:num_trials-num_conds_short
@@ -35,6 +36,7 @@ function [unaligned_ts_data, unaligned_inter_data, ...
         end
 
         %get frame position data for this trial, aligned to data rate
+
         start_ind_fr = find(Log.Frames.Time(1,:)>=trial_start_times(trial),1);
         stop_ind_fr = find(Log.Frames.Time(1,:)<=trial_stop_times(trial),1,'last');
         if isempty(stop_ind_fr)
