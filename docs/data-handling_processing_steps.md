@@ -54,5 +54,40 @@ Next starting at line 28, if there were more trials run than the expected number
 
 At the end, starting at line 78, these arrays are all saved into a struct called `times` for ease of passing them in and out of functions. The function returns three variables, all of which have been discussed: `times`, `ended_early`, and `num_extra_trials`. 
 
+## Get the modes and pattern IDS of conditions in order - Line 192
+
+The function `get_modeID_order.m` works similarly to `get_exp_order.m` except in this one we are getting the pattern and mode IDs. It again gets the index of each time the 'Set Pattern ID' command was recieved from the Log.Commands.Name array, and gets the value that was received with each command by plugging those indices into the Log.Commands.Data array. It does the same with the 'Set Control Mode' command. You end up with two arrays that are returned from the function: 
+
+`modeID_order` is an array with the mode of each trial in the order it was received.
+`PatternID_order` is an array of the pattern IDs of each trial in the order it as received. 
+
+## Further differentiate the start and stop times of trials - Line 205
+
+`get_trial_startStop.m` is a function that determines the start and stop times for different trial types (pre, inter, post, conditions, etc). In addition, if any conditions were bad and then rerun at the end of the experiment, it replaces the start times of the bad conditions with those of the rerun conditions. This way, when we use the start times later to pull the data for those trials, we will pull the good run and not the bad one. 
+
+First this function pulls the start and stop times from the `times` struct created earlier. It gets the number of trials run (conditions only) and adjusts the `trial_options` variable if needed. This variable indicates the presence of a pre-trial, inter-trial, and/or post-trial. For example, if the experiment was ended early and was intended to have a post-trial, that needs to be changed since ending the experiment early means the post-trial was not run. It gets the index of the first condition to be run and the last condition to be run in the `origin_start_times` array. At line 39 it creates a new variable, `trial_start_times` which includes only the start times of conditions, not of inter-trials or other types of trials. It does the same for stop times and modes. It also finds the start times in between each condition, or in other words, the intertrial start times, and uses this data to get the modes and durations of each intertrial. It does the same thing for reruns, so we end up with an array for rerun trial start times and rerun intertrial start times. 
+
+Starting at line 96, the code goes through each rerun trial, get the condition and repetition number that was being rerun, and then finds that in the `exp_order` array to determine which original trial was being repeated. It then goes into `trial_start_times` (and stop times) and replaces the start time of that bad trial with the start time of the rerun trial. 
+
+All arrays created (start/stop times for reruns, intertrials, and conditions) are then saved to the times struct, which is returned from the function as well as several of the other variables discussed.
+
+### Line 209 in processing
+
+Here we have a bit of code not contained in a function. This simply calculates the number of conditions short the data is if the experiment was ended early. Later this will let us use the `exp_order` variable to determine exactly which conditions were skipped by ending early.
+
+## Organize durations and modes by condition - Line 213
+
+The function `organize_durations_modes.m` is found on line 213. This function calculates the measured duration of each condition, the time gaps between conditions (expected to be the length of the intertrial), and organizes start times by condition and repetition. 
+
+At line 27 it adjusts the expected number of trials based on if the experiment was ended early. Then for each trial, it finds condition and repetition number, calculates the duration and saves it to `cond_dur`, gets the mode and saves it to `cond_modes`, and calculates the gap between it and the next condition, saving it to the variable `cond_gaps`. In addition, it creates a variable called `cond_start_times` which reorganizes the start times from a single long array to an array shaped by condition and repetition number. So all of these arrays are of a size number of conditions x number of reps, so data for any given condition/rep pair is easy to find later in these arrays. The four arrays just discussed are returned from the function. 
+
+## Create empty timeseries arrays - Line 218
+
+The function `create_ts_arrays.m` calculates the size and shape of the timeseries data and returns arrays full of NaNs which will later have condition and intertrial timeseries data assigned to them. It first finds the condition with the longest duration (even though most conditions in theory have the same duration, the measured duration will vary slightly). It then sets the `data_period` which is calculated from the variable `data_rate` provided by the user. The data period is the time between one data point and the next, generally 1 ms for behavioral data and 2 ms for frame position data. It then establishes the variable `ts_time`. This variable later becomes the `timestamps` variable and is the x-axis against which timeseries data will be plotted. If the user has provided a value to the variable `pre_dur` in the settings, then the `ts_time` variable is defined as an array of numbers from -pre_dur-data_period to the longest duration plus the post_dur plus the data_period, with steps betwen defined by the data period. This is done on line 9. `ts_data` then is defined on line 10 as an array of size [number of timeseries data types x number of conditions x number of repetitions x length of `ts_time`]. If intertrials are included in the experiment, then the same thing is done for intertrial data. 
+
+The four variables returned then are the `ts_time`, `ts_data`, `inter_ts_time`, and `inter_ts_data`. Note that these variables still only contain NaNs at this point. 
+
+## Get unaligned timeseries data organized by datatype, condition, and repetition - Line 224
+
 
 

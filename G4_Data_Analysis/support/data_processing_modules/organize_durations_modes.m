@@ -18,7 +18,6 @@ function [cond_dur, cond_modes, cond_start_times, ...
     %the condition's start. This doesn't include intertrials so the gap
     %should be expected to be the length of the intertrial plus a tiny
     %amount.
-
     cond_gaps = nan(num_conds, num_reps);
     
     
