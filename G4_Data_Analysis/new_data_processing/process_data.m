@@ -10,9 +10,10 @@ function process_data(exp_folder, processing_settings_file)
     end
 
     s = load(processing_settings_file);
-    % channel_order = {'LmR_chan', 'L_chan', 'R_chan', 'F_chan', 'Frame Position', 'LmR', 'LpR'}; %add faLmR below if desired (line 214)
+    
+    % channel_order = {'LmR_chan', 'L_chan', 'R_chan', 'F_chan', 'Frame
+    % Position', 'LmR', 'LpR'}; Usually
     channel_order = s.settings.channel_order;
-
 
     %save all settings to be used in processing
     data_rate = s.settings.data_rate; % rate (in Hz) which all data will be aligned to
@@ -28,18 +29,22 @@ function process_data(exp_folder, processing_settings_file)
     faLmR = s.settings.enable_faLmR; % 1 means you want faLmR calculated
     condition_pairs = s.settings.condition_pairs; % custom pairings for faLmR
     enable_pos_series = s.settings.enable_pos_series; % 1 means you want position series calculated
-    pos_conditions = s.settings.pos_conditions; %conditions for psoition series
-    num_positions = s.settings.num_positions;
-    data_pad = s.settings.data_pad;
-    sm_delay = s.settings.sm_delay;
-    manual_first_start = s.settings.manual_first_start;
+    pos_conditions = s.settings.pos_conditions; %conditions for position series
+    num_positions = s.settings.num_positions; %Number of positions in the position function
+    data_pad = s.settings.data_pad; %Amount of data to remove from beginning and end of position series (in indices, minimum of 1, represeting 1 ms)
+    sm_delay = s.settings.sm_delay; %How long you expect data to be delayed after pattern movement (applied to position series)
+    manual_first_start = s.settings.manual_first_start; %If first trial was started manually then first start time is the first timestamp recorded
     combined_command = s.settings.combined_command; %1 if combined command was used
-    max_prctile = s.settings.max_prctile;
-    path_to_protocol = s.settings.path_to_protocol;
-    percent_to_shift = s.settings.percent_to_shift;
-    wbf_range = s.settings.wbf_range;
-    wbf_cutoff = s.settings.wbf_cutoff;
-    wbf_end_percent = s.settings.wbf_end_percent;
+    max_prctile = s.settings.max_prctile; % When finding max value for normalization, use this percentile instead of absolute max
+    path_to_protocol = s.settings.path_to_protocol; %The path to the protocol .g4p file
+ %   percent_to_shift = s.settings.percent_to_shift;
+    wbf_range = s.settings.wbf_range; %Range you expect wbf to stay within
+    wbf_cutoff = s.settings.wbf_cutoff; %% Maximum acceptable portion of a condition where the fly is not flying
+    wbf_end_percent = s.settings.wbf_end_percent;%% If a fly is not flying for more than the above acceptable portion of a condition,
+                                            % You can choose to keep the trial
+                                            % anyway if this portion of the bad wbf
+                                            % measurements are clustered in the last
+                                            % ten percent of the condition.
 
     %These settings were only added in newer versions of the settings file, so to
     %maintain the ability to use older versions, we check for their
@@ -47,11 +52,11 @@ function process_data(exp_folder, processing_settings_file)
     if isfield(s.settings, 'cross_correlation_tolerance')
         corrTolerance = s.settings.cross_correlation_tolerance;
     else
-        corrTolerance = .02;
+        corrTolerance = .02;  %when a cross correlation is taken of all reps of a trial, any reps that are off zero by more than this percentage will be marked bad. Default 2%
     end
 
     if isfield(s.settings, 'flying')
-        flying = s.settings.flying;
+        flying = s.settings.flying; % 1 if flying experiment, 0 if walking
     else
         flying = 1;
     end
@@ -59,21 +64,21 @@ function process_data(exp_folder, processing_settings_file)
     if isfield(s.settings, 'remove_nonflying_trials')
         remove_nonflying_trials = s.settings.remove_nonflying_trials;
     else
-        remove_nonflying_trials = 1;
+        remove_nonflying_trials = 1; %1 to remove trials where the fly did not fly enough, 0 to leave them
     end
 
     if isfield(s.settings, 'duration_diff_limit')
         duration_diff_limit = s.settings.duration_diff_limit;
     else
-        duration_diff_limit = .1;
+        duration_diff_limit = .1;  %If a trial takes longer than its intended duration by more than this percentage, throw it out
     end
     
     if isempty(s.settings.summary_save_path)
-        summary_save_path = exp_folder;
+        summary_save_path = exp_folder;  %Leave empty if you want the summary saved in the fly folder.
     else
         summary_save_path = s.settings.summary_save_path;
     end
-    summary_filename = strcat(s.settings.summary_filename, '.txt');
+    summary_filename = strcat(s.settings.summary_filename, '.txt');  %Filename of the summary of which trials weren't run and why
 
     if isfield(s.settings, 'framePosPercentile')
         framePosPercentile = s.settings.framePosPercentile;
@@ -96,7 +101,7 @@ function process_data(exp_folder, processing_settings_file)
         perctile_tol = .02;
     end
 
-    if isfield(s.settings, 'static_conds')
+    if isfield(s.settings, 'static_conds')% Set this to 1 if your experiment has any static conditions, 0 if not
         static_conds = s.settings.static_conds;
     else
         static_conds = 0;
@@ -112,7 +117,7 @@ function process_data(exp_folder, processing_settings_file)
     if isfield(s.settings, 'intertrial_shift_limit')
         inter_shift_limit = s.settings.intertrial_shift_limit;
     else
-        inter_shift_limit = .2;
+        inter_shift_limit = .2; % When aligning intertrial to the first pattern movement, mark intertrial as bad if we have to shift more than this percentage. 
     end
 
     % Load TDMS file
@@ -150,7 +155,7 @@ function process_data(exp_folder, processing_settings_file)
         trials_rerun = [];
     end
 
-
+%% Start processing
 
     %get the order in which conditions were run, the number of conditions
     %and repetitions in the experiment, and the total number of expected
@@ -186,8 +191,6 @@ function process_data(exp_folder, processing_settings_file)
       %get order of mode and pattern IDs (maybe use for error-checking?)
     [modeID_order, patternID_order] = get_modeID_order(combined_command, Log, times.origin_start_idx);
     
-
-
     %Determine start and stop times for different trial types (pre, inter,
     %regular). This also replaces start/stop times of trials marked as bad
     %during streaming with the start/stop times of the final re-run of that

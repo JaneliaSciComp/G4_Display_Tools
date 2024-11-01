@@ -24,6 +24,8 @@ function create_processing_settings()
     settings.duration_diff_limit = .15; %If a trial takes longer than its intended duration by more than this percentage, throw it out
     settings.cross_correlation_tolerance = .02; %when a cross correlation is taken of all reps of a trial, any reps that are off zero by more than this percentage will be marked bad. Default 2%
     settings.flying = 1; %If this is a flying experiment, set to 1. If not, set to 0.
+    settings.static_conds = 0; % Set this to 1 if your experiment has any static conditions
+    settings.intertrial_shift_limit = .2; % When aligning intertrial to the first pattern movement, mark intertrial as bad if we have to shift more than this percentage. 
     %% Wing Beat Frequency Settings
 
     settings.remove_nonflying_trials = 1;   %% 1 if you want trials where the fly

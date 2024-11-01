@@ -21,9 +21,7 @@ function [num_trials, trial_start_times, trial_stop_times, trial_modes, ...
     end
 
     if trial_options(1) %if pre-trial was run
-        trial_start_ind = 2; %exclude pre-trial
-
-        
+        trial_start_ind = 2; %exclude pre-trial        
     else
         trial_start_ind = 1;
     end
