@@ -89,5 +89,127 @@ The four variables returned then are the `ts_time`, `ts_data`, `inter_ts_time`, 
 
 ## Get unaligned timeseries data organized by datatype, condition, and repetition - Line 224
 
+The function `get_unaligned_data.m` takes in many of the arrays we've generated up to this point and uses them to split up the behavioral and frame position data from the Log into an array organized by datatype, condition, and repetition. It is unaligned because the start of each trial is defined by when the 'Start-Display' command was received. It has not yet been cross correlated or aligned to when the pattern started moving. Data is saved to the array `unaligned_ts_data` which is 4 dimensional - channel number x condition x repetition x duration of longest condition.
+
+For each trial, whe use the `exp_order` variable to get the condition number and calculate the repetition number. The variable `num_ADC_chans` tells us how many channels there are, so for each channel we find the start index and stop index of that trial by finding the first element in Log.ADC.Time which is greater than or equal to the timestamp given in `trial_start_times` and less than or equal to the timestamp given in `trial_stop_times`. We then, at line 22, use those indices to get the data and time data for that particular trial. 
+
+For formatting purposes, we need each element in the timeseries data array to be the same length, but each condition will vary slightly in the length of the data. So lines 24-31 check for the difference between the length of the data we just pulled and the length of the array we defined earlier. If the data we just pulled is shorter, we add NaNs to the end to fill in the space. If it's longer, we remove data at the end to shorten it. The latter case should not really ever happen, since the array was defined based on the longest condition.
+
+Starting at line 39 we do the same process but for the frame position data. Find the start and stop indices, use them to get the data from Log.Frames.Position. At line 51 we start one extra step which is expanding the frame position data. Since generally the frame position data is collected at a data rate of every 2 ms, while the behavioral data is collected at a rate of every 1 ms, the frame position data will only be half the length of the behavioral data. So we create an array called `full_fr_data` which is twice the length of the frame data we just got out of the Log. Then we go through it and fill in the gaps between each data point with the data point previous to it. So for example, frame data of [1 1 2 2 3 3] becomes [1 NaN 1 Nan 2 NaN 2 NaN 3 NaN 3 NaN] and then NaNs get replaced with the number preceding it, so this becomes [1 1 1 1 2 2 2 2 3 3 3 3]. Each of these representing the frame position over 12 milliseconds. This expanded data then is saved to the `unaligned_ts_data` array. 
+
+Next, starting at line 70, we get the unaligned intertrial data, assuming the experiment included intertrials. It is the exact same process as above, using the intertrial start and stop timestamps to pull the correct data from the Log. The array `unaligned_inter_data` is a slightly different size because intertrials do not have repetition or condition numbers, they are simply numbered 1 through the number of intertrials run in the experiment. So this array is 3 dimensions instead of 4 - channel x intertrial number x length of intertrial data. Frame position data for intertrials is expanded using the same method as before. 
+
+This function returns two arrays, `unaligned_ts_data` and `unaligned_inter_data`. 
+
+## Check for conditions with the wrong duration - Line 231
+
+`check_condition_durations.m` is a function that searches for any conditions that had a duration significantly longer or shorter than expected by comparing the `cond_dur` and `intertrial_durs` arrays created earlier to the expected durations stored in the protocol.
+
+We get the expected duration of each condition directly from the loaded experiment protocol, and then go through each element in `cond_dur` and compare the found duration with the expected duration. If the percent difference between them is greater than the limit set by the user in the variable `duration_diff_limit`, then we add that condition and rep pair to the `bad_conds` variable.  The same is done for intertrials. 
+
+Two variables are returned from this function, `bad_duration_conds` and `bad_duration_intertrials` which may or may not be empty. `bad_duration_conds` contains two element arrays that look like [repeptition condition] where as the `bad_duration_intertrials` is just a one dimensional array of intertrial numbers.
+
+## Check for flat conditions if relevant - Line 233
+
+If the experiment does not contain any intentionally static conditions, then the function `check_flat_conditions.m` looks for any conditions where the frame position data is flat, meaning the screen did not move at all. 
+
+It cycles through the `unaligned_ts_data` array and looks at the frame position data for each. It goes through each data point in the frame position data, and if there is never a difference between one and the next, then the data is completely flat and that repetition condition pair are added to the `bad_slope_conds` variable, which is returned. 
+
+## Find conditions where the fly wasn't flying if relevant - Line 238
+
+Assuming this is a flying experiment, and the variable `remove_nonflying_trials` has been set to 1, the function `find_bad_wbf_trials.m` runs and searches the unaligned data for flies where the wing beat frequency falls out of range too much. 
+
+The variable `F_chan_idx` tells us which channel contains the wing beat frequency data, so we use that to pull the right data from `unaligned_ts_data`. We go through the wing beat frequency data for each condition and repetition comparing each data point to the wbf range provided by the user. For every data point that falls outside of that range, we add it to the `bad_indices` variable. At line 34 we compare the percentage of bad data points to the cutoff determined by the user. If the percentage of data points outside of range is too high, we then check to see if these bad data points are clustered at the end of the trial at line 39. If a larger percentage of the bad data points are clustered at the end than set by the `wbf_end_percent` limit, then we keep the trial, but if the portion of them clustered at the end falls below that limit, then that repetition and condition pair are added to the variable `bad_trials`. 
+
+This function returns the variables `bad_WBF_conds` and `wbf_data` which contains all the wing beat frequency data for easy use later. 
+
+## Consolidate bad conditions - Line 248
+
+At this point in the processing, we've done all the quality checks that can be done before alignment. There will be more quality checks after alignment, but because cross correlation and alignment take the largest chunk of time when processing data, we want to remove as much bad data as possible before doing the cross correlation. This way we don't waste time aligning data we already know is bad. Therefore, we next consolidate the bad conditions we've collected so far, and remove them, before then moving on to the cross correlation. This does mean that after cross correlation and alignment steps, we may find more bad conditions and will have to repeat these steps. 
+
+The function `consolidate_bad_conds.m` takes in the various arrays of bad conditions produced by the last few sections, combines them into one array of bad conditions, and removes any duplicates. The function returns three variables, `bad_conds`, `bad_reps`, and `bad_intertrials`. `bad_conds` and `bad_reps` are each a one dimensional array of condition and repetition numbers of bad trials. They line up such that `bad_conds(1)` and `bad_reps(1)` are, together, the condition repetition pair of the first bad trial. `bad_intertrials` is a one dimensional list of bad intertrials. 
+
+## Remove bad trial data - Line 255
+
+The function `remove_bad_conditions.m` takes in the dataset you want data removed from, as well as the list of bad conditions and repetitions. It sets the data for those conditions and repetitions to NaNs. It only removes condition data, not data for intertrials. 
+
+## Cross correlation of position data - Line 265
+
+The function `position_cross_corr.m` cross correlates the collected frame position data with the expected position function data and gets a lag number indicating how the data should be shifted to best line up with the expected position function. 
+
+It goes through each condition in `unaligned_ts_data` and checks the mode first. If the condition is in a mode that does not use a position function, then no cross correlation can be done and that condition is skipped. The matlab function `xcorr` is used to get the lag. A few different numbers are saved. `shift_numbers` is an array of size number conditions x number repetitions that gives the lag for that condition and repetition. We also create `avg_shift_numbers`, which contains the average lag, and `percent_off_zero` which gives the percentage by which the data needs to be shifted.
+
+We compare the percentage off zero to the correlation tolerance provided by the user, and if it's too high then that condition and repetition pair is saved in the array `conds_outside_corr_tolerance`. If the data to be cross correlated is all NaNs (meaning it has been removed because the data was bad), then these arrays get NaN values for that condition and rep pair. These arrays are saved in a struct called `alignment_data` which is returned by the function. 
+
+## Compile bad conditions from the cross correlation - Line 271
+
+Though we have collected the condition/repetition pairs that fell outside of the correlation tolerance, they're formatted to be easily viewed by the user in the processed data, not to easily be removed by the function that removes bad data. So in `compile_bad_xcorr_conds.m` the bad conditions are reformatted into `bad_corr_conds` and `bad_corr_reps`. 
+
+## Remove bad conditions - Line 276
+
+The same function from line 255, used here to remove any conditions that fell outside of the cross correlation tolerance. 
+
+## Shift data by its cross correlation lag - Line 281
+
+The function `shift_xcorrelated_data.m` actually shifts the data by the lag values found by the cross correlation. It saves the shifted data in an array called `shifted_ts_data` which is the same size as `unaligned_ts_data`. We use matlab's circshift function in order to do this shift. The code goes through each channel of each condition/repetition pair. It gets the unshifted data from the `unaligned_ts_data` array. 
+
+Assuming the data is not all NaNs, meaning it's already been removed, we then check the lag value for that condition/repetition. If it's greater than zero, that means the data needs to be shifted to the right. We use circshift to get `shifted_data`. Circshift shifts in a circular pattern, meaning if you shift data to the right, the data at the end of the array is moved to fill the space left at the beginning of the array. We don't want this data there, so after shifting, the datapoints from index 1 to the lag value are set to NaNs. 
+
+If the lag is less than zero, that means the data needs to shift to the left. We use circshift again, and in this case, the data from the beginnig of the array will be moved to the end. We don't want that data at the end, we want it gone, so we then set the data points from the end minus the lag to the end of the array to NaNs. 
+
+Filling in the gaps with NaNs after shifting the data ensures that the array itself will remain the same size, since the lag value may be different for each trial.
+
+The function returns `shifted_ts_data`, an array of all the timeseries data after it has been shifted according to the cross correlation lag. 
+
+## Get the pattern movement times - Line 291
+
+`get_pattern_move_times.m` is a function that goes through the shifted frame position data to determine at what point the pattern on the screens actually started moving. We will later align our data to "start" at this point. 
+
+Please note that there are some old functions in the folder which have similar names to this one. These were older methods for finding the pattern movement time but are not currently in use, so please make sure you're looking at `get_pattern_move_times.m`. These extra functions may be removed in future releases. 
+{:.info}
+
+For each condition/repetition pair, this function looks at the loaded position function data and finds the first movement of the pattern. For example, a position function may stay static for some amount of time and then start moving. We find the first movement and save it as an array, such as [1 2] if the first change in the frame position is from frame 1 to frame 2. It then looks at the frame position data in the `shifted_ts_data` array and searches from the beginning of the array for the first movement from frame 1 to 2 (or whatever movement it found in the position function). The index of first motion is the index of the changed value (the 2, rather than the 1). This index is saved in the array `pattern_movement_times` which is of the size number of conditions x number of repetitions.
+
+In the case that a change in frame position matching the position function is never found, a warning is put out to the user alerting them that the movement time could not be found for that condition/repetition pair, and it is added to an array called `bad_conds_movement`. This means the frame position data never follows the intended position function but was not caught in other quality checks. 
+
+In the case that there is no position function for that condition (due to it being a different mode, for example), then we search the frame position data for the first time it changes frames without comparing to any position function data. In this case, we skip the first 11 data points in the frame position data because there tends to be noise at the very beginning where the frame position can jump around. The first time after the first 11 datapoints that the frame position changes will be marked as the pattern's movement time. 
+
+This function returns several variables. `pattern_movement_times`, `pos_func_movement_times`, `bad_conds_movement`, and `bad_reps_movement`. `Pos_func_movement_times` are the indices in the position function where movement happened, as compared to the `pattern_movement_times` which contains the indices in the collected frame position data where movement happened. We save both just in case we want to use them for any kind of quality analysis in the future. 
+
+## Get intertrial movement times - Line 293
+
+For each intertrial, this function finds the index of the first datapoint where the frame position changes. It returns one variable, `intertrial_move_times`, which is a one dimensional array giving one index value per intertrial. 
+
+## Remove bad movement conditions - Line 297
+
+The `remove_bad_conditions.m` function is used one more time to remove any bad conditions found when getting the pattern movement times. 
+
+## Align data to pattern movement time - Line 302
+
+`shift_data_to_movement.m` is the alignment function that actually shifts the data so each condition's data starts at the point that the pattern started moving.
+
+It uses the same general method as the function that shifted data according to its cross correlation lags. The shift value now is the movement time (which is not a timestamp, but the index at which movement happens). Like before, it uses circshift and then removes the data that was shifted from the front of the array to the back. In this case, we are never really going to be shifting right, but only to the left. 
+
+The second half of the function shifts the intertrial data based on its movement time. It first checks if the percentage to be shifted is greater than the limit set by the user. If so, the intertrial is added to a list of bad intertrials and the data is set to NaNs. Otherwise, the data is shifted using the same method as before. 
+
+This function returns three variables. `ts_data` is the final, aligned timeseries array. `inter_ts_data` is the aligned intertrial timeseries data, and `bad_movement_intertrials` which is the list of bad intertrials, if any.
+
+## Re-formatting all bad conditions for the text file report - Line 307
+
+Lines 307 - 330 are spent reformatting the bad trials. This is only done so that older code that generates the text report can be re-used. It was simpler than re-writing the text report data. But that's it, there's no fundamental reason it needs to be formatted this way. 
+
+Bad conditions are assigned to an array named for the reason they were tossed out. So we end up with `duration_conds`, `slope_conds`, `xcorr_conds`, `posfunc_conds`, `wbf_conds`, `duration_intertrials`, and `movement_intertrials`. Each of these are a list of repetition/condition pairs, or intertrial numbers. These are all then saved to a struct called bad_trials_summary for ease of passing the data in and out of functions. 
+
+## Preparing the report of bad conditions - Line 332
+
+After the reformatting is done, `create_bad_conditions_report.m` is called. This function creates a cell array called `Summary` where each element is a line of text that will later be printed in a txt file. For each bad condition, an element is added to `Summary` with the condition and repetition number and a code telling the user why that trial was tossed. It then does the same thing with the intertrials. 
+
+This returns the `summary` variable which will be used at the end of processing when everything is saved to produce a text file reporting on all conditions and intertrials that were removed from the data. 
+
+## Add buffer data back to beginning of timeseries - Line 339
+
+If the variable `pre_dur` is set to something other than 0, then a certain amount of data needs to be tacked back on to the front of the timeseries data. The data will be plotted so that x=0 is the point at which the pattern started moving, and this data added back on to the front will align with x = -pre_dur:0.
+
+`add_pre_dur.m`
 
 
