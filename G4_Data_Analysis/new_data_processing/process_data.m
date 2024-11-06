@@ -348,24 +348,19 @@ function process_data(exp_folder, processing_settings_file)
          %% Normalize LmR timeseries data
     
         %Get maxs (do not normalize to baselines by default)    
-    
-        num_datapoints = size(ts_data, 4);
         
         maxs = get_max_process_normalization(max_prctile, ts_data,...
-            num_conds, num_datapoints, num_ts_datatypes, num_reps);
+            num_conds, num_ts_datatypes, num_reps);
     
         %Normalize all timeseries data  
         
         [ts_data_normalized, normalization_max] = normalize_ts_data(L_chan_idx, R_chan_idx, ts_data, maxs);
     
-    
         %Get timeseries avg over reps - normalized and
         %unnormalized. 
         %% process data into meaningful datasets
         %calculate LmR (Left - Right) and LpR (Left + Right)
-        
-         
-        
+
         %Unnormalized datasets
         ts_data(LmR_ind,:,:,:) = ts_data(L_chan_idx,:,:,:) - ts_data(R_chan_idx,:,:,:); % + = right turns, - = left turns
         ts_data(LpR_ind,:,:,:) = ts_data(L_chan_idx,:,:,:) + ts_data(R_chan_idx,:,:,:); % + = increased amplitude, - = decreased

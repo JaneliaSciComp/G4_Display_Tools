@@ -210,6 +210,43 @@ This returns the `summary` variable which will be used at the end of processing 
 
 If the variable `pre_dur` is set to something other than 0, then a certain amount of data needs to be tacked back on to the front of the timeseries data. The data will be plotted so that x=0 is the point at which the pattern started moving, and this data added back on to the front will align with x = -pre_dur:0.
 
-`add_pre_dur.m`
+`add_pre_dur.m` is the function that does this process. The variable `ts_time`, which holds the timestamps against which timeseries data are plotted, has already been created with the `pre_dur` value in mind, meaning it starts at `-pre_dur` and goes through the length of the longest condition in steps of 1 ms. We find the index at which `ts_time=0`. This index minus 1 will give us the number of data points (or number of milliseconds) that needs to be added to the front of the timeseries data.
+
+Then for each channel, condition, and repetition, we get the previously found time at which movement occurred. We then access the raw `unaligned_data` variable, find the index at which movement occurred, and then copy the data preceding that index back to whatever amount of time `pre_dur` indicates. Assuming there is enough data, that data is pulled and saved in a variable called `data_to_add`. If not, say movement happened sooner than the `pre_dur` amount of time, we take what data is there and then tack NaNs on to the front of it so it is still the required lenth. We then go thorugh the `ts_data` array and add this data to the front. Again, to maintain each element of the array having the same length, we use circshift to shift the data to the right and then replace the first `pre_dur` number of milliseconds with the `data_to_add`.
+
+This function returns `ts_data` after adding the data indicated by the `pre_dur` variable. 
+
+## Get normalization parameters - Line 354
+
+The function `get_max_process_normalization.m` is just a few lines of code which gets the max values (based on the percentile provided by the user) from the timeseries data which will then be used to normalize the data. 
+
+## Normalize timseries data - Line 357
+
+The function `normalize_ts_data.m` takes the max values just calculated and normalizes the timeseries data. First it gets the maximum value from the list of max values for the left wing channela nd the right wing channel. It then establishes the datatypes to normalize, which are simply the left and right wing channels. Then for each of these, each data point in the timeseries data is divided by the max value. 
+
+This function returns the normalized timeseries data array and the max value used. 
+
+## Calculating data sets - Lines 365-398
+
+The next set of code is not divided into functions but executed here in the `process_data.m` function. First, at line 365 and 366, we calculate the Left minus Right (LmR) and Left plus Right (LpR) data sets by subtracting or adding the left and right channel data. 
+
+Next, at lines 370 and 371 we do the same, but with the normalized data. 
+
+The code commented out from lines 374-389 is old and will likely be removed in future releases. 
+
+Starting at line 392 we create some more datasets which don't contain any new information but are likely to be useful to the user. These are: 
+
+`ts_avg_reps` which is the timeseries data averaged over the repetitions.
+`LmR_avg_over_reps` which is specifically the LmR data averaged over repetitions. 
+`LpR_avg_over_reps` which is specifically the LpR data averaged over repetitions. 
+`ts_avg_reps_norm` which is the same as `ts_avg_reps` but using normalized data. 
+`LmR_avg_reps_norm` is `LmR_avg_over_reps` using normalized data
+`LpR_avg_reps_norm` is `LpR_avg_over_reps` using normalized data
+
+## Calculating flipped and averaged LmR data - Line 405
+
+
+
+
 
 
