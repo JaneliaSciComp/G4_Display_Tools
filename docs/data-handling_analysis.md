@@ -2,7 +2,7 @@
 title:  G4 Data Analysis
 parent: G4 Automated Data Handling
 grand_parent: Generation 4
-nav_order: 2
+nav_order: 3
 ---
 
 1. TOC

@@ -2,7 +2,7 @@
 title:  G4 Data Processing Step by Step
 parent: G4 Automated Data Handling
 grand_parent: Generation 4
-nav_order: 1
+nav_order: 2
 ---
 
 # Overview
@@ -244,6 +244,52 @@ Starting at line 392 we create some more datasets which don't contain any new in
 `LpR_avg_reps_norm` is `LpR_avg_over_reps` using normalized data
 
 ## Calculating flipped and averaged LmR data - Line 405
+
+On line 405 you'll find the function `get_falmr.m`. Assuming the faLmR setting is turned on, this will run and return both normalized and unnormalized faLmR data. 
+
+If the `condition_pairs` setting, which tells the software which trials to flip and average together, is empty then by default it pairs conditions with the one that follows it (condtions 1 and 2, 3 and 4, 5 and 6, etc). Lines 4-14 create the default pairs assuming none were provided. Lines 16 and 17 establish variables to hold the faLmR data. Lines 19-30 actually generate hte faLmR data.
+
+This function returns two variables, `faLmR_data` and `faLmR_data_norm`.
+
+Lines 406-407 in the main processing function then use these to create `faLmR_avg_over_reps` and `faLmR_avg_reps_norm` which simply takes the mean of each output over all the repetitions. 
+
+## Calculate data for tuning curves - Line 416
+
+Lines 416-417 create the tuning curve datasets, which are simply the `ts_data` averaged over the 4th dimension (the dimension with the actual data). 
+
+## Calculating histograms of pattern position data - Line 422
+
+Assuming the user provided datatypes for which to create histograms, the function `calculate_histograms.m` will run and generate the histogram data. 
+
+Line 6 gets the max value of the frame position data. We then manipulate the arrays a bit and get an array of 1:max position value. Line 15 then gives us the indices at which the data is equal to each value in that array. In line 16, we sum them all up and save them to `hist_data` which ends up being a total sum for each value from 1:max position value. 
+
+This function returns one variable, `hist_data`, which is a four dimensional array of size [num datatypes, num conditions, num repetitions, max frame position]. 
+
+## Calculate intertrial histograms - Line 433
+
+Next we check to see if intertrials were run. If so, we calculate histograms for them using the `calculate_intertrial_histograms.m` function. Before calling the function, we pull the data we need out of the `inter_ts_data` array, and then pass it into the function. Just like the last function, we simply get the maximum frame position value among the intertrials, create an array of 1:max value, and then get the indices where the data is equal to each point in that array. Summing up those indices tells us how many data points are of each value. We save this to `inter_hist_data` and return it. 
+
+## Calculate position series if relevant - Line 443
+
+Assuming the setting for position series is set to 1, the function `get_position_series.m` is called at line 443. 
+
+If `pos_conditions`, the variable determining which conditions you want position series for, is empty, then the function uses all conditions. First it checks the entire frame position dataset for non-integer numbers, which would cause an error if present.  Then in lines 28-31 we get the indices of the actual data we want to use, assuming there may be NaNs at the beginning and/or end, removing any data set by `data_pad`, etc.
+
+At line 34 it finds all indices were there is a "big step", or a change greater than 1, in the position data. If only one big step is found, it determines whether it happens more toward the beginning or end of the trial. If there are more than one big steps, then it searches for the big steps where the latter value is more than four times the previous value. It then finds all the step candidates (all indices where the frame position changes at all) but removes the data before and after a "big step", meaning it leaves us with just one cycle of frame position data, assuming at some point the frame position makes a large jump.  We get the median step size and then for each step, check to see if the change is within 50% of the median. If not, we skip it, otherwise we get the mean step value. In the end we get `pos_series` where the first dimension is condition, second dimension is repetition, third dimension is the frame position steps, and the fourth dimension is the LmR data. This allows us to plot LmR data gainst the change in frame position instead of the change in time (hence position series instead of time series).
+
+The function returns `pos_series`, discussed earlier, and `mean_pos_series` which is the position series averaged over repetitions. 
+
+## Saving the processed data - Lines 455-484
+
+Lines 455-468 simply save some of the variables produced throughout the processing as new variables which have names that are more easily understood by the user. These variables will all be saved in a .mat file and the goal is for a user to be able to understand what they are by their variable name alone, rather than having to reference the documentation every time. 
+
+After the re-naming, we save a long list of variables in the experiment folder, under the processed filename given by the user. 
+
+Note the `else` statement at 486, tied to the `if` statement started at line 347. Most of the dataset creation listed above is for flying experiments, and this if statement separates flying experiments from other types (walking). After this `else` comes the dataset generation done for non-flying experiments, and a new save command saving different variables. The dataset generation is not nearly as extensive for non-flying experiments. We still average the timeseries data over repetitions, get the tuning curve data, and create histogram data for the intertrials (all done the same way). The rest is not included. As such, there are many fewer variables being saved for a non-flying experiment. 
+
+## Bad conditions reporting - Line 525
+
+The last thing done is creating a text file in which the bad conditions are summarized. This uses the variable created earlier in the processing, `bad_conds_summary` which is a cell arrray of text lines that are printed into a text file and saved based on the file path and name provided by the user. 
 
 
 
