@@ -192,6 +192,7 @@ function plot_falmr_timeseries(falmr_data, timestampsIN, plot_settings, exp_sett
 
                             end
                         end
+                        xline(0);
                         % 
                         % if pattern_motion_indicator == 1
                         %     if max(move_line)-min(move_line) > 50
