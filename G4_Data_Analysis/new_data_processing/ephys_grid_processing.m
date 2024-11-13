@@ -1,16 +1,44 @@
 function ephys_grid_processing(exp_folder)
     
-    channel_order = {'current', 'voltage'};
+    channel_order = {'current', 'voltage', 'Frame Position'};
     len_var_tol = .05; % By what percentage can the display time of a square vary before tossing it
     path_to_protocol = '';
     trial_options = [0 0 0];
+    command_string = 'Start-Display';
+    manual_first_start = 0;
+    data_rate = 1000;
+    num_ts_datatypes = length(channel_order);
+    pre_dur = 0;
+    post_dur = 0;
+    time_conv = 1000000;
+   
+
+    metadata_file = fullfile(exp_folder, 'metadata.mat');
+
+    % Metadata file contains list of conditions that were bad the first
+    % time and re-run.
+    if isfile(metadata_file)
+        load(metadata_file)
+        if isfield(metadata, 'trials_rerun')
+            trials_rerun = metadata.trials_rerun;
+        else
+            trials_rerun = [];
+        end
+    else
+        metadata = {};
+        trials_rerun = [];
+    end
 
 
     Log = load_tdms_log(exp_folder);
     Current_idx = find(strcmpi(channel_order, 'current'));
     Volt_idx = find(strcmpi(channel_order, 'voltage'));
-    exp_data = load(path_to_protocol);
+    Frame_ind = strcmpi(channel_order,'Frame Position');
+    num_ADC_chans = length(Log.ADC.Channels);
 
+    % We will split up the data by condition first (four conditions, two
+    % with squares displaying bright and two with squares displaying dark),
+    % then split up each condition by frame position.
     [exp_order, num_conds, num_reps, total_exp_trials] = get_exp_order(exp_folder, trial_options);
 
     % Get position functions so we know how long each square is supposed to
@@ -18,8 +46,76 @@ function ephys_grid_processing(exp_folder)
 
     [position_functions, exp] = get_position_functions(path_to_protocol, num_conds);
 
+    % These start and stop timestamps refer to entire conditions, not individual
+    % square displays, so if there's only 4 trials with no inter/pre/post,
+    % then there should only be 4 elements in each array. 
+    [start_idx, stop_idx, start_disp_times, stop_disp_times] = get_start_stop_times(Log, command_string, manual_first_start);
+
+    [times, ended_early, num_trials_short] = separate_originals_from_reruns(start_disp_times, stop_disp_times, start_idx, ...
+        trial_options, trials_rerun, num_conds, num_reps);
+
+      %get order of mode and pattern IDs (maybe use for error-checking?)
+    [modeID_order, patternID_order] = get_modeID_order(combined_command, Log, times.origin_start_idx);
+
+        [num_trials, trial_start_times, trial_stop_times, trial_modes, ...
+    intertrial_start_times, intertrial_stop_times, intertrial_durs, times] = ...
+    get_trial_startStop(exp_order, trial_options, times, modeID_order, ...
+    time_conv, trials_rerun, ended_early);
+
+    %Get the number of conditions short (versus total trials short) if experiment was ended early.
+    num_conds_short = num_trials - length(trial_start_times);
+
+    %get information about the data (durations, modes, gaps, etc) organized
+    %by condition/repetition
+    [cond_dur, cond_modes, cond_start_times, cond_gaps] = organize_durations_modes(num_conds, num_reps, ...
+    num_trials, exp_order, trial_stop_times, trial_start_times,  ...
+    trial_modes, time_conv, ended_early, num_conds_short);
+
+    % pre-allocate arrays for aligning the timeseries data
+    [cond_time, cond_data, inter_ts_time, inter_ts_data] = create_ts_arrays(cond_dur, data_rate, pre_dur, post_dur, num_ts_datatypes, ...
+    num_conds, num_reps, trial_options, intertrial_durs, num_trials);
+
+     % unaligned_ts_data: timeseries data that has not been aligned yet organized by cond/rep.
+
+    [unaligned_cond_data, unaligned_inter_data] = get_unaligned_data(cond_data, num_ADC_chans, Log, ...
+        trial_start_times, trial_stop_times, num_trials, num_conds_short, ...
+        exp_order, Frame_ind, time_conv, intertrial_start_times, ...
+        intertrial_stop_times, inter_ts_data, trial_options);
+
+    %Get frame position movement times (expected and actual) and time gaps
+    %between them. 
+    [expected_frame_moves, frame_moves] = get_frame_gaps(position_functions, ...
+    unaligned_cond_data, Frame_ind);
+
+    
+    maxdiffs = [];
+    for move = 1:length(position_functions)
+        maxdiffs(move) = max(diff(expected_frame_moves(move,:)));
+    end
+    longest_dur = max(maxdiffs);
+    data_period = 1/data_rate;
+    num_frames = max(position_functions{1}(:))-1;
+    ts_time = 0-data_period:data_period:longest_dur+data_period;
+    ts_data = nan([num_ts_datatypes num_conds num_reps num_frames longest_dur]);
+
+
+
+
+    % Create empty arrays to fill with the data. Data arrays should have
+    % one dimension size equal to the number of channels, one equal to the number of conditions
+    % conditions, one equal to the number of repetitions, and one equal to
+    % the number of frames - 1 in the pattern. So [channels conditions reps
+    % frames-1 data]
+
+    % Get the longest display of a square from the position functions to
+    % set size of the last dimension. 
+
+
+
     raw_volt_data = Log.ADC.Volts(Volt_idx,:);
     raw_curr_data = Log.ADC.Volts(Current_idx,:);
     raw_frame_data = Log.Frames.Position(1,:);
+
+
 
 end
