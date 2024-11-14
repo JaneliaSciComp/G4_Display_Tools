@@ -11,9 +11,9 @@ function ephys_grid_processing(exp_folder)
     pre_dur = 0;
     post_dur = 0;
     time_conv = 1000000;
-   
-
+    corrTolerance = .05;
     metadata_file = fullfile(exp_folder, 'metadata.mat');
+    neutral_frame = 1; % The frame of the pattern that is neutral, to be shown between each square
 
     % Metadata file contains list of conditions that were bad the first
     % time and re-run.
@@ -28,7 +28,6 @@ function ephys_grid_processing(exp_folder)
         metadata = {};
         trials_rerun = [];
     end
-
 
     Log = load_tdms_log(exp_folder);
     Current_idx = find(strcmpi(channel_order, 'current'));
@@ -82,21 +81,40 @@ function ephys_grid_processing(exp_folder)
         exp_order, Frame_ind, time_conv, intertrial_start_times, ...
         intertrial_stop_times, inter_ts_data, trial_options);
 
+    alignment_data = position_cross_corr(position_functions, ...
+    num_conds_short, cond_modes, unaligned_cond_data, Frame_ind, corrTolerance);
+
+    shifted_cond_data = shift_xcorrelated_data(unaligned_cond_data, alignment_data, ...
+    Frame_ind, num_ADC_chans);
+
+    [pattern_movement_times, pos_func_movement_times, bad_conds_movement, ...
+    bad_reps_movement] = get_pattern_move_times(shifted_cond_data, ...
+    position_functions, Frame_ind);
+    [intertrial_move_times] = get_intertrial_move_times(unaligned_inter_data, Frame_ind);
+
+    shifted_cond_data = remove_bad_conditions(shifted_cond_data, bad_conds_movement, bad_reps_movement);
+
     %Get frame position movement times (expected and actual) and time gaps
     %between them. 
-    [expected_frame_moves, frame_moves] = get_frame_gaps(position_functions, ...
-    unaligned_cond_data, Frame_ind);
-
-    
+    [expected_frame_moves, frame_moves, expected_frame_gaps, frame_gaps] = ...
+        get_frame_gaps(position_functions, shifted_cond_data, Frame_ind);
+     
     maxdiffs = [];
     for move = 1:length(position_functions)
-        maxdiffs(move) = max(diff(expected_frame_moves(move,:)));
+        maxdiffs(move) = max(expected_frame_gaps(move,:));
     end
     longest_dur = max(maxdiffs);
     data_period = 1/data_rate;
     num_frames = max(position_functions{1}(:))-1;
     ts_time = 0-data_period:data_period:longest_dur+data_period;
     ts_data = nan([num_ts_datatypes num_conds num_reps num_frames longest_dur]);
+
+    %Check quality. There are likely gaps in frame_gaps from noise frames
+    %at beginning or end. Compare gaps to expected gaps and remove excess
+
+    ts_data = separate_grid_data(ts_data, shifted_cond_data);
+
+
 
 
 
