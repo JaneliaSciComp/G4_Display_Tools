@@ -92,27 +92,29 @@ function ephys_grid_processing(exp_folder)
     position_functions, Frame_ind);
     [intertrial_move_times] = get_intertrial_move_times(unaligned_inter_data, Frame_ind);
 
-    shifted_cond_data = remove_bad_conditions(shifted_cond_data, bad_conds_movement, bad_reps_movement);
+   % shifted_cond_data = remove_bad_conditions(shifted_cond_data, bad_conds_movement, bad_reps_movement);
 
     %Get frame position movement times (expected and actual) and time gaps
     %between them. 
-    [expected_frame_moves, frame_moves, expected_frame_gaps, frame_gaps] = ...
+    [exp_frame_moves, exp_frame_move_inds, frame_moves, ...
+    frame_move_inds, exp_frame_gaps,frame_gaps, bad_gaps] = ...
         get_frame_gaps(position_functions, shifted_cond_data, Frame_ind);
      
     maxdiffs = [];
     for move = 1:length(position_functions)
-        maxdiffs(move) = max(expected_frame_gaps(move,:));
+        maxdiffs(move) = max(exp_frame_gaps(move,:));
     end
     longest_dur = max(maxdiffs);
     data_period = 1/data_rate;
     num_frames = max(position_functions{1}(:))-1;
+    
     ts_time = 0-data_period:data_period:longest_dur+data_period;
     ts_data = nan([num_ts_datatypes num_conds num_reps num_frames longest_dur]);
 
     %Check quality. There are likely gaps in frame_gaps from noise frames
     %at beginning or end. Compare gaps to expected gaps and remove excess
 
-    ts_data = separate_grid_data(ts_data, shifted_cond_data);
+    ts_data = separate_grid_data(ts_data, shifted_cond_data, frame_move_inds, Frame_ind, num_frames);
 
 
 
