@@ -959,6 +959,8 @@ classdef G4_designer_view < handle
         function open_file(self, ~, ~, filepath)
             self.con.open_file(filepath);
             self.update_gui();
+            set(self.num_rows_1, 'Enable', 'off');
+            set(self.num_rows_2, 'Enable', 'off');
             set(self.num_rows_3, 'Enable', 'off');
             set(self.num_rows_4, 'Enable', 'off');
 
