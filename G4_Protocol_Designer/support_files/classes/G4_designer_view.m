@@ -24,6 +24,8 @@ classdef G4_designer_view < handle
         chan3_rate_box
         chan4_rate_box
         num_rows_buttonGrp
+        num_rows_1
+        num_rows_2
         num_rows_3
         num_rows_4
         recent_file_menu_items
@@ -320,15 +322,21 @@ classdef G4_designer_view < handle
                 'Position', [.05, .1, .5, .17].*[chan_pan_size_pix, chan_pan_size_pix]);
 
             self.num_rows_buttonGrp = uibuttongroup(self.f, 'units', 'normalized', ...
-                'Position', [left_margin, chan_pan.Position(2) - .05, chan_pan.Position(3), .04], 'SelectionChangedFcn', @self.update_rowNum);
+                'Position', [left_margin, chan_pan.Position(2) - .1, chan_pan.Position(3), .08], 'SelectionChangedFcn', @self.update_rowNum);
             rowGrpSize = [self.num_rows_buttonGrp.Position(3), self.num_rows_buttonGrp.Position(4)];
             rowGrpSize_pix = rowGrpSize .* self.f.Position(3:4);
 
+            self.num_rows_1 = uiradiobutton(self.num_rows_buttonGrp, 'Text', '1 Row Screen', ...
+                'FontSize', font_size, 'Position', [.05, .55, .45, .45].*[rowGrpSize_pix, rowGrpSize_pix]);
+
+            self.num_rows_2 = uiradiobutton(self.num_rows_buttonGrp, 'Text', '2 Row Screen', ...
+                'FontSize', font_size, 'Position', [.5, .55, .45, .45].*[rowGrpSize_pix, rowGrpSize_pix]);
+
             self.num_rows_3 = uiradiobutton(self.num_rows_buttonGrp, 'Text', '3 Row Screen', ...
-                'FontSize', font_size, 'Position', [.05, .05, .45, .9].*[rowGrpSize_pix, rowGrpSize_pix]);
+                'FontSize', font_size, 'Position', [.05, .05, .45, .45].*[rowGrpSize_pix, rowGrpSize_pix]);
 
             self.num_rows_4 = uiradiobutton(self.num_rows_buttonGrp, 'Text', '4 Row Screen', ...
-                'FontSize', font_size, 'Position', [.5, .05, .45, .9].*[rowGrpSize_pix, rowGrpSize_pix]);
+                'FontSize', font_size, 'Position', [.5, .05, .45, .45].*[rowGrpSize_pix, rowGrpSize_pix]);
 
 
             key_pan = uipanel(self.f, 'Title', 'Mode Key:', 'BackgroundColor', [.75, .75, .75], ...
@@ -432,7 +440,11 @@ classdef G4_designer_view < handle
             if strcmp(value,'off') == 1
                 %do nothing
             else
-                if self.con.get_num_rows() == 3
+                if self.con.get_num_rows() == 1
+                    set(self.num_rows_buttonGrp,'SelectedObject',self.num_rows_1);
+                elseif self.con.get_num_rows() == 2
+                    set(self.num_rows_buttonGrp,'SelectedObject',self.num_rows_2);
+                elseif self.con.get_num_rows() == 3
                     set(self.num_rows_buttonGrp,'SelectedObject',self.num_rows_3);
                 else
                     set(self.num_rows_buttonGrp,'SelectedObject',self.num_rows_4);
@@ -553,14 +565,15 @@ classdef G4_designer_view < handle
             end
 
             if is_table == 1
+
+                 %Fill embedded list with imported files appropriate for the
+                %selected cell
+                self.provide_file_list(event);
+
                 %get index of selected cell, table it resides in, and
                 %string of the file in the cell if its index is 2-7
                 file = self.check_table_selected(src, event);
-
-                %Fill embedded list with imported files appropriate for the
-                %selected cell
-                self.provide_file_list(event);
-                
+       
             else
                 file = self.listbox_imported_files.Value;
             end
@@ -934,6 +947,8 @@ classdef G4_designer_view < handle
         function import(self, ~, ~)
 
             self.con.import();
+            set(self.num_rows_1, 'Enable', 'off');
+            set(self.num_rows_2, 'Enable', 'off');
             set(self.num_rows_3, 'Enable', 'off');
             set(self.num_rows_4, 'Enable', 'off');
 
@@ -1035,7 +1050,11 @@ classdef G4_designer_view < handle
         end
         function update_rowNum(self, ~, event)
             new = event.NewValue.Text;
-            if strcmp(new, '3 Row Screen') == 1
+            if strcmp(new, '1 Row Screen')
+                new_val = 1;
+            elseif strcmp(new, '2 Row Screen')
+                new_val = 2;
+            elseif strcmp(new, '3 Row Screen') 
                 new_val = 3;
             else
                 new_val = 4;
