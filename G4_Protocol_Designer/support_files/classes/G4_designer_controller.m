@@ -1127,7 +1127,11 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                 index_of_pat = find(strcmp(pat_fields(:), pat_field));
 
                 if index_of_pat > length(pos_fields)
-                    index_of_pat = rem(length(pos_fields), index_of_pat);
+                    if length(pos_fields) > 0
+                        index_of_pat = rem(length(pos_fields), index_of_pat);
+                    else
+                        index_of_pat = [];
+                    end
                 end
                 if ~isempty(index_of_pat)
                     pos_field = pos_fields{index_of_pat};
