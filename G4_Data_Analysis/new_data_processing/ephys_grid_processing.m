@@ -114,11 +114,8 @@ function ephys_grid_processing(exp_folder)
     %Check quality. There are likely gaps in frame_gaps from noise frames
     %at beginning or end. Compare gaps to expected gaps and remove excess
 
-    ts_data = separate_grid_data(ts_data, shifted_cond_data, frame_move_inds, Frame_ind, num_frames);
-
-
-
-
+    ts_data = separate_grid_data(ts_data, shifted_cond_data, frame_move_inds, ...
+        Frame_ind, num_frames, num_ADC_chans);
 
 
     % Create empty arrays to fill with the data. Data arrays should have

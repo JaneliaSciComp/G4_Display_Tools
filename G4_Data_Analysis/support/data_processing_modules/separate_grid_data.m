@@ -1,8 +1,9 @@
 function ts_data = separate_grid_data(ts_data, shifted_cond_data, ...
-    frame_move_inds, Frame_ind, num_frames)
+    frame_move_inds, Frame_ind, num_frames, num_ADC_chans)
     stim_order = [];
     stim = 1;
     frame_data = squeeze(shifted_cond_data(Frame_ind, :, :, :));
+
     for cond = 1:size(frame_data,1)
         for rep = 1:size(frame_data,2)
             for ind = 1:2:size(frame_move_inds,3) %first index where it changes is start of first stim

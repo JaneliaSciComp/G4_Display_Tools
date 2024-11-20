@@ -21,7 +21,7 @@ function [expected_frame_moves, expected_frame_move_inds, frame_moves, ...
             c = 1;
             for t = 1:size(cond_data,4)
                 if cond_data(Frame_ind, cond, rep, t+1)-cond_data(Frame_ind, cond, rep, t)~= 0
-                    frame_move_inds(cond, rep, c) = t+1;
+                    frame_move_inds(cond, rep, c Adde) = t+1;
                     frame_moves(cond, rep, c) = [cond_data(Frame_ind, cond, rep, t) cond_data(Frame_ind, cond, rep, t+1)];
                     c = c+1;
                 end
