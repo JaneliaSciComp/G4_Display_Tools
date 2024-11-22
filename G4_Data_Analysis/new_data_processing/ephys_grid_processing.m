@@ -103,7 +103,7 @@ function ephys_grid_processing(exp_folder)
     %between them. 
     [exp_frame_moves, exp_frame_move_inds, frame_moves, ...
     frame_move_inds, exp_frame_gaps,frame_gaps, bad_gaps] = ...
-        get_frame_gaps(position_functions, shifted_cond_data, Frame_ind);
+        get_frame_gaps(expanded_posfuncs, shifted_cond_data, Frame_ind);
      
     maxdiffs = [];
     for move = 1:length(position_functions)
