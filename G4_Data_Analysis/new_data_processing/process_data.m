@@ -166,7 +166,7 @@ function process_data(exp_folder, processing_settings_file)
     % function (the expected frame position data) in the cell array
     % position_functions which has one element per condition. Save
     % experiment data (the loaded .g4p file) in exp for future use. 
-    [position_functions, exp] = get_position_functions(path_to_protocol, num_conds);
+    [position_functions, expanded_posfuncs, exp] = get_position_functions(path_to_protocol, num_conds);
 
     % Determine the start and stop times based on start-display command of
     % each trial (will be used later to find precise start/stop times).
@@ -262,7 +262,7 @@ function process_data(exp_folder, processing_settings_file)
     %       shifted
     %       - conds_outside_corr_tol: the cond/rep pairs for which
     %       percent_off_zero falls outside of tolerance. 
-    alignment_data = position_cross_corr(position_functions, ...
+    alignment_data = position_cross_corr(expanded_posfuncs, ...
     num_conds_short, cond_modes, unaligned_ts_data, Frame_ind, corrTolerance);
 
     % Check cross correlation data against the correlation tolerance which
