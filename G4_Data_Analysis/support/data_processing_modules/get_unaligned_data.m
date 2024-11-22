@@ -26,8 +26,8 @@ function [unaligned_ts_data, unaligned_inter_data] = get_unaligned_data(ts_data,
                 data = [data nan([1 diff])];
                 time = [time nan([1 diff])];
             elseif length(data) > size(unaligned_ts_data,4)
-                data(size(unaligned_ts_data,4):end) = [];
-                time(size(unaligned_ts_data,4):end) = []; 
+                data(size(unaligned_ts_data,4)+1:end) = [];
+                time(size(unaligned_ts_data,4)+1:end) = []; 
             end
             
             unaligned_ts_data(chan, cond, rep, :) = data;
@@ -113,6 +113,9 @@ function [unaligned_ts_data, unaligned_inter_data] = get_unaligned_data(ts_data,
             end
             unaligned_inter_data(Frame_ind, trial, :) = full_int_data;
     %        unaligned_inter_time(Frame_ind, trial, :) = fr_time_int;
+
+         elseif trial_options(2) == 0
+             unaligned_inter_data = [];
 %
         end
     end

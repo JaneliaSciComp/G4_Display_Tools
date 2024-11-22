@@ -2,9 +2,10 @@ function ephys_grid_processing(exp_folder)
     
     channel_order = {'current', 'voltage', 'Frame Position'};
     len_var_tol = .05; % By what percentage can the display time of a square vary before tossing it
-    path_to_protocol = '';
-    trial_options = [0 0 0];
+    path_to_protocol = 'C:\Users\taylo\Documents\Programming\Reiser\EphysGridTestData\Protocol1_12px_6px_LHS_2sbkg_200ms_50ms_11-22-24_10-49-82\Protocol1_12px_6px_LHS_2sbkg_200ms_50ms_11-22-24_10-49-82.g4p';
+    trial_options = [1 0 0];
     command_string = 'Start-Display';
+    combined_command = 0;
     manual_first_start = 0;
     data_rate = 1000;
     num_ts_datatypes = length(channel_order);
@@ -43,7 +44,7 @@ function ephys_grid_processing(exp_folder)
     % Get position functions so we know how long each square is supposed to
     % display for
 
-    [position_functions, exp] = get_position_functions(path_to_protocol, num_conds);
+    [position_functions, expanded_posfuncs, exp] = get_position_functions(path_to_protocol, num_conds);
 
     % These start and stop timestamps refer to entire conditions, not individual
     % square displays, so if there's only 4 trials with no inter/pre/post,
@@ -81,7 +82,7 @@ function ephys_grid_processing(exp_folder)
         exp_order, Frame_ind, time_conv, intertrial_start_times, ...
         intertrial_stop_times, inter_ts_data, trial_options);
 
-    alignment_data = position_cross_corr(position_functions, ...
+    alignment_data = position_cross_corr(expanded_posfuncs, ...
     num_conds_short, cond_modes, unaligned_cond_data, Frame_ind, corrTolerance);
 
     shifted_cond_data = shift_xcorrelated_data(unaligned_cond_data, alignment_data, ...
@@ -90,7 +91,11 @@ function ephys_grid_processing(exp_folder)
     [pattern_movement_times, pos_func_movement_times, bad_conds_movement, ...
     bad_reps_movement] = get_pattern_move_times(shifted_cond_data, ...
     position_functions, Frame_ind);
-    [intertrial_move_times] = get_intertrial_move_times(unaligned_inter_data, Frame_ind);
+    if ~isempty(unaligned_inter_data)
+        [intertrial_move_times] = get_intertrial_move_times(unaligned_inter_data, Frame_ind);
+    else
+        intertrial_move_times = [];
+    end
 
    % shifted_cond_data = remove_bad_conditions(shifted_cond_data, bad_conds_movement, bad_reps_movement);
 

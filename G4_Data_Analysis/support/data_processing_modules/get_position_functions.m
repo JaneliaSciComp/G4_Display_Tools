@@ -1,4 +1,4 @@
-function [position_functions, exp] = get_position_functions(path_to_protocol, num_conds)
+function [position_functions, expanded_posfuncs, exp] = get_position_functions(path_to_protocol, num_conds)
 
     exp = load(path_to_protocol,'-mat');
     [expPath, expName, ~] = fileparts(path_to_protocol);
@@ -13,11 +13,20 @@ function [position_functions, exp] = get_position_functions(path_to_protocol, nu
             funcData = load(funcPath);
             expectedData = funcData.pfnparam.func;
             position_functions{cond} = expectedData;
+            expanded_posfuncs{cond} = nan([1 length(expectedData)*2]);
+            el = 1;
+            for full = 1:2:length(expanded_posfuncs{cond})
+                expanded_posfuncs{cond}(full) = expectedData(el);
+                expanded_posfuncs{cond}(full+1) = expectedData(el);
+                el = el + 1;
+            end
         else
-            positon_functions{cond} = NaN;
+            position_functions{cond} = NaN;
         end
+        
 
     end
+
 
 
 
