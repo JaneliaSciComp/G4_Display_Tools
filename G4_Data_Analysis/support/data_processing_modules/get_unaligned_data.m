@@ -60,7 +60,7 @@ function [unaligned_ts_data, unaligned_inter_data] = get_unaligned_data(ts_data,
             full_fr_data = [full_fr_data nan([1 fr_diff])];
  %           fr_time = [fr_time nan([1 fr_diff])];
         elseif length(full_fr_data) > size(unaligned_ts_data,4)
-            full_fr_data(size(unaligned_ts_data,4):end) = [];  
+            full_fr_data(size(unaligned_ts_data,4)+1:end) = [];  
  %           fr_time(size(unaligned_ts_data,4):end) = [];  
         end
         unaligned_ts_data(Frame_ind, cond, rep, :) = full_fr_data;
