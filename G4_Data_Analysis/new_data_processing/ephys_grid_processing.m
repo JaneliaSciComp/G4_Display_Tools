@@ -15,6 +15,10 @@ function ephys_grid_processing(exp_folder)
     corrTolerance = .05;
     metadata_file = fullfile(exp_folder, 'metadata.mat');
     neutral_frame = 1; % The frame of the pattern that is neutral, to be shown between each square
+    grid_columns(1) = 8;
+    grid_columns(2) = 16;
+    grid_rows(1) = 4;
+    grid_rows(2) = 8;
 
     % Metadata file contains list of conditions that were bad the first
     % time and re-run.
@@ -104,17 +108,22 @@ function ephys_grid_processing(exp_folder)
     [exp_frame_moves, exp_frame_move_inds, frame_moves, ...
     frame_move_inds, exp_frame_gaps,frame_gaps, bad_gaps] = ...
         get_frame_gaps(expanded_posfuncs, shifted_cond_data, Frame_ind);
+
+    
      
     maxdiffs = [];
     for move = 1:length(position_functions)
-        maxdiffs(move) = max(exp_frame_gaps(move,:));
+        maxdiffs(move) = max(exp_frame_gaps{move}(:));
     end
     longest_dur = max(maxdiffs);
     data_period = 1/data_rate;
-    num_frames = max(position_functions{1}(:))-1;
+    for cond = 1:num_conds
+        num_frames(cond) = max(position_functions{cond}(:));
+    end
+    max_num_frames = max(num_frames);
     
     ts_time = 0-data_period:data_period:longest_dur+data_period;
-    ts_data = nan([num_ts_datatypes num_conds num_reps num_frames longest_dur]);
+    ts_data = nan([num_ts_datatypes num_conds num_reps max_num_frames longest_dur]);
 
     %Check quality. There are likely gaps in frame_gaps from noise frames
     %at beginning or end. Compare gaps to expected gaps and remove excess
@@ -122,22 +131,9 @@ function ephys_grid_processing(exp_folder)
     ts_data = separate_grid_data(ts_data, shifted_cond_data, frame_move_inds, ...
         Frame_ind, num_frames, num_ADC_chans);
 
-
-    % Create empty arrays to fill with the data. Data arrays should have
-    % one dimension size equal to the number of channels, one equal to the number of conditions
-    % conditions, one equal to the number of repetitions, and one equal to
-    % the number of frames - 1 in the pattern. So [channels conditions reps
-    % frames-1 data]
-
-    % Get the longest display of a square from the position functions to
-    % set size of the last dimension. 
-
-
-
-    raw_volt_data = Log.ADC.Volts(Volt_idx,:);
-    raw_curr_data = Log.ADC.Volts(Current_idx,:);
-    raw_frame_data = Log.Frames.Position(1,:);
-
-
+    %% Next need to plot the data from ts_data in a grid where each axis is a 
+    % square from the grid on the arena screen and the appropriate data is
+    % plotted in it. Need number of columns and rows of grid to calculate
+    % where each frame should go.
 
 end

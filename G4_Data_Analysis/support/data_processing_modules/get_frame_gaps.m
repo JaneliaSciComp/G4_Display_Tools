@@ -15,15 +15,15 @@ function [expected_frame_moves, expected_frame_move_inds, frame_moves, ...
         end
         expected_frame_gaps{posfunc} = diff(expected_frame_move_inds{posfunc}(:));
     end
-    frame_move_inds = nan([size(cond_data,2) size(cond_data,3) size(cond_data,4)]);
+    frame_move_inds = {};
     for cond = 1:size(cond_data,2)
         for rep = 1:size(cond_data,3)
             c = 1;
             for t = 1:size(cond_data,4)-1
                 if cond_data(Frame_ind, cond, rep, t+1)-cond_data(Frame_ind, cond, rep, t)~= 0 ...
                         && ~isnan(cond_data(Frame_ind, cond, rep, t+1)-cond_data(Frame_ind, cond, rep, t))
-                    frame_move_inds(cond, rep, c) = t+1;
-                    frame_moves(cond, rep, c, :) = [cond_data(Frame_ind, cond, rep, t) cond_data(Frame_ind, cond, rep, t+1)];
+                    frame_move_inds{cond}(rep, c) = t+1;
+                    frame_moves{cond}(rep, c, :) = [cond_data(Frame_ind, cond, rep, t) cond_data(Frame_ind, cond, rep, t+1)];
                     c = c+1;
                 end
             end
@@ -33,30 +33,31 @@ function [expected_frame_moves, expected_frame_move_inds, frame_moves, ...
     
     for cond = 1:size(cond_data,2)
         for rep = 1:size(cond_data,3)
-            exp_move = expected_frame_moves(cond, 1);
+            exp_move = expected_frame_moves{cond}(1,:);
             count = 1; 
-            while exp_move ~= frame_moves(cond, rep, count) && count < size(frame_moves,3)
+            while sum(exp_move ~= [frame_moves{cond}(rep, count, 1), frame_moves{cond}(rep, count, 2)])~=0 && count < size(frame_moves{cond},2)
                 count = count + 1;
             end
-            if count > .5*size(frame_moves,3)
+            if count > .5*size(frame_moves{cond},2)
                 warning(['Condition ' num2str(cond) ' rep ' num2str(rep) ' may not have displayed properly.']);
             elseif count > 1
-                frame_move_inds(cond, rep, 1:count) = [];
-                frame_moves(cond, rep, 1:count) = [];
+                frame_move_inds{cond}(rep, 1:count-1) = [];
+                frame_moves{cond}(rep, 1:count-1) = [];
             end
         end
+        frame_gaps{cond}(rep, :) = diff(frame_move_inds{cond}(rep, :));
     end
 
-    frame_gaps(cond, rep, :) = diff(frame_move_inds(cond, rep, :));
+    
 
     %Compare the expected and measured gaps and produce a warning if
     %they're too far off. 
     bad_gaps = {};
     for cond = 1:size(frame_gaps,1)
-        for rep = 1:size(frame_gaps,2)
-            for gap = size(frame_gaps, 3)
-                gapdiff = expected_frame_gaps{cond}(gap) - frame_gaps(cond, rep, gap);
-                if abs(gapdiff/expected_frame_gaps(cond,gap)) > .2
+        for rep = 1:size(frame_gaps{cond},1)
+            for gap = size(frame_gaps{cond},2)
+                gapdiff = expected_frame_gaps{cond}(gap) - frame_gaps{cond}(rep, gap);
+                if abs(gapdiff/expected_frame_gaps{cond}(gap)) > .2
                     warning(['Condition ' num2str(cond) ' rep ' num2str(rep) ' gap ' num2str(gap) 'is more than 20% off in length and should be investigated.']);
                     bad_gaps{end+1} = [cond rep gap];
                 end
