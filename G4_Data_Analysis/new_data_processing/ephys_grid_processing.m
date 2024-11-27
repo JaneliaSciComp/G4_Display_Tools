@@ -1,6 +1,6 @@
 function ephys_grid_processing(exp_folder)
     
-    channel_order = {'current', 'voltage', 'Frame Position'};
+    channel_order = {'Frame Position', 'voltage'};
     len_var_tol = .05; % By what percentage can the display time of a square vary before tossing it
     path_to_protocol = 'C:\Users\taylo\Documents\Programming\Reiser\EphysGridTestData\Protocol1_12px_6px_LHS_2sbkg_200ms_50ms_11-22-24_10-49-82\Protocol1_12px_6px_LHS_2sbkg_200ms_50ms_11-22-24_10-49-82.g4p';
     trial_options = [1 0 0];
@@ -35,7 +35,7 @@ function ephys_grid_processing(exp_folder)
     end
 
     Log = load_tdms_log(exp_folder);
-    Current_idx = find(strcmpi(channel_order, 'current'));
+   % Current_idx = find(strcmpi(channel_order, 'current'));
     Volt_idx = find(strcmpi(channel_order, 'voltage'));
     Frame_ind = strcmpi(channel_order,'Frame Position');
     num_ADC_chans = length(Log.ADC.Channels);
@@ -110,19 +110,19 @@ function ephys_grid_processing(exp_folder)
         get_frame_gaps(expanded_posfuncs, shifted_cond_data, Frame_ind);
 
     
-     
+    data_period = 1/data_rate;
     maxdiffs = [];
     for move = 1:length(position_functions)
         maxdiffs(move) = max(exp_frame_gaps{move}(:));
+        ts_time{move} = data_period:data_period:maxdiffs(move)/data_rate;
     end
     longest_dur = max(maxdiffs);
-    data_period = 1/data_rate;
+   
     for cond = 1:num_conds
         num_frames(cond) = max(position_functions{cond}(:));
     end
     max_num_frames = max(num_frames);
     
-    ts_time = 0-data_period:data_period:longest_dur+data_period;
     ts_data = nan([num_ts_datatypes num_conds num_reps max_num_frames longest_dur]);
 
     %Check quality. There are likely gaps in frame_gaps from noise frames
@@ -130,6 +130,28 @@ function ephys_grid_processing(exp_folder)
 
     ts_data = separate_grid_data(ts_data, shifted_cond_data, frame_move_inds, ...
         Frame_ind, num_frames, num_ADC_chans);
+
+    % downsample data
+
+    % Separate the data collected from dark flashes and light flashes
+
+    [dark_sq_data, light_sq_data, dark_avgReps_data, light_avgReps_data] = ...
+    separate_light_dark(ts_data, position_functions);
+
+    % To plot
+    % Split dark square data from light square data and organize
+    % downsample the timeseries data
+
+    % through each frame 2 - all frames
+
+    % for each frame, run get_plot_spacing and then better_subplot 
+
+    % yline(0)
+    %hold on
+
+    %the prep the data and plot
+
+    create_grid_plot(dark_avgReps_data, light_avgReps_data, grid_rows, grid_columns, 2, ts_time);
 
     %% Next need to plot the data from ts_data in a grid where each axis is a 
     % square from the grid on the arena screen and the appropriate data is
