@@ -1,5 +1,7 @@
 function create_grid_plot(dark_avgReps_data, light_avgReps_data, grid_rows, grid_columns, plot_chan, timestamps)
     
+%% Need to switch back to passing in all data. WIll want to plot each rep individually
+% in light color and then the average thicker on each axis. 
     
     for cond = 1:length(dark_avgReps_data)
         fig = figure; 
@@ -13,9 +15,9 @@ function create_grid_plot(dark_avgReps_data, light_avgReps_data, grid_rows, grid
         [gap_x, gap_y] = get_plot_spacing(grid_rows(cond), grid_columns(cond));
         for dframe = 1:size(plot_data_dark,1)
             % if sum(~isnan(data_to_plot(dframe, :))) > 0
-                if cond == 2
-                    gap_x = 10;
-                    gap_y = 20;
+                if size(plot_data_dark,1) > 32
+                    gap_x = 5;
+                    gap_y = 15;
                 end
                 better_subplot(grid_rows(cond), grid_columns(cond), dframe, gap_x, gap_y);
                 yline(0);
@@ -28,9 +30,10 @@ function create_grid_plot(dark_avgReps_data, light_avgReps_data, grid_rows, grid
                 % if dframe == (grid_rows(cond) - 1)*grid_columns(cond) + 1
                 %     xlabel('ms');
                 % end
-                set(gca, 'Xcolor', 'w', 'Ycolor', 'w');
+                set(gca, 'Xcolor', '#F0F0F0', 'Ycolor', '#F0F0F0');
                 set(gca, 'XTick', []);
                 set(gca, 'YTick', []);
+                set(gca, 'color', '#F0F0F0');
             % end
         end
         
@@ -41,9 +44,9 @@ function create_grid_plot(dark_avgReps_data, light_avgReps_data, grid_rows, grid
         newfig = figure;
 
         for lframe = 1:size(plot_data_light,1)
-             if cond == 2
-                gap_x = 10;
-                gap_y = 20;
+             if size(plot_data_light,1) > 32
+                gap_x = 5;
+                gap_y = 15;
             end
             better_subplot(grid_rows(cond), grid_columns(cond), lframe, gap_x, gap_y);
             yline(0);
@@ -56,9 +59,10 @@ function create_grid_plot(dark_avgReps_data, light_avgReps_data, grid_rows, grid
             % if lframe == (grid_rows(cond) - 1)*grid_columns(cond) + 1
             %     xlabel('ms');
             % end
-            set(gca, 'Xcolor', 'w', 'Ycolor', 'w');
+            set(gca, 'Xcolor', '#F0F0F0', 'Ycolor', '#F0F0F0');
             set(gca, 'XTick', []);
             set(gca, 'YTick', []);
+            set(gca, 'color', '#F0F0F0');
             sgtitle(light_plot_title);
 
             hold off
