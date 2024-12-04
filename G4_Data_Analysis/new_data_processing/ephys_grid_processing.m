@@ -1,6 +1,12 @@
 function ephys_grid_processing(s, exp_folder)
     
-    
+    if isfile(s)
+        s = load(s);
+        s = s.settings;
+    end
+
+    processed_file_name = s.processed_file_name;
+
     channel_order = s.channel_order; 
     len_var_tol = s.len_var_tol; % By what percentage can the display time of a square vary before tossing it
     path_to_protocol = s.path_to_protocol;
@@ -197,6 +203,15 @@ function ephys_grid_processing(s, exp_folder)
         2, ts_time_ds, gaussFitsDark, gaussFitsLight, gaussValsDark, gaussValsLight);
 
     peak_frames = get_peak(ts_data, Volt_idx);
+
+
+    save(fullfile(exp_folder,processed_file_name), 'ts_data', 'neutral_ts_data', ...
+        'channel_order', 'frame_moves', 'frame_move_inds', 'frame_gaps', 'bad_gaps', ...
+        'dark_sq_data', 'dark_sq_neutral', 'light_sq_neutral', 'light_sq_data', ...
+        'dark_sq_data_ds', 'light_sq_data_ds', 'dark_avgReps_neutral', 'dark_avgReps_data', ...
+        'light_avgReps_neutral', 'light_avgReps_data', 'alignment_data', 'gaussValsDark', ...
+        'gaussValsLight', 'gaussFitsLight', 'gaussFitsDark', 'peak_frames');
+
  
 
 end

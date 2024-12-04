@@ -44,8 +44,9 @@ function [expected_frame_moves, expected_frame_move_inds, frame_moves, ...
                 frame_move_inds{cond, rep}(1:count-1) = [];
                 frame_moves{cond, rep}(1:count-1) = [];
             end
+            frame_gaps{cond}(rep, :) = diff(frame_move_inds{cond, rep}(:));
         end
-        frame_gaps{cond}(rep, :) = diff(frame_move_inds{cond, rep}(:));
+        
     end
 
     
