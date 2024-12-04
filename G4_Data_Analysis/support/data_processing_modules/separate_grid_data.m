@@ -1,7 +1,8 @@
-function ts_data = separate_grid_data(ts_data, shifted_cond_data, ...
+function [ts_data, neutral_ts_data] = separate_grid_data(ts_data, shifted_cond_data, ...
     frame_move_inds, Frame_ind, num_frames, num_ADC_chans)
     stim_order = {};
     frame_data = shifted_cond_data(Frame_ind, :, :, :); 
+    neutral_ts_data = ts_data;
 
     for cond = 1:size(frame_data,2)
         for rep = 1:size(frame_data,3)
@@ -28,10 +29,16 @@ function ts_data = separate_grid_data(ts_data, shifted_cond_data, ...
         for cond = 1:size(ts_data,2)
             for rep = 1:size(ts_data,3)
                 stim = 1;
+                first_neutral_data = squeeze(shifted_cond_data(chan, cond, rep, 1:frame_move_inds{cond}(1)-1));
+                first_frame = stim_order{cond}(rep, 1);
+                neutral_ts_data(chan, cond, rep, first_frame, 1:length(first_neutral_data)) = first_neutral_data;
                 for ind = 1:2:size(frame_move_inds{cond},2) %first index where it changes is start of first stim
 
                     frame = stim_order{cond}(rep, stim);
                     data = shifted_cond_data(chan, cond, rep, frame_move_inds{cond}(ind):(frame_move_inds{cond}(ind+1)-1));
+                    if ind > 1
+                        neutral_data = shifted_cond_data(chan, cond, rep, frame_move_inds{cond}(ind-1):frame_move_inds{cond}(ind)-1);
+                    end
                     dif = size(ts_data(chan, cond, rep, frame, :),5)-size(data,4);
                     if dif > 0
                         data(end+1:end+dif) = NaN;
@@ -40,6 +47,9 @@ function ts_data = separate_grid_data(ts_data, shifted_cond_data, ...
                     end
     
                     ts_data(chan, cond, rep, frame, :) = data;
+                    if ind > 1
+                        neutral_ts_data(chan, cond, rep, frame, 1:length(neutral_data)) = neutral_data;
+                    end
                     stim = stim + 1;
 
                 end

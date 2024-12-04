@@ -2,7 +2,7 @@ function ephys_grid_processing(exp_folder)
     
     channel_order = {'Frame Position', 'voltage'};
     len_var_tol = .05; % By what percentage can the display time of a square vary before tossing it
-    path_to_protocol = 'C:\Users\taylo\Documents\Programming\Reiser\EphysGridTestData\Protocol1_12px_6px_LHS_2sbkg_200ms_50ms_11-22-24_10-49-82\Protocol1_12px_6px_LHS_2sbkg_200ms_50ms_11-22-24_10-49-82.g4p';
+    path_to_protocol = 'C:\Users\taylo\Documents\Programming\Reiser\EphysGridTestData\protocol1_4reps_12px_6px_LHS_2sbkg_200msfl_50msint_11-27-24_15-02-95\protocol1_4reps_12px_6px_LHS_2sbkg_200msfl_50msint_11-27-24_15-02-95.g4p';
     trial_options = [1 0 0];
     command_string = 'Start-Display';
     combined_command = 0;
@@ -19,6 +19,7 @@ function ephys_grid_processing(exp_folder)
     grid_columns(2) = 16;
     grid_rows(1) = 4;
     grid_rows(2) = 8;
+    downsample_n = 5;
 
     % Metadata file contains list of conditions that were bad the first
     % time and re-run.
@@ -128,7 +129,7 @@ function ephys_grid_processing(exp_folder)
     %Check quality. There are likely gaps in frame_gaps from noise frames
     %at beginning or end. Compare gaps to expected gaps and remove excess
 
-    ts_data = separate_grid_data(ts_data, shifted_cond_data, frame_move_inds, ...
+    [ts_data, neutral_ts_data] = separate_grid_data(ts_data, shifted_cond_data, frame_move_inds, ...
         Frame_ind, num_frames, num_ADC_chans);
 
     % downsample data
@@ -138,24 +139,30 @@ function ephys_grid_processing(exp_folder)
     [dark_sq_data, light_sq_data, dark_avgReps_data, light_avgReps_data] = ...
     separate_light_dark(ts_data, position_functions);
 
-    % To plot
-    % Split dark square data from light square data and organize
-    % downsample the timeseries data
+    % For each square subtract average response from average response
+    % during the neutral time right before the square displayed. Do
+    % gaussian fit on this grid of numbers to find peak location.
 
-    % through each frame 2 - all frames
 
-    % for each frame, run get_plot_spacing and then better_subplot 
 
-    % yline(0)
-    %hold on
+    %downsample the data to be plotted: 
+    for cond = 1:length(dark_sq_data)
+        for chan = 1:size(dark_sq_data{cond},1)
+            for rep = 1:size(dark_sq_data{cond},3)
+                for frame = 1:size(dark_sq_data{cond},4)
+                    dark_sq_data_ds{cond}(chan,1,rep,frame,:) = downsample(squeeze(dark_sq_data{cond}(chan,1,rep,frame,:)),downsample_n);
+                    light_sq_data_ds{cond}(chan,1,rep,frame,:) = downsample(squeeze(light_sq_data{cond}(chan,1,rep,frame,:)),downsample_n);
+                end
+            end
+        end
+        ts_time_ds{cond} = downsample(ts_time{cond}, downsample_n);
+    end
 
-    %the prep the data and plot
 
-    create_grid_plot(dark_avgReps_data, light_avgReps_data, grid_rows, grid_columns, 2, ts_time);
 
-    %% Next need to plot the data from ts_data in a grid where each axis is a 
-    % square from the grid on the arena screen and the appropriate data is
-    % plotted in it. Need number of columns and rows of grid to calculate
-    % where each frame should go.
+    create_grid_plot(dark_sq_data_ds, light_sq_data_ds, grid_rows, grid_columns, 2, ts_time_ds);
+
+    peak_frames = get_peak(ts_data, Volt_idx);
+ 
 
 end

@@ -22,8 +22,8 @@ function [expected_frame_moves, expected_frame_move_inds, frame_moves, ...
             for t = 1:size(cond_data,4)-1
                 if cond_data(Frame_ind, cond, rep, t+1)-cond_data(Frame_ind, cond, rep, t)~= 0 ...
                         && ~isnan(cond_data(Frame_ind, cond, rep, t+1)-cond_data(Frame_ind, cond, rep, t))
-                    frame_move_inds{cond}(rep, c) = t+1;
-                    frame_moves{cond}(rep, c, :) = [cond_data(Frame_ind, cond, rep, t) cond_data(Frame_ind, cond, rep, t+1)];
+                    frame_move_inds{cond, rep}(c) = t+1;
+                    frame_moves{cond, rep}(c, :) = [cond_data(Frame_ind, cond, rep, t) cond_data(Frame_ind, cond, rep, t+1)];
                     c = c+1;
                 end
             end
@@ -35,17 +35,17 @@ function [expected_frame_moves, expected_frame_move_inds, frame_moves, ...
         for rep = 1:size(cond_data,3)
             exp_move = expected_frame_moves{cond}(1,:);
             count = 1; 
-            while sum(exp_move ~= [frame_moves{cond}(rep, count, 1), frame_moves{cond}(rep, count, 2)])~=0 && count < size(frame_moves{cond},2)
+            while sum(exp_move ~= [frame_moves{cond, rep}(count, 1), frame_moves{cond, rep}(count, 2)])~=0 && count < size(frame_moves{cond, rep}, 1)
                 count = count + 1;
             end
-            if count > .5*size(frame_moves{cond},2)
+            if count > .5*size(frame_moves{cond, rep})
                 warning(['Condition ' num2str(cond) ' rep ' num2str(rep) ' may not have displayed properly.']);
             elseif count > 1
-                frame_move_inds{cond}(rep, 1:count-1) = [];
-                frame_moves{cond}(rep, 1:count-1) = [];
+                frame_move_inds{cond, rep}(1:count-1) = [];
+                frame_moves{cond, rep}(1:count-1) = [];
             end
         end
-        frame_gaps{cond}(rep, :) = diff(frame_move_inds{cond}(rep, :));
+        frame_gaps{cond}(rep, :) = diff(frame_move_inds{cond, rep}(:));
     end
 
     
