@@ -1,25 +1,22 @@
-function ephys_grid_processing(exp_folder)
+function ephys_grid_processing(s, exp_folder)
     
-    channel_order = {'Frame Position', 'voltage'};
-    len_var_tol = .05; % By what percentage can the display time of a square vary before tossing it
-    path_to_protocol = 'C:\Users\taylo\Documents\Programming\Reiser\EphysGridTestData\protocol1_4reps_12px_6px_LHS_2sbkg_200msfl_50msint_11-27-24_15-02-95\protocol1_4reps_12px_6px_LHS_2sbkg_200msfl_50msint_11-27-24_15-02-95.g4p';
-    trial_options = [1 0 0];
-    command_string = 'Start-Display';
-    combined_command = 0;
-    manual_first_start = 0;
-    data_rate = 1000;
-    num_ts_datatypes = length(channel_order);
-    pre_dur = 0;
-    post_dur = 0;
-    time_conv = 1000000;
-    corrTolerance = .05;
+    
+    channel_order = s.channel_order; 
+    len_var_tol = s.len_var_tol; % By what percentage can the display time of a square vary before tossing it
+    path_to_protocol = s.path_to_protocol;
+    trial_options = s.trial_options;
+    combined_command = s.combined_command;
+    manual_first_start = s.manual_first_start;
+    data_rate = s.data_rate;    
+    pre_dur = s.pre_dur;
+    post_dur = s.post_dur;
+    time_conv = s.time_conv;
+    corrTolerance = s.cross_correlation_tolerance;
     metadata_file = fullfile(exp_folder, 'metadata.mat');
-    neutral_frame = 1; % The frame of the pattern that is neutral, to be shown between each square
-    grid_columns(1) = 8;
-    grid_columns(2) = 16;
-    grid_rows(1) = 4;
-    grid_rows(2) = 8;
-    downsample_n = 5;
+    neutral_frame = s.neutral_frame; % The frame of the pattern that is neutral, to be shown between each square
+    grid_columns = s.grid_columns;
+    grid_rows = s.grid_rows;
+    downsample_n = s.downsample_n;
 
     % Metadata file contains list of conditions that were bad the first
     % time and re-run.
@@ -33,6 +30,15 @@ function ephys_grid_processing(exp_folder)
     else
         metadata = {};
         trials_rerun = [];
+    end
+
+    num_ts_datatypes = length(channel_order);
+
+    %Set which command we should be looking for in the log files
+    if combined_command == 1
+        command_string = 'Set control mode, pattern id, pattern function id, ao function id, frame rate';
+    else
+        command_string = 'start-display';
     end
 
     Log = load_tdms_log(exp_folder);
@@ -128,6 +134,13 @@ function ephys_grid_processing(exp_folder)
 
     %Check quality. There are likely gaps in frame_gaps from noise frames
     %at beginning or end. Compare gaps to expected gaps and remove excess
+    %ts_data is the data collected during stims, 5-D, [channel condition
+    %rep frame data]. neutral_ts_data is the data collected during the
+    %neutral display directly before that frame, so the data at
+    %neutral_ts_data(2, 1, 1, 12, :) is the data collected directly before
+    %the 12th frame was displayed. In both cases, the frame=1 dimension is
+    %all NaNs because frame 1 is not a stim. So ts_data(2,2,2,1,:) will
+    %give no data because frame 1 is the neutral frame. 
 
     [ts_data, neutral_ts_data] = separate_grid_data(ts_data, shifted_cond_data, frame_move_inds, ...
         Frame_ind, num_frames, num_ADC_chans);
@@ -136,9 +149,29 @@ function ephys_grid_processing(exp_folder)
 
     % Separate the data collected from dark flashes and light flashes
 
-    [dark_sq_data, light_sq_data, dark_avgReps_data, light_avgReps_data] = ...
-    separate_light_dark(ts_data, position_functions);
+    [dark_sq_data, light_sq_data, dark_avgReps_data, light_avgReps_data, ...
+        dark_sq_neutral, light_sq_neutral, dark_avgReps_neutral, light_avgReps_neutral] = ...
+    separate_light_dark(ts_data, neutral_ts_data, position_functions);
 
+    for cond = 1:length(dark_avgReps_data)
+        for frame = 1:size(dark_avgReps_data{cond},2)
+            avgVoltDark = mean(squeeze(dark_avgReps_data{cond}(Volt_idx, frame, :)), 'omitnan');
+            avgNeutDark = mean(squeeze(dark_avgReps_neutral{cond}(Volt_idx, frame, :)), 'omitnan');
+            gaussValsDark{cond}(frame) = avgVoltDark-avgNeutDark;
+            avgVoltLight = mean(squeeze(light_avgReps_data{cond}(Volt_idx, frame, :)), 'omitnan');
+            avgNeutLight = mean(squeeze(light_avgReps_neutral{cond}(Volt_idx, frame, :)), 'omitnan');
+            gaussValsLight{cond}(frame) = avgVoltLight-avgNeutLight;
+        end
+    end
+
+    for cond = 1:length(gaussValsDark)
+        x = 1:length(gaussValsDark{cond});
+        y = gaussValsDark{cond};
+        gaussFitsDark{cond} = fit(x.', y.', 'gauss2');
+        x2 = 1:length(gaussValsLight{cond});
+        y2 = gaussValsLight{cond};
+        gaussFitsLight{cond} = fit(x2.', y2.', 'gauss2');
+    end
     % For each square subtract average response from average response
     % during the neutral time right before the square displayed. Do
     % gaussian fit on this grid of numbers to find peak location.
@@ -160,7 +193,8 @@ function ephys_grid_processing(exp_folder)
 
 
 
-    create_grid_plot(dark_sq_data_ds, light_sq_data_ds, grid_rows, grid_columns, 2, ts_time_ds);
+    create_grid_plot(dark_sq_data_ds, light_sq_data_ds, grid_rows, grid_columns, ...
+        2, ts_time_ds, gaussFitsDark, gaussFitsLight, gaussValsDark, gaussValsLight);
 
     peak_frames = get_peak(ts_data, Volt_idx);
  

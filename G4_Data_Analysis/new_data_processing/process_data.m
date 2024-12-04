@@ -120,6 +120,52 @@ function process_data(exp_folder, processing_settings_file)
         inter_shift_limit = .2; % When aligning intertrial to the first pattern movement, mark intertrial as bad if we have to shift more than this percentage. 
     end
 
+%% Check for ephys settings
+
+    if isfield(s.settings, 'len_var_tol')
+        len_var_tol = s.settings.len_var_tol;
+    else
+        len_var_tol = .05;
+    end
+
+    if isfield(s.settings, 'neutral_frame')
+        neutral_frame = s.settings.neutral_frame;
+    else
+        neutral_frame = 1;
+    end
+
+    if isfield(s.settings, 'grid_columns')
+        grid_columns = s.settings.grid_columns;
+    else
+        grid_columns(1) = 8;
+        grid_columns(2) = 16;
+    end
+    
+    if isfield(s.settings, 'grid_rows')
+        grid_rows = s.settings.grid_rows;
+    else
+        grid_rows(1) = 4;
+        grid_rows(2) = 8;
+    end
+
+    if isfield(s.settings, 'downsample_n')
+        downsample_n = s.settings.downsample_n;
+    else
+        downsample_n = 5;
+    end
+
+    if isfield(s.settings, 'is_ephys_grid')
+        is_ephys_grid = s.settings.is_ephys_grid;
+    else
+        is_ephys_grid = 0;
+    end
+
+    if is_ephys_grid
+        ephys_grid_processing(s.settings, exp_folder)
+        return;
+    end
+
+
     % Load TDMS file
 
     Log = load_tdms_log(exp_folder);
