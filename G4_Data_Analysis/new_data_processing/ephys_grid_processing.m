@@ -1,6 +1,6 @@
 function ephys_grid_processing(s, exp_folder)
     
-    if isfile(s)
+    if strcmp(class(s), 'char')
         s = load(s);
         s = s.settings;
     end
