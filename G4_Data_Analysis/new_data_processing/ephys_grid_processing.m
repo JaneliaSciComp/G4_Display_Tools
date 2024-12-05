@@ -213,6 +213,8 @@ function ephys_grid_processing(s, exp_folder)
         'light_avgReps_neutral', 'light_avgReps_data', 'alignment_data', 'gaussValsDark', ...
         'gaussValsLight', 'gaussFitsLight', 'gaussFitsDark', 'peak_frames');
 
+   % generate_protocol2_stimuli(peak_frames, hemi)
+
  
 
 end
