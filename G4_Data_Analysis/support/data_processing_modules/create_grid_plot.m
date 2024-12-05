@@ -1,4 +1,5 @@
-function create_grid_plot(dark_data, light_data, grid_rows, grid_columns, plot_chan, timestamps, gaussFitsDark, gaussFitsLight, gaussValsDark, gaussValsLight)
+function create_grid_plot(dark_data, light_data, grid_rows, grid_columns, plot_chan, ...
+    timestamps, gaussFitsDark, gaussFitsLight, gaussValsDark, gaussValsLight, exp_folder)
     
 %% Need to switch back to passing in all data. WIll want to plot each rep individually
 % in light color and then the average thicker on each axis. 
@@ -50,12 +51,14 @@ function create_grid_plot(dark_data, light_data, grid_rows, grid_columns, plot_c
        
 
         hold off 
+        savefig(fullfile(exp_folder, dark_plot_title));
         newfig = figure;
         x = 1:length(gaussValsDark{cond});
         y = gaussValsDark{cond};
         f = gaussFitsDark{cond};
         plot(f, x, y);
         sgtitle(dark_gauss_title);
+        savefig(fullfile(exp_folder, dark_gauss_title));
 
         figure();
 
@@ -83,6 +86,7 @@ function create_grid_plot(dark_data, light_data, grid_rows, grid_columns, plot_c
             set(gca, 'YTick', []);
             set(gca, 'color', '#F0F0F0');
             sgtitle(light_plot_title);
+            savefig(fullfile(exp_folder, light_plot_title));
 
             
 
@@ -99,6 +103,7 @@ function create_grid_plot(dark_data, light_data, grid_rows, grid_columns, plot_c
         f = gaussFitsLight{cond};
         plot(f, x, y);
         sgtitle(light_gauss_title);
+        savefig(fullfile(exp_folder, light_gauss_title));
 
 
 

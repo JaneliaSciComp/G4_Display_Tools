@@ -200,7 +200,8 @@ function ephys_grid_processing(s, exp_folder)
 
 
     create_grid_plot(dark_sq_data_ds, light_sq_data_ds, grid_rows, grid_columns, ...
-        2, ts_time_ds, gaussFitsDark, gaussFitsLight, gaussValsDark, gaussValsLight);
+        2, ts_time_ds, gaussFitsDark, gaussFitsLight, gaussValsDark, gaussValsLight, ...
+        exp_folder);
 
     peak_frames = get_peak(ts_data, Volt_idx);
 
