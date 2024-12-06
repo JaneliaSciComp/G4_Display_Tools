@@ -61,7 +61,7 @@ function ephys_grid_processing(s, exp_folder)
     % Get position functions so we know how long each square is supposed to
     % display for
 
-    [position_functions, expanded_posfuncs, exp] = get_position_functions(path_to_protocol, num_conds);
+    [position_functions, expanded_posfuncs, exp] = get_position_functions(path_to_protocol, num_conds, data_rate);
 
     % These start and stop timestamps refer to entire conditions, not individual
     % square displays, so if there's only 4 trials with no inter/pre/post,
@@ -97,7 +97,7 @@ function ephys_grid_processing(s, exp_folder)
     [unaligned_cond_data, unaligned_inter_data] = get_unaligned_data(cond_data, num_ADC_chans, Log, ...
         trial_start_times, trial_stop_times, num_trials, num_conds_short, ...
         exp_order, Frame_ind, time_conv, intertrial_start_times, ...
-        intertrial_stop_times, inter_ts_data, trial_options);
+        intertrial_stop_times, inter_ts_data, trial_options, data_rate);
 
     alignment_data = position_cross_corr(expanded_posfuncs, ...
     num_conds_short, cond_modes, unaligned_cond_data, Frame_ind, corrTolerance);

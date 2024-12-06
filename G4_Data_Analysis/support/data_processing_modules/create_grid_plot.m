@@ -11,6 +11,10 @@ function create_grid_plot(dark_data, light_data, grid_rows, grid_columns, plot_c
         for rep = 1:size(dark_data{cond},3)
             rep_data_dark(rep,:,:) = squeeze(dark_data{cond}(plot_chan, 1, rep, :, :));
             rep_data_light(rep,:,:) = squeeze(light_data{cond}(plot_chan, 1, rep, :, :));
+            rep_max_light(rep) = max(max(rep_data_light(rep, :, :)));
+            rep_min_light(rep) = min(min(rep_data_light(rep, :, :)));
+            rep_max_dark(rep) = max(max(rep_data_dark(rep,:,:)));
+            rep_min_dark(rep) = min(min(rep_data_dark(rep,:,:)));
         end
         avg_data_dark = squeeze(mean(rep_data_dark,1));
         avg_data_light = squeeze(mean(rep_data_light,1));
@@ -18,8 +22,8 @@ function create_grid_plot(dark_data, light_data, grid_rows, grid_columns, plot_c
         light_plot_title = ['Condition ' num2str(cond) ' Light Squares'];
         dark_gauss_title = ['Condition ' num2str(cond) 'Dark Gaussian Fit'];
         light_gauss_title = ['Condition ' num2str(cond) 'Light Gaussian Fit'];
-        dark_yax = [min(min(avg_data_dark)) max(max(avg_data_dark))];
-        light_yax = [min(min(avg_data_light)) max(max(avg_data_light))];
+        dark_yax = [min(rep_min_dark) max(rep_max_dark)];
+        light_yax = [min(rep_min_light) max(rep_max_light)];
         [gap_x, gap_y] = get_plot_spacing(grid_rows(cond), grid_columns(cond));
         for dframe = 1:size(avg_data_dark,1)
             % if sum(~isnan(data_to_plot(dframe, :))) > 0
@@ -73,7 +77,7 @@ function create_grid_plot(dark_data, light_data, grid_rows, grid_columns, plot_c
             yline(0);
             hold on
             for rep = 1:size(rep_data_light,1)
-                plot(ts, squeeze(rep_data_light(rep, dframe,:)));
+                plot(ts, squeeze(rep_data_light(rep, lframe,:)));
             end
             plot(ts, squeeze(avg_data_light(lframe, :)), 'Color', 'black', 'Linewidth', 2.0);
             ylim(light_yax);
