@@ -20,8 +20,6 @@ function create_grid_plot(dark_data, light_data, grid_rows, grid_columns, plot_c
         avg_data_light = squeeze(mean(rep_data_light,1));
         dark_plot_title = ['Condition ' num2str(cond) ' Dark Squares'];
         light_plot_title = ['Condition ' num2str(cond) ' Light Squares'];
-        dark_gauss_title = ['Condition ' num2str(cond) 'Dark Gaussian Fit'];
-        light_gauss_title = ['Condition ' num2str(cond) 'Light Gaussian Fit'];
         dark_yax = [min(rep_min_dark) max(rep_max_dark)];
         light_yax = [min(rep_min_light) max(rep_max_light)];
         [gap_x, gap_y] = get_plot_spacing(grid_rows(cond), grid_columns(cond));
@@ -31,7 +29,7 @@ function create_grid_plot(dark_data, light_data, grid_rows, grid_columns, plot_c
                     gap_x = 5;
                     gap_y = 15;
                 end
-                better_subplot(grid_rows(cond), grid_columns(cond), dframe, gap_x, gap_y);
+                better_subplot_columns1st(grid_rows(cond), grid_columns(cond), dframe, gap_x, gap_y);
                 yline(0);
                 hold on
                 for rep = 1:size(rep_data_dark,1)
@@ -67,7 +65,7 @@ function create_grid_plot(dark_data, light_data, grid_rows, grid_columns, plot_c
                 gap_x = 5;
                 gap_y = 15;
             end
-            better_subplot(grid_rows(cond), grid_columns(cond), lframe, gap_x, gap_y);
+            better_subplot_columns1st(grid_rows(cond), grid_columns(cond), lframe, gap_x, gap_y);
             yline(0);
             hold on
             for rep = 1:size(rep_data_light,1)

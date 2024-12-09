@@ -1,4 +1,4 @@
-function better_subplot(H, W, N, pix_x, pix_y)
+function better_subplot_columns1st(H, W, N, pix_x, pix_y)
 
 if ~exist('pix_x','var')
     pix_x = 20;
@@ -13,8 +13,8 @@ fig_height = fig_pos(4);
 gap_x = pix_x/fig_width;%20
 gap_y =pix_y/fig_height;%35
 
-row = ceil(N/W);
-col = mod((N-1),W) + 1;
+col = ceil(N/H);
+row = mod((N-1),H) + 1;
 
 
 plot_width = (1 - gap_x*(W+1))/W;

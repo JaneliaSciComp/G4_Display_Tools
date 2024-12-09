@@ -162,7 +162,8 @@ function ephys_grid_processing(s, exp_folder)
         dark_sq_neutral, light_sq_neutral, dark_avgReps_neutral, light_avgReps_neutral] = ...
     separate_light_dark(ts_data, neutral_ts_data, position_functions);
 
-    [gaussVals, gaussFits, gaussValsAvg, gaussFitsAvg] = get_gauss_fits(ts_data, medianVoltage, Volt_idx, exp_folder);
+    % [gaussVals, gaussFits, gaussValsAvg, gaussFitsAvg] = get_gauss_fits(ts_data, ...
+    %     medianVoltage, Volt_idx, exp_folder);
     % 
     % for cond = 1:length(dark_avgReps_data)
     %     for frame = 1:size(dark_avgReps_data{cond},2)
@@ -202,18 +203,21 @@ function ephys_grid_processing(s, exp_folder)
         ts_time_ds{cond} = downsample(ts_time{cond}, downsample_n);
     end
 
+    % [peak_frames, peak_frames_avg] = get_peak(ts_data, Volt_idx, gaussVals, ...
+    %     gaussFits, gaussValsAvg, gaussFitsAvg, grid_rows, grid_columns);
+
+
     create_grid_plot(dark_sq_data_ds, light_sq_data_ds, grid_rows, grid_columns, ...
         2, ts_time_ds, exp_folder);
 
-    [peak_frames, peak_frames_avg] = get_peak(ts_data, Volt_idx, gaussVals, gaussFits, gaussValsAvg, gaussFitsAvg);
-
+   
 
     save(fullfile(exp_folder,processed_file_name), 'ts_data', 'neutral_ts_data', ...
         'channel_order', 'frame_moves', 'frame_move_inds', 'frame_gaps', 'bad_gaps', ...
         'dark_sq_data', 'dark_sq_neutral', 'light_sq_neutral', 'light_sq_data', ...
         'dark_sq_data_ds', 'light_sq_data_ds', 'dark_avgReps_neutral', 'dark_avgReps_data', ...
-        'light_avgReps_neutral', 'light_avgReps_data', 'alignment_data', 'gaussVals', ...
-        'gaussFits', 'peak_frames', 'medianVoltage', 'maxVoltage', 'voltageRange', 'peak_frames_avg');
+        'light_avgReps_neutral', 'light_avgReps_data', 'alignment_data', ...
+        'medianVoltage', 'maxVoltage', 'voltageRange');
 
    % generate_protocol2_stimuli(peak_frames, hemi)
 
