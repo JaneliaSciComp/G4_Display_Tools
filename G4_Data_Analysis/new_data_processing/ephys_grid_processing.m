@@ -52,6 +52,7 @@ function ephys_grid_processing(s, exp_folder)
     Volt_idx = find(strcmpi(channel_order, 'voltage'));
     Frame_ind = strcmpi(channel_order,'Frame Position');
     num_ADC_chans = length(Log.ADC.Channels);
+    medianVoltage = median(Log.ADC.Volts(2,:));
 
     % We will split up the data by condition first (four conditions, two
     % with squares displaying bright and two with squares displaying dark),
@@ -159,25 +160,27 @@ function ephys_grid_processing(s, exp_folder)
         dark_sq_neutral, light_sq_neutral, dark_avgReps_neutral, light_avgReps_neutral] = ...
     separate_light_dark(ts_data, neutral_ts_data, position_functions);
 
-    for cond = 1:length(dark_avgReps_data)
-        for frame = 1:size(dark_avgReps_data{cond},2)
-            avgVoltDark = mean(squeeze(dark_avgReps_data{cond}(Volt_idx, frame, :)), 'omitnan');
-            avgNeutDark = mean(squeeze(dark_avgReps_neutral{cond}(Volt_idx, frame, :)), 'omitnan');
-            gaussValsDark{cond}(frame) = avgVoltDark-avgNeutDark;
-            avgVoltLight = mean(squeeze(light_avgReps_data{cond}(Volt_idx, frame, :)), 'omitnan');
-            avgNeutLight = mean(squeeze(light_avgReps_neutral{cond}(Volt_idx, frame, :)), 'omitnan');
-            gaussValsLight{cond}(frame) = avgVoltLight-avgNeutLight;
-        end
-    end
-
-    for cond = 1:length(gaussValsDark)
-        x = 1:length(gaussValsDark{cond});
-        y = gaussValsDark{cond};
-        gaussFitsDark{cond} = fit(x.', y.', 'gauss2');
-        x2 = 1:length(gaussValsLight{cond});
-        y2 = gaussValsLight{cond};
-        gaussFitsLight{cond} = fit(x2.', y2.', 'gauss2');
-    end
+    [gaussVals, gaussFits] = get_gauss_fits(ts_data, medianVoltage, Volt_idx, exp_folder);
+    % 
+    % for cond = 1:length(dark_avgReps_data)
+    %     for frame = 1:size(dark_avgReps_data{cond},2)
+    %         avgVoltDark = mean(squeeze(dark_avgReps_data{cond}(Volt_idx, frame, :)), 'omitnan');
+    %         avgNeutDark = mean(squeeze(dark_avgReps_neutral{cond}(Volt_idx, frame, :)), 'omitnan');
+    %         gaussValsDark{cond}(frame) = avgVoltDark-avgNeutDark;
+    %         avgVoltLight = mean(squeeze(light_avgReps_data{cond}(Volt_idx, frame, :)), 'omitnan');
+    %         avgNeutLight = mean(squeeze(light_avgReps_neutral{cond}(Volt_idx, frame, :)), 'omitnan');
+    %         gaussValsLight{cond}(frame) = avgVoltLight-avgNeutLight;
+    %     end
+    % end
+    % 
+    % for cond = 1:length(gaussValsDark)
+    %     x = 1:length(gaussValsDark{cond});
+    %     y = gaussValsDark{cond};
+    %     gaussFitsDark{cond} = fit(x.', y.', 'gauss2');
+    %     x2 = 1:length(gaussValsLight{cond});
+    %     y2 = gaussValsLight{cond};
+    %     gaussFitsLight{cond} = fit(x2.', y2.', 'gauss2');
+    % end
     % For each square subtract average response from average response
     % during the neutral time right before the square displayed. Do
     % gaussian fit on this grid of numbers to find peak location.
@@ -197,21 +200,18 @@ function ephys_grid_processing(s, exp_folder)
         ts_time_ds{cond} = downsample(ts_time{cond}, downsample_n);
     end
 
-
-
     create_grid_plot(dark_sq_data_ds, light_sq_data_ds, grid_rows, grid_columns, ...
-        2, ts_time_ds, gaussFitsDark, gaussFitsLight, gaussValsDark, gaussValsLight, ...
-        exp_folder);
+        2, ts_time_ds, exp_folder);
 
-    peak_frames = get_peak(ts_data, Volt_idx);
+    peak_frames = get_peak(ts_data, Volt_idx, gaussVals, gaussFits);
 
 
     save(fullfile(exp_folder,processed_file_name), 'ts_data', 'neutral_ts_data', ...
         'channel_order', 'frame_moves', 'frame_move_inds', 'frame_gaps', 'bad_gaps', ...
         'dark_sq_data', 'dark_sq_neutral', 'light_sq_neutral', 'light_sq_data', ...
         'dark_sq_data_ds', 'light_sq_data_ds', 'dark_avgReps_neutral', 'dark_avgReps_data', ...
-        'light_avgReps_neutral', 'light_avgReps_data', 'alignment_data', 'gaussValsDark', ...
-        'gaussValsLight', 'gaussFitsLight', 'gaussFitsDark', 'peak_frames');
+        'light_avgReps_neutral', 'light_avgReps_data', 'alignment_data', 'gaussVals', ...
+        'gaussFits', 'peak_frames');
 
    % generate_protocol2_stimuli(peak_frames, hemi)
 
