@@ -45,10 +45,12 @@ function create_grid_plot(dark_data, light_data, grid_rows, grid_columns, plot_c
                 % if dframe == (grid_rows(cond) - 1)*grid_columns(cond) + 1
                 %     xlabel('ms');
                 % end
+                
                 set(gca, 'Xcolor', '#F0F0F0', 'Ycolor', '#F0F0F0');
                 set(gca, 'XTick', []);
                 set(gca, 'YTick', []);
                 set(gca, 'color', '#F0F0F0');
+                subtitle(num2str(dframe+1), FontSize = 6);
             % end
         end
         
@@ -84,6 +86,7 @@ function create_grid_plot(dark_data, light_data, grid_rows, grid_columns, plot_c
             set(gca, 'YTick', []);
             set(gca, 'color', '#F0F0F0');
             sgtitle(light_plot_title);
+            subtitle(num2str(lframe+dframe+1), FontSize = 6);
 
         end
         hold off

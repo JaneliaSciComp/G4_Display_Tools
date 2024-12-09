@@ -1,4 +1,4 @@
-function [gaussVals, gaussFits] = get_gauss_fits(ts_data, medianVoltage, Volt_idx, exp_folder)
+function [gaussVals, gaussFits, gaussValsAvg, gaussFitsAvg] = get_gauss_fits(ts_data, medianVoltage, Volt_idx, exp_folder)
 
     fignum = 1;
     ts_data_avg = squeeze(mean(ts_data,3, 'omitnan'));

@@ -1,4 +1,4 @@
-function peak_frames = get_peak(ts_data, volt_idx, gaussVals, gaussFits)
+function [peak_frames, peak_frames_avg] = get_peak(ts_data, volt_idx, gaussVals, gaussFits, gaussValsAvg, gaussFitsAvg)
     
     for cond = 1:size(ts_data,2)
         for rep = 1:size(ts_data,3)
@@ -18,6 +18,18 @@ function peak_frames = get_peak(ts_data, volt_idx, gaussVals, gaussFits)
 
 
         end
+
+        coeffsAvg = coeffvalues(gaussFitsAvg{cond});
+        valsAvg = gaussValsAvg{cond};
+        valsAvg = valsAvg(~isnan(valsAvg));
+        xAvg = 2:length(valsAvg)+1;
+        est_y_avg = gaussian_get_y(xAvg, coeffsAvg);
+        [pkAvg locAvg] = findpeaks(est_y_avg, xAvg);
+        if isempty(pkAvg)
+            pkAvg = NaN;
+            locAvg = NaN;
+        end
+        peak_frames_avg(cond, :) = [locAvg pkAvg];
     end
 
 
