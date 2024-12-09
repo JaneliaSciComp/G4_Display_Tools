@@ -52,7 +52,9 @@ function ephys_grid_processing(s, exp_folder)
     Volt_idx = find(strcmpi(channel_order, 'voltage'));
     Frame_ind = strcmpi(channel_order,'Frame Position');
     num_ADC_chans = length(Log.ADC.Channels);
-    medianVoltage = median(Log.ADC.Volts(2,:));
+    medianVoltage = median(Log.ADC.Volts(Volt_idx,:));
+    maxVoltage = max(Log.ADC.Volts(Volt_idx,:));
+    voltageRange = diff([maxVoltage min(Log.ADC.Volts(Volt_idx,:))]);
 
     % We will split up the data by condition first (four conditions, two
     % with squares displaying bright and two with squares displaying dark),
@@ -211,7 +213,7 @@ function ephys_grid_processing(s, exp_folder)
         'dark_sq_data', 'dark_sq_neutral', 'light_sq_neutral', 'light_sq_data', ...
         'dark_sq_data_ds', 'light_sq_data_ds', 'dark_avgReps_neutral', 'dark_avgReps_data', ...
         'light_avgReps_neutral', 'light_avgReps_data', 'alignment_data', 'gaussVals', ...
-        'gaussFits', 'peak_frames');
+        'gaussFits', 'peak_frames', 'medianVoltage', 'maxVoltage', 'voltageRange');
 
    % generate_protocol2_stimuli(peak_frames, hemi)
 
