@@ -53,8 +53,9 @@ function ephys_grid_processing(s, exp_folder)
     Frame_ind = strcmpi(channel_order,'Frame Position');
     num_ADC_chans = length(Log.ADC.Channels);
     medianVoltage = median(Log.ADC.Volts(Volt_idx,:));
-    maxVoltage = max(Log.ADC.Volts(Volt_idx,:));
-    voltageRange = diff([maxVoltage min(Log.ADC.Volts(Volt_idx,:))]);
+    maxVoltage = prctile(Log.ADC.Volts(Volt_idx,:),99.999);
+    minVoltage = prctile(Log.ADC.Volts(Volt_idx,:), 0.001);
+    voltageRange = diff([maxVoltage minVoltage]);
 
     % We will split up the data by condition first (four conditions, two
     % with squares displaying bright and two with squares displaying dark),
@@ -203,12 +204,11 @@ function ephys_grid_processing(s, exp_folder)
         ts_time_ds{cond} = downsample(ts_time{cond}, downsample_n);
     end
 
-    % [peak_frames, peak_frames_avg] = get_peak(ts_data, Volt_idx, gaussVals, ...
-    %     gaussFits, gaussValsAvg, gaussFitsAvg, grid_rows, grid_columns);
+     [peak_frames, peak_frames_avg, gaussColors] = get_peak(ts_data, Volt_idx, grid_rows, grid_columns, medianVoltage);
 
 
     create_grid_plot(dark_sq_data_ds, light_sq_data_ds, grid_rows, grid_columns, ...
-        2, ts_time_ds, exp_folder);
+        2, ts_time_ds, exp_folder, gaussColors, medianVoltage, maxVoltage, minVoltage);
 
    
 

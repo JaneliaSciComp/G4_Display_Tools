@@ -1,9 +1,10 @@
 function create_grid_plot(dark_data, light_data, grid_rows, grid_columns, plot_chan, ...
-    timestamps, exp_folder)
+    timestamps, exp_folder, gaussColors, medianVoltage, maxVoltage, minVoltage)
     
 %% Need to switch back to passing in all data. WIll want to plot each rep individually
 % in light color and then the average thicker on each axis. 
     fignum = 1;
+    yax_lims = [minVoltage maxVoltage];
     for cond = 1:length(dark_data)
         fig(fignum) = figure; 
         fignum = fignum + 1;
@@ -20,11 +21,10 @@ function create_grid_plot(dark_data, light_data, grid_rows, grid_columns, plot_c
         avg_data_light = squeeze(mean(rep_data_light,1));
         dark_plot_title = ['Condition ' num2str(cond) ' Dark Squares'];
         light_plot_title = ['Condition ' num2str(cond) ' Light Squares'];
-        dark_yax = [min(rep_min_dark) max(rep_max_dark)];
-        light_yax = [min(rep_min_light) max(rep_max_light)];
         [gap_x, gap_y] = get_plot_spacing(grid_rows(cond), grid_columns(cond));
         for dframe = 1:size(avg_data_dark,1)
             % if sum(~isnan(data_to_plot(dframe, :))) > 0
+            frame_num = dframe + 1;
                 if size(avg_data_dark,1) > 32
                     gap_x = 5;
                     gap_y = 15;
@@ -36,7 +36,8 @@ function create_grid_plot(dark_data, light_data, grid_rows, grid_columns, plot_c
                     plot(ts, squeeze(rep_data_dark(rep, dframe,:)));
                 end
                 plot(ts, squeeze(avg_data_dark(dframe, :)), 'Color', 'black', 'Linewidth', 2.0);
-                ylim(dark_yax);
+                yline(medianVoltage, 'Color', '#ADADAD');
+                ylim(yax_lims);
                 % if dframe == 1
                 %     ylabel('volts');
                 % end
@@ -47,8 +48,16 @@ function create_grid_plot(dark_data, light_data, grid_rows, grid_columns, plot_c
                 set(gca, 'Xcolor', '#F0F0F0', 'Ycolor', '#F0F0F0');
                 set(gca, 'XTick', []);
                 set(gca, 'YTick', []);
-                set(gca, 'color', '#F0F0F0');
-                subtitle(num2str(dframe+1), FontSize = 6);
+                if sum(find(gaussColors.redInds{cond}==frame_num)>0)
+                    set(gca, 'color', '#FDDFDF');
+                elseif sum(find(gaussColors.orangeInds{cond}==frame_num)>0)
+                    set(gca, 'color', '#F6E8D6');
+                elseif sum(find(gaussColors.yellowInds{cond}==frame_num)>0)
+                    set(gca, 'color', '#F6F5D6');
+                else
+                    set(gca, 'color', '#F0F0F0');
+                end
+                subtitle(num2str(frame_num), FontSize = 6);
             % end
         end
         
@@ -61,6 +70,7 @@ function create_grid_plot(dark_data, light_data, grid_rows, grid_columns, plot_c
         fignum = fignum + 1;
 
         for lframe = 1:size(avg_data_light,1)
+            frame_num = lframe+dframe+1;
              if size(avg_data_light,1) > 32
                 gap_x = 5;
                 gap_y = 15;
@@ -72,7 +82,8 @@ function create_grid_plot(dark_data, light_data, grid_rows, grid_columns, plot_c
                 plot(ts, squeeze(rep_data_light(rep, lframe,:)));
             end
             plot(ts, squeeze(avg_data_light(lframe, :)), 'Color', 'black', 'Linewidth', 2.0);
-            ylim(light_yax);
+            yline(medianVoltage, 'Color', '#ADADAD');
+            ylim(yax_lims);
             % if lframe == 1
             %     ylabel('volts');
             % end
@@ -82,9 +93,17 @@ function create_grid_plot(dark_data, light_data, grid_rows, grid_columns, plot_c
             set(gca, 'Xcolor', '#F0F0F0', 'Ycolor', '#F0F0F0');
             set(gca, 'XTick', []);
             set(gca, 'YTick', []);
-            set(gca, 'color', '#F0F0F0');
+            if sum(find(gaussColors.redInds{cond}==frame_num)>0)
+                set(gca, 'color', '#FDDFDF');
+            elseif sum(find(gaussColors.orangeInds{cond}==frame_num)>0)
+                set(gca, 'color', '#F6E8D6');
+            elseif sum(find(gaussColors.yellowInds{cond}==frame_num)>0)
+                set(gca, 'color', '#F6F5D6');
+            else
+                set(gca, 'color', '#F0F0F0');
+            end
             sgtitle(light_plot_title);
-            subtitle(num2str(lframe+dframe+1), FontSize = 6);
+            subtitle(num2str(frame_num), FontSize = 6);
 
         end
         hold off
