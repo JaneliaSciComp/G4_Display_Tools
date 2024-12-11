@@ -4,12 +4,18 @@ function create_grid_plot(dark_data, light_data, grid_rows, grid_columns, plot_c
 %% Need to switch back to passing in all data. WIll want to plot each rep individually
 % in light color and then the average thicker on each axis. 
     fignum = 1;
-    yax_lims = [minVoltage maxVoltage];
+    yax_lims = [round(minVoltage,2), round(maxVoltage,2)];
+    darkRepColor = [0, 0, 0.5];
+    lightRepColor = [0.8, 0.8, 1];
+    
+    
     for cond = 1:length(dark_data)
         fig(fignum) = figure; 
         fignum = fignum + 1;
         ts = timestamps{cond};
-        for rep = 1:size(dark_data{cond},3)
+        num_reps = size(dark_data{cond},3);
+        colorRange = linspace(0,1,num_reps);
+        for rep = 1:num_reps
             rep_data_dark(rep,:,:) = squeeze(dark_data{cond}(plot_chan, 1, rep, :, :));
             rep_data_light(rep,:,:) = squeeze(light_data{cond}(plot_chan, 1, rep, :, :));
             rep_max_light(rep) = max(max(rep_data_light(rep, :, :)));
@@ -32,8 +38,9 @@ function create_grid_plot(dark_data, light_data, grid_rows, grid_columns, plot_c
                 better_subplot_columns1st(grid_rows(cond), grid_columns(cond), dframe, gap_x, gap_y);
                 yline(0);
                 hold on
-                for rep = 1:size(rep_data_dark,1)
-                    plot(ts, squeeze(rep_data_dark(rep, dframe,:)));
+                for rep = 1:num_reps
+                    repColor = lightRepColor * colorRange(rep) + darkRepColor * (1 - colorRange(rep));
+                    plot(ts, squeeze(rep_data_dark(rep, dframe,:)), 'Color', repColor);
                 end
                 plot(ts, squeeze(avg_data_dark(dframe, :)), 'Color', 'black', 'Linewidth', 2.0);
                 yline(medianVoltage, 'Color', '#ADADAD');
@@ -47,7 +54,12 @@ function create_grid_plot(dark_data, light_data, grid_rows, grid_columns, plot_c
                 
                 set(gca, 'Xcolor', '#F0F0F0', 'Ycolor', '#F0F0F0');
                 set(gca, 'XTick', []);
-                set(gca, 'YTick', []);
+                set(gca, 'FontSize', 6);
+                if dframe == grid_rows(cond) %&& size(avg_data_dark,1)<=32
+                    set(gca, 'YTick', [round(minVoltage,2), round(maxVoltage,2)], 'Ycolor', 'k');
+                else
+                    set(gca, 'YTick', []);
+                end
                 if sum(find(gaussColors.redInds{cond}==frame_num)>0)
                     set(gca, 'color', '#FDDFDF');
                 elseif sum(find(gaussColors.orangeInds{cond}==frame_num)>0)
@@ -79,7 +91,8 @@ function create_grid_plot(dark_data, light_data, grid_rows, grid_columns, plot_c
             yline(0);
             hold on
             for rep = 1:size(rep_data_light,1)
-                plot(ts, squeeze(rep_data_light(rep, lframe,:)));
+                repColor = lightRepColor * colorRange(rep) + darkRepColor * (1 - colorRange(rep));
+                plot(ts, squeeze(rep_data_light(rep, lframe,:)), 'Color', repColor);
             end
             plot(ts, squeeze(avg_data_light(lframe, :)), 'Color', 'black', 'Linewidth', 2.0);
             yline(medianVoltage, 'Color', '#ADADAD');
@@ -92,7 +105,12 @@ function create_grid_plot(dark_data, light_data, grid_rows, grid_columns, plot_c
             % end
             set(gca, 'Xcolor', '#F0F0F0', 'Ycolor', '#F0F0F0');
             set(gca, 'XTick', []);
-            set(gca, 'YTick', []);
+            set(gca, 'FontSize', 6);
+            if lframe == grid_rows(cond) %&& size(avg_data_light,1)<=32
+                    set(gca, 'YTick', [round(minVoltage,2), round(maxVoltage,2)], 'Ycolor', 'k');
+                else
+                    set(gca, 'YTick', []);
+            end           
             if sum(find(gaussColors.redInds{cond}==frame_num)>0)
                 set(gca, 'color', '#FDDFDF');
             elseif sum(find(gaussColors.orangeInds{cond}==frame_num)>0)

@@ -14,7 +14,8 @@ gap_x = pix_x/fig_width;%20
 gap_y =pix_y/fig_height;%35
 
 col = ceil(N/H);
-row = mod((N-1),H) + 1;
+%row = mod((N-1),H) + 1;
+row = (H + 1) - (N - (H*(col-1)));
 
 
 plot_width = (1 - gap_x*(W+1))/W;
