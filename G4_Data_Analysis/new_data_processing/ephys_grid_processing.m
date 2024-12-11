@@ -57,6 +57,13 @@ function ephys_grid_processing(s, exp_folder)
     minVoltage = prctile(Log.ADC.Volts(Volt_idx,:), 0.001);
     voltageRange = diff([maxVoltage minVoltage]);
 
+    [hist_yvals, hist_xvals] = histcounts(Log.ADC.Volts(Volt_idx,:));
+    if length(hist_xvals) > length(hist_yvals)
+        hist_xvals = hist_xvals(1:length(hist_yvals));
+    end
+
+    
+
     % We will split up the data by condition first (four conditions, two
     % with squares displaying bright and two with squares displaying dark),
     % then split up each condition by frame position.
@@ -217,7 +224,7 @@ function ephys_grid_processing(s, exp_folder)
         'dark_sq_data', 'dark_sq_neutral', 'light_sq_neutral', 'light_sq_data', ...
         'dark_sq_data_ds', 'light_sq_data_ds', 'dark_avgReps_neutral', 'dark_avgReps_data', ...
         'light_avgReps_neutral', 'light_avgReps_data', 'alignment_data', ...
-        'medianVoltage', 'maxVoltage', 'voltageRange');
+        'medianVoltage', 'maxVoltage', 'voltageRange', 'hist_xvals', 'hist_yvals');
 
    % generate_protocol2_stimuli(peak_frames, hemi)
 
