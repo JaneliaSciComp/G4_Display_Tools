@@ -10,10 +10,14 @@ function process_protocol_2_ephysGrid(exp_folder, settings_file)
     grid_columns = [14 14];
     grid_rows = [14 14];
     grid_conds = [1 2]; % The number of the condition that displays squares and needs a grid plot
-
+    
+    if isfolder(fullfile(exp_folder, 'Log Files'))
+        G4_TDMS_folder2struct(fullfile(exp_folder, 'Log Files'));
+        movefile(fullfile(exp_folder,'Log Files','*'),exp_folder);
+        rmdir(fullfile(exp_folder, 'Log Files'));
+    end
     %% Don't change below this line
-%    G4_TDMS_folder2struct(fullfile(exp_folder, 'Log Files'));
- %   movefile(fullfile(exp_folder,'Log Files','*'),exp_folder);
+    
 
     load(settings_file);
     processed_file_name = settings.processed_file_name;
