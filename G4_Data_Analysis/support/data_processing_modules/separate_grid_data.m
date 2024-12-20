@@ -7,7 +7,7 @@ function [ts_data, neutral_ts_data] = separate_grid_data(ts_data, shifted_cond_d
     for cond = 1:size(frame_data,2)
         for rep = 1:size(frame_data,3)
             stim = 1;
-            for ind = 1:2:size(frame_move_inds{cond, rep},2) %first index where it changes is start of first stim
+            for ind = 1:2:size(frame_move_inds{cond, rep},2)-1 %first index where it changes is start of first stim
                 frame = frame_data(1, cond, rep, frame_move_inds{cond, rep}(ind));
                 stim_order{cond}(rep, stim) = frame;
                 stim = stim + 1;
@@ -32,7 +32,7 @@ function [ts_data, neutral_ts_data] = separate_grid_data(ts_data, shifted_cond_d
                 first_neutral_data = squeeze(shifted_cond_data(chan, cond, rep, 1:frame_move_inds{cond, rep}(1)-1));
                 first_frame = stim_order{cond}(rep, 1);
                 neutral_ts_data(chan, cond, rep, first_frame, 1:length(first_neutral_data)) = first_neutral_data;
-                for ind = 1:2:size(frame_move_inds{cond, rep},2) %first index where it changes is start of first stim
+                for ind = 1:2:size(frame_move_inds{cond, rep},2)-1 %first index where it changes is start of first stim
 
                     frame = stim_order{cond}(rep, stim);
                     data = shifted_cond_data(chan, cond, rep, frame_move_inds{cond, rep}(ind):(frame_move_inds{cond, rep}(ind+1)-1));

@@ -45,9 +45,14 @@ function [expected_frame_moves, expected_frame_move_inds, frame_moves, ...
                 frame_moves{cond, rep}(1:count-1) = [];
             end
             frame_gaps{cond}(rep, :) = diff(frame_move_inds{cond, rep}(:));
+            % if length(expected_frame_gaps{cond})<size(frame_gaps{cond},2)
+            %     expected_frame_gaps{cond} = [expected_frame_gaps{cond}; expected_frame_gaps{cond}]';
+            % end
         end
         
     end
+
+    
 
     
 

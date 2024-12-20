@@ -31,18 +31,24 @@ function create_grid_plot(dark_data, light_data, grid_rows, grid_columns, plot_c
         for dframe = 1:size(avg_data_dark,1)
             % if sum(~isnan(data_to_plot(dframe, :))) > 0
             frame_num = dframe + 1;
-                if size(avg_data_dark,1) > 32
+                if size(avg_data_dark,1) > 32 && size(avg_data_dark,1) < 183
                     gap_x = 5;
                     gap_y = 15;
+                elseif size(avg_data_dark,1) > 182
+                    gap_x = 1;
+                    gap_y = 5;
+
                 end
                 better_subplot_columns1st(grid_rows(cond), grid_columns(cond), dframe, gap_x, gap_y);
                 yline(0);
                 hold on
                 for rep = 1:num_reps
                     repColor = lightRepColor * colorRange(rep) + darkRepColor * (1 - colorRange(rep));
-                    plot(ts, squeeze(rep_data_dark(rep, dframe,:)), 'Color', repColor);
+                    
+%                     rep_data_dark(rep, dframe, isnan(rep_data_dark))=[];
+                    plot(ts, squeeze(rep_data_dark(rep, dframe, 1:length(ts))), 'Color', repColor);
                 end
-                plot(ts, squeeze(avg_data_dark(dframe, :)), 'Color', 'black', 'Linewidth', 2.0);
+                plot(ts, squeeze(avg_data_dark(dframe, 1:length(ts))), 'Color', 'black', 'Linewidth', 2.0);
                 yline(medianVoltage, 'Color', '#ADADAD');
                 ylim(yax_lims);
                 % if dframe == 1
@@ -92,9 +98,9 @@ function create_grid_plot(dark_data, light_data, grid_rows, grid_columns, plot_c
             hold on
             for rep = 1:size(rep_data_light,1)
                 repColor = lightRepColor * colorRange(rep) + darkRepColor * (1 - colorRange(rep));
-                plot(ts, squeeze(rep_data_light(rep, lframe,:)), 'Color', repColor);
+                plot(ts, squeeze(rep_data_light(rep, lframe,1:length(ts))), 'Color', repColor);
             end
-            plot(ts, squeeze(avg_data_light(lframe, :)), 'Color', 'black', 'Linewidth', 2.0);
+            plot(ts, squeeze(avg_data_light(lframe, 1:length(ts))), 'Color', 'black', 'Linewidth', 2.0);
             yline(medianVoltage, 'Color', '#ADADAD');
             ylim(yax_lims);
             % if lframe == 1
