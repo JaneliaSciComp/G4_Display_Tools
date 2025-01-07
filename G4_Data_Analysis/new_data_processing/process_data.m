@@ -212,7 +212,7 @@ function process_data(exp_folder, processing_settings_file)
     % function (the expected frame position data) in the cell array
     % position_functions which has one element per condition. Save
     % experiment data (the loaded .g4p file) in exp for future use. 
-    [position_functions, expanded_posfuncs, exp] = get_position_functions(path_to_protocol, num_conds);
+    [position_functions, expanded_posfuncs, exp] = get_position_functions(path_to_protocol, num_conds, data_rate);
 
     % Determine the start and stop times based on start-display command of
     % each trial (will be used later to find precise start/stop times).
@@ -270,7 +270,7 @@ function process_data(exp_folder, processing_settings_file)
     [unaligned_ts_data, unaligned_inter_data] = get_unaligned_data(ts_data, num_ADC_chans, Log, ...
         trial_start_times, trial_stop_times, num_trials, num_conds_short, ...
         exp_order, Frame_ind, time_conv, intertrial_start_times, ...
-        intertrial_stop_times, inter_ts_data, trial_options);
+        intertrial_stop_times, inter_ts_data, trial_options, data_rate);
 
     %Look for bad conditions due to duration, wbf, slope, etc and gather
     %cond/rep information.
