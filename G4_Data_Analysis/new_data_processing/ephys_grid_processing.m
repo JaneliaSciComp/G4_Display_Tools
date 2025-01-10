@@ -61,6 +61,10 @@ function ephys_grid_processing(s, exp_folder)
     if length(hist_xvals) > length(hist_yvals)
         hist_xvals = hist_xvals(1:length(hist_yvals));
     end
+    
+    [protocol_folder, protocol_name] = fileparts(path_to_protocol);
+    load(fullfile(protocol_folder, 'currentExp.mat'));
+
 
     
 
@@ -141,9 +145,18 @@ function ephys_grid_processing(s, exp_folder)
         ts_time{move} = data_period:data_period:maxdiffs(move)/data_rate;
     end
     longest_dur = max(maxdiffs);
+
+    %Get patterns for grid conditions
+    for gridcond = 1:num_conds
+        patName = currentExp.pattern.pattNames{gridcond};
+        patPath = fullfile(protocol_folder, 'Patterns', patName);
+        patData = load(patPath);
+        pattern_data = patData.pattern.Pats;
+        grid_patterns{gridcond} = pattern_data;
+    end
    
     for cond = 1:num_conds
-        num_frames(cond) = max(position_functions{cond}(:));
+        num_frames(cond) = size(grid_patterns{cond},3);
     end
     max_num_frames = max(num_frames);
     
