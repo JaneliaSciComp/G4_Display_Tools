@@ -38,7 +38,11 @@ function create_grid_plot(dark_data, light_data, grid_rows, grid_columns, plot_c
                         gap_y = 15;
                     elseif size(avg_data_dark,1) > 182
                         gap_x = 1;
-                        gap_y = 5;
+                        gap_y = 7; %This is the minimum y gap that can be passed to the better_subplot function
+                                    % without producing a negative y
+                                    % position for the axis and therefore
+                                    % cutting it off at the bottom of the
+                                    % figure.
     
                     end
                     better_subplot_columns1st(grid_rows(cond), grid_columns(cond), dframe, gap_x, gap_y);
@@ -52,12 +56,12 @@ function create_grid_plot(dark_data, light_data, grid_rows, grid_columns, plot_c
                     plot(ts, squeeze(avg_data_dark(dframe, 1:length(ts))), 'Color', 'black', 'Linewidth', 2.0);
                     yline(medianVoltage, 'Color', '#ADADAD');
                     ylim(yax_lims);
-                    % if dframe == 1
-                    %     ylabel('volts');
-                    % end
-                    % if dframe == (grid_rows(cond) - 1)*grid_columns(cond) + 1
-                    %     xlabel('ms');
-                    % end
+                    if dframe == 1
+                        ylabel('volts');
+                    end
+                    if dframe == (grid_rows(cond) - 1)*grid_columns(cond) + 1
+                        xlabel('ms');
+                    end
                     
                     set(gca, 'Xcolor', '#F0F0F0', 'Ycolor', '#F0F0F0');
                     set(gca, 'XTick', []);
@@ -95,9 +99,12 @@ function create_grid_plot(dark_data, light_data, grid_rows, grid_columns, plot_c
 
             for lframe = 1:size(avg_data_light,1)
                 frame_num = lframe+size(avg_data_dark,1)+1;
-                 if size(avg_data_light,1) > 32
+                 if size(avg_data_light,1) > 32 && size(avg_data_light,1) < 183
                     gap_x = 5;
                     gap_y = 15;
+                elseif size(avg_data_light,1) > 182
+                    gap_x = 1;
+                    gap_y = 7;
                 end
                 better_subplot_columns1st(grid_rows(cond), grid_columns(cond), lframe, gap_x, gap_y);
                 yline(0);
@@ -109,12 +116,12 @@ function create_grid_plot(dark_data, light_data, grid_rows, grid_columns, plot_c
                 plot(ts, squeeze(avg_data_light(lframe, 1:length(ts))), 'Color', 'black', 'Linewidth', 2.0);
                 yline(medianVoltage, 'Color', '#ADADAD');
                 ylim(yax_lims);
-                % if lframe == 1
-                %     ylabel('volts');
-                % end
-                % if lframe == (grid_rows(cond) - 1)*grid_columns(cond) + 1
-                %     xlabel('ms');
-                % end
+                if lframe == 1
+                    ylabel('volts');
+                end
+                if lframe == (grid_rows(cond) - 1)*grid_columns(cond) + 1
+                    xlabel('ms');
+                end
                 set(gca, 'Xcolor', '#F0F0F0', 'Ycolor', '#F0F0F0');
                 set(gca, 'XTick', []);
                 set(gca, 'FontSize', 6);
