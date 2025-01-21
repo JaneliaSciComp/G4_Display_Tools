@@ -120,6 +120,52 @@ function process_data(exp_folder, processing_settings_file)
         inter_shift_limit = .2; % When aligning intertrial to the first pattern movement, mark intertrial as bad if we have to shift more than this percentage. 
     end
 
+%% Check for ephys settings
+
+    if isfield(s.settings, 'len_var_tol')
+        len_var_tol = s.settings.len_var_tol;
+    else
+        len_var_tol = .05;
+    end
+
+    if isfield(s.settings, 'neutral_frame')
+        neutral_frame = s.settings.neutral_frame;
+    else
+        neutral_frame = 1;
+    end
+
+    if isfield(s.settings, 'grid_columns')
+        grid_columns = s.settings.grid_columns;
+    else
+        grid_columns(1) = 8;
+        grid_columns(2) = 16;
+    end
+    
+    if isfield(s.settings, 'grid_rows')
+        grid_rows = s.settings.grid_rows;
+    else
+        grid_rows(1) = 4;
+        grid_rows(2) = 8;
+    end
+
+    if isfield(s.settings, 'downsample_n')
+        downsample_n = s.settings.downsample_n;
+    else
+        downsample_n = 5;
+    end
+
+    if isfield(s.settings, 'is_ephys_grid')
+        is_ephys_grid = s.settings.is_ephys_grid;
+    else
+        is_ephys_grid = 0;
+    end
+
+    if is_ephys_grid
+        ephys_grid_processing(s.settings, exp_folder)
+        return;
+    end
+
+
     % Load TDMS file
 
     Log = load_tdms_log(exp_folder);
@@ -166,7 +212,9 @@ function process_data(exp_folder, processing_settings_file)
     % function (the expected frame position data) in the cell array
     % position_functions which has one element per condition. Save
     % experiment data (the loaded .g4p file) in exp for future use. 
-    [position_functions, expanded_posfuncs, exp] = get_position_functions(path_to_protocol, num_conds);
+
+    [position_functions, expanded_posfuncs, exp] = get_position_functions(path_to_protocol, num_conds, data_rate);
+
 
     % Determine the start and stop times based on start-display command of
     % each trial (will be used later to find precise start/stop times).
@@ -224,7 +272,7 @@ function process_data(exp_folder, processing_settings_file)
     [unaligned_ts_data, unaligned_inter_data] = get_unaligned_data(ts_data, num_ADC_chans, Log, ...
         trial_start_times, trial_stop_times, num_trials, num_conds_short, ...
         exp_order, Frame_ind, time_conv, intertrial_start_times, ...
-        intertrial_stop_times, inter_ts_data, trial_options);
+        intertrial_stop_times, inter_ts_data, trial_options, data_rate);
 
     %Look for bad conditions due to duration, wbf, slope, etc and gather
     %cond/rep information.

@@ -3,15 +3,16 @@ function create_processing_settings()
     settings = struct;
 
     %% Save settings
-    settings_file_path = '/Users/taylorl/Downloads/emptySplit_UAS_Kir_JFRC49-17_02_28/processing_settings';
+    settings_file_path = '/Users/lisaferguson/Documents/Programming/Reiser/ePhysGridData/processing_settings';
 
     %% General settings
-    settings.trial_options = [1 1 1];
-    settings.path_to_protocol = '/Users/taylorl/Downloads/streaming_test_protocol08-26-21_12-50-35.g4p';
-    settings.channel_order = {'LmR_chan', 'L_chan', 'R_chan', 'F_chan', 'Frame Position', 'LmR', 'LpR'};
+    settings.trial_options = [1 0 0];
+    settings.path_to_protocol = 'C:\Users\taylo\Documents\Programming\Reiser\EphysGridTestData\protocol1_4reps_12px_6px_LHS_2sbkg_200msfl_50msint_11-27-24_15-02-95\protocol1_4reps_12px_6px_LHS_2sbkg_200msfl_50msint_11-27-24_15-02-95.g4p';
+   % settings.channel_order = {'LmR_chan', 'L_chan', 'R_chan', 'F_chan', 'Frame Position', 'LmR', 'LpR'};
+    settings.channel_order = {'Frame Position', 'voltage'}; % USE THIS LINE FOR EPHYS EXPERIMENTS, ABOVE LINE FOR BEHAVIORAL EXPERIMENTS
     settings.hist_datatypes = {'Frame Position', 'LmR', 'LpR'};
     settings.manual_first_start = 0;
-    settings.data_rate = 1000; % rate (in Hz) which all data will be aligned to
+    settings.data_rate = 10000; % rate (in Hz) which all data will be aligned to
     settings.pre_dur = .05; %seconds before start of trial to include
     settings.post_dur = .05; %seconds after end of trial to include
     % settings.da_start = .05; %seconds after start of trial to start data analysis
@@ -98,6 +99,17 @@ function create_processing_settings()
 %     settings.condition_pairs{14} = [22 25];
 %     settings.condition_pairs{15} = [23 28];
 %     settings.condition_pairs{16} = [24 27];
+
+    %% ePhys Grid Settings
+
+    settings.is_ephys_grid = 1; % 1 if this is an ephys grid experiment, 0 if not.
+    settings.len_var_tol = .05; % By what percentage can the display time of a square vary before tossing it
+    settings.neutral_frame = 1; % The frame of the pattern that is neutral, to be shown between each square
+    settings.grid_columns(1) = 8; % the number of columns in the grid for each condition
+    settings.grid_columns(2) = 16;
+    settings.grid_rows(1) = 4;% the number of rows in the grid for each condition
+    settings.grid_rows(2) = 8;
+    settings.downsample_n = 5; %How much to downsample by (keeping every nth data point)
 
     %% Summary settings
     settings.summary_filename = 'Summary_of_bad_trials'; %Filename of the summary of which trials weren't run and why

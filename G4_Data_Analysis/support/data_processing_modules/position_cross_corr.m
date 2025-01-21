@@ -13,7 +13,7 @@ function alignment_data = position_cross_corr(position_functions, ...
             expectedData = position_functions{cond};
             for rep = 1:num_reps
                 collData = squeeze(ts_data(Frame_ind, cond, rep, :));
-                if ~isnan(collData)
+                if ~isempty(find(~isnan(collData)))
                     [corrs, lags] = xcorr(expectedData, collData);
                     shift = lags(corrs==max(corrs));
                     avgShift = sum(lags .* corrs) / sum(corrs);

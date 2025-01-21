@@ -1,7 +1,7 @@
 function [unaligned_ts_data, unaligned_inter_data] = get_unaligned_data(ts_data, num_ADC_chans, Log, ...
     trial_start_times, trial_stop_times, num_trials, num_conds_short, exp_order, ...
     Frame_ind, time_conv, intertrial_start_times, intertrial_stop_times, ...
-    inter_ts_data, trial_options)
+    inter_ts_data, trial_options, data_rate)
 
     unaligned_ts_data = ts_data;
     unaligned_ts_time = ts_data;
@@ -26,8 +26,8 @@ function [unaligned_ts_data, unaligned_inter_data] = get_unaligned_data(ts_data,
                 data = [data nan([1 diff])];
                 time = [time nan([1 diff])];
             elseif length(data) > size(unaligned_ts_data,4)
-                data(size(unaligned_ts_data,4):end) = [];
-                time(size(unaligned_ts_data,4):end) = []; 
+                data(size(unaligned_ts_data,4)+1:end) = [];
+                time(size(unaligned_ts_data,4)+1:end) = []; 
             end
             
             unaligned_ts_data(chan, cond, rep, :) = data;
@@ -48,11 +48,11 @@ function [unaligned_ts_data, unaligned_inter_data] = get_unaligned_data(ts_data,
         % represents 2 ms. In the ADC struct, every index represents 1 ms.
         % So we need to fill in the gaps of the frame position data to make
         % it the same length as the ADC data. 
-        full_fr_data = nan([1 length(fr_data)*2]);
+        full_fr_data = nan([1 length(fr_data)*(data_rate/500)]);
         el = 1;
-        for full = 1:2:length(full_fr_data)
+        for full = 1:(data_rate/500):length(full_fr_data)
             full_fr_data(full) = fr_data(el);
-            full_fr_data(full+1) = fr_data(el);
+            full_fr_data(full+1:full+((data_rate/500)-1)) = fr_data(el);
             el = el + 1;
         end
         if length(full_fr_data) < size(unaligned_ts_data,4)
@@ -79,7 +79,7 @@ function [unaligned_ts_data, unaligned_inter_data] = get_unaligned_data(ts_data,
                     data_int = [data_int nan([1 diff])];
  %                   time_int = [time_int nan([1 diff])];
                 elseif length(data_int) > size(inter_ts_data,3)
-                    data_int(size(inter_ts_data,3):end) = [];
+                    data_int(size(inter_ts_data,3)+1:end) = [];
  %                   time_int(size(inter_ts_data,3):end) = []; 
                 end
                 unaligned_inter_data(chan_int, trial, :) = data_int; 
@@ -113,6 +113,9 @@ function [unaligned_ts_data, unaligned_inter_data] = get_unaligned_data(ts_data,
             end
             unaligned_inter_data(Frame_ind, trial, :) = full_int_data;
     %        unaligned_inter_time(Frame_ind, trial, :) = fr_time_int;
+
+         elseif trial_options(2) == 0
+             unaligned_inter_data = [];
 %
         end
     end
