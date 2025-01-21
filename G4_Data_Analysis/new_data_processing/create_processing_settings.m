@@ -9,7 +9,7 @@ function create_processing_settings()
     settings.trial_options = [1 0 0];
     settings.path_to_protocol = 'C:\Users\taylo\Documents\Programming\Reiser\EphysGridTestData\protocol1_4reps_12px_6px_LHS_2sbkg_200msfl_50msint_11-27-24_15-02-95\protocol1_4reps_12px_6px_LHS_2sbkg_200msfl_50msint_11-27-24_15-02-95.g4p';
    % settings.channel_order = {'LmR_chan', 'L_chan', 'R_chan', 'F_chan', 'Frame Position', 'LmR', 'LpR'};
-    settings.channel_order = {'Frame Position', 'voltage'};
+    settings.channel_order = {'Frame Position', 'voltage'}; % USE THIS LINE FOR EPHYS EXPERIMENTS, ABOVE LINE FOR BEHAVIORAL EXPERIMENTS
     settings.hist_datatypes = {'Frame Position', 'LmR', 'LpR'};
     settings.manual_first_start = 0;
     settings.data_rate = 10000; % rate (in Hz) which all data will be aligned to
