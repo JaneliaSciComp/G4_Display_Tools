@@ -15,9 +15,9 @@ If you'd like to follow along in the code, open the file `G4_Display_Tools\G4_Da
 
 ## Establishing variables
 
-The first 150 lines of code are setting up variables that will be used throughout the processing. Variables are pulled from the processing settings file and saved for use. Starting around line 47, the code checks for the presence of certain variables in the processing settings, and if they're not present it sets a default value. This is so that an older settings file could be used and still work with the processing even if it was created before those variables were added. Comments in the code describe what each variable does. Around line 125 we load the TDMS Log file with all the raw data, and after that we get the index of each channel so we know which array index in the log is which data type. Finally, we load the metadata file so we can access information about if and how many trials were re-run at the end of the experiment. Around line 160 starts the actual processing of data which is split into a sequence of functions. Next we will go through each function one by one to see what they all do. All functions are separate .m files that can be found in `G4_Display_Tools\G4_Data_Analysis\support\data_processing_modules`.
+The first 170 lines of code are setting up variables that will be used throughout the processing. Variables are pulled from the processing settings file and saved for use. Starting around line 47, the code checks for the presence of certain variables in the processing settings, and if they're not present it sets a default value. This is so that an older settings file could be used and still work with the processing even if it was created before those variables were added. Comments in the code describe what each variable does. At line 164, if the experiment is an ephys grid experiment (see the settings documentation for details), a separate processing function `ephys_grid_processing` is called, and none of the further code in this `process_data` function runs. This type of experiment requires a separate processing sequence, and this function will be documented in detail in the future. Around line 170 we load the TDMS Log file with all the raw data, and after that we get the index of each channel so we know which array index in the log is which data type. Finally, we load the metadata file so we can access information about if and how many trials were re-run at the end of the experiment. Around line 204 starts the actual processing of data which is split into a sequence of functions. Next we will go through each function one by one to see what they all do. All functions are separate .m files that can be found in `G4_Display_Tools\G4_Data_Analysis\support\data_processing_modules`.
 
-## Get experiment order - Line 163
+## Get experiment order - Line 209
 
 `get_exp_order.m` is a function that loads the file `exp_order.mat`, determines the number of conditions and number of repetitions in the experiment, and gets the total number of trials expected in the experiment. It returns four variables. 
 `exp_order` is an array of size number of conditions x number of repetitions. It contains the condition numbers so we know it what order the conditions actually displayed. 
@@ -25,14 +25,15 @@ The first 150 lines of code are setting up variables that will be used throughou
 `num_reps` is the number of repetitions in the experiment.
 `total_exp_trials` is the total number of trials (including pre, inter, and post-trials) in the experiment. 
 
-## Get Position Functions - Line 169
+## Get Position Functions - Line 216
 
 `get_position_functions.m` is a function that loads the experiment protocol and saves the data of each position function so it can be easily accessed and used later when checking the alignment and quality of the frame position data. For each condition in the experiment, it gets the mode of that condition and, if applicable, loads the associated position function. If the condition does not have a position function, it leaves a NaN in place of the position function data. This function returns two variables:
 
 `position_functions` is a cell array with an element for each condition in the experiment. Each element contains the position function data for that condition, or a NaN if that condition has no position function.
+`expanded_position_functions` is a cell array much like `position_functions`. However, data has been added in order to make the size of the position function data match the size of the collected data. The data rate at which data is collected is used to determine the number of data points in the collected data. For each value in `position_functions`, that same value is inserted after each data point x number of times in order to expand the position function data so that it matches the collected data in size. Essentially this gives us a frame position value for every collected data point. 
 `exp` is a struct containing the loaded protocol file, saved in case we need to use any other information from the experiment protocol later on. 
 
-## Get Start and Stop Times - Line 176
+## Get Start and Stop Times - Line 224
 
 `get_start_stop_times.m` is a function that finds the indices in the raw data of the start and stop commands, whether those be the `Start-Display` command or the combined command. 
 
@@ -44,7 +45,7 @@ At the end of this function we check one more thing - the `manual_first_start` v
 
 This function returns four variables, all of which have been discussed: `start_idx`, `stop_idx`, `start_times`, and `stop_times`. 
 
-## Separating Original Conditions from Re-runs - Line 188
+## Separating Original Conditions from Re-runs - Line 236
 
 `separate_originals_from_reruns.m` is a function found on line 188. It determines what data is from the initial protocol and what data comes from trials being re-run at the end of the experiment because the first attempt was marked as bad. This is only relevant if the experiment was run using the streaming protocol and the Conductor was set to re-run bad conditions. 
 
@@ -54,14 +55,14 @@ Next starting at line 28, if there were more trials run than the expected number
 
 At the end, starting at line 78, these arrays are all saved into a struct called `times` for ease of passing them in and out of functions. The function returns three variables, all of which have been discussed: `times`, `ended_early`, and `num_extra_trials`. 
 
-## Get the modes and pattern IDS of conditions in order - Line 192
+## Get the modes and pattern IDS of conditions in order - Line 240
 
 The function `get_modeID_order.m` works similarly to `get_exp_order.m` except in this one we are getting the pattern and mode IDs. It again gets the index of each time the 'Set Pattern ID' command was recieved from the Log.Commands.Name array, and gets the value that was received with each command by plugging those indices into the Log.Commands.Data array. It does the same with the 'Set Control Mode' command. You end up with two arrays that are returned from the function: 
 
 `modeID_order` is an array with the mode of each trial in the order it was received.
 `PatternID_order` is an array of the pattern IDs of each trial in the order it as received. 
 
-## Further differentiate the start and stop times of trials - Line 205
+## Further differentiate the start and stop times of trials - Line 253
 
 `get_trial_startStop.m` is a function that determines the start and stop times for different trial types (pre, inter, post, conditions, etc). In addition, if any conditions were bad and then rerun at the end of the experiment, it replaces the start times of the bad conditions with those of the rerun conditions. This way, when we use the start times later to pull the data for those trials, we will pull the good run and not the bad one. 
 
@@ -71,23 +72,23 @@ Starting at line 96, the code goes through each rerun trial, get the condition a
 
 All arrays created (start/stop times for reruns, intertrials, and conditions) are then saved to the times struct, which is returned from the function as well as several of the other variables discussed.
 
-### Line 209 in processing
+### Line 257 in processing
 
 Here we have a bit of code not contained in a function. This simply calculates the number of conditions short the data is if the experiment was ended early. Later this will let us use the `exp_order` variable to determine exactly which conditions were skipped by ending early.
 
-## Organize durations and modes by condition - Line 213
+## Organize durations and modes by condition - Line 261
 
 The function `organize_durations_modes.m` is found on line 213. This function calculates the measured duration of each condition, the time gaps between conditions (expected to be the length of the intertrial), and organizes start times by condition and repetition. 
 
 At line 27 it adjusts the expected number of trials based on if the experiment was ended early. Then for each trial, it finds condition and repetition number, calculates the duration and saves it to `cond_dur`, gets the mode and saves it to `cond_modes`, and calculates the gap between it and the next condition, saving it to the variable `cond_gaps`. In addition, it creates a variable called `cond_start_times` which reorganizes the start times from a single long array to an array shaped by condition and repetition number. So all of these arrays are of a size number of conditions x number of reps, so data for any given condition/rep pair is easy to find later in these arrays. The four arrays just discussed are returned from the function. 
 
-## Create empty timeseries arrays - Line 218
+## Create empty timeseries arrays - Line 266
 
 The function `create_ts_arrays.m` calculates the size and shape of the timeseries data and returns arrays full of NaNs which will later have condition and intertrial timeseries data assigned to them. It first finds the condition with the longest duration (even though most conditions in theory have the same duration, the measured duration will vary slightly). It then sets the `data_period` which is calculated from the variable `data_rate` provided by the user. The data period is the time between one data point and the next, generally 1 ms for behavioral data and 2 ms for frame position data. It then establishes the variable `ts_time`. This variable later becomes the `timestamps` variable and is the x-axis against which timeseries data will be plotted. If the user has provided a value to the variable `pre_dur` in the settings, then the `ts_time` variable is defined as an array of numbers from -pre_dur-data_period to the longest duration plus the post_dur plus the data_period, with steps betwen defined by the data period. This is done on line 9. `ts_data` then is defined on line 10 as an array of size [number of timeseries data types x number of conditions x number of repetitions x length of `ts_time`]. If intertrials are included in the experiment, then the same thing is done for intertrial data. 
 
 The four variables returned then are the `ts_time`, `ts_data`, `inter_ts_time`, and `inter_ts_data`. Note that these variables still only contain NaNs at this point. 
 
-## Get unaligned timeseries data organized by datatype, condition, and repetition - Line 224
+## Get unaligned timeseries data organized by datatype, condition, and repetition - Line 272
 
 The function `get_unaligned_data.m` takes in many of the arrays we've generated up to this point and uses them to split up the behavioral and frame position data from the Log into an array organized by datatype, condition, and repetition. It is unaligned because the start of each trial is defined by when the 'Start-Display' command was received. It has not yet been cross correlated or aligned to when the pattern started moving. Data is saved to the array `unaligned_ts_data` which is 4 dimensional - channel number x condition x repetition x duration of longest condition.
 
@@ -101,7 +102,7 @@ Next, starting at line 70, we get the unaligned intertrial data, assuming the ex
 
 This function returns two arrays, `unaligned_ts_data` and `unaligned_inter_data`. 
 
-## Check for conditions with the wrong duration - Line 231
+## Check for conditions with the wrong duration - Line 279
 
 `check_condition_durations.m` is a function that searches for any conditions that had a duration significantly longer or shorter than expected by comparing the `cond_dur` and `intertrial_durs` arrays created earlier to the expected durations stored in the protocol.
 
@@ -109,13 +110,13 @@ We get the expected duration of each condition directly from the loaded experime
 
 Two variables are returned from this function, `bad_duration_conds` and `bad_duration_intertrials` which may or may not be empty. `bad_duration_conds` contains two element arrays that look like [repeptition condition] where as the `bad_duration_intertrials` is just a one dimensional array of intertrial numbers.
 
-## Check for flat conditions if relevant - Line 233
+## Check for flat conditions if relevant - Line 281
 
 If the experiment does not contain any intentionally static conditions, then the function `check_flat_conditions.m` looks for any conditions where the frame position data is flat, meaning the screen did not move at all. 
 
 It cycles through the `unaligned_ts_data` array and looks at the frame position data for each. It goes through each data point in the frame position data, and if there is never a difference between one and the next, then the data is completely flat and that repetition condition pair are added to the `bad_slope_conds` variable, which is returned. 
 
-## Find conditions where the fly wasn't flying if relevant - Line 238
+## Find conditions where the fly wasn't flying if relevant - Line 286
 
 Assuming this is a flying experiment, and the variable `remove_nonflying_trials` has been set to 1, the function `find_bad_wbf_trials.m` runs and searches the unaligned data for flies where the wing beat frequency falls out of range too much. 
 
@@ -123,17 +124,17 @@ The variable `F_chan_idx` tells us which channel contains the wing beat frequenc
 
 This function returns the variables `bad_WBF_conds` and `wbf_data` which contains all the wing beat frequency data for easy use later. 
 
-## Consolidate bad conditions - Line 248
+## Consolidate bad conditions - Line 296
 
 At this point in the processing, we've done all the quality checks that can be done before alignment. There will be more quality checks after alignment, but because cross correlation and alignment take the largest chunk of time when processing data, we want to remove as much bad data as possible before doing the cross correlation. This way we don't waste time aligning data we already know is bad. Therefore, we next consolidate the bad conditions we've collected so far, and remove them, before then moving on to the cross correlation. This does mean that after cross correlation and alignment steps, we may find more bad conditions and will have to repeat these steps. 
 
 The function `consolidate_bad_conds.m` takes in the various arrays of bad conditions produced by the last few sections, combines them into one array of bad conditions, and removes any duplicates. The function returns three variables, `bad_conds`, `bad_reps`, and `bad_intertrials`. `bad_conds` and `bad_reps` are each a one dimensional array of condition and repetition numbers of bad trials. They line up such that `bad_conds(1)` and `bad_reps(1)` are, together, the condition repetition pair of the first bad trial. `bad_intertrials` is a one dimensional list of bad intertrials. 
 
-## Remove bad trial data - Line 255
+## Remove bad trial data - Line 303
 
 The function `remove_bad_conditions.m` takes in the dataset you want data removed from, as well as the list of bad conditions and repetitions. It sets the data for those conditions and repetitions to NaNs. It only removes condition data, not data for intertrials. 
 
-## Cross correlation of position data - Line 265
+## Cross correlation of position data - Line 313
 
 The function `position_cross_corr.m` cross correlates the collected frame position data with the expected position function data and gets a lag number indicating how the data should be shifted to best line up with the expected position function. 
 
@@ -141,15 +142,15 @@ It goes through each condition in `unaligned_ts_data` and checks the mode first.
 
 We compare the percentage off zero to the correlation tolerance provided by the user, and if it's too high then that condition and repetition pair is saved in the array `conds_outside_corr_tolerance`. If the data to be cross correlated is all NaNs (meaning it has been removed because the data was bad), then these arrays get NaN values for that condition and rep pair. These arrays are saved in a struct called `alignment_data` which is returned by the function. 
 
-## Compile bad conditions from the cross correlation - Line 271
+## Compile bad conditions from the cross correlation - Line 319
 
 Though we have collected the condition/repetition pairs that fell outside of the correlation tolerance, they're formatted to be easily viewed by the user in the processed data, not to easily be removed by the function that removes bad data. So in `compile_bad_xcorr_conds.m` the bad conditions are reformatted into `bad_corr_conds` and `bad_corr_reps`. 
 
-## Remove bad conditions - Line 276
+## Remove bad conditions - Line 324
 
 The same function from line 255, used here to remove any conditions that fell outside of the cross correlation tolerance. 
 
-## Shift data by its cross correlation lag - Line 281
+## Shift data by its cross correlation lag - Line 329
 
 The function `shift_xcorrelated_data.m` actually shifts the data by the lag values found by the cross correlation. It saves the shifted data in an array called `shifted_ts_data` which is the same size as `unaligned_ts_data`. We use matlab's circshift function in order to do this shift. The code goes through each channel of each condition/repetition pair. It gets the unshifted data from the `unaligned_ts_data` array. 
 
@@ -161,7 +162,7 @@ Filling in the gaps with NaNs after shifting the data ensures that the array its
 
 The function returns `shifted_ts_data`, an array of all the timeseries data after it has been shifted according to the cross correlation lag. 
 
-## Get the pattern movement times - Line 291
+## Get the pattern movement times - Line 339
 
 `get_pattern_move_times.m` is a function that goes through the shifted frame position data to determine at what point the pattern on the screens actually started moving. We will later align our data to "start" at this point. 
 
@@ -176,15 +177,15 @@ In the case that there is no position function for that condition (due to it bei
 
 This function returns several variables. `pattern_movement_times`, `pos_func_movement_times`, `bad_conds_movement`, and `bad_reps_movement`. `Pos_func_movement_times` are the indices in the position function where movement happened, as compared to the `pattern_movement_times` which contains the indices in the collected frame position data where movement happened. We save both just in case we want to use them for any kind of quality analysis in the future. 
 
-## Get intertrial movement times - Line 293
+## Get intertrial movement times - Line 341
 
 For each intertrial, this function finds the index of the first datapoint where the frame position changes. It returns one variable, `intertrial_move_times`, which is a one dimensional array giving one index value per intertrial. 
 
-## Remove bad movement conditions - Line 297
+## Remove bad movement conditions - Line 345
 
 The `remove_bad_conditions.m` function is used one more time to remove any bad conditions found when getting the pattern movement times. 
 
-## Align data to pattern movement time - Line 302
+## Align data to pattern movement time - Line 350
 
 `shift_data_to_movement.m` is the alignment function that actually shifts the data so each condition's data starts at the point that the pattern started moving.
 
@@ -194,19 +195,19 @@ The second half of the function shifts the intertrial data based on its movement
 
 This function returns three variables. `ts_data` is the final, aligned timeseries array. `inter_ts_data` is the aligned intertrial timeseries data, and `bad_movement_intertrials` which is the list of bad intertrials, if any.
 
-## Re-formatting all bad conditions for the text file report - Line 307
+## Re-formatting all bad conditions for the text file report - Line 355
 
-Lines 307 - 330 are spent reformatting the bad trials. This is only done so that older code that generates the text report can be re-used. It was simpler than re-writing the text report data. But that's it, there's no fundamental reason it needs to be formatted this way. 
+Lines 355 - 378 are spent reformatting the bad trials. This is only done so that older code that generates the text report can be re-used. It was simpler than re-writing the text report data. But that's it, there's no fundamental reason it needs to be formatted this way. 
 
 Bad conditions are assigned to an array named for the reason they were tossed out. So we end up with `duration_conds`, `slope_conds`, `xcorr_conds`, `posfunc_conds`, `wbf_conds`, `duration_intertrials`, and `movement_intertrials`. Each of these are a list of repetition/condition pairs, or intertrial numbers. These are all then saved to a struct called bad_trials_summary for ease of passing the data in and out of functions. 
 
-## Preparing the report of bad conditions - Line 332
+## Preparing the report of bad conditions - Line 380
 
 After the reformatting is done, `create_bad_conditions_report.m` is called. This function creates a cell array called `Summary` where each element is a line of text that will later be printed in a txt file. For each bad condition, an element is added to `Summary` with the condition and repetition number and a code telling the user why that trial was tossed. It then does the same thing with the intertrials. 
 
 This returns the `summary` variable which will be used at the end of processing when everything is saved to produce a text file reporting on all conditions and intertrials that were removed from the data. 
 
-## Add buffer data back to beginning of timeseries - Line 339
+## Add buffer data back to beginning of timeseries - Line 387
 
 If the variable `pre_dur` is set to something other than 0, then a certain amount of data needs to be tacked back on to the front of the timeseries data. The data will be plotted so that x=0 is the point at which the pattern started moving, and this data added back on to the front will align with x = -pre_dur:0.
 
@@ -216,25 +217,25 @@ Then for each channel, condition, and repetition, we get the previously found ti
 
 This function returns `ts_data` after adding the data indicated by the `pre_dur` variable. 
 
-## Get normalization parameters - Line 354
+## Get normalization parameters - Line 400
 
 The function `get_max_process_normalization.m` is just a few lines of code which gets the max values (based on the percentile provided by the user) from the timeseries data which will then be used to normalize the data. 
 
-## Normalize timseries data - Line 357
+## Normalize timseries data - Line 405
 
 The function `normalize_ts_data.m` takes the max values just calculated and normalizes the timeseries data. First it gets the maximum value from the list of max values for the left wing channela nd the right wing channel. It then establishes the datatypes to normalize, which are simply the left and right wing channels. Then for each of these, each data point in the timeseries data is divided by the max value. 
 
 This function returns the normalized timeseries data array and the max value used. 
 
-## Calculating data sets - Lines 365-398
+## Calculating data sets - Lines 413-
 
-The next set of code is not divided into functions but executed here in the `process_data.m` function. First, at line 365 and 366, we calculate the Left minus Right (LmR) and Left plus Right (LpR) data sets by subtracting or adding the left and right channel data. 
+The next set of code is not divided into functions but executed here in the `process_data.m` function. First, at line 413 and 414, we calculate the Left minus Right (LmR) and Left plus Right (LpR) data sets by subtracting or adding the left and right channel data. 
 
-Next, at lines 370 and 371 we do the same, but with the normalized data. 
+Next, at line 418 and 419 we do the same, but with the normalized data. 
 
-The code commented out from lines 374-389 is old and will likely be removed in future releases. 
+The code commented out from lines 422-437 is old and will likely be removed in future releases. 
 
-Starting at line 392 we create some more datasets which don't contain any new information but are likely to be useful to the user. These are: 
+Starting at line 440 we create some more datasets which don't contain any new information but are likely to be useful to the user. These are: 
 
 `ts_avg_reps` which is the timeseries data averaged over the repetitions.
 `LmR_avg_over_reps` which is specifically the LmR data averaged over repetitions. 
@@ -243,7 +244,7 @@ Starting at line 392 we create some more datasets which don't contain any new in
 `LmR_avg_reps_norm` is `LmR_avg_over_reps` using normalized data
 `LpR_avg_reps_norm` is `LpR_avg_over_reps` using normalized data
 
-## Calculating flipped and averaged LmR data - Line 405
+## Calculating flipped and averaged LmR data - Line 453
 
 On line 405 you'll find the function `get_falmr.m`. Assuming the faLmR setting is turned on, this will run and return both normalized and unnormalized faLmR data. 
 
@@ -253,11 +254,11 @@ This function returns two variables, `faLmR_data` and `faLmR_data_norm`.
 
 Lines 406-407 in the main processing function then use these to create `faLmR_avg_over_reps` and `faLmR_avg_reps_norm` which simply takes the mean of each output over all the repetitions. 
 
-## Calculate data for tuning curves - Line 416
+## Calculate data for tuning curves - Line 464
 
-Lines 416-417 create the tuning curve datasets, which are simply the `ts_data` averaged over the 4th dimension (the dimension with the actual data). 
+Lines 464-465 create the tuning curve datasets, which are simply the `ts_data` averaged over the 4th dimension (the dimension with the actual data). 
 
-## Calculating histograms of pattern position data - Line 422
+## Calculating histograms of pattern position data - Line 470
 
 Assuming the user provided datatypes for which to create histograms, the function `calculate_histograms.m` will run and generate the histogram data. 
 
@@ -265,13 +266,13 @@ Line 6 gets the max value of the frame position data. We then manipulate the arr
 
 This function returns one variable, `hist_data`, which is a four dimensional array of size [num datatypes, num conditions, num repetitions, max frame position]. 
 
-## Calculate intertrial histograms - Line 433
+## Calculate intertrial histograms - Line 481
 
 Next we check to see if intertrials were run. If so, we calculate histograms for them using the `calculate_intertrial_histograms.m` function. Before calling the function, we pull the data we need out of the `inter_ts_data` array, and then pass it into the function. Just like the last function, we simply get the maximum frame position value among the intertrials, create an array of 1:max value, and then get the indices where the data is equal to each point in that array. Summing up those indices tells us how many data points are of each value. We save this to `inter_hist_data` and return it. 
 
-## Calculate position series if relevant - Line 443
+## Calculate position series if relevant - Line 491
 
-Assuming the setting for position series is set to 1, the function `get_position_series.m` is called at line 443. 
+Assuming the setting for position series is set to 1, the function `get_position_series.m` is called at line 491. 
 
 If `pos_conditions`, the variable determining which conditions you want position series for, is empty, then the function uses all conditions. First it checks the entire frame position dataset for non-integer numbers, which would cause an error if present.  Then in lines 28-31 we get the indices of the actual data we want to use, assuming there may be NaNs at the beginning and/or end, removing any data set by `data_pad`, etc.
 
@@ -279,15 +280,15 @@ At line 34 it finds all indices were there is a "big step", or a change greater 
 
 The function returns `pos_series`, discussed earlier, and `mean_pos_series` which is the position series averaged over repetitions. 
 
-## Saving the processed data - Lines 455-484
+## Saving the processed data - Lines 503-523
 
-Lines 455-468 simply save some of the variables produced throughout the processing as new variables which have names that are more easily understood by the user. These variables will all be saved in a .mat file and the goal is for a user to be able to understand what they are by their variable name alone, rather than having to reference the documentation every time. 
+Lines 503-516 simply save some of the variables produced throughout the processing as new variables which have names that are more easily understood by the user. These variables will all be saved in a .mat file and the goal is for a user to be able to understand what they are by their variable name alone, rather than having to reference the documentation every time. 
 
 After the re-naming, we save a long list of variables in the experiment folder, under the processed filename given by the user. 
 
-Note the `else` statement at 486, tied to the `if` statement started at line 347. Most of the dataset creation listed above is for flying experiments, and this if statement separates flying experiments from other types (walking). After this `else` comes the dataset generation done for non-flying experiments, and a new save command saving different variables. The dataset generation is not nearly as extensive for non-flying experiments. We still average the timeseries data over repetitions, get the tuning curve data, and create histogram data for the intertrials (all done the same way). The rest is not included. As such, there are many fewer variables being saved for a non-flying experiment. 
+Note the `else` statement at 534, tied to the `if` statement started at line 395. Most of the dataset creation listed above is for flying experiments, and this if statement separates flying experiments from other types (walking). After this `else` comes the dataset generation done for non-flying experiments, and a new save command saving different variables. The dataset generation is not nearly as extensive for non-flying experiments. We still average the timeseries data over repetitions, get the tuning curve data, and create histogram data for the intertrials (all done the same way). The rest is not included. As such, there are many fewer variables being saved for a non-flying experiment. 
 
-## Bad conditions reporting - Line 525
+## Bad conditions reporting - Line 573
 
 The last thing done is creating a text file in which the bad conditions are summarized. This uses the variable created earlier in the processing, `bad_conds_summary` which is a cell arrray of text lines that are printed into a text file and saved based on the file path and name provided by the user. 
 

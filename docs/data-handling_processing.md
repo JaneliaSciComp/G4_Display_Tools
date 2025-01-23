@@ -1,5 +1,5 @@
 ---
-title:  G4 Data Processing
+title:  G4 Data Processing Setup
 parent: G4 Automated Data Handling
 grand_parent: Generation 4
 nav_order: 1
@@ -74,7 +74,7 @@ If any of these channels (besides the last two) are not implemented in your set 
 
 ### Data Rate
 
-`data_rate` indicates the rate at which data is collected in Hz. It should usually be set to 1000.
+`data_rate` indicates the rate at which data is collected in Hz.
 
 ### Duration of data to include before trial start
 
@@ -83,14 +83,6 @@ The raw data returned from the screen is not broken up into trials. It is a sing
 ### Duration of data to include after trial end
 
 `post_dur`is exactly the same as `pre_dur`, but provides a buffer at the end of the trial. Set it to something small (.05 is default)
-
-### Duration after start of trial to remove from plots
-
-`pre_dur` and `post_dur` allow you to include a bit of buffer data at the beginning and end of a trial when aligning your data. `Da_start` now refers to the actual analysis of your data. If you want your time series or histogram plot to actually start sometime after the 'start' command for the trial was received, set that amount of time here. It should be small - anywhere from 0 to 0.05 (in seconds). Oftentimes, the very beginning or end data of a trial is junk - there is a small lag from the time the command is received to the time the pattern actually displays on the screen, or the fly is still responding to a previous stimulus. You can adjust this and `da_stop` to get rid of some of that noise at the very beginning or end of a trial.
-
-### Duration before end of trial to remove from plots
-
-Exactly the same as `da_start`, but instead `da_stop` is the number of seconds to end a plot before the actual end of the trial.
 
 ### Time conversion factor
 
@@ -128,11 +120,19 @@ All repetitions of the same condition undergo a cross correlation during data pr
 
 Some experiments involve a tethered fly which is flying, others involve a fly which is walking. If this is a flying experiment, set this variable to 1. Otherwise, set it to 0. 
 
+### Are there any static conditions in the experiment? 
+
+`static_conds` shoud be set to 1 if your experiment has any conditions in it which are static, meaning the pattern on the screen never changes or moves. If not, set it to 0. This is because one of the quality checks we do on the data is looking for conditions where the screen malfunctioned and the pattern's frame position never changed. These conditions are removed, but conditions intended to be static would also be removed. If there are static conditions, then this quality check will be skipped. 
+
+### What limit indicates a bad intertrial when aligning the intertrial to pattern movement.
+
+We align data by finding the moment of a trial where the pattern moved for the first time, and then marking that point in the data as the start of the trial, removing the data before that point and therefore shifting the trial. For intertrials, how far of a shift is too far and should indicate a failed intertrial and cause the data to be removed? `intertrial_shift_limit` is set to .2 (20%) by default.
+
+## Wing Beat Frequency Settings
+
 ### Do you want to remove trials where the fly wasn't flying? 
 
 The processing can automatically remove trials where the fly was not flying in order to prevent bad data from affecting your averages. Set this variable to 1 if you'd like trials where the fly did not fly to be marked as bad and removed. If you'd like this feature turned off, set it to 0. A record is kept of all trials which are marked bad or removed and the reason, so you will be able to see how many and which trials you lost due to a fly refusing to fly. Settings in thew Wing Beat Frequency section will determine how much a fly needs to fly during a trial in order for it to be considered acceptable.
-
-## Wing Beat Frequency Settings
 
 ### Acceptable Wing Beat Frequency Range
 
@@ -213,6 +213,34 @@ settings.condition_pairs{3} = [3 8];
 ```
 
 This means that the first pair is conditions 1 and 6. The second condition listed, 6 in this case, is the one that will have its sign flipped. Do this for as many pairs as you want flipped and averaged.
+
+## ePhys Grid Settings
+
+These settings are only relevant if you are doing an ePhys experiment looking for neuron sensitivity to a particular part of their field of view. I refer to thse as ePhys Grid experiments. If this does not fit your experiment, you only need to worry about the first setting in this section.
+
+### Is this an ephys grid experiment? 
+
+`is_ephys_grid` should be set equal to 1 if this is an ephys grid experiment, or 0 if it is not. 
+
+### Tolerance for variation in the display time of a square
+
+In these experiments, squares are displayed for a short amount of time in sequence, eventually covering the entire field of view. `len_var_tol` indications by what percentage the display time of one of these squares can vary from what is expected before we assume the data is bad. It is by default set to .05 (5%).
+
+### Which frame of the pattern is the neutral frame? 
+
+In this type of experiment, a single pattern includes all frames displaying each square in the grid, plus a frame which shows a neutral screen (no square being displayed). The processing needs to know which frame in the pattern is this neutral frame. By convention `neutral_frame` should be set to 1 (the first frame) but if the neutral frame is in a different location in the pattern, provide its frame number. 
+
+### The number of columns in the grid for each condition
+
+`grid_columns` is an array with one element for each condition in the experiment. For each element there should be stored the number of columns in the grid for that condition. 
+
+### The number of rows in the grid for each condition
+
+`grid_rows` is the same as the above variable, but indicates the number of rows in the grid for each condition.
+
+### factor by which to downsample the data
+
+These experiments tend to collect a very large amount of data and the data visualization is sped up significantly by downsampling. The downsampling is simple, it takes the full data and keeps every nth datapoint. `downsample_n` is the value of n. By default it is set to 5.
 
 ## Summary Settings
 
