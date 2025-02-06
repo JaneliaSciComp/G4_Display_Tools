@@ -353,7 +353,7 @@ classdef G4_settings_view < handle
         end
         
         function browse_for_config(self, ~, ~)
-            new_file = self.con.browse();
+            new_file = self.con.browse('*.ini');
             if new_file ~= 0
                 self.config_filepath_textbox.String = new_file;
             end
