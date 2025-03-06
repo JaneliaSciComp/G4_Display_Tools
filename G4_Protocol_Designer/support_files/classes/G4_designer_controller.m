@@ -403,6 +403,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
             end
 
             self.update_trial_doc(default_mode, 1, 1, 'pre');
+            self.clear_fields(default_mode, 'pre', 1);
             self.update_trial_doc(pat1, 1, 2, 'pre');
             self.update_trial_doc(pos1, 1, 3, 'pre');
             self.update_trial_doc(ao1, 1, 4, 'pre');
@@ -1106,7 +1107,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
 
 
         % When the mode is changed, clear and disable appropriate fields
-        function clear_fields(self, mode)
+        function clear_fields(self, mode, varargin)
 
             pos_fields = fieldnames(self.doc.Pos_funcs);
             pat_fields = fieldnames(self.doc.Patterns);
@@ -1115,8 +1116,13 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
             rate = self.doc.get_uneditable_text();
             gain = self.doc.get_uneditable_text();
             offset = self.doc.get_uneditable_text();
-            trialtype = convertStringsToChars(self.model.current_selected_cell.table);
-            x = self.model.current_selected_cell.index(1);
+            if isempty(varargin)
+                trialtype = convertStringsToChars(self.model.current_selected_cell.table);
+                x = self.model.current_selected_cell.index(1);
+            else
+                trialtype = varargin{1};
+                x = varargin{2};
+            end
             if ~isnumeric(mode) && ~isempty(mode)
                 mode = str2num(mode);
             end
@@ -1213,7 +1219,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
 
             end
             if mode >=1 && mode <= 7 || isempty(mode)
-                self.set_mode_dep_props(pat_field, pos, indx, rate, gain, offset);
+                self.set_mode_dep_props(pat_field, pos, indx, rate, gain, offset, trialtype, x);
             end
 %             if ~isempty(mode)
 %                 uneditable_indices = self.get_uneditable_indices(mode);
@@ -1225,9 +1231,13 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
 
         % Set all properties dependent on the mode
         function set_mode_dep_props(self, pat_field, pos, indx, rate, gain, offset, varargin)
-
-            trialtype = convertStringsToChars(self.model.current_selected_cell.table);
-            x = self.model.current_selected_cell.index(1);
+            if isempty(varargin)
+                trialtype = convertStringsToChars(self.model.current_selected_cell.table);
+                x = self.model.current_selected_cell.index(1);
+            else
+                trialtype = varargin{1};
+                x = varargin{2};
+            end
             if strcmp(trialtype, 'pre')
                 trial_var = 'pretrial';
             elseif strcmp(trialtype, 'inter')

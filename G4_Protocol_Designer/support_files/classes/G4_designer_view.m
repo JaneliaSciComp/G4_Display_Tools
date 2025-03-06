@@ -412,7 +412,7 @@ classdef G4_designer_view < handle
             set(self.exp_name_box,'Value', self.con.get_experiment_name());
             self.set_recent_file_menu_items();
             self.set_exp_length_display();
-            %self.con.doc_replace_grey_cells();
+            self.con.doc_replace_grey_cells();
             self.update_column_widths();
             self.update_uneditable_style();
 
