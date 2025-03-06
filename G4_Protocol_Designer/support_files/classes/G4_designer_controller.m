@@ -403,7 +403,6 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
             end
 
             self.update_trial_doc(default_mode, 1, 1, 'pre');
-            self.clear_fields(default_mode, 'pre', 1);
             self.update_trial_doc(pat1, 1, 2, 'pre');
             self.update_trial_doc(pos1, 1, 3, 'pre');
             self.update_trial_doc(ao1, 1, 4, 'pre');
@@ -520,6 +519,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
 
                 end
             end
+            self.insert_greyed_cells();
             
         end
 
