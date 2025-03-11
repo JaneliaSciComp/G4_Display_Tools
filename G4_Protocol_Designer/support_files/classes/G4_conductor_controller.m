@@ -4,6 +4,7 @@ classdef G4_conductor_controller < handle
 
         model
         doc
+        system
         settings_con
         view
         fb_model
@@ -37,14 +38,15 @@ classdef G4_conductor_controller < handle
 
         %% constructor
         function self = G4_conductor_controller(varargin)
-            self.set_model(G4_conductor_model());
+            self.set_system(experiment_system());
+            self.set_model(G4_conductor_model(self.system));
             self.set_elapsed_time(0);
             if ~isempty(varargin)
                 self.set_doc(varargin{1});
                 self.model.set_fly_name(self.model.create_fly_name(self.doc.get_top_export_path()));
                 self.set_settings_con(varargin{2});
             else
-                self.set_doc(G4_document());
+                self.set_doc(G4_document(self.system));
                 self.set_settings_con(G4_settings_controller());
             end
 
@@ -1883,6 +1885,10 @@ classdef G4_conductor_controller < handle
         function value = get_settings(self)
             value = self.settings;
         end
+        function value = get_system(self)
+            value = self.system;
+        end
+
 
         %% Setters
 
@@ -1955,6 +1961,10 @@ classdef G4_conductor_controller < handle
         function set_settings(self, value)
             self.settings = value;
         end
+        function set_system(self, value)
+            self.system = value;
+        end
+            
 
     end
 end

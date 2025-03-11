@@ -50,7 +50,7 @@ classdef G4_document < handle
     methods
 
 %CONSTRUCTOR--------------------------------------------------------------
-        function self = G4_document()
+        function self = G4_document(system)
 
             self.set_settings(G4_Protocol_Designer_Settings());
             fn = fieldnames(self.settings);
@@ -77,7 +77,7 @@ classdef G4_document < handle
             self.set_save_filename('');
             self.currentExp = struct;
             self.set_experiment_name('');
-            self.set_trial_data(G4_trial_model());
+            self.set_trial_data(G4_trial_model(system));
             self.set_est_exp_length(0);
 
             %Make table parameters into a cell array so they work with the tables more easily

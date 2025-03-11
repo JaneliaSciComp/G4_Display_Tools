@@ -27,21 +27,21 @@ classdef G4_trial_model
 
     methods
         
-        function self = G4_trial_model()
-        
-            self.trial_mode = 1 ;
-            self.pattern_name= '' ;
-            self.position_func = '' ;
-            self.ao1 = '' ;
-            self.ao2 = '' ;
-            self.ao3 = '' ;
-            self.ao4 = '' ;
-            self.frame_index = [] ;
-            self.frame_rate = [] ;
-            self.gain = [] ;
-            self.offset = [] ;
-            self.duration = 5 ;
-            self.is_checked = false ;
+        function self = G4_trial_model(system)
+            default_params = system.get_default_param_values();
+            self.trial_mode = default_params{1};
+            self.pattern_name= default_params{2};
+            self.position_func = default_params{3} ;
+            self.ao1 = default_params{4} ;
+            self.ao2 = default_params{5} ;
+            self.ao3 = default_params{6} ;
+            self.ao4 = default_params{7} ;
+            self.frame_index = default_params{8} ;
+            self.frame_rate = default_params{9};
+            self.gain = default_params{10};
+            self.offset = default_params{11} ;
+            self.duration = default_params{12} ;
+            self.is_checked = false;
             self.trial_array = {self.trial_mode, self.pattern_name, self.position_func, self.ao1, ...
                 self.ao2, self.ao3, self.ao4, self.frame_index, self.frame_rate, self.gain, self.offset, ...
                 self.duration, self.is_checked};

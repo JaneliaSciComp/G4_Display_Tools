@@ -38,13 +38,14 @@ classdef G4_conductor_model < handle
         convert_tdms
         orig_expected_time
         settings
+        system
     end
 
     methods
 
         %CONSTRUCTOR--------------------------------------------------------------
-        function self = G4_conductor_model()
-
+        function self = G4_conductor_model(system)
+            self.system = system;
             self.set_settings(G4_Protocol_Designer_Settings());
             fn = fieldnames(self.settings);
             for i = 1:numel(fn)
@@ -66,8 +67,7 @@ classdef G4_conductor_model < handle
                 self.settings.Light_Cycle_Sheet_GID});
             
             %The list of available run protocols to display
-            self.set_run_protocol_file_list({'Simple', 'Streaming', 'Log Reps Separately',  ...
-                'Streaming + Log Reps'});
+            self.set_run_protocol_file_list(self.system.get_run_protocol_names());
 
             %%run functions to 1)read the metadata options from the google
             %%sheet and 2) create a metadata_lists cell array with the list
@@ -154,19 +154,20 @@ classdef G4_conductor_model < handle
         end
 
         function filename = get_run_filename(self)
-            switch self.run_protocol_num
-                case 1
-                    filename = 'G4_default_run_protocol.m';
-                case 2
-                    filename = 'G4_default_run_protocol_streaming.m';
-                case 3
-                    filename = 'G4_run_protocol_blockLogging.m';               
-                case 4
-                    filename = 'G4_run_protocol_streaming_blockLogging.m';
-
-                otherwise
-                    disp("Invalid run protocol selected.");
-            end
+            filename = self.system.run_protocols{self.run_protocol_num};
+            % switch self.run_protocol_num
+            %     case 1
+            %         filename = 'G4_default_run_protocol.m';
+            %     case 2
+            %         filename = 'G4_default_run_protocol_streaming.m';
+            %     case 3
+            %         filename = 'G4_run_protocol_blockLogging.m';               
+            %     case 4
+            %         filename = 'G4_run_protocol_streaming_blockLogging.m';
+            % 
+            %     otherwise
+            %         disp("Invalid run protocol selected.");
+            % end
         end
 
         function set_run_file(self, run_file_string)

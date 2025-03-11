@@ -391,6 +391,7 @@ classdef G4_designer_view < handle
             self.uneditableStyle = uistyle;
             self.editableStyle = uistyle;
             self.update_uneditable_style();
+            self.system_based_updates();
             
 
         end
@@ -417,6 +418,22 @@ classdef G4_designer_view < handle
             self.update_uneditable_style();
 
         end
+
+        function system_based_updates(self)
+            % Make any changes to the GUI necessary based on the system
+            % selected, like number of rows the screen allows, size of the
+            % preview window, etc.
+
+            sys = self.con.get_system();
+
+            if length(self.num_rows_buttonGrp.Buttons) > sys.num_screen_rows
+                for row = sys.num_screen_rows+1:length(self.num_rows_buttonGrp.Buttons)
+                    set(self.num_rows_buttonGrp.Buttons(row),'enable','off');
+                end
+            end
+
+        end
+
 
 
         function close_application(self, src, event)
@@ -525,18 +542,28 @@ classdef G4_designer_view < handle
             y = event.Indices(2);
             trialtype = src.Tag;
             self.con.set_current_selected_cell(trialtype, event.Indices);
+            sys = self.con.get_system();
             if y == 1
-                allow = 1;                
+                if ~isnumeric(new)
+                    new = str2num(new);
+                end
+                if isempty(find(new==sys.prohibited_modes,1))
+                    allow = 1;                
+                else
+                    allow = 2;
+                    self.con.create_error_box("This system does not currently support that mode.");
+                    
+                end
             else
                 mode = self.con.get_trial_component(trialtype, x, 1);
                 allow = self.con.check_editable(mode, y);              
             end
             if allow == 1
                 self.con.update_trial_doc(new, x, y, trialtype);
-            else
+            elseif allow == 0
                 self.con.create_error_box("You cannot edit that field in this mode.");
             end
-            if y == 1
+            if y == 1 && allow == 1
                 self.con.clear_fields(new);
             end
             self.con.insert_greyed_cells();
