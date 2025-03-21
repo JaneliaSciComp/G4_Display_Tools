@@ -15,8 +15,8 @@ classdef G4DisplayToolsTests < matlab.unittest.TestCase
 
     methods(TestMethodTeardown)
         function closeDesignerAndConductor(testCase)
-            testCase.designer.close_application();
-            testCase.conductor.view.close_application();
+            testCase.designer.view.close_application(testCase.designer.view.f);
+            testCase.conductor.view.close_application(testCase.conductor.view.fig);
         end
     end
 

@@ -15,7 +15,8 @@ function testG4DocumentImportFolder(testCase)
     t2.TimerFcn = 'com.mathworks.mde.cmdwin.CmdWinMLIF.getInstance().processKeyFromC(2,67,''C'')';
     start(t1);
     start(t2);
-    g4doc = G4_document();
+    system = experiment_system(0);
+    g4doc = G4_document(system);
     g4doc.import_folder(testpath);
     rtn = get(t2, 'Running');
     stop(t2); 
@@ -38,7 +39,8 @@ function testG4DocumentImportNestedFolder(testCase)
     t2.TimerFcn = 'com.mathworks.mde.cmdwin.CmdWinMLIF.getInstance().processKeyFromC(2,67,''C'')';
     start(t1);
     start(t2);
-    g4doc = G4_document();
+    system = experiment_system(0);
+    g4doc = G4_document(system);
     g4doc.import_folder(testpath);
     rtn = get(t2, 'Running');
     stop(t2);

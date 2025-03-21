@@ -17,10 +17,21 @@ classdef experiment_system < handle
     methods
 
 %% CONSTRUCTOR
-        function self = experiment_system()
+function self = experiment_system(varargin)
             self.set_possible_parameters({'mode','pattern','posfunc','ao1',...
                 'ao2','ao3','ao4','frame_ind','frame_rate','gain','offset','duration'});
-            answer = questdlg('Which system are you using?', 'System Version', 'G4', 'G4-1', 'G4');
+            if ~isempty(varargin)
+                if varargin{1} == 0
+                    answer = 'G4';
+                elseif varargin{1} == 1
+                    answer = 'G4-1';
+                else
+                    error("Input for experiment system must be either 0 for G4, 1 for G4-1, or not provided.");
+                    
+                end
+            else
+                answer = questdlg('Which system are you using?', 'System Version', 'G4', 'G4-1', 'G4');
+            end
             switch answer
                 
                 case 'G4'
