@@ -1036,8 +1036,12 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
         %Open the conductor to run an experiment
         function open_run_gui(self)
             self.check_and_disconnect_host();
+            sys = self.system.get_system_ID();  
+            con_command = ['run_con = G4_conductor_controller(' num2str(sys) ')'];
             if ~isempty(self.doc.save_filename)
-                evalin('base', 'G4_Experiment_Conductor()');
+                
+                evalin('base', con_command);
+                evalin('base', 'run_con.layout()');
                 evalin('base', 'run_con.open_g4p_file(con.doc.save_filename)');
             else
                 warndlg("Please save your experiment before running.");

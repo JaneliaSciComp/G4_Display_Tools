@@ -29,6 +29,8 @@
 %           rearing_protocol - char OR index
 %           light_cycle - char OR index
 %           comment_text - char. Can be empty or left out
+%    - system is the arena system that the experiment is running on. Currently
+% options are 0 for G4 or 1 for G4-1.
 
 % Possible run protocol indices are: 
 % 1 - Simple run protocol
@@ -49,7 +51,7 @@
 % variable with "human readable" values is created when the experiment creates the metadata file, and it
 % might replace these metadata values.
 
-function run_experiment_woGUI(filepath, metadataIn, run_test)
+function run_experiment_woGUI(filepath, metadataIn, run_test, system)
     
     %Set default run_test if not passed in
     if ~exist('run_test','var')
@@ -65,7 +67,7 @@ function run_experiment_woGUI(filepath, metadataIn, run_test)
     end
     
     %Open the conductor controller without the gui
-    con = G4_conductor_controller();
+    con = G4_conductor_controller(system);
     
     %Open the experiment path passed in.
     con.open_g4p_file(filepath);

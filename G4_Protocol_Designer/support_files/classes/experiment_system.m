@@ -1,7 +1,8 @@
 classdef experiment_system < handle
 
     properties
-
+        
+        system_ID
         possible_trial_parameters
         default_param_values % Default values for all parameters, whether or not they're used in the system
         num_screen_rows %Potential number of screen rows for this system, not the actual number on the screen you are using.
@@ -32,13 +33,14 @@ function self = experiment_system(varargin)
             else
                 answer = questdlg('Which system are you using?', 'System Version', 'G4', 'G4-1', 'G4');
             end
+            
             switch answer
                 
                 case 'G4'
                     %for each case provide a list of 0's and 1's that
                     %correspond to the list of possible parameters - 0 if
                     %that parameter is used in this system, 1 if not. 
-                    
+                    self.set_system_ID(0);
                     self.set_num_screen_rows(4);
                     %Must include 'G4_default_run_protocol' at a minimum.
                     self.set_run_protocols({'G4_default_run_protocol', ...
@@ -54,7 +56,7 @@ function self = experiment_system(varargin)
                     self.prohibited_modes = [];
 
                 case 'G4-1'
-                    
+                    self.set_system_ID(1);
                     self.set_num_screen_rows(2);
                     self.set_run_protocols({'G4_default_run_protocol', ...
                         'G4_run_protocol_blockLogging'});
@@ -109,6 +111,10 @@ function self = experiment_system(varargin)
             value = self.run_protocol_names;
         end
 
+        function value = get_system_ID(self)
+            value = self.system_ID;
+        end
+
 
         %% Setters
         function set_possible_parameters(self, new_val)
@@ -128,6 +134,10 @@ function self = experiment_system(varargin)
 
         function set_run_protocol_names(self, new_val)
             self.run_protocol_names = new_val;
+        end
+
+        function set_system_ID(self, new_val)
+            self.system_ID = new_val;
         end
 
 

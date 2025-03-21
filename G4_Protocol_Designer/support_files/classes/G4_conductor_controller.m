@@ -37,18 +37,22 @@ classdef G4_conductor_controller < handle
     methods
 
         %% constructor
-        function self = G4_conductor_controller(varargin)
-            self.set_system(experiment_system());
+        %No variables are required to be passed in but 'system' will need to be if
+        %hte user is running an experiment without the GUI. If running
+        %directly from the designer, doc and settings_con are also
+        %necessary.
+        function self = G4_conductor_controller(system)
+            if exist('system', 'var')
+                self.set_system(experiment_system(system));
+            else
+                self.set_system(experiment_system());
+            end
             self.set_model(G4_conductor_model(self.system));
             self.set_elapsed_time(0);
-            if ~isempty(varargin)
-                self.set_doc(varargin{1});
-                self.model.set_fly_name(self.model.create_fly_name(self.doc.get_top_export_path()));
-                self.set_settings_con(varargin{2});
-            else
-                self.set_doc(G4_document(self.system));
-                self.set_settings_con(G4_settings_controller());
-            end
+         
+            self.set_doc(G4_document(self.system));
+            self.set_settings_con(G4_settings_controller());
+            
 
             self.set_settings(G4_Protocol_Designer_Settings());
             fn = fieldnames(self.settings());
