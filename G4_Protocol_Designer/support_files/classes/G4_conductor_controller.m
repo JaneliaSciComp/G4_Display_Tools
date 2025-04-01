@@ -89,7 +89,7 @@ classdef G4_conductor_controller < handle
 
         function layout(self)
             self.set_view(G4_conductor_view(self));
-            self.set_fb_view(feedback_view(self, [910 17]));
+            self.set_fb_view(feedback_view(self, [930 35]));
         end
 
         function update_timestamp(self)

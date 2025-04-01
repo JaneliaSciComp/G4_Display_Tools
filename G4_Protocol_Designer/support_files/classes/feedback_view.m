@@ -35,9 +35,9 @@ classdef feedback_view < handle
            
 
             self.panel = uipanel(fig, 'Title', 'Data Monitoring', 'Fontsize', 11, ...
-                'units', 'pixels', 'Position', [placement fig_size(3)*.37, fig_size(4)-15]);
+                'units', 'pixels', 'Position', [placement fig_size(3)*.37, fig_size(4)-35]);
 
-             init_x = self.panel.Position(3);
+            init_x = self.panel.Position(3);
             init_y = self.panel.Position(4);
 
             wbf_label = uilabel(self.panel, 'Text', 'Last trial avg WBF:', ...
