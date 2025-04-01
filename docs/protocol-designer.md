@@ -31,15 +31,27 @@ If you already have a .g4p file saved and ready to run, you can open The [Experi
 
 ## Start the protocol designer
 
-In MATLAB open the file `G4_Experiment_Designer.m`, located in `G4_Display_Tools\G4_Protocol_Designer` and hit run. Alternatively, you can type `G4_Experiment_Designer` into the MATLAB command window and hit enter. This should open the "Fly Experiment Designer" in a Window that looks like this:
+In MATLAB open the file `G4_Experiment_Designer.m`, located in `G4_Display_Tools\G4_Protocol_Designer` and hit run. Alternatively, you can type `G4_Experiment_Designer` into the MATLAB command window and hit enter. 
+
+### G4 vs G4-1
+
+As of April, 2025, a new arena is being developed called G4-1. Since the Display Tools will need to work with both systems, there is now a pop up window when you first open the Designer asking you to select whether the experiment you're creating will be run on the G4 system or the G4-1 system. 
+
+![G4-1 Popup](assets/G41Popup.png){:.pop}
+
+A few things about the Designer will be different depending on which system you choose. This includes the number of screen rows available, which modes are allowed and which mode is the default, and the size of the pattern preview. Other features may be enabled or disabled depending on the system chosen. These differences are minor and do not affect the overall functioning or use of the Designer. The following documentation assumes G4 has been selected as the system, but will remain relevant if G4-1 is selected instead. 
+
+## The Designer
+
+Once you select your system, the "Fly Experiment Designer" will open in a Window that looks like this:
 
 ![Fly Protocol Designer main window](assets/protocol-designer_empty.png){:.pop}
 
 ## Check the size of the LED arena you are using
 
-LED screen arenas come in three row screens and four row screens. Which patterns you can use are determined by the screen size, so be sure to check what type of arena you're using.
+LED screen arenas come in different sizes. Which patterns you can use are determined by the screen size, so be sure to check what type of arena you're using. It may have 1, 2, 3, or 4 rows of panels.
 
-Notice the radio button at the center left of the application indicating _3 Row Screen_{:.gui-btn} or _4 Row Screen_{:.gui-btn}. Set this to the correct screen size that corresponds with your [hardware setup]({{site.baseurl}}/docs/g4_assembly.html) before doing anything else. This setting will become disabled as soon as you import a folder, so if it is incorrect when you import, you will need to restart the application.
+Notice the radio button at the center left of the application indicating _1 Row Screen_{:.gui-btn}, _2 Row Screen_{:.gui-btn}, _3 Row Screen_{:.gui-btn} or _4 Row Screen_{:.gui-btn}. Set this to the correct screen size that corresponds with your [hardware setup]({{site.baseurl}}/docs/g4_assembly.html) before doing anything else. This setting will become disabled as soon as you import a folder, so if it is incorrect when you import, you will need to restart the application. The default value when opening the Designer is set by whatever value is currently set in the `HHMI Panels Configuration.ini` file. 
 
 ## Verify your settings are correct
 
@@ -49,7 +61,7 @@ The next step after verifying your screen size is to verify your settings are co
 
 The first field in the settings panel reads _Configuration file location:_{:.gui-txt} If the path to the configuration file is incorrect, please update it by using the associated browse button or by typing the correct path into the field.
 
-Note: that if your configuration file location was incorrect, the Designer may have failed to open, and you may have gotten a matlab error indicating it could not find the configuration file. If this is the case, open the file `G4_Display_Tools\G4_Protocol_Designer_Settings.m` and replace the current configuration file path manually with the correct one. Please note that this file is set up like a text file - you are not setting a variable. Simply replace the actual path text with the new path, without changing any spaces or other characters in the file.
+Note: that if your configuration file location was incorrect upon opening the Designer, you may have gotten a warning in your matlab command window that says `Warning: A filepath from your settings file could not be found. Check settings for accuracy.` If you see this warning, it is imperative that you update these settings before going any further.
 {:.warning}
 
 Note too that the Designer will make changes to the configuration file based on your selections when creating an experiment. Depending on where your configuration file is saved, you may need admin privileges on the computer to make these edits. If you get an error along the lines of `Error using fileread. Could not open file HHMI Panels Configuration.ini`, please make sure your account is able to make changes to the configuration file. An easy way to test this is to open the configuration file separately in a text editor and try to save a change.
@@ -57,7 +69,7 @@ Note too that the Designer will make changes to the configuration file based on 
 
 ## Run, Plotting, and Processing
 
-The next three fields are paths to your default run protocol file, processing file, and plotting file. A default run protocol is provided with the G4 software, but if you'd like to learn exactly what the run protocol does and how to create your own, please see the tutorial [Create a Run Protocol](experiment-conductor_run-protocol_tutorial.md).
+The next three fields are paths to your default run protocol file, processing file, and plotting file. Several run protocols are provided with the G4 software, but if you'd like to learn exactly what the run protocol does and how to create your own, please see the tutorial [Create a Run Protocol](experiment-conductor_run-protocol_tutorial.md).
 
 Plotting and Processing refers to settings files dictating how you want your experimental data to be handled after the experiment. If you have not created these settings files, please see [Data Analysis](data-handling_analysis.md).
 
@@ -121,7 +133,7 @@ The conditions make up the majority of your experiment. Other parameters include
 
 This section will describe in detail how to create an experiment, but if you would like more detailed instructions or run into issues not addressed in this section, please see these tutorials on [creating a condition](protocol-designer_create-condition_tutorial.md) and [creating an experiment](protocol-designer_design-experiment_tutorial.md).
 
-You can start creating conditions using the files imported in the previous step. The easiest starting point is to hit the _Auto-Fill_{:.gui-btn} button. This will create a block trial for every pattern imported, as well as create a pre-trial, inter-trial, and post-trial using the first pattern. Each trial will default to mode 1 and automatically pair a position function and one analog output function to each pattern (if they exist). Durations default to double the length of the position function. Hitting _Auto-Fill_{:.gui-btn} will produce something like this:
+You can start creating conditions using the files imported in the previous step. The easiest starting point is to hit the _Auto-Fill_{:.gui-btn} button. This will create a block trial for every pattern imported, as well as create a pre-trial, inter-trial, and post-trial using the first pattern. Each trial will default to mode 1 (unless you are using the G4-1 system, in which case the default mode is 2) and automatically pair a position function and one analog output function to each pattern (if they exist). Durations default to double the length of the position function. Hitting _Auto-Fill_{:.gui-btn} will produce something like this:
 
 ![After Auto-fill](assets/protocol-designer_after_auto-fill.png "Main window of the experiment designer after hitting the Auto-Fill button"){:.pop}
 

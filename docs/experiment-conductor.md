@@ -17,6 +17,9 @@ To open this application directly from the [G4 Designer](protocol-designer.md), 
 
 If the Designer is not open, there is no need to open it. You can open the file `G4_Display_Tools\G4_Protocol_Designer\G4_Experiment_Conductor.m` in MATLAB and hit _Run_{:.gui-btn}, or type `G4_Experiment_Conductor` into the matlab command window and hit enter, to open the Conductor directly.
 
+Note: If you open the file `G4_Display_Tools\G4_Protocol_Designer\G4_Experiment_Conductor.m` you may see that a number is being passed into the function `run_con = G4_conductor_controller();`. The number being passed in represents the system being used, 0 for G4 and 1 for G4-1. Currently, G4 is the default so 0 is passed into this function. If you would like to run an experiment on the G4-1 system, you'll need to either change the 0 to a 1, or erase the input all together. If no input is provided, a pop up window will ask you which system you're using before the Conductor opens. 
+{:.info}
+
 The window that opens should look something like this:
 
 ![Experiment Conductor](assets/conductor-empty.png){:.pop}
@@ -117,7 +120,7 @@ Also beneath this will be the total time the experiment is expected to take.
 
 # Data Monitoring
 
-In the Data Monitoring Panel you'll find three plots as well as some labels. _Last trial avg WBF:_{:.gui-txt} will display, at the end of each trial, your fly's average wing beat frequency for that trial. Note that the items in the Data Monitoring panel will only update if you are using the run protocol called `G4_default_run_protocol_streaming.m`.
+In the Data Monitoring Panel you'll find three plots as well as some labels. _Last trial avg WBF:_{:.gui-txt} will display, at the end of each trial, your fly's average wing beat frequency for that trial. Note that the items in the Data Monitoring panel will only update if you are using a run protocol with `Streaming` in its name.
 
 There are three axes visible in this panel.
 
