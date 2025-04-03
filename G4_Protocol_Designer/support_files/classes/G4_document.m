@@ -133,7 +133,7 @@ classdef G4_document < handle
 
             %Get the recently opened .g4p files
             %Get info from log of recently opened .g4p files
-            recent_files_filename = 'recently_opened_g4p_files.m';
+            recent_files_filename = 'recently_opened_g4p_files.txt';
             filepath = fileparts(which(recent_files_filename));
             self.set_recent_files_filepath(fullfile(filepath, recent_files_filename));
             self.set_recent_g4p_files(strtrim(regexp( fileread(self.recent_files_filepath),'\n','split')));
