@@ -47,11 +47,11 @@ if ~exist(save_dir,'dir')
 end
 
 %create file name strings
-matFileName = fullfile(save_dir, [num2str(param.ID,'%04d') '_' filename '_G4.mat']);
+matFileName = fullfile(save_dir, strcat(num2str(param.ID,'%04d'), '_', filename, '_G4.mat'));
 if exist(matFileName,'file')
     error('pattern .mat file already exists in save folder with that name')
 end
-patFileName = fullfile(save_dir, ['pat' num2str(param.ID,'%04d') '.pat']);
+patFileName = fullfile(save_dir, strcat('pat', num2str(param.ID,'%04d'), '.pat'));
 if exist(patFileName,'file')
     error('pattern .pat file already exists in save folder with that name')
 end
