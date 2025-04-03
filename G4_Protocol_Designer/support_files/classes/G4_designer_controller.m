@@ -36,8 +36,9 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
 
             self.set_system(experiment_system());
             self.set_model(G4_designer_model());
-            self.set_doc(G4_document(self.system));
             self.set_settings_con(G4_settings_controller());
+            self.set_doc(G4_document(self.system));
+            
             self.set_preview_con(G4_preview_controller(self.doc));
             self.set_preview_on_arena(0);
 
