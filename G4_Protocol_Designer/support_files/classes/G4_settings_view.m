@@ -85,7 +85,7 @@ classdef G4_settings_view < handle
             
             %Def run protocol - textbox
             run_box_pos = self.calc_new_textbox_position(run_label_pos, gap_between_edges, textbox_label_ratio);
-            self.run_protocol_textbox = self.create_text_box(self.fig, self.con.model.settings.run_protocol_file, run_box_pos);
+            self.run_protocol_textbox = self.create_text_box(self.fig, self.con.model.settings.default_run_protocol_file, run_box_pos);
             %set(self.run_protocol_textbox);
             
             %Def run protocol - browse button
@@ -101,7 +101,7 @@ classdef G4_settings_view < handle
             %Def processing protocol - textbox
             
             proc_box_pos = self.calc_new_textbox_position(proc_label_pos, gap_between_edges, textbox_label_ratio);
-            self.proc_protocol_textbox = self.create_text_box(self.fig, self.con.model.settings.processing_file, proc_box_pos);
+            self.proc_protocol_textbox = self.create_text_box(self.fig, self.con.model.settings.default_processing_file, proc_box_pos);
             
             %Def processing protocol - browse button
             browse4_pos = self.calc_new_browse_position(proc_box_pos, gap_between_edges, button_textbox_ratio);
@@ -115,7 +115,7 @@ classdef G4_settings_view < handle
             
             %Def plot protocol - textbox
             plot_box_pos = self.calc_new_textbox_position(plot_label_pos, gap_between_edges, textbox_label_ratio);
-            self.plot_protocol_textbox = self.create_text_box(self.fig, self.con.model.settings.plotting_file, plot_box_pos);
+            self.plot_protocol_textbox = self.create_text_box(self.fig, self.con.model.settings.default_plotting_file, plot_box_pos);
             
             %Def plot protocol - browse button
             browse3_pos = self.calc_new_browse_position(plot_box_pos, gap_between_edges, button_textbox_ratio);
@@ -342,6 +342,7 @@ classdef G4_settings_view < handle
            failed(end+1) = self.con.check_valid_lightGID(self.light_gid_textbox.String);
 
            %This updates the gui with the most current model values. 
+           self.con.update_settings_file();
            self.con.update_view();
            if sum(failed) == 0
                 self.con.close_window();

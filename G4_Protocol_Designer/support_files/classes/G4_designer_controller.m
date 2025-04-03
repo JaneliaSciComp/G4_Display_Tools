@@ -8,8 +8,8 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
         view %contains all GUI objects
         preview_con %controller for the fullscreen preview
         run_con %controller for the run window - can be opened independently
+        settings_con %controller for the settings window
         doc %contains all data that is stored in the saved file
-        settings_con %controller (containing the view and model) for the settings panel
         system %object with information about the specific arena system being used (G4, G4-1, etc)
 
         %structs in which to load files as they are entered
@@ -36,8 +36,8 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
 
             self.set_system(experiment_system());
             self.set_model(G4_designer_model());
-            self.set_settings_con(G4_settings_controller());
-            self.set_doc(G4_document(self.system));
+            self.set_settings_con(G4_settings_controller(self));
+            self.set_doc(G4_document(self.system, self.settings_con));
             
             self.set_preview_con(G4_preview_controller(self.doc));
             self.set_preview_on_arena(0);
@@ -898,8 +898,7 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                 %keep instances of each class but clear all data
                 clear self.model;
                 delete(self.doc);
-                self.doc = G4_document(self.system);
-                self.set_settings_con(G4_settings_controller());
+                self.doc = G4_document(self.system, self.settings_con);
                 self.set_preview_con(G4_preview_controller(self.doc));
                 self.reset_defaults();
                 self.insert_greyed_cells();
@@ -2201,6 +2200,12 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
 
         end
 
+        function update_settings(self)
+
+            self.doc.update_settings();
+
+        end
+
         
         
 
@@ -2379,16 +2384,16 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
             self.inscreen_plot = value;
         end
 
-        function set_settings_con(self, value)
-            self.settings_con = value;
-        end
-
         function set_preview_on_arena(self, value)
             self.preview_on_arena = value;
         end
 
         function set_system(self, value)
             self.system = value;
+        end
+
+        function set_settings_con(self, value)
+            self.settings_con = value;
         end
 
 %% GETTERS
@@ -2647,16 +2652,16 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
             output = self.inscreen_plot;
         end
 
-        function output = get_settings_con(self)
-            output = self.settings_con;
-        end
-
         function output = get_preview_on_arena(self)
             output = self.preview_on_arena;
         end
 
         function output = get_system(self)
             output = self.system;
+        end
+
+        function output = get_settings_con(self)
+            output = self.settings_con;
         end
 
         

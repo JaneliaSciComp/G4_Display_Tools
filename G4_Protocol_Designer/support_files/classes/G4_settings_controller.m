@@ -1,25 +1,20 @@
 classdef G4_settings_controller < handle
-    
-    properties
-        
-        model_
-        view_
 
-    end
-  
-    properties (Dependent)
+    properties
         
         model
         view
+        con
 
     end
 
     methods
 
         %% Constructor
-        function self = G4_settings_controller(varargin)
+        function self = G4_settings_controller(con)
             %Create the model and wait for the window to be opened. 
             self.model = G4_settings_model();
+            self.con = con;
         end
         
         function layout_view(self)
@@ -47,9 +42,9 @@ classdef G4_settings_controller < handle
             self.view.temp_gid_textbox.String = self.model.settings.Experiment_Temp_Sheet_GID;
             self.view.rearing_gid_textbox.String = self.model.settings.Rearing_Protocol_Sheet_GID;
             self.view.light_gid_textbox.String = self.model.settings.Light_Cycle_Sheet_GID;
-            self.view.run_protocol_textbox.String = self.model.settings.run_protocol_file;
-            self.view.plot_protocol_textbox.String = self.model.settings.plotting_file;
-            self.view.proc_protocol_textbox.String = self.model.settings.processing_file;
+            self.view.run_protocol_textbox.String = self.model.settings.default_run_protocol_file;
+            self.view.plot_protocol_textbox.String = self.model.settings.default_plotting_file;
+            self.view.proc_protocol_textbox.String = self.model.settings.default_processing_file;
             self.view.flight_test_textbox.String = self.model.settings.test_protocol_file_flight;
             self.view.walkCam_test_textbox.String = self.model.settings.test_protocol_file_camWalk;
             self.view.walkChip_test_textbox.String = self.model.settings.test_protocol_file_chipWalk;
@@ -58,6 +53,7 @@ classdef G4_settings_controller < handle
             self.view.test_plot_textbox.String = self.model.settings.test_plotting_file;
             self.view.disabled_color_textbox.String = self.model.settings.Uneditable_Cell_Color;
             self.view.disabled_text_textbox.String = self.model.settings.Uneditable_Cell_Text;
+            self.con.update_settings();
         end
         
         %% Functions to check input values are correct. If valid, these 
@@ -87,7 +83,7 @@ classdef G4_settings_controller < handle
             if ~isempty(filepath)
                 if ischar(filepath)
                     if isfile(filepath)
-                        self.model.set_new_setting('run_protocol_file', filepath);
+                        self.model.set_new_setting('default_run_protocol_file', filepath);
                     else
                         self.create_error_box("The file path for 'Default Run Protocol' does not exist.");
                         failed = 1;
@@ -97,7 +93,7 @@ classdef G4_settings_controller < handle
                     failed = 1;
                 end
             else
-                self.model.set_new_setting('run_protocol_file', filepath);
+                self.model.set_new_setting('default_run_protocol_file', filepath);
                 
             end
         end
@@ -107,7 +103,7 @@ classdef G4_settings_controller < handle
             if ~isempty(filepath)
                 if ischar(filepath)
                     if isfile(filepath)
-                        self.model.set_new_setting('plotting_file', filepath);
+                        self.model.set_new_setting('default_plotting_file', filepath);
                     else
                         self.create_error_box("The file path for 'Default Plotting Protocol' does not exist.");
                         failed = 1;
@@ -117,7 +113,7 @@ classdef G4_settings_controller < handle
                     failed = 1;
                 end
             else
-                self.model.set_new_setting('plotting_file', filepath);
+                self.model.set_new_setting('default_plotting_file', filepath);
                 
             end
         end
@@ -127,7 +123,7 @@ classdef G4_settings_controller < handle
             if ~isempty(filepath)
                 if ischar(filepath)
                     if isfile(filepath)
-                        self.model.set_new_setting('processing_file', filepath);
+                        self.model.set_new_setting('default_processing_file', filepath);
                     else
                         self.create_error_box("The file path for 'Default Processing Protocol' does not exist.");
                         failed = 1;
@@ -137,7 +133,7 @@ classdef G4_settings_controller < handle
                     failed = 1;
                 end
             else
-                self.model.set_new_setting('processing_file', filepath);
+                self.model.set_new_setting('default_processing_file', filepath);
             end
         end
         
@@ -349,25 +345,37 @@ classdef G4_settings_controller < handle
     
         end
 
+        function update_settings_file(self)
+
+            self.model.update_settings_file();
+        end
+
 
         
         %% Setters
         
-        function set.model(self, value)
-            self.model_ = value;
+        function set_model(self, value)
+            self.model = value;
         end
-        function set.view(self, value)
-            self.view_ = value;
+        function set_view(self, value)
+            self.view = value;
         end
         
         %% Getters
         
-        function value = get.model(self)
-            value = self.model_;
+        function value = get_model(self)
+            value = self.model;
         end
-        function value = get.view(self)
-            value = self.view_;
+        function value = get_view(self)
+            value = self.view;
         end
+        function value = get_settings(self)
+            value = self.model.get_settings();
+        end
+
+        
+
+       
         
         
         

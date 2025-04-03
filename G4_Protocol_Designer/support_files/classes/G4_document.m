@@ -44,23 +44,24 @@ classdef G4_document < handle
         function_locations
         aoFunc_locations
         settings
+        settings_con
+        
 
     end
 
     methods
 
 %CONSTRUCTOR--------------------------------------------------------------
-        function self = G4_document(system)
-
-            self.set_settings(G4_Protocol_Designer_Settings());
+        function self = G4_document(system, settings_con)
+            
+            self.settings_con = settings_con;
+            self.settings = self.settings_con.get_settings();
             fn = fieldnames(self.settings);
             for i = 1:numel(fn)
                 if isstring(self.settings.(fn{i}))
                     self.settings.(fn{i}) = convertStringsToChars(self.settings.(fn{i}));
                 end
             end
-
-
             %%constructor sets rest of variables
             %Set these properties to empty values until they are needed
             self.set_top_folder_path('');
@@ -141,7 +142,6 @@ classdef G4_document < handle
         end
 
 %SETTING INDIVIDUAL TRIAL PROPERTIES---------------------------------------
-
         function set_trial_property(self, x, y, new_value, trialtype)
 
             if strcmp(trialtype, 'block')
@@ -1750,6 +1750,14 @@ classdef G4_document < handle
 
         end
 
+        function update_settings(self)
+            
+            self.set_settings(self.settings_con.get_settings());
+
+        end
+
+        
+
         %% Setters
         function set_top_folder_path(self, value)
             self.top_folder_path = value;
@@ -1942,6 +1950,8 @@ classdef G4_document < handle
             self.settings = value;
         end
 
+        
+
         %% Getters
         function value = get_top_folder_path(self)
             value = self.top_folder_path;
@@ -2092,6 +2102,7 @@ classdef G4_document < handle
         function output = get_settings(self)
             output = self.settings;
         end
+        
 
     end
 end

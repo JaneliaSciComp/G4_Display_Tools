@@ -19,24 +19,17 @@ classdef G4_settings_model < handle
             self.settings_filepath = fullfile(self.settings_filepath, settings_filename);
             self.settings_data = strtrim(regexp( fileread(settings_filename),'\n','split'));
             self.settings_data = self.settings_data((~cellfun('isempty',self.settings_data)));
-            self.settings = get_settings();
+            self.get_settings_from_file();
            
         end
 
         function set_new_setting(self, line_to_match, value)
-
-            if ischar(value)
-                value = ['"',value,'"'];
-            else
-                value = num2str(value);
-            end
+            new_line = [line_to_match, ' = ', value];
+            value = string(value);
             self.settings.(line_to_match) = value;
-
-            line_to_match = ['settings.', line_to_match, ' = '];
             line = contains(self.settings_data,line_to_match);
-
             self.settings_data{line} = new_line;
-            self.update_settings_file();
+            
 
         
         end
@@ -49,22 +42,25 @@ classdef G4_settings_model < handle
             
         end
 
-        function setts = get_settings_from_file(self)
+        function get_settings_from_file(self)
             
             for line = 1:length(self.settings_data)
                 space = strfind(self.settings_data{line}, ' ');
                 first_space = space(1);
                 var = self.settings_data{line}(1:first_space-1);
                 val_ind = first_space + 3; 
-                value = self.settings_data{line}(val_ind:end);
+                value = string(self.settings_data{line}(val_ind:end));
                 self.settings.(var) = value; 
             end
             
         end
-        
-       
 
+        function setts = get_settings(self)
+            setts = self.settings;
         end
+
+    end
+
 
         % Setters
 
