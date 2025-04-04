@@ -47,14 +47,13 @@ classdef G4_conductor_controller < handle
             else
                 self.set_system(experiment_system());
             end
-            self.set_model(G4_conductor_model(self.system));
-            self.set_elapsed_time(0);
-         
-            self.set_doc(G4_document(self.system));
-            self.set_settings_con(G4_settings_controller());
+            self.set_settings_con(G4_settings_controller(self));
+            self.set_doc(G4_document(self.system, self.settings_con));
+            self.set_settings(self.doc.get_settings())
+            self.set_model(G4_conductor_model(self.system, self.settings));
+            self.set_elapsed_time(0);        
             
-
-            self.set_settings(G4_Protocol_Designer_Settings());
+            
             fn = fieldnames(self.settings());
             for i = 1:numel(fn)
                 if isstring(self.settings.(fn{i}))
@@ -227,6 +226,12 @@ classdef G4_conductor_controller < handle
             clear('self.doc');
             self.set_doc(G4_document());
             self.fb_model.update_model_channels(self.doc)
+
+        end
+
+        function update_settings(self)
+
+            self.doc.update_settings();
 
         end
 

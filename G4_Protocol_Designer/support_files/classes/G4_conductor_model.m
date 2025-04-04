@@ -44,9 +44,9 @@ classdef G4_conductor_model < handle
     methods
 
         %CONSTRUCTOR--------------------------------------------------------------
-        function self = G4_conductor_model(system)
+        function self = G4_conductor_model(system, settings)
             self.system = system;
-            self.set_settings(G4_Protocol_Designer_Settings());
+            self.set_settings(settings);
             fn = fieldnames(self.settings);
             for i = 1:numel(fn)
                 if isstring(self.settings.(fn{i}))
@@ -54,9 +54,9 @@ classdef G4_conductor_model < handle
                 end
             end
 
-            self.set_run_protocol_file(self.settings.run_protocol_file);
-            self.set_processing_file(self.settings.processing_file);
-            self.set_plotting_file(self.settings.plotting_file);
+            self.set_run_protocol_file(self.settings.default_run_protocol_file);
+            self.set_processing_file(self.settings.default_processing_file);
+            self.set_plotting_file(self.settings.default_plotting_file);
             self.set_google_sheet_key(self.settings.Google_Sheet_Key);
            
             %This list must be in the same order as the gid strings list.
