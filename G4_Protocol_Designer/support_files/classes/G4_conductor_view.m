@@ -99,7 +99,7 @@ classdef G4_conductor_view < handle
                  'Position', [390, self.fig_size(4) - 305, 115, 85], 'ButtonPushedFcn', @self.end_early);
 
             settings_pan = uipanel(self.fig, 'Title', 'Settings', 'FontSize', 13, 'units', 'pixels', ...
-                'Position', [15, self.fig_size(4) - 215, 415, 200]);
+                'Position', [15, self.fig_size(4) - 215, 445, 200]);
             metadata_pan = uipanel(self.fig, 'Title', 'Metadata', 'units', 'pixels', ...
                 'FontSize', 13, 'Position', [settings_pan.Position(1) + settings_pan.Position(3) + 180, self.fig_size(4) - 305, 275, 305]);
             status_pan = uipanel(self.fig, 'Title', 'Status', 'FontSize', 13, 'units', 'pixels', ...
@@ -336,17 +336,17 @@ classdef G4_conductor_view < handle
                 'Position', [115, 153, 150, 18], 'ValueChangedFcn', @self.new_experiment_type);
 
             test_button = uibutton(settings_pan, 'Text', 'Run Test Protocol', ...
-                'Position', [290, 123, 120, 20], 'ButtonPushedFcn', @self.run_test_exp);
+                'Position', [320, 122, 120, 20], 'ButtonPushedFcn', @self.run_test_exp);
             
-            tdms_checkbox_label = uilabel(settings_pan, 'Text', 'Convert TDMS?', ...
-                'Position', [10, 123, 100, 15]);
+            tdms_checkbox_label = uilabel(settings_pan, 'Text', 'Convert to MATLAB?', ...
+                'Position', [10, 123, 115, 15]);
             self.convert_tdms_checkbox = uicheckbox(settings_pan, 'Value', self.con.model.convert_tdms, ...
-                'Position', [101, 123, 15, 15], 'ValueChangedFcn', @self.new_convert_tdms);
+                'Position', [126, 123, 15, 15], 'ValueChangedFcn', @self.new_convert_tdms);
             
             processing_checkbox_label = uilabel(settings_pan, 'Text', 'Processing?', ...
-                'Position', [120, 123, 75, 15]);
+                'Position', [150, 123, 67, 15]);
             self.processing_checkbox = uicheckbox(settings_pan, 'Value', self.con.model.do_processing, ...
-                'Position', [196, 123, 15, 15], 'ValueChangedFcn', @self.new_do_processing);
+                'Position', [218, 123, 15, 15], 'ValueChangedFcn', @self.new_do_processing);
             
             processing_filename_label = uilabel(settings_pan, 'Text', 'Processing Protocol:', ...
                 'Position', [10, 73, 115, 15]);
@@ -357,9 +357,9 @@ classdef G4_conductor_view < handle
             
             
             plotting_checkbox_label = uilabel(settings_pan, 'Text', 'Plotting?', ...
-                'Position', [215, 123, 55, 15]);
+                'Position', [245, 123, 50, 15]);
             self.plotting_checkbox = uicheckbox(settings_pan, 'Value', self.con.model.do_plotting, ...
-                'Position', [271, 123, 15, 15], 'ValueChangedFcn', @self.new_do_plotting);
+                'Position', [296, 123, 15, 15], 'ValueChangedFcn', @self.new_do_plotting);
             
             plotting_filename_label = uilabel(settings_pan, 'Text', 'Plotting Protocol:', ...
                 'Position', [10, 98, 115, 15]);
@@ -380,7 +380,7 @@ classdef G4_conductor_view < handle
                 'ValueChangedFcn', @self.new_num_attempts);
 
             combine_tdms_label = uilabel(settings_pan, 'Text', ...
-                'Combine multiple TDMS files into one?', 'Position', [10, 3, 210, 15]);
+                'Combine multiple data files into one?', 'Position', [10, 3, 210, 15]);
 
             self.combine_tdms_checkbox = uicheckbox(settings_pan, 'Value', ...
                 self.con.get_combine_tdms(), 'Position', [225, 3, 15, 15], ...

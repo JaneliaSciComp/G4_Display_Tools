@@ -17,6 +17,9 @@ To open this application directly from the [G4 Designer](protocol-designer.md), 
 
 If the Designer is not open, there is no need to open it. You can open the file `G4_Display_Tools\G4_Protocol_Designer\G4_Experiment_Conductor.m` in MATLAB and hit _Run_{:.gui-btn}, or type `G4_Experiment_Conductor` into the matlab command window and hit enter, to open the Conductor directly.
 
+Note: If you open the file `G4_Display_Tools\G4_Protocol_Designer\G4_Experiment_Conductor.m` you may see that a number is being passed into the function `run_con = G4_conductor_controller();`. The number being passed in represents the system being used, 0 for G4 and 1 for G4-1. Currently, G4 is the default so 0 is passed into this function. If you would like to run an experiment on the G4-1 system, you'll need to either change the 0 to a 1, or erase the input all together. If no input is provided, a pop up window will ask you which system you're using before the Conductor opens. 
+{:.info}
+
 The window that opens should look something like this:
 
 ![Experiment Conductor](assets/conductor-empty.png){:.pop}
@@ -52,9 +55,9 @@ This is important because, in the Designer settings, you have a default test pro
 
 ## Processing and Plotting
 
-There are three checkboxes here labeled `Convert TDMS?`, `Processing?`, and `Plotting?`. 
+There are three checkboxes here labeled `Convert to MATLAB?`, `Processing?`, and `Plotting?`. 
 
-Data collected during the experiment is initially saved in TDMS files, which are difficult to open and work with. If `Convert TDMS?` is selected, the Conductor will automatically convert these TDMS files to a matlab file containing your raw data. This can take a few minutes, depending on the data size and which run protocol is being used. If you do not want the software to spend 1-10 minutes doing this conversion at the end of the experiment, de-select this box. The conversion can be done manually later.  
+Data collected during the experiment is initially saved in TDMS files (if using G4), which are difficult to open and work with. If `Convert to MATLAB?` is selected, the Conductor will automatically convert these TDMS files to a matlab file containing your raw data. This can take a few minutes, depending on the data size and which run protocol is being used. If you do not want the software to spend 1-10 minutes doing this conversion at the end of the experiment, de-select this box. The conversion can be done manually later.  
 
 `Processing` refers to the step after converting the TDMS files to matlab files, which takes the raw data and processes it into datasets that are easier to read and visualize. If you want the Conductor to do this step automatically, you should have created a data processing settings file earlier in the design process. You'll need to provide the path to this settings file in the textbox labeled `Processing Protocol:`
 
@@ -95,9 +98,9 @@ Notice the next line in the Conductor asking how many times bad conditions shoul
 
 ## Combine TDMS files
 
-The last line in the Settings panel asks if you'd like to combine multiple TDMS files into one. This refers to the .mat files (named G4_TDMS_Logs_timestamp.mat) that the original TDMS files are converted into. If you have de-selected the `Convert TDMS?` option above, then you should de-select this option as well. Otherwise, it is recommended that you leave this box selected.
+The last line in the Settings panel asks if you'd like to combine multiple data files into one. This refers to the .mat files (named G4_TDMS_Logs_timestamp.mat) that the original TDMS files are converted into. If you have de-selected the `Convert to MATLAB?` option above, then you should de-select this option as well. Otherwise, it is recommended that you leave this box selected.
 
-You will end up with multiple TDMS .mat files if you are using the run protocol that creates separate logs for each repetition, OR if you use the Pause button anytime during your experiment. If you're using the protocol for separate logging, you'll end up with TDMS files for each repetition. If you use the pause button, all data collected after unpausing the experiment will be saved in a new log, since the pause button automatically halts logging. The Conductor can automatically take the converted TDMS .mat files and stitch them together into one file called G4_TDMS_Logs_Final.mat. This file does not replace the separate log files, they'll still be accessible as well. This must be done if you want to use the automatic data processing and analysis tools, but if you are using your own code to process the raw data, then you could de-select this option and skip the step of combining your separate log files into one. 
+You will end up with multiple .mat files if you are using the run protocol that creates separate logs for each repetition, OR if you use the Pause button anytime during your experiment. If you're using the protocol for separate logging, you'll end up with data files for each repetition. If you use the pause button, all data collected after unpausing the experiment will be saved in a new log, since the pause button automatically halts logging. The Conductor can automatically take the converted .mat files and stitch them together into one file called G4_TDMS_Logs_Final.mat. This file does not replace the separate log files, they'll still be accessible as well. This must be done if you want to use the automatic data processing and analysis tools, but if you are using your own code to process the raw data, then you could de-select this option and skip the step of combining your separate log files into one. 
 
 ## Run a test protocol (optional)
 
@@ -117,7 +120,7 @@ Also beneath this will be the total time the experiment is expected to take.
 
 # Data Monitoring
 
-In the Data Monitoring Panel you'll find three plots as well as some labels. _Last trial avg WBF:_{:.gui-txt} will display, at the end of each trial, your fly's average wing beat frequency for that trial. Note that the items in the Data Monitoring panel will only update if you are using the run protocol called `G4_default_run_protocol_streaming.m`.
+In the Data Monitoring Panel you'll find three plots as well as some labels. _Last trial avg WBF:_{:.gui-txt} will display, at the end of each trial, your fly's average wing beat frequency for that trial. Note that the items in the Data Monitoring panel will only update if you are using a run protocol with `Streaming` in its name.
 
 There are three axes visible in this panel.
 
