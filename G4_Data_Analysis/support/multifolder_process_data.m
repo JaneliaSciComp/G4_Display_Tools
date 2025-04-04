@@ -1,7 +1,11 @@
 %make sure process_data settings are correct before you run this
 %% file paths (user-inputs)
 %experiment folder path; exp_folder is the top folder that contains data of the individual flies
-exp_folder = uigetdir('C:\Users\kappagantular\Desktop\smallfield_V2_comparison\Results','Select folder containing genotype data');
+exp_folder = fullfile("C:\");
+new_dir = uigetdir('C:\Users\kappagantular\Desktop\smallfield_V2_comparison\Results','Select folder containing genotype data');
+if new_dir ~= 0
+    exp_folder = new_dir;
+end
 
 %setting mat file path
 set_folder= 'C:\Users\kappagantular\Desktop\smallfield_V2_comparison\processing_settings_badtrials.mat';

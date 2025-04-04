@@ -20,7 +20,11 @@ function convert_processed_file(varargin)
     %Put in link to results folder. It will go through each fly folder int he
     %results folder and convert the processed data file to the new format.
     if isempty(varargin)
-        results_folder = uigetdir;
+        results_folder = fullfile("C:\");
+        new_dir = uigetdir;
+        if new_dir ~= 0
+            results_folder = new_dir;
+        end
     else
         results_folder = varargin{1};
     end

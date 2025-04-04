@@ -1988,24 +1988,22 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
         function import_folder(self, str_to_match)
 
             if strcmp(str_to_match,'')
-                 %% fixfocus citation
-            %% Jorg Woehl (2024). fixfocus (https://github.com/JorgWoehl/fixfocus/releases/tag/v1.2), GitHub. Retrieved June 4, 2024. 
+                %% fixfocus citation
+                %% Jorg Woehl (2024). fixfocus (https://github.com/JorgWoehl/fixfocus/releases/tag/v1.2), GitHub. Retrieved June 4, 2024. 
                 ff = fixfocus();
                 path = uigetdir;
                 delete(ff);
 
             else
-                 %% fixfocus citation
-            %% Jorg Woehl (2024). fixfocus (https://github.com/JorgWoehl/fixfocus/releases/tag/v1.2), GitHub. Retrieved June 4, 2024. 
+                %% fixfocus citation
+                %% Jorg Woehl (2024). fixfocus (https://github.com/JorgWoehl/fixfocus/releases/tag/v1.2), GitHub. Retrieved June 4, 2024. 
                 ff = fixfocus();
                 path = uigetdir(['*',str_to_match,'*']);
                 delete(ff);
 
             end
 
-            if isequal(path, 0)
-                %do nothing
-            else
+            if path ~= 0
                 import_success = self.doc.import_folder(path);
                 waitfor(msgbox(import_success, 'Import Successful!'));
                 

@@ -1,4 +1,8 @@
-exp_folder = uigetdir();
+exp_folder = fullfile("C:\");
+new_dir = uigetdir();
+if new_dir ~= 0
+    exp_folder = new_dir;
+end
 settings_filename = 'da_settings';
 
 [protocol_subFiles, protocol_subFolders] = get_files_and_subdirectories(exp_folder);

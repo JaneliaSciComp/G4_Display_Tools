@@ -721,7 +721,7 @@ function choose_dir_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 userSettings;
 expDir = uigetdir(exp_path, 'Pick a Directory');
-if expDir
+if expDir ~= 0
     set(handles.exp_dir, 'string', expDir);
     set(handles.save,'enable', 'on');
     handles.saveExpDir = expDir;
