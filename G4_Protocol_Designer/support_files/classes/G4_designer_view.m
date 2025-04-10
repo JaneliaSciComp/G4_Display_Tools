@@ -153,7 +153,7 @@ classdef G4_designer_view < handle
 
             self.listbox_imported_files = uilistbox(self.f, 'Items', {'Imported files here'},  ...
                 'Position', [listbox_files_label.Position(1), listbox_files_label.Position(2) - .24*fSize(2), ...
-                .09*fSize(1), .24*fSize(2)],'ValueChangedFcn', @self.preview_selection);
+                .09*fSize(1), .24*fSize(2)], 'Tag', 'empty', 'ValueChangedFcn', @self.preview_selection);
 
              %select_imported_file_button
              uibutton(self.f, 'Text', 'Select', 'Position',  [self.listbox_imported_files.Position(1) + .5*self.listbox_imported_files.Position(3), ...
@@ -596,6 +596,7 @@ classdef G4_designer_view < handle
                  %Fill embedded list with imported files appropriate for the
                 %selected cell
                 self.provide_file_list(event);
+                
 
                 %get index of selected cell, table it resides in, and
                 %string of the file in the cell if its index is 2-7
@@ -658,6 +659,9 @@ classdef G4_designer_view < handle
                     filenames{i} = pats.(fields{i}).filename;
                 end
                 self.listbox_imported_files.Items = filenames;
+                %Update tag on embedded list to indicate the type of files
+                %in it
+                set(self.listbox_imported_files, 'Tag', 'Pats')
 
             elseif event.Indices(2) == 3
                 curr_cell = self.con.get_current_selected_cell();
@@ -691,6 +695,9 @@ classdef G4_designer_view < handle
                 end
 
                 self.listbox_imported_files.Items = filenames;
+                %Update tag on embedded list to indicate the type of files
+                %in it
+                set(self.listbox_imported_files, 'Tag', 'Funcs')
 
            elseif event.Indices(2) > 3 && event.Indices(2) < 8
 
@@ -706,6 +713,9 @@ classdef G4_designer_view < handle
                 end
 
                 self.listbox_imported_files.Items = filenames;
+                %Update tag on embedded list to indicate the type of files
+                %in it
+                set(self.listbox_imported_files, 'Tag', 'AO')
             else
                 return;
             end

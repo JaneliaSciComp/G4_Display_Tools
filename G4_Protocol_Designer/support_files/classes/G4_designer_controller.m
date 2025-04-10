@@ -1573,8 +1573,13 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
 
         function [frame_rate, dur, patfield, funcfield, aofield, file_type] = get_preview_parameters(self, is_table, file)
             curr_cell = self.get_current_selected_cell();
-            index = curr_cell.index;
-            table = curr_cell.table;
+            if is_table == 1
+                index = curr_cell.index;
+                table = curr_cell.table;
+            elseif is_table == 0
+                table = 'list';
+                index = curr_cell.index;
+            end
             file_type = '';
             patfile = '';
             funcfile = '';
@@ -1786,6 +1791,55 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                     end
                 end
                 dur = self.doc.posttrial{12}*1000;
+            elseif strcmp(table, 'list')
+
+                mode = self.doc.block_trials{index(1), 1};
+
+                 if strcmp(self.view.listbox_imported_files.Tag, 'Pats')
+                    file_type = 'pat';
+                    patfile = file;
+                end
+
+                if strcmp(self.view.listbox_imported_files.Tag, 'Funcs')
+                    file_type = 'pos';
+                    funcfile = file;
+
+                end
+
+                if strcmp(self.view.listbox_imported_files.Tag, 'AO')
+                    file_type = 'ao';
+
+                    aofile = file;
+
+
+                end
+
+                patfield = self.doc.get_pattern_field_name(patfile);
+                funcfield = self.doc.get_posfunc_field_name(funcfile);
+                aofield = self.doc.get_aofunc_field_name(aofile);
+
+                if mode == 2
+                   frame_rate = self.doc.block_trials{index(1),9};
+                else
+                    if ~strcmp(funcfield,'')
+                        if self.doc.Pos_funcs.(funcfield).pfnparam.gs_val == 1
+                            frame_rate = 1000;
+                        else
+                            frame_rate = 500;
+                        end
+                    elseif ~strcmp(patfield,'')
+                        if self.doc.Patterns.(patfield).pattern.gs_val == 1
+                            frame_rate = 1000;
+                        else
+                            frame_rate = 500;
+                        end
+                    else
+                        frame_rate = 1000;
+                    end
+                end
+
+                dur = NaN;
+
             end
         end
 
