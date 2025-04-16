@@ -224,7 +224,7 @@ function change_function_path_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 new_dir = uigetdir;
-if new_dir 
+if new_dir ~= 0
     function_path = new_dir;
     set(handles.function_path, 'String', function_path);
     %save('Pcontrol_paths.mat', 'function_path', '-append');
@@ -239,7 +239,7 @@ function change_pattern_path_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 new_dir = uigetdir;
-if new_dir 
+if new_dir ~= 0
     pattern_path = new_dir;
     set(handles.pattern_path, 'String', pattern_path);
     %save('Pcontrol_paths.mat', 'pattern_path', '-append');
@@ -253,7 +253,7 @@ function change_temp_path_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 new_dir = uigetdir;
-if new_dir 
+if new_dir ~= 0
     temp_path = new_dir;
     set(handles.temp_path, 'String', temp_path);
     save('Pcontrol_paths.mat', 'temp_path', '-append');
@@ -268,7 +268,7 @@ function change_root_path_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 new_dir = uigetdir;
-if new_dir 
+if new_dir ~= 0 
     root_path = new_dir;
     set(handles.root_path, 'String', root_path);
     save('Pcontrol_paths.mat', 'root_path', '-append');
@@ -283,7 +283,7 @@ function change_controller_path_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 new_dir = uigetdir;
-if new_dir 
+if new_dir ~= 0
     controller_path = new_dir;
     set(handles.controller_path, 'String', controller_path);
     save('Pcontrol_paths.mat', 'controller_path', '-append');
@@ -298,7 +298,7 @@ function change_cfg_path_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 new_dir = uigetdir;
-if new_dir 
+if new_dir ~= 0
     cfg_path = new_dir;
     set(handles.cfg_path, 'String', cfg_path);
     save('Pcontrol_paths.mat', 'cfg_path', '-append');

@@ -13,7 +13,11 @@ function G4_TDMS_folder2struct(exp_folder)
 
 %% configure data importing
 if nargin==0
-    exp_folder = uigetdir('C:/','Select a folder containing .TDMS files');
+    exp_folder = fullfile("C:\");
+    new_dir  = uigetdir('C:/','Select a folder containing .TDMS files');
+    if new_dir ~= 0
+        exp_folder = new_dir;
+    end
 end
 
 %get/validate directories of exp_folder and TDMS_folder

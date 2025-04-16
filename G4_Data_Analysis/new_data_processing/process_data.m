@@ -5,7 +5,11 @@ function process_data(exp_folder, processing_settings_file)
     % Get data to be processed and processing settings manually if they
     % were not provided by the user
     if nargin==0
-        exp_folder = uigetdir('C:/','Select a folder containing a G4_TDMS_Logs file');
+        exp_folder = fullfile("C:\");
+        new_dir = uigetdir('C:/','Select a folder containing a G4_TDMS_Logs file');
+        if new_dir ~= 0
+            exp_folder = new_dir;
+        end
         processing_settings_file = uigetfile('C:/','Select your processing settings file');
     end
 

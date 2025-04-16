@@ -842,7 +842,10 @@ function pushbutton4_Callback(hObject, eventdata, handles)
 % hObject    handle to pushbutton4 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-handles.save_dir = uigetdir('', 'Pick a Directory');
+newdir = uigetdir('', 'Pick a Directory');
+if newdir ~= 0
+    handles.save_dir = newdir;
+end
 set(handles.text26,'String',handles.save_dir);
 
 %set pattern ID

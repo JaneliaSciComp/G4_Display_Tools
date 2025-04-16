@@ -57,7 +57,11 @@ histogram_ylimits = [0 100; -0.3 0.3; -0.1 0.3; -0.1 0.3];
 %%%% load data and prepare for plotting
 %load G4_Processed_Data
 if nargin==0
-    exp_folder = uigetdir('C:/','Select a folder containing a G4_Processed_Data file');
+    exp_folder = fullfile("C:\");
+    new_dir = uigetdir('C:/','Select a folder containing a G4_Processed_Data file');
+    if new_dir ~= 0
+        exp_folder = new_dir;
+    end
     trial_options = [1 1 1];
 end
 files = dir(exp_folder);

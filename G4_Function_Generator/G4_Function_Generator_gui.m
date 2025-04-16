@@ -1326,8 +1326,9 @@ function pushbutton3_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-handles.save_dir = uigetdir('', 'Pick a Directory');
-if handles.save_dir ~= 0
+new_dir = uigetdir('', 'Pick a Directory');
+if new_dir ~= 0
+    handles.save_dir = new_dir;
     set(handles.text8,'String',handles.save_dir);
 else
     handles.save_dir = get(handles.text8,'String');

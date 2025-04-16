@@ -24,7 +24,11 @@ common_cond_dur = 0; %sets whether all condition durations are the same (1) or n
 %% configure data processing
 %specify exp folder to analyse and plot
 if nargin==0
-    exp_folder = uigetdir('C:/','Select a folder containing a G4_TDMS_Logs file');
+    exp_folder = fullfile("C:\");
+    new_dir = uigetdir('C:/','Select a folder containing a G4_TDMS_Logs file');
+    if new_dir ~= 0
+        exp_folder = new_dir;
+    end
     trial_options = [1 1 1]; %[pre-trial, inter-trial, post-trial]
 end
 

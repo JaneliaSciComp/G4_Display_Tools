@@ -782,18 +782,17 @@ classdef PanelsController < handle
             end                                    
         end
         
-%         % TODO: not fully working yet.
-%         function rtn = streamFrame(self, aox, aoy, frame)
-%             rtn = false;
-%             cmdData = char([50]); % 0x32
-%             frLength = length(frame);
-%             fullCmd = [cmdData dec2char(frLength, 2) dec2char(aox, 2) dec2char(aoy, 2) frame];
-%             self.write([fullCmd]);
-%             resp = self.expectResponse(0, 50, [], 0.1); 
-%             if ~isempty(resp)
-%                 rtn = true;
-%             end
-%         end
+        function rtn = streamFrame(self, aox, aoy, frame)
+            rtn = false;
+            cmdData = char([50]); % 0x32
+            frLength = length(frame);
+            fullCmd = [cmdData dec2char(frLength, 2) dec2char(aox, 2) dec2char(aoy, 2) frame];
+            self.write([fullCmd]);
+            resp = self.expectResponse(0, 50, [], 0.1); 
+            if ~isempty(resp)
+                rtn = true;
+            end
+        end
         
         function rtn = combinedCommand(self, ...
                 controlMode, patternID, functionID,...

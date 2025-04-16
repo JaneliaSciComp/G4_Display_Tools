@@ -11,7 +11,10 @@ function [g4ppath] = get_g4p_file(path)
     %If there is no g4p file, prompt the user to browse to the protocol
     %folder
     if isempty(file_index)
-        path = uigetdir(path, "Please select your protocol folder");
+        new_dir = uigetdir(path, "Please select your protocol folder");
+        if new_dir ~= 0
+            path = new_dir
+        end
         [files, ~] = get_files_and_subdirectories(path);
         file_index = find(contains(files, '.g4p'));
     end
