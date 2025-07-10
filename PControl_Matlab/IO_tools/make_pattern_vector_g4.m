@@ -40,11 +40,14 @@ for j = 1:NumPatsY
         stretch_val = stretch(i,j);
         if gs_val == 16
             stretch_val = min(stretch_val, 20);
-            frameOut = make_framevector_gs16(frame, stretch_val);
+           % frameOut = make_framevector_gs16(frame, stretch_val);
+            frameOut = pyrunfile("make_framevector_gs16.py","convertedPatternData_conv", framein=frame, stretch=stretch_val);
         elseif gs_val == 2
             stretch_val = min(stretch_val, 107);
-            frameOut = make_framevector_gs2(frame, stretch_val);
+            %frameOut = make_framevector_gs2(frame, stretch_val);
+            frameOut = pyrunfile("make_framevector_gs16.py","convertedPatternData_conv", framein=frame, stretch=stretch_val);
         end
+        frameOut = cellfun(@double, cell(frameOut));
         pat_vector = [pat_vector, frameOut];
     end
 end
