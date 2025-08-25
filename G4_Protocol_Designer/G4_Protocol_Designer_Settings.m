@@ -10,6 +10,9 @@ function settings = G4_Protocol_Designer_Settings(settingsIn)
         %% config file
         settings.Configuration_Filepath = "C:\Program Files (x86)\HHMI G4\Support Files\HHMI Panels Configuration.ini";
         
+        %% Experiment types available
+        settings.Experiment_Types = {'Flight','Camera walk', 'Chip walk'};
+
         %% Google sheet settings
         settings.Google_Sheet_Key = "1g4IYtTNq-QAaGgPDIut5P_5y6CNWU0azGazq4zguqw8";
         settings.Users_Sheet_GID = "0";

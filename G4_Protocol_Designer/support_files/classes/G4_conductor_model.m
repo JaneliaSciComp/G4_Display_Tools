@@ -246,7 +246,12 @@ classdef G4_conductor_model < handle
         end
 
         function set_experiment_type(self, new_val)
-            self.experiment_type = new_val;
+            if sum(strcmp(new_val, self.settings.Experiment_Types))>0
+                self.experiment_type = new_val;
+            else
+                warning("This experiment type is not listed in settings file.");
+            end
+            
         end
 
         function set_fly_age(self, new_val)
