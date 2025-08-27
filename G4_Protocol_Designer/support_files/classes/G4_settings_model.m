@@ -50,6 +50,11 @@ classdef G4_settings_model < handle
                 var = self.settings_data{line}(1:first_space-1);
                 val_ind = first_space + 3; 
                 value = string(self.settings_data{line}(val_ind:end));
+                
+                % If value contains ", " then split into cell array
+                if contains(value, ', ')
+                    value = strsplit(value, ', '); 
+                end
                 self.settings.(var) = value; 
             end
             

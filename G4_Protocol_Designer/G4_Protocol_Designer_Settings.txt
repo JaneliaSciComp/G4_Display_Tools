@@ -1,5 +1,5 @@
 Configuration_Filepath = /Users/lisaferguson/Documents/PC/Programming/Reiser/HHMI Panels Configuration.ini
-Experiment_Types = {'Flight', 'Camera walk', 'Chip walk'}
+Experiment_Types = Flight, Camera walk, Chip walk
 Google_Sheet_Key = 1g4IYtTNq-QAaGgPDIut5P_5y6CNWU0azGazq4zguqw8
 Users_Sheet_GID = 0
 Fly_Age_Sheet_GID = 149111612
