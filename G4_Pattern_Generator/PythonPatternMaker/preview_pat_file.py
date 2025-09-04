@@ -1,12 +1,9 @@
-# preview_pat_exact.py
+
 import struct
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.widgets import Slider
 
-# ------------------------------------------------------------------
-# Helpers for header
-# ------------------------------------------------------------------
 def read_header_and_raw(path):
     with open(path, "rb") as f:
         header = f.read(7)
@@ -17,21 +14,19 @@ def read_header_and_raw(path):
     return NumPatsX, NumPatsY, gs_val, RowN, ColN, raw
 
 def frame_size_bytes(RowN, ColN):
-    """Matches make_framevector_gs16 in writer."""
+    
     numSubpanel = 4
     subpanelMsgLength = 33
     return (ColN * subpanelMsgLength + 1) * RowN * numSubpanel
 
-# ------------------------------------------------------------------
-# Inverse of make_framevector_gs16
-# ------------------------------------------------------------------
+
 def decode_framevector_gs16(framevec, rows, cols):
-    """
-    Inverse of make_framevector_gs16.
-    framevec: 1D np.uint8 array for a single frame
-    rows, cols: full arena size
-    Returns: 2D np.uint8 image of shape (rows, cols)
-    """
+  
+    #Inverse of make_framevector_gs16.
+    #framevec: 1D np.uint8 array for a single frame
+    #rows, cols: full arena size
+    #Returns: 2D np.uint8 image of shape (rows, cols)
+    
     numSubpanel = 4
     subpanelMsgLength = 33
     idGrayScale16 = 1
@@ -44,7 +39,7 @@ def decode_framevector_gs16(framevec, rows, cols):
     n = 0
     for i in range(panelRow):
         for j in range(1, numSubpanel + 1):
-            row_header = framevec[n]  # not used in reconstruction
+            row_header = framevec[n]  
             n += 1
             for k in range(subpanelMsgLength):
                 for m in range(panelCol):
@@ -69,9 +64,7 @@ def decode_framevector_gs16(framevec, rows, cols):
                         img[panelStartRow, panelStartCol + 1] = tmp2
     return img
 
-# ------------------------------------------------------------------
-# High-level load + decode
-# ------------------------------------------------------------------
+
 def load_pat(path):
     NumPatsX, NumPatsY, gs_val, RowN, ColN, raw = read_header_and_raw(path)
     rows = RowN * 16
@@ -94,9 +87,7 @@ def load_pat(path):
     vmax = 15 if gs_val in (4, 16) else 1
     return frames, dict(frames=num_frames, rows=rows, cols=cols, vmax=vmax)
 
-# ------------------------------------------------------------------
-# Preview with slider
-# ------------------------------------------------------------------
+
 def preview_pat(path):
     frames, meta = load_pat(path)
     nframes, rows, cols, vmax = meta["frames"], meta["rows"], meta["cols"], meta["vmax"]
@@ -119,9 +110,6 @@ def preview_pat(path):
     slider.on_changed(update)
     plt.show()
 
-# ------------------------------------------------------------------
-# VS Code entry point
-# ------------------------------------------------------------------
 if __name__ == "__main__":
-    FILENAME = "pat0006.pat"   # change this to your file
+    FILENAME = "/Users/lisaferguson/Documents/PC/Programming/Reiser/PythonPatterns/pat0006.pat"   # change this to your file
     preview_pat(FILENAME)

@@ -4,12 +4,7 @@ import matplotlib.pyplot as plt
 from matplotlib.widgets import Slider
 
 def inspect_npz_file(npz_path):
-    """
-    Load and display contents of a G4 .npz pattern file.
-
-    Args:
-        npz_path (str): Path to the .npz file.
-    """
+    
     data = np.load(npz_path, allow_pickle=True)
 
     print(f"\nContents of: {npz_path}\n{'=' * 50}")
@@ -37,13 +32,7 @@ def inspect_npz_file(npz_path):
             print(f"\n{key}: {val}")
 
 def view_pattern_frames(Pats, y_index=0):
-    """
-    Visualizes the Pats array as a series of grayscale images.
     
-    Args:
-        Pats (ndarray): 4D array (rows, cols, x_frames, y_frames)
-        y_index (int): Which y-frame to visualize (defaults to 0)
-    """
     if Pats.ndim != 4:
         raise ValueError("Expected a 4D array (rows, cols, x_frames, y_frames)")
 

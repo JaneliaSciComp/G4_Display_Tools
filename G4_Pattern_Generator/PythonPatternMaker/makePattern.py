@@ -5,20 +5,20 @@ import json
 import re
 
 def pack_uint16_le(val):
-    """Pack unsigned 16-bit int as little-endian bytes."""
-    return struct.pack('<H', val)  # '<H' = little-endian unsigned short
+    #Pack unsigned 16-bit int as little-endian bytes.
+    return struct.pack('<H', val)  
 
 def make_framevector_gs16(framein, stretch):
-    """
-    Python version of make_framevector_gs16.
     
-    Parameters:
-    - framein: 2D numpy array of shape (dataRow, dataCol)
-    - stretch: optional int (0 or 1)
+    #Python version of make_framevector_gs16.
     
-    Returns:
-    - 1D numpy array of uint8
-    """
+    #Parameters:
+    #- framein: 2D numpy array of shape (dataRow, dataCol)
+    #- stretch: optional int (0 or 1)
+    
+    #Returns:
+    #- 1D numpy array of uint8
+   
 
     dataRow, dataCol = np.shape(framein)
     numSubpanel = 4
@@ -90,9 +90,7 @@ def make_pattern_vector_g4(pattern):
             else:
                 raise ValueError("Invalid gs_val")
 
-            # >>> Call your existing Python function <<<
-            # Assumes make_framevector_gs16.py defines `make_framevector_gs16(frame, stretch)`
-           #from make_framevector_gs16 import make_framevector_gs16
+           
             frameOut = make_framevector_gs16(frame, stretch_val)
 
             # Make sure it's a NumPy array of uint8 before converting to bytes
@@ -102,16 +100,16 @@ def make_pattern_vector_g4(pattern):
     return pat_vector
 
 def get_pattern_id(save_dir):
-    """
-    Finds the next available 4-digit pattern ID in the given directory.
-    Matches files named like 'pat####.pat', where #### is a 4-digit ID.
+    
+    #Finds the next available 4-digit pattern ID in the given directory.
+    #Matches files named like 'pat####.pat', where #### is a 4-digit ID.
 
-    Args:
-        save_dir (str): The directory to scan for .pat files.
+    #Args:
+        #save_dir (str): The directory to scan for .pat files.
 
-    Returns:
-        int: The next available ID (starting from 1).
-    """
+    #Returns:
+        #int: The next available ID (starting from 1).
+    
     if not os.path.exists(save_dir):
         os.makedirs(save_dir)
 
@@ -151,22 +149,22 @@ def save_pattern_g4(Pats, param, stretch, save_dir, filename):
 
     # Format file names
     pattern_id = int(param['ID'])
-    mat_basename = f"{pattern_id:04d}_{filename}_G4.npz"
+    #mat_basename = f"{pattern_id:04d}_{filename}_G4.npz"
     pat_basename = f"pat{pattern_id:04d}.pat"
 
-    mat_path = os.path.join(save_dir, mat_basename)
+    #mat_path = os.path.join(save_dir, mat_basename)
     pat_path = os.path.join(save_dir, pat_basename)
 
-    np.savez_compressed(mat_path,
-                        Pats=pattern['Pats'],
-                        x_num=pattern['x_num'],
-                        y_num=pattern['y_num'],
-                        gs_val=pattern['gs_val'],
-                        stretch=pattern['stretch'],
-                        param=json.dumps(pattern['param']),
-                        data=np.array(pattern['data'], dtype=np.uint8))
+    #np.savez_compressed(mat_path,
+    #                    Pats=pattern['Pats'],
+    #                    x_num=pattern['x_num'],
+    #                    y_num=pattern['y_num'],
+    #                    gs_val=pattern['gs_val'],
+    #                    stretch=pattern['stretch'],
+    #                    param=json.dumps(pattern['param']),
+    #                    data=np.array(pattern['data'], dtype=np.uint8))
     
-    print(f"Saved: {mat_path}")
+    #print(f"Saved: {mat_path}")
     
      # Save .pat binary file
     with open(pat_path, 'wb') as f:
