@@ -149,22 +149,22 @@ def save_pattern_g4(Pats, param, stretch, save_dir, filename):
 
     # Format file names
     pattern_id = int(param['ID'])
-    #mat_basename = f"{pattern_id:04d}_{filename}_G4.npz"
+    mat_basename = f"{pattern_id:04d}_{filename}_G4.npz"
     pat_basename = f"pat{pattern_id:04d}.pat"
 
-    #mat_path = os.path.join(save_dir, mat_basename)
+    mat_path = os.path.join(save_dir, mat_basename)
     pat_path = os.path.join(save_dir, pat_basename)
 
-    #np.savez_compressed(mat_path,
-    #                    Pats=pattern['Pats'],
-    #                    x_num=pattern['x_num'],
-    #                    y_num=pattern['y_num'],
-    #                    gs_val=pattern['gs_val'],
-    #                    stretch=pattern['stretch'],
-    #                    param=json.dumps(pattern['param']),
-    #                    data=np.array(pattern['data'], dtype=np.uint8))
+    np.savez_compressed(mat_path,
+                        Pats=pattern['Pats'],
+                        x_num=pattern['x_num'],
+                        y_num=pattern['y_num'],
+                        gs_val=pattern['gs_val'],
+                        stretch=pattern['stretch'],
+                        param=json.dumps(pattern['param']),
+                        data=np.array(pattern['data'], dtype=np.uint8))
     
-    #print(f"Saved: {mat_path}")
+    print(f"Saved: {mat_path}")
     
      # Save .pat binary file
     with open(pat_path, 'wb') as f:

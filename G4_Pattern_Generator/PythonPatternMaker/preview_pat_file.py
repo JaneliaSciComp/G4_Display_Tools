@@ -10,7 +10,10 @@ def read_header_and_raw(path):
         if len(header) < 7:
             raise ValueError("File too short to contain header.")
         NumPatsX, NumPatsY, gs_val, RowN, ColN = struct.unpack("<HHBBB", header)
+        
         raw = np.frombuffer(f.read(), dtype=np.uint8)
+        print(NumPatsX, NumPatsY, gs_val, RowN, ColN, len(raw))
+        print("Frame size:", frame_size_bytes(RowN, ColN))
     return NumPatsX, NumPatsY, gs_val, RowN, ColN, raw
 
 def frame_size_bytes(RowN, ColN):
@@ -62,13 +65,18 @@ def decode_framevector_gs16(framevec, rows, cols):
 
                         img[panelStartRow, panelStartCol] = tmp1
                         img[panelStartRow, panelStartCol + 1] = tmp2
+    print("img shape:", img.shape)
     return img
+    
 
 
 def load_pat(path):
     NumPatsX, NumPatsY, gs_val, RowN, ColN, raw = read_header_and_raw(path)
+    print("RowN, ColN:", RowN, ColN)
+
     rows = RowN * 16
     cols = ColN * 16
+    print("rows, cols:", rows, cols)
     num_frames = NumPatsX * NumPatsY
     fsize = frame_size_bytes(RowN, ColN)
 
