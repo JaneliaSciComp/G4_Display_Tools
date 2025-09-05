@@ -33,11 +33,8 @@ end
 
 function [frames, meta] = load_pat(path)
     [NumPatsX, NumPatsY, gs_val, RowN, ColN, raw] = read_header_and_raw(path);
-    disp(['RowN = ' num2str(RowN) ', ColN = ' num2str(ColN)])
-    
     rows = RowN * 16;
     cols = ColN * 16;
-    disp(['rows = ' num2str(rows) ', cols = ' num2str(cols)])
     num_frames = NumPatsX * NumPatsY;
     fsize = frame_size_bytes(RowN, ColN);
 
