@@ -2069,13 +2069,13 @@ classdef G4_designer_controller < handle %Made this handle class because was hav
                  %% fixfocus citation
             %% Jorg Woehl (2024). fixfocus (https://github.com/JorgWoehl/fixfocus/releases/tag/v1.2), GitHub. Retrieved June 4, 2024. 
                 ff = fixfocus();
-                [imported_file, path] = uigetfile('*.mat');
+                [imported_file, path] = uigetfile({'*.mat','*.pat'});
                 delete(ff);
             else
                  %% fixfocus citation
             %% Jorg Woehl (2024). fixfocus (https://github.com/JorgWoehl/fixfocus/releases/tag/v1.2), GitHub. Retrieved June 4, 2024. 
                 ff = fixfocus();
-                [imported_file, path] = uigetfile(['*',str_to_match,'*.mat']);
+                [imported_file, path] = uigetfile({['*',str_to_match,'*.mat'], ['*',str_to_match,'*.pat']});
                 delete(ff);
             end
 
