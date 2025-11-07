@@ -35,7 +35,7 @@ end
 Pats = reshape(pattern_array_3d, [rows, cols, frames, 1]);
 
 %% Set up parameters
-save_dir = '/Users/lisaferguson/Documents/PC/Programming/Reiser/PythonPatterns';
+save_dir = pwd;
 patName = '4RowSqGrate_Matlab';
 gs_val = 4;  % Grayscale value (4 or 16)
 stretch = ones(frames, 1, 'uint8');

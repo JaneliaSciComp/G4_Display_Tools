@@ -1,0 +1,88 @@
+template_version: 1
+
+experiment_info: 
+    name: 
+    date_created:
+    author: 
+
+arena_info: 
+  num_rows: 4
+  num_cols: 12
+
+experiment_structure:
+  repetitions: 3
+  randomize: true
+
+pretrial:
+  include: true
+  command: combined_command
+  command_inputs:
+    pattern: "path/to/pattern"
+    duration: 2000
+    mode: 2
+    frame_index: 1
+    frame_rate: 60
+    gain: 0
+    offset: 0
+
+block:
+  conditions:
+    - id: 1
+      command: combined_command
+      command_inputs:
+        pattern: "path/to/pattern"
+        duration: 2000
+        mode: 2
+        frame_index: 1
+        frame_rate: 60
+        gain: 0
+        offset: 0
+    
+    - id: 2
+      command: combined_command
+      command_inputs:
+        pattern: "path/to/pattern"
+        duration: 2000
+        mode: 2
+        frame_index: 1
+        frame_rate: 60
+        gain: 0
+        offset: 0
+    
+    - id: 3
+      command: combined_command
+      command_inputs:
+        pattern: "path/to/pattern"
+        duration: 2000
+        mode: 2
+        frame_index: 1
+        frame_rate: 60
+        gain: 0
+        offset: 0
+
+intertrial: 
+  include: true
+  command: combined_command
+  command_inputs:
+    pattern: "path/to/pattern"
+    duration: 2000
+    mode: 2
+    frame_index: 1
+    frame_rate: 60
+    gain: 0
+    offset: 0
+
+posttrial:
+  include: true
+  command: combined_command
+  command_inputs:
+    pattern: "path/to/pattern"
+    duration: 2000
+    mode: 2
+    frame_index: 1
+    frame_rate: 60
+    gain: 0
+    offset: 0
+
+
+
