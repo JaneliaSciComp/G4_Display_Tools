@@ -31,7 +31,7 @@ classdef PanelsController < handle
     properties (Dependent)
         isOpen;
     end
-    
+
     properties (Access = private)
         iBuf = uint8([]);  % input buffer
         prevLogStart = uint64(0);
@@ -39,8 +39,8 @@ classdef PanelsController < handle
     end
 
 
-    methods 
-        
+    methods
+
         function self = PanelsController(varargin)
             if numel(varargin) > 0
                 self.setHostName(varargin{1});
@@ -80,7 +80,7 @@ classdef PanelsController < handle
                     end
                 end
             end
-            
+
             while ~self.isOpen
                 self.tcpConn = pnet('tcpconnect', self.hostName, self.port);
                 pause(0.3);
@@ -96,7 +96,7 @@ classdef PanelsController < handle
 
         function close(self, stopHost)
             %% close Disconnect from Main Host
-            % 
+            %
             % Disconnect the connection established in
             % PanelsController.open. If stopHost is true then also stop the
             % `G4 Host.exe`.
@@ -161,7 +161,7 @@ classdef PanelsController < handle
             %
             % Triggers the 'stop display' TCP command on the G4 Main Host
             % and checks for the response.
-            % 
+            %
             % Returns true if 'stop display' was confirmed, and false if
             % either an error was reported by the G4 Main Host, an
             % unexpected response was received, or the operation timed out
@@ -216,7 +216,7 @@ classdef PanelsController < handle
                 rtn = true;
             end
         end
-        
+
         function rtn = setRootDirectory(self, dirName, createDir)
             %% setRootDirectory Set Root directory
             %
@@ -253,7 +253,7 @@ classdef PanelsController < handle
                 rtn = true;
             end
         end
-        
+
         function rtn = setActiveAOChannels(self, activeOutputChannels)
             %% setActiveAOChannels Set active analog output channels
             %
@@ -265,7 +265,7 @@ classdef PanelsController < handle
             % after 100ms.
             %
             % activeOutputChannels can be a single number between 2 and 5
-            % or an array of numbers between 2 and 5. Only Analog output 
+            % or an array of numbers between 2 and 5. Only Analog output
             % channels 2, 3, 4, and 5 can be turned on and off.
             % The channel numbers can be a source of confusion. Here we
             % define activeOutputChannel 2 as the AO2 (or ADC2) on the
@@ -283,7 +283,7 @@ classdef PanelsController < handle
             end
             %TODO implement output channels
             rtn = false;
-            cmdData = char([2 17]);  % Command 0x02 0x11            
+            cmdData = char([2 17]);  % Command 0x02 0x11
             chn = uint8(0);
             if ~isempty(find(activeOutputChannels == 2, 1))
                 chn = chn + 1;
@@ -314,7 +314,7 @@ classdef PanelsController < handle
             % Return true if the active input channels were set correctly
             % and false if an unexpected response was received or the
             % response timed out after 100ms.
-            % 
+            %
             % activeInputChannels can either be a number from 0 to 3 or an
             % array with several values from 0 to 3. The default is [0 1 2
             % 3], which means all channels are active.
@@ -325,7 +325,7 @@ classdef PanelsController < handle
                 activeInputChannels (1,:) {mustBeInteger,...
                      mustBeGreaterThanOrEqual(activeInputChannels , 0),...
                      mustBeLessThanOrEqual(activeInputChannels , 3)}...
-                    = [0 1 2 3] 
+                    = [0 1 2 3]
             end
             rtn = false;
             cmdData = char([2 19]); % Command 0x02 0x13
@@ -348,7 +348,7 @@ classdef PanelsController < handle
                 rtn = true;
             end
         end
-        
+
         function rtn = startLog(self)
             %% startLog Start logging on the the Main Host
             %
@@ -375,7 +375,7 @@ classdef PanelsController < handle
                 self.isLogRunning = true;
             end
         end
-        
+
         function rtn = stopLog(self, options)
             arguments
                 self (1,1) PanelsController
@@ -386,8 +386,8 @@ classdef PanelsController < handle
             end
             %% stopLog Stop logging on the the Main Host
             %
-            % Triggers the 'Stop Log' TCP command if the log is still 
-            % running. Returns true if logging stopped or has already 
+            % Triggers the 'Stop Log' TCP command if the log is still
+            % running. Returns true if logging stopped or has already
             % stopped, returns false if an unexpected response was
             % received or timed out after 30 seconds.
             %
@@ -444,7 +444,7 @@ classdef PanelsController < handle
                 rtn = true;
             end
         end
-        
+
         function rtn = setPatternID(self, patternID)
             arguments
                 self (1,1) PanelsController
@@ -461,7 +461,7 @@ classdef PanelsController < handle
                 rtn = true;
             end
         end
-        
+
         function setPositionX(self, position)
             arguments
                 self (1,1) PanelsController
@@ -473,7 +473,7 @@ classdef PanelsController < handle
             cmdData = char([3 112]); % Command 0x03 0x70
             self.write([cmdData dec2char(position, 2)]);
         end
-        
+
         function setPositionY(self, position)
             arguments
                 self (1,1) PanelsController
@@ -485,7 +485,7 @@ classdef PanelsController < handle
             cmdData = char([3 113]); % Command 0x03 0x71
             self.write([cmdData dec2char(position, 2)]);
         end
-        
+
         function setPatternAndPositionIDs(self, positionID, functionID)
             arguments
                 self (1,1) PanelsController
@@ -501,7 +501,7 @@ classdef PanelsController < handle
             cmdData = char([5 5]); % Command 0x05 0x05
             self.write([cmdData dec2char(positionID, 2) dec2char(functionID, 2)]);
         end
-        
+
         function rtn = setPatternFunctionID(self, patternID)
             arguments
                 self (1,1) PanelsController
@@ -518,11 +518,11 @@ classdef PanelsController < handle
                 rtn = true;
             end
         end
-        
+
         function setGain(self, gain, bias)
             %% Send a `Set-Gain` command to the controller.
             %
-            %  
+            %
             arguments
                 self (1,1) PanelsController
                 gain (1,1) {mustBeInteger,...
@@ -535,7 +535,7 @@ classdef PanelsController < handle
             cmdData = char([5 1]); % Command 0x05 0x01
             self.write([cmdData signed_16Bit_to_char(gain) signed_16Bit_to_char(bias)]);
         end
-        
+
         function rtn = setFrameRate(self, fps)
             arguments
                 self (1,1) PanelsController
@@ -574,14 +574,77 @@ classdef PanelsController < handle
                 rtn = true;
             end
         end
-        
+
+        function rtn = trialParams(self, controlMode, patternID, fps, initPos, gain, deciSeconds, waitForEnd)
+            %% trialParams Send trial parameters in a single command
+            %
+            % Triggers the 'Set control mode, pattern id, frame rate,
+            % initial position, gain, and run-time(ms)' TCP command
+            % on the G4 Main Host and checks for the correct response.
+            %
+            % Return true if the command was successful and false if either
+            % sending the command received a time out after 0.1 sec or,
+            % when waitForEnd is true, the display did not return a
+            % successful "Sequence completed" after the time specified
+            % deciSeconds.
+            %
+            % see also startDisplay, combinedCommand, setControlMode,
+            % setPatternID, setFrameRate, setGain
+            arguments
+                self (1,1) PanelsController
+                controlMode (1,1) ...
+                    {mustBeInteger, ...
+                     mustBeGreaterThanOrEqual(controlMode, 0), ...
+                     mustBeLessThanOrEqual(controlMode, 7)}
+                patternID (1,1) ...
+                    {mustBeInteger, ...
+                     mustBeGreaterThanOrEqual(patternID, 0), ...
+                     mustBeLessThanOrEqual(patternID, 65535)}
+                fps (1,1) {mustBeInteger,...
+                     mustBeGreaterThanOrEqual(fps, -32768),...
+                     mustBeLessThanOrEqual(fps, 32767)}
+                initPos (1,1) {mustBeInteger,...
+                     mustBeGreaterThanOrEqual(initPos, -32768),...
+                     mustBeLessThanOrEqual(initPos, 32767)}
+                gain (1,1) {mustBeInteger,...
+                     mustBeGreaterThanOrEqual(gain, 0),...
+                     mustBeLessThanOrEqual(gain, 65535)}
+                deciSeconds (1,1) {mustBeInteger,...
+                    mustBeGreaterThanOrEqual(deciSeconds, 0),...
+                    mustBeLessThanOrEqual(deciSeconds, 65535)}
+                waitForEnd (1,1) logical = true
+            end
+            rtn = false;
+            cmdData = uint8([12 08]); % Command 0x0c, 0x08
+            cmd = cmdData;
+            cmd = [cmd controlMode];
+            cmd = [cmd dec2char(patternID, 2)];
+            cmd = [cmd signed_16Bit_to_char(fps)];
+            cmd = [cmd signed_16Bit_to_char(initPos)];
+            cmd = [cmd dec2char(gain, 2)];
+            cmd = [cmd dec2char(deciSeconds, 2)];
+
+            self.write(cmd);
+            resp = self.expectResponse([0 1], 08, [], 0.1);
+
+            if waitForEnd == true && ~isempty(resp) && resp(2) == 0
+                resp2 = self.expectResponse(0, 33, sprintf("Sequence completed in %d ms", deciSeconds*100), deciSeconds*1.0/10 + 1);
+                disp(sprintf("Waitfor was %d and response was '%s'.",  deciSeconds, resp2)); % Debug
+                if ~isempty(resp2)
+                    rtn = true;
+                end
+            elseif waitForEnd == false && ~isempty(resp) && resp(2) == 0
+                rtn = true;
+            end
+        end
+
         function rtn = setAOFunctionID(self, aoChannel, aoFunctionID)
             %% setAOFunctionID assign an AO channel a function by ID
             %
-            % aoChannel can be a single number between 2 and 5. Only 
+            % aoChannel can be a single number between 2 and 5. Only
             % Analog output channels 2, 3, 4, and 5 can associated with a
             % function. Channels 6 and 7 can be set to a static voltage
-            % (see setAO). 
+            % (see setAO).
             % The channel numbers can be a source of confusion. Here we
             % define aoChannel 2 as the AO2 (or ADC2) on the
             % breakout box. Most versions of G4 Host might report it as
@@ -607,7 +670,7 @@ classdef PanelsController < handle
                 rtn = true;
             end
         end
-        
+
         function rtn = setAO(self, aoChannel, voltage)
             %% setAO sets the voltage on AO6 or AO7
             arguments
@@ -630,12 +693,12 @@ classdef PanelsController < handle
                 rtn = true;
             end
         end
-        
+
         function rtn = sendSyncLog(self, msgClass, msg)
             %% sendSyncLog Log information to TDMS file.
             %
             %  Triggers the 'Sync Log' TCP command. Returns true if the two
-            %  values 'msgClass' and 'msg' were successfully stored in the 
+            %  values 'msgClass' and 'msg' were successfully stored in the
             %  TDMS log files.
             arguments
                 self (1,1) PanelsController
@@ -654,7 +717,7 @@ classdef PanelsController < handle
                 rtn = true;
             end
         end
-        
+
         function rtn = sendDisplayReset(self)
             %% sendDisplayReset Reset the displays
             %
@@ -668,7 +731,7 @@ classdef PanelsController < handle
                 rtn = true;
             end
         end
-        
+
         function version = getVersion(self)
             %% getVersion Retrieve current version of G4 Host
             %
@@ -681,9 +744,9 @@ classdef PanelsController < handle
                 version = str2double(split(resp(4:end), ".", 2));
             end
         end
-        
+
         function rtn = getTreadmillData(self)
-            rtn = false; 
+            rtn = false;
             cmdData = char([1 69]); % 0x01 0x45
             self.write([cmdData]);
             resp = self.expectResponse(0, 69, [], 0.1); % TODO: This is untested a and broken
@@ -691,7 +754,7 @@ classdef PanelsController < handle
                 rtn = true;
             end
         end
-        
+
         function rtn = resetCounter(self)
             %% resetCounter
             %
@@ -704,7 +767,7 @@ classdef PanelsController < handle
                 rtn = true;
             end
         end
-        
+
         function rtn = setSPIDebug(self, enable, column)
             %% setSPIDebug enable SPI debugging
             %
@@ -736,7 +799,7 @@ classdef PanelsController < handle
                 rtn = true;
             end
         end
-        
+
         function rtn = setColorDepth(self, depth)
             %% setColorDepth Set the panel either to 2 or 16 colors
             arguments
@@ -755,12 +818,12 @@ classdef PanelsController < handle
                 rtn = true;
             end
         end
-        
+
         function setControllerParameters(self, p)
             % Used by Conductor to set all the controller values before
             % running a trial (when not using the combined command)
-           
-            % p should be a cell array as follows: 
+
+            % p should be a cell array as follows:
             % {trial_mode, pat_id, gain, offset, pos_id, frame_rate, frame_ind, ...
             % active_ao_channels, trial_ao_indices};
 
@@ -778,22 +841,22 @@ classdef PanelsController < handle
             self.setPositionX(p{7});
             for i = 1:length(p{8})
                 tmppos = p{8}(i)-1; % TODO: This seems to be needed because of the 0 padding in `G4_conductor_controller.fill_inactive_ao_indices`. Not clear why that padding is needed, though. It only seems to complicate things.
-                self.setAOFunctionID(p{8}(i), p{9}(tmppos));  
-            end                                    
+                self.setAOFunctionID(p{8}(i), p{9}(tmppos));
+            end
         end
-        
+
         function rtn = streamFrame(self, aox, aoy, frame)
             rtn = false;
             cmdData = char([50]); % 0x32
             frLength = length(frame);
             fullCmd = [cmdData dec2char(frLength, 2) dec2char(aox, 2) dec2char(aoy, 2) frame];
             self.write([fullCmd]);
-            resp = self.expectResponse(0, 50, [], 0.1); 
+            resp = self.expectResponse(0, 50, [], 0.1);
             if ~isempty(resp)
                 rtn = true;
             end
         end
-        
+
         function rtn = combinedCommand(self, ...
                 controlMode, patternID, functionID,...
                 ao0FunctionID, ao1FunctionID, ao2FunctionID, ao3FunctionID,...
@@ -801,14 +864,14 @@ classdef PanelsController < handle
                 waitForEnd)
             %% combinedCommand Send many updates in a single command
             %
-            % Triggers the 'Set control mode, pattern id, pattern function 
-            % id, ao function id, frame rate, run-time(ms)' TCP command 
+            % Triggers the 'Set control mode, pattern id, pattern function
+            % id, ao function id, frame rate, run-time(ms)' TCP command
             % on the G4 Main Host and checks for the correct response.
             %
             % Return true if the command was successful and false if either
-            % sending the command received a time out after 0.2 sec or, 
-            % when waitForEnd is true, the display did not return a 
-            % successful "Sequence completed" after the time specified 
+            % sending the command received a time out after 0.2 sec or,
+            % when waitForEnd is true, the display did not return a
+            % successful "Sequence completed" after the time specified
             % deciSeconds.
             %
             % TODO: At some point we weren't sure about the timing of this
@@ -862,10 +925,10 @@ classdef PanelsController < handle
             cmd = [cmd dec2char(ao3FunctionID, 2)];
             cmd = [cmd signed_16Bit_to_char(fps)];
             cmd = [cmd dec2char(deciSeconds, 2)];
-            
+
             self.write(cmd);
             resp = self.expectResponse([0 1], 07, [], 0.2);
-            
+
             if waitForEnd == true && ~isempty(resp) && resp(2) == 0
                 resp2 = self.expectResponse(0, 33, sprintf("Sequence completed in %d ms", deciSeconds*100), deciSeconds*1.0/10 + 1);
                 % disp(sprintf("Waitfor was %d and response was '%s'.",  deciSeconds, resp2));
@@ -876,7 +939,7 @@ classdef PanelsController < handle
                 rtn = true;
             end
         end
-        
+
         function success = write(self, data)
             %% write Send data via TCP
             %
@@ -890,7 +953,7 @@ classdef PanelsController < handle
         end
 
         %% Deprecated?
-        
+
         function startStreamingMode(self)
             cmdData = char([2, hex2dec('10'), 0]);
             self.write(cmdData);
@@ -916,7 +979,7 @@ classdef PanelsController < handle
             self.write(frameCmd);
         end
 
-        
+
         function frameCmd = getFrameCmd16(self,frame)
 
             frame = self.unInvertPanels(frame);
@@ -958,23 +1021,23 @@ classdef PanelsController < handle
                     frameOut = [frameOut i panMsg];
                 end
             end
-     
-            frameCmd = [ 50, signed_16Bit_to_char(length(frameOut)), ... 
+
+            frameCmd = [ 50, signed_16Bit_to_char(length(frameOut)), ...
                 signed_16Bit_to_char(0), signed_16Bit_to_char(0), frameOut];
 
             frameCmd = char(frameCmd);
 
         end
-        
+
         %use mex function to speed up the Matlab version getFrameCmd16
         function frameCmd = getFrameCmd16Mex(self,frame)
             stretchF = min(self.stretch, 20);
             frameOut = make_framevector_gs16(frame,stretchF);
-            frameCmd = [ 50, signed_16Bit_to_char(length(frameOut)), ... 
+            frameCmd = [ 50, signed_16Bit_to_char(length(frameOut)), ...
                 signed_16Bit_to_char(0), signed_16Bit_to_char(0), frameOut];
 
             frameCmd = char(frameCmd);
-        end        
+        end
 
         function frameCmd = getFrameCmd2(self,frame)
 
@@ -1017,24 +1080,24 @@ classdef PanelsController < handle
                     frameOut = [frameOut i panMsg];
                 end
             end
-            
-            frameCmd = [ 50, signed_16Bit_to_char(length(frameOut)), ... 
+
+            frameCmd = [ 50, signed_16Bit_to_char(length(frameOut)), ...
                 signed_16Bit_to_char(0), signed_16Bit_to_char(0), frameOut];
 
             frameCmd = char(frameCmd);
         end
-        
+
         %use mex function to speed up the Matlab version getFrameCmd2
         function frameCmd = getFrameCmd2Mex(self,frame)
             stretchF = min(self.stretch, 107);
             frameOut = make_framevector_gs2(frame, stretchF);
-            frameCmd = [ 50, signed_16Bit_to_char(length(frameOut)), ... 
+            frameCmd = [ 50, signed_16Bit_to_char(length(frameOut)), ...
                 signed_16Bit_to_char(0), signed_16Bit_to_char(0), frameOut];
 
             frameCmd = char(frameCmd);
-        end        
+        end
     end
-    
+
     methods (Access=protected)
 
         function msg = subPanelFrameToMsg16(self,subFrame)
@@ -1063,7 +1126,7 @@ classdef PanelsController < handle
         function frameNew = unInvertPanels(self,frameOrig)
             frameNew = frameOrig;
             [numRow,numCol] = size(frameNew);
-            if mod(numRow,16) ~= 0 
+            if mod(numRow,16) ~= 0
                 error('rows must be divisible by 16');
             end
             numRowPan = numRow/16;
@@ -1079,7 +1142,7 @@ classdef PanelsController < handle
             %
             %  iBuf is a FIFO buffer which only contains as many chars as
             %  defined in iBufSz
-            self.iBuf = [self.iBuf pnet(self.tcpConn, 'read', 65536, 'uint8', 'noblock')];            
+            self.iBuf = [self.iBuf pnet(self.tcpConn, 'read', 65536, 'uint8', 'noblock')];
             if length(self.iBuf) > self.iBufSz
                 self.iBuf(1, length(self.iBuf) - self.iBufSz) = [];
             end
@@ -1089,7 +1152,7 @@ classdef PanelsController < handle
             %% expectResponse Check TCP response for certain features
             arguments
                 self (1,1) PanelsController
-                rsp (1,:) uint8 
+                rsp (1,:) uint8
                 cmd (1,1) uint8
                 rspString (1,:) string
                 timeout (1,1) double = 0.1
@@ -1099,7 +1162,7 @@ classdef PanelsController < handle
             ltim = tic;
             while ~found_response && ~timedOut
                 response = [];
-                pat.start = [];                
+                pat.start = [];
                 self.pullResponse();
                 for rsp_i = rsp
                     pat.start = [pat.start uint64(strfind(self.iBuf, [rsp_i cmd])-1)];
@@ -1112,7 +1175,7 @@ classdef PanelsController < handle
                         response = char(self.iBuf(pat.start(i):pat.end(i)));
                         if (~isempty(response) && isempty(rspString)) || ...
                            (~isempty(response) && contains(response, rspString))
-                            found_response = true;            
+                            found_response = true;
                             self.iBuf(pat.start(i):pat.end(i)) = [];
                             break;
                         else
@@ -1126,7 +1189,7 @@ classdef PanelsController < handle
                 end
             end
         end
-    end 
+    end
 end % PanelsController
 
 
@@ -1136,27 +1199,27 @@ end % PanelsController
 
 function [n1,n2,m1,m2] = subPanelNumToInd(i,j,panelNum)
     switch (panelNum)
-        case 1 
+        case 1
             n1 = 1;
             n2 = 8;
             m1 = 1;
             m2 = 8;
-        case 2 
+        case 2
             n1 = 9;
             n2 = 16;
             m1 = 1;
             m2 = 8;
-        case 3 
+        case 3
             n1 = 1;
             n2 = 8;
             m1 = 9;
             m2 = 16;
-        case 4 
+        case 4
             n1 = 9;
             n2 = 16;
-            m1 = 9; 
+            m1 = 9;
             m2 = 16;
-        otherwise 
+        otherwise
             error('sub panel number out of range');
     end
 
