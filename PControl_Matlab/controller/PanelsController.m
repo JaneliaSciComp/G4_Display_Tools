@@ -150,7 +150,7 @@ classdef PanelsController < handle
         function setPort(self,port)
             %% setPort Update the host port
             if ~self.isOpen
-                self.port = port
+                self.port = port;
             else
                 warning('tcp connection open - unable to change port');
             end
@@ -209,7 +209,7 @@ classdef PanelsController < handle
             %
             % see also allOn
             rtn = false;
-            cmdData = char([1 0]); % Command 0x01 0x00
+            cmdData = uint8([1 0]); % Command 0x01 0x00
             self.write(cmdData);
             resp = self.expectResponse(0, 0, "All-Off Received", 0.3);
             if ~isempty(resp)
@@ -231,7 +231,7 @@ classdef PanelsController < handle
                 dirName (1,1) string
                 createDir (1,1) logical = true
             end
-            cmdData = char([67]);   % Command 0x43
+            cmdData = uint8([67]);   % Command 0x43
             rtn = false;
             if ~exist(dirName, 'dir') % doesn't exist
                 if createDir
@@ -283,7 +283,7 @@ classdef PanelsController < handle
             end
             %TODO implement output channels
             rtn = false;
-            cmdData = char([2 17]);  % Command 0x02 0x11
+            cmdData = uint8([2 17]);  % Command 0x02 0x11
             chn = uint8(0);
             if ~isempty(find(activeOutputChannels == 2, 1))
                 chn = chn + 1;
@@ -328,7 +328,7 @@ classdef PanelsController < handle
                     = [0 1 2 3]
             end
             rtn = false;
-            cmdData = char([2 19]); % Command 0x02 0x13
+            cmdData = uint8([2 19]); % Command 0x02 0x13
             chn = uint8(0);
             if ~isempty(find(activeInputChannels == 0, 1))
                 chn = chn + 1;
@@ -363,7 +363,7 @@ classdef PanelsController < handle
                 return;
             end
             rtn = false;
-            cmdData = char([1 65]); % Command 0x01 0x41
+            cmdData = uint8([1 65]); % Command 0x01 0x41
             while toc(self.prevLogStart)<1
                 pause(0.01);
             end
@@ -397,7 +397,7 @@ classdef PanelsController < handle
                 return;
             end
             rtn = false;
-            cmdData = char([1 64]); % Command 0x01 0x40
+            cmdData = uint8([1 64]); % Command 0x01 0x40
             self.write(cmdData);
             resp = self.expectResponse(0, 64, [], options.timeout);
             if ~isempty(resp)
@@ -437,7 +437,7 @@ classdef PanelsController < handle
                      mustBeLessThanOrEqual(controlMode, 7)}
             end
             rtn = false;
-            cmdData = char([2 16]); % Command 0x02 0x10
+            cmdData = uint8([2 16]); % Command 0x02 0x10
             self.write([cmdData controlMode]);
             resp = self.expectResponse([0 1], 16, [], 0.1);
             if ~isempty(resp) && uint8(resp(2)) == 0
@@ -454,7 +454,7 @@ classdef PanelsController < handle
                      mustBeLessThanOrEqual(patternID, 65535)}
             end
             rtn = false;
-            cmdData = char([3 3]); % Command 0x03 0x03
+            cmdData = uint8([3 3]); % Command 0x03 0x03
             self.write([cmdData dec2char(patternID, 2)]);
             resp = self.expectResponse([0 1], 3, [], 0.1);
             if ~isempty(resp) && uint8(resp(2)) == 0
@@ -470,7 +470,7 @@ classdef PanelsController < handle
                      mustBeGreaterThanOrEqual(position, 0),...
                      mustBeLessThanOrEqual(position, 65535)}
             end
-            cmdData = char([3 112]); % Command 0x03 0x70
+            cmdData = uint8([3 112]); % Command 0x03 0x70
             self.write([cmdData dec2char(position, 2)]);
         end
 
@@ -482,7 +482,7 @@ classdef PanelsController < handle
                      mustBeGreaterThanOrEqual(position, 0),...
                      mustBeLessThanOrEqual(position, 65535)}
             end
-            cmdData = char([3 113]); % Command 0x03 0x71
+            cmdData = uint8([3 113]); % Command 0x03 0x71
             self.write([cmdData dec2char(position, 2)]);
         end
 
@@ -498,7 +498,7 @@ classdef PanelsController < handle
                      mustBeGreaterThanOrEqual(functionID, 0),...
                      mustBeLessThanOrEqual(functionID, 65535)}
             end
-            cmdData = char([5 5]); % Command 0x05 0x05
+            cmdData = uint8([5 5]); % Command 0x05 0x05
             self.write([cmdData dec2char(positionID, 2) dec2char(functionID, 2)]);
         end
 
@@ -511,7 +511,7 @@ classdef PanelsController < handle
                     mustBeLessThanOrEqual(patternID, 65535)}
             end
             rtn = false;
-            cmdData = char([3 21]); % Command 0x03 0x15
+            cmdData = uint8([3 21]); % Command 0x03 0x15
             self.write([cmdData dec2char(patternID, 2)]);
             resp = self.expectResponse([0 1], 21, "Pattern Function", 0.1);
             if ~isempty(resp) && uint8(resp(2)) == 0
@@ -532,7 +532,7 @@ classdef PanelsController < handle
                      mustBeGreaterThanOrEqual(bias, -32768),...
                      mustBeLessThanOrEqual(bias, 32767)}
             end
-            cmdData = char([5 1]); % Command 0x05 0x01
+            cmdData = uint8([5 1]); % Command 0x05 0x01
             self.write([cmdData signed_16Bit_to_char(gain) signed_16Bit_to_char(bias)]);
         end
 
@@ -544,7 +544,7 @@ classdef PanelsController < handle
                      mustBeLessThanOrEqual(fps, 32767)}
             end
             rtn = false;
-            cmdData = char([3 18]); % Command 0x03 0x12
+            cmdData = uint8([3 18]); % Command 0x03 0x12
             self.write([cmdData signed_16Bit_to_char(fps)]);
             resp = self.expectResponse([0 1], 18, [], 0.1);
             if ~isempty(resp) && uint8(resp(2)) == 0
@@ -561,7 +561,7 @@ classdef PanelsController < handle
                 waitForEnd (1,1) logical = true
             end
             rtn = false;
-            cmdData = char([3 33]); % Command 0x03 0x21
+            cmdData = uint8([3 33]); % Command 0x03 0x21
             self.write([cmdData dec2char(deciSeconds, 2)]);
             resp = self.expectResponse([0 1], 33, [], 0.1);
             if waitForEnd == true && ~isempty(resp) && resp(2) == 0
@@ -662,7 +662,7 @@ classdef PanelsController < handle
                     mustBeLessThanOrEqual(aoFunctionID, 65535)}
             end
             rtn = false;
-            cmdData = char([4 49]); % 0x04 0x31
+            cmdData = uint8([4 49]); % 0x04 0x31
             chn = cast(aoChannel-2, "uint8");
             self.write([cmdData chn dec2char(aoFunctionID, 2)]);
             resp = self.expectResponse([0 1], 49, [], 0.1);
@@ -683,7 +683,7 @@ classdef PanelsController < handle
                     mustBeLessThanOrEqual(voltage, 10)}
             end
             rtn = false;
-            cmdData = char([4 50]); % 0x04 0x32
+            cmdData = uint8([4 50]); % 0x04 0x32
             chnl = aoChannel - 5;
             volVar = voltage/10 * intmax('int16'); % TODO use ADConvert?
             volTrans = mod(int32(intmax('uint16')) + int32(volVar), int32(intmax('uint16')));
@@ -709,7 +709,7 @@ classdef PanelsController < handle
                     mustBeLessThanOrEqual(msg, 9223372036854775807)}
             end
             rtn = false;
-            cmdData = char([10 71]); % 0x0A 0x47
+            cmdData = uint8([10 71]); % 0x0A 0x47
             alltogethernow = [cmdData dec2char(msgClass, 1) fliplr(dec2char(msg, 8))];
             self.write(alltogethernow);
             resp = self.expectResponse(0, 71, [], 0.1);
@@ -724,7 +724,7 @@ classdef PanelsController < handle
             %  Triggers the 'Display Reset' TCP command. Returns true if
             %  the reset command returns the expected TCP response.
             rtn = false;
-            cmdData = char([1 1]); % 0x01 0x01
+            cmdData = uint8([1 1]); % 0x01 0x01
             self.write([cmdData]);
             resp = self.expectResponse(0, 1, "Reset Command Sent to FPGA", 0.1);
             if ~isempty(resp)
@@ -737,7 +737,7 @@ classdef PanelsController < handle
             %
             %  Triggers the 'Get Version' TCP command. T
             version = [0];
-            cmdData = char([1 70]); % 0x01 0x46
+            cmdData = uint8([1 70]); % 0x01 0x46
             self.write([cmdData]);
             resp = self.expectResponse(0, 70, [], 0.1);
             if length(resp) > 4
@@ -747,7 +747,7 @@ classdef PanelsController < handle
 
         function rtn = getTreadmillData(self)
             rtn = false;
-            cmdData = char([1 69]); % 0x01 0x45
+            cmdData = uint8([1 69]); % 0x01 0x45
             self.write([cmdData]);
             resp = self.expectResponse(0, 69, [], 0.1); % TODO: This is untested a and broken
             if ~isempty(resp)
@@ -760,7 +760,7 @@ classdef PanelsController < handle
             %
             %  Trigger 'Reset Counter' TCP command.
             rtn = false;
-            cmdData = char([1 66]); % 0x01 0x42
+            cmdData = uint8([1 66]); % 0x01 0x42
             self.write([cmdData]);
             resp = self.expectResponse(0, 66, "Counter has been reset", 0.1);
             if ~isempty(resp)
@@ -788,7 +788,7 @@ classdef PanelsController < handle
                     'Cannot start SPI debugging after logging.');
                 throw(ME);
             end
-            cmdData = char([3 80]); % 0x03 0x50
+            cmdData = uint8([3 80]); % 0x03 0x50
             onoff = 0;
             if enable
                 onoff = 1;
@@ -807,7 +807,7 @@ classdef PanelsController < handle
                 depth (1,1) {mustBeMember(depth, {'2', '16'})}
             end
             rtn = false;
-            cmdData = char([2 6]); % 0x02 0x06
+            cmdData = uint8([2 6]); % 0x02 0x06
             depthBit = 0;
             if str2double(depth) == 16
                 depthBit = 1;
@@ -847,7 +847,7 @@ classdef PanelsController < handle
 
         function rtn = streamFrame(self, aox, aoy, frame)
             rtn = false;
-            cmdData = char([50]); % 0x32
+            cmdData = uint8([50]); % 0x32
             frLength = length(frame);
             fullCmd = [cmdData dec2char(frLength, 2) dec2char(aox, 2) dec2char(aoy, 2) frame];
             self.write([fullCmd]);
@@ -955,7 +955,7 @@ classdef PanelsController < handle
         %% Deprecated?
 
         function startStreamingMode(self)
-            cmdData = char([2, hex2dec('10'), 0]);
+            cmdData = uint8([2, hex2dec('10'), 0]);
             self.write(cmdData);
         end
 
