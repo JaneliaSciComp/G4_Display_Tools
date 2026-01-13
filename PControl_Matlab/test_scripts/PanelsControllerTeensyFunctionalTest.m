@@ -6,7 +6,7 @@ classdef PanelsControllerTeensyFunctionalTest < matlab.unittest.TestCase
 
     methods(TestMethodSetup)
         function startNewHost(testCase)
-            testCase.panelsController = PanelsController('192.168.10.62');
+            testCase.panelsController = PanelsController('10.103.40.25');
             testCase.panelsController.open(false);
         end
      end
@@ -98,7 +98,18 @@ classdef PanelsControllerTeensyFunctionalTest < matlab.unittest.TestCase
             end
             testCase.panelsController.stopLog();
         end
-        
+
+        function g41CombinedCommand(testCase)
+            % New "combined" command. 
+            controlMode = 2;
+            patternID = 1;
+            fps = 20;
+            initPos = 0;
+            gain = 0;
+            deciSeconds = 10;
+            testCase.panelsController.trialParams(controlMode, patternID, fps, initPos, gain, deciSeconds);
+        end
+
         function paintNumbers(testCase)
             nmb = zeros(16*2, 16*12);
             % one
@@ -186,6 +197,7 @@ classdef PanelsControllerTeensyFunctionalTest < matlab.unittest.TestCase
             end
         end
 
+        
 
     end
      

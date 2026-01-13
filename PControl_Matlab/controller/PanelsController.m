@@ -566,7 +566,7 @@ classdef PanelsController < handle
             resp = self.expectResponse([0 1], 33, [], 0.1);
             if waitForEnd == true && ~isempty(resp) && resp(2) == 0
                 resp2 = self.expectResponse(0, 33, sprintf("Sequence completed in %d ms", deciSeconds*100), deciSeconds*1.0/10 + 1);
-                % disp(sprintf("Waitfor was %d and response was '%s'.",  deciSeconds, resp2));
+                % fprintf("Waitfor was %d and response was '%s'.\n",  deciSeconds, resp2);
                 if ~isempty(resp2)
                     rtn = true;
                 end
@@ -628,8 +628,8 @@ classdef PanelsController < handle
             resp = self.expectResponse([0 1], 08, [], 0.1);
 
             if waitForEnd == true && ~isempty(resp) && resp(2) == 0
-                resp2 = self.expectResponse(0, 33, sprintf("Sequence completed in %d ms", deciSeconds*100), deciSeconds*1.0/10 + 1);
-                disp(sprintf("Waitfor was %d and response was '%s'.",  deciSeconds, resp2)); % Debug
+                resp2 = self.expectResponse(0, 08, sprintf("Sequence completed in %d ms", deciSeconds*100), deciSeconds*1.0/10 + 1);
+                % fprintf("Waitfor was %d and response was '%s'.\n",  deciSeconds, resp2); % Debug
                 if ~isempty(resp2)
                     rtn = true;
                 end
@@ -931,7 +931,7 @@ classdef PanelsController < handle
 
             if waitForEnd == true && ~isempty(resp) && resp(2) == 0
                 resp2 = self.expectResponse(0, 33, sprintf("Sequence completed in %d ms", deciSeconds*100), deciSeconds*1.0/10 + 1);
-                % disp(sprintf("Waitfor was %d and response was '%s'.",  deciSeconds, resp2));
+                % fprintf("Waitfor was %d and response was '%s'.\n",  deciSeconds, resp2);
                 if ~isempty(resp2)
                     rtn = true;
                 end
